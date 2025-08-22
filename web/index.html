@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="fr" data-color-scheme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnalyLit V4.0 - Analyse de Littérature Assistée par IA</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔬</text></svg>">
+</head>
+<body>
+    <!-- ===== EN-TÊTE DE L'APPLICATION ===== -->
+    <header class="app-header">
+        <div class="container app-header__content">
+            <div class="app-header__left">
+                <h1 class="app-header__title">
+                    <span class="app-header__icon">🔬</span>
+                    AnalyLit
+                    <span class="app-header__subtitle">V4.0</span>
+                </h1>
+            </div>
+            <div class="app-header__right">
+                <div class="connection-status">
+                    <span>État:</span>
+                    <span data-connection-status>❓</span>
+                </div>
+                <div class="notification-indicator" id="notificationIndicator" style="display: none;">
+                    🔔<span class="notification-indicator__count">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== BARRE DE NAVIGATION ===== -->
+    <nav class="app-nav">
+        <div class="container">
+            <ul class="app-nav__list">
+                <li class="app-nav__item"><button class="app-nav__button app-nav__button--active" data-section="projects">📋 Projets</button></li>
+                <li class="app-nav__item"><button class="app-nav__button" data-section="search">🔍 Recherche</button></li>
+                <li class="app-nav__item"><button class="app-nav__button" data-section="results">📊 Résultats</button></li>
+                <li class="app-nav__item"><button class="app-nav__button" data-section="validation">✅ Validation</button></li>
+                <li class="app-nav__item"><button class="app-nav__button" data-section="analysis">📈 Analyses</button></li>
+                <li class="app-nav__item"><button class="app-nav__button" data-section="import">📥 Import PDF</button></li>
+                <li class="app-nav__item"><button class="app-nav__button" data-section="chat">💬 Chat</button></li>
+                <li class="app-nav__item"><button class="app-nav__button" data-section="settings">⚙️ Paramètres</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ===== CONTENU PRINCIPAL ===== -->
+    <main class="app-main">
+        <div class="container">
+            <!-- ===== SECTION : PROJETS ===== -->
+            <section id="projectsSection" class="section">
+                <div class="section-header">
+                    <div class="section-header__content">
+                        <h2>📋 Gestion des Projets</h2>
+                        <p>Créez et gérez vos projets d'analyse de littérature scientifique.</p>
+                    </div>
+                    <div class="section-header__actions">
+                        <button id="createProjectBtn" class="btn btn--primary">✨ Nouveau Projet</button>
+                    </div>
+                </div>
+                <div class="section__content--split">
+                    <div class="projects-list-container">
+                        <ul id="projectsList" class="project-list">
+                            <div class="projects-empty">
+                                <p>Chargement des projets...</p>
+                            </div>
+                        </ul>
+                    </div>
+                    <div class="project-detail-container" id="projectDetail">
+                        <div id="projectPlaceholder" class="projects-empty">
+                            <div class="projects-empty__icon">👈</div>
+                            <h4>Sélectionnez un projet</h4>
+                            <p>Sélectionnez un projet dans la liste de gauche pour voir ses détails et lancer des analyses.</p>
+                        </div>
+                        <div id="projectDetailContent" class="hidden"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SECTION : RECHERCHE MULTI-BASES ===== -->
+            <section id="searchSection" class="section hidden">
+                <div class="section-header">
+                    <h2>🔍 Recherche Multi-Bases de Données</h2>
+                    <p>Recherchez dans plusieurs bases de données scientifiques simultanément.</p>
+                </div>
+                <div id="searchContainer">
+                    <div class="search-interface">
+                        <div class="search-form-card">
+                            <h3>Configuration de la Recherche</h3>
+                            <form id="multiSearchForm">
+                                <div class="form-group">
+                                    <label for="searchQuery" class="form-label">Requête de recherche</label>
+                                    <textarea id="searchQuery" class="form-control" rows="3" placeholder="Ex: therapeutic alliance AND digital health" required></textarea>
+                                    <small class="form-text">Utilisez les opérateurs booléens (AND, OR, NOT) pour affiner votre recherche.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Bases de données à interroger</label>
+                                    <div class="checkbox-grid" id="databaseSelection">
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" name="databases" value="pubmed" checked>
+                                            <span>PubMed (Biomédical)</span>
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" name="databases" value="arxiv">
+                                            <span>arXiv (Prépublications)</span>
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" name="databases" value="crossref">
+                                            <span>CrossRef (Métadonnées)</span>
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" name="databases" value="ieee">
+                                            <span>IEEE Xplore (Technique)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="maxResults" class="form-label">Résultats max par base</label>
+                                    <input type="number" id="maxResults" class="form-control" value="50" min="10" max="200">
+                                </div>
+                                <button type="submit" class="btn btn--primary btn--full-width">🚀 Lancer la Recherche</button>
+                            </form>
+                        </div>
+                        <div id="searchResults" class="search-results-container">
+                            <div class="search-placeholder">
+                                <div class="search-placeholder__icon">🔍</div>
+                                <h4>Aucune recherche lancée</h4>
+                                <p>Configurez votre recherche et cliquez sur "Lancer la Recherche".</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SECTION : RÉSULTATS ===== -->
+            <section id="resultsSection" class="section hidden">
+                <div id="resultsContainer">
+                    <div class="results-placeholder">
+                        <div class="results-placeholder__icon">📊</div>
+                        <h4>Aucun résultat disponible</h4>
+                        <p>Sélectionnez un projet avec des résultats pour les visualiser ici.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SECTION : VALIDATION ===== -->
+            <section id="validationSection" class="section hidden">
+                <div id="validationContainer">
+                    <div class="validation-placeholder">
+                        <div class="validation-placeholder__icon">✅</div>
+                        <h4>Aucune validation disponible</h4>
+                        <p>Sélectionnez un projet en mode "validation" pour commencer.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SECTION : ANALYSES STATISTIQUES ===== -->
+            <section id="analysisSection" class="section hidden">
+                <div class="section-header">
+                    <h2>📈 Analyses Statistiques</h2>
+                    <p>Lancez des analyses avancées sur vos données extraites.</p>
+                </div>
+                <div id="analysisContainer" class="analysis-grid"></div>
+            </section>
+
+            <!-- ===== SECTION : IMPORT PDF ===== -->
+            <section id="importSection" class="section hidden">
+                <div class="section-header">
+                    <h2>📥 Import de PDF</h2>
+                    <p>Importez des fichiers PDF pour enrichir vos analyses.</p>
+                </div>
+                <div id="importContainer" class="import-container">
+                    <div class="import-placeholder">
+                        <div class="import-placeholder__icon">👈</div>
+                        <h4>Sélectionnez un projet</h4>
+                        <p>Sélectionnez un projet pour importer ses PDF.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SECTION : CHAT ===== -->
+            <section id="chatSection" class="section hidden">
+                <div class="section-header">
+                    <h2>💬 Chat avec le Corpus</h2>
+                    <p>Posez des questions sur les documents de vos projets.</p>
+                </div>
+                <div id="chatContainer" class="chat-interface">
+                    <div class="chat-placeholder">
+                        <div class="chat-placeholder__icon">👈</div>
+                        <h4>Sélectionnez un projet</h4>
+                        <p>Sélectionnez un projet pour discuter avec ses documents.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SECTION : PARAMÈTRES ===== -->
+            <section id="settingsSection" class="section hidden">
+                <div class="section-header">
+                    <h2>⚙️ Paramètres & Configuration</h2>
+                    <p>Configurez les modèles IA, prompts et autres paramètres.</p>
+                </div>
+                <div id="settingsContainer" class="settings-grid"></div>
+            </section>
+        </div>
+    </main>
+
+    <!-- ===== MODALES ===== -->
+    <!-- Modale Nouveau Projet -->
+    <div id="newProjectModal" class="modal">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3>✨ Créer un nouveau projet</h3>
+                <button class="modal__close" onclick="closeModal('newProjectModal')">&times;</button>
+            </div>
+            <form id="newProjectForm">
+                <div class="form-group">
+                    <label for="projectName" class="form-label">Nom du projet</label>
+                    <input type="text" id="projectName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="projectDescription" class="form-label">Description</label>
+                    <textarea id="projectDescription" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="analysisMode" class="form-label">Mode d'analyse</label>
+                    <select id="analysisMode" class="form-control">
+                        <option value="screening">Pré-sélection (Screening)</option>
+                        <option value="full_extraction">Extraction détaillée</option>
+                        <option value="validation">Validation manuelle</option>
+                    </select>
+                </div>
+                <div class="modal__actions">
+                    <button type="button" class="btn btn--secondary" onclick="closeModal('newProjectModal')">Annuler</button>
+                    <button type="submit" class="btn btn--primary">Créer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modale Lancer Pipeline -->
+    <div id="runPipelineModal" class="modal">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3>🚀 Lancer l'analyse</h3>
+                <button class="modal__close" onclick="closeModal('runPipelineModal')">&times;</button>
+            </div>
+            <form id="runPipelineForm">
+                <div class="form-group">
+                    <label for="pipelineSourceSelect" class="form-label">Source des articles</label>
+                    <select id="pipelineSourceSelect" class="form-control">
+                        <option value="manual">Saisie manuelle des IDs</option>
+                        <option value="search_results">Résultats de recherche existants</option>
+                    </select>
+                </div>
+                <div class="form-group" id="manualIdsGroup">
+                    <label for="pmidsTextarea" class="form-label">Liste des IDs (un par ligne)</label>
+                    <textarea id="pmidsTextarea" class="form-control" rows="10" placeholder="12345678&#10;87654321&#10;..."></textarea>
+                    <small class="form-text">PMIDs, DOIs, ou IDs selon la base de données</small>
+                </div>
+                <div class="form-group">
+                    <label for="pipelineProfileSelect" class="form-label">Profil d'analyse</label>
+                    <select id="pipelineProfileSelect" class="form-control"></select>
+                </div>
+                <div class="form-group" id="pipelineGridContainer" style="display: none;">
+                    <label for="pipelineGridSelect" class="form-label">Grille d'extraction</label>
+                    <select id="pipelineGridSelect" class="form-control"></select>
+                </div>
+                <div class="modal__actions">
+                    <button type="button" class="btn btn--secondary" onclick="closeModal('runPipelineModal')">Annuler</button>
+                    <button type="submit" class="btn btn--primary">Lancer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modale Créer/Modifier Grille -->
+    <div id="gridModal" class="modal">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3 id="gridModalTitle">Créer une grille d'extraction</h3>
+                <button class="modal__close" onclick="closeModal('gridModal')">&times;</button>
+            </div>
+            <form id="gridForm">
+                <input type="hidden" id="gridIdInput">
+                <div class="form-group">
+                    <label for="gridNameInput" class="form-label">Nom de la grille</label>
+                    <input type="text" id="gridNameInput" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Champs d'extraction</label>
+                    <div id="gridFieldsContainer"></div>
+                    <button type="button" id="addGridFieldBtn" class="btn btn--secondary btn--sm mt-8">+ Ajouter un champ</button>
+                </div>
+                <div class="modal__actions">
+                    <button type="button" class="btn btn--secondary" onclick="closeModal('gridModal')">Annuler</button>
+                    <button type="submit" class="btn btn--primary">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modale Modifier Prompt -->
+    <div id="editPromptModal" class="modal">
+        <div class="modal__content modal__content--large">
+            <div class="modal__header">
+                <h3 id="promptModalTitle">Modifier le prompt</h3>
+                <button class="modal__close" onclick="closeModal('editPromptModal')">&times;</button>
+            </div>
+            <form id="promptForm">
+                <input type="hidden" id="promptIdInput">
+                <p id="promptDescription" class="form-text"></p>
+                <div class="form-group">
+                    <label for="promptTemplateTextarea" class="form-label">Template du prompt</label>
+                    <textarea id="promptTemplateTextarea" class="form-control" rows="15"></textarea>
+                </div>
+                <div class="modal__actions">
+                    <button type="button" class="btn btn--secondary" onclick="closeModal('editPromptModal')">Annuler</button>
+                    <button type="submit" class="btn btn--primary">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modale Gérer Profils -->
+    <div id="profileModal" class="modal">
+        <div class="modal__content modal__content--large">
+            <div class="modal__header">
+                <h3 id="profileModalTitle">Créer un profil d'analyse</h3>
+                <button class="modal__close" onclick="closeModal('profileModal')">&times;</button>
+            </div>
+            <form id="profileForm">
+                <input type="hidden" id="profileIdInput">
+                <div class="form-group">
+                    <label for="profileNameInput" class="form-label">Nom du profil</label>
+                    <input type="text" id="profileNameInput" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="profilePreprocessSelect" class="form-label">Modèle de Pré-sélection</label>
+                    <select id="profilePreprocessSelect" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="profileExtractSelect" class="form-label">Modèle d'Extraction</label>
+                    <select id="profileExtractSelect" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="profileSynthesisSelect" class="form-label">Modèle de Synthèse & Chat</label>
+                    <select id="profileSynthesisSelect" class="form-control" required></select>
+                </div>
+                <div class="modal__actions">
+                    <button type="button" class="btn btn--secondary" onclick="closeModal('profileModal')">Annuler</button>
+                    <button type="submit" class="btn btn--primary">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== ÉLÉMENTS UTILITAIRES ===== -->
+    <!-- Overlay de chargement -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-overlay__content">
+            <div class="loading-spinner"></div>
+            <p id="loadingMessage" class="loading-overlay__message">Chargement...</p>
+        </div>
+    </div>
+
+    <!-- Conteneur pour les notifications (toasts) -->
+    <div id="toastContainer" class="toast-container"></div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
