@@ -1,0 +1,65 @@
+# AnalyLit V4.0 - Dockerfile pour le serveur web avec support GPU
+FROM nvidia/cuda:12.3.1-runtime-ubuntu22.04
+
+# Éviter les prompts interactifs
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Paris
+
+# Installation Python 3.11
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    tzdata \
+    && add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update && apt-get install -y \
+    python3.11 \
+    python3.11-dev \
+    python3.11-venv \
+    python3-pip \
+    gcc \
+    g++ \
+    curl \
+    build-essential \
+    git \
+    && ln -s /usr/bin/python3.11 /usr/bin/python \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Mise à jour de pip pour Python 3.11
+RUN python -m pip install --upgrade pip
+
+# Installation des requirements Python
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Variables d'environnement pour GPU
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+ENV CUDA_VISIBLE_DEVICES=0
+
+# Copie des fichiers de configuration
+COPY config_v4.py .
+COPY server_v4_complete.py .
+COPY tasks_v4_complete.py .
+
+# Copie des fichiers web statiques
+COPY web/ ./web/
+
+# Création du répertoire des projets
+RUN mkdir -p /app/projects
+
+# Pré-téléchargement du modèle d'embedding
+ENV SENTENCE_TRANSFORMERS_HOME=/app/model_cache
+RUN python -c "from sentence_transformers import SentenceTransformer; model = SentenceTransformer('all-MiniLM-L6-v2'); model.save('/app/model_cache/all-MiniLM-L6-v2')"
+
+# Variables d'environnement Flask
+ENV FLASK_APP=server_v4_complete.py
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+ENV USE_GPU=true
+
+# Port d'écoute
+EXPOSE 5001
+
+# Commande de démarrage
+CMD ["python", "server_v4_complete.py"]
