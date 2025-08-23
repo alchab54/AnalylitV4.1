@@ -1,6 +1,6 @@
 # AnalyLit V4.0 - Configuration centrale
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 @dataclass
@@ -24,7 +24,7 @@ class Config:
     SECRET_KEY: str = os.getenv('SECRET_KEY', 'your-super-secret-key-change-this-in-production')
     
     # Configuration des modèles par défaut
-    DEFAULT_MODELS: dict = {
+    DEFAULT_MODELS: dict = field(default_factory=lambda: {
         'fast': {
             'preprocess': 'gemma:2b',
             'extract': 'phi3:mini', 
@@ -40,7 +40,7 @@ class Config:
             'extract': 'mixtral:8x7b',
             'synthesis': 'llama3.1:70b'
         }
-    }
+    })
     
     # Configuration timeouts
     REQUEST_TIMEOUT: int = 900  # 15 minutes
@@ -52,7 +52,7 @@ class Config:
     LOG_LEVEL: str = os.getenv('LOG_LEVEL', 'INFO')
     
     # Configuration sécurité
-    ALLOWED_EXTENSIONS: set = {'pdf', 'json'}
+    ALLOWED_EXTENSIONS: set = field(default_factory=lambda: {'pdf', 'json'})
     MAX_CONTENT_LENGTH: int = 16 * 1024 * 1024  # 16MB
     
     # Configuration APIs externes
