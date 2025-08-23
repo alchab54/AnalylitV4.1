@@ -1,13 +1,17 @@
 # AnalyLit V4.0 - Dockerfile pour les workers (VERSION FINALE STABLE ET RAPIDE)
 
-# --- Stage 1: base_builder - Installation des dépendances système et Python ---
-FROM nvidia/cuda:12.3.1-runtime-ubuntu22.04 AS base_builder
+# Utilise une image de base CUDA avec Ubuntu 22.04
+FROM nvidia/cuda:12.3.1-runtime-ubuntu22.04 AS final_worker
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Paris
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app
 
+WORKDIR /app
+
+# --- Installation des dépendances système et Python ---
+# Installe Python 3.11 et les outils nécessaires, y compris pip et les libs graphiques
 RUN apt-get update && apt-get install -y --no-install-recommends \
     software-properties-common \
     tzdata \
@@ -28,37 +32,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
-
+# Met à jour pip, setuptools, wheel pour éviter les problèmes de version
+# Cette étape est cruciale pour que 'python -m pip' fonctionne de manière fiable
 RUN python -m pip install --upgrade pip setuptools wheel
 
+# Copie requirements.txt et installe les dépendances Python
+# Utilise --no-cache-dir pour s'assurer que les paquets sont toujours téléchargés
+# Utilise --ignore-installed --no-deps pour blinker afin de gérer le conflit avec les paquets système
 COPY requirements.txt .
-# Utilisation de --force-reinstall et --break-system-packages pour contourner le problème de blinker
-RUN pip install --force-reinstall --break-system-packages -r requirements.txt
+RUN python -m pip install --no-cache-dir --ignore-installed --no-deps blinker==1.7.0 && \
+    python -m pip install --no-cache-dir --ignore-installed -r requirements.txt
 
-# --- Stage 2: final_worker - Copie de l'environnement Python et du code worker ---
-# Le stage final est maintenant nommé 'final_worker'
-FROM nvidia/cuda:12.3.1-runtime-ubuntu22.04 AS final_worker
-
-ENV DEBIAN_FRONTEND=noninteractive
-ENV TZ=Europe/Paris
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONPATH=/app
-
-WORKDIR /app
-
-# Copier l'environnement Python du stage précédent
-COPY --from=base_builder /usr/local/lib/python3.11/dist-packages /usr/local/lib/python3.11/dist-packages
-COPY --from=base_builder /usr/local/bin/gunicorn /usr/local/bin/gunicorn
-COPY --from=base_builder /usr/local/bin/rq /usr/local/bin/rq
-COPY --from=base_builder /usr/lib/x86_64-linux-gnu/libGL.so.1 /usr/lib/x86_64-linux-gnu/
-COPY --from=base_builder /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0 /usr/lib/x86_64-linux-gnu/
-
-# Copie du reste de l'application
+# --- Copie du reste de l'application ---
+# Ces fichiers peuvent changer fréquemment, donc ils sont copiés à la fin
 COPY config_v4.py .
 COPY tasks_v4_complete.py .
 
-# Configuration finale
+# --- Configuration finale ---
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 ENV CUDA_VISIBLE_DEVICES=0
