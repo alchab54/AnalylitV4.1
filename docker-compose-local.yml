@@ -1,12 +1,5 @@
 # docker-compose-local.yml
 services:
-  
-  base_image_builder:
-    build:
-      context: .
-      dockerfile: Dockerfile.base
-    image: analylit-base:latest
-  
   # --- NGINX : Reverse Proxy & Serveur de fichiers statiques ---
   nginx:
     image: nginx:1.25.3-alpine
@@ -29,7 +22,6 @@ services:
 
   # --- SERVEUR WEB PRINCIPAL (Flask avec Gunicorn/Gevent) ---
   web:
-    # Utilise l'image construite par base_image_builder
     build:
       context: .
       dockerfile: Dockerfile-web-complete # Utilise le Dockerfile modifié
@@ -78,7 +70,6 @@ services:
 
   # --- WORKER POUR TÂCHES DE FOND (RQ) ---
   worker:
-    # Utilise l'image construite par base_image_builder
     build:
       context: .
       dockerfile: Dockerfile-worker-complete # Utilise le Dockerfile modifié
@@ -185,5 +176,3 @@ volumes:
     driver: local
   ollama_data: # Définition du volume pour Ollama
     driver: local
-
-  
