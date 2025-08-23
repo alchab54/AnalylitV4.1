@@ -36,7 +36,8 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 # --- Stage 2: final_worker - Copie de l'environnement Python et du code worker ---
-FROM nvidia/cuda:12.3.1-runtime-ubuntu22.04
+# Le stage final est maintenant nommé 'final_worker'
+FROM nvidia/cuda:12.3.1-runtime-ubuntu22.04 AS final_worker
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Paris

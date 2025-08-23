@@ -36,7 +36,8 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 # --- Stage 2: final_web - Copie de l'environnement Python et de l'application ---
-FROM nvidia/cuda:12.3.1-runtime-ubuntu22.04
+# Le stage final est maintenant nommé 'final_web'
+FROM nvidia/cuda:12.3.1-runtime-ubuntu22.04 AS final_web
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Paris

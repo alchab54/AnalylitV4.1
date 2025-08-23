@@ -1,5 +1,4 @@
 # docker-compose-local.yml
-version: '3.8' # Spécifiez une version Docker Compose plus récente
 
 services:
   # --- NGINX : Reverse Proxy & Serveur de fichiers statiques ---
@@ -27,6 +26,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-web-complete # Utilise le Dockerfile modifié
+      target: final_web # Spécifie d'utiliser le stage 'final_web' comme image pour ce service
     networks:
       - analylit-network
     environment:
@@ -75,6 +75,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-worker-complete # Utilise le Dockerfile modifié
+      target: final_worker # Spécifie d'utiliser le stage 'final_worker' comme image pour ce service
     environment:
       # Variables d'environnement pour le worker
       - REDIS_URL=redis://redis:6379/0
