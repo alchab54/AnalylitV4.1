@@ -2,6 +2,7 @@
 import os
 from dataclasses import dataclass
 from pathlib import Path
+from dataclasses import field
 
 @dataclass
 class Config:
@@ -27,7 +28,7 @@ class Config:
     DEFAULT_MODELS = {
         'fast': {
             'preprocess': 'gemma:2b',
-            'extract': 'phi3:mini', 
+            'extract': 'phi3:mini',
             'synthesis': 'llama3.1:8b'
         },
         'standard': {
@@ -36,11 +37,11 @@ class Config:
             'synthesis': 'llama3.1:8b'
         },
         'deep': {
-            'preprocess': 'llama3.1:8b', 
+            'preprocess': 'llama3.1:8b',
             'extract': 'mixtral:8x7b',
             'synthesis': 'llama3.1:70b'
         }
-    }
+    })
     
     # Configuration timeouts
     REQUEST_TIMEOUT = 900  # 15 minutes

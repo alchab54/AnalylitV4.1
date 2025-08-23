@@ -1,6 +1,4 @@
 # docker-compose-local.yml
-# Optimisé pour Windows + WSL2 + RTX 2060 SUPER + Ryzen 7 + 16GB RAM
-
 services:
   # --- SERVEUR WEB PRINCIPAL ---
   web:
@@ -22,6 +20,10 @@ services:
       - UNPAYWALL_EMAIL=${UNPAYWALL_EMAIL:-alicechabaux@gmail.com}
       - ZOTERO_USER_ID=${ZOTERO_USER_ID:-8926142}
       - ZOTERO_API_KEY=${ZOTERO_API_KEY:-NaqpuvV9xxfJArJRWgYMDlYs}
+      - PYTHONPATH=/app
+      - USE_GPU=true
+      - NVIDIA_VISIBLE_DEVICES=0
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     volumes:
       - ./projects:/app/projects
       - ./web:/app/web:ro
@@ -32,21 +34,17 @@ services:
       ollama:
         condition: service_started
     restart: unless-stopped
-    command: >
-      sh -c "
-      echo '🚀 Démarrage AnalyLit V4.0...' &&
-      pip install -r requirements.txt &&
-      python -c 'from server_v4_complete import init_db; init_db()' &&
-      python server_v4_complete.py
-      "
+    runtime: nvidia
     deploy:
       resources:
         limits:
           memory: 4g
           cpus: '3.0'
         reservations:
-          memory: 2g
-          cpus: '1.5'
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
   # --- WORKER POUR TÂCHES DE FOND ---
   worker:
@@ -59,6 +57,10 @@ services:
       - DATABASE_URL=sqlite:///app/projects/database.db
       - USE_GPU=true
       - CUDA_VISIBLE_DEVICES=0
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - NVIDIA_VISIBLE_DEVICES=0
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     volumes:
       - ./projects:/app/projects
       - .:/app
@@ -70,16 +72,7 @@ services:
     networks:
       - analylit-network
     restart: unless-stopped
-    command: >
-      sh -c "
-      echo '🔧 Démarrage Worker AnalyLit...' &&
-      pip install -r requirements.txt &&
-      python -m rq worker -u redis://redis:6379/0 --with-scheduler
-        analylit_processing_v4
-        analylit_synthesis_v4
-        analylit_analysis_v4
-        analylit_background_v4
-      "
+    runtime: nvidia
     deploy:
       resources:
         limits:
@@ -101,6 +94,7 @@ services:
     networks:
       - analylit-network
     restart: unless-stopped
+    runtime: nvidia
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
@@ -114,11 +108,9 @@ services:
           memory: 8g
           cpus: '4.0'
         reservations:
-          memory: 4g
-          cpus: '2.0'
           devices:
             - driver: nvidia
-              count: 1
+              count: all
               capabilities: [gpu]
 
   # --- REDIS POUR CACHE ET QUEUES ---

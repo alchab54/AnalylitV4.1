@@ -1,15 +1,16 @@
-# AnalyLit V4.0 - Dockerfile pour les workers avec support GPU
+# AnalyLit V4.0 - Dockerfile pour les workers (VERSION FINALE STABLE ET RAPIDE)
 FROM nvidia/cuda:12.3.1-runtime-ubuntu22.04
 
-# Éviter les prompts interactifs
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Paris
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
 
-# Installation Python 3.11
+# --- 1. Installation des dépendances système ---
 RUN apt-get update && apt-get install -y \
     software-properties-common \
     tzdata \
-    && add-apt-repository ppa:deadsnakes/ppa \
+    && add-apt-repository ppa:deadsnakes/ppa -y \
     && apt-get update && apt-get install -y \
     python3.11 \
     python3.11-dev \
@@ -20,38 +21,38 @@ RUN apt-get update && apt-get install -y \
     curl \
     build-essential \
     git \
-    && ln -s /usr/bin/python3.11 /usr/bin/python \
+    && update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1 \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Mise à jour de pip pour Python 3.11
-RUN python -m pip install --upgrade pip
+# --- 2. Installation des dépendances Python (optimisée pour le cache) ---
+RUN python -m pip install --upgrade pip setuptools wheel
 
-# Installation des requirements Python
+# Copier uniquement le fichier de dépendances pour optimiser le cache Docker
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
-# Variables d'environnement pour GPU
+# Installer les dépendances en utilisant l'option --ignore-installed
+# C'est la solution la plus directe pour écraser les packages système problématiques
+# comme 'blinker' sans ralentir excessivement les builds futurs grâce au cache.
+RUN pip install --no-cache-dir --ignore-installed -r requirements.txt
+
+# --- 3. Copie du reste de l'application ---
+# Ces fichiers peuvent changer sans invalider le cache des dépendances
+COPY config_v4.py .
+COPY tasks_v4_complete.py .
+
+# --- 4. Configuration finale ---
+# Variables d'environnement pour le GPU
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 ENV CUDA_VISIBLE_DEVICES=0
 ENV USE_GPU=true
 
-# Copie des fichiers de configuration
-COPY config_v4.py .
-COPY tasks_v4_complete.py .
-
-# Création du répertoire des projets
-RUN mkdir -p /app/projects
-
-# Pré-téléchargement du modèle d'embedding
+# Création des répertoires nécessaires
+RUN mkdir -p /app/projects /app/model_cache
 ENV SENTENCE_TRANSFORMERS_HOME=/app/model_cache
-RUN python -c "from sentence_transformers import SentenceTransformer; model = SentenceTransformer('all-MiniLM-L6-v2'); model.save('/app/model_cache/all-MiniLM-L6-v2')"
 
-# Variables d'environnement
-ENV PYTHONPATH=/app
-ENV PYTHONUNBUFFERED=1
-
-# Commande de démarrage du worker RQ
-CMD ["python", "-m", "rq", "worker", "-u", "redis://redis:6379/0", "--with-scheduler", "analylit_processing_v4", "analylit_synthesis_v4", "analylit_analysis_v4", "analylit_background_v4"]
+# Commande de démarrage du worker
+CMD ["python", "-m", "rq.cli", "worker", "-u", "redis://redis:6379/0", "--with-scheduler", "analylit_processing_v4", "analylit_synthesis_v4", "analylit_analysis_v4", "analylit_background_v4"]
