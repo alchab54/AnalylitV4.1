@@ -1,49 +1,14 @@
 # AnalyLit V4.0 - Dockerfile pour les workers (VERSION FINALE STABLE ET RAPIDE)
-FROM nvidia/cuda:12.3.1-runtime-ubuntu22.04
+# Utilise l'image de base personnalisée pour des builds plus rapides
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV TZ=Europe/Paris
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONPATH=/app
+FROM analylit-base:latest
 
-# --- 1. Installation des dépendances système ---
-RUN apt-get update && apt-get install -y \
-    software-properties-common \
-    tzdata \
-    && add-apt-repository ppa:deadsnakes/ppa -y \
-    && apt-get update && apt-get install -y \
-    python3.11 \
-    python3.11-dev \
-    python3.11-venv \
-    python3-pip \
-    gcc \
-    g++ \
-    curl \
-    build-essential \
-    git \
-    && update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1 \
-    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 \
-    && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
-
-# --- 2. Installation des dépendances Python (optimisée pour le cache) ---
-RUN python -m pip install --upgrade pip setuptools wheel
-
-# Copier uniquement le fichier de dépendances pour optimiser le cache Docker
-COPY requirements.txt .
-
-# Installer les dépendances en utilisant l'option --ignore-installed
-# C'est la solution la plus directe pour écraser les packages système problématiques
-# comme 'blinker' sans ralentir excessivement les builds futurs grâce au cache.
-RUN pip install --no-cache-dir --ignore-installed -r requirements.txt
-
-# --- 3. Copie du reste de l'application ---
-# Ces fichiers peuvent changer sans invalider le cache des dépendances
+# --- Copie du reste de l'application ---
+# Ces fichiers peuvent changer sans invalider le cache des dépendances de base
 COPY config_v4.py .
 COPY tasks_v4_complete.py .
 
-# --- 4. Configuration finale ---
+# --- Configuration finale ---
 # Variables d'environnement pour le GPU
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
@@ -54,5 +19,5 @@ ENV USE_GPU=true
 RUN mkdir -p /app/projects /app/model_cache
 ENV SENTENCE_TRANSFORMERS_HOME=/app/model_cache
 
-# Commande de démarrage du worker
-CMD ["python", "-m", "rq.cli", "worker", "-u", "redis://redis:6379/0", "--with-scheduler", "analylit_processing_v4", "analylit_synthesis_v4", "analylit_analysis_v4", "analylit_background_v4"]
+# La commande de démarrage est maintenant dans docker-compose-local.yml
+# CMD ["python", "-m", "rq.cli", "worker", "-u", "redis://redis:6379/0", "--with-scheduler", "analylit_processing_v4", "analylit_synthesis_v4", "analylit_analysis_v4", "analylit_background_v4"]
