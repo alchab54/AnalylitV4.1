@@ -1,4 +1,6 @@
 # docker-compose-local.yml
+version: '3.8' # Spécifiez une version Docker Compose plus récente
+
 services:
   # --- NGINX : Reverse Proxy & Serveur de fichiers statiques ---
   nginx:
