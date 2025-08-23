@@ -1,31 +1,30 @@
 # AnalyLit V4.0 - Configuration centrale
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field 
 from pathlib import Path
-from dataclasses import field
 
 @dataclass
 class Config:
     """Configuration pour AnalyLit V4.0"""
     
     # Version de l'application
-    ANALYLIT_VERSION = "4.0.0"
+    ANALYLIT_VERSION: str = "4.0.0"
     
     # Configuration Redis
-    REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+    REDIS_URL: str = os.getenv('REDIS_URL', 'redis://redis:6379/0')
     
     # Configuration Ollama
-    OLLAMA_BASE_URL = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
+    OLLAMA_BASE_URL: str = os.getenv('OLLAMA_BASE_URL', 'http://ollama:11434')
     
     # Configuration base de données
-    DATABASE_PATH = "/app/projects/database.db"
-    PROJECTS_DIR = Path("/app/projects")
+    DATABASE_PATH: str = "/app/projects/database.db"
+    PROJECTS_DIR: Path = Path("/app/projects")
     
     # Configuration Flask
-    SECRET_KEY = os.getenv('SECRET_KEY', 'your-super-secret-key-change-this-in-production')
-    
-    # Configuration des modèles par défaut
-    DEFAULT_MODELS = {
+    SECRET_KEY: str = os.getenv('SECRET_KEY', 'your-super-secret-key-change-this-in-production')
+
+    # Configuration des modèles par défaut - C'EST LA CORRECTION
+    DEFAULT_MODELS: dict = field(default_factory=lambda: {
         'fast': {
             'preprocess': 'gemma:2b',
             'extract': 'phi3:mini',
@@ -44,30 +43,32 @@ class Config:
     })
     
     # Configuration timeouts
-    REQUEST_TIMEOUT = 900  # 15 minutes
-    JOB_TIMEOUT = 3600    # 1 heure
+    REQUEST_TIMEOUT: int = 900  # 15 minutes
+    JOB_TIMEOUT: int = 3600    # 1 heure
+    WEBSOCKET_PING_INTERVAL: int = 25
+    WEBSOCKET_PING_TIMEOUT: int = 60
     
     # Configuration logging
-    LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
+    LOG_LEVEL: str = os.getenv('LOG_LEVEL', 'INFO')
     
     # Configuration sécurité
-    ALLOWED_EXTENSIONS = {'pdf', 'json'}
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
+    ALLOWED_EXTENSIONS: set = {'pdf', 'json'}
+    MAX_CONTENT_LENGTH: int = 16 * 1024 * 1024  # 16MB
     
     # Configuration APIs externes
-    UNPAYWALL_EMAIL = os.getenv('UNPAYWALL_EMAIL', 'researcher@analylit.com')
-    MAX_RETRIES = int(os.getenv('HTTP_MAX_RETRIES', '3'))
+    UNPAYWALL_EMAIL: str = os.getenv('UNPAYWALL_EMAIL', 'researcher@analylit.com')
+    MAX_RETRIES: int = int(os.getenv('HTTP_MAX_RETRIES', '3'))
     
     # Configuration embedding et indexation
-    EMBEDDING_MODEL = os.getenv('EMBEDDING_MODEL', 'all-MiniLM-L6-v2')
-    CHUNK_SIZE = int(os.getenv('CHUNK_SIZE', '1000'))
-    CHUNK_OVERLAP = int(os.getenv('CHUNK_OVERLAP', '200'))
+    EMBEDDING_MODEL: str = os.getenv('EMBEDDING_MODEL', 'all-MiniLM-L6-v2')
+    CHUNK_SIZE: int = int(os.getenv('CHUNK_SIZE', '1000'))
+    CHUNK_OVERLAP: int = int(os.getenv('CHUNK_OVERLAP', '200'))
     
     # Configuration bases de données externes
-    IEEE_API_KEY = os.getenv('IEEE_API_KEY', '')
-    CROSSREF_EMAIL = os.getenv('CROSSREF_EMAIL', 'researcher@analylit.com')
+    IEEE_API_KEY: str = os.getenv('IEEE_API_KEY', '')
+    CROSSREF_EMAIL: str = os.getenv('CROSSREF_EMAIL', 'researcher@analylit.com')
     
-    def get_database_config(self):
+    def get_database_config(self) -> dict:
         """Configuration des bases de données externes"""
         return {
             'ieee': {

@@ -47,3 +47,4 @@ wheel>=0.38.0
 # Transformers compatibles
 transformers==4.35.2
 tokenizers==0.15.0
+gevent-websocket==0.10.1
