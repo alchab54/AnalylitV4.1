@@ -36,11 +36,12 @@ class Config:
             'synthesis': 'llama3.1:8b'
         },
         'deep': {
-            'preprocess': 'llama3.1:8b', 
+            'preprocess': 'llama3.1:8b',
             'extract': 'mixtral:8x7b',
             'synthesis': 'llama3.1:70b'
+        } # &lt;-- Accolade manquante
         }
-    })
+        )
     
     # Configuration timeouts
     REQUEST_TIMEOUT: int = 900  # 15 minutes
