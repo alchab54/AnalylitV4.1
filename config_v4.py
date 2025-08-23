@@ -67,6 +67,7 @@ class Config:
     # Configuration bases de données externes
     IEEE_API_KEY: str = os.getenv('IEEE_API_KEY', '')
     CROSSREF_EMAIL: str = os.getenv('CROSSREF_EMAIL', 'researcher@analylit.com')
+    MAX_PDF_SIZE: int = 50 * 1024 * 1024  # Exemple: 50MB
     
     def get_database_config(self) -> dict:
         """Configuration des bases de données externes"""
@@ -86,3 +87,5 @@ class Config:
 def get_config() -> Config:
     """Retourne une instance de configuration"""
     return Config()
+    
+    

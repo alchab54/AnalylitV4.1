@@ -33,7 +33,8 @@ WORKDIR /app
 RUN python -m pip install --upgrade pip setuptools wheel
 
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+# Utilisation de --force-reinstall et --break-system-packages pour contourner le problème de blinker
+RUN pip install --force-reinstall --break-system-packages -r requirements.txt
 
 # --- Stage 2: final_web - Copie de l'environnement Python et de l'application ---
 # Le stage final est maintenant nommé 'final_web'
