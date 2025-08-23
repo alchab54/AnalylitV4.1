@@ -30,7 +30,6 @@ services:
   # --- SERVEUR WEB PRINCIPAL (Flask avec Gunicorn/Gevent) ---
   web:
     # Utilise l'image construite par base_image_builder
-    image: analylit-base:latest 
     build:
       context: .
       dockerfile: Dockerfile-web-complete # Utilise le Dockerfile modifié
@@ -80,7 +79,6 @@ services:
   # --- WORKER POUR TÂCHES DE FOND (RQ) ---
   worker:
     # Utilise l'image construite par base_image_builder
-    image: analylit-base:latest 
     build:
       context: .
       dockerfile: Dockerfile-worker-complete # Utilise le Dockerfile modifié
