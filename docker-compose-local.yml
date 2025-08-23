@@ -13,7 +13,8 @@ services:
     networks:
       - analylit-network
     depends_on:
-      - web # Nginx dépend du service web pour pouvoir le proxifier
+      web:
+        condition: service_healthy
     restart: unless-stopped
     deploy:
       resources:
@@ -69,7 +70,11 @@ services:
             - driver: nvidia
               count: 1 # Réserve 1 GPU (le même que Ollama et worker)
               capabilities: [gpu]
-
+    healthcheck:
+          test: ["CMD", "curl", "-f", "http://web:5001/api/health"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
   # --- WORKER POUR TÂCHES DE FOND (RQ) ---
   worker:
     build:
