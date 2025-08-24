@@ -2605,3 +2605,16 @@ textarea.form-control {
     white-space: normal;
     line-height: 1.6;
 }
+
+.extraction-preview-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--font-size-xs);
+}
+.extraction-preview-list li {
+    margin-bottom: var(--space-4);
+}
+.extraction-preview-list li strong {
+    color: var(--color-text);
+}

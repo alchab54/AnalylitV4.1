@@ -101,8 +101,8 @@ function setupEventListeners() {
     document.getElementById('pipelineSourceSelect')?.addEventListener('change', handlePipelineSourceChange);
     document.getElementById('analysisMode')?.addEventListener('change', handleAnalysisModeChange);
 	document.getElementById('pipelineSourceSelect')?.addEventListener('change', handlePipelineSourceChange);
-	document.getElementById('gridFileInput')?.addEventListener('change', handleGridImport); 
-	
+	document.getElementById('gridFileInput')?.addEventListener('change', handleGridImport);
+
     // Délégation d'événements pour les éléments dynamiques
     document.body.addEventListener('click', (e) => {
         const target = e.target.closest('[data-action]');
@@ -111,19 +111,16 @@ function setupEventListeners() {
         const { action, projectId, articleId, extractionId, gridId, promptId, profileId, queueName, plotType, database } = target.dataset;
 
         const actions = {
-            // Projets
             selectProject: () => selectProject(projectId),
             deleteProject: () => handleDeleteProject(projectId),
             runPipeline: () => openRunPipelineModal(),
             runSynthesis: () => handleRunSynthesis(),
             exportProject: () => handleExportProject(projectId),
-
-            // Recherche
-            selectSearchResult: () => selectSearchResult(articleId, database),
+            selectSearchResult: () => selectSearchResult(articleId),
             selectAllSearchResults: () => selectAllSearchResults(),
-            
-            // Validation
             validateExtraction: () => handleValidateExtraction(extractionId, target.dataset.decision),
+            
+            // --- CORRECTION : 'toggleAbstract' est maintenant à l'intérieur de l'objet 'actions' ---
             toggleAbstract: () => {
                 const titleRow = target.closest('tr');
                 if (titleRow) {
@@ -133,8 +130,7 @@ function setupEventListeners() {
                     }
                 }
             },
-
-            // Analyses avancées
+            
             'generate-discussion': () => runAdvancedAnalysis('generate-discussion', projectId),
             'generate-knowledge-graph': () => runAdvancedAnalysis('generate-knowledge-graph', projectId),
             'generate-prisma-flow': () => runAdvancedAnalysis('generate-prisma-flow', projectId),
@@ -142,44 +138,28 @@ function setupEventListeners() {
             'run-descriptive-stats': () => runAdvancedAnalysis('run-descriptive-stats', projectId),
             'run-atn-score': () => runAdvancedAnalysis('run-atn-score', projectId),
             viewAnalysisPlot: () => viewAnalysisPlot(projectId, plotType),
-
-            // Import
             'upload-pdfs-bulk': () => document.getElementById('pdfFileInput')?.click(),
             'import-zotero': () => handleImportZotero(projectId),
             'fetch-online-pdfs': () => handleFetchOnlinePdfs(projectId),
             'run-indexing': () => handleRunIndexing(projectId),
-
-            // Chat
             sendChatMessage: () => sendChatMessage(),
             clearChatHistory: () => clearChatHistory(),
-
-            // Paramètres - Grilles
             'create-grid': () => openGridModal(),
             'edit-grid': () => openGridModal(gridId),
             'delete-grid': () => handleDeleteGrid(gridId),
             'import-grid': () => document.getElementById('gridFileInput')?.click(),
-            removeGridField: () => target.closest('.form-group-dynamic').remove(),
-
-            // Paramètres - Prompts
+            removeGridField: () => target.closest('.grid-field-item').remove(),
             'edit-prompt': () => openPromptModal(promptId),
-
-            // Paramètres - Profils
             'create-profile': () => openProfileModal(),
             'edit-profile': () => openProfileModal(profileId),
             'delete-profile': () => handleDeleteProfile(profileId),
-
-            // Paramètres - Modèles & Files
             pullModel: () => handlePullModel(),
-            'refresh-queues': () => loadQueueStatus().then(renderQueueStatus),
+            'refresh-queues': () => renderQueueStatus(),
             clearQueue: () => handleClearQueue(queueName),
-
-            // Paramètres - Zotero
             saveZoteroSettings: () => handleSaveZoteroSettings(),
         };
 
-        if (actions[action]) {
-            actions[action]();
-        }
+        if (actions[action]) actions[action]();
     });
 
     // Raccourcis clavier
@@ -596,29 +576,21 @@ async function handleCreateProject(e) {
     const formData = new FormData(e.target);
     const projectData = {
         name: formData.get('projectName'),
-        description: formData.get('description'),
+        description: formData.get('description'), // Corrigé
         mode: formData.get('analysisMode')
     };
-
     if (!projectData.name) {
         showToast("Le nom du projet est requis.", 'error');
         return;
     }
-
     showLoadingOverlay(true, 'Création du projet...');
     try {
-        const newProject = await fetchAPI('/projects', {
-            method: 'POST',
-            body: projectData
-        });
-        
+        const newProject = await fetchAPI('/projects', { method: 'POST', body: projectData });
         closeModal('newProjectModal');
         e.target.reset();
         await loadProjects();
         await selectProject(newProject.id);
         showToast('Projet créé avec succès!', 'success');
-    } catch (error) {
-        console.error('Erreur création projet:', error);
     } finally {
         showLoadingOverlay(false);
     }
@@ -745,44 +717,27 @@ async function loadSearchResults(projectId) {
 function renderSearchResults() {
     const container = elements.searchResults;
     if (!container) return;
-    
     if (!appState.searchResults || appState.searchResults.length === 0) {
-        container.innerHTML = `
-            <div class="search-placeholder">
-                <div class="search-placeholder__icon">🔍</div>
-                <h4>Aucun résultat</h4>
-                <p>Lancez une recherche pour voir les résultats ici.</p>
-            </div>
-        `;
+        container.innerHTML = `<div class="results-placeholder"><h4>Aucun résultat</h4><p>Lancez une recherche pour voir les résultats ici.</p></div>`;
         return;
     }
-    
-    // Grouper par base de données
     const groupedResults = appState.searchResults.reduce((acc, result) => {
-        if (!acc[result.database_source]) {
-            acc[result.database_source] = [];
-        }
-        acc[result.database_source].push(result);
+        (acc[result.database_source] = acc[result.database_source] || []).push(result);
         return acc;
     }, {});
-    
     container.innerHTML = `
         <div class="search-results-header">
-            <h3>Résultats de Recherche (${appState.searchResults.length} articles)</h3>
+            <h3>Résultats (${appState.searchResults.length} articles)</h3>
             <div class="search-actions">
-                <button class="btn btn--secondary" data-action="selectAllSearchResults">Tout sélectionner / désélectionner</button>
-                </div>
+                <button class="btn btn--secondary btn--sm" data-action="selectAllSearchResults">Tout sélectionner / désélectionner</button>
+            </div>
         </div>
-        
         ${Object.entries(groupedResults).map(([database, results]) => `
             <div class="database-results-section">
-                <h4>${escapeHtml(database)} (${results.length} résultats)</h4>
-                <div class="search-results-grid">
-                    ${results.map(result => renderSearchResultCard(result)).join('')}
-                </div>
+                <h4>${escapeHtml(database)} (${results.length})</h4>
+                <div class="search-results-grid">${results.map(renderSearchResultCard).join('')}</div>
             </div>
-        `).join('')}
-    `;
+        `).join('')}`;
 }
 
 function renderSearchResultCard(result) {
@@ -1111,41 +1066,22 @@ function renderExtractionRow(extraction, isScreening) {
     if (validationStatus === 'include') rowClass = 'extraction-row--included';
     if (validationStatus === 'exclude') rowClass = 'extraction-row--excluded';
 
-    // Construire la ligne principale du tableau
-    let mainRowHtml = `<tr class="extraction-row ${rowClass}">`;
-    
-    if (isScreening) {
-        const scoreClass = extraction.relevance_score >= 7 ? 'score-badge--high' : 'score-badge--low';
-        mainRowHtml += `<td><span class="score-badge ${scoreClass}">${extraction.relevance_score ?? 'N/A'}</span></td>`;
-    }
-    
-    mainRowHtml += `<td>${escapeHtml(extraction.pmid)}</td>`;
-    mainRowHtml += `<td class="title-cell" data-action="toggleAbstract" title="Cliquer pour voir l'abstract">${escapeHtml(extraction.title || '')}</td>`;
-    
-    if (isScreening) {
-        mainRowHtml += `<td class="justification-cell">${escapeHtml(extraction.relevance_justification || 'N/A')}</td>`;
-    } else {
-        let preview = 'N/A';
-        try {
-            if (extraction.extracted_data) {
-                const data = JSON.parse(extraction.extracted_data);
-                preview = Object.keys(data).slice(0, 3).join(', ') + '...';
-            }
-        } catch (e) {}
-        mainRowHtml += `<td class="extraction-preview">${escapeHtml(preview)}</td>`;
-    }
-    
-    mainRowHtml += `
-        <td class="actions-cell">
-            <button class="btn btn--success btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="include" ${validationStatus === 'include' ? 'disabled' : ''}>Inclure</button>
-            <button class="btn btn--danger btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="exclude" ${validationStatus === 'exclude' ? 'disabled' : ''}>Exclure</button>
-        </td>
-    </tr>`;
+    const mainRowHtml = `
+        <tr class="extraction-row ${rowClass}">
+            ${isScreening ? `<td><span class="score-badge ${extraction.relevance_score >= 7 ? 'score-badge--high' : ''}">${extraction.relevance_score ?? 'N/A'}</span></td>` : ''}
+            <td>${escapeHtml(extraction.pmid)}</td>
+            <td class="title-cell" data-action="toggleAbstract" title="Cliquer pour voir l'abstract">${escapeHtml(extraction.title || '')}</td>
+            ${isScreening ? `<td class="justification-cell">${escapeHtml(extraction.relevance_justification || 'N/A')}</td>` : `<td>${renderExtractedDataPreview(extraction.extracted_data)}</td>`}
+            <td class="actions-cell">
+                <button class="btn btn--success btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="include" ${validationStatus === 'include' ? 'disabled' : ''}>Inclure</button>
+                <button class="btn btn--danger btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="exclude" ${validationStatus === 'exclude' ? 'disabled' : ''}>Exclure</button>
+            </td>
+        </tr>`;
 
-    // Construire la ligne cachée pour l'abstract
+    const colspan = isScreening ? 5 : 4;
     const abstractRowHtml = (isScreening && extraction.abstract) ? `
         <tr class="abstract-row hidden">
-            <td colspan="5">
+            <td colspan="${colspan}">
                 <div class="abstract-content">
                     <strong>Abstract:</strong>
                     <p>${escapeHtml(extraction.abstract)}</p>
@@ -1155,6 +1091,20 @@ function renderExtractionRow(extraction, isScreening) {
     ` : '';
 
     return mainRowHtml + abstractRowHtml;
+}
+
+function renderExtractedDataPreview(dataString) {
+    if (!dataString) return '<span class="text-muted">Aucune donnée.</span>';
+    try {
+        const data = JSON.parse(dataString);
+        // Affiche les 3 premières clés/valeurs de l'objet JSON
+        const previewItems = Object.entries(data).slice(0, 3).map(([key, value]) =>
+            `<li><strong>${escapeHtml(key)}:</strong> ${escapeHtml(String(value).substring(0, 50))}${String(value).length > 50 ? '...' : ''}</li>`
+        ).join('');
+        return `<ul class="extraction-preview-list">${previewItems}</ul>`;
+    } catch (e) {
+        return '<span class="text-error">Erreur de format.</span>';
+    }
 }
 
 async function renderValidationSection() {
@@ -1682,39 +1632,6 @@ async function handleSaveGrid(e) {
         console.error('Erreur sauvegarde grille:', error);
     } finally {
         showLoadingOverlay(false);
-    }
-}
-
-async function handleGridImport(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (!appState.currentProject) {
-        showToast("Veuillez sélectionner un projet avant d'importer une grille.", 'error');
-        return;
-    }
-    if (!file.name.endsWith('.json')) {
-        showToast("Veuillez sélectionner un fichier .json valide.", 'error');
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    showLoadingOverlay(true, "Importation de la grille...");
-    try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/grids/import`, {
-            method: 'POST',
-            body: formData,
-        });
-        showToast("Grille d'extraction importée avec succès.", 'success');
-        await loadProjectGrids(appState.currentProject.id);
-        renderSettingsSection();
-    } catch (error) {
-        console.error('Erreur importation grille:', error);
-    } finally {
-        showLoadingOverlay(false);
-        e.target.value = ''; // Réinitialise l'input de fichier
     }
 }
 
