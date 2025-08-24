@@ -2582,11 +2582,15 @@ textarea.form-control {
 .cm-fn { background-color: rgba(var(--color-error-rgb), 0.1); }
 
 /* Style pour le titre cliquable et l'abstract */
-.title-cell[data-action="toggleAbstract"] {
+.title-cell > a {
+    text-decoration: none;
+    margin-right: var(--space-8);
+    display: inline-block;
+}
+.title-cell > .title-text {
     cursor: pointer;
     text-decoration: underline;
     text-decoration-style: dotted;
-    color: var(--color-primary);
 }
 .abstract-row.hidden {
     display: none;
@@ -2605,29 +2609,6 @@ textarea.form-control {
     white-space: normal;
     line-height: 1.6;
 }
-
-.extraction-preview-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    font-size: var(--font-size-xs);
-}
-.extraction-preview-list li {
-    margin-bottom: var(--space-4);
-}
-.extraction-preview-list li strong {
-    color: var(--color-text);
-}
-
-.title-cell > a {
-    text-decoration: none;
-    margin-right: var(--space-8);
-}
-.title-cell > .title-text {
-    cursor: pointer;
-    text-decoration: underline;
-    text-decoration-style: dotted;
-}
 .modal__body {
     padding: var(--space-20);
 }
@@ -2638,6 +2619,12 @@ textarea.form-control {
 }
 .extraction-details-list li {
     margin-bottom: var(--space-12);
+    padding-bottom: var(--space-12);
+    border-bottom: 1px solid var(--color-border);
+}
+.extraction-details-list li:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
 }
 .extraction-details-list li strong {
     display: block;
@@ -2649,4 +2636,17 @@ textarea.form-control {
     margin: 0;
     font-size: var(--font-size-sm);
     line-height: var(--line-height-normal);
+    white-space: pre-wrap;
+}
+.extraction-preview-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--font-size-xs);
+}
+.extraction-preview-list li {
+    margin-bottom: var(--space-4);
+}
+.extraction-preview-list li strong {
+    color: var(--color-text);
 }

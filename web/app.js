@@ -1,63 +1,30 @@
 // ================================================================
-// AnalyLit V4.0 - Application Frontend Complète
+// AnalyLit V4.1 - Application Frontend Complète (Version Finale Corrigée)
 // ================================================================
 
-// ===== ÉTAT GLOBAL DE L'APPLICATION =====
 const appState = {
-    currentProject: null,
-    projects: [],
-    searchResults: [],
-    analysisProfiles: [],
-    ollamaModels: [],
-    prompts: [],
-    currentProjectGrids: [],
-    currentProjectExtractions: [],
-    socketConnected: false,
-    currentSection: 'projects',
-    socket: null,
-    availableDatabases: [],
-    notifications: [],
-    unreadNotifications: 0,
-    selectedSearchResults: new Set()
+    currentProject: null, projects: [], searchResults: [], analysisProfiles: [],
+    ollamaModels: [], prompts: [], currentProjectGrids: [], currentProjectExtractions: [],
+    socketConnected: false, currentSection: 'projects', socket: null, availableDatabases: [],
+    notifications: [], unreadNotifications: 0, selectedSearchResults: new Set()
 };
-
-// ===== SÉLECTEURS D'ÉLÉMENTS DOM =====
 let elements = {};
 
-// ================================================================
-// ===== 1. INITIALISATION ET POINT D'ENTRÉE
-// ================================================================
-
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Démarrage de AnalyLit V4.0 Frontend...');
-    
+    console.log('🚀 Démarrage de AnalyLit V4.1 Frontend...');
     elements = {
-        sections: document.querySelectorAll('.section'),
-        navButtons: document.querySelectorAll('.app-nav__button'),
-        connectionStatus: document.querySelector('[data-connection-status]'),
-        projectsList: document.getElementById('projectsList'),
-        createProjectBtn: document.getElementById('createProjectBtn'),
-        projectDetail: document.getElementById('projectDetail'),
-        projectDetailContent: document.getElementById('projectDetailContent'),
-        projectPlaceholder: document.getElementById('projectPlaceholder'),
-        searchContainer: document.getElementById('searchContainer'),
-        searchResults: document.getElementById('searchResults'),
-        resultsContainer: document.getElementById('resultsContainer'),
-        validationContainer: document.getElementById('validationContainer'),
-        analysisContainer: document.getElementById('analysisContainer'),
-        importContainer: document.getElementById('importContainer'),
-        chatContainer: document.getElementById('chatContainer'),
-        settingsContainer: document.getElementById('settingsContainer'),
-        newProjectForm: document.getElementById('newProjectForm'),
-        multiSearchForm: document.getElementById('multiSearchForm'),
-        runPipelineForm: document.getElementById('runPipelineForm'),
-        gridForm: document.getElementById('gridForm'),
-        promptForm: document.getElementById('promptForm'),
-        profileForm: document.getElementById('profileForm'),
-        loadingOverlay: document.getElementById('loadingOverlay'),
+        sections: document.querySelectorAll('.section'), navButtons: document.querySelectorAll('.app-nav__button'), connectionStatus: document.querySelector('[data-connection-status]'),
+        projectsList: document.getElementById('projectsList'), createProjectBtn: document.getElementById('createProjectBtn'), projectDetail: document.getElementById('projectDetail'),
+        projectDetailContent: document.getElementById('projectDetailContent'), projectPlaceholder: document.getElementById('projectPlaceholder'),
+        searchResults: document.getElementById('searchResults'), resultsContainer: document.getElementById('resultsContainer'),
+        validationContainer: document.getElementById('validationContainer'), analysisContainer: document.getElementById('analysisContainer'),
+        importContainer: document.getElementById('importContainer'), chatContainer: document.getElementById('chatContainer'),
+        settingsContainer: document.getElementById('settingsContainer'), newProjectForm: document.getElementById('newProjectForm'),
+        multiSearchForm: document.getElementById('multiSearchForm'), runPipelineForm: document.getElementById('runPipelineForm'),
+        gridForm: document.getElementById('gridForm'), promptForm: document.getElementById('promptForm'),
+        profileForm: document.getElementById('profileForm'), loadingOverlay: document.getElementById('loadingOverlay'),
         toastContainer: document.getElementById('toastContainer'),
     };
-
     setupEventListeners();
     initializeApplication();
 });
@@ -82,7 +49,6 @@ function setupEventListeners() {
         e.preventDefault();
         showSection(e.currentTarget.getAttribute('data-section'));
     }));
-
     elements.createProjectBtn?.addEventListener('click', () => openModal('newProjectModal'));
     elements.newProjectForm?.addEventListener('submit', handleCreateProject);
     elements.multiSearchForm?.addEventListener('submit', handleMultiSearch);
@@ -90,7 +56,6 @@ function setupEventListeners() {
     elements.gridForm?.addEventListener('submit', handleSaveGrid);
     elements.promptForm?.addEventListener('submit', handleSavePrompt);
     elements.profileForm?.addEventListener('submit', handleSaveProfile);
-    
     document.getElementById('addGridFieldBtn')?.addEventListener('click', () => addGridFieldInput());
     document.getElementById('pipelineSourceSelect')?.addEventListener('change', handlePipelineSourceChange);
     document.getElementById('gridFileInput')?.addEventListener('change', handleGridImport);
@@ -99,7 +64,6 @@ function setupEventListeners() {
         const target = e.target.closest('[data-action]');
         if (!target) return;
         const { action, projectId, articleId, extractionId, gridId, promptId, profileId, queueName, plotType } = target.dataset;
-
         const actions = {
             selectProject: () => selectProject(projectId),
             deleteProject: () => handleDeleteProject(projectId),
@@ -154,7 +118,6 @@ function setupEventListeners() {
             if (activeModal) closeModal(activeModal.id);
         }
     });
-
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modal.id); });
         modal.querySelector('.modal__close')?.addEventListener('click', () => closeModal(modal.id));
@@ -549,15 +512,8 @@ function renderSynthesisPreview(synthesis) {
 async function handleCreateProject(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const projectData = {
-        name: formData.get('projectName'),
-        description: formData.get('description'), // Corrigé
-        mode: formData.get('analysisMode')
-    };
-    if (!projectData.name) {
-        showToast("Le nom du projet est requis.", 'error');
-        return;
-    }
+    const projectData = { name: formData.get('projectName'), description: formData.get('description'), mode: formData.get('analysisMode') };
+    if (!projectData.name) { showToast("Le nom du projet est requis.", 'error'); return; }
     showLoadingOverlay(true, 'Création du projet...');
     try {
         const newProject = await fetchAPI('/projects', { method: 'POST', body: projectData });
@@ -987,34 +943,20 @@ async function loadProjectGrids(projectId) {
 function renderResultsSection() {
     const container = elements.resultsContainer;
     const project = appState.currentProject;
-
     if (!project) {
-        container.innerHTML = `
-            <div class="results-placeholder">
-                <div class="results-placeholder__icon">📊</div>
-                <h4>Sélectionnez un projet</h4>
-                <p>Les résultats s'afficheront ici.</p>
-            </div>`;
+        container.innerHTML = `<div class="results-placeholder"><h4>Sélectionnez un projet</h4><p>Les résultats s'afficheront ici.</p></div>`;
         return;
     }
-
     const extractions = appState.currentProjectExtractions;
     if (!extractions || extractions.length === 0) {
-        container.innerHTML = `
-            <div class="results-placeholder">
-                <div class="results-placeholder__icon">📊</div>
-                <h4>Aucune extraction</h4>
-                <p>Lancez une analyse pour générer des résultats.</p>
-            </div>`;
+        container.innerHTML = `<div class="results-placeholder"><h4>Aucune extraction</h4><p>Lancez une analyse pour générer des résultats.</p></div>`;
         return;
     }
-
-   const isScreening = project.analysis_mode === 'screening';
-    
+    const isScreening = project.analysis_mode === 'screening';
     container.innerHTML = `
         <div class="results-header">
             <h2>Résultats pour : ${escapeHtml(project.name)}</h2>
-            <p>Validez les décisions de l'IA en cliquant sur "Inclure" ou "Exclure" pour chaque article.</p>
+            <p>Validez les décisions de l'IA et consultez les données extraites.</p>
         </div>
         <div class="table-container">
             <table class="table">
@@ -1031,8 +973,7 @@ function renderResultsSection() {
                     ${extractions.map(ext => renderExtractionRow(ext, isScreening)).join('')}
                 </tbody>
             </table>
-        </div>
-    `;
+        </div>`;
 }
 
 function renderExtractionRow(extraction, isScreening) {
@@ -1041,77 +982,7 @@ function renderExtractionRow(extraction, isScreening) {
     if (validationStatus === 'include') rowClass = 'extraction-row--included';
     if (validationStatus === 'exclude') rowClass = 'extraction-row--excluded';
 
-    const titleHtml = `<td class="title-cell"><a href="${extraction.url}" target="_blank" title="Voir source en ligne">🔗</a> <span class="title-text" data-action="toggleAbstract" title="Cliquer pour voir l'abstract">${escapeHtml(extraction.title || '')}</span></td>`;
-
-    const mainRowHtml = `
-        <tr class="extraction-row ${rowClass}">
-            ${isScreening ? `<td><span class="score-badge ${extraction.relevance_score >= 7 ? 'score-badge--high' : ''}">${extraction.relevance_score ?? 'N/A'}</span></td>` : ''}
-            <td>${escapeHtml(extraction.pmid)}</td>
-            ${titleHtml}
-            ${isScreening ? `<td class="justification-cell">${escapeHtml(extraction.relevance_justification || 'N/A')}</td>` : `<td><button class="btn btn--secondary btn--sm" data-action="viewExtractionDetails" data-extraction-id="${extraction.id}">Voir détails</button></td>`}
-            <td class="actions-cell">
-                <button class="btn btn--success btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="include" ${validationStatus === 'include' ? 'disabled' : ''}>Inclure</button>
-                <button class="btn btn--danger btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="exclude" ${validationStatus === 'exclude' ? 'disabled' : ''}>Exclure</button>
-            </td>
-        </tr>`;
-
-    const colspan = isScreening ? 5 : 4;
-    const abstractRowHtml = (extraction.abstract) ? `
-        <tr class="abstract-row hidden">
-            <td colspan="${colspan}">
-                <div class="abstract-content">
-                    <strong>Abstract:</strong>
-                    <p>${escapeHtml(extraction.abstract)}</p>
-                </div>
-            </td>
-        </tr>
-    ` : '';
-
-    return mainRowHtml + abstractRowHtml;
-}
-
-function renderExtractionRow(extraction, isScreening) {
-    const validationStatus = extraction.user_validation_status;
-    let rowClass = '';
-    if (validationStatus === 'include') rowClass = 'extraction-row--included';
-    if (validationStatus === 'exclude') rowClass = 'extraction-row--excluded';
-
-    const titleHtml = `<td class="title-cell"><a href="${extraction.url}" target="_blank" title="Voir source en ligne">🔗</a> <span class="title-text" data-action="toggleAbstract" title="Cliquer pour voir l'abstract">${escapeHtml(extraction.title || '')}</span></td>`;
-
-    const mainRowHtml = `
-        <tr class="extraction-row ${rowClass}">
-            ${isScreening ? `<td><span class="score-badge ${extraction.relevance_score >= 7 ? 'score-badge--high' : ''}">${extraction.relevance_score ?? 'N/A'}</span></td>` : ''}
-            <td>${escapeHtml(extraction.pmid)}</td>
-            ${titleHtml}
-            ${isScreening ? `<td class="justification-cell">${escapeHtml(extraction.relevance_justification || 'N/A')}</td>` : `<td><button class="btn btn--secondary btn--sm" data-action="viewExtractionDetails" data-extraction-id="${extraction.id}">Voir détails</button></td>`}
-            <td class="actions-cell">
-                <button class="btn btn--success btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="include" ${validationStatus === 'include' ? 'disabled' : ''}>Inclure</button>
-                <button class="btn btn--danger btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="exclude" ${validationStatus === 'exclude' ? 'disabled' : ''}>Exclure</button>
-            </td>
-        </tr>`;
-
-    const colspan = isScreening ? 5 : 4;
-    const abstractRowHtml = (extraction.abstract) ? `
-        <tr class="abstract-row hidden">
-            <td colspan="${colspan}">
-                <div class="abstract-content">
-                    <strong>Abstract:</strong>
-                    <p>${escapeHtml(extraction.abstract)}</p>
-                </div>
-            </td>
-        </tr>
-    ` : '';
-
-    return mainRowHtml + abstractRowHtml;
-}
-
-function renderExtractionRow(extraction, isScreening) {
-    const validationStatus = extraction.user_validation_status;
-    let rowClass = '';
-    if (validationStatus === 'include') rowClass = 'extraction-row--included';
-    if (validationStatus === 'exclude') rowClass = 'extraction-row--excluded';
-
-    const titleHtml = `<td class="title-cell"><a href="${extraction.url}" target="_blank" title="Voir source en ligne">🔗</a> <span class="title-text" data-action="toggleAbstract" title="Cliquer pour voir l'abstract">${escapeHtml(extraction.title || '')}</span></td>`;
+    const titleHtml = `<td class="title-cell"><a href="${extraction.url || '#'}" target="_blank" title="Voir source en ligne">🔗</a> <span class="title-text" data-action="toggleAbstract" title="Cliquer pour voir l'abstract">${escapeHtml(extraction.title || '')}</span></td>`;
 
     const mainRowHtml = `
         <tr class="extraction-row ${rowClass}">
@@ -1144,13 +1015,49 @@ function renderExtractedDataPreview(dataString) {
     if (!dataString) return '<span class="text-muted">Aucune donnée.</span>';
     try {
         const data = JSON.parse(dataString);
-        // Affiche les 3 premières clés/valeurs de l'objet JSON
         const previewItems = Object.entries(data).slice(0, 3).map(([key, value]) =>
             `<li><strong>${escapeHtml(key)}:</strong> ${escapeHtml(String(value).substring(0, 50))}${String(value).length > 50 ? '...' : ''}</li>`
         ).join('');
         return `<ul class="extraction-preview-list">${previewItems}</ul>`;
     } catch (e) {
         return '<span class="text-error">Erreur de format.</span>';
+    }
+}
+
+async function handleGridImport(e) {
+    const file = e.target.files[0];
+    if (!file || !appState.currentProject) return;
+    if (!file.name.endsWith('.json')) {
+        showToast("Veuillez sélectionner un fichier .json valide.", 'error');
+        return;
+    }
+    const formData = new FormData();
+    formData.append('file', file);
+    showLoadingOverlay(true, "Importation de la grille...");
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/grids/import`, { method: 'POST', body: formData });
+        showToast("Grille d'extraction importée avec succès.", 'success');
+        await loadProjectGrids(appState.currentProject.id);
+        renderSettingsSection();
+    } finally {
+        showLoadingOverlay(false);
+        e.target.value = '';
+    }
+}
+
+function openExtractionDetailModal(extractionId) {
+    const extraction = appState.currentProjectExtractions.find(e => e.id === extractionId);
+    if (!extraction || !extraction.extracted_data) {
+        showToast("Aucune donnée détaillée à afficher.", "info");
+        return;
+    }
+    const modalBody = document.getElementById('extractionModalBody');
+    try {
+        const data = JSON.parse(extraction.extracted_data);
+        modalBody.innerHTML = `<ul class="extraction-details-list">${Object.entries(data).map(([key, value]) => `<li><strong>${escapeHtml(key)}:</strong><p>${escapeHtml(value)}</p></li>`).join('')}</ul>`;
+        openModal('extractionDetailModal');
+    } catch (e) {
+        showToast("Erreur lors de l'affichage des données.", "error");
     }
 }
 

@@ -242,17 +242,21 @@
       </form>
     </div>
 	
-	<div id="extractionDetailModal" class="modal">
+  <div id="extractionDetailModal" class="modal">
     <div class="modal__content modal__content--large">
       <div class="modal__header">
         <h3 id="extractionModalTitle">Détails de l'Extraction</h3>
         <button class="modal__close">×</button>
       </div>
       <div id="extractionModalBody" class="modal__body">
-        </div>
+        <!-- Le contenu sera injecté par JavaScript -->
+      </div>
     </div>
   </div>
-  </div>
+
+  <!-- Inputs/Forms auxiliaires (suppression du formulaire dupliqué) -->
+  <input id="pdfFileInput" type="file" accept="application/pdf" multiple class="hidden" />
+  <input id="gridFileInput" type="file" accept="application/json" class="hidden" />
 
   <!-- Overlays / Toasts -->
   <div id="loadingOverlay" class="loading-overlay">

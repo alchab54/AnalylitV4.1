@@ -893,7 +893,7 @@ def process_single_article_task(project_id: str, article_id: str, profile: dict,
                     'url': details.get('url', f"https://doi.org/{article_id}" if article_id.strip().startswith("10.") else f"https://pubmed.ncbi.nlm.nih.gov/{article_id}"),
                     'database_source': 'manual_input'
                 }
-        
+
         if analysis_mode == "screening":
             if not article_data.get('abstract'):
                 log_processing_status(project_id, article_id, "écarté", "Résumé non disponible pour le screening.")
