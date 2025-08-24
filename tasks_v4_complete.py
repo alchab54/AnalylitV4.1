@@ -539,10 +539,17 @@ def get_screening_prompt(title, abstract, database_source="unknown"):
     return template.format(title=title, abstract=abstract, database_source=database_source)
 
 def get_full_extraction_prompt(text, database_source="unknown", custom_grid_id=None):
-    """Génère le prompt d'extraction avec grille personnalisée optionnelle."""
-    base_prompt_template = get_prompt_from_db('full_extraction_prompt')
+    """Génère le prompt d'extraction avec grille personnalisée optionnelle (CORRIGÉ)."""
     
-    # Si une grille personnalisée est fournie, l'utiliser
+    # Décomposition du prompt pour un assemblage plus robuste
+    intro = "En tant qu'expert en revue systématique, extrayez les données importantes de cet article selon une grille d'extraction structurée."
+    text_to_analyze = f'Texte à analyser: "{text}"'
+    source_info = f'Source: {database_source}'
+    instruction = "Extrayez les informations suivantes au format JSON:"
+
+    json_structure = ""
+    
+    # Si une grille personnalisée est fournie, on l'utilise
     if custom_grid_id:
         try:
             with sqlite3.connect(DATABASE_FILE) as conn:
@@ -550,21 +557,27 @@ def get_full_extraction_prompt(text, database_source="unknown", custom_grid_id=N
                 row = cursor.fetchone()
                 if row:
                     custom_fields = json.loads(row[0])
-                    json_structure = "{\n" + ",\n".join([f'  "{field}": "..."' for field in custom_fields]) + "\n}"
-                    
-                    # Remplacer la structure par défaut par la grille personnalisée
-                    prompt_start = base_prompt_template.find('{')
-                    prompt_end = base_prompt_template.rfind('}')
-                    if prompt_start != -1 and prompt_end != -1:
-                        base_structure = base_prompt_template[prompt_start:prompt_end+1]
-                        prompt_with_new_grid = base_prompt_template.replace(base_structure, json_structure)
-                        return prompt_with_new_grid.format(text=text, database_source=database_source)
-        
+                    # Création de la structure JSON à partir des champs de la grille
+                    json_fields = ",\n".join([f'  "{field}": "..."' for field in custom_fields])
+                    json_structure = f"{{\n{json_fields}\n}}"
         except Exception as e:
             print(f"Erreur lors de la récupération de la grille personnalisée: {e}")
-    
-    return base_prompt_template.format(text=text, database_source=database_source)
+            # En cas d'erreur, on se rabat sur la grille par défaut
+            json_structure = ""
 
+    # Si aucune grille personnalisée n'est trouvée ou s'il y a eu une erreur, on utilise la grille par défaut
+    if not json_structure:
+        default_prompt_template = get_prompt_from_db('full_extraction_prompt')
+        # Extraction de la partie JSON du prompt par défaut
+        json_start = default_prompt_template.find('{')
+        if json_start != -1:
+            json_structure = default_prompt_template[json_start:]
+
+    # Assemblage final du prompt
+    final_prompt = f"{intro}\n\n{text_to_analyze}\n{source_info}\n\n{instruction}\n{json_structure}"
+    
+    return final_prompt
+    
 def update_project_status(project_id: str, status: str, result: dict = None, discussion: str = None,
                          graph: dict = None, prisma_path: str = None, analysis_result: dict = None,
                          analysis_plot_path: str = None):
@@ -878,6 +891,39 @@ def pull_ollama_model_task(model_name: str):
         print(f"❌ Erreur lors du téléchargement du modèle '{model_name}': {e}")
         return f"Erreur: {e}"
 
+def get_full_extraction_prompt(text, database_source="unknown", custom_grid_id=None):
+    """Génère le prompt d'extraction avec grille personnalisée optionnelle (CORRIGÉ ET ROBUSTE)."""
+    
+    intro = "ROLE: Vous êtes un assistant expert en analyse de littérature scientifique, spécialisé dans l'extraction de données structurées.\n\nTÂCHE: Analysez le texte fourni et extrayez les informations demandées en respectant SCRUPULEUSEMENT le format JSON.\n\nINSTRUCTIONS IMPORTANTES:\n1. Répondez **UNIQUEMENT** avec un objet JSON valide. N'ajoutez aucun texte, commentaire ou explication avant ou après le JSON.\n2. Assurez-vous que chaque paire clé-valeur est séparée par une virgule, sauf la dernière.\n3. Échappez correctement les guillemets doubles (\") à l'intérieur des chaînes de caractères avec un antislash (\\).\n4. Si une information n'est pas présente dans le texte, utilisez une chaîne de caractères vide (\"\") comme valeur. Ne laissez pas de champ vide ou avec \"...\"."
+    text_to_analyze = f'TEXTE À ANALYSER:\n---\n{text}\n---'
+    source_info = f'SOURCE: {database_source}'
+    instruction = "GRILLE D'EXTRACTION JSON (remplissez les valeurs):"
+
+    json_structure = ""
+    
+    if custom_grid_id:
+        try:
+            with sqlite3.connect(DATABASE_FILE) as conn:
+                cursor = conn.execute("SELECT fields FROM extraction_grids WHERE id = ?", (custom_grid_id,))
+                row = cursor.fetchone()
+                if row:
+                    custom_fields = json.loads(row[0])
+                    json_fields = ",\n".join([f'  "{field}": "..."' for field in custom_fields])
+                    json_structure = f"{{\n{json_fields}\n}}"
+        except Exception as e:
+            print(f"Erreur lors du chargement de la grille personnalisée: {e}")
+            json_structure = ""
+
+    if not json_structure:
+        default_prompt_template = get_prompt_from_db('full_extraction_prompt')
+        json_start = default_prompt_template.find('{')
+        if json_start != -1:
+            json_structure = default_prompt_template[json_start:]
+
+    final_prompt = f"{intro}\n\n{text_to_analyze}\n{source_info}\n\n{instruction}\n{json_structure}"
+    
+    return final_prompt
+    
 def process_single_article_task(
     project_id: str,
     article_id: str,
@@ -893,8 +939,8 @@ def process_single_article_task(
     """
     start_time = time.time()
     try:
-        # Récupérer ou chercher les métadonnées de l'article
-        with sqlite3.connect(DATABASE_FILE) as conn:
+        # Chaque tâche utilise sa propre connexion à la base de données pour éviter les blocages
+        with sqlite3.connect(DATABASE_FILE, timeout=30.0) as conn:
             conn.row_factory = sqlite3.Row
             row = conn.execute(
                 "SELECT * FROM search_results WHERE project_id = ? AND article_id = ?",
@@ -914,73 +960,14 @@ def process_single_article_task(
                 "article_id": article_id,
                 "title": details.get("title", "Titre inconnu"),
                 "abstract": details.get("abstract", ""),
-                "authors": details.get("authors", ""),
-                "publication_date": details.get("publication_date", ""),
-                "journal": details.get("journal", ""),
-                "doi": details.get("doi", ""),
-                "url": details.get("url", ""),
                 "database_source": details.get("database_source", "manual_input")
             }
 
-        # Mode screening
-        if analysis_mode == "screening":
-            abstract = article_data.get("abstract", "")
-            if not abstract:
-                log_processing_status(project_id, article_id, "écarté", "Résumé manquant")
-                return
-
-            prompt = get_screening_prompt(
-                article_data["title"],
-                abstract,
-                article_data.get("database_source", "unknown")
-            )
-            resp = call_ollama_api(prompt, profile["preprocess_model"], output_format="json")
-            decision = resp.get("decision") if isinstance(resp, dict) else None
-
-            if decision == "À inclure":
-                score = resp.get("relevance_score", 0)
-                justification = resp.get("justification", "Justification non fournie.")
-            else:
-                score = 0
-                justification = (
-                    resp.get("justification") if isinstance(resp, dict) else None
-                ) or "Non pertinent selon IA."
-
-            with sqlite3.connect(DATABASE_FILE) as conn:
-                conn.execute("""
-                    INSERT INTO extractions (
-                        id, project_id, pmid, title,
-                        relevance_score, relevance_justification, created_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    f"{project_id}-{article_id}",
-                    project_id,
-                    article_id,
-                    article_data["title"],
-                    score,
-                    justification,
-                    datetime.now().isoformat()
-                ))
-                conn.commit()
-
-            status = "analysé" if score > 0 else "écarté"
-            log_processing_status(
-                project_id,
-                article_id,
-                status,
-                f"Score: {score}/10"
-            )
-            print(f"▶️ {status.capitalize()} {article_id} (score {score})")
-
-        # Mode extraction détaillée
-        elif analysis_mode == "full_extraction":
-            # Récupérer le texte intégral depuis PDF si disponible
+        if analysis_mode == "full_extraction":
             pdf_path = PROJECTS_DIR / project_id / f"{article_id.replace('/', '_')}.pdf"
+            text_for_extraction = ""
             if pdf_path.exists():
-                full_text = extract_text_from_pdf(str(pdf_path))
-                text_for_extraction = full_text or ""
-            else:
-                text_for_extraction = ""
+                text_for_extraction = extract_text_from_pdf(str(pdf_path)) or ""
 
             if not text_for_extraction:
                 text_for_extraction = (
@@ -997,7 +984,7 @@ def process_single_article_task(
             )
 
             if isinstance(extracted, dict) and extracted:
-                with sqlite3.connect(DATABASE_FILE) as conn:
+                with sqlite3.connect(DATABASE_FILE, timeout=30.0) as conn:
                     conn.execute("""
                         INSERT INTO extractions (
                             id, project_id, pmid, title,
@@ -1005,44 +992,51 @@ def process_single_article_task(
                             relevance_justification, created_at
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                     """, (
-                        f"{project_id}-{article_id}",
-                        project_id,
-                        article_id,
-                        article_data["title"],
-                        json.dumps(extracted),
-                        10,
-                        "Extraction détaillée",
-                        datetime.now().isoformat()
+                        str(uuid.uuid4()), project_id, article_id,
+                        article_data["title"], json.dumps(extracted),
+                        10, "Extraction détaillée effectuée", datetime.now().isoformat()
                     ))
                     conn.commit()
-                log_processing_status(
-                    project_id,
-                    article_id,
-                    "analysé",
-                    "Extraction détaillée terminée"
-                )
+                log_processing_status(project_id, article_id, "analysé", "Extraction détaillée réussie")
                 print(f"✅ Extraction complète pour {article_id}")
             else:
-                log_processing_status(
-                    project_id,
-                    article_id,
-                    "écarté",
-                    "Réponse extraction invalide"
-                )
+                log_processing_status(project_id, article_id, "écarté", "Réponse de l'IA invalide pour l'extraction")
                 print(f"⚠️ Extraction invalide pour {article_id}")
+        
+        else: # Mode Screening par défaut
+            abstract = article_data.get("abstract", "")
+            if not abstract:
+                log_processing_status(project_id, article_id, "écarté", "Résumé manquant pour le screening")
+                return
 
-        # Mettre à jour compteurs et timing
+            prompt = get_screening_prompt(
+                article_data["title"], abstract, article_data.get("database_source", "unknown")
+            )
+            resp = call_ollama_api(prompt, profile["preprocess_model"], output_format="json")
+            
+            score = resp.get("relevance_score", 0) if isinstance(resp, dict) else 0
+            justification = resp.get("justification", "Non pertinent selon IA.") if isinstance(resp, dict) else "Réponse IA invalide."
+
+            with sqlite3.connect(DATABASE_FILE, timeout=30.0) as conn:
+                conn.execute("""
+                    INSERT INTO extractions (
+                        id, project_id, pmid, title,
+                        relevance_score, relevance_justification, created_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    str(uuid.uuid4()), project_id, article_id,
+                    article_data["title"], score, justification, datetime.now().isoformat()
+                ))
+                conn.commit()
+            log_processing_status(project_id, article_id, "analysé", f"Screening terminé (Score: {score}/10)")
+            print(f"▶️ Screening terminé pour {article_id} (score {score})")
+
         increment_processed_count(project_id)
         update_project_timing(project_id, time.time() - start_time)
 
     except Exception as e:
-        print(f"❌ Erreur critique {article_id}: {e}")
-        log_processing_status(
-            project_id,
-            article_id,
-            "erreur",
-            f"Exception: {str(e)}"
-        )
+        print(f"❌ Erreur critique dans le traitement de l'article {article_id}: {e}")
+        log_processing_status(project_id, article_id, "erreur", f"Exception: {str(e)}")
         
 def run_synthesis_task(project_id: str, profile: dict):
     """Génère une synthèse des articles pertinents d'un projet."""

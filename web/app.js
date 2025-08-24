@@ -842,50 +842,117 @@ function updateSearchProgress(data) {
 // ================================================================
 
 function openRunPipelineModal() {
-  openModal('runPipelineModal');
-  renderRunPipelineModal();
-  document.getElementById('runPipelineForm').innerHTML += `
-    <label>
-      <input type="radio" name="analysis_mode" value="screening" checked> Screening
-    </label>
-    <label>
-      <input type="radio" name="analysis_mode" value="full_extraction"> Extraction détaillée
-    </label>
-    <select id="gridSelect" name="custom_grid_id">
-      <option value="">— Aucune grille —</option>
-      ${appState.currentProjectGrids.map(g => `<option value="${g.id}">${g.name}</option>`).join('')}
-    </select>`;
-}
-
-async function handleRunPipeline(e) {
-  e.preventDefault();
-  const form = e.target;
-  const formData = new FormData(form);
-
-  const body = {
-    articles: Array.from(appState.selectedSearchResults),
-    profile: formData.get('profile'),
-    analysis_mode: formData.get('analysis_mode'),
-    custom_grid_id: formData.get('custom_grid_id')
-  };
-
-  await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json'
+    if (!appState.currentProject) {
+        showToast("Sélectionnez d'abord un projet.", 'error');
+        return;
     }
-  });
+    
+    // Ouvre la modale vide en premier
+    openModal('runPipelineModal');
+    // Ensuite, remplit son contenu
+    renderRunPipelineModal();
 }
 
+// Fonction qui remplit la modale "Lancer une analyse"
+function renderRunPipelineModal() {
+    const project = appState.currentProject;
+    if (!project) return;
+
+    // --- CORRECTION DE L'ERREUR ---
+    // Sélection des éléments qui existent déjà dans index.html
+    const profileSelect = document.getElementById('pipelineProfileSelect');
+    const gridContainer = document.getElementById('pipelineGridContainer');
+    const gridSelect = document.getElementById('pipelineGridSelect');
+    const sourceSelect = document.getElementById('pipelineSourceSelect');
+    
+    // Vérification que les éléments existent avant de les manipuler
+    if (!profileSelect || !gridContainer || !gridSelect || !sourceSelect) {
+        console.error("Éléments de la modale d'analyse non trouvés !");
+        return;
+    }
+    
+    // Remplissage du sélecteur de profils
+    profileSelect.innerHTML = appState.analysisProfiles.map(profile => 
+        `<option value="${profile.id}">${escapeHtml(profile.name)}</option>`
+    ).join('');
+    profileSelect.value = project.profile_used || 'standard';
+
+    // Affichage du sélecteur de grille uniquement en mode "extraction détaillée"
+    if (project.analysis_mode === 'full_extraction') {
+        gridContainer.style.display = 'block';
+        gridSelect.innerHTML = '<option value="">Grille par défaut</option>' + 
+            appState.currentProjectGrids.map(grid => 
+                `<option value="${grid.id}">${escapeHtml(grid.name)}</option>`
+            ).join('');
+    } else {
+        gridContainer.style.display = 'none';
+    }
+    
+    // Assurer que le champ de saisie manuelle est correctement affiché ou masqué
+    handlePipelineSourceChange();
+}
 
 function handlePipelineSourceChange() {
     const sourceSelect = document.getElementById('pipelineSourceSelect');
     const manualGroup = document.getElementById('manualIdsGroup');
     
     if (sourceSelect && manualGroup) {
-        const isManual = sourceSelect.value === 'manual';
-        manualGroup.style.display = isManual ? 'block' : 'none';
+        manualGroup.style.display = sourceSelect.value === 'manual' ? 'block' : 'none';
+    }
+}
+
+async function handleRunPipeline(e) {
+    e.preventDefault();
+    
+    if (!appState.currentProject) {
+        showToast('Aucun projet sélectionné.', 'error');
+        return;
+    }
+
+    const formData = new FormData(e.target);
+    const source = formData.get('pipelineSourceSelect');
+    const profileId = formData.get('pipelineProfileSelect');
+    const customGridId = formData.get('pipelineGridSelect');
+    
+    let articleIds = [];
+    
+    if (source === 'manual') {
+        const manualIds = formData.get('pmidsTextarea');
+        if (!manualIds) {
+            showToast('Veuillez fournir des IDs d\'articles.', 'error');
+            return;
+        }
+        articleIds = manualIds.split('\n').map(id => id.trim()).filter(Boolean);
+    } else {
+        // En mode "résultats de recherche", on récupère les IDs sélectionnés
+        articleIds = Array.from(appState.selectedSearchResults);
+    }
+    
+    if (articleIds.length === 0) {
+        showToast('Aucun article à traiter. Veuillez en sélectionner ou en saisir manuellement.', 'error');
+        return;
+    }
+
+    closeModal('runPipelineModal');
+    showLoadingOverlay(true, 'Lancement du pipeline...');
+    
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
+            method: 'POST',
+            body: {
+                articles: articleIds,
+                profile: profileId,
+                custom_grid_id: customGridId || null
+            }
+        });
+        
+        showToast(`Analyse lancée pour ${articleIds.length} article(s).`, 'info');
+        await selectProject(appState.currentProject.id, true);
+        
+    } catch (error) {
+        console.error('Erreur lancement pipeline:', error);
+    } finally {
+        showLoadingOverlay(false);
     }
 }
 
@@ -957,30 +1024,6 @@ async function handleExportProject(projectId) {
   }
 }
 
-function renderRunPipelineModal() {
-  // Remplir la liste des grilles
-  const gridSelect = document.getElementById("customGridSelect");
-  gridSelect.innerHTML =
-    '<option value="" disabled selected>Choisir une grille</option>' +
-    appState.currentProjectGrids
-      .map((g) => `<option value="${g.id}">${g.name}</option>`)
-      .join("");
-
-  // Basculer affichage manuel vs recherche
-  const sourceSelect = document.getElementById("pipelineSourceSelect");
-  const manualGroup = document.getElementById("manualIdsGroup");
-  sourceSelect.removeEventListener("change", toggleManualGroup);
-  sourceSelect.addEventListener("change", toggleManualGroup);
-
-  function toggleManualGroup() {
-    manualGroup.style.display =
-      sourceSelect.value === "manual" ? "block" : "none";
-  }
-
-  // Initialisation de l'affichage en fonction de la valeur actuelle
-  toggleManualGroup();
-}
-
 // ================================================================
 // ===== 7. AUTRES SECTIONS (RÉSULTATS, VALIDATION, ANALYSES...)
 // ================================================================
@@ -1002,105 +1045,61 @@ async function loadProjectGrids(projectId) {
 }
 
 function renderResultsSection() {
-  
-	  const project = appState.currentProject;  // ← AJOUT
-	  let html = '';               // ← Déclaration de la variable
-	  const resultsContainer = elements.resultsContainer;
+    const container = elements.resultsContainer;
+    const project = appState.currentProject;
 
-	  if (!appState.searchResults.length) {
-		html = '<p>Aucun résultat trouvé.</p>';
-		resultsContainer.innerHTML = html;
-		return;
-	  }
+    if (!project) {
+        container.innerHTML = `
+            <div class="results-placeholder">
+                <span class="results-placeholder__icon">📊</span>
+                <h4>Sélectionnez un projet</h4>
+                <p>Les résultats des analyses s'afficheront ici.</p>
+            </div>`;
+        return;
+    }
 
-	  // Construction du tableau des résultats
-	  html += `
-		<table class="table">
-		  <thead>
-			<tr>
-			  <th>Titre</th>
-			  <th>Journal</th>
-			  <th>Actions</th>
-			</tr>
-		  </thead>
-		  <tbody>
-	  `;
-	  appState.searchResults.forEach(result => {
-		html += `
-		  <tr data-pmid="${result.article_id}">
-			<td class="title-cell">
-			  <a href="#" data-action="toggleAbstract">
-				<span class="title-text">${escapeHtml(result.title)}</span>
-			  </a>
-			</td>
-			<td>${escapeHtml(result.journal)}</td>
-			<td>
-			  <button class="btn btn--sm" data-action="selectSearchResult" data-article-id="${result.article_id}">
-				Sélectionner
-			  </button>
-			</td>
-		  </tr>
-		  <tr class="abstract-row hidden">
-			<td colspan="3">${escapeHtml(result.abstract)}</td>
-		  </tr>
-		`;
-	  });
-	  html += `
-		  </tbody>
-		</table>
-	  `;
+    const extractions = appState.currentProjectExtractions;
+    if (!extractions || extractions.length === 0) {
+        container.innerHTML = `
+            <div class="results-placeholder">
+                <span class="results-placeholder__icon">📋</span>
+                <h4>Aucun résultat d'analyse</h4>
+                <p>Lancez une analyse pour générer des résultats à afficher ici.</p>
+            </div>`;
+        return;
+    }
 
-	  resultsContainer.innerHTML = html;
-	}
-	
-async function openExtractionDetailModal(extractionId) {
-  const modal = document.getElementById('extractionDetailModal');
-  const container = document.getElementById('extractionDetailContainer');
-  if (!modal || !container) return;
-
-  // Récupérer l'extraction
-  const ext = appState.currentProjectExtractions.find(e => e.id === extractionId);
-  if (!ext || !ext.extracted_data) return;
-
-  // Construire le formulaire
-  const data = typeof ext.extracted_data === 'string'
-    ? JSON.parse(ext.extracted_data)
-    : ext.extracted_data;
-  let html = `<form id="editExtractionForm">`;
-  Object.entries(data).forEach(([key, value]) => {
-    html += `
-      <div class="form-group">
-        <label for="field_${key}">${key}:</label>
-        <textarea id="field_${key}" name="${key}" class="form-control">${value}</textarea>
-      </div>`;
-  });
-  html += `<div class="modal-footer">
-             <button type="submit" class="btn btn-primary">Enregistrer</button>
-             <button type="button" class="btn btn-secondary" onclick="closeModal('extractionDetailModal')">Annuler</button>
-           </div>
-           </form>`;
-  container.innerHTML = html;
-
-  // Brancher la soumission
-  const form = document.getElementById('editExtractionForm');
-  if (!form) return;
-  form.onsubmit = async e => {
-    e.preventDefault();
-    const fd = new FormData(form);
-    const updated = {};
-    fd.forEach((val, key) => { updated[key] = val; });
-    await fetchAPI(
-      `/projects/${appState.currentProject.id}/extractions/${extractionId}`,
-      { method: 'PATCH', body: { extracted_data: updated } }
-    );
-    closeModal('extractionDetailModal');
-    // Rafraîchir la vue
-    await selectProject(appState.currentProject.id, true);
-  };
-
-  openModal('extractionDetailModal');
+    const isScreening = project.analysis_mode === 'screening';
+    
+    // CORRECTION : Affichage des extractions au lieu des résultats de recherche
+    container.innerHTML = `
+        <div class="results-header">
+            <h2>Résultats d'analyse pour : ${escapeHtml(project.name)}</h2>
+            <div class="results-stats">
+                <span class="status status--info">📊 ${extractions.length} articles traités</span>
+                <span class="status status--success">✅ ${extractions.filter(e => e.relevance_score >= 7).length} articles pertinents</span>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        ${isScreening ? 
+                            `<th>Score</th><th>ID</th><th>Titre</th><th>Justification</th><th>Actions</th>` :
+                            `<th>ID</th><th>Titre</th><th>Données Extraites</th><th>Actions</th>`
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    ${extractions.map(ext => renderExtractionRow(ext, isScreening)).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
 }
-
+	
+// Affiche une ligne dans le tableau des résultats (corrigé pour l'extraction détaillée)
 function renderExtractionRow(extraction, isScreening) {
     const validationStatus = extraction.user_validation_status;
     let rowClass = '';
@@ -1108,16 +1107,26 @@ function renderExtractionRow(extraction, isScreening) {
     if (validationStatus === 'exclude') rowClass = 'extraction-row--excluded';
 
     const titleHtml = `<td class="title-cell"><a href="${extraction.url || '#'}" target="_blank" title="Voir source en ligne">🔗</a> <span class="title-text" data-action="toggleAbstract" title="Cliquer pour voir l'abstract">${escapeHtml(extraction.title || '')}</span></td>`;
+    
+    // CORRECTION : Logique pour basculer entre les colonnes
+    let dataCellHtml = '';
+    if (isScreening) {
+        dataCellHtml = `<td class="justification-cell">${escapeHtml(extraction.relevance_justification || 'N/A')}</td>`;
+    } else {
+        // Nouvelle fonction pour afficher un aperçu des données extraites
+        dataCellHtml = `<td>${renderExtractedDataPreview(extraction.extracted_data)}</td>`;
+    }
 
     const mainRowHtml = `
-        <tr class="extraction-row ${rowClass}">
-            ${isScreening ? `<td><span class="score-badge ${extraction.relevance_score >= 7 ? 'score-badge--high' : ''}">${extraction.relevance_score ?? 'N/A'}</span></td>` : ''}
+        <tr class="extraction-row ${rowClass}" data-pmid="${extraction.pmid}">
+            ${isScreening ? `<td><span class="score-badge">${extraction.relevance_score ?? 'N/A'}</span></td>` : ''}
             <td>${escapeHtml(extraction.pmid)}</td>
             ${titleHtml}
-            ${isScreening ? `<td class="justification-cell">${escapeHtml(extraction.relevance_justification || 'N/A')}</td>` : `<td><button class="btn btn--secondary btn--sm" data-action="viewExtractionDetails" data-extraction-id="${extraction.id}">Voir détails</button></td>`}
+            ${dataCellHtml}
             <td class="actions-cell">
-                <button class="btn btn--success btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="include" ${validationStatus === 'include' ? 'disabled' : ''}>Inclure</button>
-                <button class="btn btn--danger btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="exclude" ${validationStatus === 'exclude' ? 'disabled' : ''}>Exclure</button>
+                <button class="btn btn--secondary btn--sm" data-action="viewExtractionDetails" data-extraction-id="${extraction.id}">Détails</button>
+                <button class="btn btn--success btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="include">Inclure</button>
+                <button class="btn btn--danger btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="exclude">Exclure</button>
             </td>
         </tr>`;
 
@@ -1136,20 +1145,103 @@ function renderExtractionRow(extraction, isScreening) {
     return mainRowHtml + abstractRowHtml;
 }
 
+// CORRECTION : Affiche correctement les données, même si elles sont imbriquées
 function renderExtractedDataPreview(extractedData) {
     if (!extractedData) return '<span class="text-muted">Aucune donnée</span>';
     
     try {
         const data = typeof extractedData === 'string' ? JSON.parse(extractedData) : extractedData;
-        const preview = Object.entries(data)
-            .filter(([key, value]) => value && value.toString().trim())
-            .slice(0, 3)
-            .map(([key, value]) => `<strong>${key}:</strong> ${escapeHtml(value.toString().slice(0, 50) + '...')}`)
+
+        // Fonction pour "aplatir" les objets imbriqués (ex: { "a": { "b": 1 } } devient { "a.b": 1 })
+        const flattenObject = (obj, parentKey = '') => 
+            Object.keys(obj).reduce((acc, key) => {
+                const newKey = parentKey ? `${parentKey} / ${key}` : key;
+                if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+                    Object.assign(acc, flattenObject(obj[key], newKey));
+                } else {
+                    acc[newKey] = obj[key];
+                }
+                return acc;
+            }, {});
+        
+        const flatData = flattenObject(data);
+
+        const preview = Object.entries(flatData)
+            .filter(([, value]) => value && value.toString().trim())
+            .slice(0, 4) // Affiche jusqu'à 4 champs
+            .map(([key, value]) => {
+                const displayValue = value.toString();
+                return `<strong>${escapeHtml(key.replace(/_/g, ' '))}:</strong> ${escapeHtml(displayValue.slice(0, 70))}${displayValue.length > 70 ? '...' : ''}`;
+            })
             .join('<br>');
-        return preview || '<span class="text-muted">Données vides</span>';
+
+        return `<div class="extraction-preview-list">${preview || '<span class="text-muted">Données vides</span>'}</div>`;
     } catch (error) {
-        return '<span class="text-muted">Données non valides</span>';
+        return '<span class="text-muted">Données invalides</span>';
     }
+}
+
+// CORRECTION : Fait fonctionner le bouton "Détails"
+async function openExtractionDetailModal(extractionId) {
+    const modal = document.getElementById('extractionDetailModal');
+    // Correction de l'ID du conteneur
+    const container = document.getElementById('extractionModalBody'); 
+    if (!modal || !container) return;
+
+    const ext = appState.currentProjectExtractions.find(e => e.id === extractionId);
+    if (!ext) {
+        container.innerHTML = '<p>Détails non trouvés.</p>';
+        openModal('extractionDetailModal');
+        return;
+    }
+
+    // Affiche les détails formatés
+    container.innerHTML = formatExtractionDetailsForModal(ext);
+    openModal('extractionDetailModal');
+}
+
+// Nouvelle fonction pour formater joliment les détails dans la modale
+function formatExtractionDetailsForModal(extraction) {
+    let html = `
+        <div class="extraction-details">
+            <h4>${escapeHtml(extraction.title || 'Titre non disponible')}</h4>
+            <div class="extraction-meta">
+                <p><strong>ID Article:</strong> ${escapeHtml(extraction.pmid || 'N/A')}</p>
+                ${extraction.relevance_score ? `<p><strong>Score Pertinence:</strong> ${extraction.relevance_score}/10</p>` : ''}
+                ${extraction.relevance_justification ? `<p><strong>Justification:</strong> ${escapeHtml(extraction.relevance_justification)}</p>` : ''}
+            </div>
+    `;
+
+    if (extraction.extracted_data) {
+        try {
+            const data = typeof extraction.extracted_data === 'string' ? 
+                JSON.parse(extraction.extracted_data) : extraction.extracted_data;
+            
+            html += '<div class="extraction-data"><h5>Données extraites :</h5><ul class="extraction-details-list">';
+            
+            // Fonction récursive pour afficher joliment les objets imbriqués
+            const createList = (obj) => {
+                let listHtml = '<ul>';
+                for (const [key, value] of Object.entries(obj)) {
+                    const cleanKey = escapeHtml(key.replace(/_/g, ' '));
+                    if (value && typeof value === 'object') {
+                        listHtml += `<li><strong>${cleanKey}:</strong>${createList(value)}</li>`;
+                    } else if (value) {
+                        listHtml += `<li><strong>${cleanKey}:</strong><p>${escapeHtml(value)}</p></li>`;
+                    }
+                }
+                listHtml += '</ul>';
+                return listHtml;
+            };
+
+            html += createList(data) + '</ul></div>';
+        } catch (error) {
+            html += '<p>Erreur lors de l\'affichage des données extraites.</p>';
+        }
+    }
+
+    html += '</div>';
+    return html;
 }
 
 async function handleGridImport(event) {
@@ -1385,42 +1477,6 @@ async function runAdvancedAnalysis(analysisType, projectId) {
     }
 }
 
-function formatExtractionDetailsForModal(extraction) {
-    let html = `
-        <div class="extraction-details">
-            <h3>${escapeHtml(extraction.title || 'Titre non disponible')}</h3>
-            <div class="extraction-meta">
-                <p><strong>ID Article:</strong> ${escapeHtml(extraction.pmid || extraction.article_id || 'N/A')}</p>
-                <p><strong>Score de pertinence:</strong> ${extraction.relevance_score || 'N/A'}/10</p>
-                <p><strong>Justification:</strong> ${escapeHtml(extraction.relevance_justification || 'N/A')}</p>
-            </div>
-        `;
-
-    // Si des données extraites sont disponibles
-    if (extraction.extracted_data) {
-        try {
-            const extractedData = typeof extraction.extracted_data === 'string' ? 
-                JSON.parse(extraction.extracted_data) : extraction.extracted_data;
-            
-            html += '<div class="extraction-data"><h4>Données extraites:</h4><ul class="extraction-details-list">';
-            
-            for (const [key, value] of Object.entries(extractedData)) {
-                if (value && value.toString().trim()) {
-                    html += `<li><strong>${escapeHtml(key.replace(/_/g, ' '))}:</strong><p>${escapeHtml(value)}</p></li>`;
-                }
-            }
-            
-            html += '</ul></div>';
-        } catch (error) {
-            console.error('Erreur parsing des données extraites:', error);
-            html += '<p>Erreur lors de l\'affichage des données extraites</p>';
-        }
-    }
-
-    html += '</div>';
-    return html;
-}
-
 function formatExtractionDetailsForAlert(extraction) {
     let text = `Titre: ${extraction.title || 'N/A'}\n`;
     text += `PMID: ${extraction.pmid || 'N/A'}\n`;
@@ -1491,6 +1547,13 @@ function renderSettingsSection() {
     
     container.innerHTML = cards.join('');
     
+	const gridFileInput = document.getElementById('gridFileInput');
+    if (gridFileInput) {
+        // On s'assure qu'il n'y a qu'un seul écouteur actif à la fois.
+        gridFileInput.removeEventListener('change', handleGridImport);
+        gridFileInput.addEventListener('change', handleGridImport);
+    }
+	
     // Charger le statut des files après le rendu
     loadQueueStatus().then(renderQueueStatus);
 }
@@ -1740,35 +1803,9 @@ function openGridModal(gridId = null) {
   const idInput = document.getElementById('gridIdInput');
   const fieldsContainer = document.getElementById('gridFieldsContainer');
 
-  // 1) Injection du input caché et du bouton importer
-  if (form && !document.getElementById('gridFileInput')) {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.id = 'gridFileInput';
-    fileInput.accept = '.json';
-    fileInput.style.display = 'none';
-    form.appendChild(fileInput);
-
-    const importBtn = document.createElement('button');
-    importBtn.type = 'button';
-    importBtn.dataset.action = 'import-grid';
-    importBtn.textContent = 'Importer grille (.json)';
-    form.appendChild(importBtn);
-
-    // clic du bouton pour ouvrir le file chooser
-    importBtn.addEventListener('click', () => fileInput.click());
-  }
-
-  // 2) Binding de l'événement change
-  const gridFileInput = document.getElementById('gridFileInput');
-  if (gridFileInput) {
-    gridFileInput.removeEventListener('change', handleGridImport);
-    gridFileInput.addEventListener('change', handleGridImport);
-  }
-
   if (!modal || !form) return;
 
-  // reset du formulaire et chargement des champs
+  // Reset du formulaire et chargement des champs
   form.reset();
   idInput.value = gridId || '';
   title.textContent = gridId ? "Modifier la grille" : "Créer une grille";

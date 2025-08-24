@@ -34,7 +34,6 @@
   </header>
 
   <main class="app-main container">
-    <!-- Projets -->
     <section id="projectsSection" class="section section--active">
       <div class="section-header">
         <div class="section-header__content">
@@ -60,7 +59,6 @@
       </div>
     </section>
 
-    <!-- Recherche -->
     <section id="searchSection" class="section">
 	  <div id="searchContainer" class="container--narrow">
 		<form id="multiSearchForm">
@@ -82,17 +80,14 @@
 	  </div>
 	</section>
 
-    <!-- Résultats -->
     <section id="resultsSection" class="section">
       <div id="resultsContainer" class="container--narrow results-placeholder">Les résultats s'afficheront ici.</div>
     </section>
 
-    <!-- Validation -->
     <section id="validationSection" class="section">
       <div id="validationContainer" class="container--narrow validation-placeholder">Interface de validation en cours de développement.</div>
     </section>
 
-    <!-- Analyses -->
     <section id="analysisSection" class="section">
       <div class="section-header">
         <div class="section-header__content">
@@ -103,23 +98,19 @@
       <div id="analysisContainer" class="analysis-grid"></div>
     </section>
 
-    <!-- Import -->
     <section id="importSection" class="section">
       <div id="importContainer" class="import-container"></div>
     </section>
 
-    <!-- Chat -->
     <section id="chatSection" class="section">
       <div id="chatContainer" class="chat-interface"></div>
     </section>
 
-    <!-- Paramètres -->
     <section id="settingsSection" class="section">
       <div id="settingsContainer" class="settings-grid"></div>
     </section>
   </main>
 
-  <!-- Modales -->
   <div id="newProjectModal" class="modal">
     <div class="modal__content">
       <button class="modal__close">×</button>
@@ -183,37 +174,35 @@
       <div class="modal__content">
           <button class="modal__close" onclick="closeModal('runPipelineModal')">×</button>
           <h3>Lancer une analyse</h3>
-            <form id="runPipelineForm">
-			  <div class="form-group">
-				<label for="pipelineSourceSelect">Source des articles</label>
-				<select id="pipelineSourceSelect" name="source" class="form-control">
-				  <option value="search_results" selected>Utiliser les résultats de la recherche</option>
-				  <option value="manual">Saisir manuellement</option>
-				</select>
-			  </div>
+          <form id="runPipelineForm">
+              <div class="form-group">
+                  <label for="pipelineSourceSelect" class="form-label">Source des articles</label>
+                  <select id="pipelineSourceSelect" name="pipelineSourceSelect" class="form-control">
+                      <option value="search_results" selected>Utiliser les résultats de la recherche</option>
+                      <option value="manual">Saisir manuellement les identifiants</option>
+                  </select>
+              </div>
+            
+              <div id="manualIdsGroup" class="form-group" style="display: none;">
+                  <label for="pmidsTextarea" class="form-label">Liste d'identifiants (un par ligne)</label>
+                  <textarea id="pmidsTextarea" name="pmidsTextarea" class="form-control" rows="5" placeholder="Collez ici vos PMID, DOI, etc."></textarea>
+              </div>
 
-			  <div class="form-group">
-				<label for="customGridSelect">Grille d’extraction</label>
-				<select id="customGridSelect" name="custom_grid_id" class="form-control">
-				  <option value="" disabled selected>Choisir une grille</option>
-				</select>
-			  </div>
+              <div class="form-group">
+                  <label for="pipelineProfileSelect" class="form-label">Profil d'analyse</label>
+                  <select id="pipelineProfileSelect" name="pipelineProfileSelect" class="form-control"></select>
+              </div>
 
-			  <div id="manualIdsGroup" class="form-group" style="display:none;">
-				<label for="pmidsTextarea">Liste d’identifiants</label>
-				<textarea id="pmidsTextarea" name="articles" class="form-control" rows="5"></textarea>
-			  </div>
+              <div id="pipelineGridContainer" class="form-group" style="display: none;">
+                  <label for="pipelineGridSelect" class="form-label">Grille d'extraction personnalisée</label>
+                  <select id="pipelineGridSelect" name="pipelineGridSelect" class="form-control"></select>
+              </div>
 
-			  <div class="form-group">
-				<label for="pipelineProfileSelect">Profil d’analyse</label>
-				<select id="pipelineProfileSelect" name="profile" class="form-control"></select>
-			  </div>
-
-			  <div class="modal__actions">
-				<button type="submit" class="btn btn--primary">Lancer le traitement</button>
-			  </div>
-			</form
-	  </div>
+              <div class="modal__actions">
+                   <button type="submit" class="btn btn--primary">Lancer le traitement</button>
+              </div>
+          </form>
+      </div>
   </div>
 
   <div id="profileModal" class="modal">
@@ -251,16 +240,13 @@
         <button class="modal__close">×</button>
       </div>
       <div id="extractionModalBody" class="modal__body">
-        <!-- Le contenu sera injecté par JavaScript -->
-      </div>
+        </div>
     </div>
   </div>
 
-  <!-- Inputs/Forms auxiliaires (suppression du formulaire dupliqué) -->
   <input id="pdfFileInput" type="file" accept="application/pdf" multiple class="hidden" />
   <input id="gridFileInput" type="file" accept="application/json" class="hidden" />
 
-  <!-- Overlays / Toasts -->
   <div id="loadingOverlay" class="loading-overlay">
     <div class="loading-overlay__content">
       <div class="loading-spinner loading-spinner--lg"></div>
@@ -269,7 +255,6 @@
   </div>
   <div id="toastContainer" class="toast-container"></div>
 
-  <!-- Scripts: Socket.IO client depuis le serveur, puis app.js -->
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
   <script src="/app.js"></script>
 </body>
