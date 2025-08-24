@@ -101,7 +101,8 @@ function setupEventListeners() {
     document.getElementById('pipelineSourceSelect')?.addEventListener('change', handlePipelineSourceChange);
     document.getElementById('analysisMode')?.addEventListener('change', handleAnalysisModeChange);
 	document.getElementById('pipelineSourceSelect')?.addEventListener('change', handlePipelineSourceChange);
-
+	document.getElementById('gridFileInput')?.addEventListener('change', handleGridImport); 
+	
     // Délégation d'événements pour les éléments dynamiques
     document.body.addEventListener('click', (e) => {
         const target = e.target.closest('[data-action]');
@@ -167,6 +168,14 @@ function setupEventListeners() {
             // Paramètres - Zotero
             saveZoteroSettings: () => handleSaveZoteroSettings(),
         };
+		
+		'toggleAbstract': () => {
+                const titleRow = target.closest('tr');
+                const abstractRow = titleRow.nextElementSibling;
+                if (abstractRow && abstractRow.classList.contains('abstract-row')) {
+                    abstractRow.classList.toggle('hidden');
+                }
+            },
 
         if (actions[action]) {
             actions[action]();
@@ -587,7 +596,7 @@ async function handleCreateProject(e) {
     const formData = new FormData(e.target);
     const projectData = {
         name: formData.get('projectName'),
-        description: formData.get('projectDescription'),
+        description: formData.get('description'),
         mode: formData.get('analysisMode')
     };
 
@@ -761,9 +770,8 @@ function renderSearchResults() {
         <div class="search-results-header">
             <h3>Résultats de Recherche (${appState.searchResults.length} articles)</h3>
             <div class="search-actions">
-                <button class="btn btn--secondary" data-action="selectAllSearchResults">Tout sélectionner</button>
-                <button class="btn btn--primary" data-action="addSelectedToProject">Ajouter sélectionnés au projet</button>
-            </div>
+                <button class="btn btn--secondary" data-action="selectAllSearchResults">Tout sélectionner / désélectionner</button>
+                </div>
         </div>
         
         ${Object.entries(groupedResults).map(([database, results]) => `
@@ -948,20 +956,22 @@ async function handleRunPipeline(e) {
     const customGridId = formData.get('pipelineGridSelect');
     
     let articleIds = [];
-    
+    let sourceDescription = ""; // Pour l'affichage dans le toast
+
     if (source === 'manual') {
         const manualIds = formData.get('pmidsTextarea');
-        if (!manualIds) {
-            showToast('Veuillez fournir des IDs d\'articles.', 'error');
-            return;
+        if (manualIds) {
+            articleIds = manualIds.split('\n').map(id => id.trim()).filter(Boolean);
         }
-        articleIds = manualIds.split('\n').map(id => id.trim()).filter(Boolean);
-    } 
-    // Si la source n'est pas manuelle, nous n'envoyons pas la liste d'articles.
-    // Le backend les récupérera de la base de données.
+        sourceDescription = `${articleIds.length} article(s) saisi(s) manuellement`;
+    } else { 
+        
+        articleIds = Array.from(appState.selectedSearchResults);
+        sourceDescription = `${articleIds.length} article(s) sélectionné(s) depuis la recherche`;
+    }
     
-    if (source === 'manual' && articleIds.length === 0) {
-        showToast('Aucun article à traiter.', 'error');
+    if (articleIds.length === 0) {
+        showToast('Aucun article à traiter. Veuillez en sélectionner depuis la recherche ou en saisir manuellement.', 'error');
         return;
     }
 
@@ -972,14 +982,16 @@ async function handleRunPipeline(e) {
         await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
             method: 'POST',
             body: {
-                source: source, // On précise la source
-                article_ids: articleIds, // La liste sera vide si la source n'est pas manuelle
+                // Le backend s'attend à 'articles' et non 'article_ids'
+                articles: articleIds, 
                 profile: profile,
                 custom_grid_id: customGridId || null
             }
         });
         
-        showToast(`Analyse lancée pour ${source === 'manual' ? articleIds.length : 'les résultats de recherche'} articles.`, 'info');
+        showToast(`Analyse lancée pour ${sourceDescription}.`, 'info');
+        // Vider la sélection après avoir lancé l'analyse
+        appState.selectedSearchResults.clear(); 
         await selectProject(appState.currentProject.id, true);
         
     } catch (error) {
@@ -1067,25 +1079,22 @@ function renderResultsSection() {
         return;
     }
 
-    const isScreening = project.analysis_mode === 'screening';
+   const isScreening = project.analysis_mode === 'screening';
     
     container.innerHTML = `
         <div class="results-header">
             <h2>Résultats pour : ${escapeHtml(project.name)}</h2>
-            <div class="results-stats">
-                <span class="stat-badge">📊 ${extractions.length} extractions</span>
-                <span class="stat-badge">✅ ${extractions.filter(e => e.relevance_score >= 7).length} pertinentes</span>
-            </div>
+            <p>Validez les décisions de l'IA en cliquant sur "Inclure" ou "Exclure" pour chaque article.</p>
         </div>
-        
         <div class="table-container">
             <table class="table">
                 <thead>
                     <tr>
-                        ${isScreening ? 
-                            `<th>Score</th><th>ID</th><th>Titre</th><th>Justification</th>` :
-                            `<th>ID</th><th>Titre</th><th>Données Extraites</th>`
-                        }
+                        ${isScreening ? '<th>Score IA</th>' : ''}
+                        <th>ID</th>
+                        <th>Titre</th>
+                        ${isScreening ? '<th>Justification IA</th>' : '<th>Données Extraites</th>'}
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1097,58 +1106,121 @@ function renderResultsSection() {
 }
 
 function renderExtractionRow(extraction, isScreening) {
+    const validationStatus = extraction.user_validation_status;
+    let rowClass = '';
+    if (validationStatus === 'include') rowClass = 'extraction-row--included';
+    if (validationStatus === 'exclude') rowClass = 'extraction-row--excluded';
+
+    // Construire la ligne principale du tableau
+    let mainRowHtml = `<tr class="extraction-row ${rowClass}">`;
+    
     if (isScreening) {
         const scoreClass = extraction.relevance_score >= 7 ? 'score-badge--high' : 'score-badge--low';
-        return `
-            <tr>
-                <td><span class="score-badge ${scoreClass}">${extraction.relevance_score ?? 'N/A'}</span></td>
-                <td>${escapeHtml(extraction.pmid)}</td>
-                <td class="title-cell" title="${escapeHtml(extraction.title)}">${escapeHtml(extraction.title || '')}</td>
-                <td class="justification-cell">${escapeHtml(extraction.relevance_justification || 'N/A')}</td>
-            </tr>
-        `;
+        mainRowHtml += `<td><span class="score-badge ${scoreClass}">${extraction.relevance_score ?? 'N/A'}</span></td>`;
+    }
+    
+    mainRowHtml += `<td>${escapeHtml(extraction.pmid)}</td>`;
+    mainRowHtml += `<td class="title-cell" data-action="toggleAbstract" title="Cliquer pour voir l'abstract">${escapeHtml(extraction.title || '')}</td>`;
+    
+    if (isScreening) {
+        mainRowHtml += `<td class="justification-cell">${escapeHtml(extraction.relevance_justification || 'N/A')}</td>`;
     } else {
-        let extractedDataPreview = 'N/A';
+        let preview = 'N/A';
         try {
             if (extraction.extracted_data) {
                 const data = JSON.parse(extraction.extracted_data);
-                extractedDataPreview = Object.keys(data).join(', ');
+                preview = Object.keys(data).slice(0, 3).join(', ') + '...';
             }
-        } catch (e) {
-            extractedDataPreview = 'Erreur de parsing';
-        }
-        
-        return `
-            <tr>
-                <td>${escapeHtml(extraction.pmid)}</td>
-                <td class="title-cell" title="${escapeHtml(extraction.title)}">${escapeHtml(extraction.title || '')}</td>
-                <td class="extraction-preview">${escapeHtml(extractedDataPreview)}</td>
-            </tr>
-        `;
+        } catch (e) {}
+        mainRowHtml += `<td class="extraction-preview">${escapeHtml(preview)}</td>`;
     }
+    
+    mainRowHtml += `
+        <td class="actions-cell">
+            <button class="btn btn--success btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="include" ${validationStatus === 'include' ? 'disabled' : ''}>Inclure</button>
+            <button class="btn btn--danger btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="exclude" ${validationStatus === 'exclude' ? 'disabled' : ''}>Exclure</button>
+        </td>
+    </tr>`;
+
+    // Construire la ligne cachée pour l'abstract
+    const abstractRowHtml = (isScreening && extraction.abstract) ? `
+        <tr class="abstract-row hidden">
+            <td colspan="5">
+                <div class="abstract-content">
+                    <strong>Abstract:</strong>
+                    <p>${escapeHtml(extraction.abstract)}</p>
+                </div>
+            </td>
+        </tr>
+    ` : '';
+
+    return mainRowHtml + abstractRowHtml;
 }
 
-function renderValidationSection() {
+async function renderValidationSection() {
     const container = elements.validationContainer;
     const project = appState.currentProject;
     
-    if (!project || project.analysis_mode !== 'validation') {
+    if (!project) {
         container.innerHTML = `
             <div class="validation-placeholder">
-                <div class="validation-placeholder__icon">✅</div>
-                <h4>Mode validation non activé</h4>
-                <p>Créez un projet en mode "Validation manuelle" pour utiliser cette section.</p>
+                <h4>Sélectionnez un projet</h4>
+                <p>Les statistiques de validation s'afficheront ici.</p>
             </div>`;
         return;
     }
     
-    // Interface de validation (à implémenter selon les besoins)
-    container.innerHTML = `
-        <div class="validation-interface">
-            <h2>Validation manuelle - ${escapeHtml(project.name)}</h2>
-            <p>Interface de validation en cours de développement.</p>
-        </div>
-    `;
+    showLoadingOverlay(true, 'Calcul des statistiques...');
+    try {
+        const stats = await fetchAPI(`/projects/${project.id}/validation-stats`);
+        
+        if (stats.total_validated === 0) {
+            container.innerHTML = `
+                <div class="validation-placeholder">
+                    <h4>Aucune validation</h4>
+                    <p>Allez dans l'onglet "Résultats" et cliquez sur "Inclure" ou "Exclure" pour commencer à évaluer l'IA.</p>
+                </div>`;
+            return;
+        }
+
+        const { metrics, confusion_matrix: cm } = stats;
+        container.innerHTML = `
+            <div class="section-header">
+                <h2>Statistiques de Validation pour : ${escapeHtml(project.name)}</h2>
+                <p>Performance de l'IA comparée à vos décisions manuelles sur ${stats.total_validated} article(s).</p>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card"><h5>Précision</h5><span class="metric-value">${(metrics.precision * 100).toFixed(1)}%</span></div>
+                <div class="metric-card"><h5>Rappel</h5><span class="metric-value">${(metrics.recall * 100).toFixed(1)}%</span></div>
+                <div class="metric-card"><h5>Exactitude</h5><span class="metric-value">${(metrics.accuracy * 100).toFixed(1)}%</span></div>
+                <div class="metric-card"><h5>F1-Score</h5><span class="metric-value">${metrics.f1_score.toFixed(2)}</span></div>
+            </div>
+            <div class="confusion-matrix-container">
+                <h4>Matrice de Confusion</h4>
+                <table class="table confusion-matrix">
+                    <thead>
+                        <tr><th></th><th>Prédit : Inclus</th><th>Prédit : Exclu</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Réel : Inclus</th>
+                            <td class="cm-tp" title="Vrais Positifs">${cm.tp}</td>
+                            <td class="cm-fn" title="Faux Négatifs">${cm.fn}</td>
+                        </tr>
+                        <tr>
+                            <th>Réel : Exclu</th>
+                            <td class="cm-fp" title="Faux Positifs">${cm.fp}</td>
+                            <td class="cm-tn" title="Vrais Négatifs">${cm.tn}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+    } catch (error) {
+        container.innerHTML = `<p class="text-error">Impossible de charger les statistiques.</p>`;
+    } finally {
+        showLoadingOverlay(false);
+    }
 }
 
 function renderAnalysisSection() {
@@ -1610,6 +1682,39 @@ async function handleSaveGrid(e) {
         console.error('Erreur sauvegarde grille:', error);
     } finally {
         showLoadingOverlay(false);
+    }
+}
+
+async function handleGridImport(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!appState.currentProject) {
+        showToast("Veuillez sélectionner un projet avant d'importer une grille.", 'error');
+        return;
+    }
+    if (!file.name.endsWith('.json')) {
+        showToast("Veuillez sélectionner un fichier .json valide.", 'error');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    showLoadingOverlay(true, "Importation de la grille...");
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/grids/import`, {
+            method: 'POST',
+            body: formData,
+        });
+        showToast("Grille d'extraction importée avec succès.", 'success');
+        await loadProjectGrids(appState.currentProject.id);
+        renderSettingsSection();
+    } catch (error) {
+        console.error('Erreur importation grille:', error);
+    } finally {
+        showLoadingOverlay(false);
+        e.target.value = ''; // Réinitialise l'input de fichier
     }
 }
 
@@ -2168,18 +2273,18 @@ function viewAnalysisPlot(projectId, plotType) {
 }
 
 async function handleValidateExtraction(extractionId, decision) {
+    if (!appState.currentProject) return;
+    
     try {
         await fetchAPI(`/extractions/${extractionId}/validate`, {
             method: 'POST',
             body: { decision }
         });
+        showToast(`Article marqué comme "${decision === 'include' ? 'Inclus' : 'Exclu'}".`, 'success');
         
-        showToast(`Extraction marquée comme ${decision}.`, 'success');
-        
-        if (appState.currentProject) {
-            await loadProjectExtractions(appState.currentProject.id);
-            renderResultsSection();
-        }
+        // Rafraîchir les données pour mettre à jour l'affichage
+        await loadProjectExtractions(appState.currentProject.id);
+        renderResultsSection(); // Redessiner la table des résultats
         
     } catch (error) {
         console.error('Erreur validation:', error);

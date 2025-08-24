@@ -992,36 +992,30 @@ def import_grid_from_file(project_id):
 # Pipeline de traitement
 @api_bp.route('/projects/<project_id>/run', methods=['POST'])
 def run_project_pipeline(project_id):
-    """Lance le pipeline d'analyse pour un projet."""
+    """Lance le pipeline d'analyse pour un projet sur une liste d'articles fournie."""
     data = request.get_json()
-    source = data.get('source')
+    
+    # --- CORRECTION : Simplification de la logique ---
+    # On attend toujours une liste nommée 'articles'
+    selected_articles = data.get('articles', [])
     profile_id = data.get('profile', 'standard')
     custom_grid_id = data.get('custom_grid_id')
     
+    if not selected_articles:
+        return jsonify({'error': 'La liste d\'articles est requise.'}), 400
+    
     with sqlite3.connect(DATABASE_FILE) as conn:
         conn.row_factory = sqlite3.Row
+        
         profile_row = conn.execute("SELECT * FROM analysis_profiles WHERE id = ?", (profile_id,)).fetchone()
         if not profile_row:
             return jsonify({'error': f"Profil invalide: '{profile_id}'"}), 400
         profile = dict(profile_row)
         
         project = conn.execute("SELECT analysis_mode FROM projects WHERE id = ?", (project_id,)).fetchone()
-        analysis_mode = project[0] if project else 'screening'
-
-    article_ids = []
-    if source == 'manual':
-        article_ids = data.get('article_ids', [])
-        if not article_ids:
-            return jsonify({'error': 'La liste d\'identifiants manuels est vide.'}), 400
-    else: # Par défaut, on utilise les résultats de recherche
-        with sqlite3.connect(DATABASE_FILE) as conn:
-            rows = conn.execute("SELECT article_id FROM search_results WHERE project_id = ?", (project_id,)).fetchall()
-            article_ids = [row[0] for row in rows]
-        if not article_ids:
-            return jsonify({'error': 'Aucun résultat de recherche à analyser. Veuillez d\'abord lancer une recherche.'}), 400
-
-    # Nettoyage et mise à jour du projet
-    with sqlite3.connect(DATABASE_FILE) as conn:
+        analysis_mode = project['analysis_mode'] if project else 'screening'
+        
+        # Nettoyage et mise à jour du projet
         conn.execute("DELETE FROM extractions WHERE project_id = ?", (project_id,))
         conn.execute("DELETE FROM processing_log WHERE project_id = ?", (project_id,))
         conn.execute("""
@@ -1029,11 +1023,11 @@ def run_project_pipeline(project_id):
             status = 'processing', profile_used = ?, updated_at = ?, pmids_count = ?,
             processed_count = 0, total_processing_time = 0
             WHERE id = ?
-        """, (profile_id, datetime.now().isoformat(), len(article_ids), project_id))
+        """, (profile_id, datetime.now().isoformat(), len(selected_articles), project_id))
         conn.commit()
 
     # Lancer les tâches de fond
-    for article_id in article_ids:
+    for article_id in selected_articles:
         processing_queue.enqueue(
             process_single_article_task,
             project_id=project_id,
@@ -1046,7 +1040,7 @@ def run_project_pipeline(project_id):
     
     return jsonify({
         "status": "processing",
-        "message": f"{len(article_ids)} articles sont en cours de traitement."
+        "message": f"{len(selected_articles)} articles sont en cours de traitement."
     }), 202
 
 @api_bp.route('/projects/<project_id>/run-synthesis', methods=['POST'])
@@ -1083,33 +1077,23 @@ def run_synthesis_endpoint(project_id):
 # Extractions
 @api_bp.route('/projects/<project_id>/extractions', methods=['GET'])
 def get_project_extractions(project_id):
-    """Récupère les extractions d'un projet."""
+    """Récupère les extractions d'un projet, y compris l'abstract."""
     with sqlite3.connect(DATABASE_FILE) as conn:
         conn.row_factory = sqlite3.Row
+        # On joint la table des extractions (e) avec celle des résultats de recherche (s)
+        # pour récupérer l'abstract correspondant à chaque article.
         extractions = conn.execute("""
-            SELECT id, pmid, title, relevance_score, relevance_justification,
-            user_validation_status, extracted_data FROM extractions
-            WHERE project_id = ? ORDER BY relevance_score DESC
+            SELECT
+                e.id, e.pmid, e.title, e.relevance_score, e.relevance_justification,
+                e.user_validation_status, e.extracted_data,
+                s.abstract
+            FROM extractions e
+            LEFT JOIN search_results s ON e.project_id = s.project_id AND e.pmid = s.article_id
+            WHERE e.project_id = ?
+            ORDER BY e.relevance_score DESC
         """, (project_id,)).fetchall()
     
     return jsonify([dict(row) for row in extractions])
-
-@api_bp.route('/extractions/<extraction_id>/validate', methods=['POST'])
-def validate_extraction(extraction_id):
-    """Valide une extraction par l'utilisateur."""
-    data = request.get_json()
-    user_decision = data.get('decision')
-    
-    if user_decision not in ['include', 'exclude']:
-        return jsonify({'error': 'Décision invalide'}), 400
-    
-    with sqlite3.connect(DATABASE_FILE) as conn:
-        conn.execute("""
-            UPDATE extractions SET user_validation_status = ? WHERE id = ?
-        """, (user_decision, extraction_id))
-        conn.commit()
-    
-    return jsonify({'message': f'Extraction marquée comme {user_decision}.'}), 200
 
 # Logs et résultats
 @api_bp.route('/projects/<project_id>/processing-log', methods=['GET'])
@@ -1337,53 +1321,6 @@ def get_prisma_flow_image(project_id):
     
     return jsonify({"error": "Image PRISMA non trouvée."}), 404
 
-# Validation
-@api_bp.route('/projects/<project_id>/validation-stats', methods=['GET'])
-def get_validation_stats(project_id):
-    """Calcule les statistiques de validation pour un projet."""
-    with sqlite3.connect(DATABASE_FILE) as conn:
-        conn.row_factory = sqlite3.Row
-        
-        # Récupérer toutes les extractions avec décision utilisateur
-        extractions = conn.execute("""
-            SELECT relevance_score, user_validation_status
-            FROM extractions
-            WHERE project_id = ? AND user_validation_status IS NOT NULL
-        """, (project_id,)).fetchall()
-        
-        if not extractions:
-            return jsonify({"error": "Aucune validation utilisateur trouvée."}), 404
-        
-        # Calculer les métriques de performance
-        total = len(extractions)
-        ia_includes = sum(1 for e in extractions if e['relevance_score'] >= 7)
-        user_includes = sum(1 for e in extractions if e['user_validation_status'] == 'include')
-        
-        # Matrice de confusion
-        tp = sum(1 for e in extractions if e['relevance_score'] >= 7 and e['user_validation_status'] == 'include')
-        tn = sum(1 for e in extractions if e['relevance_score'] < 7 and e['user_validation_status'] == 'exclude')
-        fp = sum(1 for e in extractions if e['relevance_score'] >= 7 and e['user_validation_status'] == 'exclude')
-        fn = sum(1 for e in extractions if e['relevance_score'] < 7 and e['user_validation_status'] == 'include')
-        
-        # Métriques
-        accuracy = (tp + tn) / total if total > 0 else 0
-        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
-        f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-        
-        return jsonify({
-            "total_articles": total,
-            "ia_includes": ia_includes,
-            "user_includes": user_includes,
-            "confusion_matrix": {"tp": tp, "tn": tn, "fp": fp, "fn": fn},
-            "metrics": {
-                "accuracy": round(accuracy, 3),
-                "precision": round(precision, 3),
-                "recall": round(recall, 3),
-                "f1_score": round(f1_score, 3)
-            }
-        })
-
 # Upload de PDF individuel
 @api_bp.route('/projects/<project_id>/<article_id>/upload-pdf', methods=['POST'])
 def upload_pdf(project_id, article_id):
@@ -1404,6 +1341,66 @@ def upload_pdf(project_id, article_id):
     
     return jsonify({'message': f'PDF pour {article_id} importé avec succès.'}), 200
 
+@api_bp.route('/extractions/<extraction_id>/validate', methods=['POST'])
+def validate_extraction(extraction_id):
+    """Valide une extraction par l'utilisateur."""
+    data = request.get_json()
+    user_decision = data.get('decision') # 'include' or 'exclude'
+    
+    if user_decision not in ['include', 'exclude']:
+        return jsonify({'error': 'Décision invalide'}), 400
+    
+    with sqlite3.connect(DATABASE_FILE) as conn:
+        conn.execute("""
+            UPDATE extractions SET user_validation_status = ? WHERE id = ?
+        """, (user_decision, extraction_id))
+        conn.commit()
+    
+    return jsonify({'message': f'Extraction marquée comme {user_decision}.'}), 200
+
+@api_bp.route('/projects/<project_id>/validation-stats', methods=['GET'])
+def get_validation_stats(project_id):
+    """Calcule les statistiques de validation pour un projet."""
+    with sqlite3.connect(DATABASE_FILE) as conn:
+        conn.row_factory = sqlite3.Row
+        extractions = conn.execute("""
+            SELECT relevance_score, user_validation_status
+            FROM extractions
+            WHERE project_id = ? AND user_validation_status IS NOT NULL
+        """, (project_id,)).fetchall()
+        
+        if not extractions:
+            return jsonify({
+                "total_validated": 0,
+                "message": "Aucune validation manuelle n'a encore été effectuée pour ce projet."
+            }), 200
+        
+        # IA 'include' si score >= 7, sinon 'exclude'
+        # Utilisateur 'include' ou 'exclude'
+        tp = sum(1 for e in extractions if e['relevance_score'] >= 7 and e['user_validation_status'] == 'include')
+        tn = sum(1 for e in extractions if e['relevance_score'] < 7 and e['user_validation_status'] == 'exclude')
+        fp = sum(1 for e in extractions if e['relevance_score'] >= 7 and e['user_validation_status'] == 'exclude')
+        fn = sum(1 for e in extractions if e['relevance_score'] < 7 and e['user_validation_status'] == 'include')
+        
+        total = len(extractions)
+        accuracy = (tp + tn) / total if total > 0 else 0
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+        f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+        
+        return jsonify({
+            "total_validated": total,
+            "ia_positives": tp + fp,
+            "user_positives": tp + fn,
+            "confusion_matrix": {"tp": tp, "tn": tn, "fp": fp, "fn": fn},
+            "metrics": {
+                "accuracy": round(accuracy, 3),
+                "precision": round(precision, 3),
+                "recall": round(recall, 3),
+                "f1_score": round(f1_score, 3)
+            }
+        })
+        
 # WebSocket Events
 @socketio.on('connect')
 def handle_connect():
