@@ -47,10 +47,10 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # WebSocket
 socketio = SocketIO(
-    app, 
-    cors_allowed_origins="*", 
-    async_mode='gevent', 
-    path='/socket.io',
+    app,
+    cors_allowed_origins="*",
+    async_mode='gevent',
+    path='/socket.io/',  
     message_queue=config.REDIS_URL,
     ping_interval=config.WEBSOCKET_PING_INTERVAL,
     ping_timeout=config.WEBSOCKET_PING_TIMEOUT
@@ -1425,13 +1425,14 @@ def handle_disconnect():
 
 @socketio.on('join_project')
 def handle_join_project(data):
-    """Permet à un client de rejoindre une "room" pour un projet spécifique."""
-    if 'project_id' in data:
-        from flask_socketio import join_room
-        join_room(data['project_id'])
-        logger.info(f"Client {request.sid} a rejoint le projet {data['project_id']}")
-        socketio.emit('project_joined', {'project_id': data['project_id']})
-
+    from flask_socketio import join_room
+    project_id = data.get('project_id')
+    if not project_id:
+        return
+    join_room(project_id)
+    # Confirmer aux clients de la room (dont l’émetteur)
+    socketio.emit('project_joined', {'project_id': project_id}, room=project_id)
+    
 # Enregistrement du blueprint et routes statiques
 app.register_blueprint(api_bp)
 
@@ -1450,7 +1451,7 @@ def internal_error(error):
     """Gestion des erreurs internes."""
     logger.error(f"Erreur interne du serveur: {error}")
     return jsonify({"error": "Erreur interne du serveur"}), 500
-
+    
 if __name__ == '__main__':
     init_db()
     logger.info("🚀 Démarrage du serveur AnalyLit V4.0 sur le port 5001...")

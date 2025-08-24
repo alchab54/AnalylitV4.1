@@ -52,7 +52,7 @@ services:
       - ./web:/app/web:ro
       - .:/app # Monte le répertoire courant pour que les fichiers Python soient accessibles
     # Utilisation de Gunicorn avec GeventWebSocketWorker pour les WebSockets
-    command: sh -c "python -c 'from server_v4_complete import init_db; init_db()' && gunicorn --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker --bind 0.0.0.0:5001 server_v4_complete:app"
+    command: sh -c "python -c 'from server_v4_complete import init_db; init_db()' && gunicorn --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker --workers 1 --bind 0.0.0.0:5001 server_v4_complete:app"
     depends_on:
       redis:
         condition: service_healthy

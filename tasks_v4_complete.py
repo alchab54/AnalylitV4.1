@@ -53,6 +53,7 @@ MIN_CHUNK_LEN = 250
 NORMALIZE_LOWER = False
 EMBED_BATCH = 32
 USE_QUERY_EMBED = True
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://ollama:11434")
 
 class DatabaseManager:
     """Gestionnaire centralisé pour les requêtes multi-bases de données."""

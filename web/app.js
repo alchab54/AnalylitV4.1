@@ -17,7 +17,8 @@ const appState = {
     socket: null,
     availableDatabases: [],
     notifications: [],
-    unreadNotifications: 0
+    unreadNotifications: 0,
+    selectedSearchResults: new Set()
 };
 
 // ===== SÉLECTEURS D'ÉLÉMENTS DOM =====
@@ -281,23 +282,20 @@ function initializeWebSocket() {
 function handleWebSocketNotification(data) {
     const { type, message, project_id, data: notificationData } = data;
     
-    // Afficher la notification
     showToast(message, notificationData?.type || 'info');
     
-    // Incrémenter le compteur de notifications
     appState.unreadNotifications++;
     updateNotificationIndicator();
     
-    // Actions spécifiques selon le type
     switch (type) {
         case 'article_processed':
         case 'search_completed':
         case 'synthesis_completed':
         case 'analysis_completed':
             if (project_id === appState.currentProject?.id) {
-                selectProject(project_id, true); // Rafraîchissement silencieux
+                selectProject(project_id, true);
             } else {
-                loadProjects(); // Recharger la liste des projets
+                loadProjects();
             }
             break;
             
@@ -366,27 +364,22 @@ function closeModal(modalId) {
 function showSection(sectionName) {
     appState.currentSection = sectionName;
     
-    // Marquer les notifications comme lues lors du changement de section
     appState.unreadNotifications = 0;
     updateNotificationIndicator();
     
-    // Masquer toutes les sections
     elements.sections.forEach(section => {
         section.classList.add('hidden');
     });
     
-    // Afficher la section active
     const activeSection = document.getElementById(`${sectionName}Section`);
     if (activeSection) {
         activeSection.classList.remove('hidden');
     }
 
-    // Mettre à jour la navigation
     elements.navButtons.forEach(button => {
         button.classList.toggle('app-nav__button--active', button.getAttribute('data-section') === sectionName);
     });
 
-    // Rafraîchir le contenu de la section
     refreshCurrentSection();
 }
 
@@ -647,7 +640,7 @@ async function handleDeleteProject(projectId) {
 
 async function loadAvailableDatabases() {
     try {
-        appState.availableDatabases = await fetchAPI('/databases/available');
+        appState.availableDatabases = await fetchAPI('/databases');
         renderDatabaseSelection();
     } catch (error) {
         appState.availableDatabases = [
@@ -702,9 +695,10 @@ async function handleMultiSearch(e) {
     
     showLoadingOverlay(true, 'Lancement de la recherche...');
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/search`, {
+        await fetchAPI(`/search`, {
             method: 'POST',
             body: {
+                project_id: appState.currentProject.id,
                 query: query,
                 databases: databases,
                 max_results_per_db: maxResults
@@ -725,7 +719,8 @@ async function handleMultiSearch(e) {
 
 async function loadSearchResults(projectId) {
     try {
-        appState.searchResults = await fetchAPI(`/projects/${projectId}/search-results`);
+        const data = await fetchAPI(`/projects/${projectId}/search-results`);
+        appState.searchResults = data.results;
         renderSearchResults();
     } catch (error) {
         appState.searchResults = [];
@@ -1639,7 +1634,7 @@ async function handleDeleteGrid(gridId) {
 }
 
 function openPromptModal(promptId) {
-    const prompt = appState.prompts.find(p => p.id === promptId);
+    const prompt = appState.prompts.find(p => p.id == promptId); // Use == for loose comparison
     if (!prompt) return;
     
     const modal = document.getElementById('editPromptModal');
