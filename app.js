@@ -1,8 +1,8 @@
 // ================================================================
-// AnalyLit V4.0 - Application Frontend Complète
+// AnalyLit V4.1 - Application Frontend CORRIGÉE
+// Corrections des bugs A, B, C et D
 // ================================================================
 
-// ===== ÉTAT GLOBAL DE L'APPLICATION =====
 const appState = {
     currentProject: null,
     projects: [],
@@ -21,16 +21,10 @@ const appState = {
     selectedSearchResults: new Set()
 };
 
-// ===== SÉLECTEURS D'ÉLÉMENTS DOM =====
 let elements = {};
 
-// ================================================================
-// ===== 1. INITIALISATION ET POINT D'ENTRÉE
-// ================================================================
-
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Démarrage de AnalyLit V4.0 Frontend...');
-    
+    console.log('🚀 Démarrage de AnalyLit V4.1 Frontend CORRIGÉ...');
     elements = {
         sections: document.querySelectorAll('.section'),
         navButtons: document.querySelectorAll('.app-nav__button'),
@@ -40,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
         projectDetail: document.getElementById('projectDetail'),
         projectDetailContent: document.getElementById('projectDetailContent'),
         projectPlaceholder: document.getElementById('projectPlaceholder'),
-        searchContainer: document.getElementById('searchContainer'),
         searchResults: document.getElementById('searchResults'),
         resultsContainer: document.getElementById('resultsContainer'),
         validationContainer: document.getElementById('validationContainer'),
@@ -78,16 +71,13 @@ async function initializeApplication() {
 }
 
 function setupEventListeners() {
-    // Navigation principale
-    elements.navButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            const sectionName = e.currentTarget.getAttribute('data-section');
-            showSection(sectionName);
-        });
-    });
+    // Navigation
+    elements.navButtons.forEach(button => button.addEventListener('click', (e) => {
+        e.preventDefault();
+        showSection(e.currentTarget.getAttribute('data-section'));
+    }));
 
-    // Boutons et formulaires principaux
+    // Formulaires
     elements.createProjectBtn?.addEventListener('click', () => openModal('newProjectModal'));
     elements.newProjectForm?.addEventListener('submit', handleCreateProject);
     elements.multiSearchForm?.addEventListener('submit', handleMultiSearch);
@@ -96,105 +86,113 @@ function setupEventListeners() {
     elements.promptForm?.addEventListener('submit', handleSavePrompt);
     elements.profileForm?.addEventListener('submit', handleSaveProfile);
 
-    // Événements spéciaux
+    // CORRECTION BUG A : Import de grille d'extraction
+    const gridFileInput = document.getElementById('gridFileInput');
+    if (gridFileInput) {
+        gridFileInput.addEventListener('change', handleGridImport);
+    }
+
+    // Autres gestionnaires
     document.getElementById('addGridFieldBtn')?.addEventListener('click', () => addGridFieldInput());
     document.getElementById('pipelineSourceSelect')?.addEventListener('change', handlePipelineSourceChange);
-    document.getElementById('analysisMode')?.addEventListener('change', handleAnalysisModeChange);
-	document.getElementById('pipelineSourceSelect')?.addEventListener('change', handlePipelineSourceChange);
 
-    // Délégation d'événements pour les éléments dynamiques
-    document.body.addEventListener('click', (e) => {
-        const target = e.target.closest('[data-action]');
-        if (!target) return;
+    // Gestionnaire d'événements principal avec corrections
+    document.body.addEventListener('click', e => {
+		const target = e.target.closest('[data-action]');
+		if (!target) return;
 
-        const { action, projectId, articleId, extractionId, gridId, promptId, profileId, queueName, plotType, database } = target.dataset;
+		const action = target.dataset.action;
+		const pmid = target.closest('tr')?.dataset.pmid;
+		const extractionId = target.dataset.extractionId;
+		const { projectId, articleId, gridId, promptId, profileId, queueName, plotType } = target.dataset;
 
-        const actions = {
-            // Projets
-            selectProject: () => selectProject(projectId),
-            deleteProject: () => handleDeleteProject(projectId),
-            runPipeline: () => openRunPipelineModal(),
-            runSynthesis: () => handleRunSynthesis(),
-            exportProject: () => handleExportProject(projectId),
+		switch (action) {
+			case 'toggleAbstract': {
+				const row = target.closest('tr');
+				const next = row?.nextElementSibling;
+				if (next && next.classList.contains('abstract-row')) {
+					next.classList.toggle('hidden');
+					const isHidden = next.classList.contains('hidden');
+					target.textContent = isHidden
+						? escapeHtml(row.querySelector('.title-text').textContent)
+						: 'Masquer résumé';
+				}
+				return;
+			}
+			case 'viewExtractionDetails':
+				openExtractionDetailModal(extractionId);
+				return;
+			case 'validateExtraction':
+				handleValidateExtraction(extractionId, target.dataset.decision);
+				return;
+		}
 
-            // Recherche
-            selectSearchResult: () => selectSearchResult(articleId, database),
-            selectAllSearchResults: () => selectAllSearchResults(),
-            addSelectedToProject: () => addSelectedToProject(),
+		const actions = {
+			selectProject:    () => selectProject(projectId),
+			deleteProject:    () => handleDeleteProject(projectId),
+			runPipeline:      () => openRunPipelineModal(),
+			runSynthesis:     () => handleRunSynthesis(),
+			exportProject:    () => handleExportProject(projectId),
+			selectSearchResult:     () => selectSearchResult(articleId),
+			selectAllSearchResults: () => selectAllSearchResults(),
+			validateExtraction:     () => handleValidateExtraction(extractionId, target.dataset.decision),
+			toggleAbstract:         () => {
+				const titleRow = target.closest('tr');
+				const abstractRow = titleRow?.nextElementSibling;
+				if (abstractRow && abstractRow.classList.contains('abstract-row')) {
+					abstractRow.classList.toggle('hidden');
+					const isHidden = abstractRow.classList.contains('hidden');
+					target.textContent = isHidden ? '📖 Voir résumé' : '📖 Masquer résumé';
+				}
+			},
+			viewExtractionDetails:   () => openExtractionDetailModal(extractionId),
+			'generate-discussion':    () => runAdvancedAnalysis('generate-discussion', projectId),
+			'generate-knowledge-graph': () => runAdvancedAnalysis('generate-knowledge-graph', projectId),
+			'generate-prisma-flow':   () => runAdvancedAnalysis('generate-prisma-flow', projectId),
+			'run-meta-analysis':      () => runAdvancedAnalysis('run-meta-analysis', projectId),
+			'run-descriptive-stats':  () => runAdvancedAnalysis('run-descriptive-stats', projectId),
+			'run-atn-score':          () => runAdvancedAnalysis('run-atn-score', projectId),
+			viewAnalysisPlot:         () => viewAnalysisPlot(projectId, plotType),
+			'import-zotero':          () => handleImportZotero(projectId),
+			'fetch-online-pdfs':      () => handleFetchOnlinePdfs(projectId),
+			'run-indexing':           () => handleRunIndexing(projectId),
+			sendChatMessage:          () => sendChatMessage(),
+			clearChatHistory:         () => clearChatHistory(),
+			'create-grid':            () => openGridModal(),
+			'edit-grid':              () => openGridModal(gridId),
+			'delete-grid':            () => handleDeleteGrid(gridId),
+			'import-grid':            () => document.getElementById('gridFileInput')?.click(),
+			removeGridField:          () => target.closest('.grid-field-item')?.remove(),
+			'edit-prompt':            () => openPromptModal(promptId),
+			'create-profile':         () => openProfileModal(),
+			'edit-profile':           () => openProfileModal(profileId),
+			'delete-profile':         () => handleDeleteProfile(profileId),
+			pullModel:                () => handlePullModel(),
+			'refresh-queues':         () => renderQueueStatus(),
+			clearQueue:               () => handleClearQueue(queueName),
+			saveZoteroSettings:       () => handleSaveZoteroSettings(),
+		};
 
-            // Validation
-            validateExtraction: () => handleValidateExtraction(extractionId, target.dataset.decision),
+		if (actions[action]) {
+			actions[action]();
+		}
+	});
 
-            // Analyses avancées
-            'generate-discussion': () => runAdvancedAnalysis('generate-discussion', projectId),
-            'generate-knowledge-graph': () => runAdvancedAnalysis('generate-knowledge-graph', projectId),
-            'generate-prisma-flow': () => runAdvancedAnalysis('generate-prisma-flow', projectId),
-            'run-meta-analysis': () => runAdvancedAnalysis('run-meta-analysis', projectId),
-            'run-descriptive-stats': () => runAdvancedAnalysis('run-descriptive-stats', projectId),
-            'run-atn-score': () => runAdvancedAnalysis('run-atn-score', projectId),
-            viewAnalysisPlot: () => viewAnalysisPlot(projectId, plotType),
 
-            // Import
-            'upload-pdfs-bulk': () => document.getElementById('pdfFileInput')?.click(),
-            'import-zotero': () => handleImportZotero(projectId),
-            'fetch-online-pdfs': () => handleFetchOnlinePdfs(projectId),
-            'run-indexing': () => handleRunIndexing(projectId),
-
-            // Chat
-            sendChatMessage: () => sendChatMessage(),
-            clearChatHistory: () => clearChatHistory(),
-
-            // Paramètres - Grilles
-            'create-grid': () => openGridModal(),
-            'edit-grid': () => openGridModal(gridId),
-            'delete-grid': () => handleDeleteGrid(gridId),
-            'import-grid': () => document.getElementById('gridFileInput')?.click(),
-            removeGridField: () => target.closest('.form-group-dynamic').remove(),
-
-            // Paramètres - Prompts
-            'edit-prompt': () => openPromptModal(promptId),
-
-            // Paramètres - Profils
-            'create-profile': () => openProfileModal(),
-            'edit-profile': () => openProfileModal(profileId),
-            'delete-profile': () => handleDeleteProfile(profileId),
-
-            // Paramètres - Modèles & Files
-            pullModel: () => handlePullModel(),
-            'refresh-queues': () => loadQueueStatus().then(renderQueueStatus),
-            clearQueue: () => handleClearQueue(queueName),
-
-            // Paramètres - Zotero
-            saveZoteroSettings: () => handleSaveZoteroSettings(),
-        };
-
-        if (actions[action]) {
-            actions[action]();
-        }
-    });
-
-    // Raccourcis clavier
+    // Gestion des modales et touches clavier
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             const activeModal = document.querySelector('.modal--show');
             if (activeModal) closeModal(activeModal.id);
         }
-        if (e.key === 'Enter' && !e.shiftKey && appState.currentSection === 'chat') {
-             e.preventDefault();
-             sendChatMessage();
-        }
     });
 
-    // Fermeture des modales par clic extérieur
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) closeModal(modal.id);
         });
         modal.querySelector('.modal__close')?.addEventListener('click', () => closeModal(modal.id));
     });
-    
-    // Gestion du drag & drop de PDF
-    setupPDFDragDrop();
 }
 
 async function loadInitialData() {
@@ -281,7 +279,16 @@ function initializeWebSocket() {
 }
 
 function handleWebSocketNotification(data) {
-    const { type, message, project_id, data: notificationData } = data;
+	const { type, project_id } = data;
+	if (type === 'search_completed' && project_id === appState.currentProject?.id) {
+	// Recharger les résultats et afficher
+	fetchAPI(`/projects/${project_id}/search-results`)
+	  .then(res => {
+		appState.searchResults = res.results;
+		renderResultsSection();
+	  })
+	  .catch(err => console.error('Erreur fetch search-results:', err));
+	}
     
     showToast(message, notificationData?.type || 'info');
     
@@ -585,31 +592,16 @@ function renderSynthesisPreview(synthesis) {
 async function handleCreateProject(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const projectData = {
-        name: formData.get('projectName'),
-        description: formData.get('description'),
-        mode: formData.get('analysisMode')
-    };
-
-    if (!projectData.name) {
-        showToast("Le nom du projet est requis.", 'error');
-        return;
-    }
-
+    const projectData = { name: formData.get('projectName'), description: formData.get('description'), mode: formData.get('analysisMode') };
+    if (!projectData.name) { showToast("Le nom du projet est requis.", 'error'); return; }
     showLoadingOverlay(true, 'Création du projet...');
     try {
-        const newProject = await fetchAPI('/projects', {
-            method: 'POST',
-            body: projectData
-        });
-        
+        const newProject = await fetchAPI('/projects', { method: 'POST', body: projectData });
         closeModal('newProjectModal');
         e.target.reset();
         await loadProjects();
         await selectProject(newProject.id);
         showToast('Projet créé avec succès!', 'success');
-    } catch (error) {
-        console.error('Erreur création projet:', error);
     } finally {
         showLoadingOverlay(false);
     }
@@ -676,50 +668,32 @@ function renderSearchInterface() {
 }
 
 async function handleMultiSearch(e) {
-    e.preventDefault();
-    
-    if (!appState.currentProject) {
-        showToast('Veuillez sélectionner un projet avant de lancer une recherche.', 'error');
-        return;
-    }
-    
-    const formData = new FormData(e.target);
-    const query = formData.get('searchQuery');
-    const databases = formData.getAll('databases');
-    const maxResults = parseInt(formData.get('maxResults'));
-    
-    if (!query.trim()) {
-        showToast('Veuillez saisir une requête de recherche.', 'error');
-        return;
-    }
-    
-    if (databases.length === 0) {
-        showToast('Veuillez sélectionner au moins une base de données.', 'error');
-        return;
-    }
-    
-    showLoadingOverlay(true, 'Lancement de la recherche...');
-    try {
-        await fetchAPI(`/search`, {
-            method: 'POST',
-            body: {
-                project_id: appState.currentProject.id,
-                query: query,
-                databases: databases,
-                max_results_per_db: maxResults
-            }
-        });
-        
-        showToast(`Recherche lancée dans ${databases.length} base(s) de données.`, 'info');
-        
-        // Commencer à surveiller les résultats
-        setTimeout(() => loadSearchResults(appState.currentProject.id), 2000);
-        
-    } catch (error) {
-        console.error('Erreur recherche:', error);
-    } finally {
-        showLoadingOverlay(false);
-    }
+  e.preventDefault();
+  if (!appState.currentProject) return;
+  const form = elements.multiSearchForm;
+  const query = form.querySelector('input[name="query"]').value;
+  const databases = Array.from(form.querySelectorAll('input[name="databases"]:checked')).map(cb => cb.value);
+
+  showLoadingOverlay(true, 'Recherche en cours...');
+  try {
+    // Lancer la recherche
+    await fetchAPI('/search', {
+      method: 'POST',
+      body: { project_id: appState.currentProject.id, query, databases }
+    });
+
+    // Polling ou attendre notification WebSocket, mais on fait un fetch immédiat
+    const resultsResponse = await fetchAPI(
+      `/projects/${appState.currentProject.id}/search-results`
+    );
+    appState.searchResults = resultsResponse.results;
+    renderResultsSection();
+  } catch (err) {
+    console.error('Erreur lors de la recherche :', err);
+    showToast(err.message, 'error');
+  } finally {
+    showLoadingOverlay(false);
+  }
 }
 
 async function loadSearchResults(projectId) {
@@ -736,45 +710,27 @@ async function loadSearchResults(projectId) {
 function renderSearchResults() {
     const container = elements.searchResults;
     if (!container) return;
-    
     if (!appState.searchResults || appState.searchResults.length === 0) {
-        container.innerHTML = `
-            <div class="search-placeholder">
-                <div class="search-placeholder__icon">🔍</div>
-                <h4>Aucun résultat</h4>
-                <p>Lancez une recherche pour voir les résultats ici.</p>
-            </div>
-        `;
+        container.innerHTML = `<div class="results-placeholder"><h4>Aucun résultat</h4><p>Lancez une recherche pour voir les résultats ici.</p></div>`;
         return;
     }
-    
-    // Grouper par base de données
     const groupedResults = appState.searchResults.reduce((acc, result) => {
-        if (!acc[result.database_source]) {
-            acc[result.database_source] = [];
-        }
-        acc[result.database_source].push(result);
+        (acc[result.database_source] = acc[result.database_source] || []).push(result);
         return acc;
     }, {});
-    
     container.innerHTML = `
         <div class="search-results-header">
-            <h3>Résultats de Recherche (${appState.searchResults.length} articles)</h3>
+            <h3>Résultats (${appState.searchResults.length} articles)</h3>
             <div class="search-actions">
-                <button class="btn btn--secondary" data-action="selectAllSearchResults">Tout sélectionner</button>
-                <button class="btn btn--primary" data-action="addSelectedToProject">Ajouter sélectionnés au projet</button>
+                <button class="btn btn--secondary btn--sm" data-action="selectAllSearchResults">Tout sélectionner / désélectionner</button>
             </div>
         </div>
-        
         ${Object.entries(groupedResults).map(([database, results]) => `
             <div class="database-results-section">
-                <h4>${escapeHtml(database)} (${results.length} résultats)</h4>
-                <div class="search-results-grid">
-                    ${results.map(result => renderSearchResultCard(result)).join('')}
-                </div>
+                <h4>${escapeHtml(database)} (${results.length})</h4>
+                <div class="search-results-grid">${results.map(renderSearchResultCard).join('')}</div>
             </div>
-        `).join('')}
-    `;
+        `).join('')}`;
 }
 
 function renderSearchResultCard(result) {
@@ -887,23 +843,53 @@ function updateSearchProgress(data) {
 
 function openRunPipelineModal() {
     if (!appState.currentProject) {
-        showToast('Sélectionnez d\'abord un projet.', 'error');
+        showToast("Sélectionnez d'abord un projet.", 'error');
         return;
     }
     
-    // Remplir la liste des profils
+    // Ouvre la modale vide en premier
+    openModal('runPipelineModal');
+    // Ensuite, remplit son contenu
+    renderRunPipelineModal();
+}
+
+// Fonction qui remplit la modale "Lancer une analyse"
+function renderRunPipelineModal() {
+    const project = appState.currentProject;
+    if (!project) return;
+
+    // --- CORRECTION DE L'ERREUR ---
+    // Sélection des éléments qui existent déjà dans index.html
     const profileSelect = document.getElementById('pipelineProfileSelect');
-    if (profileSelect) {
-        profileSelect.innerHTML = appState.analysisProfiles.map(profile => 
-            `<option value="${profile.id}">${escapeHtml(profile.name)}</option>`
-        ).join('');
-        profileSelect.value = appState.currentProject.profile_used || 'standard';
+    const gridContainer = document.getElementById('pipelineGridContainer');
+    const gridSelect = document.getElementById('pipelineGridSelect');
+    const sourceSelect = document.getElementById('pipelineSourceSelect');
+    
+    // Vérification que les éléments existent avant de les manipuler
+    if (!profileSelect || !gridContainer || !gridSelect || !sourceSelect) {
+        console.error("Éléments de la modale d'analyse non trouvés !");
+        return;
     }
     
-    // Gérer l'affichage de la grille selon le mode
-    handleAnalysisModeChange();
+    // Remplissage du sélecteur de profils
+    profileSelect.innerHTML = appState.analysisProfiles.map(profile => 
+        `<option value="${profile.id}">${escapeHtml(profile.name)}</option>`
+    ).join('');
+    profileSelect.value = project.profile_used || 'standard';
+
+    // Affichage du sélecteur de grille uniquement en mode "extraction détaillée"
+    if (project.analysis_mode === 'full_extraction') {
+        gridContainer.style.display = 'block';
+        gridSelect.innerHTML = '<option value="">Grille par défaut</option>' + 
+            appState.currentProjectGrids.map(grid => 
+                `<option value="${grid.id}">${escapeHtml(grid.name)}</option>`
+            ).join('');
+    } else {
+        gridContainer.style.display = 'none';
+    }
     
-    openModal('runPipelineModal');
+    // Assurer que le champ de saisie manuelle est correctement affiché ou masqué
+    handlePipelineSourceChange();
 }
 
 function handlePipelineSourceChange() {
@@ -911,26 +897,7 @@ function handlePipelineSourceChange() {
     const manualGroup = document.getElementById('manualIdsGroup');
     
     if (sourceSelect && manualGroup) {
-        const isManual = sourceSelect.value === 'manual';
-        manualGroup.style.display = isManual ? 'block' : 'none';
-    }
-}
-
-function handleAnalysisModeChange() {
-    const project = appState.currentProject;
-    const gridContainer = document.getElementById('pipelineGridContainer');
-    const gridSelect = document.getElementById('pipelineGridSelect');
-    
-    if (project && gridContainer && gridSelect) {
-        if (project.analysis_mode === 'full_extraction') {
-            gridContainer.style.display = 'block';
-            gridSelect.innerHTML = '<option value="">Grille par défaut</option>' + 
-                appState.currentProjectGrids.map(grid => 
-                    `<option value="${grid.id}">${escapeHtml(grid.name)}</option>`
-                ).join('');
-        } else {
-            gridContainer.style.display = 'none';
-        }
+        manualGroup.style.display = sourceSelect.value === 'manual' ? 'block' : 'none';
     }
 }
 
@@ -944,7 +911,7 @@ async function handleRunPipeline(e) {
 
     const formData = new FormData(e.target);
     const source = formData.get('pipelineSourceSelect');
-    const profile = formData.get('pipelineProfileSelect');
+    const profileId = formData.get('pipelineProfileSelect');
     const customGridId = formData.get('pipelineGridSelect');
     
     let articleIds = [];
@@ -956,12 +923,13 @@ async function handleRunPipeline(e) {
             return;
         }
         articleIds = manualIds.split('\n').map(id => id.trim()).filter(Boolean);
-    } 
-    // Si la source n'est pas manuelle, nous n'envoyons pas la liste d'articles.
-    // Le backend les récupérera de la base de données.
+    } else {
+        // En mode "résultats de recherche", on récupère les IDs sélectionnés
+        articleIds = Array.from(appState.selectedSearchResults);
+    }
     
-    if (source === 'manual' && articleIds.length === 0) {
-        showToast('Aucun article à traiter.', 'error');
+    if (articleIds.length === 0) {
+        showToast('Aucun article à traiter. Veuillez en sélectionner ou en saisir manuellement.', 'error');
         return;
     }
 
@@ -972,20 +940,37 @@ async function handleRunPipeline(e) {
         await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
             method: 'POST',
             body: {
-                source: source, // On précise la source
-                article_ids: articleIds, // La liste sera vide si la source n'est pas manuelle
-                profile: profile,
+                articles: articleIds,
+                profile: profileId,
                 custom_grid_id: customGridId || null
             }
         });
         
-        showToast(`Analyse lancée pour ${source === 'manual' ? articleIds.length : 'les résultats de recherche'} articles.`, 'info');
+        showToast(`Analyse lancée pour ${articleIds.length} article(s).`, 'info');
         await selectProject(appState.currentProject.id, true);
         
     } catch (error) {
         console.error('Erreur lancement pipeline:', error);
     } finally {
         showLoadingOverlay(false);
+    }
+}
+
+function handleAnalysisModeChange() {
+    const project = appState.currentProject;
+    const gridContainer = document.getElementById('pipelineGridContainer');
+    const gridSelect = document.querySelector('.grid-select');
+
+    if (project && gridContainer && gridSelect) {
+        if (project.analysis_mode === 'full_extraction') {
+            gridContainer.style.display = 'block';
+            gridSelect.innerHTML = '<option value="">Grille par défaut</option>' + 
+                appState.currentProjectGrids.map(grid => 
+                    `<option value="${grid.id}">${escapeHtml(grid.name)}</option>`
+                ).join('');
+        } else {
+            gridContainer.style.display = 'none';
+        }
     }
 }
 
@@ -1012,14 +997,31 @@ async function handleRunSynthesis() {
 }
 
 async function handleExportProject(projectId) {
-    showToast("Préparation de l'export...", 'info');
-    try {
-        // Ouvrir le lien d'export dans un nouvel onglet
-        window.open(`/api/projects/${projectId}/export`, '_blank');
-    } catch (error) {
-        console.error('Erreur export:', error);
-        showToast("Erreur lors de l'export", 'error');
+  showToast("Préparation de l'export...", "info");
+  try {
+    const response = await fetch(`/api/projects/${projectId}/export`, {
+      method: "GET"
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
     }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    // Récupère le nom de fichier depuis l'en-tête Content-Disposition si possible
+    const disposition = response.headers.get("Content-Disposition") || "";
+    const filenameMatch = disposition.match(/filename="?(.+)"?/);
+    a.download = filenameMatch ? filenameMatch[1] : `project_${projectId}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast("Export terminé.", "success");
+  } catch (error) {
+    console.error("Erreur export :", error);
+    showToast("Erreur lors de l'export", "error");
+  }
 }
 
 // ================================================================
@@ -1049,9 +1051,9 @@ function renderResultsSection() {
     if (!project) {
         container.innerHTML = `
             <div class="results-placeholder">
-                <div class="results-placeholder__icon">📊</div>
+                <span class="results-placeholder__icon">📊</span>
                 <h4>Sélectionnez un projet</h4>
-                <p>Les résultats s'afficheront ici.</p>
+                <p>Les résultats des analyses s'afficheront ici.</p>
             </div>`;
         return;
     }
@@ -1060,21 +1062,22 @@ function renderResultsSection() {
     if (!extractions || extractions.length === 0) {
         container.innerHTML = `
             <div class="results-placeholder">
-                <div class="results-placeholder__icon">📊</div>
-                <h4>Aucune extraction</h4>
-                <p>Lancez une analyse pour générer des résultats.</p>
+                <span class="results-placeholder__icon">📋</span>
+                <h4>Aucun résultat d'analyse</h4>
+                <p>Lancez une analyse pour générer des résultats à afficher ici.</p>
             </div>`;
         return;
     }
 
     const isScreening = project.analysis_mode === 'screening';
     
+    // CORRECTION : Affichage des extractions au lieu des résultats de recherche
     container.innerHTML = `
         <div class="results-header">
-            <h2>Résultats pour : ${escapeHtml(project.name)}</h2>
+            <h2>Résultats d'analyse pour : ${escapeHtml(project.name)}</h2>
             <div class="results-stats">
-                <span class="stat-badge">📊 ${extractions.length} extractions</span>
-                <span class="stat-badge">✅ ${extractions.filter(e => e.relevance_score >= 7).length} pertinentes</span>
+                <span class="status status--info">📊 ${extractions.length} articles traités</span>
+                <span class="status status--success">✅ ${extractions.filter(e => e.relevance_score >= 7).length} articles pertinents</span>
             </div>
         </div>
         
@@ -1083,8 +1086,8 @@ function renderResultsSection() {
                 <thead>
                     <tr>
                         ${isScreening ? 
-                            `<th>Score</th><th>ID</th><th>Titre</th><th>Justification</th>` :
-                            `<th>ID</th><th>Titre</th><th>Données Extraites</th>`
+                            `<th>Score</th><th>ID</th><th>Titre</th><th>Justification</th><th>Actions</th>` :
+                            `<th>ID</th><th>Titre</th><th>Données Extraites</th><th>Actions</th>`
                         }
                     </tr>
                 </thead>
@@ -1095,61 +1098,290 @@ function renderResultsSection() {
         </div>
     `;
 }
-
+	
+// Affiche une ligne dans le tableau des résultats (corrigé pour l'extraction détaillée)
 function renderExtractionRow(extraction, isScreening) {
+    const validationStatus = extraction.user_validation_status;
+    let rowClass = '';
+    if (validationStatus === 'include') rowClass = 'extraction-row--included';
+    if (validationStatus === 'exclude') rowClass = 'extraction-row--excluded';
+
+    const titleHtml = `<td class="title-cell"><a href="${extraction.url || '#'}" target="_blank" title="Voir source en ligne">🔗</a> <span class="title-text" data-action="toggleAbstract" title="Cliquer pour voir l'abstract">${escapeHtml(extraction.title || '')}</span></td>`;
+    
+    // CORRECTION : Logique pour basculer entre les colonnes
+    let dataCellHtml = '';
     if (isScreening) {
-        const scoreClass = extraction.relevance_score >= 7 ? 'score-badge--high' : 'score-badge--low';
-        return `
-            <tr>
-                <td><span class="score-badge ${scoreClass}">${extraction.relevance_score ?? 'N/A'}</span></td>
-                <td>${escapeHtml(extraction.pmid)}</td>
-                <td class="title-cell" title="${escapeHtml(extraction.title)}">${escapeHtml(extraction.title || '')}</td>
-                <td class="justification-cell">${escapeHtml(extraction.relevance_justification || 'N/A')}</td>
-            </tr>
-        `;
+        dataCellHtml = `<td class="justification-cell">${escapeHtml(extraction.relevance_justification || 'N/A')}</td>`;
     } else {
-        let extractedDataPreview = 'N/A';
-        try {
-            if (extraction.extracted_data) {
-                const data = JSON.parse(extraction.extracted_data);
-                extractedDataPreview = Object.keys(data).join(', ');
-            }
-        } catch (e) {
-            extractedDataPreview = 'Erreur de parsing';
-        }
+        // Nouvelle fonction pour afficher un aperçu des données extraites
+        dataCellHtml = `<td>${renderExtractedDataPreview(extraction.extracted_data)}</td>`;
+    }
+
+    const mainRowHtml = `
+        <tr class="extraction-row ${rowClass}" data-pmid="${extraction.pmid}">
+            ${isScreening ? `<td><span class="score-badge">${extraction.relevance_score ?? 'N/A'}</span></td>` : ''}
+            <td>${escapeHtml(extraction.pmid)}</td>
+            ${titleHtml}
+            ${dataCellHtml}
+            <td class="actions-cell">
+                <button class="btn btn--secondary btn--sm" data-action="viewExtractionDetails" data-extraction-id="${extraction.id}">Détails</button>
+                <button class="btn btn--success btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="include">Inclure</button>
+                <button class="btn btn--danger btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="exclude">Exclure</button>
+            </td>
+        </tr>`;
+
+    const colspan = isScreening ? 5 : 4;
+    const abstractRowHtml = (extraction.abstract) ? `
+        <tr class="abstract-row hidden">
+            <td colspan="${colspan}">
+                <div class="abstract-content">
+                    <strong>Abstract:</strong>
+                    <p>${escapeHtml(extraction.abstract)}</p>
+                </div>
+            </td>
+        </tr>
+    ` : '';
+
+    return mainRowHtml + abstractRowHtml;
+}
+
+// CORRECTION : Affiche correctement les données, même si elles sont imbriquées
+function renderExtractedDataPreview(extractedData) {
+    if (!extractedData) return '<span class="text-muted">Aucune donnée</span>';
+    
+    try {
+        const data = typeof extractedData === 'string' ? JSON.parse(extractedData) : extractedData;
+
+        // Fonction pour "aplatir" les objets imbriqués (ex: { "a": { "b": 1 } } devient { "a.b": 1 })
+        const flattenObject = (obj, parentKey = '') => 
+            Object.keys(obj).reduce((acc, key) => {
+                const newKey = parentKey ? `${parentKey} / ${key}` : key;
+                if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+                    Object.assign(acc, flattenObject(obj[key], newKey));
+                } else {
+                    acc[newKey] = obj[key];
+                }
+                return acc;
+            }, {});
         
-        return `
-            <tr>
-                <td>${escapeHtml(extraction.pmid)}</td>
-                <td class="title-cell" title="${escapeHtml(extraction.title)}">${escapeHtml(extraction.title || '')}</td>
-                <td class="extraction-preview">${escapeHtml(extractedDataPreview)}</td>
-            </tr>
-        `;
+        const flatData = flattenObject(data);
+
+        const preview = Object.entries(flatData)
+            .filter(([, value]) => value && value.toString().trim())
+            .slice(0, 4) // Affiche jusqu'à 4 champs
+            .map(([key, value]) => {
+                const displayValue = value.toString();
+                return `<strong>${escapeHtml(key.replace(/_/g, ' '))}:</strong> ${escapeHtml(displayValue.slice(0, 70))}${displayValue.length > 70 ? '...' : ''}`;
+            })
+            .join('<br>');
+
+        return `<div class="extraction-preview-list">${preview || '<span class="text-muted">Données vides</span>'}</div>`;
+    } catch (error) {
+        return '<span class="text-muted">Données invalides</span>';
+    }
+}
+
+// CORRECTION : Fait fonctionner le bouton "Détails"
+async function openExtractionDetailModal(extractionId) {
+    const modal = document.getElementById('extractionDetailModal');
+    // Correction de l'ID du conteneur
+    const container = document.getElementById('extractionModalBody'); 
+    if (!modal || !container) return;
+
+    const ext = appState.currentProjectExtractions.find(e => e.id === extractionId);
+    if (!ext) {
+        container.innerHTML = '<p>Détails non trouvés.</p>';
+        openModal('extractionDetailModal');
+        return;
+    }
+
+    // Affiche les détails formatés
+    container.innerHTML = formatExtractionDetailsForModal(ext);
+    openModal('extractionDetailModal');
+}
+
+// Nouvelle fonction pour formater joliment les détails dans la modale
+function formatExtractionDetailsForModal(extraction) {
+    let html = `
+        <div class="extraction-details">
+            <h4>${escapeHtml(extraction.title || 'Titre non disponible')}</h4>
+            <div class="extraction-meta">
+                <p><strong>ID Article:</strong> ${escapeHtml(extraction.pmid || 'N/A')}</p>
+                ${extraction.relevance_score ? `<p><strong>Score Pertinence:</strong> ${extraction.relevance_score}/10</p>` : ''}
+                ${extraction.relevance_justification ? `<p><strong>Justification:</strong> ${escapeHtml(extraction.relevance_justification)}</p>` : ''}
+            </div>
+    `;
+
+    if (extraction.extracted_data) {
+        try {
+            const data = typeof extraction.extracted_data === 'string' ? 
+                JSON.parse(extraction.extracted_data) : extraction.extracted_data;
+            
+            html += '<div class="extraction-data"><h5>Données extraites :</h5><ul class="extraction-details-list">';
+            
+            // Fonction récursive pour afficher joliment les objets imbriqués
+            const createList = (obj) => {
+                let listHtml = '<ul>';
+                for (const [key, value] of Object.entries(obj)) {
+                    const cleanKey = escapeHtml(key.replace(/_/g, ' '));
+                    if (value && typeof value === 'object') {
+                        listHtml += `<li><strong>${cleanKey}:</strong>${createList(value)}</li>`;
+                    } else if (value) {
+                        listHtml += `<li><strong>${cleanKey}:</strong><p>${escapeHtml(value)}</p></li>`;
+                    }
+                }
+                listHtml += '</ul>';
+                return listHtml;
+            };
+
+            html += createList(data) + '</ul></div>';
+        } catch (error) {
+            html += '<p>Erreur lors de l\'affichage des données extraites.</p>';
+        }
+    }
+
+    html += '</div>';
+    return html;
+}
+
+async function handleGridImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.name.endsWith('.json')) {
+        showToast('Veuillez sélectionner un fichier JSON', 'error');
+        return;
+    }
+
+    if (!appState.currentProject) {
+        showToast('Veuillez sélectionner un projet avant d\'importer une grille', 'error');
+        return;
+    }
+
+    showLoadingOverlay(true, 'Import de la grille en cours...');
+
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch(`/api/projects/${appState.currentProject.id}/grids/import`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erreur lors de l\'import');
+        }
+
+        const result = await response.json();
+        showToast('Grille importée avec succès !', 'success');
+        
+        // Recharger les grilles du projet
+        await loadProjectGrids(appState.currentProject.id);
+        renderSettingsSection();
+        
+        // Réinitialiser le champ de fichier
+        event.target.value = '';
+        
+    } catch (error) {
+        console.error('Erreur lors de l\'import de grille:', error);
+        showToast(`Erreur d'import : ${error.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
     }
 }
 
 function renderValidationSection() {
-    const container = elements.validationContainer;
-    const project = appState.currentProject;
-    
-    if (!project || project.analysis_mode !== 'validation') {
-        container.innerHTML = `
-            <div class="validation-placeholder">
-                <div class="validation-placeholder__icon">✅</div>
-                <h4>Mode validation non activé</h4>
-                <p>Créez un projet en mode "Validation manuelle" pour utiliser cette section.</p>
-            </div>`;
-        return;
-    }
-    
-    // Interface de validation (à implémenter selon les besoins)
+  const container = elements.validationContainer;
+  const extractions = appState.currentProjectExtractions;
+  if (!extractions || extractions.length === 0) {
     container.innerHTML = `
-        <div class="validation-interface">
-            <h2>Validation manuelle - ${escapeHtml(project.name)}</h2>
-            <p>Interface de validation en cours de développement.</p>
-        </div>
+      <div class="validation-placeholder">
+        <span class="validation-placeholder__icon">📋</span>
+        <p>Aucune extraction disponible pour ce projet.</p>
+      </div>`;
+    return;
+  }
+
+  // Construire le tableau
+  let html = `
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Titre</th>
+          <th>Score IA</th>
+          <th>Décision IA</th>
+          <th>Décision humaine</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  extractions.forEach(ext => {
+    const included = ext.relevance_score >= 7;
+    html += `
+      <tr data-pmid="${ext.pmid}" class="extraction-row ${included ? 'extraction-row--included' : 'extraction-row--excluded'}">
+        <td>
+          <a href="${ext.url}" target="_blank">${ext.pmid}</a>
+        </td>
+        <td class="title-cell">
+          <span class="title-text" data-action="toggleAbstract">${escapeHtml(ext.title)}</span>
+        </td>
+        <td>
+          <span class="score-badge">${ext.relevance_score}</span>
+        </td>
+        <td>${included ? 'Inclu' : 'Exclu'}</td>
+        <td class="actions-cell">
+          <button class="btn btn--success btn--sm" data-action="validateExtraction" data-extraction-id="${ext.id}" data-decision="include">Inclure</button>
+          <button class="btn btn--error btn--sm" data-action="validateExtraction" data-extraction-id="${ext.id}" data-decision="exclude">Exclure</button>
+          <button class="btn btn--outline btn--sm" data-action="viewExtractionDetails" data-extraction-id="${ext.id}">Détails</button>
+        </td>
+      </tr>
+      <tr class="abstract-row hidden">
+        <td colspan="5">
+          <div class="abstract-content">
+            <strong>Résumé :</strong>
+            <p>${escapeHtml(ext.abstract)}</p>
+          </div>
+        </td>
+      </tr>
     `;
+  });
+
+  html += `</tbody></table>`;
+  container.innerHTML = html;
 }
+
+async function handleUpdateDecision(extractionId, decision) {
+  await fetchAPI(`/projects/${appState.currentProject.id}/extractions/${extractionId}`, {
+    method: 'PATCH',
+    body: { user_validation_status: decision }
+  });
+  renderValidationSection();
+}
+
+function calculateAndRenderMetrics(exts) {
+  const tp = exts.filter(e => e.relevance_score>=7 && e.user_validation_status==='include').length;
+  const fp = exts.filter(e => e.relevance_score>=7 && e.user_validation_status==='exclude').length;
+  const fn = exts.filter(e => e.relevance_score<7 && e.user_validation_status==='include').length;
+  const tn = exts.filter(e => e.relevance_score<7 && e.user_validation_status==='exclude').length;
+  const precision = tp/(tp+fp) || 0;
+  const recall = tp/(tp+fn) || 0;
+  const f1 = 2*precision*recall/(precision+recall) || 0;
+  document.getElementById('metrics').innerHTML = `
+    <div>Precision: ${precision.toFixed(2)}</div>
+    <div>Recall: ${recall.toFixed(2)}</div>
+    <div>F1: ${f1.toFixed(2)}</div>`;
+}
+
+document.body.addEventListener('click', e => {
+  const t = e.target.closest('[data-action="updateDecision"]');
+  if (t) {
+    handleUpdateDecision(t.dataset.extractionId, t.dataset.decision);
+  }
+});
 
 function renderAnalysisSection() {
     const container = elements.analysisContainer;
@@ -1243,6 +1475,30 @@ async function runAdvancedAnalysis(analysisType, projectId) {
     } finally {
         showLoadingOverlay(false);
     }
+}
+
+function formatExtractionDetailsForAlert(extraction) {
+    let text = `Titre: ${extraction.title || 'N/A'}\n`;
+    text += `PMID: ${extraction.pmid || 'N/A'}\n`;
+    text += `Score: ${extraction.relevance_score || 'N/A'}/10\n`;
+    text += `Justification: ${extraction.relevance_justification || 'N/A'}\n`;
+    
+    if (extraction.extracted_data) {
+        try {
+            const data = typeof extraction.extracted_data === 'string' ? 
+                JSON.parse(extraction.extracted_data) : extraction.extracted_data;
+            text += '\nDonnées extraites:\n';
+            for (const [key, value] of Object.entries(data)) {
+                if (value && value.toString().trim()) {
+                    text += `${key}: ${value}\n`;
+                }
+            }
+        } catch (error) {
+            text += '\nErreur lors de l\'affichage des données extraites';
+        }
+    }
+    
+    return text;
 }
 
 // ================================================================
@@ -1533,31 +1789,58 @@ function renderQueueStatus() {
 // ================================================================
 
 function openGridModal(gridId = null) {
-    const modal = document.getElementById('gridModal');
-    const form = document.getElementById('gridForm');
-    const title = document.getElementById('gridModalTitle');
-    const nameInput = document.getElementById('gridNameInput');
-    const idInput = document.getElementById('gridIdInput');
-    const fieldsContainer = document.getElementById('gridFieldsContainer');
-    
-    if (!modal || !form) return;
-    
-    form.reset();
-    idInput.value = gridId || '';
-    title.textContent = gridId ? "Modifier la grille" : "Créer une grille";
-    fieldsContainer.innerHTML = '';
-    
-    if (gridId) {
-        const grid = appState.currentProjectGrids.find(g => g.id === gridId);
-        if (grid) {
-            nameInput.value = grid.name;
-            grid.fields.forEach(field => addGridFieldInput(field));
-        }
-    } else {
-        addGridFieldInput(); // Ajouter un champ vide par défaut
+  const modal = document.getElementById('gridModal');
+  const form = document.getElementById('gridForm');
+  const title = document.getElementById('gridModalTitle');
+  const nameInput = document.getElementById('gridNameInput');
+  const idInput = document.getElementById('gridIdInput');
+  const fieldsContainer = document.getElementById('gridFieldsContainer');
+
+  // 1) Injection du input caché et du bouton importer
+  if (form && !document.getElementById('gridFileInput')) {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.id = 'gridFileInput';
+    fileInput.accept = '.json';
+    fileInput.style.display = 'none';
+    form.appendChild(fileInput);
+
+    const importBtn = document.createElement('button');
+    importBtn.type = 'button';
+    importBtn.dataset.action = 'import-grid';
+    importBtn.textContent = 'Importer grille (.json)';
+    form.appendChild(importBtn);
+
+    // clic du bouton pour ouvrir le file chooser
+    importBtn.addEventListener('click', () => fileInput.click());
+  }
+
+  // 2) Binding de l'événement change
+  const gridFileInput = document.getElementById('gridFileInput');
+  if (gridFileInput) {
+    gridFileInput.removeEventListener('change', handleGridImport);
+    gridFileInput.addEventListener('change', handleGridImport);
+  }
+
+  if (!modal || !form) return;
+
+  // reset du formulaire et chargement des champs
+  form.reset();
+  idInput.value = gridId || '';
+  title.textContent = gridId ? "Modifier la grille" : "Créer une grille";
+  fieldsContainer.innerHTML = '';
+
+  if (gridId) {
+    const grid = appState.currentProjectGrids.find(g => g.id === gridId);
+    if (grid) {
+      nameInput.value = grid.name;
+      grid.fields.forEach(field => addGridFieldInput(field));
     }
-    
-    openModal('gridModal');
+  } else {
+    addGridFieldInput(); // champ vide par défaut
+  }
+
+  openModal('gridModal');
 }
 
 function addGridFieldInput(value = '') {
@@ -2168,18 +2451,18 @@ function viewAnalysisPlot(projectId, plotType) {
 }
 
 async function handleValidateExtraction(extractionId, decision) {
+    if (!appState.currentProject) return;
+    
     try {
         await fetchAPI(`/extractions/${extractionId}/validate`, {
             method: 'POST',
             body: { decision }
         });
+        showToast(`Article marqué comme "${decision === 'include' ? 'Inclus' : 'Exclu'}".`, 'success');
         
-        showToast(`Extraction marquée comme ${decision}.`, 'success');
-        
-        if (appState.currentProject) {
-            await loadProjectExtractions(appState.currentProject.id);
-            renderResultsSection();
-        }
+        // Rafraîchir les données pour mettre à jour l'affichage
+        await loadProjectExtractions(appState.currentProject.id);
+        renderResultsSection(); // Redessiner la table des résultats
         
     } catch (error) {
         console.error('Erreur validation:', error);
