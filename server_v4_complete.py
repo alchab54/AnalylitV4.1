@@ -1077,16 +1077,14 @@ def run_synthesis_endpoint(project_id):
 # Extractions
 @api_bp.route('/projects/<project_id>/extractions', methods=['GET'])
 def get_project_extractions(project_id):
-    """Récupère les extractions d'un projet, y compris l'abstract."""
+    """Récupère les extractions d'un projet, y compris l'abstract et l'URL."""
     with sqlite3.connect(DATABASE_FILE) as conn:
         conn.row_factory = sqlite3.Row
-        # On joint la table des extractions (e) avec celle des résultats de recherche (s)
-        # pour récupérer l'abstract correspondant à chaque article.
         extractions = conn.execute("""
             SELECT
                 e.id, e.pmid, e.title, e.relevance_score, e.relevance_justification,
                 e.user_validation_status, e.extracted_data,
-                s.abstract
+                s.abstract, s.url
             FROM extractions e
             LEFT JOIN search_results s ON e.project_id = s.project_id AND e.pmid = s.article_id
             WHERE e.project_id = ?
@@ -1094,7 +1092,7 @@ def get_project_extractions(project_id):
         """, (project_id,)).fetchall()
     
     return jsonify([dict(row) for row in extractions])
-
+    
 # Logs et résultats
 @api_bp.route('/projects/<project_id>/processing-log', methods=['GET'])
 def get_project_processing_log(project_id):

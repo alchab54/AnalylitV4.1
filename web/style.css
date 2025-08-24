@@ -2618,3 +2618,35 @@ textarea.form-control {
 .extraction-preview-list li strong {
     color: var(--color-text);
 }
+
+.title-cell > a {
+    text-decoration: none;
+    margin-right: var(--space-8);
+}
+.title-cell > .title-text {
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+}
+.modal__body {
+    padding: var(--space-20);
+}
+.extraction-details-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.extraction-details-list li {
+    margin-bottom: var(--space-12);
+}
+.extraction-details-list li strong {
+    display: block;
+    font-weight: var(--font-weight-medium);
+    margin-bottom: var(--space-4);
+    color: var(--color-primary);
+}
+.extraction-details-list li p {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
+}

@@ -864,40 +864,33 @@ def pull_ollama_model_task(model_name: str):
 def process_single_article_task(project_id: str, article_id: str, profile: dict, analysis_mode: str, custom_grid_id: str = None):
     """Traite un article individuel, en allant chercher ses détails si nécessaire."""
     start_time = time.time()
-    
     try:
-        # --- DÉBUT DE LA LOGIQUE AMÉLIORÉE ---
         with sqlite3.connect(DATABASE_FILE) as conn:
             conn.row_factory = sqlite3.Row
-            # 1. Essayer de trouver l'article dans les résultats de recherche existants
-            search_result = conn.execute("""
-                SELECT * FROM search_results 
-                WHERE project_id = ? AND article_id = ?
-            """, (project_id, article_id)).fetchone()
+            search_result = conn.execute("SELECT * FROM search_results WHERE project_id = ? AND article_id = ?", (project_id, article_id)).fetchone()
             
             article_data = {}
             if search_result:
                 article_data = dict(search_result)
             else:
-                # 2. Si non trouvé (cas manuel), aller chercher les détails en ligne
                 print(f"ℹ️ Article {article_id} non trouvé localement, recherche des détails en ligne...")
-                # On suppose que l'ID est un PMID pour l'instant (on pourrait complexifier la détection)
-                details = fetch_pubtator_abstract(article_id)
+                details = {}
+                # --- CORRECTION : Détection DOI/PMID ---
+                if article_id.strip().startswith("10."):
+                    details = fetch_crossref_details(article_id)
+                else:
+                    details = fetch_pubtator_abstract(article_id)
+                
                 if not details or not details.get('title'):
                     log_processing_status(project_id, article_id, "erreur", "Détails de l'article introuvables en ligne.")
                     return
+                # --- FIN CORRECTION ---
 
-                # Créer une entrée minimale pour le traitement
                 article_data = {
-                    'project_id': project_id,
-                    'article_id': article_id,
+                    'project_id': project_id, 'article_id': article_id,
                     'title': details.get('title', 'Titre inconnu'),
                     'abstract': details.get('abstract', ''),
-                    'authors': '',
-                    'publication_date': '',
-                    'journal': '',
-                    'doi': '',
-                    'url': f"https://pubmed.ncbi.nlm.nih.gov/{article_id}/",
+                    'url': details.get('url', f"https://doi.org/{article_id}" if article_id.strip().startswith("10.") else f"https://pubmed.ncbi.nlm.nih.gov/{article_id}"),
                     'database_source': 'manual_input'
                 }
         

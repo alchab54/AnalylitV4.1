@@ -78,16 +78,11 @@ async function initializeApplication() {
 }
 
 function setupEventListeners() {
-    // Navigation principale
-    elements.navButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            const sectionName = e.currentTarget.getAttribute('data-section');
-            showSection(sectionName);
-        });
-    });
+    elements.navButtons.forEach(button => button.addEventListener('click', (e) => {
+        e.preventDefault();
+        showSection(e.currentTarget.getAttribute('data-section'));
+    }));
 
-    // Boutons et formulaires principaux
     elements.createProjectBtn?.addEventListener('click', () => openModal('newProjectModal'));
     elements.newProjectForm?.addEventListener('submit', handleCreateProject);
     elements.multiSearchForm?.addEventListener('submit', handleMultiSearch);
@@ -95,20 +90,15 @@ function setupEventListeners() {
     elements.gridForm?.addEventListener('submit', handleSaveGrid);
     elements.promptForm?.addEventListener('submit', handleSavePrompt);
     elements.profileForm?.addEventListener('submit', handleSaveProfile);
-
-    // Événements spéciaux
+    
     document.getElementById('addGridFieldBtn')?.addEventListener('click', () => addGridFieldInput());
     document.getElementById('pipelineSourceSelect')?.addEventListener('change', handlePipelineSourceChange);
-    document.getElementById('analysisMode')?.addEventListener('change', handleAnalysisModeChange);
-	document.getElementById('pipelineSourceSelect')?.addEventListener('change', handlePipelineSourceChange);
-	document.getElementById('gridFileInput')?.addEventListener('change', handleGridImport);
+    document.getElementById('gridFileInput')?.addEventListener('change', handleGridImport);
 
-    // Délégation d'événements pour les éléments dynamiques
     document.body.addEventListener('click', (e) => {
         const target = e.target.closest('[data-action]');
         if (!target) return;
-
-        const { action, projectId, articleId, extractionId, gridId, promptId, profileId, queueName, plotType, database } = target.dataset;
+        const { action, projectId, articleId, extractionId, gridId, promptId, profileId, queueName, plotType } = target.dataset;
 
         const actions = {
             selectProject: () => selectProject(projectId),
@@ -119,8 +109,6 @@ function setupEventListeners() {
             selectSearchResult: () => selectSearchResult(articleId),
             selectAllSearchResults: () => selectAllSearchResults(),
             validateExtraction: () => handleValidateExtraction(extractionId, target.dataset.decision),
-            
-            // --- CORRECTION : 'toggleAbstract' est maintenant à l'intérieur de l'objet 'actions' ---
             toggleAbstract: () => {
                 const titleRow = target.closest('tr');
                 if (titleRow) {
@@ -130,7 +118,7 @@ function setupEventListeners() {
                     }
                 }
             },
-            
+            viewExtractionDetails: () => openExtractionDetailModal(extractionId),
             'generate-discussion': () => runAdvancedAnalysis('generate-discussion', projectId),
             'generate-knowledge-graph': () => runAdvancedAnalysis('generate-knowledge-graph', projectId),
             'generate-prisma-flow': () => runAdvancedAnalysis('generate-prisma-flow', projectId),
@@ -138,7 +126,6 @@ function setupEventListeners() {
             'run-descriptive-stats': () => runAdvancedAnalysis('run-descriptive-stats', projectId),
             'run-atn-score': () => runAdvancedAnalysis('run-atn-score', projectId),
             viewAnalysisPlot: () => viewAnalysisPlot(projectId, plotType),
-            'upload-pdfs-bulk': () => document.getElementById('pdfFileInput')?.click(),
             'import-zotero': () => handleImportZotero(projectId),
             'fetch-online-pdfs': () => handleFetchOnlinePdfs(projectId),
             'run-indexing': () => handleRunIndexing(projectId),
@@ -158,32 +145,20 @@ function setupEventListeners() {
             clearQueue: () => handleClearQueue(queueName),
             saveZoteroSettings: () => handleSaveZoteroSettings(),
         };
-
         if (actions[action]) actions[action]();
     });
 
-    // Raccourcis clavier
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             const activeModal = document.querySelector('.modal--show');
             if (activeModal) closeModal(activeModal.id);
         }
-        if (e.key === 'Enter' && !e.shiftKey && appState.currentSection === 'chat') {
-             e.preventDefault();
-             sendChatMessage();
-        }
     });
 
-    // Fermeture des modales par clic extérieur
     document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal(modal.id);
-        });
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modal.id); });
         modal.querySelector('.modal__close')?.addEventListener('click', () => closeModal(modal.id));
     });
-    
-    // Gestion du drag & drop de PDF
-    setupPDFDragDrop();
 }
 
 async function loadInitialData() {
@@ -1066,12 +1041,14 @@ function renderExtractionRow(extraction, isScreening) {
     if (validationStatus === 'include') rowClass = 'extraction-row--included';
     if (validationStatus === 'exclude') rowClass = 'extraction-row--excluded';
 
+    const titleHtml = `<td class="title-cell"><a href="${extraction.url}" target="_blank" title="Voir source en ligne">🔗</a> <span class="title-text" data-action="toggleAbstract" title="Cliquer pour voir l'abstract">${escapeHtml(extraction.title || '')}</span></td>`;
+
     const mainRowHtml = `
         <tr class="extraction-row ${rowClass}">
             ${isScreening ? `<td><span class="score-badge ${extraction.relevance_score >= 7 ? 'score-badge--high' : ''}">${extraction.relevance_score ?? 'N/A'}</span></td>` : ''}
             <td>${escapeHtml(extraction.pmid)}</td>
-            <td class="title-cell" data-action="toggleAbstract" title="Cliquer pour voir l'abstract">${escapeHtml(extraction.title || '')}</td>
-            ${isScreening ? `<td class="justification-cell">${escapeHtml(extraction.relevance_justification || 'N/A')}</td>` : `<td>${renderExtractedDataPreview(extraction.extracted_data)}</td>`}
+            ${titleHtml}
+            ${isScreening ? `<td class="justification-cell">${escapeHtml(extraction.relevance_justification || 'N/A')}</td>` : `<td><button class="btn btn--secondary btn--sm" data-action="viewExtractionDetails" data-extraction-id="${extraction.id}">Voir détails</button></td>`}
             <td class="actions-cell">
                 <button class="btn btn--success btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="include" ${validationStatus === 'include' ? 'disabled' : ''}>Inclure</button>
                 <button class="btn btn--danger btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="exclude" ${validationStatus === 'exclude' ? 'disabled' : ''}>Exclure</button>
@@ -1079,7 +1056,77 @@ function renderExtractionRow(extraction, isScreening) {
         </tr>`;
 
     const colspan = isScreening ? 5 : 4;
-    const abstractRowHtml = (isScreening && extraction.abstract) ? `
+    const abstractRowHtml = (extraction.abstract) ? `
+        <tr class="abstract-row hidden">
+            <td colspan="${colspan}">
+                <div class="abstract-content">
+                    <strong>Abstract:</strong>
+                    <p>${escapeHtml(extraction.abstract)}</p>
+                </div>
+            </td>
+        </tr>
+    ` : '';
+
+    return mainRowHtml + abstractRowHtml;
+}
+
+function renderExtractionRow(extraction, isScreening) {
+    const validationStatus = extraction.user_validation_status;
+    let rowClass = '';
+    if (validationStatus === 'include') rowClass = 'extraction-row--included';
+    if (validationStatus === 'exclude') rowClass = 'extraction-row--excluded';
+
+    const titleHtml = `<td class="title-cell"><a href="${extraction.url}" target="_blank" title="Voir source en ligne">🔗</a> <span class="title-text" data-action="toggleAbstract" title="Cliquer pour voir l'abstract">${escapeHtml(extraction.title || '')}</span></td>`;
+
+    const mainRowHtml = `
+        <tr class="extraction-row ${rowClass}">
+            ${isScreening ? `<td><span class="score-badge ${extraction.relevance_score >= 7 ? 'score-badge--high' : ''}">${extraction.relevance_score ?? 'N/A'}</span></td>` : ''}
+            <td>${escapeHtml(extraction.pmid)}</td>
+            ${titleHtml}
+            ${isScreening ? `<td class="justification-cell">${escapeHtml(extraction.relevance_justification || 'N/A')}</td>` : `<td><button class="btn btn--secondary btn--sm" data-action="viewExtractionDetails" data-extraction-id="${extraction.id}">Voir détails</button></td>`}
+            <td class="actions-cell">
+                <button class="btn btn--success btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="include" ${validationStatus === 'include' ? 'disabled' : ''}>Inclure</button>
+                <button class="btn btn--danger btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="exclude" ${validationStatus === 'exclude' ? 'disabled' : ''}>Exclure</button>
+            </td>
+        </tr>`;
+
+    const colspan = isScreening ? 5 : 4;
+    const abstractRowHtml = (extraction.abstract) ? `
+        <tr class="abstract-row hidden">
+            <td colspan="${colspan}">
+                <div class="abstract-content">
+                    <strong>Abstract:</strong>
+                    <p>${escapeHtml(extraction.abstract)}</p>
+                </div>
+            </td>
+        </tr>
+    ` : '';
+
+    return mainRowHtml + abstractRowHtml;
+}
+
+function renderExtractionRow(extraction, isScreening) {
+    const validationStatus = extraction.user_validation_status;
+    let rowClass = '';
+    if (validationStatus === 'include') rowClass = 'extraction-row--included';
+    if (validationStatus === 'exclude') rowClass = 'extraction-row--excluded';
+
+    const titleHtml = `<td class="title-cell"><a href="${extraction.url}" target="_blank" title="Voir source en ligne">🔗</a> <span class="title-text" data-action="toggleAbstract" title="Cliquer pour voir l'abstract">${escapeHtml(extraction.title || '')}</span></td>`;
+
+    const mainRowHtml = `
+        <tr class="extraction-row ${rowClass}">
+            ${isScreening ? `<td><span class="score-badge ${extraction.relevance_score >= 7 ? 'score-badge--high' : ''}">${extraction.relevance_score ?? 'N/A'}</span></td>` : ''}
+            <td>${escapeHtml(extraction.pmid)}</td>
+            ${titleHtml}
+            ${isScreening ? `<td class="justification-cell">${escapeHtml(extraction.relevance_justification || 'N/A')}</td>` : `<td><button class="btn btn--secondary btn--sm" data-action="viewExtractionDetails" data-extraction-id="${extraction.id}">Voir détails</button></td>`}
+            <td class="actions-cell">
+                <button class="btn btn--success btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="include" ${validationStatus === 'include' ? 'disabled' : ''}>Inclure</button>
+                <button class="btn btn--danger btn--sm" data-action="validateExtraction" data-extraction-id="${extraction.id}" data-decision="exclude" ${validationStatus === 'exclude' ? 'disabled' : ''}>Exclure</button>
+            </td>
+        </tr>`;
+
+    const colspan = isScreening ? 5 : 4;
+    const abstractRowHtml = (extraction.abstract) ? `
         <tr class="abstract-row hidden">
             <td colspan="${colspan}">
                 <div class="abstract-content">
