@@ -72,7 +72,8 @@ def init_db():
         c = conn.cursor()
         c.execute("PRAGMA journal_mode=WAL;")
         
-        # Table des projets
+        # --- DÉBUT DE LA CORRECTION ---
+        # Table des projets (avec les colonnes manquantes ajoutées)
         c.execute("""
             CREATE TABLE IF NOT EXISTS projects (
                 id TEXT PRIMARY KEY,
@@ -94,8 +95,8 @@ def init_db():
                 processed_count INTEGER DEFAULT 0,
                 total_processing_time REAL DEFAULT 0,
                 indexed_at TEXT,
-                search_query TEXT,
-                databases_used TEXT
+                search_query TEXT,         -- Ajouté
+                databases_used TEXT        -- Ajouté
             )
         """)
         
@@ -993,49 +994,46 @@ def import_grid_from_file(project_id):
 def run_project_pipeline(project_id):
     """Lance le pipeline d'analyse pour un projet."""
     data = request.get_json()
-    selected_articles = data.get('articles', [])
+    source = data.get('source')
     profile_id = data.get('profile', 'standard')
     custom_grid_id = data.get('custom_grid_id')
     
-    if not selected_articles:
-        return jsonify({'error': 'Articles requis'}), 400
-    
     with sqlite3.connect(DATABASE_FILE) as conn:
         conn.row_factory = sqlite3.Row
-        
-        # Récupérer le profil
         profile_row = conn.execute("SELECT * FROM analysis_profiles WHERE id = ?", (profile_id,)).fetchone()
         if not profile_row:
             return jsonify({'error': f"Profil invalide: '{profile_id}'"}), 400
-        
         profile = dict(profile_row)
         
-        # Récupérer le projet
         project = conn.execute("SELECT analysis_mode FROM projects WHERE id = ?", (project_id,)).fetchone()
         analysis_mode = project[0] if project else 'screening'
-        
-        # Nettoyer les données existantes
+
+    article_ids = []
+    if source == 'manual':
+        article_ids = data.get('article_ids', [])
+        if not article_ids:
+            return jsonify({'error': 'La liste d\'identifiants manuels est vide.'}), 400
+    else: # Par défaut, on utilise les résultats de recherche
+        with sqlite3.connect(DATABASE_FILE) as conn:
+            rows = conn.execute("SELECT article_id FROM search_results WHERE project_id = ?", (project_id,)).fetchall()
+            article_ids = [row[0] for row in rows]
+        if not article_ids:
+            return jsonify({'error': 'Aucun résultat de recherche à analyser. Veuillez d\'abord lancer une recherche.'}), 400
+
+    # Nettoyage et mise à jour du projet
+    with sqlite3.connect(DATABASE_FILE) as conn:
         conn.execute("DELETE FROM extractions WHERE project_id = ?", (project_id,))
         conn.execute("DELETE FROM processing_log WHERE project_id = ?", (project_id,))
-        
-        # Mettre à jour le projet
         conn.execute("""
             UPDATE projects SET
-            status = 'processing',
-            profile_used = ?,
-            updated_at = ?,
-            pmids_count = ?,
-            processed_count = 0,
-            total_processing_time = 0,
-            analysis_result = NULL,
-            analysis_plot_path = NULL
+            status = 'processing', profile_used = ?, updated_at = ?, pmids_count = ?,
+            processed_count = 0, total_processing_time = 0
             WHERE id = ?
-        """, (profile_id, datetime.now().isoformat(), len(selected_articles), project_id))
-        
+        """, (profile_id, datetime.now().isoformat(), len(article_ids), project_id))
         conn.commit()
-    
-    # Lancer le traitement pour chaque article
-    for article_id in selected_articles:
+
+    # Lancer les tâches de fond
+    for article_id in article_ids:
         processing_queue.enqueue(
             process_single_article_task,
             project_id=project_id,
@@ -1048,7 +1046,7 @@ def run_project_pipeline(project_id):
     
     return jsonify({
         "status": "processing",
-        "message": f"{len(selected_articles)} articles sont en cours de traitement."
+        "message": f"{len(article_ids)} articles sont en cours de traitement."
     }), 202
 
 @api_bp.route('/projects/<project_id>/run-synthesis', methods=['POST'])

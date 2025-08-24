@@ -956,16 +956,11 @@ async function handleRunPipeline(e) {
             return;
         }
         articleIds = manualIds.split('\n').map(id => id.trim()).filter(Boolean);
-    } else {
-        // Utiliser les résultats de recherche existants
-        if (!appState.searchResults || appState.searchResults.length === 0) {
-            showToast('Aucun résultat de recherche disponible.', 'error');
-            return;
-        }
-        articleIds = appState.searchResults.map(result => result.article_id);
-    }
+    } 
+    // Si la source n'est pas manuelle, nous n'envoyons pas la liste d'articles.
+    // Le backend les récupérera de la base de données.
     
-    if (articleIds.length === 0) {
+    if (source === 'manual' && articleIds.length === 0) {
         showToast('Aucun article à traiter.', 'error');
         return;
     }
@@ -977,13 +972,14 @@ async function handleRunPipeline(e) {
         await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
             method: 'POST',
             body: {
-                article_ids: articleIds,
+                source: source, // On précise la source
+                article_ids: articleIds, // La liste sera vide si la source n'est pas manuelle
                 profile: profile,
-                custom_grid_id: customGridId
+                custom_grid_id: customGridId || null
             }
         });
         
-        showToast(`Analyse lancée pour ${articleIds.length} articles.`, 'info');
+        showToast(`Analyse lancée pour ${source === 'manual' ? articleIds.length : 'les résultats de recherche'} articles.`, 'info');
         await selectProject(appState.currentProject.id, true);
         
     } catch (error) {
