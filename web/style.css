@@ -2502,3 +2502,21 @@ textarea.form-control {
     padding: var(--space-24);
     overflow-y: auto;
 }
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+  padding: var(--space-8);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-base);
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}

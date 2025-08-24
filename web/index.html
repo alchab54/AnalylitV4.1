@@ -62,27 +62,25 @@
 
     <!-- Recherche -->
     <section id="searchSection" class="section">
-      <div id="searchContainer" class="container--narrow">
-        <form id="multiSearchForm">
-          <div class="form-group">
-            <label class="form-label" for="queryInput">Requête</label>
-            <input id="queryInput" name="query" class="form-control" placeholder="Mots-clés..." required />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Bases de données</label>
-            <select id="databasesSelect" name="databases" class="form-control" multiple></select>
-            <small class="form-text">Maintenir Ctrl/Cmd pour multi-sélection.</small>
-          </div>
-          <div class="form-group--inline">
-            <input id="maxResultsInput" name="max_results_per_db" class="form-control" type="number" min="1" value="50" />
-            <button type="submit" class="btn btn--primary">Lancer la recherche</button>
-            <button type="button" class="btn btn--secondary" data-action="selectAllSearchResults">Tout sélectionner</button>
-            <button type="button" class="btn btn--success" data-action="addSelectedToProject">Ajouter au projet</button>
-          </div>
-        </form>
-        <div id="searchResults" class="results-placeholder">Lancez une recherche pour voir les résultats ici.</div>
-      </div>
-    </section>
+	  <div id="searchContainer" class="container--narrow">
+		<form id="multiSearchForm">
+		  <div class="form-group">
+			<label class="form-label" for="queryInput">Requête</label>
+			<input id="queryInput" name="searchQuery" class="form-control" placeholder="Mots-clés..." required />
+		  </div>
+		  <div class="form-group">
+			<label class="form-label">Bases de données</label>
+			<div id="databaseSelection" class="checkbox-group"></div>
+			<small class="form-text">Cochez les bases de données à interroger.</small>
+		  </div>
+		  <div class="form-group--inline">
+			<input id="maxResultsInput" name="max_results_per_db" class="form-control" type="number" min="1" value="50" />
+			<button type="submit" class="btn btn--primary">Lancer la recherche</button>
+		  </div>
+		</form>
+		<div id="searchResults" class="results-placeholder">Lancez une recherche pour voir les résultats ici.</div>
+	  </div>
+	</section>
 
     <!-- Résultats -->
     <section id="resultsSection" class="section">
@@ -129,7 +127,7 @@
       <form id="newProjectForm">
         <div class="form-group">
           <label class="form-label">Nom</label>
-          <input name="name" class="form-control" required />
+          <input name="projectName" class="form-control" required />
         </div>
         <div class="form-group">
           <label class="form-label">Description</label>
@@ -137,7 +135,7 @@
         </div>
         <div class="form-group--inline">
           <label class="form-label">Mode</label>
-          <select name="mode" class="form-control">
+		  <select name="analysisMode" class="form-control">
             <option value="screening">Screening</option>
             <option value="full_extraction">Extraction détaillée</option>
           </select>
@@ -180,6 +178,41 @@
       </form>
     </div>
   </div>
+  
+  <div id="runPipelineModal" class="modal">
+      <div class="modal__content">
+          <button class="modal__close" onclick="closeModal('runPipelineModal')">×</button>
+          <h3>Lancer une analyse</h3>
+          <form id="runPipelineForm">
+              <div class="form-group">
+                  <label for="pipelineSourceSelect" class="form-label">Source des articles</label>
+                  <select id="pipelineSourceSelect" name="pipelineSourceSelect" class="form-control">
+                      <option value="search_results" selected>Utiliser les résultats de la recherche</option>
+                      <option value="manual">Saisir manuellement les identifiants</option>
+                  </select>
+              </div>
+            
+              <div id="manualIdsGroup" class="form-group" style="display: none;">
+                  <label for="pmidsTextarea" class="form-label">Liste d'identifiants (un par ligne)</label>
+                  <textarea id="pmidsTextarea" name="pmidsTextarea" class="form-control" rows="5" placeholder="Collez ici vos PMID, DOI, etc."></textarea>
+              </div>
+
+              <div class="form-group">
+                  <label for="pipelineProfileSelect" class="form-label">Profil d'analyse</label>
+                  <select id="pipelineProfileSelect" name="pipelineProfileSelect" class="form-control"></select>
+              </div>
+
+              <div id="pipelineGridContainer" class="form-group" style="display: none;">
+                  <label for="pipelineGridSelect" class="form-label">Grille d'extraction personnalisée</label>
+                  <select id="pipelineGridSelect" name="pipelineGridSelect" class="form-control"></select>
+              </div>
+
+              <div class="modal__actions">
+                   <button type="submit" class="btn btn--primary">Lancer le traitement</button>
+              </div>
+          </form>
+      </div>
+  </div>
 
   <div id="profileModal" class="modal">
     <div class="modal__content">
@@ -214,6 +247,8 @@
   <form id="runPipelineForm" class="hidden"></form>
   <input id="pdfFileInput" type="file" accept="application/pdf" multiple class="hidden" />
   <input id="gridFileInput" type="file" accept="application/json" class="hidden" />
+  
+  
 
   <!-- Overlays / Toasts -->
   <div id="loadingOverlay" class="loading-overlay">

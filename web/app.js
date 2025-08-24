@@ -100,6 +100,7 @@ function setupEventListeners() {
     document.getElementById('addGridFieldBtn')?.addEventListener('click', () => addGridFieldInput());
     document.getElementById('pipelineSourceSelect')?.addEventListener('change', handlePipelineSourceChange);
     document.getElementById('analysisMode')?.addEventListener('change', handleAnalysisModeChange);
+	document.getElementById('pipelineSourceSelect')?.addEventListener('change', handlePipelineSourceChange);
 
     // Délégation d'événements pour les éléments dynamiques
     document.body.addEventListener('click', (e) => {
@@ -367,14 +368,18 @@ function showSection(sectionName) {
     appState.unreadNotifications = 0;
     updateNotificationIndicator();
     
+    // --- DÉBUT DE LA CORRECTION ---
+    // On retire la classe 'section--active' de toutes les sections pour les masquer.
     elements.sections.forEach(section => {
-        section.classList.add('hidden');
+        section.classList.remove('section--active');
     });
     
+    // On trouve la nouvelle section à afficher et on lui ajoute la classe 'section--active'.
     const activeSection = document.getElementById(`${sectionName}Section`);
     if (activeSection) {
-        activeSection.classList.remove('hidden');
+        activeSection.classList.add('section--active');
     }
+    // --- FIN DE LA CORRECTION ---
 
     elements.navButtons.forEach(button => {
         button.classList.toggle('app-nav__button--active', button.getAttribute('data-section') === sectionName);
@@ -1865,7 +1870,11 @@ function renderImportSection() {
             </div>`;
         return;
     }
-
+	
+	const hasArticles = project.pmids_count > 0;
+    const disabledAttribute = !hasArticles ? 'disabled' : '';
+    const disabledTooltip = !hasArticles ? 'title="Veuillez d\'abord effectuer une recherche et ajouter des articles au projet."' : '';
+ 
     container.innerHTML = `
         <div class="import-sections">
             <div class="import-card">
