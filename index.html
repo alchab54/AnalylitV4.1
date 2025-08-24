@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AnalyLit V4.0</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="app-header__content container">
+      <div class="app-header__left">
+        <h1 class="app-header__title">AnalyLit <span class="app-header__subtitle">V4.0</span></h1>
+      </div>
+      <div class="app-header__right">
+        <div class="connection-status">État: <span data-connection-status>❌</span></div>
+        <div id="notificationIndicator" class="notification-indicator" style="display:none;">
+          <span class="notification-indicator__count">0</span>
+        </div>
+      </div>
+    </div>
+    <nav class="app-nav">
+      <ul class="app-nav__list container">
+        <li class="app-nav__item"><button class="app-nav__button app-nav__button--active" data-section="projects">📁 Projets</button></li>
+        <li class="app-nav__item"><button class="app-nav__button" data-section="search">🔎 Recherche</button></li>
+        <li class="app-nav__item"><button class="app-nav__button" data-section="results">📊 Résultats</button></li>
+        <li class="app-nav__item"><button class="app-nav__button" data-section="validation">✅ Validation</button></li>
+        <li class="app-nav__item"><button class="app-nav__button" data-section="analysis">📈 Analyses</button></li>
+        <li class="app-nav__item"><button class="app-nav__button" data-section="import">📥 Import PDF</button></li>
+        <li class="app-nav__item"><button class="app-nav__button" data-section="chat">💬 Chat</button></li>
+        <li class="app-nav__item"><button class="app-nav__button" data-section="settings">⚙️ Paramètres</button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="app-main container">
+    <!-- Projets -->
+    <section id="projectsSection" class="section section--active">
+      <div class="section-header">
+        <div class="section-header__content">
+          <h2>Gestion des Projets</h2>
+          <p>Créez et gérez vos projets d'analyse de littérature scientifique.</p>
+        </div>
+        <div class="section-header__actions">
+          <button id="createProjectBtn" class="btn btn--primary">Nouveau projet</button>
+        </div>
+      </div>
+      <div class="section__content section__content--split">
+        <div class="projects-list-container">
+          <ul id="projectsList" class="project-list"></ul>
+        </div>
+        <div id="projectDetail" class="project-detail-container">
+          <div id="projectPlaceholder" class="projects-empty">
+            <span class="projects-empty__icon">🗂️</span>
+            <h3>Aucun projet sélectionné</h3>
+            <p>Sélectionnez un projet dans la liste de gauche.</p>
+          </div>
+          <div id="projectDetailContent"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recherche -->
+    <section id="searchSection" class="section">
+	  <div id="searchContainer" class="container--narrow">
+		<form id="multiSearchForm">
+		  <div class="form-group">
+			<label class="form-label" for="queryInput">Requête</label>
+			<input id="queryInput" name="searchQuery" class="form-control" placeholder="Mots-clés..." required />
+		  </div>
+		  <div class="form-group">
+			<label class="form-label">Bases de données</label>
+			<div id="databaseSelection" class="checkbox-group"></div>
+			<small class="form-text">Cochez les bases de données à interroger.</small>
+		  </div>
+		  <div class="form-group--inline">
+			<input id="maxResultsInput" name="max_results_per_db" class="form-control" type="number" min="1" value="50" />
+			<button type="submit" class="btn btn--primary">Lancer la recherche</button>
+		  </div>
+		</form>
+		<div id="searchResults" class="results-placeholder">Lancez une recherche pour voir les résultats ici.</div>
+	  </div>
+	</section>
+
+    <!-- Résultats -->
+    <section id="resultsSection" class="section">
+      <div id="resultsContainer" class="container--narrow results-placeholder">Les résultats s'afficheront ici.</div>
+    </section>
+
+    <!-- Validation -->
+    <section id="validationSection" class="section">
+      <div id="validationContainer" class="container--narrow validation-placeholder">Interface de validation en cours de développement.</div>
+    </section>
+
+    <!-- Analyses -->
+    <section id="analysisSection" class="section">
+      <div class="section-header">
+        <div class="section-header__content">
+          <h2>Analyses Avancées</h2>
+          <p>Lancez des analyses statistiques et des visualisations.</p>
+        </div>
+      </div>
+      <div id="analysisContainer" class="analysis-grid"></div>
+    </section>
+
+    <!-- Import -->
+    <section id="importSection" class="section">
+      <div id="importContainer" class="import-container"></div>
+    </section>
+
+    <!-- Chat -->
+    <section id="chatSection" class="section">
+      <div id="chatContainer" class="chat-interface"></div>
+    </section>
+
+    <!-- Paramètres -->
+    <section id="settingsSection" class="section">
+      <div id="settingsContainer" class="settings-grid"></div>
+    </section>
+  </main>
+
+  <!-- Modales -->
+  <div id="newProjectModal" class="modal">
+    <div class="modal__content">
+      <button class="modal__close">×</button>
+      <h3>Créer un projet</h3>
+      <form id="newProjectForm">
+        <div class="form-group">
+          <label class="form-label">Nom</label>
+          <input name="projectName" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea name="description" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="form-group--inline">
+          <label class="form-label">Mode</label>
+		  <select name="analysisMode" class="form-control">
+            <option value="screening">Screening</option>
+            <option value="full_extraction">Extraction détaillée</option>
+          </select>
+          <button type="submit" class="btn btn--primary">Créer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="gridModal" class="modal">
+    <div class="modal__content">
+      <button class="modal__close">×</button>
+      <h3 id="gridModalTitle"></h3>
+      <form id="gridForm">
+        <input id="gridIdInput" type="hidden" />
+        <div class="form-group">
+          <label class="form-label">Nom de la grille</label>
+          <input id="gridNameInput" class="form-control" required />
+        </div>
+        <div id="gridFieldsContainer"></div>
+        <div class="form-group--inline">
+          <button id="addGridFieldBtn" type="button" class="btn btn--secondary">Ajouter un champ</button>
+          <button type="submit" class="btn btn--primary">Sauvegarder</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="editPromptModal" class="modal">
+    <div class="modal__content">
+      <button class="modal__close">×</button>
+      <h3 id="promptModalTitle"></h3>
+      <p id="promptDescription"></p>
+      <form id="promptForm">
+        <input id="promptIdInput" type="hidden" />
+        <textarea id="promptTemplateTextarea" class="form-control" rows="12"></textarea>
+        <div class="form-group" style="margin-top:12px;">
+          <button type="submit" class="btn btn--primary">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <div id="runPipelineModal" class="modal">
+      <div class="modal__content">
+          <button class="modal__close" onclick="closeModal('runPipelineModal')">×</button>
+          <h3>Lancer une analyse</h3>
+          <form id="runPipelineForm">
+              <div class="form-group">
+                  <label for="pipelineSourceSelect" class="form-label">Source des articles</label>
+                  <select id="pipelineSourceSelect" name="pipelineSourceSelect" class="form-control">
+                      <option value="search_results" selected>Utiliser les résultats de la recherche</option>
+                      <option value="manual">Saisir manuellement les identifiants</option>
+                  </select>
+              </div>
+            
+              <div id="manualIdsGroup" class="form-group" style="display: none;">
+                  <label for="pmidsTextarea" class="form-label">Liste d'identifiants (un par ligne)</label>
+                  <textarea id="pmidsTextarea" name="pmidsTextarea" class="form-control" rows="5" placeholder="Collez ici vos PMID, DOI, etc."></textarea>
+              </div>
+
+              <div class="form-group">
+                  <label for="pipelineProfileSelect" class="form-label">Profil d'analyse</label>
+                  <select id="pipelineProfileSelect" name="pipelineProfileSelect" class="form-control"></select>
+              </div>
+
+              <div id="pipelineGridContainer" class="form-group" style="display: none;">
+                  <label for="pipelineGridSelect" class="form-label">Grille d'extraction personnalisée</label>
+                  <select id="pipelineGridSelect" name="pipelineGridSelect" class="form-control"></select>
+              </div>
+
+              <div class="modal__actions">
+                   <button type="submit" class="btn btn--primary">Lancer le traitement</button>
+              </div>
+          </form>
+      </div>
+  </div>
+
+  <div id="profileModal" class="modal">
+    <div class="modal__content">
+      <button class="modal__close">×</button>
+      <h3 id="profileModalTitle"></h3>
+      <form id="profileForm">
+        <input id="profileIdInput" name="profileIdInput" type="hidden" />
+        <div class="form-group">
+          <label class="form-label">Nom</label>
+          <input id="profileNameInput" name="profileNameInput" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Modèle Prétraitement</label>
+          <select id="profilePreprocessSelect" name="profilePreprocessSelect" class="form-control"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Modèle Extraction</label>
+          <select id="profileExtractSelect" name="profileExtractSelect" class="form-control"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Modèle Synthèse</label>
+          <select id="profileSynthesisSelect" name="profileSynthesisSelect" class="form-control"></select>
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn--primary">Sauvegarder</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Inputs/Forms auxiliaires -->
+  <form id="runPipelineForm" class="hidden"></form>
+  <input id="pdfFileInput" type="file" accept="application/pdf" multiple class="hidden" />
+  <input id="gridFileInput" type="file" accept="application/json" class="hidden" />
+  
+  
+
+  <!-- Overlays / Toasts -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-overlay__content">
+      <div class="loading-spinner loading-spinner--lg"></div>
+      <div class="loading-overlay__message">Chargement...</div>
+    </div>
+  </div>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scripts: Socket.IO client depuis le serveur, puis app.js -->
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

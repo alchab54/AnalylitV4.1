@@ -862,23 +862,44 @@ def pull_ollama_model_task(model_name: str):
         return f"Erreur: {e}"
 
 def process_single_article_task(project_id: str, article_id: str, profile: dict, analysis_mode: str, custom_grid_id: str = None):
-    """Traite un article individuel selon le mode d'analyse choisi."""
+    """Traite un article individuel, en allant chercher ses détails si nécessaire."""
     start_time = time.time()
     
     try:
-        # Récupérer les détails de l'article depuis la base de données
+        # --- DÉBUT DE LA LOGIQUE AMÉLIORÉE ---
         with sqlite3.connect(DATABASE_FILE) as conn:
             conn.row_factory = sqlite3.Row
+            # 1. Essayer de trouver l'article dans les résultats de recherche existants
             search_result = conn.execute("""
                 SELECT * FROM search_results 
                 WHERE project_id = ? AND article_id = ?
             """, (project_id, article_id)).fetchone()
             
-            if not search_result:
-                log_processing_status(project_id, article_id, "erreur", "Article non trouvé dans les résultats de recherche.")
-                return
-            
-            article_data = dict(search_result)
+            article_data = {}
+            if search_result:
+                article_data = dict(search_result)
+            else:
+                # 2. Si non trouvé (cas manuel), aller chercher les détails en ligne
+                print(f"ℹ️ Article {article_id} non trouvé localement, recherche des détails en ligne...")
+                # On suppose que l'ID est un PMID pour l'instant (on pourrait complexifier la détection)
+                details = fetch_pubtator_abstract(article_id)
+                if not details or not details.get('title'):
+                    log_processing_status(project_id, article_id, "erreur", "Détails de l'article introuvables en ligne.")
+                    return
+
+                # Créer une entrée minimale pour le traitement
+                article_data = {
+                    'project_id': project_id,
+                    'article_id': article_id,
+                    'title': details.get('title', 'Titre inconnu'),
+                    'abstract': details.get('abstract', ''),
+                    'authors': '',
+                    'publication_date': '',
+                    'journal': '',
+                    'doi': '',
+                    'url': f"https://pubmed.ncbi.nlm.nih.gov/{article_id}/",
+                    'database_source': 'manual_input'
+                }
         
         if analysis_mode == "screening":
             if not article_data.get('abstract'):

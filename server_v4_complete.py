@@ -1421,15 +1421,20 @@ def handle_disconnect():
     """Gestion de la déconnexion WebSocket."""
     logger.info(f"Client WebSocket déconnecté: {request.sid}")
 
-@socketio.on('join_project')
-def handle_join_project(data):
-    from flask_socketio import join_room
-    project_id = data.get('project_id')
+@socketio.on('join_room')
+def handle_join_room(data):
+    from flask_socketio import join_room as flask_join_room
+    
+    # Le client envoie 'room', pas 'project_id'
+    project_id = data.get('room') 
     if not project_id:
         return
-    join_room(project_id)
-    # Confirmer aux clients de la room (dont l’émetteur)
-    socketio.emit('project_joined', {'project_id': project_id}, room=project_id)
+        
+    flask_join_room(project_id)
+    
+    # Confirmer au client qu'il a bien rejoint la "room", avec le bon nom d'événement
+    socketio.emit('room_joined', {'project_id': project_id}, room=project_id)
+    logger.info(f"Client {request.sid} a rejoint la room du projet {project_id}")
     
 # Enregistrement du blueprint et routes statiques
 app.register_blueprint(api_bp)
