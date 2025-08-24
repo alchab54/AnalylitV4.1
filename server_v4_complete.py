@@ -374,7 +374,7 @@ def get_project_search_results(project_id):
         'has_prev': page > 1
     })
 
-@api_bp.route('/projects/<project_id>/search-stats', methods=['GET'])
+@api_bp.route('/projects/<project_id>/search-stats',   methods=['GET'])
 def get_project_search_stats(project_id):
     """Récupère les statistiques de recherche d'un projet."""
     with sqlite3.connect(DATABASE_FILE) as conn:
@@ -995,14 +995,14 @@ def run_project_pipeline(project_id):
     """Lance le pipeline d'analyse pour un projet sur une liste d'articles fournie."""
     data = request.get_json()
     
-    # --- CORRECTION : Simplification de la logique ---
-    # On attend toujours une liste nommée 'articles'
     selected_articles = data.get('articles', [])
     profile_id = data.get('profile', 'standard')
-    custom_grid_id = data.get('custom_grid_id')
+    custom_grid_id = data.get('custom_grid_id')               
+    analysis_mode = data.get('analysis_mode', 'screening')    
     
     if not selected_articles:
         return jsonify({'error': 'La liste d\'articles est requise.'}), 400
+
     
     with sqlite3.connect(DATABASE_FILE) as conn:
         conn.row_factory = sqlite3.Row
@@ -1025,23 +1025,21 @@ def run_project_pipeline(project_id):
             WHERE id = ?
         """, (profile_id, datetime.now().isoformat(), len(selected_articles), project_id))
         conn.commit()
+        
+    conn.execute("UPDATE projects SET analysis_mode = ? WHERE id = ?", (analysis_mode, project_id))
 
-    # Lancer les tâches de fond
+    # Lancer les tâches
     for article_id in selected_articles:
         processing_queue.enqueue(
             process_single_article_task,
             project_id=project_id,
             article_id=article_id,
             profile=profile,
-            analysis_mode=analysis_mode,
-            custom_grid_id=custom_grid_id,
+            analysis_mode=analysis_mode,      # ← transmet le nouveau mode
+            custom_grid_id=custom_grid_id,    # ← transmet l’ID de la grille
             job_timeout=1800
         )
-    
-    return jsonify({
-        "status": "processing",
-        "message": f"{len(selected_articles)} articles sont en cours de traitement."
-    }), 202
+    return jsonify({"status": "processing"}), 202
 
 @api_bp.route('/projects/<project_id>/run-synthesis', methods=['POST'])
 def run_synthesis_endpoint(project_id):
@@ -1075,7 +1073,7 @@ def run_synthesis_endpoint(project_id):
     }), 202
 
 # Extractions
-@api_bp.route('/projects/<project_id>/extractions', methods=['GET'])
+@api_bp.route('/projects/<project_id>/extractions',    methods=['GET'])
 def get_project_extractions(project_id):
     """Récupère les extractions d'un projet, y compris l'abstract et l'URL."""
     with sqlite3.connect(DATABASE_FILE) as conn:
@@ -1241,6 +1239,42 @@ Bases de données utilisées: {project['databases_used']}
     except Exception as e:
         logger.error(f"Erreur d'export ZIP pour {project_id}: {e}")
         return jsonify({"error": "Erreur interne du serveur lors de l'export."}), 500
+
+@api_bp.route('/projects/<project_id>/extractions/<extraction_id>', methods=['PATCH'])
+def update_extraction(project_id, extraction_id):
+    data = request.get_json()
+    # Autoriser modification de extracted_data ou user_validation_status
+    fields = []
+    params = []
+    if 'extracted_data' in data:
+        fields.append("extracted_data = ?")
+        params.append(json.dumps(data['extracted_data']))
+    if 'user_validation_status' in data:
+        fields.append("user_validation_status = ?")
+        params.append(data['user_validation_status'])
+    if not fields:
+        return jsonify({'error': 'Rien à mettre à jour'}), 400
+    params.extend([extraction_id, project_id])
+    with sqlite3.connect(DATABASE_FILE) as conn:
+        conn.execute(f"""
+            UPDATE extractions SET {', '.join(fields)} WHERE id = ? AND project_id = ?
+        """, params)
+        conn.commit()
+    return jsonify({'message': 'Extraction mise à jour'}), 200
+
+@api_bp.route('/projects/<project_id>/export-extractions', methods=['GET'])
+def export_extractions_csv(project_id):
+    with sqlite3.connect(DATABASE_FILE) as conn:
+        df = pd.read_sql_query(f"""
+            SELECT pmid, title, extracted_data FROM extractions
+            WHERE project_id = '{project_id}' AND extracted_data IS NOT NULL
+        """, conn)
+    # Déplier la colonne JSON en colonnes individuelles
+    data = df['extracted_data'].apply(json.loads).apply(pd.Series)
+    out = pd.concat([df.drop(columns=['extracted_data']), data], axis=1)
+    csv = out.to_csv(index=False)
+    return Response(csv, mimetype="text/csv",
+                    headers={"Content-Disposition": f"attachment; filename=extractions_{project_id}.csv"})
 
 # Analyse avancée
 @api_bp.route('/projects/<project_id>/generate-discussion', methods=['POST'])

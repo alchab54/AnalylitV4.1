@@ -657,18 +657,35 @@ def call_ollama_api(prompt: str, model: str, output_format: str = "", retries: i
     print(f"❌ Échec de l'appel API Ollama après {retries} essais. Erreur: {last_exception}")
     return {} if output_format == "json" else ""
 
-def fetch_article_details(article_id: str, database_source: str) -> dict:
-    """Récupère les détails d'un article selon sa source."""
-    if database_source == 'pubmed':
-        return fetch_pubtator_abstract(article_id)
-    elif database_source == 'arxiv':
-        return fetch_arxiv_details(article_id)
-    elif database_source == 'crossref':
+def fetch_article_details(article_id: str, database_source: str = None) -> dict:
+    """
+    Récupère les détails d'un article selon son identifiant.
+    CORRECTION BUG C : Détection automatique du type d'identifiant (DOI vs PMID)
+    """
+    # Nettoyer l'identifiant
+    article_id = article_id.strip()
+    
+    # Détection automatique du type d'identifiant
+    if article_id.startswith("10.") and "/" in article_id:
+        # C'est un DOI
+        print(f"📖 Détecté comme DOI : {article_id}")
         return fetch_crossref_details(article_id)
-    elif database_source == 'ieee':
-        return fetch_ieee_details(article_id)
+    elif article_id.isdigit() and len(article_id) >= 7:
+        # C'est probablement un PMID
+        print(f"📖 Détecté comme PMID : {article_id}")
+        return fetch_pubtator_abstract(article_id)
+    elif "arxiv" in article_id.lower() or article_id.count('.') == 1:
+        # C'est probablement un ID arXiv
+        print(f"📖 Détecté comme arXiv ID : {article_id}")
+        return fetch_arxiv_details(article_id)
     else:
-        return {'id': article_id, 'title': 'Article inconnu', 'abstract': ''}
+        # Fallback : essayer en tant que PMID d'abord, puis DOI
+        print(f"⚠️ Type d'identifiant incertain pour : {article_id}, essai PMID d'abord...")
+        details = fetch_pubtator_abstract(article_id)
+        if details.get('title') == 'Erreur de récupération':
+            print(f"⚠️ Échec PMID, essai en tant que DOI...")
+            details = fetch_crossref_details(article_id)
+        return details
 
 def fetch_pubtator_abstract(pmid: str) -> dict:
     """Récupère le titre et le résumé d'un article via l'API PubTator avec retry."""
@@ -861,156 +878,171 @@ def pull_ollama_model_task(model_name: str):
         print(f"❌ Erreur lors du téléchargement du modèle '{model_name}': {e}")
         return f"Erreur: {e}"
 
-def process_single_article_task(project_id: str, article_id: str, profile: dict, analysis_mode: str, custom_grid_id: str = None):
-    """Traite un article individuel, en allant chercher ses détails si nécessaire."""
+def process_single_article_task(
+    project_id: str,
+    article_id: str,
+    profile: dict,
+    analysis_mode: str,
+    custom_grid_id: str = None
+):
+    """
+    Traite un article individuel avec :
+    - détection automatique DOI/PMID/arXiv
+    - mode 'screening' ou 'full_extraction'
+    - grille personnalisée pour extraction détaillée
+    """
     start_time = time.time()
     try:
+        # Récupérer ou chercher les métadonnées de l'article
         with sqlite3.connect(DATABASE_FILE) as conn:
             conn.row_factory = sqlite3.Row
-            search_result = conn.execute("SELECT * FROM search_results WHERE project_id = ? AND article_id = ?", (project_id, article_id)).fetchone()
-            
-            article_data = {}
-            if search_result:
-                article_data = dict(search_result)
-            else:
-                print(f"ℹ️ Article {article_id} non trouvé localement, recherche des détails en ligne...")
-                details = {}
-                # --- CORRECTION : Détection DOI/PMID ---
-                if article_id.strip().startswith("10."):
-                    details = fetch_crossref_details(article_id)
-                else:
-                    details = fetch_pubtator_abstract(article_id)
-                
-                if not details or not details.get('title'):
-                    log_processing_status(project_id, article_id, "erreur", "Détails de l'article introuvables en ligne.")
-                    return
-                # --- FIN CORRECTION ---
+            row = conn.execute(
+                "SELECT * FROM search_results WHERE project_id = ? AND article_id = ?",
+                (project_id, article_id)
+            ).fetchone()
 
-                article_data = {
-                    'project_id': project_id, 'article_id': article_id,
-                    'title': details.get('title', 'Titre inconnu'),
-                    'abstract': details.get('abstract', ''),
-                    'url': details.get('url', f"https://doi.org/{article_id}" if article_id.strip().startswith("10.") else f"https://pubmed.ncbi.nlm.nih.gov/{article_id}"),
-                    'database_source': 'manual_input'
-                }
-
-        if analysis_mode == "screening":
-            if not article_data.get('abstract'):
-                log_processing_status(project_id, article_id, "écarté", "Résumé non disponible pour le screening.")
+        if row:
+            article_data = dict(row)
+        else:
+            print(f"ℹ️ Article {article_id} non trouvé localement, recherche en ligne...")
+            details = fetch_article_details(article_id)
+            if not details or not details.get("title") or details.get("title") == "Erreur de récupération":
+                log_processing_status(project_id, article_id, "erreur", "Détails introuvables")
                 return
-            
+            article_data = {
+                "project_id": project_id,
+                "article_id": article_id,
+                "title": details.get("title", "Titre inconnu"),
+                "abstract": details.get("abstract", ""),
+                "authors": details.get("authors", ""),
+                "publication_date": details.get("publication_date", ""),
+                "journal": details.get("journal", ""),
+                "doi": details.get("doi", ""),
+                "url": details.get("url", ""),
+                "database_source": details.get("database_source", "manual_input")
+            }
+
+        # Mode screening
+        if analysis_mode == "screening":
+            abstract = article_data.get("abstract", "")
+            if not abstract:
+                log_processing_status(project_id, article_id, "écarté", "Résumé manquant")
+                return
+
             prompt = get_screening_prompt(
-                article_data['title'], 
-                article_data['abstract'], 
-                article_data['database_source']
+                article_data["title"],
+                abstract,
+                article_data.get("database_source", "unknown")
             )
-            
-            relevance_response = call_ollama_api(prompt, profile['preprocess_model'], output_format="json")
-            
-            if isinstance(relevance_response, dict) and relevance_response.get('decision') == "À inclure":
-                relevance_score = relevance_response.get('relevance_score', 0)
-                relevance_justification = relevance_response.get('justification', 'Justification non fournie.')
-                
-                with sqlite3.connect(DATABASE_FILE) as conn:
-                    conn.execute("""
-                        INSERT INTO extractions (
-                            id, project_id, pmid, title, relevance_score, 
-                            relevance_justification, created_at
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?)
-                    """, (
-                        f"{project_id}-{article_id}", project_id, article_id, article_data['title'], 
-                        relevance_score, relevance_justification, datetime.now().isoformat()
-                    ))
-                    conn.commit()
-                
-                log_processing_status(project_id, article_id, "analysé", f"Pertinence: {relevance_score}/10")
-                print(f"✅ Article {article_id} pré-sélectionné (Pertinence: {relevance_score}/10).")
-            
+            resp = call_ollama_api(prompt, profile["preprocess_model"], output_format="json")
+            decision = resp.get("decision") if isinstance(resp, dict) else None
+
+            if decision == "À inclure":
+                score = resp.get("relevance_score", 0)
+                justification = resp.get("justification", "Justification non fournie.")
             else:
-                relevance_justification = (
-                    relevance_response.get('justification')
-                    if isinstance(relevance_response, dict) else None
-                ) or "Hors sujet ou ne correspond pas aux critères."
-                
-                with sqlite3.connect(DATABASE_FILE) as conn:
-                    conn.execute("""
-                        INSERT INTO extractions (
-                            id, project_id, pmid, title, relevance_score, 
-                            relevance_justification, created_at
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?)
-                    """, (
-                        f"{project_id}-{article_id}", project_id, article_id, article_data['title'], 
-                        0, relevance_justification, datetime.now().isoformat()
-                    ))
-                    conn.commit()
-                
-                log_processing_status(project_id, article_id, "écarté", relevance_justification)
-                print(f"⏩ Article {article_id} écarté : {relevance_justification}")
-        
+                score = 0
+                justification = (
+                    resp.get("justification") if isinstance(resp, dict) else None
+                ) or "Non pertinent selon IA."
+
+            with sqlite3.connect(DATABASE_FILE) as conn:
+                conn.execute("""
+                    INSERT INTO extractions (
+                        id, project_id, pmid, title,
+                        relevance_score, relevance_justification, created_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    f"{project_id}-{article_id}",
+                    project_id,
+                    article_id,
+                    article_data["title"],
+                    score,
+                    justification,
+                    datetime.now().isoformat()
+                ))
+                conn.commit()
+
+            status = "analysé" if score > 0 else "écarté"
+            log_processing_status(
+                project_id,
+                article_id,
+                status,
+                f"Score: {score}/10"
+            )
+            print(f"▶️ {status.capitalize()} {article_id} (score {score})")
+
+        # Mode extraction détaillée
         elif analysis_mode == "full_extraction":
-            text_for_extraction = ""
-            pdf_path = PROJECTS_DIR / project_id / f"{article_id}.pdf"
-            
+            # Récupérer le texte intégral depuis PDF si disponible
+            pdf_path = PROJECTS_DIR / project_id / f"{article_id.replace('/', '_')}.pdf"
             if pdf_path.exists():
-                print(f"📄 PDF trouvé pour {article_id}. Extraction du texte intégral.")
-                full_text = extract_text_from_pdf(pdf_path)
-                if full_text:
-                    text_for_extraction = full_text
-            
+                full_text = extract_text_from_pdf(str(pdf_path))
+                text_for_extraction = full_text or ""
+            else:
+                text_for_extraction = ""
+
             if not text_for_extraction:
-                print(f"Aucun PDF pour {article_id}. Utilisation du titre et du résumé pour l'extraction.")
-                text_for_extraction = article_data['title'] + " " + article_data.get('abstract', '')
-            
+                text_for_extraction = (
+                    article_data["title"] + "\n\n" + article_data.get("abstract", "")
+                )
+
             prompt = get_full_extraction_prompt(
-                text_for_extraction, 
-                article_data['database_source'], 
+                text_for_extraction,
+                article_data.get("database_source", "unknown"),
                 custom_grid_id
             )
-            
-            extracted_data = call_ollama_api(prompt, profile['extract_model'], output_format="json")
-            
-            if isinstance(extracted_data, dict) and extracted_data:
+            extracted = call_ollama_api(
+                prompt, profile["extract_model"], output_format="json"
+            )
+
+            if isinstance(extracted, dict) and extracted:
                 with sqlite3.connect(DATABASE_FILE) as conn:
                     conn.execute("""
                         INSERT INTO extractions (
-                            id, project_id, pmid, title, extracted_data, 
-                            relevance_score, relevance_justification, created_at
+                            id, project_id, pmid, title,
+                            extracted_data, relevance_score,
+                            relevance_justification, created_at
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                     """, (
-                        f"{project_id}-{article_id}", project_id, article_id, article_data['title'], 
-                        json.dumps(extracted_data), 10, "Extraction détaillée", datetime.now().isoformat()
+                        f"{project_id}-{article_id}",
+                        project_id,
+                        article_id,
+                        article_data["title"],
+                        json.dumps(extracted),
+                        10,
+                        "Extraction détaillée",
+                        datetime.now().isoformat()
                     ))
                     conn.commit()
-                
-                log_processing_status(project_id, article_id, "analysé", "Extraction détaillée complète.")
-                print(f"✅ Article {article_id} traité avec la grille détaillée.")
-            
+                log_processing_status(
+                    project_id,
+                    article_id,
+                    "analysé",
+                    "Extraction détaillée terminée"
+                )
+                print(f"✅ Extraction complète pour {article_id}")
             else:
-                log_processing_status(project_id, article_id, "écarté", "Extraction JSON (grille détaillée) invalide.")
-                print(f"⏩ Article {article_id} ignoré : format de réponse invalide.")
-        
-        # Notification après traitement
-        with sqlite3.connect(DATABASE_FILE) as conn:
-            processed_count = conn.execute(
-                "SELECT processed_count FROM projects WHERE id = ?", (project_id,)
-            ).fetchone()[0]
-            
-            send_project_notification(
-                project_id,
-                'article_processed',
-                f'Article {article_id} traité.',
-                {'article_id': article_id, 'processed_count': processed_count}
-            )
-    
-    except Exception as e:
-        error_details = str(e)[:150]
-        log_processing_status(project_id, article_id, "erreur", error_details)
-        print(f"❌ Erreur critique lors du traitement de l'article {article_id}: {e}")
-    
-    finally:
-        duration = time.time() - start_time
-        update_project_timing(project_id, duration)
+                log_processing_status(
+                    project_id,
+                    article_id,
+                    "écarté",
+                    "Réponse extraction invalide"
+                )
+                print(f"⚠️ Extraction invalide pour {article_id}")
+
+        # Mettre à jour compteurs et timing
         increment_processed_count(project_id)
+        update_project_timing(project_id, time.time() - start_time)
+
+    except Exception as e:
+        print(f"❌ Erreur critique {article_id}: {e}")
+        log_processing_status(
+            project_id,
+            article_id,
+            "erreur",
+            f"Exception: {str(e)}"
+        )
 
 def run_synthesis_task(project_id: str, profile: dict):
     """Génère une synthèse des articles pertinents d'un projet."""

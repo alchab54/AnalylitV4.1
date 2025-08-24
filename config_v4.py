@@ -27,7 +27,7 @@ class Config:
     DEFAULT_MODELS: dict = field(default_factory=lambda: {
         'fast': {
             'preprocess': 'gemma:2b',
-            'extract': 'phi3:mini', 
+            'extract': 'phi3:mini',
             'synthesis': 'llama3.1:8b'
         },
         'standard': {
@@ -39,16 +39,15 @@ class Config:
             'preprocess': 'llama3.1:8b',
             'extract': 'mixtral:8x7b',
             'synthesis': 'llama3.1:70b'
-        } # &lt;-- Accolade manquante
         }
-        )
-    
+    }),
+
     # Configuration timeouts
-    REQUEST_TIMEOUT: int = 900  # 15 minutes
-    JOB_TIMEOUT: int = 3600    # 1 heure
+    REQUEST_TIMEOUT: int = 900   # 15 minutes
+    JOB_TIMEOUT: int = 3600      # 1 heure
     WEBSOCKET_PING_INTERVAL: int = 25
     WEBSOCKET_PING_TIMEOUT: int = 60
-    
+
     # Configuration logging
     LOG_LEVEL: str = os.getenv('LOG_LEVEL', 'INFO')
     
