@@ -518,6 +518,7 @@ def get_zotero_import_status(project_id):
         return jsonify({'status': 'pending'})
 
 # Upload PDF en lot
+# Upload PDF en lot
 @api_bp.route('/projects/<project_id>/upload-pdfs-bulk', methods=['POST'])
 def upload_pdfs_bulk(project_id):
     """Upload de PDF en lot."""
@@ -553,7 +554,7 @@ def upload_pdfs_bulk(project_id):
         'failed': failed, 
         'skipped': []
     })
-
+    
 # Recherche PDF en ligne
 @api_bp.route('/projects/<project_id>/fetch-online-pdfs', methods=['POST'])
 def fetch_online_pdfs(project_id):

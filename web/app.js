@@ -878,6 +878,7 @@ async function handleRunPipeline(e) {
   });
 }
 
+
 function handlePipelineSourceChange() {
     const sourceSelect = document.getElementById('pipelineSourceSelect');
     const manualGroup = document.getElementById('manualIdsGroup');
@@ -1051,7 +1052,7 @@ function renderResultsSection() {
 
 	  resultsContainer.innerHTML = html;
 	}
-
+	
 async function openExtractionDetailModal(extractionId) {
   const modal = document.getElementById('extractionDetailModal');
   const container = document.getElementById('extractionDetailContainer');

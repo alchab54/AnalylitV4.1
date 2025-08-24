@@ -1043,7 +1043,7 @@ def process_single_article_task(
             "erreur",
             f"Exception: {str(e)}"
         )
-
+        
 def run_synthesis_task(project_id: str, profile: dict):
     """Génère une synthèse des articles pertinents d'un projet."""
     update_project_status(project_id, "synthesizing")
@@ -1548,7 +1548,7 @@ def fetch_online_pdf_task(project_id, article_ids):
         print(f"❌ Erreur critique OA: {e}")
         redis_key = f"online_fetch_result:{project_id}"
         redis_conn.set(redis_key, json.dumps([]), ex=600)
-
+        
 def index_project_pdfs_task(project_id: str):
     """Indexe les PDF d'un projet avec normalisation, filtrage et embeddings."""
     print(f"📚 Indexation améliorée pour le projet {project_id}...")
