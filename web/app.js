@@ -121,10 +121,18 @@ function setupEventListeners() {
             // Recherche
             selectSearchResult: () => selectSearchResult(articleId, database),
             selectAllSearchResults: () => selectAllSearchResults(),
-            addSelectedToProject: () => addSelectedToProject(),
-
+            
             // Validation
             validateExtraction: () => handleValidateExtraction(extractionId, target.dataset.decision),
+            toggleAbstract: () => {
+                const titleRow = target.closest('tr');
+                if (titleRow) {
+                    const abstractRow = titleRow.nextElementSibling;
+                    if (abstractRow && abstractRow.classList.contains('abstract-row')) {
+                        abstractRow.classList.toggle('hidden');
+                    }
+                }
+            },
 
             // Analyses avancées
             'generate-discussion': () => runAdvancedAnalysis('generate-discussion', projectId),
@@ -168,14 +176,6 @@ function setupEventListeners() {
             // Paramètres - Zotero
             saveZoteroSettings: () => handleSaveZoteroSettings(),
         };
-		
-		'toggleAbstract': () => {
-                const titleRow = target.closest('tr');
-                const abstractRow = titleRow.nextElementSibling;
-                if (abstractRow && abstractRow.classList.contains('abstract-row')) {
-                    abstractRow.classList.toggle('hidden');
-                }
-            },
 
         if (actions[action]) {
             actions[action]();
