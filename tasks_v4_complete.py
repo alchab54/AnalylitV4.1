@@ -354,6 +354,12 @@ class DatabaseManager:
 # Instance globale du gestionnaire de bases de données
 db_manager = DatabaseManager()
 
+# NOUVEAU : Fonction de sanétisation unifiée
+def sanitize_filename(article_id: str) -> str:
+    """Convertit un identifiant d'article en un nom de fichier valide."""
+    # Remplace les caractères non alphanumériques (sauf le point) par un underscore
+    return re.sub(r'[^a-zA-Z0-9.-]', '_', article_id)
+    
 # Fonctions utilitaires
 def http_get_with_retries(url, headers=None, timeout=15, max_retries=HTTP_MAX_RETRIES,
                          backoff_base=HTTP_BACKOFF_BASE, jitter=True, ok_statuses=(200,)):
@@ -1043,52 +1049,55 @@ def run_synthesis_task(project_id: str, profile: dict):
     update_project_status(project_id, "synthesizing")
     
     with sqlite3.connect(DATABASE_FILE) as conn:
-        conn.row_factory = lambda cursor, row: json.loads(row[0]) if row[0] else {}
+        conn.row_factory = sqlite3.Row
+        
+        project = conn.execute("SELECT description FROM projects WHERE id = ?", (project_id,)).fetchone()
+        project_description = project['description'] if project else "Non spécifié"
+
+        # CORRECTION : Jointure pour récupérer title et abstract depuis search_results
         extractions = conn.execute("""
-            SELECT extracted_data FROM extractions 
-            WHERE project_id = ? AND relevance_score >= 7 
-            ORDER BY relevance_score DESC LIMIT 30
+            SELECT s.title, s.abstract
+            FROM extractions e
+            JOIN search_results s ON e.project_id = s.project_id AND e.pmid = s.article_id
+            WHERE e.project_id = ? AND e.relevance_score >= 7 
+            ORDER BY e.relevance_score DESC LIMIT 30
         """, (project_id,)).fetchall()
         
         if not extractions:
             update_project_status(project_id, "failed")
+            send_project_notification(project_id, 'synthesis_failed', 'Aucun article pertinent trouvé pour la synthèse.')
             print(f"⏩ Échec de la synthèse pour {project_id}: Aucun article pertinent trouvé (score >= 7).")
             return "Échec : Aucun article suffisamment pertinent trouvé pour la synthèse."
         
-        # Préparer les données pour la synthèse
-        abstracts_for_prompt = []
-        for item in extractions:
-            if item:
-                title = item.get('titre', item.get('title', ''))
-                resume = item.get('résumé', item.get('abstract', ''))
-                abstracts_for_prompt.append(f"Titre: {title}\nRésumé: {resume}")
+        abstracts_for_prompt = [
+            f"Titre: {row['title']}\nRésumé: {row['abstract']}"
+            for row in extractions if row['abstract']
+        ]
         
+        if not abstracts_for_prompt:
+            update_project_status(project_id, "failed")
+            send_project_notification(project_id, 'synthesis_failed', 'Les articles pertinents n\'avaient pas de résumé.')
+            print(f"⏩ Échec de la synthèse pour {project_id}: Les articles pertinents n'avaient pas de résumé.")
+            return "Échec : Les articles pertinents n'avaient pas de résumé."
+
         data_for_prompt = "\n\n---\n\n".join(abstracts_for_prompt)
         
-        prompt = f"""Tu es un chercheur expert. Analyse les résumés d'articles suivants et produis une synthèse concise au format JSON. Identifie les thèmes principaux, les tendances et les questions en suspens.
-
-Résumés à analyser :
-
----
-
-{data_for_prompt}
-
----
-
-Réponds UNIQUEMENT avec un objet JSON valide contenant :
-"points_cles_convergents" (array), "resultats_notables_divergents" (array), "lacunes_identifiees" (array), "synthese_globale" (string)."""
+        synthesis_prompt_template = get_prompt_from_db('synthesis_prompt')
+        prompt = synthesis_prompt_template.format(
+            project_description=project_description,
+            data_for_prompt=data_for_prompt
+        )
         
         synthesis_output = call_ollama_api(prompt, profile['synthesis_model'], output_format="json")
         
         if synthesis_output and isinstance(synthesis_output, dict):
             update_project_status(project_id, "completed", result=synthesis_output)
             print(f"--- ✅ SYNTHÈSE COMPLÈTE pour le projet {project_id} ---")
-            
             send_project_notification(project_id, 'synthesis_completed', 'La synthèse est terminée avec succès.')
         else:
             update_project_status(project_id, "failed")
-            send_project_notification(project_id, 'synthesis_failed', 'La synthèse a échoué.')
-
+            send_project_notification(project_id, 'synthesis_failed', 'La synthèse a échoué car l\'IA a renvoyé une réponse invalide.')
+            
 def run_discussion_generation_task(project_id: str):
     """Génère une section discussion académique pour un projet."""
     try:
@@ -1389,66 +1398,93 @@ def run_atn_score_task(project_id: str):
         update_project_status(project_id, "failed")
 
 def import_pdfs_from_zotero_task(project_id, pmids, zotero_user_id, zotero_api_key):
-    """Importe des PDF depuis Zotero pour un projet avec gestion d'erreurs améliorée."""
-    print(f"🔄 Import Zotero démarré pour {len(pmids)} PMIDs...")
+    """Importe des PDF depuis Zotero pour un projet avec gestion d'erreurs et recherche améliorée."""
+    print(f"🔄 Import Zotero démarré pour {len(pmids)} IDs...")
     
     successful_pmids = []
     
+    if not zotero_user_id or not zotero_api_key:
+        print("❌ ERREUR: ZOTERO_USER_ID ou ZOTERO_API_KEY manquant. Veuillez les configurer.")
+        send_project_notification(project_id, 'zotero_import_failed', 'ID utilisateur ou Clé API Zotero non configurés.')
+        return
+
     try:
         zot = zotero.Zotero(zotero_user_id, 'user', zotero_api_key)
+        
+        try:
+            print("🔐 Test de la connexion à l'API Zotero...")
+            zot.key_info()
+            print("✅ Connexion à l'API Zotero réussie.")
+        except Exception as e:
+            print(f"❌ ÉCHEC DE LA CONNEXION ZOTERO. Vérifiez vos identifiants.")
+            print(f"   Erreur détaillée: {e}")
+            send_project_notification(project_id, 'zotero_import_failed', 'Échec de la connexion à Zotero. Vérifiez vos identifiants.')
+            return
+
         project_dir = PROJECTS_DIR / project_id
         project_dir.mkdir(exist_ok=True)
         
-        for pmid in pmids:
+        for article_id in pmids:
             try:
-                # Recherche de l'item par PMID avec plusieurs stratégies
-                search_queries = [pmid, f"PMID:{pmid}", f"pmid:{pmid}"]
-                found = False
+                search_queries = [article_id, f"PMID:{article_id}"]
+                if '/' in article_id and article_id.startswith('10.'):
+                    search_queries.append(f"doi:\"{article_id}\"")
+
+                found_item = None
+                print(f"--- [ID: {article_id}] ---")
                 
                 for query in search_queries:
-                    if found:
+                    if found_item: break
+                    print(f"   -> Recherche avec la requête: '{query}'")
+                    items = zot.items(q=query, limit=5)
+                    if items:
+                        print(f"   ✅ Trouvé {len(items)} item(s). Sélection du premier.")
+                        found_item = items[0]
                         break
-                    
-                    items = zot.items(q=query, limit=10)
-                    for item in items:
-                        try:
-                            # Vérifier les fichiers attachés
-                            attachments = zot.children(item['key'])
-                            for attachment in attachments:
-                                attachment_data = attachment.get('data', {})
-                                if attachment_data.get('contentType') == 'application/pdf':
-                                    # Télécharger le PDF
-                                    pdf_content = zot.file(attachment['key'])
-                                    pdf_path = project_dir / f"{pmid}.pdf"
-                                    
-                                    with open(pdf_path, 'wb') as f:
-                                        f.write(pdf_content)
-                                    
-                                    print(f"✅ PDF téléchargé pour PMID {pmid}")
-                                    successful_pmids.append(pmid)
-                                    found = True
-                                    break
-                            
-                            if found:
-                                break
-                        
-                        except Exception as e:
-                            print(f"⚠️ Erreur traitement attachment pour {pmid}: {e}")
-                            continue
+                    else:
+                        print(f"   -> Aucun résultat pour cette requête.")
                 
-                time.sleep(0.5)  # Politesse API
+                if not found_item:
+                    print(f"   ⏩ Article non trouvé dans Zotero.")
+                    continue
+
+                item_key = found_item['key']
+                print(f"   -> Item Zotero Key: {item_key}. Recherche des pièces jointes...")
+                attachments = zot.children(item_key)
+                print(f"   -> Trouvé {len(attachments)} pièce(s) jointe(s).")
+                
+                pdf_found_for_item = False
+                for attachment in attachments:
+                    content_type = attachment.get('data', {}).get('contentType', 'N/A')
+                    print(f"      - Pièce jointe trouvée, type: {content_type}")
+                    if content_type == 'application/pdf':
+                        print(f"      -> C'est un PDF! Téléchargement...")
+                        pdf_content = zot.file(attachment['key'])
+                        safe_filename = sanitize_filename(article_id) + ".pdf"
+                        pdf_path = project_dir / safe_filename
+                        
+                        with open(pdf_path, 'wb') as f:
+                            f.write(pdf_content)
+                        
+                        print(f"      ✅ PDF téléchargé et sauvegardé: {safe_filename}")
+                        successful_pmids.append(article_id)
+                        pdf_found_for_item = True
+                        break
+
+                if not pdf_found_for_item:
+                    print(f"   ⏩ Item trouvé, mais aucun PDF attaché.")
+
+                time.sleep(0.5)
             
             except Exception as e:
-                print(f"❌ Erreur pour PMID {pmid}: {e}")
+                print(f"❌ Erreur durant le traitement de l'ID {article_id}: {e}")
                 continue
         
-        # Mémoriser le résultat dans Redis
         redis_key = f"zotero_import_result:{project_id}"
         redis_conn.set(redis_key, json.dumps(successful_pmids), ex=600)
         
-        print(f"📊 Import Zotero terminé: {len(successful_pmids)}/{len(pmids)} PDF importés")
-        
-        # Notification de fin d'import
+        print(f"--- FIN DE L'IMPORT ---")
+        print(f"📊 Total: {len(successful_pmids)}/{len(pmids)} PDF importés")
         send_project_notification(
             project_id,
             'zotero_import_completed',
@@ -1457,17 +1493,11 @@ def import_pdfs_from_zotero_task(project_id, pmids, zotero_user_id, zotero_api_k
         )
     
     except Exception as e:
-        print(f"❌ Erreur critique import Zotero: {e}")
-        redis_key = f"zotero_import_result:{project_id}"
-        redis_conn.set(redis_key, json.dumps([]), ex=600)
-        
+        print(f"❌ ERREUR CRITIQUE PENDANT L'IMPORT ZOTERO: {e}")
         send_project_notification(
-            project_id,
-            'zotero_import_failed',
-            f'Échec de l\'import Zotero: {str(e)}',
-            {'error': str(e)}
+            project_id, 'zotero_import_failed', f'Échec de l\'import Zotero: {str(e)}'
         )
-
+        
 def fetch_online_pdf_task(project_id, article_ids):
     """Recherche et télécharge des PDF OA via DOI→Unpaywall."""
     print(f"🌐 Recherche OA (DOI→Unpaywall) pour {len(article_ids)} articles...")
@@ -1506,12 +1536,13 @@ def fetch_online_pdf_task(project_id, article_ids):
                 if resp.status_code == 200:
                     content_type = resp.headers.get("Content-Type", "").lower()
                     if content_type.startswith("application/pdf"):
-                        pdf_path = project_dir / f"{article_id}.pdf"
+                        safe_filename = sanitize_filename(article_id) + ".pdf"
+                        pdf_path = project_dir / safe_filename
                         
                         with open(pdf_path, "wb") as f:
                             f.write(resp.content)
                         
-                        print(f"✅ PDF OA téléchargé pour article {article_id} (DOI {doi})")
+                        print(f"✅ PDF OA téléchargé pour {article_id} sous le nom {safe_filename}")
                         successful_ids.append(article_id)
                     else:
                         print(f"⚠️ Contenu non-PDF pour article {article_id} (type: {content_type})")
@@ -1550,20 +1581,17 @@ def index_project_pdfs_task(project_id: str):
     try:
         project_dir = PROJECTS_DIR / project_id
         
-        # Initialiser ChromaDB
         chroma_client = chromadb.PersistentClient(path=str(project_dir / "chroma_db"))
         collection_name = f"project_{project_id}"
         
-        # Supprimer la collection si elle existe déjà
         try:
             chroma_client.delete_collection(collection_name)
             print(f"🗑️ Ancienne collection supprimée: {collection_name}")
-        except:
-            pass
+        except Exception:
+            pass # C'est normal si la collection n'existait pas
         
         collection = chroma_client.create_collection(collection_name)
         
-        # Trouver tous les PDF
         pdf_files = list(project_dir.glob("*.pdf"))
         if not pdf_files:
             print("❌ Aucun PDF trouvé pour l'indexation")
@@ -1580,126 +1608,79 @@ def index_project_pdfs_task(project_id: str):
             length_function=len,
         )
         
-        all_documents = []
-        all_metadatas = []
-        all_ids = []
+        all_documents, all_metadatas, all_ids = [], [], []
         total_filtered = 0
         successful_files = 0
         
         for pdf_file in pdf_files:
+            # CORRECTION : S'assurer que la variable article_id est toujours définie dans la boucle
             article_id = pdf_file.stem
-            
+            if not article_id:
+                continue # Ignorer les fichiers sans nom de base
+
             try:
-                # Extraire le texte
                 text = extract_text_from_pdf(pdf_file)
-                if not text:
-                    print(f"⚠️ Pas de texte extrait pour {article_id}")
-                    continue
-                
-                # Normaliser le texte
-                text = normalize_text(text)
                 if not text or len(text.strip()) < 50:
-                    print(f"⚠️ Texte trop court après normalisation pour {article_id}")
+                    print(f"⚠️ Texte trop court ou vide pour {article_id}")
                     continue
                 
-                # Découper en chunks
+                text = normalize_text(text)
                 chunks = text_splitter.split_text(text)
                 
-                # Filtrage et dé-duplication
-                keep_docs, keep_meta, keep_ids = [], [], []
-                seen_hashes = set()
+                keep_docs, seen_hashes = [], set()
                 
                 for i, chunk in enumerate(chunks):
                     c = normalize_text(chunk)
                     if len(c) < MIN_CHUNK_LEN:
                         continue
                     
-                    # Hash pour dé-duplication
                     h = hashlib.sha1(c.encode("utf-8")).hexdigest()
                     if h in seen_hashes:
                         continue
                     
                     seen_hashes.add(h)
                     keep_docs.append(c)
-                    keep_meta.append({
+                    
+                    all_metadatas.append({
                         'article_id': article_id,
                         'chunk_id': len(keep_docs)-1,
                         'source': str(pdf_file.name)
                     })
-                    keep_ids.append(f"{article_id}_chunk_{len(keep_docs)-1}")
-                
+                    all_ids.append(f"{article_id}_chunk_{len(keep_docs)-1}")
+
                 all_documents.extend(keep_docs)
-                all_metadatas.extend(keep_meta)
-                all_ids.extend(keep_ids)
                 total_filtered += len(chunks) - len(keep_docs)
                 successful_files += 1
-                
                 print(f"🔎 {article_id}: {len(chunks)} → {len(keep_docs)} chunks (filtrage+dedup)")
             
             except Exception as e:
-                print(f"❌ Erreur extraction PDF {article_id}: {e}")
+                print(f"❌ Erreur durant le traitement du PDF {article_id}: {e}")
                 continue
         
         if all_documents:
-            # Vérification cohérence
-            if not (len(all_documents) == len(all_metadatas) == len(all_ids)):
-                print("❌ Incohérence tailles docs/metadatas/ids, abandon add()")
-                return
-            
-            # Calcul des embeddings par batch
             print(f"🤖 Calcul embeddings pour {len(all_documents)} chunks...")
-            vectors = []
-            batch_size = EMBED_BATCH
+            vectors = embedding_model.encode(all_documents, batch_size=EMBED_BATCH, show_progress_bar=False).tolist()
             
-            for b in range(0, len(all_documents), batch_size):
-                batch = all_documents[b:b+batch_size]
-                vec = embedding_model.encode(batch, convert_to_numpy=True, show_progress_bar=False)
-                vectors.extend(vec)
-            
-            # Indexer dans ChromaDB avec embeddings
             collection.add(
                 documents=all_documents,
                 metadatas=all_metadatas,
                 ids=all_ids,
-                embeddings=[v.tolist() for v in vectors]
+                embeddings=vectors
             )
             
             print(f"✅ Indexation terminée: {len(all_documents)} chunks de {successful_files}/{len(pdf_files)} PDF")
-            print(f"📊 Filtrés: {total_filtered} chunks (trop courts ou dupliqués)")
-            
-            # Marquer le projet comme indexé
             with sqlite3.connect(DATABASE_FILE) as conn:
-                conn.execute("""
-                    UPDATE projects SET indexed_at = ? WHERE id = ?
-                """, (datetime.now().isoformat(), project_id))
+                conn.execute("UPDATE projects SET indexed_at = ? WHERE id = ?", (datetime.now().isoformat(), project_id))
                 conn.commit()
             
-            send_project_notification(
-                project_id,
-                'indexing_completed',
-                f'Indexation terminée: {len(all_documents)} chunks indexés',
-                {
-                    'chunks_count': len(all_documents),
-                    'files_count': successful_files,
-                    'total_files': len(pdf_files)
-                }
-            )
-        
+            send_project_notification(project_id, 'indexing_completed', f'Indexation terminée: {len(all_documents)} chunks indexés.')
         else:
-            print("❌ Aucun chunk valide après filtrage")
-            send_project_notification(
-                project_id,
-                'indexing_failed',
-                'Aucun contenu textuel trouvé dans les PDF'
-            )
+            print("❌ Aucun chunk valide après filtrage.")
+            send_project_notification(project_id, 'indexing_failed', 'Aucun contenu textuel trouvé dans les PDF.')
     
     except Exception as e:
         print(f"❌ Erreur critique lors de l'indexation: {e}")
-        send_project_notification(
-            project_id,
-            'indexing_failed',
-            f'Erreur critique: {str(e)}'
-        )
+        send_project_notification(project_id, 'indexing_failed', f'Erreur critique: {str(e)}')
 
 def answer_chat_question_task(project_id: str, question: str, profile: dict):
     """Répond à une question avec recherche par embeddings optionnelle."""
@@ -1804,3 +1785,81 @@ Réponse:"""
             "answer": f"❌ Erreur lors de la génération de la réponse: {str(e)}",
             "sources": []
         }
+ 
+def import_from_zotero_file_task(project_id, zotero_json_data):
+    """
+    Importe des PDF en se basant sur un export CSL JSON de Zotero.
+    Cette méthode est beaucoup plus fiable car elle utilise les Zotero Item Keys.
+    """
+    zotero_group_id = os.getenv('ZOTERO_GROUP_ID')
+    zotero_user_id = os.getenv('ZOTERO_USER_ID')
+    zotero_api_key = os.getenv('ZOTERO_API_KEY')
+
+    print(f"🔄 Import Zotero depuis fichier pour {len(zotero_json_data)} articles...")
+    
+    # Setup Zotero connection (same logic as before)
+    if zotero_group_id:
+        library_id, library_type = zotero_group_id, 'group'
+    else:
+        library_id, library_type = zotero_user_id, 'user'
+    
+    try:
+        zot = zotero.Zotero(library_id, library_type, zotero_api_key)
+        zot.key_info()
+        print("✅ Connexion à l'API Zotero réussie.")
+    except Exception as e:
+        print(f"❌ ÉCHEC CONNEXION ZOTERO: {e}")
+        send_project_notification(project_id, 'zotero_import_failed', 'Échec connexion Zotero.')
+        return
+
+    # Add articles to the project database
+    with sqlite3.connect(DATABASE_FILE) as conn:
+        for item in zotero_json_data:
+            article_id = item.get('DOI', item.get('PMID', item.get('id')))
+            title = item.get('title', 'Titre inconnu')
+            abstract = item.get('abstract', '')
+            
+            # Check if article already exists
+            exists = conn.execute("SELECT 1 FROM search_results WHERE project_id = ? AND article_id = ?", (project_id, article_id)).fetchone()
+            if not exists:
+                conn.execute("""
+                    INSERT INTO search_results (id, project_id, article_id, title, abstract, database_source, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (str(uuid.uuid4()), project_id, article_id, title, abstract, 'zotero_file', datetime.now().isoformat()))
+        conn.commit()
+
+    # Fetch PDFs using the reliable item key
+    project_dir = PROJECTS_DIR / project_id
+    project_dir.mkdir(exist_ok=True)
+    successful_imports = 0
+
+    for item in zotero_json_data:
+        # The 'id' in a CSL JSON export is the Zotero Item Key!
+        zotero_item_key = zotero_item_key_uri.split('/')[-1] if zotero_item_key_uri else None
+        article_id = item.get('DOI', item.get('PMID', zotero_item_key))
+        
+        if not zotero_item_key:
+            continue
+
+        try:
+            attachments = zot.children(zotero_item_key)
+            for attachment in attachments:
+                if attachment.get('data', {}).get('contentType') == 'application/pdf':
+                    pdf_content = zot.file(attachment['key'])
+                    safe_filename = sanitize_filename(article_id) + ".pdf"
+                    pdf_path = project_dir / safe_filename
+                    with open(pdf_path, 'wb') as f: f.write(pdf_content)
+                    
+                    print(f"✅ PDF téléchargé pour {article_id} via Zotero Key {zotero_item_key}")
+                    successful_imports += 1
+                    break
+            time.sleep(0.5)
+        except Exception as e:
+            print(f"❌ Erreur import PDF pour Zotero Key {zotero_item_key}: {e}")
+
+    print(f"📊 Import Fichier Zotero terminé: {successful_imports}/{len(zotero_json_data)} PDF importés")
+    send_project_notification(
+        project_id,
+        'zotero_import_completed',
+        f'Import Fichier Zotero terminé: {successful_imports}/{len(zotero_json_data)} PDF importés'
+    ) 

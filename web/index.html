@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AnalyLit V4.0</title>
+  <title>AnalyLit V4.1</title>
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
   <header class="app-header">
     <div class="app-header__content container">
       <div class="app-header__left">
-        <h1 class="app-header__title">AnalyLit <span class="app-header__subtitle">V4.0</span></h1>
+        <h1 class="app-header__title">AnalyLit <span class="app-header__subtitle">V4.1</span></h1>
       </div>
       <div class="app-header__right">
         <div class="connection-status">État: <span data-connection-status>❌</span></div>
@@ -99,9 +99,13 @@
     </section>
 
     <section id="importSection" class="section">
-      <div id="importContainer" class="import-container"></div>
+      <div id="importContainer" class="import-container">
+        <div class="import-placeholder">
+            <h4>Sélectionnez un projet</h4>
+            <p>Veuillez sélectionner un projet pour pouvoir importer des documents.</p>
+        </div>
+      </div>
     </section>
-
     <section id="chatSection" class="section">
       <div id="chatContainer" class="chat-interface"></div>
     </section>
@@ -113,8 +117,10 @@
 
   <div id="newProjectModal" class="modal">
     <div class="modal__content">
-      <button class="modal__close">×</button>
-      <h3>Créer un projet</h3>
+      <div class="modal__header">
+          <h3>Créer un projet</h3>
+          <button class="modal__close">×</button>
+      </div>
       <form id="newProjectForm">
         <div class="form-group">
           <label class="form-label">Nom</label>
@@ -124,12 +130,14 @@
           <label class="form-label">Description</label>
           <textarea name="description" class="form-control" rows="3"></textarea>
         </div>
-        <div class="form-group--inline">
-          <label class="form-label">Mode</label>
+        <div class="form-group">
+          <label class="form-label">Mode d'analyse</label>
 		  <select name="analysisMode" class="form-control">
-            <option value="screening">Screening</option>
+            <option value="screening">Screening (Pré-sélection)</option>
             <option value="full_extraction">Extraction détaillée</option>
           </select>
+        </div>
+        <div class="modal__actions">
           <button type="submit" class="btn btn--primary">Créer</button>
         </div>
       </form>
@@ -138,8 +146,10 @@
 
   <div id="gridModal" class="modal">
     <div class="modal__content">
-      <button class="modal__close">×</button>
-      <h3 id="gridModalTitle"></h3>
+       <div class="modal__header">
+          <h3 id="gridModalTitle"></h3>
+          <button class="modal__close">×</button>
+      </div>
       <form id="gridForm">
         <input id="gridIdInput" type="hidden" />
         <div class="form-group">
@@ -147,7 +157,7 @@
           <input id="gridNameInput" class="form-control" required />
         </div>
         <div id="gridFieldsContainer"></div>
-        <div class="form-group--inline">
+        <div class="modal__actions">
           <button id="addGridFieldBtn" type="button" class="btn btn--secondary">Ajouter un champ</button>
           <button type="submit" class="btn btn--primary">Sauvegarder</button>
         </div>
@@ -156,14 +166,16 @@
   </div>
 
   <div id="editPromptModal" class="modal">
-    <div class="modal__content">
-      <button class="modal__close">×</button>
-      <h3 id="promptModalTitle"></h3>
-      <p id="promptDescription"></p>
+    <div class="modal__content modal__content--large">
+       <div class="modal__header">
+          <h3 id="promptModalTitle"></h3>
+          <button class="modal__close">×</button>
+      </div>
       <form id="promptForm">
+        <p id="promptDescription"></p>
         <input id="promptIdInput" type="hidden" />
         <textarea id="promptTemplateTextarea" class="form-control" rows="12"></textarea>
-        <div class="form-group" style="margin-top:12px;">
+        <div class="modal__actions">
           <button type="submit" class="btn btn--primary">Enregistrer</button>
         </div>
       </form>
@@ -172,8 +184,10 @@
   
   <div id="runPipelineModal" class="modal">
       <div class="modal__content">
-          <button class="modal__close" onclick="closeModal('runPipelineModal')">×</button>
-          <h3>Lancer une analyse</h3>
+          <div class="modal__header">
+              <h3>Lancer une analyse</h3>
+              <button class="modal__close">×</button>
+          </div>
           <form id="runPipelineForm">
               <div class="form-group">
                   <label for="pipelineSourceSelect" class="form-label">Source des articles</label>
@@ -207,8 +221,10 @@
 
   <div id="profileModal" class="modal">
     <div class="modal__content">
-      <button class="modal__close">×</button>
-      <h3 id="profileModalTitle"></h3>
+      <div class="modal__header">
+          <h3 id="profileModalTitle"></h3>
+          <button class="modal__close">×</button>
+      </div>
       <form id="profileForm">
         <input id="profileIdInput" name="profileIdInput" type="hidden" />
         <div class="form-group">
@@ -216,7 +232,7 @@
           <input id="profileNameInput" name="profileNameInput" class="form-control" required />
         </div>
         <div class="form-group">
-          <label class="form-label">Modèle Prétraitement</label>
+          <label class="form-label">Modèle Pré-sélection</label>
           <select id="profilePreprocessSelect" name="profilePreprocessSelect" class="form-control"></select>
         </div>
         <div class="form-group">
@@ -227,12 +243,13 @@
           <label class="form-label">Modèle Synthèse</label>
           <select id="profileSynthesisSelect" name="profileSynthesisSelect" class="form-control"></select>
         </div>
-        <div class="form-group">
+        <div class="modal__actions">
           <button type="submit" class="btn btn--primary">Sauvegarder</button>
         </div>
       </form>
     </div>
-	
+  </div>
+  
   <div id="extractionDetailModal" class="modal">
     <div class="modal__content modal__content--large">
       <div class="modal__header">
@@ -246,11 +263,12 @@
 
   <input id="pdfFileInput" type="file" accept="application/pdf" multiple class="hidden" />
   <input id="gridFileInput" type="file" accept="application/json" class="hidden" />
+  <input id="zoteroFileInput" type="file" accept=".json" class="hidden" />
 
   <div id="loadingOverlay" class="loading-overlay">
     <div class="loading-overlay__content">
       <div class="loading-spinner loading-spinner--lg"></div>
-      <div class="loading-overlay__message">Chargement...</div>
+      <div id="loadingMessage" class="loading-overlay__message">Chargement...</div>
     </div>
   </div>
   <div id="toastContainer" class="toast-container"></div>

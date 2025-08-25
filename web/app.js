@@ -1,6 +1,5 @@
 // ================================================================
 // AnalyLit V4.1 - Application Frontend CORRIGÉE
-// Corrections des bugs A, B, C et D
 // ================================================================
 
 const appState = {
@@ -86,100 +85,88 @@ function setupEventListeners() {
     elements.promptForm?.addEventListener('submit', handleSavePrompt);
     elements.profileForm?.addEventListener('submit', handleSaveProfile);
 
-    // CORRECTION BUG A : Import de grille d'extraction
     const gridFileInput = document.getElementById('gridFileInput');
     if (gridFileInput) {
         gridFileInput.addEventListener('change', handleGridImport);
     }
-
-    // Autres gestionnaires
+	
+	const zoteroFileInput = document.getElementById('zoteroFileInput');
+    if (zoteroFileInput) {
+        zoteroFileInput.addEventListener('change', handleZoteroFileUpload);
+    }
+    
     document.getElementById('addGridFieldBtn')?.addEventListener('click', () => addGridFieldInput());
     document.getElementById('pipelineSourceSelect')?.addEventListener('change', handlePipelineSourceChange);
 
-    // Gestionnaire d'événements principal avec corrections
     document.body.addEventListener('click', e => {
-		const target = e.target.closest('[data-action]');
-		if (!target) return;
+        const target = e.target.closest('[data-action]');
+        if (!target) return;
 
-		const action = target.dataset.action;
-		const pmid = target.closest('tr')?.dataset.pmid;
-		const extractionId = target.dataset.extractionId;
-		const { projectId, articleId, gridId, promptId, profileId, queueName, plotType } = target.dataset;
+        const action = target.dataset.action;
+        const { projectId, articleId, gridId, promptId, profileId, queueName, plotType, extractionId, decision } = target.dataset;
 
-		switch (action) {
-			case 'toggleAbstract': {
+        if (action === 'view-article-online') {
+            e.preventDefault();
+            const url = target.href;
+            if (url && url !== '#' && !url.endsWith('null')) {
+                window.open(url, '_blank');
+            } else {
+                showToast("URL de l'article non disponible.", 'warning');
+            }
+            return;
+        }
+
+        const actions = {
+			selectProject: () => selectProject(projectId),
+			deleteProject: () => handleDeleteProject(projectId),
+			runPipeline: () => openRunPipelineModal(),
+			runSynthesis: () => handleRunSynthesis(),
+			exportProject: () => handleExportProject(projectId),
+			selectSearchResult: () => selectSearchResult(articleId),
+			selectAllSearchResults: () => selectAllSearchResults(),
+			validateExtraction: () => handleValidateExtraction(extractionId, decision),
+			toggleAbstract: () => {
 				const row = target.closest('tr');
 				const next = row?.nextElementSibling;
 				if (next && next.classList.contains('abstract-row')) {
 					next.classList.toggle('hidden');
-					const isHidden = next.classList.contains('hidden');
-					target.textContent = isHidden
-						? escapeHtml(row.querySelector('.title-text').textContent)
-						: 'Masquer résumé';
-				}
-				return;
-			}
-			case 'viewExtractionDetails':
-				openExtractionDetailModal(extractionId);
-				return;
-			case 'validateExtraction':
-				handleValidateExtraction(extractionId, target.dataset.decision);
-				return;
-		}
-
-		const actions = {
-			selectProject:    () => selectProject(projectId),
-			deleteProject:    () => handleDeleteProject(projectId),
-			runPipeline:      () => openRunPipelineModal(),
-			runSynthesis:     () => handleRunSynthesis(),
-			exportProject:    () => handleExportProject(projectId),
-			selectSearchResult:     () => selectSearchResult(articleId),
-			selectAllSearchResults: () => selectAllSearchResults(),
-			validateExtraction:     () => handleValidateExtraction(extractionId, target.dataset.decision),
-			toggleAbstract:         () => {
-				const titleRow = target.closest('tr');
-				const abstractRow = titleRow?.nextElementSibling;
-				if (abstractRow && abstractRow.classList.contains('abstract-row')) {
-					abstractRow.classList.toggle('hidden');
-					const isHidden = abstractRow.classList.contains('hidden');
-					target.textContent = isHidden ? '📖 Voir résumé' : '📖 Masquer résumé';
 				}
 			},
-			viewExtractionDetails:   () => openExtractionDetailModal(extractionId),
-			'generate-discussion':    () => runAdvancedAnalysis('generate-discussion', projectId),
+			viewExtractionDetails: () => openExtractionDetailModal(extractionId),
+			'generate-discussion': () => runAdvancedAnalysis('generate-discussion', projectId),
 			'generate-knowledge-graph': () => runAdvancedAnalysis('generate-knowledge-graph', projectId),
-			'generate-prisma-flow':   () => runAdvancedAnalysis('generate-prisma-flow', projectId),
-			'run-meta-analysis':      () => runAdvancedAnalysis('run-meta-analysis', projectId),
-			'run-descriptive-stats':  () => runAdvancedAnalysis('run-descriptive-stats', projectId),
-			'run-atn-score':          () => runAdvancedAnalysis('run-atn-score', projectId),
-			viewAnalysisPlot:         () => viewAnalysisPlot(projectId, plotType),
-			'import-zotero':          () => handleImportZotero(projectId),
-			'fetch-online-pdfs':      () => handleFetchOnlinePdfs(projectId),
-			'run-indexing':           () => handleRunIndexing(projectId),
-			sendChatMessage:          () => sendChatMessage(),
-			clearChatHistory:         () => clearChatHistory(),
-			'create-grid':            () => openGridModal(),
-			'edit-grid':              () => openGridModal(gridId),
-			'delete-grid':            () => handleDeleteGrid(gridId),
-			'import-grid':            () => document.getElementById('gridFileInput')?.click(),
-			removeGridField:          () => target.closest('.grid-field-item')?.remove(),
-			'edit-prompt':            () => openPromptModal(promptId),
-			'create-profile':         () => openProfileModal(),
-			'edit-profile':           () => openProfileModal(profileId),
-			'delete-profile':         () => handleDeleteProfile(profileId),
-			pullModel:                () => handlePullModel(),
-			'refresh-queues':         () => renderQueueStatus(),
-			clearQueue:               () => handleClearQueue(queueName),
-			saveZoteroSettings:       () => handleSaveZoteroSettings(),
+			'generate-prisma-flow': () => runAdvancedAnalysis('generate-prisma-flow', projectId),
+			'run-meta-analysis': () => runAdvancedAnalysis('run-meta-analysis', projectId),
+			'run-descriptive-stats': () => runAdvancedAnalysis('run-descriptive-stats', projectId),
+			'run-atn-score': () => runAdvancedAnalysis('run-atn-score', projectId),
+			viewAnalysisPlot: () => viewAnalysisPlot(projectId, plotType),
+			'import-zotero-file': () => document.getElementById('zoteroFileInput')?.click(),
+			'import-zotero-list': () => handleImportZotero(projectId), // <-- LA NOUVELLE LIGNE AJOUTÉE
+			'fetch-online-pdfs': () => handleFetchOnlinePdfs(projectId),
+			'run-indexing': () => handleRunIndexing(projectId),
+			sendChatMessage: () => sendChatMessage(),
+			clearChatHistory: () => clearChatHistory(),
+			'create-grid': () => openGridModal(),
+			'edit-grid': () => openGridModal(gridId),
+			'delete-grid': () => handleDeleteGrid(gridId),
+			'import-grid': () => document.getElementById('gridFileInput')?.click(),
+			removeGridField: () => target.closest('.form-group-dynamic')?.remove(),
+			'edit-prompt': () => openPromptModal(promptId),
+			'create-profile': () => openProfileModal(),
+			'edit-profile': () => openProfileModal(profileId),
+			'delete-profile': () => handleDeleteProfile(profileId),
+			pullModel: () => handlePullModel(),
+			'refresh-queues': () => renderQueueStatus(),
+			clearQueue: () => handleClearQueue(queueName),
+			saveZoteroSettings: () => handleSaveZoteroSettings(),
 		};
 
-		if (actions[action]) {
-			actions[action]();
-		}
-	});
+        if (actions[action]) {
+            e.preventDefault();
+            actions[action]();
+        }
+    });
 
-
-    // Gestion des modales et touches clavier
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             const activeModal = document.querySelector('.modal--show');
@@ -193,7 +180,7 @@ function setupEventListeners() {
         });
         modal.querySelector('.modal__close')?.addEventListener('click', () => closeModal(modal.id));
     });
-}
+} 
 
 async function loadInitialData() {
     await Promise.all([
@@ -279,57 +266,43 @@ function initializeWebSocket() {
 }
 
 function handleWebSocketNotification(data) {
-	const { type, project_id } = data;
-	if (type === 'search_completed' && project_id === appState.currentProject?.id) {
-	// Recharger les résultats et afficher
-	fetchAPI(`/projects/${project_id}/search-results`)
-	  .then(res => {
-		appState.searchResults = res.results;
-		renderResultsSection();
-	  })
-	  .catch(err => console.error('Erreur fetch search-results:', err));
-	}
-    
-    showToast(message, notificationData?.type || 'info');
-    
+    showToast(data.message, data.type || 'info');
     appState.unreadNotifications++;
     updateNotificationIndicator();
-    
+
+    const { type, project_id } = data;
+
     switch (type) {
-        case 'article_processed':
         case 'search_completed':
+        case 'article_processed':
         case 'synthesis_completed':
         case 'analysis_completed':
+        case 'pdf_upload_completed':
+        case 'indexing_completed':
             if (project_id === appState.currentProject?.id) {
                 selectProject(project_id, true);
             } else {
                 loadProjects();
             }
             break;
-            
-        case 'search_progress':
-            updateSearchProgress(notificationData);
-            break;
     }
 }
 
 function updateNotificationIndicator() {
     const indicator = document.getElementById('notificationIndicator');
-    if (indicator) {
-        if (appState.unreadNotifications > 0) {
-            indicator.style.display = 'flex';
-            indicator.querySelector('.notification-indicator__count').textContent = appState.unreadNotifications;
-        } else {
-            indicator.style.display = 'none';
-        }
+    if (!indicator) return;
+    if (appState.unreadNotifications > 0) {
+        indicator.style.display = 'flex';
+        indicator.querySelector('.notification-indicator__count').textContent = appState.unreadNotifications;
+    } else {
+        indicator.style.display = 'none';
     }
 }
 
 function escapeHtml(text) {
     if (text === null || typeof text === 'undefined') return '';
-    return String(text).replace(/[&<>"']/g, match => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    }[match]));
+    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+    return String(text).replace(/[&<>"']/g, (m) => map[m]);
 }
 
 function showToast(message, type = 'info') {
@@ -371,57 +344,33 @@ function closeModal(modalId) {
 
 function showSection(sectionName) {
     appState.currentSection = sectionName;
-    
     appState.unreadNotifications = 0;
     updateNotificationIndicator();
     
-    // --- DÉBUT DE LA CORRECTION ---
-    // On retire la classe 'section--active' de toutes les sections pour les masquer.
     elements.sections.forEach(section => {
-        section.classList.remove('section--active');
+        section.classList.toggle('section--active', section.id === `${sectionName}Section`);
     });
-    
-    // On trouve la nouvelle section à afficher et on lui ajoute la classe 'section--active'.
-    const activeSection = document.getElementById(`${sectionName}Section`);
-    if (activeSection) {
-        activeSection.classList.add('section--active');
-    }
-    // --- FIN DE LA CORRECTION ---
 
     elements.navButtons.forEach(button => {
-        button.classList.toggle('app-nav__button--active', button.getAttribute('data-section') === sectionName);
+        button.classList.toggle('app-nav__button--active', button.dataset.section === sectionName);
     });
 
     refreshCurrentSection();
 }
 
 function refreshCurrentSection() {
-    switch (appState.currentSection) {
-        case 'projects':
-            renderProjectsList();
-            renderProjectDetail();
-            break;
-        case 'search':
-            renderSearchInterface();
-            break;
-        case 'results':
-            renderResultsSection();
-            break;
-        case 'validation':
-            renderValidationSection();
-            break;
-        case 'analysis':
-            renderAnalysisSection();
-            break;
-        case 'import':
-            renderImportSection();
-            break;
-        case 'chat':
-            renderChatSection();
-            break;
-        case 'settings':
-            renderSettingsSection();
-            break;
+    const renderMap = {
+        projects: () => { renderProjectsList(); renderProjectDetail(); },
+        search: renderSearchInterface,
+        results: renderResultsSection,
+        validation: renderValidationSection,
+        analysis: renderAnalysisSection,
+        import: renderImportSection,
+        chat: renderChatSection,
+        settings: renderSettingsSection,
+    };
+    if (renderMap[appState.currentSection]) {
+        renderMap[appState.currentSection]();
     }
 }
 
@@ -432,11 +381,10 @@ function refreshCurrentSection() {
 async function loadProjects() {
     try {
         appState.projects = await fetchAPI('/projects');
-        renderProjectsList();
     } catch (error) {
         appState.projects = [];
-        renderProjectsList();
     }
+    renderProjectsList();
 }
 
 function renderProjectsList() {
@@ -444,29 +392,22 @@ function renderProjectsList() {
     if (!container) return;
 
     if (!appState.projects || appState.projects.length === 0) {
-        container.innerHTML = `<div class="projects-empty"><p>Créez votre premier projet pour commencer.</p></div>`;
+        container.innerHTML = `<div class="projects-empty"><p>Créez votre premier projet.</p></div>`;
         return;
     }
 
     container.innerHTML = appState.projects.map(project => {
         const isActive = appState.currentProject?.id === project.id;
-        const statusColors = {
-            pending: 'status--info',
-            processing: 'status--warning', 
-            completed: 'status--success',
-            failed: 'status--error'
-        };
-        
         return `
             <li class="project-list__item ${isActive ? 'project-list__item--active' : ''}" data-action="selectProject" data-project-id="${project.id}">
                 <div class="project-list__item-info">
                     <span class="project-list__item-name">${escapeHtml(project.name)}</span>
                     <div class="project-meta">
-                        <span class="status ${statusColors[project.status] || 'status--info'}">${escapeHtml(project.status || 'pending')}</span>
+                        <span class="status ${getStatusClass(project.status)}">${escapeHtml(project.status || 'pending')}</span>
                         <span class="project-list__item-date">${new Date(project.updated_at).toLocaleDateString()}</span>
                     </div>
                 </div>
-                <button class="btn btn--danger btn--sm" data-action="deleteProject" data-project-id="${project.id}" title="Supprimer le projet" onclick="event.stopPropagation()">&times;</button>
+                <button class="btn btn--danger btn--sm" data-action="deleteProject" data-project-id="${project.id}" title="Supprimer" onclick="event.stopPropagation()">&times;</button>
             </li>`;
     }).join('');
 }
@@ -498,6 +439,8 @@ async function selectProject(projectId, isRefresh = false) {
     }
 }
 
+// Dans app.js, remplacez la fonction renderProjectDetail
+
 function renderProjectDetail() {
     const project = appState.currentProject;
     if (!project) {
@@ -510,83 +453,115 @@ function renderProjectDetail() {
     elements.projectDetailContent.style.display = 'block';
 
     const progress = project.pmids_count > 0 ? (project.processed_count / project.pmids_count) * 100 : 0;
-    const statusIcons = {
-        pending: '⏳',
-        processing: '🔄',
-        completed: '✅',
-        failed: '❌'
-    };
     
+    let resultsHtml = '';
+    if (project.synthesis_result) {
+        resultsHtml += renderSynthesisPreview(JSON.parse(project.synthesis_result));
+    }
+    if (project.discussion_draft) {
+        resultsHtml += `
+            <div class="result-preview" style="margin-top:20px;">
+                <h4>📝 Discussion Générée</h4>
+                <p class="result-text">${escapeHtml(project.discussion_draft).replace(/\n/g, '<br>')}</p>
+            </div>`;
+    }
+
+    // **CORRECTION : On vérifie le contenu de analysis_result avant de l'afficher**
+    if (project.analysis_result) {
+        try {
+            const analysisData = JSON.parse(project.analysis_result);
+            
+            // Si c'est une méta-analyse
+            if (analysisData.mean_score !== undefined && analysisData.confidence_interval) {
+                resultsHtml += `
+                    <div class="result-preview" style="margin-top:20px;">
+                        <h4>📈 Méta-Analyse</h4>
+                        <p>Articles analysés: <strong>${analysisData.n_articles}</strong></p>
+                        <p>Score moyen de pertinence: <strong>${analysisData.mean_score.toFixed(2)}</strong> (IC 95%: [${analysisData.confidence_interval[0].toFixed(2)}, ${analysisData.confidence_interval[1].toFixed(2)}])</p>
+                    </div>`;
+            }
+            // Si c'est un calcul de score ATN
+            else if (analysisData.atn_scores !== undefined) {
+                 resultsHtml += `
+                    <div class="result-preview" style="margin-top:20px;">
+                        <h4>💯 Score ATN</h4>
+                        <p>Articles évalués: <strong>${analysisData.total_articles_scored}</strong></p>
+                        <p>Score ATN moyen: <strong>${analysisData.mean_atn.toFixed(2)}</strong></p>
+                    </div>`;
+            }
+            // Si ce sont des statistiques descriptives
+            else if (analysisData.total_articles !== undefined) {
+                 resultsHtml += `
+                    <div class="result-preview" style="margin-top:20px;">
+                        <h4>📋 Statistiques Descriptives</h4>
+                        <p>Total d'articles avec données extraites: <strong>${analysisData.total_articles}</strong></p>
+                    </div>`;
+            }
+
+        } catch(e) { console.error("Erreur parsing analysis_result", e); }
+    }
+
     elements.projectDetailContent.innerHTML = `
         <div class="project-detail-header">
             <h3>${escapeHtml(project.name)}</h3>
             <div class="project-badges">
                 <span class="status status--info">${escapeHtml(project.analysis_mode)}</span>
-                <span class="status ${getStatusClass(project.status)}">${statusIcons[project.status] || '❓'} ${escapeHtml(project.status || 'pending')}</span>
+                <span class="status ${getStatusClass(project.status)}">${escapeHtml(project.status || 'pending')}</span>
             </div>
         </div>
-        
         <p class="project-detail-description">${escapeHtml(project.description) || 'Aucune description.'}</p>
-        
         <div class="project-detail-stats">
-            <div class="stat">
-                <div class="stat__value">${project.pmids_count || 0}</div>
-                <div class="stat__label">Articles Total</div>
-            </div>
-            <div class="stat">
-                <div class="stat__value">${project.processed_count || 0}</div>
-                <div class="stat__label">Traités</div>
-            </div>
-            <div class="stat">
-                <div class="stat__value">${(project.total_processing_time || 0).toFixed(1)}s</div>
-                <div class="stat__label">Temps Total</div>
-            </div>
+            <div class="stat"><div class="stat__value">${project.pmids_count || 0}</div><div class="stat__label">Articles Total</div></div>
+            <div class="stat"><div class="stat__value">${project.processed_count || 0}</div><div class="stat__label">Traités</div></div>
+            <div class="stat"><div class="stat__value">${(project.total_processing_time || 0).toFixed(1)}s</div><div class="stat__label">Temps Total</div></div>
         </div>
-
         <div class="progress-bar">
             <div class="progress-bar__inner" style="width: ${progress}%"></div>
             <span class="progress-bar__label">${escapeHtml(project.status || 'pending')} (${progress.toFixed(0)}%)</span>
         </div>
-
         <div class="project-detail-actions">
             <button class="btn btn--primary" data-action="runPipeline">🚀 Lancer Analyse</button>
             ${(project.status === 'completed' || project.processed_count > 0) ? `<button class="btn btn--secondary" data-action="runSynthesis">🔄 Générer Synthèse</button>` : ''}
             <button class="btn btn--secondary" data-action="exportProject" data-project-id="${project.id}">📤 Exporter</button>
             <button class="btn btn--danger btn--outline" data-action="deleteProject" data-project-id="${project.id}">🗑️ Supprimer</button>
         </div>
-        
-        ${project.synthesis_result ? renderSynthesisPreview(JSON.parse(project.synthesis_result)) : ''}
-    `;
+        <div class="project-results-container" style="margin-top:20px;">
+            ${resultsHtml || ''}
+        </div>`;
 }
 
 function getStatusClass(status) {
     const statusMapping = {
-        pending: 'status--info',
-        processing: 'status--warning',
-        completed: 'status--success',
-        failed: 'status--error'
+        pending: 'status--info', processing: 'status--warning',
+        completed: 'status--success', failed: 'status--error'
     };
     return statusMapping[status] || 'status--info';
 }
 
 function renderSynthesisPreview(synthesis) {
+    const renderList = (items) => {
+        if (!Array.isArray(items) || items.length === 0) return '<li>Aucun élément identifié.</li>';
+        return items.map(point => `<li>${escapeHtml(point)}</li>`).join('');
+    };
+
     return `
-        <div class="synthesis-preview">
+        <div class="result-preview">
             <h4>📋 Synthèse Générée</h4>
             <div class="synthesis-content">
                 <div class="synthesis-section">
-                    <strong>Points clés convergents:</strong>
-                    <ul>
-                        ${synthesis.points_cles_convergents?.map(point => `<li>${escapeHtml(point)}</li>`).join('') || '<li>Aucun point identifié</li>'}
-                    </ul>
+                    <strong>Évaluation de la pertinence du corpus :</strong>
+                    <p>${escapeHtml(synthesis.relevance_evaluation || 'Non évaluée.')}</p>
                 </div>
                 <div class="synthesis-section">
-                    <strong>Synthèse globale:</strong>
-                    <p>${escapeHtml(synthesis.synthese_globale || 'Non disponible')}</p>
+                    <strong>Thèmes principaux :</strong>
+                    <ul>${renderList(synthesis.main_themes)}</ul>
+                </div>
+                <div class="synthesis-section">
+                    <strong>Synthèse globale :</strong>
+                    <p>${escapeHtml(synthesis.synthesis_summary || synthesis.synthese_globale || 'Non disponible.')}</p>
                 </div>
             </div>
-        </div>
-    `;
+        </div>`;
 }
 
 async function handleCreateProject(e) {
@@ -609,23 +584,15 @@ async function handleCreateProject(e) {
 
 async function handleDeleteProject(projectId) {
     const project = appState.projects.find(p => p.id === projectId);
-    if (!project) return;
-    
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer le projet "${project.name}" ? Cette action est irréversible.`)) return;
+    if (!project || !confirm(`Supprimer le projet "${project.name}" ?`)) return;
 
     showLoadingOverlay(true, 'Suppression...');
     try {
         await fetchAPI(`/projects/${projectId}`, { method: 'DELETE' });
         showToast('Projet supprimé.', 'success');
-        
-        if (appState.currentProject?.id === projectId) {
-            appState.currentProject = null;
-        }
-        
+        if (appState.currentProject?.id === projectId) appState.currentProject = null;
         await loadProjects();
         refreshCurrentSection();
-    } catch (error) {
-        console.error('Erreur suppression:', error);
     } finally {
         showLoadingOverlay(false);
     }
@@ -997,30 +964,35 @@ async function handleRunSynthesis() {
 }
 
 async function handleExportProject(projectId) {
-  showToast("Préparation de l'export...", "info");
+  showToast("Préparation de l'export complet...", "info");
   try {
-    const response = await fetch(`/api/projects/${projectId}/export`, {
+    const response = await fetch(`/api/projects/${projectId}/export-all`, {
       method: "GET"
     });
+
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
     }
+
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    // Récupère le nom de fichier depuis l'en-tête Content-Disposition si possible
+    
     const disposition = response.headers.get("Content-Disposition") || "";
     const filenameMatch = disposition.match(/filename="?(.+)"?/);
-    a.download = filenameMatch ? filenameMatch[1] : `project_${projectId}.zip`;
+    a.download = filenameMatch ? filenameMatch[1] : `project_export_${projectId}.zip`;
+    
     document.body.appendChild(a);
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-    showToast("Export terminé.", "success");
+    showToast("Export ZIP terminé.", "success");
+
   } catch (error) {
     console.error("Erreur export :", error);
-    showToast("Erreur lors de l'export", "error");
+    showToast(`Erreur lors de l'export du ZIP: ${error.message}`, "error");
   }
 }
 
@@ -1106,9 +1078,14 @@ function renderExtractionRow(extraction, isScreening) {
     if (validationStatus === 'include') rowClass = 'extraction-row--included';
     if (validationStatus === 'exclude') rowClass = 'extraction-row--excluded';
 
-    const titleHtml = `<td class="title-cell"><a href="${extraction.url || '#'}" target="_blank" title="Voir source en ligne">🔗</a> <span class="title-text" data-action="toggleAbstract" title="Cliquer pour voir l'abstract">${escapeHtml(extraction.title || '')}</span></td>`;
+    const articleUrl = extraction.url || `https://pubmed.ncbi.nlm.nih.gov/${extraction.pmid}/`;
+    const titleHtml = `
+        <td class="title-cell">
+            <a href="${articleUrl}" data-action="view-article-online" target="_blank" title="Voir source en ligne">🔗</a>
+            <span class="title-text" data-action="toggleAbstract" title="Cliquer pour voir l'abstract">${escapeHtml(extraction.title || '')}</span>
+        </td>`;
     
-    // CORRECTION : Logique pour basculer entre les colonnes
+    // Logique pour basculer entre les colonnes
     let dataCellHtml = '';
     if (isScreening) {
         dataCellHtml = `<td class="justification-cell">${escapeHtml(extraction.relevance_justification || 'N/A')}</td>`;
@@ -1121,7 +1098,7 @@ function renderExtractionRow(extraction, isScreening) {
         <tr class="extraction-row ${rowClass}" data-pmid="${extraction.pmid}">
             ${isScreening ? `<td><span class="score-badge">${extraction.relevance_score ?? 'N/A'}</span></td>` : ''}
             <td>${escapeHtml(extraction.pmid)}</td>
-            ${titleHtml}
+            ${titleHtml} 
             ${dataCellHtml}
             <td class="actions-cell">
                 <button class="btn btn--secondary btn--sm" data-action="viewExtractionDetails" data-extraction-id="${extraction.id}">Détails</button>
@@ -1145,7 +1122,7 @@ function renderExtractionRow(extraction, isScreening) {
     return mainRowHtml + abstractRowHtml;
 }
 
-// CORRECTION : Affiche correctement les données, même si elles sont imbriquées
+
 function renderExtractedDataPreview(extractedData) {
     if (!extractedData) return '<span class="text-muted">Aucune donnée</span>';
     
@@ -1181,12 +1158,14 @@ function renderExtractedDataPreview(extractedData) {
     }
 }
 
-// CORRECTION : Fait fonctionner le bouton "Détails"
+
 async function openExtractionDetailModal(extractionId) {
     const modal = document.getElementById('extractionDetailModal');
-    // Correction de l'ID du conteneur
-    const container = document.getElementById('extractionModalBody'); 
-    if (!modal || !container) return;
+    const container = document.getElementById('extractionModalBody');
+    if (!modal || !container) {
+        console.error("La modale d'extraction ou son conteneur n'a pas été trouvé.");
+        return;
+    }
 
     const ext = appState.currentProjectExtractions.find(e => e.id === extractionId);
     if (!ext) {
@@ -1195,7 +1174,6 @@ async function openExtractionDetailModal(extractionId) {
         return;
     }
 
-    // Affiche les détails formatés
     container.innerHTML = formatExtractionDetailsForModal(ext);
     openModal('extractionDetailModal');
 }
@@ -1388,80 +1366,51 @@ function renderAnalysisSection() {
     const project = appState.currentProject;
 
     if (!project) {
-        container.innerHTML = `
-            <div class="results-placeholder">
-                <div class="results-placeholder__icon">📈</div>
-                <h4>Sélectionnez un projet</h4>
-                <p>Les options d'analyses avancées s'afficheront ici.</p>
-            </div>`;
+        container.innerHTML = `<div class="results-placeholder"><h4>Sélectionnez un projet</h4><p>Les options d'analyses avancées s'afficheront ici.</p></div>`;
         return;
     }
     
     const analysisCards = [
-        {
-            id: 'discussion',
-            title: 'Générer une Discussion',
-            description: 'Rédige une section "Discussion" académique basée sur la synthèse.',
-            action: 'generate-discussion',
-            icon: '📝'
-        },
-        {
-            id: 'knowledge-graph',
-            title: 'Graphe de Connaissances',
-            description: 'Identifie les concepts clés et leurs relations sous forme de graphe.',
-            action: 'generate-knowledge-graph',
-            icon: '🕸️'
-        },
-        {
-            id: 'prisma-flow',
-            title: 'Diagramme PRISMA',
-            description: 'Génère un diagramme de flux PRISMA basé sur les stats du projet.',
-            action: 'generate-prisma-flow',
-            icon: '📊'
-        },
-        {
-            id: 'meta-analysis',
-            title: 'Méta-analyse',
-            description: 'Effectue une analyse statistique sur les scores de pertinence.',
-            action: 'run-meta-analysis',
-            icon: '📈'
-        },
-        {
-            id: 'descriptive-stats',
-            title: 'Statistiques Descriptives',
-            description: 'Analyse le contenu des données extraites (mode extraction détaillée).',
-            action: 'run-descriptive-stats',
-            mode: 'full_extraction',
-            icon: '📋'
-        },
-        {
-            id: 'atn-score',
-            title: 'Score ATN',
-            description: 'Calcule un score personnalisé "Alliance Thérapeutique Numérique".',
-            action: 'run-atn-score',
-            mode: 'full_extraction',
-            icon: '💯'
-        }
+        { id: 'discussion', title: 'Générer une Discussion', description: 'Rédige une section "Discussion" académique basée sur la synthèse.', action: 'generate-discussion', icon: '📝' },
+        { id: 'knowledge-graph', title: 'Graphe de Connaissances', description: 'Identifie les concepts clés et leurs relations sous forme de graphe.', action: 'generate-knowledge-graph', icon: '🕸️' },
+        { id: 'prisma-flow', title: 'Diagramme PRISMA', description: 'Génère un diagramme de flux PRISMA basé sur les stats du projet.', action: 'generate-prisma-flow', icon: '📊' },
+        { id: 'meta-analysis', title: 'Méta-analyse', description: 'Effectue une analyse statistique sur les scores de pertinence.', action: 'run-meta-analysis', icon: '📈' },
+        { id: 'descriptive-stats', title: 'Statistiques Descriptives', description: 'Analyse le contenu des données extraites (mode extraction détaillée).', action: 'run-descriptive-stats', mode: 'full_extraction', icon: '📋' },
+        { id: 'atn-score', title: 'Score ATN', description: 'Calcule un score personnalisé "Alliance Thérapeutique Numérique".', action: 'run-atn-score', mode: 'full_extraction', icon: '💯' }
     ];
 
-    const availableCards = analysisCards.filter(card => 
-        !card.mode || card.mode === project.analysis_mode
-    );
+    const availableCards = analysisCards.filter(card => !card.mode || card.mode === project.analysis_mode);
 
-    container.innerHTML = availableCards.map(card => `
-        <div class="analysis-card">
-            <div class="analysis-card__header">
-                <div class="analysis-card__icon">${card.icon}</div>
-                <h4>${card.title}</h4>
+    container.innerHTML = availableCards.map(card => {
+        let resultHtml = '';
+        const actionButton = `<button class="btn btn--primary" data-action="${card.action}" data-project-id="${project.id}">Lancer</button>`;
+        
+        // **CORRECTION : On vérifie si un chemin de graphique existe ET n'est pas un objet vide**
+        const hasPlotPath = project.analysis_plot_path && project.analysis_plot_path !== '{}';
+
+        if (card.action === 'generate-knowledge-graph' && project.knowledge_graph) {
+            resultHtml = `<div class="analysis-result">✅ Graphe généré (consultable dans l'export).</div>`;
+        } else if (card.action === 'generate-prisma-flow' && project.prisma_flow_path) {
+            resultHtml = `<div class="analysis-result"><img src="/api/projects/${project.id}/prisma-flow" alt="Diagramme PRISMA" style="width:100%; border:1px solid var(--color-border); border-radius: 8px;"/></div>`;
+        } else if (card.action === 'run-meta-analysis' && hasPlotPath) {
+             resultHtml = `<div class="analysis-result"><img src="/api/projects/${project.id}/analysis-plot" alt="Graphique Méta-Analyse" style="width:100%; border:1px solid var(--color-border); border-radius: 8px;"/></div>`;
+        } else if (card.action === 'run-descriptive-stats' && hasPlotPath) {
+             resultHtml = `<div class="analysis-result"><img src="/api/projects/${project.id}/analysis-plot" alt="Graphique Stats Descriptives" style="width:100%; border:1px solid var(--color-border); border-radius: 8px;"/></div>`;
+        }
+
+        return `
+            <div class="analysis-card">
+                <div class="analysis-card__header">
+                    <div class="analysis-card__icon">${card.icon}</div>
+                    <h4>${card.title}</h4>
+                </div>
+                <div class="analysis-card__content">
+                    <p>${card.description}</p>
+                    ${resultHtml || actionButton}
+                </div>
             </div>
-            <div class="analysis-card__content">
-                <p>${card.description}</p>
-                <button class="btn btn--primary" data-action="${card.action}" data-project-id="${project.id}">
-                    Lancer
-                </button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 async function runAdvancedAnalysis(analysisType, projectId) {
@@ -2117,59 +2066,98 @@ async function handleSaveZoteroSettings() {
 // ===== 10. SECTIONS IMPORT ET CHAT
 // ================================================================
 
-function renderImportSection() {
+async function renderProjectArticlesList(projectId) {
+    const container = document.getElementById('project-articles-list');
+    if (!container) return;
+
+    try {
+        const [articles, pdfFiles] = await Promise.all([
+            fetchAPI(`/projects/${projectId}/search-results?per_page=1000`),
+            fetchAPI(`/projects/${projectId}/files`)
+        ]);
+
+        const pdfFilenames = new Set(pdfFiles.map(f => f.filename));
+
+        if (!articles.results || articles.results.length === 0) {
+            container.innerHTML = '<p class="text-muted">Aucun article dans ce projet.</p>';
+            return;
+        }
+
+        container.innerHTML = `
+            <ul class="articles-list">
+                ${articles.results.map(article => {
+                    // MODIFIÉ : Utiliser la fonction de sanétisation pour vérifier et créer le lien
+                    const safeFilename = sanitizeFilename(article.article_id) + ".pdf";
+                    const hasPdf = pdfFilenames.has(safeFilename);
+                    
+                    return `
+                        <li class="article-item">
+                            <span class="article-title">${escapeHtml(article.title)}</span>
+                            <div class="article-actions">
+                                <span class="article-id">${escapeHtml(article.article_id)}</span>
+                                ${hasPdf 
+                                    ? `<a href="/api/projects/${projectId}/files/${safeFilename}" target="_blank" class="btn btn--secondary btn--sm" title="Ouvrir le PDF">📄</a>`
+                                    : `<span class="btn btn--secondary btn--sm disabled" title="PDF non trouvé">📄</span>`
+                                }
+                            </div>
+                        </li>`;
+                }).join('')}
+            </ul>`;
+    } catch (error) {
+        container.innerHTML = '<p class="text-error">Erreur chargement des articles.</p>';
+    }
+}
+
+async function renderImportSection() {
     const container = elements.importContainer;
     const project = appState.currentProject;
-
     if (!project) {
-        container.innerHTML = `
-            <div class="import-placeholder">
-                <div class="import-placeholder__icon">👈</div>
-                <h4>Sélectionnez un projet</h4>
-                <p>Les options d'import s'afficheront ici.</p>
-            </div>`;
+        // This part is fine, it shows a message if no project is selected.
+        container.innerHTML = `<div class="import-placeholder">
+            <h4>Sélectionnez un projet</h4>
+            <p>Veuillez sélectionner un projet pour pouvoir importer des documents.</p>
+        </div>`;
         return;
     }
-	
-	const hasArticles = project.pmids_count > 0;
-    const disabledAttribute = !hasArticles ? 'disabled' : '';
-    const disabledTooltip = !hasArticles ? 'title="Veuillez d\'abord effectuer une recherche et ajouter des articles au projet."' : '';
- 
+
+    // This is the main HTML structure for the import page
     container.innerHTML = `
         <div class="import-sections">
             <div class="import-card">
-                <h4>1. 📄 Récupérer les PDF</h4>
-                <p>Importez les PDF des articles de votre projet.</p>
+                <h4>1. Ajouter des Articles via Liste d'ID</h4>
+                <p>Collez des PMIDs ou DOIs (un par ligne). Les doublons sont ignorés.</p>
+                <div class="form-group">
+                    <textarea id="manualPmidTextarea" class="form-control" rows="8" placeholder="..."></textarea>
+                </div>
                 <div class="import-actions">
-                    <button class="btn btn--primary" data-action="fetch-online-pdfs" data-project-id="${project.id}">
-                        🌐 Chercher PDF en ligne (OA)
-                    </button>
-                    <button class="btn btn--secondary" data-action="import-zotero" data-project-id="${project.id}">
-                        📚 Importer depuis Zotero
-                    </button>
+                    <button class="btn btn--primary" data-action="fetch-online-pdfs" data-project-id="${project.id}">➕ Chercher PDF (Open Access)</button>
+                    
+                    <button class="btn btn--secondary" data-action="import-zotero-list" data-project-id="${project.id}">📚 Importer via Zotero (Liste)</button>
                 </div>
-                <div id="pdfDropZone" class="pdf-drop-zone">
-                    <div class="pdf-drop-zone__content">
-                        <div class="pdf-drop-zone__icon">📄</div>
-                        <p>Glissez-déposez vos fichiers PDF ici</p>
-                        <small>Ou cliquez pour sélectionner (max 20 fichiers)</small>
-                    </div>
-                    <input type="file" id="pdfFileInput" multiple accept=".pdf" class="hidden">
+            </div>
+
+            <div class="import-card">
+                <h4>2. Importer via Fichier Zotero</h4>
+                <p>Exportez une collection depuis Zotero au format "CSL JSON" et importez le fichier ici. C'est la méthode la plus fiable.</p>
+                <div class="import-actions">
+                    <button class="btn btn--primary" data-action="import-zotero-file">📂 Importer un Fichier Zotero (.json)</button>
                 </div>
-                <ul id="pdfUploadStatus" class="upload-status-list"></ul>
+            </div>
+
+            <div class="import-card">
+                <h4>3. Articles du Projet (${project.pmids_count || 0})</h4>
+                <p>Cliquez sur 📄 pour ouvrir le PDF s'il a été trouvé.</p>
+                <div id="project-articles-list" class="articles-list-container"><p>Chargement...</p></div>
             </div>
             
             <div class="import-card">
-                <h4>2. 🔍 Indexer le Corpus</h4>
-                <p>Une fois les PDF importés, lancez l'indexation pour pouvoir utiliser la fonction de Chat.</p>
-                <button class="btn btn--primary" data-action="run-indexing" data-project-id="${project.id}">
-                    ⚙️ Lancer l'Indexation
-                </button>
+                <h4>4. Indexer le Corpus</h4>
+                <p>Après avoir récupéré les PDF, lancez l'indexation pour le chat.</p>
+                <button class="btn btn--primary" data-action="run-indexing" data-project-id="${project.id}">⚙️ Lancer l'Indexation</button>
             </div>
-        </div>
-    `;
+        </div>`;
     
-    setupPDFDragDrop();
+    await renderProjectArticlesList(project.id);
 }
 
 function setupPDFDragDrop() {
@@ -2241,11 +2229,55 @@ async function handlePDFUpload(files) {
     }
 }
 
-async function handleImportZotero(projectId) {
-    showLoadingOverlay(true, 'Lancement de l\'import Zotero...');
+async function handleZoteroFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (!appState.currentProject) {
+        showToast('Veuillez sélectionner un projet.', 'error');
+        return;
+    }
+
+    showLoadingOverlay(true, 'Traitement du fichier Zotero...');
+    
+    const formData = new FormData();
+    formData.append('file', file);
+
     try {
-        await fetchAPI(`/projects/${projectId}/import-zotero`, { method: 'POST' });
-        showToast('Import depuis Zotero lancé en arrière-plan.', 'info');
+        const result = await fetchAPI(`/projects/${appState.currentProject.id}/import-zotero-file`, {
+            method: 'POST',
+            body: formData,
+        });
+        
+        showToast(result.message || 'Import depuis le fichier Zotero lancé.', 'info');
+        // Refresh project data to show new articles
+        await selectProject(appState.currentProject.id, true);
+    } catch (error) {
+        console.error('Erreur import fichier Zotero:', error);
+    } finally {
+        showLoadingOverlay(false);
+        event.target.value = ''; // Reset file input
+    }
+}
+
+async function handleImportZotero(projectId) {
+    const textarea = document.getElementById('manualPmidTextarea');
+    // CORRECTION : On utilise .split('\n') pour correctement séparer les lignes
+    const articleIds = textarea?.value.split('\n').map(id => id.trim()).filter(Boolean) || [];
+
+    if (articleIds.length === 0) {
+        showToast("Veuillez fournir au moins un PMID ou DOI.", 'warning');
+        return;
+    }
+
+    showLoadingOverlay(true, `Ajout et import Zotero pour ${articleIds.length} article(s)...`);
+    try {
+        await fetchAPI(`/projects/${projectId}/import-zotero`, {
+            method: 'POST',
+            body: { articles: articleIds }
+        });
+        showToast('Tâche d\'import depuis Zotero lancée en arrière-plan.', 'info');
+        textarea.value = ''; // On vide le champ de texte
+        await selectProject(projectId, true); // On rafraîchit les données du projet
     } catch (error) {
         console.error('Erreur import Zotero:', error);
     } finally {
@@ -2254,10 +2286,24 @@ async function handleImportZotero(projectId) {
 }
 
 async function handleFetchOnlinePdfs(projectId) {
-    showLoadingOverlay(true, 'Lancement de la recherche de PDF...');
+    const textarea = document.getElementById('manualPmidTextarea');
+    // CORRECTION : On utilise .split('\n') pour correctement séparer les lignes
+    const articleIds = textarea?.value.split('\n').map(id => id.trim()).filter(Boolean) || [];
+
+    if (articleIds.length === 0) {
+        showToast("Veuillez fournir au moins un PMID ou DOI.", 'warning');
+        return;
+    }
+
+    showLoadingOverlay(true, `Ajout et recherche de PDF pour ${articleIds.length} article(s)...`);
     try {
-        await fetchAPI(`/projects/${projectId}/fetch-online-pdfs`, { method: 'POST' });
-        showToast('Recherche de PDF en ligne lancée en arrière-plan.', 'info');
+        await fetchAPI(`/projects/${projectId}/fetch-online-pdfs`, {
+            method: 'POST',
+            body: { articles: articleIds }
+        });
+        showToast('Tâche de recherche de PDF lancée en arrière-plan.', 'info');
+        textarea.value = ''; // On vide le champ de texte
+        await selectProject(projectId, true); // On rafraîchit les données du projet
     } catch (error) {
         console.error('Erreur recherche PDF:', error);
     } finally {
@@ -2441,13 +2487,20 @@ async function handleValidateExtraction(extractionId, decision) {
         });
         showToast(`Article marqué comme "${decision === 'include' ? 'Inclus' : 'Exclu'}".`, 'success');
         
-        // Rafraîchir les données pour mettre à jour l'affichage
+        
         await loadProjectExtractions(appState.currentProject.id);
-        renderResultsSection(); // Redessiner la table des résultats
+        refreshCurrentSection(); 
         
     } catch (error) {
         console.error('Erreur validation:', error);
     }
+}
+
+function sanitizeFilename(articleId) {
+    if (!articleId) return '';
+    // Remplace les caractères non alphanumériques (sauf le point) par un underscore.
+    // Correspond à la logique Python re.sub(r'[^a-zA-Z0-9.-]', '_', article_id)
+    return String(articleId).replace(/[^a-zA-Z0-9.-]/g, '_');
 }
 
 // ================================================================

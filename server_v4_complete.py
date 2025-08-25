@@ -32,7 +32,10 @@ from tasks_v4_complete import (
     index_project_pdfs_task,
     answer_chat_question_task,
     fetch_online_pdf_task,
-    db_manager
+    db_manager,
+    fetch_article_details,
+    sanitize_filename,
+    import_from_zotero_file_task
 )
 
 # Configuration
@@ -206,44 +209,63 @@ def init_db():
             c.executemany("INSERT INTO analysis_profiles VALUES (?, ?, ?, ?, ?, ?)", default_profiles)
             logger.info("✅ Profils par défaut insérés.")
         
-        # Insérer les prompts par défaut
-        if c.execute("SELECT COUNT(*) FROM prompts").fetchone()[0] == 0:
-            default_prompts = [
-                ('screening_prompt', 'Prompt pour la pré-sélection des articles.',
-                 """En tant qu'assistant de recherche spécialisé, analysez cet article et déterminez sa pertinence pour une revue systématique.
+            # Insérer les prompts par défaut
+            if c.execute("SELECT COUNT(*) FROM prompts").fetchone()[0] == 0:
+                default_prompts = [
+                    ('screening_prompt', 'Prompt pour la pré-sélection des articles.',
+                     """En tant qu'assistant de recherche spécialisé, analysez cet article et déterminez sa pertinence pour une revue systématique.
 
-Titre: {title}
-Résumé: {abstract}
-Source: {database_source}
+    Titre: {title}
+    Résumé: {abstract}
+    Source: {database_source}
 
-Veuillez évaluer la pertinence de cet article sur une échelle de 1 à 10 et fournir une justification concise.
+    Veuillez évaluer la pertinence de cet article sur une échelle de 1 à 10 et fournir une justification concise.
 
-Répondez UNIQUEMENT avec un objet JSON contenant :
-- "relevance_score": score numérique de 0 à 10
-- "decision": "À inclure" si score >= 7, sinon "À exclure" 
-- "justification": phrase courte (max 30 mots) expliquant le score"""),
+    Répondez UNIQUEMENT avec un objet JSON contenant :
+    - "relevance_score": score numérique de 0 à 10
+    - "decision": "À inclure" si score >= 7, sinon "À exclure" 
+    - "justification": phrase courte (max 30 mots) expliquant le score"""),
+                    
+                    ('full_extraction_prompt', "Prompt pour l'extraction détaillée (grille).",
+                     """ROLE: Vous êtes un assistant expert en analyse de littérature scientifique, spécialisé dans l'extraction de données structurées.
+
+    TÂCHE: Analysez le texte fourni et extrayez les informations demandées en respectant SCRUPULEUSEMENT le format JSON qui vous sera fourni.
+
+    INSTRUCTIONS IMPORTANTES:
+    1. Répondez **UNIQUEMENT** avec un objet JSON valide. N'ajoutez aucun texte, commentaire ou explication avant ou après le JSON.
+    2. Assurez-vous que chaque paire clé-valeur est séparée par une virgule, sauf la dernière.
+    3. Échappez correctement les guillemets doubles (") à l'intérieur des chaînes de caractères avec un antislash (\\).
+    4. Si une information n'est pas présente dans le texte, utilisez une chaîne de caractères vide ("") comme valeur. Ne laissez pas de champ vide ou avec "...".
+
+    TEXTE À ANALYSER:
+    ---
+    {text}
+    ---
+    SOURCE: {database_source}
+    """),
                 
-                ('full_extraction_prompt', 'Prompt pour l\'extraction détaillée (grille).',
-                 """En tant qu'expert en revue systématique, extrayez les données importantes de cet article selon une grille d'extraction structurée.
+                    ('synthesis_prompt', 'Prompt pour la synthèse des résultats.',
+                 """En tant que chercheur expert, analyse les résumés d'articles suivants fournis pour une revue de littérature. Ton objectif est de produire une synthèse structurée et critique au format JSON.
 
-Texte à analyser: "{text}"
-Source: {database_source}
+**CONTEXTE DE LA REVUE :** {project_description}
 
-Extrayez les informations suivantes au format JSON:
-{{
-  "type_etude": "...",
-  "population": "...",
-  "intervention": "...",
-  "resultats_principaux": "...",
-  "limites": "...",
-  "methodologie": "..."
-}}""")
+**RÉSUMÉS À ANALYSER :**
+---
+{data_for_prompt}
+---
+
+**INSTRUCTIONS :**
+Réponds **UNIQUEMENT** avec un objet JSON valide contenant les clés suivantes :
+- "relevance_evaluation": (String) Évalue si le corpus d'articles dans son ensemble semble pertinent pour répondre à la question de recherche initiale. Justifie brièvement.
+- "main_themes": (Array de Strings) Identifie les 3 à 5 thèmes principaux ou axes de recherche qui émergent du corpus.
+- "key_findings": (Array de Strings) Liste les résultats et conclusions les plus importants et récurrents.
+- "methodologies_used": (Array de Strings) Résume les types de méthodologies d'étude les plus courantes (ex: 'Essais contrôlés randomisés', 'Études de cohorte', 'Revues systématiques').
+- "synthesis_summary": (String) Rédige un paragraphe de synthèse global qui résume l'état de l'art basé sur ces articles, en incluant les convergences et les divergences notables.
+- "research_gaps": (Array de Strings) Identifie les lacunes dans la recherche ou les questions qui restent sans réponse.
+""")
             ]
             c.executemany("INSERT INTO prompts (name, description, template) VALUES (?, ?, ?)", default_prompts)
             logger.info("✅ Prompts par défaut insérés.")
-        
-        conn.commit()
-        logger.info("✅ Base de données initialisée.")
 
 def get_project_by_id(project_id: str):
     """Récupère un projet par son ID."""
@@ -475,32 +497,33 @@ def get_zotero_settings():
 # Import depuis Zotero
 @api_bp.route('/projects/<project_id>/import-zotero', methods=['POST'])
 def import_from_zotero(project_id):
-    """Lance l'import depuis Zotero."""
+    """Lance l'import depuis Zotero pour une liste d'articles fournie."""
+    data = request.get_json()
+    manual_ids = data.get('articles', [])
+
     try:
         with open(PROJECTS_DIR / 'zotero_config.json', 'r') as f:
             zotero_config = json.load(f)
     except FileNotFoundError:
         return jsonify({'error': 'Veuillez configurer vos identifiants Zotero dans les paramètres.'}), 400
     
-    # Récupérer les article IDs depuis la base de données
-    with sqlite3.connect(DATABASE_FILE) as conn:
-        article_ids = conn.execute("SELECT article_id FROM search_results WHERE project_id = ?", (project_id,)).fetchall()
-        article_ids = [row[0] for row in article_ids]
+    # Ajoute les nouveaux articles à la base de données
+    article_ids_to_process = add_manual_articles_to_project(project_id, manual_ids)
     
-    if not article_ids:
-        return jsonify({'error': 'Aucun article à importer pour ce projet.'}), 400
+    if not article_ids_to_process:
+        return jsonify({'error': 'Aucun article valide à importer pour ce projet.'}), 400
     
     job = background_queue.enqueue(
         import_pdfs_from_zotero_task,
         project_id=project_id,
-        pmids=article_ids,
+        pmids=article_ids_to_process,
         zotero_user_id=zotero_config.get('user_id'),
         zotero_api_key=zotero_config.get('api_key'),
         job_timeout='1h'
     )
     
-    return jsonify({'message': f'Import depuis Zotero lancé pour {len(article_ids)} articles.'}), 202
-
+    return jsonify({'message': f'Import depuis Zotero lancé pour {len(article_ids_to_process)} articles.'}), 202
+    
 @api_bp.route('/projects/<project_id>/zotero-import-status', methods=['GET'])
 def get_zotero_import_status(project_id):
     """Récupère le statut de l'import Zotero."""
@@ -518,62 +541,109 @@ def get_zotero_import_status(project_id):
         return jsonify({'status': 'pending'})
 
 # Upload PDF en lot
-# Upload PDF en lot
+def add_manual_articles_to_project(project_id, article_ids):
+    """
+    Ajoute une liste d'articles (PMID/DOI) à la base de données d'un projet.
+    CORRECTION : Renvoie la liste des IDs traités, pas seulement le compte.
+    """
+    processed_ids = []
+    with sqlite3.connect(DATABASE_FILE) as conn:
+        for article_id in article_ids:
+            if not article_id or not isinstance(article_id, str):
+                continue
+
+            exists = conn.execute("SELECT 1 FROM search_results WHERE project_id = ? AND article_id = ?", (project_id, article_id)).fetchone()
+            if exists:
+                processed_ids.append(article_id)
+                continue
+
+            details = fetch_article_details(article_id)
+            if details and details.get('title') != 'Erreur de récupération':
+                conn.execute("""
+                    INSERT INTO search_results (id, project_id, article_id, title, abstract, database_source, created_at, url, doi, authors, journal, publication_date)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    str(uuid.uuid4()), project_id, article_id,
+                    details.get('title', 'Titre non trouvé'),
+                    details.get('abstract', ''),
+                    details.get('database_source', 'manual'),
+                    datetime.now().isoformat(),
+                    details.get('url'), details.get('doi'),
+                    details.get('authors'), details.get('journal'),
+                    details.get('publication_date')
+                ))
+                processed_ids.append(article_id)
+        conn.commit()
+
+        total_articles = conn.execute("SELECT COUNT(*) FROM search_results WHERE project_id = ?", (project_id,)).fetchone()[0]
+        conn.execute("UPDATE projects SET pmids_count = ? WHERE id = ?", (total_articles, project_id))
+        conn.commit()
+
+    # CORRECTION : On renvoie la liste des IDs, et non le compte
+    return processed_ids
+    
 @api_bp.route('/projects/<project_id>/upload-pdfs-bulk', methods=['POST'])
 def upload_pdfs_bulk(project_id):
-    """Upload de PDF en lot."""
     if 'files' not in request.files:
         return jsonify({'error': 'Aucun fichier fourni'}), 400
-    
+
     files = request.files.getlist('files')
-    project_dir = PROJECTS_DIR / project_id
+    project_dir = Path(config.PROJECTS_DIR) / project_id
     project_dir.mkdir(exist_ok=True)
-    
+
     successful = []
     failed = []
-    
+
     for file in files:
         if file and file.filename:
-            # Extraire l'ID de l'article du nom de fichier
-            article_id = Path(file.filename).stem
-            pdf_path = project_dir / f"{article_id}.pdf"
-            
+            filename_base = Path(file.filename).stem
+            # MODIFIÉ : Utiliser la fonction de sanétisation
+            safe_filename = sanitize_filename(filename_base) + ".pdf"
+            pdf_path = project_dir / safe_filename
+
             try:
-                if file.content_length and file.content_length > config.MAX_PDF_SIZE:
-                    failed.append(f"{file.filename}: fichier trop volumineux")
+                # Vérifier la taille du fichier
+                if file.content_length > config.MAX_PDF_SIZE:
+                    failed.append(f"{filename}: Fichier trop volumineux (max {config.MAX_PDF_SIZE / 1024 / 1024} Mo)")
                     continue
                 
                 file.save(str(pdf_path))
-                successful.append(file.filename)
-                
+                successful.append(safe_filename)
+            
             except Exception as e:
-                failed.append(f"{file.filename}: {e}")
+                failed.append(f"{safe_filename}: {str(e)}")
     
-    return jsonify({
-        'successful': successful, 
-        'failed': failed, 
-        'skipped': []
-    })
+    # Envoyer une notification après l'upload
+    send_project_notification(
+        project_id,
+        'pdf_upload_completed',
+        f"{len(successful)} PDF importés, {len(failed)} échecs.",
+        {'successful': successful, 'failed': failed}
+    )
+
+    return jsonify({'successful': successful, 'failed': failed}), 200
     
 # Recherche PDF en ligne
 @api_bp.route('/projects/<project_id>/fetch-online-pdfs', methods=['POST'])
 def fetch_online_pdfs(project_id):
-    """Lance la recherche de PDF en ligne."""
-    with sqlite3.connect(DATABASE_FILE) as conn:
-        article_ids = conn.execute("SELECT article_id FROM search_results WHERE project_id = ?", (project_id,)).fetchall()
-        article_ids = [row[0] for row in article_ids]
-    
-    if not article_ids:
-        return jsonify({'error': 'Aucun article à importer pour ce projet.'}), 400
+    """Lance la recherche de PDF en ligne pour une liste d'articles fournie."""
+    data = request.get_json()
+    manual_ids = data.get('articles', [])
+
+    # Ajoute les nouveaux articles à la base de données
+    article_ids_to_process = add_manual_articles_to_project(project_id, manual_ids)
+
+    if not article_ids_to_process:
+        return jsonify({'error': 'Aucun article valide à traiter pour ce projet.'}), 400
     
     job = background_queue.enqueue(
         fetch_online_pdf_task,
         project_id=project_id,
-        article_ids=article_ids,
+        article_ids=article_ids_to_process,
         job_timeout='1h'
     )
     
-    return jsonify({'message': f'La recherche de PDF en ligne a été lancée pour {len(article_ids)} articles.'}), 202
+    return jsonify({'message': f'La recherche de PDF en ligne a été lancée pour {len(article_ids_to_process)} articles.'}), 202
 
 @api_bp.route('/projects/<project_id>/fetch-online-status', methods=['GET'])
 def get_fetch_online_status(project_id):
@@ -1183,64 +1253,61 @@ def export_all_data_zip(project_id):
             if not project:
                 return jsonify({"error": "Projet non trouvé."}), 404
         
+        project_dict = dict(project)
         memory_file = io.BytesIO()
         
         with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
-            # 1. Fichier de résumé
+            # **CORRECTION : Utilisation de .get() pour la robustesse**
             summary = f"""Rapport d'Exportation pour le Projet AnalyLit V4
 -------------------------------------------------
-ID du Projet: {project['id']}
-Nom: {project['name']}
-Description: {project['description']}
-Date de création: {project['created_at']}
-Dernière mise à jour: {project['updated_at']}
-Statut: {project['status']}
-Profil utilisé: {project['profile_used']}
-Mode d'analyse: {project['analysis_mode']}
-Nombre d'articles: {project['pmids_count']}
-Requête de recherche: {project['search_query']}
-Bases de données utilisées: {project['databases_used']}
+ID du Projet: {project_dict.get('id', 'N/A')}
+Nom: {project_dict.get('name', 'N/A')}
+Description: {project_dict.get('description', 'N/A')}
+Date de création: {project_dict.get('created_at', 'N/A')}
+Dernière mise à jour: {project_dict.get('updated_at', 'N/A')}
+Statut: {project_dict.get('status', 'N/A')}
+Profil utilisé: {project_dict.get('profile_used', 'N/A')}
+Mode d'analyse: {project_dict.get('analysis_mode', 'N/A')}
+Nombre d'articles: {project_dict.get('pmids_count', 0)}
+Requête de recherche: {project_dict.get('search_query', 'N/A')}
+Bases de données utilisées: {project_dict.get('databases_used', 'N/A')}
 """
             zf.writestr('summary.txt', summary)
             
-            # 2. Résultats de recherche en CSV
             if search_results:
-                search_df = pd.DataFrame([dict(row) for row in search_results])
-                zf.writestr('search_results.csv', search_df.to_csv(index=False))
+                zf.writestr('search_results.csv', pd.DataFrame([dict(row) for row in search_results]).to_csv(index=False))
             
-            # 3. Extractions en CSV
             if extractions:
-                extractions_df = pd.DataFrame([dict(row) for row in extractions])
-                zf.writestr('extractions.csv', extractions_df.to_csv(index=False))
+                zf.writestr('extractions.csv', pd.DataFrame([dict(row) for row in extractions]).to_csv(index=False))
             
-            # 4. Résultats de synthèse en JSON
-            if project['synthesis_result']:
-                zf.writestr('synthesis_result.json', project['synthesis_result'])
+            if project_dict.get('synthesis_result'):
+                zf.writestr('synthesis_result.json', project_dict['synthesis_result'])
             
-            # 5. Brouillon de discussion en texte
-            if project['discussion_draft']:
-                zf.writestr('discussion_draft.txt', project['discussion_draft'])
+            if project_dict.get('discussion_draft'):
+                zf.writestr('discussion_draft.txt', project_dict['discussion_draft'])
             
-            # 6. Graphe de connaissances en JSON
-            if project['knowledge_graph']:
-                zf.writestr('knowledge_graph.json', project['knowledge_graph'])
+            if project_dict.get('knowledge_graph'):
+                zf.writestr('knowledge_graph.json', project_dict['knowledge_graph'])
             
-            # 7. Résultats d'analyse en JSON
-            if project['analysis_result']:
-                zf.writestr('analysis_result.json', project['analysis_result'])
-        
+            if project_dict.get('analysis_result'):
+                zf.writestr('analysis_result_raw.json', project_dict['analysis_result'])
+                try:
+                    analysis_data = json.loads(project_dict['analysis_result'])
+                    if 'mean_score' in analysis_data:
+                        report = f"Rapport de Méta-Analyse\n-----------------------------\nArticles analysés: {analysis_data.get('n_articles', 'N/A')}\nScore moyen: {analysis_data.get('mean_score', 0):.2f}"
+                        zf.writestr('meta_analysis_report.txt', report)
+                    elif 'atn_scores' in analysis_data:
+                        zf.writestr('atn_scores.csv', pd.DataFrame(analysis_data['atn_scores']).to_csv(index=False))
+                except Exception as e:
+                    logger.error(f"Erreur formatage export analyse: {e}")
+
         memory_file.seek(0)
-        
-        return Response(
-            memory_file.read(),
-            mimetype="application/zip",
-            headers={"Content-disposition": f"attachment; filename=analylit_export_{project_id}.zip"}
-        )
+        return Response(memory_file.read(), mimetype="application/zip", headers={"Content-disposition": f"attachment; filename=analylit_export_{project_id}.zip"})
     
     except Exception as e:
         logger.error(f"Erreur d'export ZIP pour {project_id}: {e}")
         return jsonify({"error": "Erreur interne du serveur lors de l'export."}), 500
-
+    
 @api_bp.route('/projects/<project_id>/extractions/<extraction_id>', methods=['PATCH'])
 def update_extraction(project_id, extraction_id):
     data = request.get_json()
@@ -1317,32 +1384,35 @@ def run_atn_score_endpoint(project_id):
 # Images et fichiers
 @api_bp.route('/projects/<project_id>/analysis-plot', methods=['GET'])
 def get_analysis_plot_image(project_id):
-    """Récupère l'image d'analyse."""
+    """
+    Récupère l'image d'analyse principale pour un projet.
+    Gère intelligemment les différents formats de sauvegarde des chemins.
+    """
     with sqlite3.connect(DATABASE_FILE) as conn:
+        conn.row_factory = sqlite3.Row
         project = conn.execute("SELECT analysis_plot_path FROM projects WHERE id = ?", (project_id,)).fetchone()
         
-        if project and project[0] and os.path.exists(project[0]):
-            return send_from_directory(os.path.dirname(project[0]), os.path.basename(project[0]))
-    
-    return jsonify({"error": "Image d'analyse non trouvée."}), 404
+        if not project or not project['analysis_plot_path']:
+            return jsonify({"error": "Aucun chemin de graphique trouvé pour ce projet."}), 404
 
-@api_bp.route('/projects/<project_id>/analysis-plot/<plot_type>', methods=['GET'])
-def get_analysis_plot_by_type(project_id, plot_type):
-    """Récupère une image d'analyse par type."""
-    with sqlite3.connect(DATABASE_FILE) as conn:
-        project = conn.execute("SELECT analysis_plot_path FROM projects WHERE id = ?", (project_id,)).fetchone()
+        plot_path_data = project['analysis_plot_path']
+        final_plot_path = None
         
-        if project and project[0]:
-            try:
-                plot_paths = json.loads(project[0])
-                if plot_type in plot_paths and os.path.exists(plot_paths[plot_type]):
-                    plot_path = plot_paths[plot_type]
-                    return send_from_directory(os.path.dirname(plot_path), os.path.basename(plot_path))
-            except (json.JSONDecodeError, TypeError, KeyError):
-                pass
-    
-    return jsonify({"error": f"Image '{plot_type}' non trouvée."}), 404
+        try:
+            # Cas 1: Le chemin est un JSON contenant plusieurs types de graphiques
+            plot_paths = json.loads(plot_path_data)
+            if isinstance(plot_paths, dict):
+                # On prend le premier chemin de graphique disponible dans le dictionnaire
+                final_plot_path = next(iter(plot_paths.values()), None)
+        except (json.JSONDecodeError, TypeError):
+            # Cas 2: Le chemin est une simple chaîne de caractères
+            final_plot_path = plot_path_data
 
+        if final_plot_path and os.path.exists(final_plot_path):
+            return send_from_directory(os.path.dirname(final_plot_path), os.path.basename(final_plot_path))
+    
+    return jsonify({"error": "Fichier image d'analyse introuvable sur le serveur."}), 404
+    
 @api_bp.route('/projects/<project_id>/prisma-flow', methods=['GET'])
 def get_prisma_flow_image(project_id):
     """Récupère l'image du diagramme PRISMA."""
@@ -1353,7 +1423,7 @@ def get_prisma_flow_image(project_id):
             return send_from_directory(os.path.dirname(project[0]), os.path.basename(project[0]))
     
     return jsonify({"error": "Image PRISMA non trouvée."}), 404
-
+    
 # Upload de PDF individuel
 @api_bp.route('/projects/<project_id>/<article_id>/upload-pdf', methods=['POST'])
 def upload_pdf(project_id, article_id):
@@ -1465,7 +1535,56 @@ def handle_join_room(data):
     # Confirmer au client qu'il a bien rejoint la "room", avec le bon nom d'événement
     socketio.emit('room_joined', {'project_id': project_id}, room=project_id)
     logger.info(f"Client {request.sid} a rejoint la room du projet {project_id}")
+
+# --- Gestion des fichiers du projet ---
+
+@api_bp.route('/projects/<project_id>/files', methods=['GET'])
+def list_project_files(project_id):
+    """Liste les fichiers PDF disponibles pour un projet."""
+    project_dir = PROJECTS_DIR / project_id
+    if not project_dir.is_dir():
+        return jsonify([])
     
+    pdf_files = [{"filename": f.name} for f in project_dir.glob("*.pdf")]
+    return jsonify(pdf_files)
+
+@api_bp.route('/projects/<project_id>/files/<filename>', methods=['GET'])
+def get_project_file(project_id, filename):
+    """Sert un fichier PDF spécifique d'un projet."""
+    project_dir = PROJECTS_DIR / project_id
+    if ".." in filename or filename.startswith("/"):
+        return jsonify({"error": "Chemin de fichier invalide."}), 400
+    return send_from_directory(str(project_dir), filename)
+
+@api_bp.route('/projects/<project_id>/import-zotero-file', methods=['POST'])
+def import_from_zotero_file(project_id):
+    """Lance l'import depuis un fichier CSL JSON exporté de Zotero."""
+    if 'file' not in request.files:
+        return jsonify({'error': 'Aucun fichier fourni'}), 400
+
+    file = request.files['file']
+    if not file.filename.endswith('.json'):
+        return jsonify({'error': 'Veuillez fournir un fichier .json'}), 400
+
+    try:
+        # We read the file content in memory to pass to the background task
+        file_content = file.stream.read().decode('utf-8')
+        zotero_data = json.loads(file_content)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return jsonify({'error': 'Fichier JSON invalide ou mal encodé.'}), 400
+
+    job = background_queue.enqueue(
+        import_from_zotero_file_task,
+        project_id=project_id,
+        zotero_json_data=zotero_data,
+        job_timeout='1h'
+    )
+
+    return jsonify({
+        'message': f'Import depuis le fichier Zotero lancé pour {len(zotero_data)} articles.',
+        'job_id': job.id
+    }), 202
+
 # Enregistrement du blueprint et routes statiques
 app.register_blueprint(api_bp)
 
@@ -1473,7 +1592,7 @@ app.register_blueprint(api_bp)
 def serve_index():
     """Sert la page d'accueil."""
     return app.send_static_file('index.html')
-
+    
 @app.errorhandler(404)
 def not_found(error):
     """Gestion des erreurs 404 - redirige vers l'app SPA."""

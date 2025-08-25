@@ -41,7 +41,8 @@ services:
       - ANALYLIT_VERSION=4.0.0
       - UNPAYWALL_EMAIL=${UNPAYWALL_EMAIL:-alicechabaux@gmail.com}
       - ZOTERO_USER_ID=${ZOTERO_USER_ID:-8926142}
-      - ZOTERO_API_KEY=${ZOTERO_API_KEY:-NaqpuvV9xxfJArJRWgYMDlYs}
+      - ZOTERO_GROUP_ID=6109700  # ex: 1234567
+      - ZOTERO_API_KEY=d9ktu2TS9DIovtjLV3N9sOel
       - PYTHONPATH=/app
       - USE_GPU=true
       - NVIDIA_VISIBLE_DEVICES=0
@@ -92,6 +93,9 @@ services:
       - PYTHONUNBUFFERED=1
       - NVIDIA_VISIBLE_DEVICES=0
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - ZOTERO_API_KEY=${ZOTERO_API_KEY:-AiUsAAqTvtyUJQKxOa5PTonc}
+      - ZOTERO_GROUP_ID=6109700  # ex: 1234567
+      - ZOTERO_API_KEY=d9ktu2TS9DIovtjLV3N9sOel
     volumes:
       # Montage des dossiers pour la persistance des données et l'accès au code source
       - ./projects:/app/projects
