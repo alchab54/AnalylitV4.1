@@ -1789,37 +1789,43 @@ Réponse:"""
 def import_from_zotero_file_task(project_id, zotero_json_data):
     """
     Importe des PDF en se basant sur un export CSL JSON de Zotero.
-    Cette méthode est beaucoup plus fiable car elle utilise les Zotero Item Keys.
+    Cette version détecte automatiquement si la bibliothèque est personnelle ou de groupe.
     """
-    zotero_group_id = os.getenv('ZOTERO_GROUP_ID')
-    zotero_user_id = os.getenv('ZOTERO_USER_ID')
     zotero_api_key = os.getenv('ZOTERO_API_KEY')
-
     print(f"🔄 Import Zotero depuis fichier pour {len(zotero_json_data)} articles...")
-    
-    # Setup Zotero connection (same logic as before)
-    if zotero_group_id:
-        library_id, library_type = zotero_group_id, 'group'
-    else:
-        library_id, library_type = zotero_user_id, 'user'
-    
+
+    if not zotero_json_data:
+        print("❌ Fichier Zotero vide.")
+        return
+
+    # --- DÉTECTION AUTOMATIQUE DE LA BIBLIOTHÈQUE ---
     try:
+        first_item_id_uri = zotero_json_data[0].get('id', '')
+        parts = first_item_id_uri.split('/')
+        library_type = parts[3]
+        library_id = parts[4]
+        
+        if library_type == 'users':
+            library_type = 'user'
+        
+        print(f"🏢 Bibliothèque Zotero détectée: type='{library_type}', id='{library_id}'")
+        
         zot = zotero.Zotero(library_id, library_type, zotero_api_key)
         zot.key_info()
         print("✅ Connexion à l'API Zotero réussie.")
+
     except Exception as e:
-        print(f"❌ ÉCHEC CONNEXION ZOTERO: {e}")
+        print(f"❌ ÉCHEC CONNEXION ZOTERO. Erreur: {e}")
         send_project_notification(project_id, 'zotero_import_failed', 'Échec connexion Zotero.')
         return
 
-    # Add articles to the project database
+    # --- AJOUT DES ARTICLES À LA BASE DE DONNÉES ---
     with sqlite3.connect(DATABASE_FILE) as conn:
         for item in zotero_json_data:
-            article_id = item.get('DOI', item.get('PMID', item.get('id')))
+            article_id = item.get('DOI', item.get('PMID', item.get('id', str(uuid.uuid4()))))
             title = item.get('title', 'Titre inconnu')
             abstract = item.get('abstract', '')
             
-            # Check if article already exists
             exists = conn.execute("SELECT 1 FROM search_results WHERE project_id = ? AND article_id = ?", (project_id, article_id)).fetchone()
             if not exists:
                 conn.execute("""
@@ -1828,14 +1834,16 @@ def import_from_zotero_file_task(project_id, zotero_json_data):
                 """, (str(uuid.uuid4()), project_id, article_id, title, abstract, 'zotero_file', datetime.now().isoformat()))
         conn.commit()
 
-    # Fetch PDFs using the reliable item key
+    # --- TÉLÉCHARGEMENT DES PDF ---
     project_dir = PROJECTS_DIR / project_id
     project_dir.mkdir(exist_ok=True)
     successful_imports = 0
 
     for item in zotero_json_data:
-        # The 'id' in a CSL JSON export is the Zotero Item Key!
+        # ## CORRECTION DE LA FAUTE DE FRAPPE ICI ##
+        zotero_item_key_uri = item.get('id')
         zotero_item_key = zotero_item_key_uri.split('/')[-1] if zotero_item_key_uri else None
+        
         article_id = item.get('DOI', item.get('PMID', zotero_item_key))
         
         if not zotero_item_key:
@@ -1848,7 +1856,8 @@ def import_from_zotero_file_task(project_id, zotero_json_data):
                     pdf_content = zot.file(attachment['key'])
                     safe_filename = sanitize_filename(article_id) + ".pdf"
                     pdf_path = project_dir / safe_filename
-                    with open(pdf_path, 'wb') as f: f.write(pdf_content)
+                    with open(pdf_path, 'wb') as f:
+                        f.write(pdf_content)
                     
                     print(f"✅ PDF téléchargé pour {article_id} via Zotero Key {zotero_item_key}")
                     successful_imports += 1
@@ -1862,4 +1871,4 @@ def import_from_zotero_file_task(project_id, zotero_json_data):
         project_id,
         'zotero_import_completed',
         f'Import Fichier Zotero terminé: {successful_imports}/{len(zotero_json_data)} PDF importés'
-    ) 
+    )
