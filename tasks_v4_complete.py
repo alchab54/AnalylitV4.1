@@ -938,104 +938,78 @@ def process_single_article_task(
     custom_grid_id: str = None
 ):
     """
-    Traite un article individuel avec :
-    - détection automatique DOI/PMID/arXiv
-    - mode 'screening' ou 'full_extraction'
-    - grille personnalisée pour extraction détaillée
+    Traite un article en priorisant le contenu du PDF pour l'analyse.
+    Enregistre la source utilisée (PDF ou Résumé).
     """
     start_time = time.time()
     try:
-        # Chaque tâche utilise sa propre connexion à la base de données pour éviter les blocages
         with sqlite3.connect(DATABASE_FILE, timeout=30.0) as conn:
             conn.row_factory = sqlite3.Row
-            row = conn.execute(
+            article_data_row = conn.execute(
                 "SELECT * FROM search_results WHERE project_id = ? AND article_id = ?",
                 (project_id, article_id)
             ).fetchone()
 
-        if row:
-            article_data = dict(row)
-        else:
-            print(f"ℹ️ Article {article_id} non trouvé localement, recherche en ligne...")
-            details = fetch_article_details(article_id)
-            if not details or not details.get("title") or details.get("title") == "Erreur de récupération":
-                log_processing_status(project_id, article_id, "erreur", "Détails introuvables")
-                return
-            article_data = {
-                "project_id": project_id,
-                "article_id": article_id,
-                "title": details.get("title", "Titre inconnu"),
-                "abstract": details.get("abstract", ""),
-                "database_source": details.get("database_source", "manual_input")
-            }
+        if not article_data_row:
+            log_processing_status(project_id, article_id, "erreur", "Article non trouvé dans la base de données.")
+            return
 
+        article_data = dict(article_data_row)
+        
+        # --- NOUVELLE LOGIQUE : CHOIX DE LA SOURCE DU TEXTE ---
+        text_for_analysis = ""
+        analysis_source = "abstract" # Par défaut
+        
+        pdf_path = PROJECTS_DIR / project_id / (sanitize_filename(article_id) + ".pdf")
+        
+        if pdf_path.exists():
+            print(f"📄 PDF trouvé pour {article_id}. Utilisation du texte intégral.")
+            pdf_text = extract_text_from_pdf(str(pdf_path))
+            if pdf_text and len(pdf_text) > 100:
+                text_for_analysis = pdf_text
+                analysis_source = "pdf"
+        
+        # Si le PDF n'a pas été utilisé, on se rabat sur le résumé
+        if not text_for_analysis:
+            print(f"📑 PDF non trouvé ou vide pour {article_id}. Utilisation du résumé.")
+            text_for_analysis = article_data.get("title", "") + "\n\n" + article_data.get("abstract", "")
+
+        if len(text_for_analysis.strip()) < 50:
+            log_processing_status(project_id, article_id, "écarté", "Contenu textuel insuffisant pour l'analyse.")
+            return
+
+        # --- DÉBUT DE L'ANALYSE (screening ou extraction) ---
         if analysis_mode == "full_extraction":
-            pdf_path = PROJECTS_DIR / project_id / f"{article_id.replace('/', '_')}.pdf"
-            text_for_extraction = ""
-            if pdf_path.exists():
-                text_for_extraction = extract_text_from_pdf(str(pdf_path)) or ""
-
-            if not text_for_extraction:
-                text_for_extraction = (
-                    article_data["title"] + "\n\n" + article_data.get("abstract", "")
-                )
-
             prompt = get_full_extraction_prompt(
-                text_for_extraction,
+                text_for_analysis,
                 article_data.get("database_source", "unknown"),
                 custom_grid_id
             )
-            extracted = call_ollama_api(
-                prompt, profile["extract_model"], output_format="json"
-            )
+            extracted = call_ollama_api(prompt, profile["extract_model"], output_format="json")
 
             if isinstance(extracted, dict) and extracted:
                 with sqlite3.connect(DATABASE_FILE, timeout=30.0) as conn:
                     conn.execute("""
-                        INSERT INTO extractions (
-                            id, project_id, pmid, title,
-                            extracted_data, relevance_score,
-                            relevance_justification, created_at
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                    """, (
-                        str(uuid.uuid4()), project_id, article_id,
-                        article_data["title"], json.dumps(extracted),
-                        10, "Extraction détaillée effectuée", datetime.now().isoformat()
-                    ))
+                        INSERT INTO extractions (id, project_id, pmid, title, extracted_data, relevance_score, relevance_justification, analysis_source, created_at) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (str(uuid.uuid4()), project_id, article_id, article_data["title"], json.dumps(extracted), 10, "Extraction détaillée effectuée", analysis_source, datetime.now().isoformat()))
                     conn.commit()
-                log_processing_status(project_id, article_id, "analysé", "Extraction détaillée réussie")
-                print(f"✅ Extraction complète pour {article_id}")
+                print(f"✅ Extraction ({analysis_source}) terminée pour {article_id}")
             else:
-                log_processing_status(project_id, article_id, "écarté", "Réponse de l'IA invalide pour l'extraction")
-                print(f"⚠️ Extraction invalide pour {article_id}")
-        
-        else: # Mode Screening par défaut
-            abstract = article_data.get("abstract", "")
-            if not abstract:
-                log_processing_status(project_id, article_id, "écarté", "Résumé manquant pour le screening")
-                return
-
-            prompt = get_screening_prompt(
-                article_data["title"], abstract, article_data.get("database_source", "unknown")
-            )
+                 log_processing_status(project_id, article_id, "écarté", "Réponse IA invalide pour l'extraction")
+        else: # Mode Screening
+            prompt = get_screening_prompt(article_data["title"], article_data.get("abstract", ""), article_data.get("database_source", "unknown"))
             resp = call_ollama_api(prompt, profile["preprocess_model"], output_format="json")
-            
             score = resp.get("relevance_score", 0) if isinstance(resp, dict) else 0
-            justification = resp.get("justification", "Non pertinent selon IA.") if isinstance(resp, dict) else "Réponse IA invalide."
+            justification = resp.get("justification", "N/A") if isinstance(resp, dict) else "Réponse IA invalide."
 
             with sqlite3.connect(DATABASE_FILE, timeout=30.0) as conn:
                 conn.execute("""
-                    INSERT INTO extractions (
-                        id, project_id, pmid, title,
-                        relevance_score, relevance_justification, created_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    str(uuid.uuid4()), project_id, article_id,
-                    article_data["title"], score, justification, datetime.now().isoformat()
-                ))
+                    INSERT INTO extractions (id, project_id, pmid, title, relevance_score, relevance_justification, analysis_source, created_at) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, (str(uuid.uuid4()), project_id, article_id, article_data["title"], score, justification, analysis_source, datetime.now().isoformat()))
                 conn.commit()
-            log_processing_status(project_id, article_id, "analysé", f"Screening terminé (Score: {score}/10)")
-            print(f"▶️ Screening terminé pour {article_id} (score {score})")
+            print(f"▶️ Screening ({analysis_source}) terminé pour {article_id} (score {score})")
 
         increment_processed_count(project_id)
         update_project_timing(project_id, time.time() - start_time)
@@ -1043,7 +1017,8 @@ def process_single_article_task(
     except Exception as e:
         print(f"❌ Erreur critique dans le traitement de l'article {article_id}: {e}")
         log_processing_status(project_id, article_id, "erreur", f"Exception: {str(e)}")
-        
+
+       
 def run_synthesis_task(project_id: str, profile: dict):
     """Génère une synthèse des articles pertinents d'un projet."""
     update_project_status(project_id, "synthesizing")
@@ -1789,7 +1764,7 @@ Réponse:"""
 def import_from_zotero_file_task(project_id, zotero_json_data):
     """
     Importe des PDF en se basant sur un export CSL JSON de Zotero.
-    Cette version détecte automatiquement si la bibliothèque est personnelle ou de groupe.
+    Cette version détecte et corrige automatiquement le type de bibliothèque (user/group).
     """
     zotero_api_key = os.getenv('ZOTERO_API_KEY')
     print(f"🔄 Import Zotero depuis fichier pour {len(zotero_json_data)} articles...")
@@ -1798,15 +1773,16 @@ def import_from_zotero_file_task(project_id, zotero_json_data):
         print("❌ Fichier Zotero vide.")
         return
 
-    # --- DÉTECTION AUTOMATIQUE DE LA BIBLIOTHÈQUE ---
+    # --- DÉTECTION ET CORRECTION AUTOMATIQUE DE LA BIBLIOTHÈQUE ---
     try:
         first_item_id_uri = zotero_json_data[0].get('id', '')
         parts = first_item_id_uri.split('/')
-        library_type = parts[3]
+        library_type_raw = parts[3]  # 'users' ou 'groups'
         library_id = parts[4]
         
-        if library_type == 'users':
-            library_type = 'user'
+        # ## CORRECTION FINALE ICI ##
+        # La librairie pyzotero attend 'user' ou 'group' (singulier)
+        library_type = 'user' if library_type_raw == 'users' else 'group'
         
         print(f"🏢 Bibliothèque Zotero détectée: type='{library_type}', id='{library_id}'")
         
@@ -1840,10 +1816,8 @@ def import_from_zotero_file_task(project_id, zotero_json_data):
     successful_imports = 0
 
     for item in zotero_json_data:
-        # ## CORRECTION DE LA FAUTE DE FRAPPE ICI ##
         zotero_item_key_uri = item.get('id')
         zotero_item_key = zotero_item_key_uri.split('/')[-1] if zotero_item_key_uri else None
-        
         article_id = item.get('DOI', item.get('PMID', zotero_item_key))
         
         if not zotero_item_key:

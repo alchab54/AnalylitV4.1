@@ -135,6 +135,7 @@ def init_db():
                 relevance_score REAL DEFAULT 0,
                 relevance_justification TEXT,
                 user_validation_status TEXT,
+                analysis_source TEXT,
                 FOREIGN KEY (project_id) REFERENCES projects(id)
             )
         """)
@@ -1585,6 +1586,36 @@ def import_from_zotero_file(project_id):
         'job_id': job.id
     }), 202
 
+@api_bp.route('/projects/<project_id>/delete-articles', methods=['POST'])
+def delete_articles(project_id):
+    """Supprime un ou plusieurs articles d'un projet."""
+    data = request.get_json()
+    article_ids = data.get('article_ids', [])
+
+    if not article_ids:
+        return jsonify({'error': 'Aucun ID d\'article fourni'}), 400
+
+    placeholders = ','.join('?' for _ in article_ids)
+    with sqlite3.connect(DATABASE_FILE) as conn:
+        # Supprimer des tables
+        conn.execute(f"DELETE FROM extractions WHERE project_id = ? AND pmid IN ({placeholders})", [project_id] + article_ids)
+        conn.execute(f"DELETE FROM search_results WHERE project_id = ? AND article_id IN ({placeholders})", [project_id] + article_ids)
+        conn.commit()
+
+    # Supprimer les fichiers PDF
+    deleted_files = 0
+    project_dir = PROJECTS_DIR / project_id
+    for article_id in article_ids:
+        pdf_path = project_dir / (sanitize_filename(article_id) + ".pdf")
+        if pdf_path.exists():
+            pdf_path.unlink()
+            deleted_files += 1
+
+    return jsonify({
+        'message': f'{len(article_ids)} article(s) supprimé(s) de la base de données.',
+        'files_deleted': deleted_files
+    }), 200
+    
 # Enregistrement du blueprint et routes statiques
 app.register_blueprint(api_bp)
 

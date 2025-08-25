@@ -159,6 +159,20 @@ function setupEventListeners() {
 			'refresh-queues': () => renderQueueStatus(),
 			clearQueue: () => handleClearQueue(queueName),
 			saveZoteroSettings: () => handleSaveZoteroSettings(),
+			'delete-selected-articles': () => handleDeleteSelectedArticles(),
+			'upload-single-pdf': () => {
+				// Crée un input de fichier temporaire pour un article spécifique
+				const fileInput = document.createElement('input');
+				fileInput.type = 'file';
+				fileInput.accept = '.pdf';
+				fileInput.style.display = 'none';
+				fileInput.addEventListener('change', (e) => {
+					handleManualPDFUpload(target.dataset.articleId, e.target.files[0]);
+				});
+				document.body.appendChild(fileInput);
+				fileInput.click();
+				fileInput.remove(); // Nettoyage après usage
+			},
 		};
 
         if (actions[action]) {
@@ -1080,10 +1094,11 @@ function renderExtractionRow(extraction, isScreening) {
 
     const articleUrl = extraction.url || `https://pubmed.ncbi.nlm.nih.gov/${extraction.pmid}/`;
     const titleHtml = `
-        <td class="title-cell">
-            <a href="${articleUrl}" data-action="view-article-online" target="_blank" title="Voir source en ligne">🔗</a>
-            <span class="title-text" data-action="toggleAbstract" title="Cliquer pour voir l'abstract">${escapeHtml(extraction.title || '')}</span>
-        </td>`;
+    <td class="title-cell">
+        <a href="${articleUrl}" data-action="view-article-online" target="_blank" title="Voir source">🔗</a>
+        <span class="title-text" data-action="toggleAbstract">${escapeHtml(extraction.title || '')}</span>
+        ${sourceBadge}
+    </td>`;
     
     // Logique pour basculer entre les colonnes
     let dataCellHtml = '';
@@ -1108,6 +1123,7 @@ function renderExtractionRow(extraction, isScreening) {
         </tr>`;
 
     const colspan = isScreening ? 5 : 4;
+	const sourceBadge = `<span class="status-badge source--${extraction.analysis_source}">${escapeHtml(extraction.analysis_source)}</span>`;
     const abstractRowHtml = (extraction.abstract) ? `
         <tr class="abstract-row hidden">
             <td colspan="${colspan}">
@@ -2066,6 +2082,38 @@ async function handleSaveZoteroSettings() {
 // ===== 10. SECTIONS IMPORT ET CHAT
 // ================================================================
 
+async function handleManualPDFUpload(articleId, file) {
+    if (!file || !appState.currentProject) return;
+
+    showLoadingOverlay(true, `Import du PDF pour ${articleId}...`);
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    // Le backend utilisera le nom du fichier pour l'article_id, mais on peut le passer en paramètre pour plus de robustesse si nécessaire
+    // Par exemple : `/projects/${appState.currentProject.id}/${articleId}/upload-pdf`
+
+    try {
+        // On utilise l'endpoint d'upload en lot qui est déjà intelligent
+        const result = await fetchAPI(`/projects/${appState.currentProject.id}/upload-pdfs-bulk`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (result.successful && result.successful.length > 0) {
+            showToast(`PDF pour l'article ${articleId} importé avec succès.`, 'success');
+            // Rafraîchir la liste pour montrer le changement d'icône
+            await renderProjectArticlesList(appState.currentProject.id);
+        } else {
+            throw new Error(result.failed[0] || 'Échec de l\'import.');
+        }
+    } catch (error) {
+        console.error(`Erreur d'import manuel pour ${articleId}:`, error);
+        showToast(`Erreur: ${error.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
 async function renderProjectArticlesList(projectId) {
     const container = document.getElementById('project-articles-list');
     if (!container) return;
@@ -2079,40 +2127,37 @@ async function renderProjectArticlesList(projectId) {
         const pdfFilenames = new Set(pdfFiles.map(f => f.filename));
 
         if (!articles.results || articles.results.length === 0) {
-            container.innerHTML = '<p class="text-muted">Aucun article dans ce projet.</p>';
+            container.innerHTML = '<p>Aucun article dans ce projet. Commencez par en ajouter via l\'onglet "Recherche" ou un import Zotero.</p>';
             return;
         }
 
         container.innerHTML = `
-            <ul class="articles-list">
-                ${articles.results.map(article => {
-                    // MODIFIÉ : Utiliser la fonction de sanétisation pour vérifier et créer le lien
-                    const safeFilename = sanitizeFilename(article.article_id) + ".pdf";
-                    const hasPdf = pdfFilenames.has(safeFilename);
-                    
-                    return `
-                        <li class="article-item">
-                            <span class="article-title">${escapeHtml(article.title)}</span>
-                            <div class="article-actions">
-                                <span class="article-id">${escapeHtml(article.article_id)}</span>
-                                ${hasPdf 
-                                    ? `<a href="/api/projects/${projectId}/files/${safeFilename}" target="_blank" class="btn btn--secondary btn--sm" title="Ouvrir le PDF">📄</a>`
-                                    : `<span class="btn btn--secondary btn--sm disabled" title="PDF non trouvé">📄</span>`
-                                }
-                            </div>
-                        </li>`;
-                }).join('')}
-            </ul>`;
-    } catch (error) {
-        container.innerHTML = '<p class="text-error">Erreur chargement des articles.</p>';
-    }
+        <ul class="articles-list">
+            ${articles.results.map(article => {
+                const safeFilename = sanitize_filename(article.article_id) + ".pdf";
+                const hasPdf = pdfFilenames.has(safeFilename);
+                const pdfActionHtml = hasPdf 
+                    ? `<a href="/api/projects/${projectId}/files/${safeFilename}" target="_blank" class="btn btn--secondary btn--sm" title="Ouvrir le PDF">📄</a>`
+                    : `<button class="btn btn--primary btn--sm" data-action="upload-single-pdf" data-article-id="${escapeHtml(article.article_id)}" title="Ajouter un PDF">➕</button>`;
+
+                return `
+                    <li class="article-item">
+                        <input type="checkbox" class="article-select-checkbox" data-article-id="${escapeHtml(article.article_id)}">
+                        <span class="article-title">${escapeHtml(article.title)}</span>
+                        <div class="article-actions">
+                            <span class="article-id">${escapeHtml(article.article_id)}</span>
+                            ${pdfActionHtml}
+                        </div>
+                    </li>`;
+            }).join('')}
+        </ul>`;
 }
 
 async function renderImportSection() {
     const container = elements.importContainer;
     const project = appState.currentProject;
+
     if (!project) {
-        // This part is fine, it shows a message if no project is selected.
         container.innerHTML = `<div class="import-placeholder">
             <h4>Sélectionnez un projet</h4>
             <p>Veuillez sélectionner un projet pour pouvoir importer des documents.</p>
@@ -2120,43 +2165,42 @@ async function renderImportSection() {
         return;
     }
 
-    // This is the main HTML structure for the import page
     container.innerHTML = `
         <div class="import-sections">
             <div class="import-card">
-                <h4>1. Ajouter des Articles via Liste d'ID</h4>
-                <p>Collez des PMIDs ou DOIs (un par ligne). Les doublons sont ignorés.</p>
+                <h4>1. Ajouter des Articles</h4>
+                <p>Utilisez l'une des méthodes ci-dessous pour ajouter des articles à votre projet.</p>
                 <div class="form-group">
-                    <textarea id="manualPmidTextarea" class="form-control" rows="8" placeholder="..."></textarea>
+                    <label class="form-label">Liste d'identifiants (un par ligne)</label>
+                    <textarea id="manualPmidTextarea" class="form-control" rows="6" placeholder="Collez des PMIDs ou DOIs ici..."></textarea>
                 </div>
                 <div class="import-actions">
-                    <button class="btn btn--primary" data-action="fetch-online-pdfs" data-project-id="${project.id}">➕ Chercher PDF (Open Access)</button>
-                    
-                    <button class="btn btn--secondary" data-action="import-zotero-list" data-project-id="${project.id}">📚 Importer via Zotero (Liste)</button>
+                    <button class="btn btn--secondary" data-action="import-zotero-list" data-project-id="${project.id}">📚 Zotero (via ID)</button>
+                    <button class="btn btn--secondary" data-action="fetch-online-pdfs" data-project-id="${project.id}">🌐 Open Access (via ID)</button>
+                </div>
+                <hr>
+                <p>Ou importez un fichier pour ajouter des articles et leurs PDF en une seule fois (recommandé).</p>
+                <div class="import-actions">
+                    <button class="btn btn--primary" data-action="import-zotero-file">📂 Importer Fichier Zotero (.json)</button>
                 </div>
             </div>
 
-            <div class="import-card">
-                <h4>2. Importer via Fichier Zotero</h4>
-                <p>Exportez une collection depuis Zotero au format "CSL JSON" et importez le fichier ici. C'est la méthode la plus fiable.</p>
-                <div class="import-actions">
-                    <button class="btn btn--primary" data-action="import-zotero-file">📂 Importer un Fichier Zotero (.json)</button>
+            <div class="import-card" style="grid-column: 1 / -1;">
+                <h4>2. Gérer les Articles du Projet (${project.pmids_count || 0})</h4>
+                <div class="project-actions-header">
+                    <p>Cochez les articles à supprimer, puis cliquez sur le bouton.</p>
+                    <button class="btn btn--danger" data-action="delete-selected-articles">🗑️ Supprimer la sélection</button>
                 </div>
+                <div id="project-articles-list" class="articles-list-container"><div class="loading-spinner"></div></div>
             </div>
 
-            <div class="import-card">
-                <h4>3. Articles du Projet (${project.pmids_count || 0})</h4>
-                <p>Cliquez sur 📄 pour ouvrir le PDF s'il a été trouvé.</p>
-                <div id="project-articles-list" class="articles-list-container"><p>Chargement...</p></div>
-            </div>
-            
-            <div class="import-card">
-                <h4>4. Indexer le Corpus</h4>
-                <p>Après avoir récupéré les PDF, lancez l'indexation pour le chat.</p>
+            <div class="import-card" style="grid-column: 1 / -1;">
+                <h4>3. Indexer le Corpus</h4>
+                <p>Après avoir récupéré les PDF, lancez l'indexation pour activer le Chat.</p>
                 <button class="btn btn--primary" data-action="run-indexing" data-project-id="${project.id}">⚙️ Lancer l'Indexation</button>
             </div>
         </div>`;
-    
+
     await renderProjectArticlesList(project.id);
 }
 
@@ -2501,6 +2545,32 @@ function sanitizeFilename(articleId) {
     // Remplace les caractères non alphanumériques (sauf le point) par un underscore.
     // Correspond à la logique Python re.sub(r'[^a-zA-Z0-9.-]', '_', article_id)
     return String(articleId).replace(/[^a-zA-Z0-9.-]/g, '_');
+}
+
+async function handleDeleteSelectedArticles() {
+    const selectedCheckboxes = document.querySelectorAll('#project-articles-list .article-select-checkbox:checked');
+    const articleIdsToDelete = Array.from(selectedCheckboxes).map(cb => cb.dataset.articleId);
+
+    if (articleIdsToDelete.length === 0) {
+        showToast("Veuillez sélectionner au moins un article à supprimer.", "warning");
+        return;
+    }
+
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer définitivement ${articleIdsToDelete.length} article(s) ?`)) {
+        return;
+    }
+
+    showLoadingOverlay(true, 'Suppression des articles...');
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/delete-articles`, {
+            method: 'POST',
+            body: { article_ids: articleIdsToDelete }
+        });
+        showToast(`${articleIdsToDelete.length} article(s) supprimé(s).`, 'success');
+        await selectProject(appState.currentProject.id, true); // Rafraîchir
+    } finally {
+        showLoadingOverlay(false);
+    }
 }
 
 // ================================================================
