@@ -326,6 +326,9 @@ function handleWebSocketNotification(data) {
 				}
 			}
             break;
+		case 'analysis_failed':
+		    if (project_id === appState.currentProject?.id) { selectProject(project_id, true); }
+		    break;
     }
 }
 

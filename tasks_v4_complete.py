@@ -541,20 +541,18 @@ def run_prisma_flow_task(project_id: str):
     finally:
         session.close()
 
-
 def run_meta_analysis_task(project_id: str):
     """Méta-analyse simple des scores de pertinence (distribution + IC 95%)."""
     update_project_status(project_id, "generating_analysis")
     session = Session()
     try:
-        # OPTIMISATION : .scalars().all() récupère directement une liste de valeurs
         scores = session.execute(text("""
-            SELECT relevance_score FROM extractions
-            WHERE project_id = :pid AND relevance_score IS NOT NULL AND relevance_score > 0
+        SELECT relevance_score FROM extractions
+        WHERE project_id = :pid AND relevance_score IS NOT NULL AND relevance_score > 0
         """), {"pid": project_id}).scalars().all()
-
         if len(scores) < 2:
             update_project_status(project_id, "failed")
+            send_project_notification(project_id, 'analysis_failed', 'Pas assez de données pour la méta-analyse (au moins 2 scores requis).')
             return
 
         arr = np.array(scores, dtype=float)
@@ -565,10 +563,8 @@ def run_meta_analysis_task(project_id: str):
         ci_low, ci_high = stats.t.interval(0.95, df=n - 1, loc=mean_score, scale=std_err)
 
         analysis_result = {
-            "mean_score": mean_score,
-            "std_dev": std_dev,
-            "confidence_interval": [float(ci_low), float(ci_high)],
-            "n_articles": n
+            "mean_score": mean_score, "std_dev": std_dev,
+            "confidence_interval": [float(ci_low), float(ci_high)], "n_articles": n
         }
 
         pdir = PROJECTS_DIR / project_id
@@ -598,16 +594,17 @@ def run_descriptive_stats_task(project_id: str):
     session = Session()
     try:
         rows = session.execute(text("""
-            SELECT extracted_data FROM extractions WHERE project_id = :pid AND extracted_data IS NOT NULL
+        SELECT extracted_data FROM extractions WHERE project_id = :pid AND extracted_data IS NOT NULL
         """), {"pid": project_id}).fetchall()
         if not rows:
             update_project_status(project_id, "failed")
+            send_project_notification(project_id, 'analysis_failed', "Aucune donnée d'extraction disponible pour les statistiques descriptives.")
             return
 
         records = []
         for r in rows:
             try:
-                data = json.loads(r)
+                data = json.loads(r['extracted_data'])
                 if isinstance(data, dict):
                     records.append(data)
             except Exception:
@@ -615,6 +612,7 @@ def run_descriptive_stats_task(project_id: str):
 
         if not records:
             update_project_status(project_id, "failed")
+            send_project_notification(project_id, 'analysis_failed', "Impossible de parser les données extraites pour les statistiques descriptives.")
             return
 
         df = pd.json_normalize(records)
@@ -622,23 +620,19 @@ def run_descriptive_stats_task(project_id: str):
         pdir.mkdir(exist_ok=True)
         plot_paths = {}
 
-        # Exemple: histogramme des types d'étude si présents
         if 'methodologie.type_etude' in df.columns:
             s = df['methodologie.type_etude'].value_counts()
             fig, ax = plt.subplots(figsize=(10, 6))
             s.plot(kind='bar', ax=ax)
-            ax.set_title('Répartition des Types d\'Études')
-            ax.set_ylabel('Nombre d\'Articles')
+            ax.set_title("Répartition des Types d'Études")
+            ax.set_ylabel("Nombre d'Articles")
             plt.xticks(rotation=45, ha='right')
             plot_path = str(pdir / 'study_types.png')
             plt.savefig(plot_path, bbox_inches='tight')
             plt.close(fig)
             plot_paths['study_types'] = plot_path
 
-        summary_stats = {
-            "total_articles": int(len(df)),
-            "available_fields": list(df.columns)
-        }
+        summary_stats = {"total_articles": int(len(df)), "available_fields": list(df.columns)}
         update_project_status(project_id, "completed", analysis_result=summary_stats,
                               analysis_plot_path=json.dumps(plot_paths) if plot_paths else None)
         send_project_notification(project_id, 'analysis_completed', 'Statistiques descriptives générées.')
@@ -647,7 +641,6 @@ def run_descriptive_stats_task(project_id: str):
         update_project_status(project_id, "failed")
     finally:
         session.close()
-
 
 def run_atn_score_task(project_id: str):
     """Calcule un score ATN (Alliance Thérapeutique Numérique) simple à partir du JSON extrait."""
@@ -659,9 +652,9 @@ def run_atn_score_task(project_id: str):
             FROM extractions
             WHERE project_id = :pid AND extracted_data IS NOT NULL
         """), {"pid": project_id}).mappings().all()
-
         if not rows:
             update_project_status(project_id, "failed")
+            send_project_notification(project_id, 'analysis_failed', "Aucune donnée d'extraction disponible pour le calcul du score ATN.")
             return
 
         scores = []
@@ -682,7 +675,13 @@ def run_atn_score_task(project_id: str):
             except Exception:
                 continue
 
-        mean_atn = float(np.mean([s['atn_score'] for s in scores])) if scores else 0.0
+        # Aucun score calculable
+        if not scores:
+            update_project_status(project_id, "failed")
+            send_project_notification(project_id, 'analysis_failed', "Aucun score ATN calculable à partir des données extraites.")
+            return
+
+        mean_atn = float(np.mean([s['atn_score'] for s in scores]))
         analysis_result = {
             "atn_scores": scores,
             "mean_atn": mean_atn,
@@ -693,23 +692,24 @@ def run_atn_score_task(project_id: str):
         pdir.mkdir(exist_ok=True)
         plot_path = str(pdir / 'atn_scores.png')
 
-        if scores:
-            fig, ax = plt.subplots(figsize=(10, 6))
-            atn_values = [s['atn_score'] for s in scores]
-            ax.hist(atn_values, bins=11, range=(-0.5, 10.5), alpha=0.7, color='green', edgecolor='black')
-            ax.set_xlabel('Score ATN')
-            ax.set_ylabel('Nombre d\'Articles')
-            ax.set_title('Distribution des Scores ATN')
-            ax.set_xticks(range(0, 11))
-            plt.savefig(plot_path, bbox_inches='tight')
-            plt.close(fig)
+        # Génération du plot uniquement si des scores existent (déjà garanti ci-dessus)
+        fig, ax = plt.subplots(figsize=(10, 6))
+        atn_values = [s['atn_score'] for s in scores]
+        ax.hist(atn_values, bins=11, range=(-0.5, 10.5), alpha=0.7, color='green', edgecolor='black')
+        ax.set_xlabel('Score ATN')
+        ax.set_ylabel("Nombre d'Articles")
+        ax.set_title('Distribution des Scores ATN')
+        ax.set_xticks(range(0, 11))
+        plt.savefig(plot_path, bbox_inches='tight')
+        plt.close(fig)
 
-        update_project_status(project_id, "completed", analysis_result=analysis_result,
-                              analysis_plot_path=plot_path if scores else None)
+        update_project_status(project_id, "completed", analysis_result=analysis_result, analysis_plot_path=plot_path)
         send_project_notification(project_id, 'analysis_completed', 'Score ATN calculé.')
     except Exception as e:
         logger.error(f"Erreur run_atn_score_task: {e}", exc_info=True)
         update_project_status(project_id, "failed")
+        # Option UX minimale: notifier l'échec inattendu aussi
+        send_project_notification(project_id, 'analysis_failed', f"Erreur inattendue lors du calcul du score ATN: {e}")
     finally:
         session.close()
 
