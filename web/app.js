@@ -56,19 +56,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function attachValidationFileInputListener() {
     const validationFileInput = document.getElementById('validationFileInput');
-    if (!validationFileInput) {
-        return; // L'élément n'est pas (encore) dans le DOM.
-    }
+    if (!validationFileInput) return;
 
-    // Technique robuste : remplacer l'élément par un clone pour nettoyer
-    // les anciens écouteurs et éviter les déclenchements multiples.
+    // Remplacer l'élément par un clone pour purger les anciens écouteurs
     const newValidationFileInput = validationFileInput.cloneNode(true);
     validationFileInput.parentNode.replaceChild(newValidationFileInput, validationFileInput);
 
-    // Attacher l'écouteur au nouvel élément cloné
     newValidationFileInput.addEventListener('change', (e) => {
-        // CORRECTION CRITIQUE : Il faut passer le premier fichier (e.target.files[0]),
-        // pas la liste de fichiers complète.
         if (e.target.files.length > 0 && appState.currentProject) {
             handleImportValidations(e.target.files[0], appState.currentProject.id);
         }
@@ -81,6 +75,7 @@ async function initializeApplication() {
         initializeWebSocket();
         await loadInitialData();
         showSection('projects');
+		attachValidationFileInputListener();
         console.log('✅ Application initialisée avec succès');
     } catch (error) {
         console.error('❌ Erreur initialisation application:', error);
@@ -196,10 +191,9 @@ function setupEventListeners() {
 				fileInput.remove(); // Nettoyage après usage
 			},
 			'export-validations': () => handleExportValidations(appState.currentProject?.id),
-			'import-validations': () => document.getElementById('validationFileInput')?.click(),
-			'calculate-kappa': () => handleCalculateKappa(appState.currentProject?.id),
-		};
-
+            'import-validations': () => document.getElementById('validationFileInput')?.click(),
+            'calculate-kappa': () => handleCalculateKappa(appState.currentProject?.id),
+        };
         if (actions[action]) {
             e.preventDefault();
             actions[action]();
@@ -323,6 +317,7 @@ function handleWebSocketNotification(data) {
             } else {
                 loadProjects();
             }
+			break;
 		case 'kappa_calculated':
 			showToast('Calcul du Kappa terminé !', 'success');
 			if (project_id === appState.currentProject?.id) {
@@ -483,9 +478,8 @@ async function selectProject(projectId, isRefresh = false) {
     } finally {
         if (!isRefresh) showLoadingOverlay(false);
     }
+	attachValidationFileInputListener();
 }
-
-// Dans app.js, remplacez la fonction renderProjectDetail
 
 function renderProjectDetail() {
     const project = appState.currentProject;
@@ -2606,48 +2600,53 @@ async function handleDeleteSelectedArticles() {
 }
 
 async function handleExportValidations(projectId) {
-  if (!projectId) return;
-  window.location.href = `/api/projects/${projectId}/export-validations`;
+    if (!projectId) return;
+    window.location.href = `/api/projects/${projectId}/export-validations`;
 }
 
 async function handleImportValidations(file, projectId) {
-  if (!file || !projectId) return;
-  const formData = new FormData();
-  formData.append('file', file);
-  showLoadingOverlay(true, 'Importation des validations...');
-  try {
-    const result = await fetchAPI(`/projects/${projectId}/import-validations`, { method: 'POST', body: formData });
-    showToast(result.message, 'success');
-    await selectProject(projectId, true); // Rafraîchir
-  } catch (error) {
-    showToast(`Erreur d'importation : ${error.message}`, 'error');
-  } finally {
-    showLoadingOverlay(false);
-    const input = document.getElementById('validationFileInput');
-    if (input) input.value = '';
-  }
+    if (!file || !projectId) return;
+    const formData = new FormData();
+    formData.append('file', file);
+
+    showLoadingOverlay(true, 'Importation des validations...');
+    try {
+        const result = await fetchAPI(`/projects/${projectId}/import-validations`, {
+            method: 'POST',
+            body: formData
+        });
+        showToast(result.message, 'success');
+        await selectProject(projectId, true); // Rafraîchir
+    } catch (error) {
+        showToast(`Erreur d'importation : ${error.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+        const input = document.getElementById('validationFileInput');
+        if (input) input.value = '';
+    }
 }
 
 async function handleCalculateKappa(projectId) {
-  if (!projectId) return;
-  showLoadingOverlay(true, 'Lancement du calcul du Kappa...');
-  try {
-    const result = await fetchAPI(`/projects/${projectId}/calculate-kappa`, { method: 'POST' });
-    showToast(result.message, 'info');
-  } catch (error) {
-    showToast(`Erreur : ${error.message}`, 'error');
-  } finally {
-    showLoadingOverlay(false);
-  }
+    if (!projectId) return;
+    showLoadingOverlay(true, 'Lancement du calcul du Kappa...');
+    try {
+        const result = await fetchAPI(`/projects/${projectId}/calculate-kappa`, { method: 'POST' });
+        showToast(result.message, 'info');
+    } catch (error) {
+        showToast(`Erreur : ${error.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
 }
 
 function displayKappaResult(resultText) {
-  const display = document.getElementById('kappaResultDisplay');
-  if (display) {
-    display.textContent = resultText || 'Résultat du Kappa non disponible.';
-    display.classList.remove('hidden');
-  }
+    const display = document.getElementById('kappaResultDisplay');
+    if (display) {
+        display.textContent = resultText || 'Résultat du Kappa non disponible.';
+        display.classList.remove('hidden');
+    }
 }
+
 // ================================================================
 // ===== 12. INITIALISATION FINALE
 // ================================================================

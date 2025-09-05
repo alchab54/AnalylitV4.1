@@ -56,3 +56,4 @@ lxml==5.2.2
 
 psycopg2-binary
 SQLAlchemy
+langchain-text-splitters
