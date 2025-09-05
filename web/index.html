@@ -86,8 +86,25 @@
 
     <section id="validationSection" class="section">
       <div id="validationContainer" class="container--narrow validation-placeholder">Interface de validation en cours de développement.</div>
+	  <div class="validation-actions card">
+		<h4>Actions de Double Codage</h4>
+		<p>Exportez vos décisions pour un pair, importez les siennes, puis calculez la fiabilité de l'accord.</p>
+		<div class="button-group">
+			<button class="btn btn--secondary" data-action="export-validations">
+				<i class="fas fa-file-export"></i> Exporter mes validations (CSV)
+			</button>
+			<button class="btn btn--secondary" data-action="import-validations">
+				<i class="fas fa-file-import"></i> Importer validations d'un pair (CSV)
+			</button>
+			<input type="file" id="validationFileInput" class="hidden" accept=".csv">
+			<button class="btn btn--primary" data-action="calculate-kappa">
+				<i class="fas fa-calculator"></i> Calculer le Kappa
+			</button>
+		</div>
+		<div id="kappaResultDisplay" class="kappa-result-display hidden"></div>
+	  </div>
     </section>
-
+	
     <section id="analysisSection" class="section">
       <div class="section-header">
         <div class="section-header__content">

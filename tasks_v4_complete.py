@@ -34,6 +34,9 @@ import xml.etree.ElementTree as ET
 import arxiv
 import crossref_commons.retrieval as cr
 import os
+from sklearn.metrics import cohen_kappa_score
+from sqlalchemy import text
+
 
 # Configuration
 config = get_config()
@@ -1843,3 +1846,44 @@ def import_from_zotero_file_task(project_id, zotero_json_data):
         'zotero_import_completed',
         f'Import Fichier Zotero terminé: {successful_imports}/{len(zotero_json_data)} PDF importés'
     )
+
+def calculate_kappa_task(project_id: str):
+    session = Session()  # Cohérence avec les autres tâches
+    try:
+        logger.info(f"Démarrage du calcul du Kappa pour le projet {project_id}")
+        rows = session.execute(text("""
+            SELECT validations
+            FROM extractions
+            WHERE project_id = :pid AND validations IS NOT NULL
+        """), {"pid": project_id}).mappings().all()
+
+        r1, r2 = [], []
+        for r in rows:
+            try:
+                v = json.loads(r["validations"])
+                # snake_case homogène
+                if "evaluator_1" in v and "evaluator_2" in v:
+                    r1.append(v["evaluator_1"])
+                    r2.append(v["evaluator_2"])
+            except (json.JSONDecodeError, TypeError):
+                continue
+
+        if len(r1) < 5:
+            result_text = f"Pas assez de données communes ({len(r1)}) pour un calcul de Kappa fiable."
+        else:
+            kappa = cohen_kappa_score(r1, r2)
+            result_text = f"Coefficient Kappa de Cohen : {kappa:.3f} (basé sur {len(r1)} articles)"
+
+        session.execute(text("""
+            UPDATE projects SET inter_rater_reliability = :kappa WHERE id = :id
+        """), {"kappa": result_text, "id": project_id})
+        session.commit()
+
+        send_project_notification(project_id, 'kappa_calculated', result_text)
+        logger.info(f"Calcul du Kappa terminé pour {project_id}: {result_text}")
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Erreur dans calculate_kappa_task pour {project_id}: {e}")
+        send_project_notification(project_id, 'error', f"Erreur lors du calcul du Kappa: {e}")
+    finally:
+        session.close()

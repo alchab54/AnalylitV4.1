@@ -54,6 +54,27 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeApplication();
 });
 
+function attachValidationFileInputListener() {
+    const validationFileInput = document.getElementById('validationFileInput');
+    if (!validationFileInput) {
+        return; // L'élément n'est pas (encore) dans le DOM.
+    }
+
+    // Technique robuste : remplacer l'élément par un clone pour nettoyer
+    // les anciens écouteurs et éviter les déclenchements multiples.
+    const newValidationFileInput = validationFileInput.cloneNode(true);
+    validationFileInput.parentNode.replaceChild(newValidationFileInput, validationFileInput);
+
+    // Attacher l'écouteur au nouvel élément cloné
+    newValidationFileInput.addEventListener('change', (e) => {
+        // CORRECTION CRITIQUE : Il faut passer le premier fichier (e.target.files[0]),
+        // pas la liste de fichiers complète.
+        if (e.target.files.length > 0 && appState.currentProject) {
+            handleImportValidations(e.target.files[0], appState.currentProject.id);
+        }
+    });
+}
+
 async function initializeApplication() {
     showLoadingOverlay(true, 'Initialisation...');
     try {
@@ -67,6 +88,7 @@ async function initializeApplication() {
     } finally {
         showLoadingOverlay(false);
     }
+	attachValidationFileInputListener();
 }
 
 function setupEventListeners() {
@@ -173,6 +195,9 @@ function setupEventListeners() {
 				fileInput.click();
 				fileInput.remove(); // Nettoyage après usage
 			},
+			'export-validations': () => handleExportValidations(appState.currentProject?.id),
+			'import-validations': () => document.getElementById('validationFileInput')?.click(),
+			'calculate-kappa': () => handleCalculateKappa(appState.currentProject?.id),
 		};
 
         if (actions[action]) {
@@ -298,6 +323,13 @@ function handleWebSocketNotification(data) {
             } else {
                 loadProjects();
             }
+		case 'kappa_calculated':
+			showToast('Calcul du Kappa terminé !', 'success');
+			if (project_id === appState.currentProject?.id) {
+				if (data.message) {
+					displayKappaResult(data.message);
+				}
+			}
             break;
     }
 }
@@ -2573,6 +2605,49 @@ async function handleDeleteSelectedArticles() {
     }
 }
 
+async function handleExportValidations(projectId) {
+  if (!projectId) return;
+  window.location.href = `/api/projects/${projectId}/export-validations`;
+}
+
+async function handleImportValidations(file, projectId) {
+  if (!file || !projectId) return;
+  const formData = new FormData();
+  formData.append('file', file);
+  showLoadingOverlay(true, 'Importation des validations...');
+  try {
+    const result = await fetchAPI(`/projects/${projectId}/import-validations`, { method: 'POST', body: formData });
+    showToast(result.message, 'success');
+    await selectProject(projectId, true); // Rafraîchir
+  } catch (error) {
+    showToast(`Erreur d'importation : ${error.message}`, 'error');
+  } finally {
+    showLoadingOverlay(false);
+    const input = document.getElementById('validationFileInput');
+    if (input) input.value = '';
+  }
+}
+
+async function handleCalculateKappa(projectId) {
+  if (!projectId) return;
+  showLoadingOverlay(true, 'Lancement du calcul du Kappa...');
+  try {
+    const result = await fetchAPI(`/projects/${projectId}/calculate-kappa`, { method: 'POST' });
+    showToast(result.message, 'info');
+  } catch (error) {
+    showToast(`Erreur : ${error.message}`, 'error');
+  } finally {
+    showLoadingOverlay(false);
+  }
+}
+
+function displayKappaResult(resultText) {
+  const display = document.getElementById('kappaResultDisplay');
+  if (display) {
+    display.textContent = resultText || 'Résultat du Kappa non disponible.';
+    display.classList.remove('hidden');
+  }
+}
 // ================================================================
 // ===== 12. INITIALISATION FINALE
 // ================================================================

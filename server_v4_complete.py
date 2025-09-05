@@ -37,6 +37,7 @@ from tasks_v4_complete import (
     sanitize_filename,
     import_from_zotero_file_task
 )
+from sqlalchemy import text
 
 # Configuration
 config = get_config()
@@ -70,14 +71,15 @@ PROJECTS_DIR = config.PROJECTS_DIR
 DATABASE_FILE = PROJECTS_DIR / "database.db"
 
 def init_db():
-    """Initialise la base de données avec toutes les tables nécessaires."""
-    with sqlite3.connect(DATABASE_FILE) as conn:
-        c = conn.cursor()
-        c.execute("PRAGMA journal_mode=WAL;")
-        
-        # --- DÉBUT DE LA CORRECTION ---
-        # Table des projets (avec les colonnes manquantes ajoutées)
-        c.execute("""
+    """Initialise ou met à jour le schéma de la base de données PostgreSQL."""
+    # Utilisation de l'objet 'engine' déjà initialisé dans le module
+    with engine.connect() as conn:
+        trans = conn.begin()
+        try:
+            # =======================
+            # Création des tables
+            # =======================
+            conn.execute(text("""
             CREATE TABLE IF NOT EXISTS projects (
                 id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
@@ -96,15 +98,14 @@ def init_db():
                 analysis_plot_path TEXT,
                 pmids_count INTEGER DEFAULT 0,
                 processed_count INTEGER DEFAULT 0,
-                total_processing_time REAL DEFAULT 0,
+                total_processing_time DOUBLE PRECISION DEFAULT 0,
                 indexed_at TEXT,
-                search_query TEXT,         -- Ajouté
-                databases_used TEXT        -- Ajouté
+                search_query TEXT,
+                databases_used TEXT
             )
-        """)
-        
-        # Table des résultats de recherche multi-bases
-        c.execute("""
+            """))
+
+            conn.execute(text("""
             CREATE TABLE IF NOT EXISTS search_results (
                 id TEXT PRIMARY KEY,
                 project_id TEXT NOT NULL,
@@ -120,63 +121,58 @@ def init_db():
                 created_at TEXT,
                 FOREIGN KEY (project_id) REFERENCES projects(id)
             )
-        """)
-        
-        # Table des extractions
-        c.execute("""
+            """))
+
+            conn.execute(text("""
             CREATE TABLE IF NOT EXISTS extractions (
                 id TEXT PRIMARY KEY,
                 project_id TEXT,
                 pmid TEXT,
                 title TEXT,
-                validation_score REAL,
+                validation_score DOUBLE PRECISION,
                 created_at TEXT,
                 extracted_data TEXT,
-                relevance_score REAL DEFAULT 0,
+                relevance_score DOUBLE PRECISION DEFAULT 0,
                 relevance_justification TEXT,
                 user_validation_status TEXT,
                 analysis_source TEXT,
                 FOREIGN KEY (project_id) REFERENCES projects(id)
             )
-        """)
-        
-        # Table des logs de traitement
-        c.execute("""
+            """))
+
+            conn.execute(text("""
             CREATE TABLE IF NOT EXISTS processing_log (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 project_id TEXT,
                 pmid TEXT,
                 status TEXT,
                 details TEXT,
-                timestamp TEXT,
+                "timestamp" TIMESTAMP,
                 FOREIGN KEY (project_id) REFERENCES projects(id)
             )
-        """)
-        
-        # Table des profils d'analyse
-        c.execute("""
+            """))
+
+            conn.execute(text("""
             CREATE TABLE IF NOT EXISTS analysis_profiles (
                 id TEXT PRIMARY KEY,
                 name TEXT NOT NULL UNIQUE,
-                is_custom BOOLEAN DEFAULT 1,
+                is_custom BOOLEAN DEFAULT TRUE,
                 preprocess_model TEXT NOT NULL,
                 extract_model TEXT NOT NULL,
                 synthesis_model TEXT NOT NULL
             )
-        """)
-        
-        # Table des prompts
-        c.execute("""
+            """))
+
+            conn.execute(text("""
             CREATE TABLE IF NOT EXISTS prompts (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 name TEXT NOT NULL UNIQUE,
                 description TEXT,
                 template TEXT NOT NULL
             )
-        """)
-        
-        # Table des grilles d'extraction
-        c.execute("""
+            """))
+
+            conn.execute(text("""
             CREATE TABLE IF NOT EXISTS extraction_grids (
                 id TEXT PRIMARY KEY,
                 project_id TEXT NOT NULL,
@@ -185,10 +181,9 @@ def init_db():
                 created_at TEXT,
                 FOREIGN KEY (project_id) REFERENCES projects(id)
             )
-        """)
-        
-        # Table des messages de chat
-        c.execute("""
+            """))
+
+            conn.execute(text("""
             CREATE TABLE IF NOT EXISTS chat_messages (
                 id TEXT PRIMARY KEY,
                 project_id TEXT NOT NULL,
@@ -198,75 +193,130 @@ def init_db():
                 timestamp TEXT,
                 FOREIGN KEY (project_id) REFERENCES projects(id)
             )
-        """)
-        
-        # Insérer les profils par défaut
-        if c.execute("SELECT COUNT(*) FROM analysis_profiles").fetchone()[0] == 0:
-            default_profiles = [
-                ('fast', 'Rapide', 0, 'gemma:2b', 'phi3:mini', 'llama3.1:8b'),
-                ('standard', 'Standard', 0, 'phi3:mini', 'llama3.1:8b', 'llama3.1:8b'),
-                ('deep', 'Approfondi', 0, 'llama3.1:8b', 'mixtral:8x7b', 'llama3.1:70b')
-            ]
-            c.executemany("INSERT INTO analysis_profiles VALUES (?, ?, ?, ?, ?, ?)", default_profiles)
-            logger.info("✅ Profils par défaut insérés.")
-        
-            # Insérer les prompts par défaut
-            if c.execute("SELECT COUNT(*) FROM prompts").fetchone()[0] == 0:
+            """))
+
+            # =======================
+            # Migration non destructive
+            # =======================
+            # Ajout colonne inter_rater_reliability (projects)
+            conn.execute(text("""
+            ALTER TABLE projects
+            ADD COLUMN IF NOT EXISTS inter_rater_reliability TEXT
+            """))
+
+            # Ajout colonne validations (extractions)
+            conn.execute(text("""
+            ALTER TABLE extractions
+            ADD COLUMN IF NOT EXISTS validations TEXT
+            """))
+
+            # =======================
+            # Données par défaut (seeding)
+            # =======================
+
+            # Seeding des profils (analysis_profiles)
+            count_profiles = conn.execute(text("SELECT COUNT(*) FROM analysis_profiles")).scalar_one()
+            if count_profiles == 0:
+                default_profiles = [
+                    {
+                        "id": "fast",
+                        "name": "Rapide",
+                        "is_custom": False,
+                        "preprocess_model": "gemma:2b",
+                        "extract_model": "phi3:mini",
+                        "synthesis_model": "llama3.1:8b",
+                    },
+                    {
+                        "id": "standard",
+                        "name": "Standard",
+                        "is_custom": False,
+                        "preprocess_model": "phi3:mini",
+                        "extract_model": "llama3.1:8b",
+                        "synthesis_model": "llama3.1:8b",
+                    },
+                    {
+                        "id": "deep",
+                        "name": "Approfondi",
+                        "is_custom": False,
+                        "preprocess_model": "llama3.1:8b",
+                        "extract_model": "mixtral:8x7b",
+                        "synthesis_model": "llama3.1:70b",
+                    },
+                ]
+                stmt_profiles = text("""
+                    INSERT INTO analysis_profiles (id, name, is_custom, preprocess_model, extract_model, synthesis_model)
+                    VALUES (:id, :name, :is_custom, :preprocess_model, :extract_model, :synthesis_model)
+                """)
+                for p in default_profiles:
+                    conn.execute(stmt_profiles, p)
+
+            # Seeding des prompts (prompts)
+            count_prompts = conn.execute(text("SELECT COUNT(*) FROM prompts")).scalar_one()
+            if count_prompts == 0:
                 default_prompts = [
-                    ('screening_prompt', 'Prompt pour la pré-sélection des articles.',
-                     """En tant qu'assistant de recherche spécialisé, analysez cet article et déterminez sa pertinence pour une revue systématique.
+                    {
+                        "name": "screening_prompt",
+                        "description": "Prompt pour la pré-sélection des articles.",
+                        "template": (
+                            "En tant qu'assistant de recherche spécialisé, analysez cet article et déterminez sa pertinence pour une revue systématique.\n\n"
+                            "Titre: {title}\n\n"
+                            "Résumé: {abstract}\n\n"
+                            "Source: {database_source}\n\n"
+                            "Veuillez évaluer la pertinence de cet article sur une échelle de 1 à 10 et fournir une justification concise.\n\n"
+                            "Répondez UNIQUEMENT avec un objet JSON contenant :\n"
+                            "- \"relevance_score\": score numérique de 0 à 10\n"
+                            "- \"decision\": \"À inclure\" si score >= 7, sinon \"À exclure\"\n"
+                            "- \"justification\": phrase courte (max 30 mots) expliquant le score"
+                        ),
+                    },
+                    {
+                        "name": "full_extraction_prompt",
+                        "description": "Prompt pour l'extraction détaillée (grille).",
+                        "template": (
+                            "ROLE: Vous êtes un assistant expert en analyse de littérature scientifique, spécialisé dans l'extraction de données structurées.\n\n"
+                            "TÂCHE: Analysez le texte fourni et extrayez les informations demandées en respectant SCRUPULEUSEMENT le format JSON qui vous sera fourni.\n\n"
+                            "INSTRUCTIONS IMPORTANTES:\n"
+                            "1. Répondez **UNIQUEMENT** avec un objet JSON valide. N'ajoutez aucun texte, commentaire ou explication avant ou après le JSON.\n"
+                            "2. Assurez-vous que chaque paire clé-valeur est séparée par une virgule, sauf la dernière.\n"
+                            "3. Échappez correctement les guillemets doubles (\") à l'intérieur des chaînes de caractères avec un antislash (\\).\n"
+                            "4. Si une information n'est pas présente dans le texte, utilisez une chaîne de caractères vide (\"\") comme valeur. Ne laissez pas de champ vide ou avec \"...\".\n\n"
+                            "TEXTE À ANALYSER:\n---\n{text}\n---\n\n"
+                            "SOURCE: {database_source}\n"
+                        ),
+                    },
+                    {
+                        "name": "synthesis_prompt",
+                        "description": "Prompt pour la synthèse des résultats.",
+                        "template": (
+                            "En tant que chercheur expert, analyse les résumés d'articles suivants fournis pour une revue de littérature. "
+                            "Ton objectif est de produire une synthèse structurée et critique au format JSON.\n\n"
+                            "**CONTEXTE DE LA REVUE :** {project_description}\n\n"
+                            "**RÉSUMÉS À ANALYSER :**\n\n---\n\n{data_for_prompt}\n\n---\n\n"
+                            "**INSTRUCTIONS :**\n\n"
+                            "Réponds **UNIQUEMENT** avec un objet JSON valide contenant les clés suivantes :\n"
+                            "- \"relevance_evaluation\"\n"
+                            "- \"main_themes\"\n"
+                            "- \"key_findings\"\n"
+                            "- \"methodologies_used\"\n"
+                            "- \"synthesis_summary\"\n"
+                            "- \"research_gaps\"\n"
+                        ),
+                    },
+                ]
+                stmt_prompts = text("""
+                    INSERT INTO prompts (name, description, template)
+                    VALUES (:name, :description, :template)
+                """)
+                for prompt in default_prompts:
+                    conn.execute(stmt_prompts, prompt)
 
-    Titre: {title}
-    Résumé: {abstract}
-    Source: {database_source}
 
-    Veuillez évaluer la pertinence de cet article sur une échelle de 1 à 10 et fournir une justification concise.
-
-    Répondez UNIQUEMENT avec un objet JSON contenant :
-    - "relevance_score": score numérique de 0 à 10
-    - "decision": "À inclure" si score >= 7, sinon "À exclure" 
-    - "justification": phrase courte (max 30 mots) expliquant le score"""),
-                    
-                    ('full_extraction_prompt', "Prompt pour l'extraction détaillée (grille).",
-                     """ROLE: Vous êtes un assistant expert en analyse de littérature scientifique, spécialisé dans l'extraction de données structurées.
-
-    TÂCHE: Analysez le texte fourni et extrayez les informations demandées en respectant SCRUPULEUSEMENT le format JSON qui vous sera fourni.
-
-    INSTRUCTIONS IMPORTANTES:
-    1. Répondez **UNIQUEMENT** avec un objet JSON valide. N'ajoutez aucun texte, commentaire ou explication avant ou après le JSON.
-    2. Assurez-vous que chaque paire clé-valeur est séparée par une virgule, sauf la dernière.
-    3. Échappez correctement les guillemets doubles (") à l'intérieur des chaînes de caractères avec un antislash (\\).
-    4. Si une information n'est pas présente dans le texte, utilisez une chaîne de caractères vide ("") comme valeur. Ne laissez pas de champ vide ou avec "...".
-
-    TEXTE À ANALYSER:
-    ---
-    {text}
-    ---
-    SOURCE: {database_source}
-    """),
-                
-                    ('synthesis_prompt', 'Prompt pour la synthèse des résultats.',
-                 """En tant que chercheur expert, analyse les résumés d'articles suivants fournis pour une revue de littérature. Ton objectif est de produire une synthèse structurée et critique au format JSON.
-
-**CONTEXTE DE LA REVUE :** {project_description}
-
-**RÉSUMÉS À ANALYSER :**
----
-{data_for_prompt}
----
-
-**INSTRUCTIONS :**
-Réponds **UNIQUEMENT** avec un objet JSON valide contenant les clés suivantes :
-- "relevance_evaluation": (String) Évalue si le corpus d'articles dans son ensemble semble pertinent pour répondre à la question de recherche initiale. Justifie brièvement.
-- "main_themes": (Array de Strings) Identifie les 3 à 5 thèmes principaux ou axes de recherche qui émergent du corpus.
-- "key_findings": (Array de Strings) Liste les résultats et conclusions les plus importants et récurrents.
-- "methodologies_used": (Array de Strings) Résume les types de méthodologies d'étude les plus courantes (ex: 'Essais contrôlés randomisés', 'Études de cohorte', 'Revues systématiques').
-- "synthesis_summary": (String) Rédige un paragraphe de synthèse global qui résume l'état de l'art basé sur ces articles, en incluant les convergences et les divergences notables.
-- "research_gaps": (Array de Strings) Identifie les lacunes dans la recherche ou les questions qui restent sans réponse.
-""")
-            ]
-            c.executemany("INSERT INTO prompts (name, description, template) VALUES (?, ?, ?)", default_prompts)
-            logger.info("✅ Prompts par défaut insérés.")
+            trans.commit()
+            logger.info("✅ Schéma DB initialisé/mis à jour (colonnes inter_rater_reliability et validations ajoutées).")
+        except Exception as e:
+            trans.rollback()
+            logger.error(f"❌ Erreur lors de l'initialisation/migration de la DB: {e}")
+            raise
 
 def get_project_by_id(project_id: str):
     """Récupère un projet par son ID."""
@@ -1615,7 +1665,127 @@ def delete_articles(project_id):
         'message': f'{len(article_ids)} article(s) supprimé(s) de la base de données.',
         'files_deleted': deleted_files
     }), 200
-    
+
+# --- Validation inter-évaluateurs ---
+
+@api_bp.route('/projects/<project_id>/export-validations', methods=['GET'])
+def export_validations(project_id):
+    session = Session()
+    try:
+        rows = session.execute(text("""
+            SELECT pmid, title, validations, relevance_score
+            FROM extractions
+            WHERE project_id = :pid AND validations IS NOT NULL
+        """), {"pid": project_id}).mappings().all()
+
+        records = []
+        for r in rows:
+            try:
+                v = json.loads(r["validations"])
+                # snake_case systématique
+                if "evaluator_1" in v:
+                    records.append({
+                        "article_id": r["pmid"],
+                        "title": r["title"],
+                        "decision": v["evaluator_1"],
+                        "ia_score": r["relevance_score"],
+                    })
+            except (json.JSONDecodeError, TypeError):
+                continue
+
+        if not records:
+            return jsonify({"message": "Aucune validation (évaluateur 1) à exporter."}), 404
+
+        df = pd.DataFrame(records)
+        csv_data = df.to_csv(index=False, encoding='utf-8')
+        return Response(
+            csv_data,
+            mimetype="text/csv",
+            headers={"Content-disposition": f"attachment; filename=validations_eval1_{project_id}.csv"}
+        )
+    except Exception as e:
+        logger.error(f"Erreur d'export validations: {e}")
+        return jsonify({"error": "Erreur interne du serveur"}), 500
+    finally:
+        session.close()
+
+
+@api_bp.route('/projects/<project_id>/import-validations', methods=['POST'])
+def import_validations(project_id):
+    if 'file' not in request.files:
+        return jsonify({"error": "Aucun fichier fourni"}), 400
+
+    file = request.files['file']
+    session = Session()
+    try:
+        df = pd.read_csv(file.stream)
+        # colonnes minimales attendues
+        normalized = {c.strip().lower() for c in df.columns}
+        required = {"article_id", "decision"}
+        if not required.issubset(normalized):
+            return jsonify({"error": f"Le fichier CSV doit contenir les colonnes {sorted(required)}"}), 400
+
+        updated = 0
+        for _, row in df.iterrows():
+            article_id = str(row.get('article_id', '')).strip()
+            decision = str(row.get('decision', '')).strip().lower()
+            if not article_id or decision not in ("include", "exclude"):
+                continue
+
+            ext = session.execute(text("""
+                SELECT id, validations
+                FROM extractions
+                WHERE project_id = :pid AND pmid = :pmid
+            """), {"pid": project_id, "pmid": article_id}).mappings().fetchone()
+            if not ext:
+                continue
+
+            v = {}
+            try:
+                v = json.loads(ext["validations"] or '{}')
+            except (json.JSONDecodeError, TypeError):
+                v = {}
+
+            # snake_case cohérent
+            v["evaluator_2"] = decision
+
+            session.execute(text("""
+                UPDATE extractions SET validations = :val WHERE id = :id
+            """), {"val": json.dumps(v), "id": ext["id"]})
+            updated += 1
+
+        session.commit()
+        return jsonify({"message": f"{updated} validations importées pour l'évaluateur 2."}), 200
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Erreur import validations: {e}")
+        return jsonify({"error": "Erreur interne ou format de fichier invalide"}), 500
+    finally:
+        session.close()
+
+
+@api_bp.route('/projects/<project_id>/calculate-kappa', methods=['POST'])
+def calculate_kappa(project_id):
+    from tasks_v4_complete import calculate_kappa_task
+    job = analysis_queue.enqueue(calculate_kappa_task, project_id=project_id)
+    return jsonify({"message": "Calcul du Kappa lancé.", "job_id": job.id}), 202
+
+
+@api_bp.route('/projects/<project_id>/inter-rater-stats', methods=['GET'])
+def get_inter_rater_stats(project_id):
+    session = Session()
+    try:
+        row = session.execute(text("""
+            SELECT inter_rater_reliability
+            FROM projects WHERE id = :pid
+        """), {"pid": project_id}).mappings().fetchone()
+        return jsonify({"kappa_result": row["inter_rater_reliability"] if row else "Non calculé"})
+    except Exception as e:
+        logger.error(f"Erreur inter-rater stats: {e}")
+        return jsonify({"error": "Erreur interne du serveur"}), 500
+    finally:
+        session.close()
+
 # Enregistrement du blueprint et routes statiques
 app.register_blueprint(api_bp)
 
