@@ -612,37 +612,24 @@ def update_project_status(project_id: str, status: str, result: dict = None, dis
         
         conn.commit()
 
-def update_project_timing(project_id: str, duration: float):
-    """Met à jour le temps de traitement total d'un projet."""
-    try:
-        with sqlite3.connect(DATABASE_FILE, timeout=30.0) as conn:
-            conn.execute("UPDATE projects SET total_processing_time = total_processing_time + ? WHERE id = ?",
-                        (duration, project_id))
-            conn.commit()
-    
-    except sqlite3.Error as e:
-        print(f"❌ ERREUR DATABASE (timing) pour {project_id}: {e}")
+def log_processing_status(session, project_id: str, article_id: str, status: str, details: str):
+    """Enregistre un événement de traitement dans les logs EN UTILISANT LA SESSION FOURNIE."""
+    session.execute(text("""
+        INSERT INTO processing_log (project_id, pmid, status, details, "timestamp")
+        VALUES (:project_id, :pmid, :status, :details, :timestamp)
+    """), {
+        'project_id': project_id, 'pmid': article_id, 'status': status,
+        'details': details, 'timestamp': datetime.now()
+    })
 
-def log_processing_status(project_id: str, article_id: str, status: str, details: str):
-    """Enregistre un événement de traitement dans les logs."""
-    try:
-        with sqlite3.connect(DATABASE_FILE, timeout=30.0) as conn:
-            conn.execute("INSERT INTO processing_log (project_id, pmid, status, details, timestamp) VALUES (?, ?, ?, ?, ?)",
-                        (project_id, article_id, status, details, datetime.now().isoformat()))
-            conn.commit()
-    
-    except sqlite3.Error as e:
-        print(f"❌ ERREUR DATABASE (log) pour {article_id}: {e}")
+def increment_processed_count(session, project_id: str):
+    """Incrémente le compteur d'articles traités EN UTILISANT LA SESSION FOURNIE."""
+    session.execute(text("UPDATE projects SET processed_count = processed_count + 1 WHERE id = :id"), {'id': project_id})
 
-def increment_processed_count(project_id: str):
-    """Incrémente le compteur d'articles traités."""
-    try:
-        with sqlite3.connect(DATABASE_FILE, timeout=30.0) as conn:
-            conn.execute("UPDATE projects SET processed_count = processed_count + 1 WHERE id = ?", (project_id,))
-            conn.commit()
-    
-    except sqlite3.Error as e:
-        print(f"❌ ERREUR DATABASE (increment) pour {project_id}: {e}")
+def update_project_timing(session, project_id: str, duration: float):
+    """Met à jour le temps de traitement total EN UTILISANT LA SESSION FOURNIE."""
+    session.execute(text("UPDATE projects SET total_processing_time = total_processing_time + :duration WHERE id = :id"),
+                    {'duration': duration, 'id': project_id})
 
 def call_ollama_api(prompt: str, model: str, output_format: str = "", retries: int = 3) -> any:
     """Appelle l'API Ollama avec gestion des erreurs et retry."""
@@ -937,87 +924,97 @@ def process_single_article_task(
     analysis_mode: str,
     custom_grid_id: str = None
 ):
-    """
-    Traite un article en priorisant le contenu du PDF pour l'analyse.
-    Enregistre la source utilisée (PDF ou Résumé).
-    """
+    """Tâche complète et corrigée pour traiter un seul article avec une transaction atomique."""
     start_time = time.time()
+    session = Session() # Session créée UNE SEULE FOIS au début
     try:
-        with sqlite3.connect(DATABASE_FILE, timeout=30.0) as conn:
-            conn.row_factory = sqlite3.Row
-            article_data_row = conn.execute(
-                "SELECT * FROM search_results WHERE project_id = ? AND article_id = ?",
-                (project_id, article_id)
-            ).fetchone()
+        # Récupérer les données de l'article
+        article_data_row = session.execute(text("""
+            SELECT * FROM search_results WHERE project_id = :project_id AND article_id = :article_id
+        """), {'project_id': project_id, 'article_id': article_id}).fetchone()
 
         if not article_data_row:
-            log_processing_status(project_id, article_id, "erreur", "Article non trouvé dans la base de données.")
+            log_processing_status(session, project_id, article_id, "erreur", "Article non trouvé dans la base de données.")
+            session.commit()
             return
 
-        article_data = dict(article_data_row)
+        article_data = dict(article_data_row._mapping)
         
-        # --- NOUVELLE LOGIQUE : CHOIX DE LA SOURCE DU TEXTE ---
+        # Logique de choix de la source (PDF ou résumé)
         text_for_analysis = ""
-        analysis_source = "abstract" # Par défaut
-        
-        pdf_path = PROJECTS_DIR / project_id / (sanitize_filename(article_id) + ".pdf")
+        analysis_source = "abstract"
+        sanitized_id = sanitize_filename(article_id)
+        pdf_path = PROJECTS_DIR / project_id / f"{sanitized_id}.pdf"
         
         if pdf_path.exists():
-            print(f"📄 PDF trouvé pour {article_id}. Utilisation du texte intégral.")
             pdf_text = extract_text_from_pdf(str(pdf_path))
             if pdf_text and len(pdf_text) > 100:
                 text_for_analysis = pdf_text
                 analysis_source = "pdf"
         
-        # Si le PDF n'a pas été utilisé, on se rabat sur le résumé
         if not text_for_analysis:
-            print(f"📑 PDF non trouvé ou vide pour {article_id}. Utilisation du résumé.")
             text_for_analysis = article_data.get("title", "") + "\n\n" + article_data.get("abstract", "")
 
         if len(text_for_analysis.strip()) < 50:
-            log_processing_status(project_id, article_id, "écarté", "Contenu textuel insuffisant pour l'analyse.")
+            log_processing_status(session, project_id, article_id, "écarté", "Contenu textuel insuffisant.")
+            session.commit()
             return
 
-        # --- DÉBUT DE L'ANALYSE (screening ou extraction) ---
+        # Logique d'analyse (screening ou extraction)
         if analysis_mode == "full_extraction":
-            prompt = get_full_extraction_prompt(
-                text_for_analysis,
-                article_data.get("database_source", "unknown"),
-                custom_grid_id
-            )
+            prompt = get_full_extraction_prompt(text_for_analysis, article_data.get("database_source", "unknown"), custom_grid_id)
             extracted = call_ollama_api(prompt, profile["extract_model"], output_format="json")
 
             if isinstance(extracted, dict) and extracted:
-                with sqlite3.connect(DATABASE_FILE, timeout=30.0) as conn:
-                    conn.execute("""
-                        INSERT INTO extractions (id, project_id, pmid, title, extracted_data, relevance_score, relevance_justification, analysis_source, created_at) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """, (str(uuid.uuid4()), project_id, article_id, article_data["title"], json.dumps(extracted), 10, "Extraction détaillée effectuée", analysis_source, datetime.now().isoformat()))
-                    conn.commit()
-                print(f"✅ Extraction ({analysis_source}) terminée pour {article_id}")
+                session.execute(text("""
+                    INSERT INTO extractions (id, project_id, pmid, title, extracted_data, relevance_score, relevance_justification, analysis_source, created_at)
+                    VALUES (:id, :project_id, :pmid, :title, :extracted_data, 10, 'Extraction détaillée effectuée', :analysis_source, :created_at)
+                """), {'id': str(uuid.uuid4()), 'project_id': project_id, 'pmid': article_id, 'title': article_data["title"], 
+                       'extracted_data': json.dumps(extracted), 'analysis_source': analysis_source, 'created_at': datetime.now()})
             else:
-                 log_processing_status(project_id, article_id, "écarté", "Réponse IA invalide pour l'extraction")
+                 log_processing_status(session, project_id, article_id, "écarté", "Réponse IA invalide pour l'extraction.")
         else: # Mode Screening
             prompt = get_screening_prompt(article_data["title"], article_data.get("abstract", ""), article_data.get("database_source", "unknown"))
             resp = call_ollama_api(prompt, profile["preprocess_model"], output_format="json")
             score = resp.get("relevance_score", 0) if isinstance(resp, dict) else 0
             justification = resp.get("justification", "N/A") if isinstance(resp, dict) else "Réponse IA invalide."
 
-            with sqlite3.connect(DATABASE_FILE, timeout=30.0) as conn:
-                conn.execute("""
-                    INSERT INTO extractions (id, project_id, pmid, title, relevance_score, relevance_justification, analysis_source, created_at) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """, (str(uuid.uuid4()), project_id, article_id, article_data["title"], score, justification, analysis_source, datetime.now().isoformat()))
-                conn.commit()
-            print(f"▶️ Screening ({analysis_source}) terminé pour {article_id} (score {score})")
+            session.execute(text("""
+                INSERT INTO extractions (id, project_id, pmid, title, relevance_score, relevance_justification, analysis_source, created_at)
+                VALUES (:id, :project_id, :pmid, :title, :relevance_score, :relevance_justification, :analysis_source, :created_at)
+            """), {'id': str(uuid.uuid4()), 'project_id': project_id, 'pmid': article_id, 'title': article_data["title"], 
+                   'relevance_score': score, 'relevance_justification': justification, 
+                   'analysis_source': analysis_source, 'created_at': datetime.now()})
 
-        increment_processed_count(project_id)
-        update_project_timing(project_id, time.time() - start_time)
+        # Mises à jour atomiques
+        increment_processed_count(session, project_id)
+        update_project_timing(session, project_id, time.time() - start_time)
+        
+        session.commit() # UN SEUL commit pour toutes les opérations
+        
+        # Envoi de la notification APRÈS que les données soient bien en base
+        send_project_notification(
+            project_id,
+            'article_processed',
+            f'Article "{article_data["title"][:30]}..." traité.',
+            {'article_id': article_id}
+        )
 
     except Exception as e:
-        print(f"❌ Erreur critique dans le traitement de l'article {article_id}: {e}")
-        log_processing_status(project_id, article_id, "erreur", f"Exception: {str(e)}")
-
+        session.rollback() # Annule TOUT en cas d'erreur
+        error_message = f"Erreur critique dans le traitement de l'article {article_id}: {e}"
+        print(error_message)
+        # On logue l'erreur dans une nouvelle transaction pour garantir son enregistrement
+        log_session = Session()
+        try:
+            log_processing_status(log_session, project_id, article_id, "erreur", error_message)
+            log_session.commit()
+        except:
+            log_session.rollback()
+        finally:
+            log_session.close()
+    finally:
+        session.close() # Ferme la session à la toute fin
        
 def run_synthesis_task(project_id: str, profile: dict):
     """Génère une synthèse des articles pertinents d'un projet."""
