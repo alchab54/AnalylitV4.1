@@ -1,59 +1,50 @@
-# Core Flask
+#--- Framework Web ---
 Flask==2.3.3
 Flask-CORS==4.0.0
 Flask-SocketIO==5.3.6
-blinker>=1.7.0
-
-# Base de données et files d'attente - VERSIONS FIXES
-redis==5.0.1
-rq==1.15.1
-click>=8.0.0
-
-# Traitement de données
-pandas==2.1.1
-numpy==1.24.4
-matplotlib==3.7.2
-scipy==1.11.3
-
-# IA et NLP - VERSIONS COMPATIBLES
-sentence-transformers==2.3.1
-huggingface_hub==0.25.2
-langchain==0.0.325
-chromadb==0.4.15
-
-# Traitement PDF
-PyPDF2==3.0.1
-
-# API externes
-requests==2.31.0
-pyzotero==1.6.11
-arxiv==1.4.8
-crossref-commons==0.0.7
-
-# Serveur web
 gunicorn==21.2.0
 gevent==23.7.0
 python-socketio==5.9.0
 
-# Utilitaires
+#--- Base de Données & Tâches de Fond ---
+redis==5.0.1
+rq==1.15.1
+SQLAlchemy==2.0.43
+psycopg2-binary==2.9.10
+
+#--- Stack Scientifique & Analyse de Données (Versions Compatibles) ---
+numpy==1.26.4
+pandas==2.2.2
+scipy==1.13.0
+matplotlib==3.7.2
+statsmodels==0.14.1
+scikit-learn==1.4.2
+
+#--- IA & NLP ---
+sentence-transformers==2.3.1
+huggingface-hub==0.25.2
+langchain==0.0.325
+langchain-text-splitters==0.3.2
+chromadb==0.4.15
+transformers==4.35.2
+tokenizers==0.15.0
+torch
+
+#--- Utilitaires ---
+PyPDF2==3.0.1
+requests==2.31.0
+pyzotero==1.6.11
+arxiv==1.4.8
+crossref-commons==0.0.7
 python-dotenv==1.0.0
 Pillow==10.0.1
 beautifulsoup4==4.12.2
+lxml==5.2.2
+PyMuPDF==1.24.1
+pdfplumber==0.11.1
+blinker==1.7.0
 
-# Dépendances supplémentaires pour Python 3.11
+#--- Outils de Build ---
 setuptools>=65.0.0
 wheel>=0.38.0
 
-# Transformers compatibles
-transformers==4.35.2
-tokenizers==0.15.0
-
-scikit-learn
-PyMuPDF
-pdfplumber
-statsmodels
-lxml==5.2.2
-
-psycopg2-binary
-SQLAlchemy
-langchain-text-splitters
