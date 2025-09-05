@@ -918,15 +918,25 @@ def import_validations(project_id):
     session = Session()
     try:
         df = pd.read_csv(file.stream)
-        normalized = {str(c).strip().lower() for c in df.columns}
+        normalized_cols = {str(c).strip().lower() for c in df.columns}
         required = {"article_id", "decision"}
-        if not required.issubset(normalized):
+        if not required.issubset(normalized_cols):
             return jsonify({"error": f"Le fichier CSV doit contenir les colonnes {sorted(required)}"}), 400
+
+        # Ajout du mapping pour la robustesse (accepte le français)
+        decision_map = {
+            "inclu": "include",
+            "exclu": "exclude"
+        }
 
         updated = 0
         for _, row in df.iterrows():
             article_id = str(row.get('article_id', '')).strip()
-            decision = str(row.get('decision', '')).strip().lower()
+            decision_raw = str(row.get('decision', '')).strip().lower()
+            
+            # Normalisation de la décision
+            decision = decision_map.get(decision_raw, decision_raw)
+
             if not article_id or decision not in ("include", "exclude"):
                 continue
             ext = session.execute(text("""

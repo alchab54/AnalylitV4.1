@@ -36,6 +36,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Cette étape est cruciale pour que 'python -m pip' fonctionne de manière fiable
 RUN python -m pip install --upgrade pip setuptools wheel
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copie requirements.txt et installe les dépendances Python
 # Utilise --no-cache-dir pour s'assurer que les paquets sont toujours téléchargés
 # Utilise --ignore-installed --no-deps pour blinker afin de gérer le conflit avec les paquets système
