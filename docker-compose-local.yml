@@ -41,11 +41,11 @@ services:
       - ANALYLIT_VERSION=${ANALYLIT_VERSION:-4.1.0}
       - PYTHONPATH=/app
     command: >
-      sh -c "echo 'En attente de la base de données...' && sleep 5 && 
-             echo 'Initialisation de la base de données...' && python -c 'from server_v4_complete import init_db; init_db()' && 
-             echo 'Lancement du serveur Gunicorn...' &&
-             gunicorn --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker 
-                      --workers 1 --bind 0.0.0.0:5001 server_v4_complete:app"
+      sh -c "echo 'En attente de la base de données...' && sleep 5 &&
+      echo 'Initialisation de la base de données...' && python -c 'from server_v4_complete import init_db; init_db()' &&
+      echo 'Lancement du serveur Gunicorn...' &&
+      gunicorn server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"
+
     depends_on:
       db:
         condition: service_healthy

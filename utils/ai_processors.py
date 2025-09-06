@@ -1,23 +1,46 @@
-# utils/ai_processors.py - Processeurs IA et prompts
+# utils/ai_processors.py - Processeurs IA pour AnalyLit v4.1
+
+import json
 import logging
 import requests
-import json
-from typing import Dict, Any, Optional
+from typing import Any
+
+# Import de la configuration de manière sécurisée
+try:
+    from config_v4 import get_config
+    config = get_config()
+except ImportError:
+    # Fallback pour un contexte où le module config n'est pas dans le path
+    class FallbackConfig:
+        OLLAMA_BASE_URL = "http://localhost:11434"
+        REQUEST_TIMEOUT = 900
+    config = FallbackConfig()
 
 logger = logging.getLogger(__name__)
 
-def call_ollama_api(prompt: str, model: str, output_format: str = "text") -> Any:
-    """Appelle l'API Ollama avec le prompt donné."""
-    try:
-        from config_v4 import get_config
-        config = get_config()
+def call_ollama_api(prompt: str, model: str = "llama3.1:8b", output_format: str = "text") -> Any:
+    """
+    Appelle l'API Ollama avec le prompt fourni.
+    
+    Args:
+        prompt: Le prompt à envoyer au modèle.
+        model: Le nom du modèle Ollama à utiliser.
+        output_format: "text" ou "json" selon le format de réponse attendu.
         
+    Returns:
+        La réponse du modèle (str si text, dict si json).
+    """
+    try:
         url = f"{config.OLLAMA_BASE_URL}/api/generate"
         
         payload = {
             "model": model,
             "prompt": prompt,
-            "stream": False
+            "stream": False,
+            "options": {
+                "temperature": 0.5,
+                "top_p": 0.9,
+            }
         }
         
         if output_format == "json":
@@ -26,70 +49,22 @@ def call_ollama_api(prompt: str, model: str, output_format: str = "text") -> Any
         response = requests.post(url, json=payload, timeout=config.REQUEST_TIMEOUT)
         response.raise_for_status()
         
-        data = response.json()
-        response_text = data.get("response", "")
+        result = response.json()
+        raw_response = result.get("response", "").strip()
         
         if output_format == "json":
             try:
-                return json.loads(response_text)
+                return json.loads(raw_response)
             except json.JSONDecodeError:
-                logger.error(f"Réponse JSON invalide de Ollama: {response_text}")
+                logger.warning(f"Réponse IA non-JSON valide: {raw_response[:200]}...")
                 return {}
-        
-        return response_text
-        
+        else:
+            return raw_response
+            
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Erreur de communication avec Ollama: {e}")
+        return {} if output_format == "json" else f"Erreur: Impossible de contacter le service Ollama."
     except Exception as e:
-        logger.error(f"Erreur call_ollama_api: {e}")
-        if output_format == "json":
-            return {}
-        return f"Erreur: {str(e)}"
+        logger.error(f"Erreur inattendue dans call_ollama_api: {e}", exc_info=True)
+        return {} if output_format == "json" else f"Erreur inattendue: {str(e)}"
 
-def get_screening_prompt(title: str, abstract: str, database_source: str) -> str:
-    """Génère le prompt de screening."""
-    return f"""En tant qu'assistant de recherche spécialisé, analysez cet article et déterminez sa pertinence.
-
-Titre: {title}
-
-Résumé: {abstract}
-
-Source: {database_source}
-
-Répondez UNIQUEMENT en JSON: {{"relevance_score": 0-10, "decision": "À inclure"|"À exclure", "justification": "..."}}"""
-
-def get_full_extraction_prompt(text: str, database_source: str, custom_grid_id: str = None) -> str:
-    """Génère le prompt d'extraction complète."""
-    base_prompt = f"""ROLE: Assistant expert. Répondez UNIQUEMENT avec un JSON valide.
-
-TEXTE À ANALYSER:
----
-{text}
----
-SOURCE: {database_source}
-
-Extractez les informations suivantes au format JSON:
-"""
-
-    if custom_grid_id:
-        # Utiliser une grille personnalisée (à implémenter selon vos besoins)
-        base_prompt += """
-{
-"type_etude": "...",
-"population": "...", 
-"intervention": "...",
-"resultats_principaux": "...",
-"limites": "...",
-"methodologie": "..."
-}"""
-    else:
-        # Grille par défaut
-        base_prompt += """
-{
-"type_etude": "...",
-"population": "...",
-"intervention": "...",
-"resultats_principaux": "...",
-"limites": "...",
-"methodologie": "..."
-}"""
-    
-    return base_prompt

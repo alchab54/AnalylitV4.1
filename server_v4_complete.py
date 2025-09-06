@@ -34,13 +34,11 @@ from tasks_v4_complete import (
     index_project_pdfs_task,
     answer_chat_question_task,
     fetch_online_pdf_task,
-    db_manager,
-    fetch_article_details,
-    sanitize_filename,
     import_from_zotero_file_task,
-    calculate_kappa_task,
-    send_project_notification
+    calculate_kappa_task
 )
+from utils.fetchers import db_manager, fetch_article_details
+from utils.file_handlers import sanitize_filename
 
 # --- Configuration ---
 config = get_config()
@@ -983,6 +981,7 @@ def get_inter_rater_stats(project_id):
 # --- Chat ---
 @api_bp.route('/projects/<project_id>/chat', methods=['POST'])
 def handle_chat_message(project_id):
+    """Traite un message de chat."""
     data = request.get_json(force=True)
     question = data.get('question')
     profile_id = data.get('profile', 'standard')
@@ -992,15 +991,16 @@ def handle_chat_message(project_id):
         if not profile_row:
             return jsonify({'error': 'Profil invalide'}), 400
         profile = dict(profile_row)
-    finally:
-        session.close()
-
-    try:
+        
+        # Appel corrigé pour correspondre à la signature de la tâche
         result = answer_chat_question_task(project_id, question, profile)
         return jsonify(result)
+        
     except Exception as e:
-        logger.error(f"Erreur chat pour {project_id}: {e}")
+        logger.error(f"Erreur lors du chat pour le projet {project_id}: {e}")
         return jsonify({'error': 'Erreur lors de la génération de la réponse.'}), 500
+    finally:
+        session.close()
 
 @api_bp.route('/projects/<project_id>/chat-history', methods=['GET'])
 def get_chat_history(project_id):

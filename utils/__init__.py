@@ -1,53 +1,26 @@
 # utils/__init__.py - Initialisation du package utils
-"""
-Package utils pour AnalyLit V4.1
-Contient les modules utilitaires pour les fetchers, processors, handlers, etc.
-"""
 
-# Imports principaux pour faciliter l'utilisation
+__all__ = [
+    'db_manager', 'fetch_unpaywall_pdf_url', 'fetch_article_details',
+    'call_ollama_api',
+    'sanitize_filename', 'extract_text_from_pdf',
+    'send_project_notification', 'send_global_notification',
+    'http_get_with_retries', 'safe_json_loads', 'format_file_size',
+    'get_screening_prompt_template', 'get_full_extraction_prompt_template',
+    'get_synthesis_prompt_template', 'get_rag_chat_prompt_template',
+    'get_effective_prompt_template'
+]
+
+# Imports pour faciliter l'accès depuis d'autres modules
 from .fetchers import db_manager, fetch_unpaywall_pdf_url, fetch_article_details
-from .ai_processors import call_ollama_api, get_screening_prompt, get_full_extraction_prompt
+from .ai_processors import call_ollama_api
 from .file_handlers import sanitize_filename, extract_text_from_pdf
 from .notifications import send_project_notification, send_global_notification
 from .helpers import http_get_with_retries, safe_json_loads, format_file_size
-
 from .prompt_templates import (
     get_screening_prompt_template,
     get_full_extraction_prompt_template,
     get_synthesis_prompt_template,
     get_rag_chat_prompt_template,
+    get_effective_prompt_template
 )
-__all__ += [
-    "get_screening_prompt_template",
-    "get_full_extraction_prompt_template",
-    "get_synthesis_prompt_template",
-    "get_rag_chat_prompt_template",
-]
-
-__version__ = "4.1.0"
-__author__ = "AnalyLit Team"
-
-__all__ = [
-    # Fetchers
-    "db_manager",
-    "fetch_unpaywall_pdf_url", 
-    "fetch_article_details",
-    
-    # AI Processors
-    "call_ollama_api",
-    "get_screening_prompt",
-    "get_full_extraction_prompt",
-    
-    # File Handlers
-    "sanitize_filename",
-    "extract_text_from_pdf",
-    
-    # Notifications
-    "send_project_notification",
-    "send_global_notification",
-    
-    # Helpers
-    "http_get_with_retries",
-    "safe_json_loads",
-    "format_file_size"
-]
