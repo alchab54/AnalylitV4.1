@@ -931,10 +931,10 @@ async function handleRunPipeline(e) {
     const profileId = formData.get('profile');
     const customGridId = formData.get('custom_grid_id');
     const analysis_mode = formData.get('analysis_mode');
-    
+
     let articles = [];
     if (source === 'manual') {
-        // CORRECTION : Lire la valeur directement depuis l'élément textarea
+        // CORRECTED: Read the value directly from the textarea element
         const manualIds = document.getElementById('manualIdsTextarea').value;
         if (!manualIds) {
             showToast("Veuillez fournir des identifiants d'articles dans la zone de texte.", 'error');
@@ -946,7 +946,7 @@ async function handleRunPipeline(e) {
     } else { // 'all'
         articles = appState.searchResults.map(r => r.article_id);
     }
-    
+
     if (articles.length === 0) {
         showToast('Aucun article à traiter.', 'error');
         return;
@@ -954,7 +954,7 @@ async function handleRunPipeline(e) {
 
     closeModal('runPipelineModal');
     showLoadingOverlay(true, 'Lancement du pipeline...');
-    
+
     try {
         await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
             method: 'POST',
@@ -965,10 +965,10 @@ async function handleRunPipeline(e) {
                 analysis_mode
             }
         });
-        
+
         showToast(`Analyse lancée pour ${articles.length} article(s).`, 'info');
         await selectProject(appState.currentProject.id, true);
-        
+
     } catch (error) {
         console.error('Erreur lancement pipeline:', error);
     } finally {

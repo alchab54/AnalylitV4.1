@@ -562,20 +562,31 @@ def import_from_zotero_file(project_id):
     file = request.files['file']
     if not file.filename.endswith('.json'):
         return jsonify({'error': 'Veuillez fournir un fichier .json'}), 400
-    try:
-        file_content = file.stream.read().decode('utf-8')
-        zotero_data = json.loads(file_content)
-    except (json.JSONDecodeError, UnicodeDecodeError):
-        return jsonify({'error': 'Fichier JSON invalide ou mal encodé.'}), 400
 
+    # Create a temporary directory for uploads if it doesn't exist
+    temp_dir = PROJECTS_DIR / 'temp_uploads'
+    temp_dir.mkdir(exist_ok=True)
+
+    # Save the file with a unique name to avoid conflicts
+    temp_filename = f"{uuid.uuid4()}.json"
+    temp_filepath = temp_dir / temp_filename
+
+    try:
+        file.save(str(temp_filepath))
+    except Exception as e:
+        logger.error(f"Impossible de sauvegarder le fichier Zotero temporaire: {e}")
+        return jsonify({"error": "Erreur interne lors de la sauvegarde du fichier."}), 500
+
+    # Enqueue the background task with the file path, not its content
     job = background_queue.enqueue(
         import_from_zotero_file_task,
         project_id=project_id,
-        zotero_json_data=zotero_data,
+        json_file_path=str(temp_filepath),
         job_timeout='1h'
     )
-    return jsonify({'message': f'Import fichier Zotero lancé pour {len(zotero_data)} items.', 'job_id': job.id}), 202
 
+    return jsonify({'message': 'Import du fichier Zotero lancé.', 'job_id': job.id}), 202
+    
 @api_bp.route('/projects/<project_id>/fetch-online-pdfs', methods=['POST'])
 def fetch_online_pdfs(project_id):
     data = request.get_json(force=True)
