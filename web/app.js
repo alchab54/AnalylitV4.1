@@ -424,17 +424,11 @@ function refreshCurrentSection() {
         chat: renderChatSection,
         settings: renderSettingsSection,
     };
+
+    // Appelle simplement la fonction de rendu correspondante à la section actuelle
     if (renderMap[appState.currentSection]) {
         renderMap[appState.currentSection]();
     }
-	if (typeof renderImportSection === 'function') {
-    renderImportSection(project);
-  } else {
-    // Fallback: recharger la liste des articles + états d’import
-    if (project?.id) {
-      renderProjectArticlesList(project.id);
-    }
-  }
 }
 
 // ================================================================
@@ -887,78 +881,74 @@ function renderRunPipelineModal() {
     const project = appState.currentProject;
     if (!project) return;
 
-    // --- CORRECTION DE L'ERREUR ---
-    // Sélection des éléments qui existent déjà dans index.html
+    // Cibler les nouveaux IDs du formulaire
     const profileSelect = document.getElementById('pipelineProfileSelect');
-    const gridContainer = document.getElementById('pipelineGridContainer');
-    const gridSelect = document.getElementById('pipelineGridSelect');
+    const modeSelect = document.getElementById('pipelineModeSelect');
     const sourceSelect = document.getElementById('pipelineSourceSelect');
+    const gridSelect = document.getElementById('customGridSelect');
     
-    // Vérification que les éléments existent avant de les manipuler
-    if (!profileSelect || !gridContainer || !gridSelect || !sourceSelect) {
-        console.error("Éléments de la modale d'analyse non trouvés !");
+    if (!profileSelect || !modeSelect || !sourceSelect || !gridSelect) {
+        console.error("Un ou plusieurs éléments de la modale d'analyse sont introuvables !");
         return;
     }
-    
-    // Remplissage du sélecteur de profils
+
+    // Remplir le sélecteur de profils (ce qui ne fonctionnait pas)
     profileSelect.innerHTML = appState.analysisProfiles.map(profile => 
         `<option value="${profile.id}">${escapeHtml(profile.name)}</option>`
     ).join('');
     profileSelect.value = project.profile_used || 'standard';
 
-    // Affichage du sélecteur de grille uniquement en mode "extraction détaillée"
-    if (project.analysis_mode === 'full_extraction') {
-        gridContainer.style.display = 'block';
-        gridSelect.innerHTML = '<option value="">Grille par défaut</option>' + 
-            appState.currentProjectGrids.map(grid => 
-                `<option value="${grid.id}">${escapeHtml(grid.name)}</option>`
-            ).join('');
-    } else {
-        gridContainer.style.display = 'none';
-    }
-    
-    // Assurer que le champ de saisie manuelle est correctement affiché ou masqué
-    handlePipelineSourceChange();
+    // Remplir le sélecteur de grilles
+    gridSelect.innerHTML = '<option value="">Grille par défaut</option>' + 
+        appState.currentProjectGrids.map(grid => 
+            `<option value="${grid.id}">${escapeHtml(grid.name)}</option>`
+        ).join('');
+
+    // Gérer la visibilité des champs
+    handlePipelineSourceChange(); 
 }
 
 function handlePipelineSourceChange() {
     const sourceSelect = document.getElementById('pipelineSourceSelect');
-    const manualGroup = document.getElementById('manualIdsGroup');
-    
-    if (sourceSelect && manualGroup) {
-        manualGroup.style.display = sourceSelect.value === 'manual' ? 'block' : 'none';
+    const manualIdsTextarea = document.getElementById('manualIdsTextarea');
+    if (sourceSelect && manualIdsTextarea) {
+        const manualGroup = manualIdsTextarea.closest('.form-group');
+        if (manualGroup) {
+            manualGroup.style.display = sourceSelect.value === 'manual' ? 'block' : 'none';
+        }
     }
 }
 
 async function handleRunPipeline(e) {
     e.preventDefault();
-    
     if (!appState.currentProject) {
         showToast('Aucun projet sélectionné.', 'error');
         return;
     }
 
     const formData = new FormData(e.target);
-    const source = formData.get('pipelineSourceSelect');
-    const profileId = formData.get('pipelineProfileSelect');
-    const customGridId = formData.get('pipelineGridSelect');
+    const source = formData.get('source');
+    const profileId = formData.get('profile');
+    const customGridId = formData.get('custom_grid_id');
+    const analysis_mode = formData.get('analysis_mode');
     
-    let articleIds = [];
-    
+    let articles = [];
     if (source === 'manual') {
-        const manualIds = formData.get('pmidsTextarea');
+        // CORRECTION : Lire la valeur directement depuis l'élément textarea
+        const manualIds = document.getElementById('manualIdsTextarea').value;
         if (!manualIds) {
-            showToast('Veuillez fournir des IDs d\'articles.', 'error');
+            showToast("Veuillez fournir des identifiants d'articles dans la zone de texte.", 'error');
             return;
         }
-        articleIds = manualIds.split('\n').map(id => id.trim()).filter(Boolean);
-    } else {
-        // En mode "résultats de recherche", on récupère les IDs sélectionnés
-        articleIds = Array.from(appState.selectedSearchResults);
+        articles = manualIds.split('\n').map(id => id.trim()).filter(Boolean);
+    } else if (source === 'selected') {
+        articles = Array.from(appState.selectedSearchResults);
+    } else { // 'all'
+        articles = appState.searchResults.map(r => r.article_id);
     }
     
-    if (articleIds.length === 0) {
-        showToast('Aucun article à traiter. Veuillez en sélectionner ou en saisir manuellement.', 'error');
+    if (articles.length === 0) {
+        showToast('Aucun article à traiter.', 'error');
         return;
     }
 
@@ -969,13 +959,14 @@ async function handleRunPipeline(e) {
         await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
             method: 'POST',
             body: {
-                articles: articleIds,
+                articles,
                 profile: profileId,
-                custom_grid_id: customGridId || null
+                custom_grid_id: customGridId || null,
+                analysis_mode
             }
         });
         
-        showToast(`Analyse lancée pour ${articleIds.length} article(s).`, 'info');
+        showToast(`Analyse lancée pour ${articles.length} article(s).`, 'info');
         await selectProject(appState.currentProject.id, true);
         
     } catch (error) {
@@ -1886,16 +1877,16 @@ function appendChatMessage(role, content, sources = null) {
 
 function clearChatHistory() {
     if (!confirm("Effacer tout l'historique de chat pour ce projet ?")) return;
-    
+       
     const messagesContainer = document.getElementById('chatMessages');
     if (messagesContainer) {
-        messagesContainer.innerHTML = \`
+        messagesContainer.innerHTML = `
             <div class="chat-message chat-message--assistant">
                 <div class="chat-message__content">
                     Historique effacé. Posez-moi une nouvelle question !
                 </div>
             </div>
-        \`;
+        `;
     }
 }
 

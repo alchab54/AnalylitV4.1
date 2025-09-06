@@ -5,8 +5,7 @@
   <title>AnalyLit v4.1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="/style.css" />
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
-</head>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script></head>
 <body>
   <header class="app-header">
     <div class="app-header__content container">
@@ -23,7 +22,7 @@
         </ul>
       </nav>
       <div class="app-header__meta">
-        <span data-connection-status title="WebSocket status">❌</span>
+        <span data-connection-status title="WebSocket">❌</span>
         <div id="notificationIndicator" class="notification-indicator" style="display:none;">
           <span class="notification-indicator__count">0</span>
         </div>
@@ -32,7 +31,7 @@
   </header>
 
   <main class="app-main container">
-    <!-- Section Projets -->
+    <!-- Projets -->
     <section id="projectsSection" class="section" data-section="projects">
       <div class="section__content--split">
         <aside class="projects-list-container">
@@ -42,9 +41,7 @@
               <button id="createProjectBtn" class="btn btn--primary">Nouveau projet</button>
             </div>
           </div>
-          <ul id="projectsList" class="project-list">
-            <!-- Rendu dynamique -->
-          </ul>
+          <ul id="projectsList" class="project-list"></ul>
         </aside>
 
         <div id="projectDetail" class="project-detail-container">
@@ -53,24 +50,36 @@
             <h3>Aucun projet sélectionné</h3>
             <p>Sélectionner un projet dans la liste de gauche.</p>
           </div>
+
           <div id="projectDetailContent">
-            <!-- Rendu dynamique (header projet, stats, actions, onglets, etc.) -->
+            <!-- Rendu dynamique du projet sélectionné: stats, actions, onglets -->
+            <div class="project-actions-header">
+              <div class="button-group">
+                <button class="btn btn--secondary" data-action="runPipeline">Lancer le pipeline</button>
+                <button class="btn" data-action="runSynthesis">Générer la synthèse</button>
+                <button class="btn" data-action="run-indexing">Indexer les PDFs</button>
+                <button class="btn btn--danger" data-action="exportProject" data-project-id="">Exporter le projet</button>
+              </div>
+            </div>
+
+            <div id="project-articles-list">
+              <!-- Liste des articles du projet (render côté app.js) -->
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Section Recherche -->
+    <!-- Recherche -->
     <section id="searchSection" class="section hidden" data-section="search">
       <div class="section-header">
         <h2>Recherche multi-bases</h2>
       </div>
-
       <form id="multiSearchForm" class="form">
         <div class="form-group form-group--inline">
-          <input type="text" name="query" id="searchQuery" placeholder="Requête (ex: IA empathie patient)" required />
-          <select id="databasesSelect" multiple title="Bases disponibles">
-            <!-- Rendu dynamique depuis /api/databases -->
+          <input type="text" id="searchQuery" name="query" placeholder="Requête (ex: alliance thérapeutique numérique)" required />
+          <select id="databasesSelect" multiple title="Bases">
+            <!-- rempli dynamiquement via /api/databases -->
           </select>
           <button type="submit" class="btn btn--primary">Lancer</button>
         </div>
@@ -80,20 +89,16 @@
         <div class="button-group">
           <button class="btn" data-action="selectAllSearchResults">Tout sélectionner</button>
           <button class="btn btn--secondary" data-action="runPipeline">Lancer le pipeline</button>
-          <button class="btn" data-action="runSynthesis">Générer la synthèse</button>
-          <button class="btn" data-action="run-indexing" data-project-id="">Indexer les PDFs</button>
           <button class="btn" data-action="delete-selected-articles">Supprimer sélection</button>
         </div>
       </div>
 
       <div id="searchResults">
-        <div id="resultsContainer" class="results-container">
-          <!-- Table de résultats rendue dynamiquement -->
-        </div>
+        <div id="resultsContainer" class="results-container"></div>
       </div>
     </section>
 
-    <!-- Section Validation (double codage) -->
+    <!-- Validation -->
     <section id="validationSection" class="section hidden" data-section="validation">
       <div class="section-header">
         <h2>Validation inter-évaluateurs</h2>
@@ -110,25 +115,19 @@
         <div id="kappaResult" class="kappa-result-display"></div>
       </div>
 
-      <div id="validationContainer" class="validation-container">
-        <!-- Tableau de validations et détails dynamiques -->
-      </div>
+      <div id="validationContainer"></div>
     </section>
 
-    <!-- Section Analyses -->
+    <!-- Analyses -->
     <section id="analysisSection" class="section hidden" data-section="analysis">
       <div class="section-header">
         <h2>Analyses avancées</h2>
       </div>
-      <div class="analysis-grid">
-        <!-- Cartes d'analyses avancées rendues dynamiquement -->
-      </div>
-      <div id="analysisContainer" class="analysis-container">
-        <!-- Résultats / graphiques -->
-      </div>
+      <div class="analysis-grid"><!-- cartes d’analyses --></div>
+      <div id="analysisContainer"></div>
     </section>
 
-    <!-- Section Import -->
+    <!-- Import -->
     <section id="importSection" class="section hidden" data-section="import">
       <div class="section-header">
         <h2>Import de données</h2>
@@ -137,7 +136,7 @@
       <div class="import-sections">
         <div class="import-card">
           <h4>Import Zotero (JSON)</h4>
-          <p>Importer un export Zotero au format .json pour peupler le projet.</p>
+          <p>Importer un export Zotero (.json) de références avec métadonnées.</p>
           <div class="import-actions">
             <button class="btn btn--secondary" data-action="import-zotero-file">Choisir un fichier</button>
             <input type="file" id="zoteroFileInput" class="hidden" accept=".json" />
@@ -146,52 +145,46 @@
 
         <div class="import-card">
           <h4>Récupération PDF en ligne</h4>
-          <p>Tenter de récupérer automatiquement les PDFs en accès libre (Unpaywall).</p>
+          <p>Récupérer automatiquement les PDFs OA via Unpaywall lorsqu’ils sont disponibles.</p>
           <div class="import-actions">
             <button class="btn btn--secondary" data-action="fetch-online-pdfs">Chercher les PDFs OA</button>
           </div>
         </div>
 
         <div class="import-card">
-          <h4>Indexation locale</h4>
-          <p>Indexer les PDFs du projet pour le RAG.</p>
+          <h4>Indexation locale (RAG)</h4>
+          <p>Indexer les PDFs du projet pour l’assistant contextuel.</p>
           <div class="import-actions">
             <button class="btn" data-action="run-indexing">Indexer les PDFs</button>
           </div>
         </div>
       </div>
 
-      <div id="importContainer" class="import-container">
-        <!-- Liste de fichiers, états d'import -->
-      </div>
+      <div id="importContainer" class="import-container"></div>
     </section>
 
-    <!-- Section Chat -->
+    <!-- Chat -->
     <section id="chatSection" class="section hidden" data-section="chat">
       <div class="section-header">
         <h2>Chat RAG</h2>
       </div>
-      <div id="chatContainer" class="chat-container">
-        <!-- Historique, entrée de question et réponses -->
-      </div>
+      <div id="chatContainer" class="chat-container"></div>
     </section>
 
-    <!-- Section Paramètres -->
+    <!-- Paramètres -->
     <section id="settingsSection" class="section hidden" data-section="settings">
       <div class="section-header">
         <h2>Paramètres & Modèles</h2>
       </div>
-
       <div id="settingsContainer" class="settings-container">
-        <!-- Prompts, Profils, Modèles Ollama, Files RQ -->
         <div class="settings-card">
           <h4>Prompts</h4>
-          <div id="promptsList"><!-- dynamique --></div>
+          <div id="promptsList"></div>
         </div>
 
         <div class="settings-card">
           <h4>Profils d'analyse</h4>
-          <div id="profilesList"><!-- dynamique --></div>
+          <div id="profilesList"></div>
           <button class="btn" data-action="create-profile">Nouveau profil</button>
         </div>
 
@@ -201,7 +194,7 @@
             <input type="text" id="pullModelName" placeholder="ex: llama3.1:8b" />
             <button class="btn btn--secondary" data-action="pullModel">Télécharger</button>
           </div>
-          <div id="ollamaModelsList"><!-- dynamique --></div>
+          <div id="ollamaModelsList"></div>
         </div>
 
         <div class="settings-card">
@@ -211,7 +204,7 @@
             <button class="btn" data-action="import-grid">Importer (.json)</button>
             <input type="file" id="gridFileInput" class="hidden" accept=".json" />
           </div>
-          <div id="gridsList"><!-- dynamique --></div>
+          <div id="gridsList"></div>
         </div>
 
         <div class="settings-card">
@@ -220,7 +213,7 @@
             <button class="btn" data-action="refresh-queues">Rafraîchir</button>
             <button class="btn btn--warning" data-action="clearQueue" data-queue-name="analylit_processing_v4">Vider processing</button>
           </div>
-          <div id="queuesStatus"><!-- dynamique --></div>
+          <div id="queuesStatus"></div>
         </div>
 
         <div class="settings-card">
@@ -239,7 +232,7 @@
     </section>
   </main>
 
-  <!-- Modale: Nouveau Projet -->
+  <!-- Modale: Création projet -->
   <div id="newProjectModal" class="modal">
     <div class="modal__content">
       <button class="modal__close" aria-label="Fermer">×</button>
@@ -260,55 +253,78 @@
     </div>
   </div>
 
-  <!-- Modale: Lancer le pipeline -->
+  <!-- Modale: Pipeline d’analyse -->
   <div id="runPipelineModal" class="modal">
     <div class="modal__content">
       <button class="modal__close" aria-label="Fermer">×</button>
-      <h3>Lancer le pipeline d'analyse</h3>
+      <h3>Lancer le pipeline d’analyse</h3>
       <form id="runPipelineForm">
+        <!-- Choix du profil d’analyse -->
         <div class="form-group">
-          <label for="pipelineProfileSelect">Profil d'analyse</label>
-          <select id="pipelineProfileSelect" name="profile">
-            <!-- Rempli dynamiquement -->
+          <label for="pipelineProfileSelect">Profil d’analyse</label>
+          <select id="pipelineProfileSelect" name="profile" required>
+            <!-- rempli dynamiquement depuis /api/analysis-profiles -->
           </select>
+          <small class="text-muted">Définit les modèles IA utilisés (pré-tri, extraction, synthèse).</small>
         </div>
+
+        <!-- Mode d’analyse -->
         <div class="form-group">
           <label for="pipelineModeSelect">Mode</label>
-          <select id="pipelineModeSelect" name="analysis_mode">
-            <option value="screening">Screening</option>
+          <select id="pipelineModeSelect" name="analysis_mode" required>
+            <option value="screening">Screening (pré-sélection)</option>
             <option value="full_extraction">Extraction complète</option>
           </select>
         </div>
+
+        <!-- Source d’articles -->
         <div class="form-group">
-          <label for="pipelineSourceSelect">Source</label>
+          <label for="pipelineSourceSelect">Source d’articles</label>
           <select id="pipelineSourceSelect" name="source">
             <option value="selected">Articles sélectionnés</option>
-            <option value="all">Tous les résultats</option>
+            <option value="all">Tous les résultats du projet</option>
+            <option value="manual">Liste saisie manuellement (ci-dessous)</option>
           </select>
         </div>
+
+        <!-- Saisie manuelle d’identifiants (restauration) -->
         <div class="form-group">
-          <label for="customGridSelect">Grille d'extraction</label>
+          <label for="manualIdsTextarea">Liste d’identifiants (PMID, DOI, arXiv), un par ligne</label>
+          <textarea id="manualIdsTextarea" rows="6" placeholder="Ex:
+34567890
+10.1000/j.jmb.2024.01.001
+arXiv:2401.01234"></textarea>
+          <small class="text-muted">Si “Liste saisie manuellement” est sélectionnée, ces IDs seront ajoutés au projet avant traitement.</small>
+        </div>
+
+        <!-- Grille d’extraction personnalisée -->
+        <div class="form-group">
+          <label for="customGridSelect">Grille d’extraction (optionnel)</label>
           <select id="customGridSelect" name="custom_grid_id">
-            <!-- dyn -->
+            <!-- rempli dynamiquement avec les grilles du projet -->
           </select>
         </div>
+
         <div class="form-actions">
           <button type="submit" class="btn btn--primary">Exécuter</button>
         </div>
       </form>
+      <p class="text-muted" style="margin-top:8px;">
+        Les articles saisis sont validés et ajoutés au projet avant mise en file de traitement; le backend s’appuie sur /projects/:id/run. 
+      </p>
     </div>
   </div>
 
-  <!-- Modale: Détail Extraction -->
+  <!-- Modale: Détail d’extraction -->
   <div id="extractionDetailModal" class="modal">
     <div class="modal__content">
       <button class="modal__close" aria-label="Fermer">×</button>
-      <h3>Détails de l'extraction</h3>
-      <div id="extractionDetailContainer"><!-- rempli dynamiquement --></div>
+      <h3>Détails de l’extraction</h3>
+      <div id="extractionDetailContainer"></div>
     </div>
   </div>
 
-  <!-- Modale: Edit Prompt -->
+  <!-- Modale: Edition Prompt -->
   <div id="editPromptModal" class="modal">
     <div class="modal__content">
       <button class="modal__close" aria-label="Fermer">×</button>
@@ -338,7 +354,7 @@
           <label>Nom de la grille</label>
           <input type="text" id="gridNameInput" required />
         </div>
-        <div id="gridFieldsContainer"><!-- champs dynamiques --></div>
+        <div id="gridFieldsContainer"></div>
         <div class="form-actions">
           <button type="button" id="addGridFieldBtn" class="btn">Ajouter un champ</button>
           <button type="submit" class="btn btn--primary">Enregistrer</button>
@@ -347,7 +363,7 @@
     </div>
   </div>
 
-  <!-- Overlay de chargement -->
+  <!-- Overlay chargement -->
   <div id="loadingOverlay" class="loading-overlay" style="display:none;">
     <div class="loading-overlay__content">
       <div class="loading-spinner loading-spinner--lg"></div>
@@ -355,7 +371,7 @@
     </div>
   </div>
 
-  <!-- Conteneur de toasts -->
+  <!-- Toasts -->
   <div id="toastContainer" class="toast-container"></div>
 
   <script src="/app.js"></script>
