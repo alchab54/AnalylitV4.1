@@ -1,6 +1,7 @@
 # ================================================================
 # AnalyLit V4.1 - Tâches RQ (Finalisé et 100% PostgreSQL/SQLAlchemy)
 # ================================================================
+
 import os
 import io
 import time
@@ -14,6 +15,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -32,14 +34,23 @@ from rq import get_current_job
 # --- Importer la config de l'application ---
 from config_v4 import get_config
 
-# --- Importer les helpers/utilitaires applicatifs (déjà présents dans votre projet) ---
+# --- Importer les helpers/utilitaires applicatifs (factorisés) ---
 # IMPORTANT: ces modules existent côté serveur ou utils. Ils doivent rester factorisés.
 # - Ne pas réécrire ici les appels réseau ou fonctions de bas niveau.
 from utils.fetchers import db_manager, fetch_unpaywall_pdf_url, fetch_article_details
-from utils.ai_processors import call_ollama_api, get_screening_prompt, get_full_extraction_prompt
+from utils.ai_processors import call_ollama_api  # on n’utilise plus les anciens helpers de prompt
 from utils.file_handlers import sanitize_filename, extract_text_from_pdf
 from utils.notifications import send_project_notification
 from utils.helpers import http_get_with_retries
+
+# Prompts “forts” + override DB
+from utils.prompt_templates import (
+    get_screening_prompt_template,
+    get_full_extraction_prompt_template,
+    get_synthesis_prompt_template,
+    get_rag_chat_prompt_template,
+    get_effective_prompt_template,
+)
 
 # --- Configuration globale ---
 config = get_config()
@@ -68,50 +79,9 @@ except Exception as e:
     logger.error(f"Erreur chargement du modèle d'embedding '{EMBEDDING_MODEL_NAME}': {e}")
     embedding_model = None
 
-
 # ================================================================
 # === FONCTIONS UTILITAIRES DB-SAFE (SQLAlchemy)
 # ================================================================
-def get_prompt_from_db(prompt_name: str) -> str:
-    """Récupère un template de prompt depuis la base via SQLAlchemy.
-       Fournit un fallback minimal si indisponible."""
-    session = Session()
-    try:
-        row = session.execute(
-            text("SELECT template FROM prompts WHERE name = :name"),
-            {"name": prompt_name}
-        ).scalar_one_or_none()
-        if row:
-            return row
-    except Exception as e:
-        logger.error(f"Erreur get_prompt_from_db: {e}", exc_info=True)
-    finally:
-        session.close()
-
-    # Fallbacks minimaux
-    if prompt_name == 'screening_prompt':
-        return (
-            "En tant qu'assistant de recherche spécialisé, analysez cet article et déterminez sa pertinence.\n\n"
-            "Titre: {title}\n\nRésumé: {abstract}\n\nSource: {database_source}\n\n"
-            "Répondez UNIQUEMENT en JSON: {\"relevance_score\": 0-10, "
-            "\"decision\": \"À inclure\"|\"À exclure\", \"justification\": \"...\"}"
-        )
-    if prompt_name == 'full_extraction_prompt':
-        return (
-            "ROLE: Assistant expert. Répondez UNIQUEMENT avec un JSON valide.\n"
-            "TEXTE À ANALYSER:\n---\n{text}\n---\nSOURCE: {database_source}\n"
-            "{\n\"type_etude\":\"...\",\"population\":\"...\",\"intervention\":\"...\","
-            "\"resultats_principaux\":\"...\",\"limites\":\"...\",\"methodologie\":\"...\"\n}"
-        )
-    if prompt_name == 'synthesis_prompt':
-        return (
-            "Contexte: {project_description}\n"
-            "Résumés:\n---\n{data_for_prompt}\n---\n"
-            "Réponds en JSON: {\"relevance_evaluation\":[],\"main_themes\":[],"
-            "\"key_findings\":[],\"methodologies_used\":[],\"synthesis_summary\":\"\",\"research_gaps\":[]}"
-        )
-    return ""
-
 
 def update_project_status(project_id: str, status: str, result: dict = None, discussion: str = None,
                           graph: dict = None, prisma_path: str = None, analysis_result: dict = None,
@@ -152,7 +122,6 @@ def update_project_status(project_id: str, status: str, result: dict = None, dis
     finally:
         session.close()
 
-
 def log_processing_status(session, project_id: str, article_id: str, status: str, details: str):
     """Enregistre un événement de traitement dans processing_log (utilise la session fournie)."""
     session.execute(text("""
@@ -160,12 +129,10 @@ def log_processing_status(session, project_id: str, article_id: str, status: str
         VALUES (:project_id, :pmid, :status, :details, :ts)
     """), {"project_id": project_id, "pmid": article_id, "status": status, "details": details, "ts": datetime.now()})
 
-
 def increment_processed_count(session, project_id: str):
     """Incrémente processed_count du projet (utilise la session fournie)."""
     session.execute(text("UPDATE projects SET processed_count = processed_count + 1 WHERE id = :id"),
                     {"id": project_id})
-
 
 def update_project_timing(session, project_id: str, duration: float):
     """Ajoute une durée au total_processing_time (utilise la session fournie)."""
@@ -173,10 +140,10 @@ def update_project_timing(session, project_id: str, duration: float):
         UPDATE projects SET total_processing_time = total_processing_time + :d WHERE id = :id
     """), {"d": float(duration), "id": project_id})
 
-
 # ================================================================
 # === TÂCHES RQ (100% SQLAlchemy)
 # ================================================================
+
 def multi_database_search_task(project_id: str, query: str, databases: list, max_results_per_db: int = 50):
     """Recherche dans plusieurs bases et insère les résultats dans search_results."""
     logger.info(f"🔍 Recherche multi-bases pour {project_id} - {databases}")
@@ -224,9 +191,11 @@ def multi_database_search_task(project_id: str, query: str, databases: list, max
                     })
                 session.commit()
                 total_found += len(results)
+
                 send_project_notification(project_id, 'search_progress',
-                                          f'Recherche terminée dans {db_name}: {len(results)} résultats',
-                                          {'database': db_name, 'count': len(results)})
+                    f'Recherche terminée dans {db_name}: {len(results)} résultats',
+                    {'database': db_name, 'count': len(results)})
+
                 time.sleep(0.6)
             except Exception as e:
                 session.rollback()
@@ -238,8 +207,9 @@ def multi_database_search_task(project_id: str, query: str, databases: list, max
         session.commit()
 
         send_project_notification(project_id, 'search_completed',
-                                  f'Recherche terminée: {total_found} articles trouvés',
-                                  {'total_results': total_found, 'databases': databases})
+            f'Recherche terminée: {total_found} articles trouvés',
+            {'total_results': total_found, 'databases': databases})
+
         logger.info(f"✅ Recherche multi-bases: total {total_found}")
     except Exception as e:
         session.rollback()
@@ -251,7 +221,6 @@ def multi_database_search_task(project_id: str, query: str, databases: list, max
     finally:
         session.close()
 
-
 def process_single_article_task(project_id: str, article_id: str, profile: dict,
                                 analysis_mode: str, custom_grid_id: str = None):
     """Traite un article: screening ou extraction complète. Transaction atomique."""
@@ -261,7 +230,6 @@ def process_single_article_task(project_id: str, article_id: str, profile: dict,
         row = session.execute(text("""
             SELECT * FROM search_results WHERE project_id = :pid AND article_id = :aid
         """), {"pid": project_id, "aid": article_id}).mappings().fetchone()
-
         if not row:
             log_processing_status(session, project_id, article_id, "erreur", "Article introuvable en base.")
             session.commit()
@@ -278,6 +246,7 @@ def process_single_article_task(project_id: str, article_id: str, profile: dict,
             if pdf_text and len(pdf_text) > 100:
                 text_for_analysis = pdf_text
                 analysis_source = "pdf"
+
         if not text_for_analysis:
             title = article.get("title", "") or ""
             abstract = article.get("abstract", "") or ""
@@ -289,11 +258,30 @@ def process_single_article_task(project_id: str, article_id: str, profile: dict,
             return
 
         if analysis_mode == "full_extraction":
-            prompt = get_full_extraction_prompt(
-                text_for_analysis,
-                article.get("database_source", "unknown"),
-                custom_grid_id
-            )
+            # Charger une grille si custom_grid_id, sinon fallback simple: champs génériques
+            fields_list = []
+            if custom_grid_id:
+                try:
+                    grid_row = session.execute(text("""
+                        SELECT fields FROM extraction_grids WHERE id = :gid AND project_id = :pid
+                    """), {"gid": custom_grid_id, "pid": project_id}).mappings().fetchone()
+                    if grid_row and grid_row.get("fields"):
+                        parsed = json.loads(grid_row["fields"])
+                        if isinstance(parsed, list):
+                            fields_list = parsed
+                except Exception as e:
+                    logger.warning(f"Grille custom invalide: {e}")
+
+            if not fields_list:
+                # Fallback minimal si aucune grille custom
+                fields_list = ["type_etude", "population", "intervention",
+                               "resultats_principaux", "limites", "methodologie"]
+
+            fields = [{"name": f, "description": f} for f in fields_list]
+            base_tpl = get_full_extraction_prompt_template(fields)
+            tpl = get_effective_prompt_template("full_extraction_prompt", base_tpl)
+            prompt = tpl.replace("{text}", text_for_analysis)
+
             extracted = call_ollama_api(prompt, profile["extract_model"], output_format="json")
             if isinstance(extracted, dict) and extracted:
                 session.execute(text("""
@@ -315,11 +303,14 @@ def process_single_article_task(project_id: str, article_id: str, profile: dict,
                 log_processing_status(session, project_id, article_id, "écarté", "Réponse IA invalide (extraction).")
         else:
             # screening
-            prompt = get_screening_prompt(
-                article.get("title", ""),
-                article.get("abstract", ""),
-                article.get("database_source", "unknown")
+            base_tpl = get_screening_prompt_template()
+            tpl = get_effective_prompt_template("screening_prompt", base_tpl)
+            prompt = tpl.format(
+                title=article.get("title", ""),
+                abstract=article.get("abstract", ""),
+                database_source=article.get("database_source", "unknown")
             )
+
             resp = call_ollama_api(prompt, profile["preprocess_model"], output_format="json")
             score = resp.get("relevance_score", 0) if isinstance(resp, dict) else 0
             justification = resp.get("justification", "N/A") if isinstance(resp, dict) else "Réponse IA invalide."
@@ -361,7 +352,6 @@ def process_single_article_task(project_id: str, article_id: str, profile: dict,
     finally:
         session.close()
 
-
 def run_synthesis_task(project_id: str, profile: dict):
     """Génère une synthèse à partir des articles pertinents (score >= 7)."""
     update_project_status(project_id, "synthesizing")
@@ -394,10 +384,12 @@ def run_synthesis_task(project_id: str, profile: dict):
             return
 
         data_for_prompt = "\n\n---\n\n".join(abstracts)
-        template = get_prompt_from_db('synthesis_prompt')
-        prompt = template.format(project_description=project_description, data_for_prompt=data_for_prompt)
+        base_tpl = get_synthesis_prompt_template()
+        tpl = get_effective_prompt_template('synthesis_prompt', base_tpl)
 
+        prompt = tpl.format(project_description=project_description, data_for_prompt=data_for_prompt)
         output = call_ollama_api(prompt, profile.get('synthesis_model', 'llama3.1:8b'), output_format="json")
+
         if output and isinstance(output, dict):
             update_project_status(project_id, "completed", result=output)
             send_project_notification(project_id, 'synthesis_completed', 'Synthèse générée.')
@@ -410,7 +402,6 @@ def run_synthesis_task(project_id: str, profile: dict):
         send_project_notification(project_id, 'synthesis_failed', f"Erreur: {e}")
     finally:
         session.close()
-
 
 def run_discussion_generation_task(project_id: str):
     """Génère une section 'Discussion' basée sur la synthèse et la liste d'articles."""
@@ -456,7 +447,6 @@ def run_discussion_generation_task(project_id: str):
     finally:
         session.close()
 
-
 def run_knowledge_graph_task(project_id: str):
     """Génère un graphe de connaissances JSON à partir des titres d'articles extraits."""
     update_project_status(project_id, status="generating_graph")
@@ -498,7 +488,6 @@ def run_knowledge_graph_task(project_id: str):
     finally:
         session.close()
 
-
 def run_prisma_flow_task(project_id: str):
     """Génère un diagramme PRISMA simplifié et stocke l'image sur disque."""
     update_project_status(project_id, status="generating_prisma")
@@ -507,6 +496,7 @@ def run_prisma_flow_task(project_id: str):
         total_found = session.execute(text("""
             SELECT COUNT(*) FROM search_results WHERE project_id = :pid
         """), {"pid": project_id}).scalar_one()
+
         n_included = session.execute(text("""
             SELECT COUNT(*) FROM extractions WHERE project_id = :pid
         """), {"pid": project_id}).scalar_one()
@@ -520,7 +510,7 @@ def run_prisma_flow_task(project_id: str):
 
         fig, ax = plt.subplots(figsize=(8, 10))
         box = dict(boxstyle='round,pad=0.5', fc='lightblue', alpha=0.7)
-        ax.text(0.5, 0.9, f'Articles identifiés (n = {total_found})', ha='center', va='center', bbox=box)
+        ax.text(0.5, 0.9, f'Articles identifiés (n = {total_found})', ha='center,', va='center', bbox=box)
         ax.text(0.5, 0.7, f'Après exclusion doublons (n = {n_after_duplicates})', ha='center', va='center', bbox=box)
         ax.text(0.5, 0.5, f'Articles évalués (n = {n_after_duplicates})', ha='center', va='center', bbox=box)
         ax.text(0.5, 0.3, f'Études incluses (n = {n_included})', ha='center', va='center', bbox=box)
@@ -547,9 +537,10 @@ def run_meta_analysis_task(project_id: str):
     session = Session()
     try:
         scores = session.execute(text("""
-        SELECT relevance_score FROM extractions
-        WHERE project_id = :pid AND relevance_score IS NOT NULL AND relevance_score > 0
+            SELECT relevance_score FROM extractions
+            WHERE project_id = :pid AND relevance_score IS NOT NULL AND relevance_score > 0
         """), {"pid": project_id}).scalars().all()
+
         if len(scores) < 2:
             update_project_status(project_id, "failed")
             send_project_notification(project_id, 'analysis_failed', 'Pas assez de données pour la méta-analyse (au moins 2 scores requis).')
@@ -563,13 +554,16 @@ def run_meta_analysis_task(project_id: str):
         ci_low, ci_high = stats.t.interval(0.95, df=n - 1, loc=mean_score, scale=std_err)
 
         analysis_result = {
-            "mean_score": mean_score, "std_dev": std_dev,
-            "confidence_interval": [float(ci_low), float(ci_high)], "n_articles": n
+            "mean_score": mean_score,
+            "std_dev": std_dev,
+            "confidence_interval": [float(ci_low), float(ci_high)],
+            "n_articles": n
         }
 
         pdir = PROJECTS_DIR / project_id
         pdir.mkdir(exist_ok=True)
         plot_path = str(pdir / 'meta_analysis_plot.png')
+
         fig, ax = plt.subplots(figsize=(10, 6))
         ax.hist(arr, bins=10, alpha=0.7, color='skyblue', edgecolor='black')
         ax.axvline(mean_score, color='red', linestyle='--', linewidth=2, label=f'Moyenne: {mean_score:.2f}')
@@ -594,7 +588,7 @@ def run_descriptive_stats_task(project_id: str):
     session = Session()
     try:
         rows = session.execute(text("""
-        SELECT extracted_data FROM extractions WHERE project_id = :pid AND extracted_data IS NOT NULL
+            SELECT extracted_data FROM extractions WHERE project_id = :pid AND extracted_data IS NOT NULL
         """), {"pid": project_id}).fetchall()
         if not rows:
             update_project_status(project_id, "failed")
@@ -652,6 +646,7 @@ def run_atn_score_task(project_id: str):
             FROM extractions
             WHERE project_id = :pid AND extracted_data IS NOT NULL
         """), {"pid": project_id}).mappings().all()
+
         if not rows:
             update_project_status(project_id, "failed")
             send_project_notification(project_id, 'analysis_failed', "Aucune donnée d'extraction disponible pour le calcul du score ATN.")
@@ -675,7 +670,6 @@ def run_atn_score_task(project_id: str):
             except Exception:
                 continue
 
-        # Aucun score calculable
         if not scores:
             update_project_status(project_id, "failed")
             send_project_notification(project_id, 'analysis_failed', "Aucun score ATN calculable à partir des données extraites.")
@@ -692,7 +686,6 @@ def run_atn_score_task(project_id: str):
         pdir.mkdir(exist_ok=True)
         plot_path = str(pdir / 'atn_scores.png')
 
-        # Génération du plot uniquement si des scores existent (déjà garanti ci-dessus)
         fig, ax = plt.subplots(figsize=(10, 6))
         atn_values = [s['atn_score'] for s in scores]
         ax.hist(atn_values, bins=11, range=(-0.5, 10.5), alpha=0.7, color='green', edgecolor='black')
@@ -708,241 +701,117 @@ def run_atn_score_task(project_id: str):
     except Exception as e:
         logger.error(f"Erreur run_atn_score_task: {e}", exc_info=True)
         update_project_status(project_id, "failed")
-        # Option UX minimale: notifier l'échec inattendu aussi
         send_project_notification(project_id, 'analysis_failed', f"Erreur inattendue lors du calcul du score ATN: {e}")
     finally:
         session.close()
 
+# ================================================================
+# === IMPORTS / ZOTERO / OA PDF
+# ================================================================
 
 def import_pdfs_from_zotero_task(project_id, pmids, zotero_user_id, zotero_api_key):
     """Importe des PDF depuis Zotero, en les écrivant dans le dossier du projet."""
     logger.info(f"🔄 Import Zotero démarré pour {len(pmids)} IDs...")
     successful_pmids = []
-
     try:
         from pyzotero import zotero
         zot = zotero.Zotero(zotero_user_id, 'user', zotero_api_key)
+        for pmid in pmids:
+            try:
+                items = zot.items(q=pmid)
+                for it in items:
+                    attachments = zot.children(it['key'])
+                    for att in attachments:
+                        if att.get('data', {}).get('contentType') == 'application/pdf':
+                            content = zot.file(att['key'])
+                            out = PROJECTS_DIR / project_id / (sanitize_filename(pmid) + ".pdf")
+                            with open(out, 'wb') as f:
+                                f.write(content)
+                            successful_pmids.append(pmid)
+                            break
+                    time.sleep(0.3)
+            except Exception as e:
+                logger.warning(f"Erreur import Zotero pour PMID {pmid}: {e}")
+        send_project_notification(project_id, 'zotero_import_completed',
+                                  f'Import Zotero terminé: {len(successful_pmids)}/{len(pmids)} PDF importés')
+    except Exception as e:
+        logger.error(f"Erreur import Zotero: {e}", exc_info=True)
+        send_project_notification(project_id, 'zotero_import_failed', f'Erreur import Zotero: {e}')
 
-        # Test connexion
+def fetch_online_pdf_task(project_id: str, article_ids: list):
+    """Recherche et télécharge des PDF OA (Unpaywall) pour une liste d’articles."""
+    logger.info(f"🔎 Démarrage OA fetch pour {len(article_ids)} articles.")
+    downloaded = 0
+    for aid in article_ids:
         try:
-            zot.key_info()
+            # Récupérer le DOI
+            session = Session()
+            try:
+                row = session.execute(text("""
+                    SELECT doi FROM search_results WHERE project_id = :pid AND article_id = :aid
+                """), {"pid": project_id, "aid": aid}).mappings().fetchone()
+            finally:
+                session.close()
+
+            doi = row["doi"] if row and row.get("doi") else None
+            pdf_url = fetch_unpaywall_pdf_url(doi) if doi else None
+            if not pdf_url:
+                continue
+
+            resp = http_get_with_retries(pdf_url, timeout=60, max_retries=3)
+            if not resp or resp.status_code != 200:
+                continue
+
+            out = PROJECTS_DIR / project_id / (sanitize_filename(aid) + ".pdf")
+            with open(out, 'wb') as f:
+                f.write(resp.content)
+            downloaded += 1
+            time.sleep(0.2)
         except Exception as e:
-            send_project_notification(project_id, 'zotero_import_failed', 'Échec connexion Zotero.')
-            return
+            logger.warning(f"Erreur OA fetch pour {aid}: {e}")
 
-        pdir = PROJECTS_DIR / project_id
-        pdir.mkdir(exist_ok=True)
+    send_project_notification(project_id, 'pdf_upload_completed',
+                              f"Téléchargement OA terminé: {downloaded}/{len(article_ids)} PDF.")
 
-        for aid in pmids:
-            try:
-                queries = [aid, f"PMID:{aid}"]
-                if '/' in aid and aid.startswith('10.'):
-                    queries.append(f'doi:"{aid}"')
-                found_item = None
-                for q in queries:
-                    items = zot.items(q=q, limit=5)
-                    if items:
-                        found_item = items
-                        break
-                if not found_item:
-                    continue
+# ================================================================
+# === CHAT RAG (exemple d’utilisation de prompt RAG robuste)
+# ================================================================
 
-                attachments = zot.children(found_item['key'])
-                for att in attachments:
-                    if att.get('data', {}).get('contentType') == 'application/pdf':
-                        pdf_content = zot.file(att['key'])
-                        out = pdir / (sanitize_filename(aid) + ".pdf")
-                        with open(out, 'wb') as f:
-                            f.write(pdf_content)
-                        successful_pmids.append(aid)
-                        break
-                time.sleep(0.4)
-            except Exception as e:
-                logger.warning(f"Erreur Zotero pour {aid}: {e}")
-                continue
-
-        send_project_notification(
-            project_id,
-            'zotero_import_completed',
-            f'Import Zotero terminé: {len(successful_pmids)}/{len(pmids)} PDF importés',
-            {'successful_count': len(successful_pmids), 'total_count': len(pmids)}
-        )
-    except Exception as e:
-        logger.error(f"Erreur critique import Zotero: {e}", exc_info=True)
-        send_project_notification(project_id, 'zotero_import_failed', f'Échec import Zotero: {e}')
-
-
-def fetch_online_pdf_task(project_id, article_ids):
-    """Cherche et télécharge des PDF OA via Unpaywall à partir des DOI en base."""
-    logger.info(f"🌐 Recherche OA via Unpaywall pour {len(article_ids)} IDs...")
-    session = Session()
-    successful = []
+def answer_chat_question_task(project_id: str, question: str, top_k: int = 5):
+    """
+    Exemple simplifié: utilise des chunks indexés (non détaillé ici) + prompt RAG robuste.
+    Suppose qu’un index ChromaDB existe déjà pour project_id.
+    """
     try:
-        rows = session.execute(text(f"""
-            SELECT article_id, doi FROM search_results
-            WHERE project_id = :pid AND article_id = ANY(:ids)
-        """), {"pid": project_id, "ids": article_ids}).mappings().all()
-        session.close()
-
-        pdir = PROJECTS_DIR / project_id
-        pdir.mkdir(exist_ok=True)
-
-        for r in rows:
-            aid = r['article_id']
-            doi = r['doi']
-            if not doi:
-                continue
-            try:
-                pdf_url = fetch_unpaywall_pdf_url(doi)
-                if not pdf_url:
-                    continue
-                resp = http_get_with_retries(pdf_url, timeout=30)
-                if getattr(resp, "status_code", 0) == 200 and \
-                   resp.headers.get("Content-Type", "").lower().startswith("application/pdf"):
-                    out = pdir / (sanitize_filename(aid) + ".pdf")
-                    with open(out, "wb") as f:
-                        f.write(resp.content)
-                    successful.append(aid)
-                time.sleep(0.3)
-            except Exception as e:
-                logger.warning(f"Erreur OA pour {aid}: {e}")
-                continue
-
-        send_project_notification(
-            project_id,
-            'fetch_online_completed',
-            f'Recherche OA terminée: {len(successful)}/{len(article_ids)} PDF trouvés',
-            {'successful_count': len(successful), 'total_count': len(article_ids)}
-        )
-    except Exception as e:
-        logger.error(f"Erreur critique fetch_online_pdf_task: {e}", exc_info=True)
-        send_project_notification(project_id, 'fetch_online_failed', f'Erreur: {e}')
-
-
-def index_project_pdfs_task(project_id: str):
-    """Indexe tous les PDF du projet avec ChromaDB et embeddings (RAG)."""
-    logger.info(f"📚 Indexation PDF pour projet {project_id}")
-    try:
-        pdir = PROJECTS_DIR / project_id
-        chroma_client = chromadb.PersistentClient(path=str(pdir / "chroma_db"))
-        collection_name = f"project_{project_id}"
-
-        # Reset collection si existe
-        try:
-            chroma_client.delete_collection(collection_name)
-        except Exception:
-            pass
-        collection = chroma_client.create_collection(collection_name)
-
-        pdf_files = list(pdir.glob("*.pdf"))
-        if not pdf_files:
-            send_project_notification(project_id, 'indexing_failed', 'Aucun PDF trouvé.')
-            return
-
-        # Splitter local (simple)
-        from langchain.text_splitter import RecursiveCharacterTextSplitter
-        splitter = RecursiveCharacterTextSplitter(
-            chunk_size=CHUNK_SIZE,
-            chunk_overlap=CHUNK_OVERLAP,
-            length_function=len,
-        )
-
-        all_documents, all_metadatas, all_ids = [], [], []
-        successful_files = 0
-        total_filtered = 0
-
-        for pf in pdf_files:
-            article_id = pf.stem
-            try:
-                txt = extract_text_from_pdf(pf)
-                if not txt or len(txt.strip()) < 50:
-                    continue
-                chunks = splitter.split_text(txt)
-                keep, seen = [], set()
-                for i, ch in enumerate(chunks):
-                    c = (ch or "").strip()
-                    if len(c) < MIN_CHUNK_LEN:
-                        continue
-                    h = hash(c)
-                    if h in seen:
-                        continue
-                    seen.add(h)
-                    keep.append(c)
-                    all_metadatas.append({"article_id": article_id, "chunk_id": len(keep)-1, "source": pf.name})
-                    all_ids.append(f"{article_id}_chunk_{len(keep)-1}")
-                all_documents.extend(keep)
-                total_filtered += len(chunks) - len(keep)
-                successful_files += 1
-            except Exception as e:
-                logger.warning(f"Erreur traitement PDF {pf}: {e}")
-
-        if not all_documents:
-            send_project_notification(project_id, 'indexing_failed', 'Aucun contenu textuel indexable.')
-            return
-
-        # Embeddings
+        # Chargement du vecteur store (exemple très simplifié)
+        client = chromadb.Client()
+        collection = client.get_or_create_collection(name=f"project_{project_id}")
+        # Embedding de la question
         if embedding_model is None:
-            send_project_notification(project_id, 'indexing_failed', "Modèle d'embedding non disponible.")
-            return
+            return {"answer": "Embedding indisponible sur le worker.", "sources": []}
+        q_emb = embedding_model.encode([question]).tolist()[0]
+        # Recherche sémantique
+        results = collection.query(query_embeddings=[q_emb], n_results=top_k)
+        docs = results.get("documents", [[]])[0]
+        metadatas = results.get("metadatas", [[]])[0]
 
-        vectors = embedding_model.encode(all_documents, batch_size=EMBED_BATCH, show_progress_bar=False).tolist()
-        collection.add(documents=all_documents, metadatas=all_metadatas, ids=all_ids, embeddings=vectors)
+        # Construit le contexte + sources
+        context_parts, sources = [], []
+        for i, d in enumerate(docs):
+            if not d:
+                continue
+            context_parts.append(d)
+            md = metadatas[i] if i < len(metadatas) else {}
+            sources.append(md.get("source_id", f"doc_{i+1}"))
+        context = "\n\n---\n\n".join(context_parts) if context_parts else ""
 
-        # Marquer indexation
-        session = Session()
-        try:
-            session.execute(text("UPDATE projects SET indexed_at = :ts WHERE id = :pid"),
-                            {"ts": datetime.now().isoformat(), "pid": project_id})
-            session.commit()
-        finally:
-            session.close()
+        base_tpl = get_rag_chat_prompt_template()
+        tpl = get_effective_prompt_template("rag_chat_prompt", base_tpl)
+        prompt = tpl.format(context=context, question=question)
 
-        send_project_notification(project_id, 'indexing_completed',
-                                  f'Indexation terminée: {len(all_documents)} chunks, {successful_files}/{len(pdf_files)} PDF')
-    except Exception as e:
-        logger.error(f"Erreur index_project_pdfs_task: {e}", exc_info=True)
-        send_project_notification(project_id, 'indexing_failed', f'Erreur: {e}')
-
-
-def answer_chat_question_task(project_id: str, question: str, profile: dict):
-    """RAG: répond à une question basée sur les PDFs indexés via embeddings."""
-    logger.info(f"💬 Question RAG pour projet {project_id}")
-    try:
-        pdir = PROJECTS_DIR / project_id
-        chroma_path = pdir / "chroma_db"
-        if not chroma_path.exists():
-            return {"answer": "❌ Corpus non indexé. Lancez l'indexation.", "sources": []}
-
-        chroma_client = chromadb.PersistentClient(path=str(chroma_path))
-        collection_name = f"project_{project_id}"
-        try:
-            collection = chroma_client.get_collection(collection_name)
-        except Exception:
-            return {"answer": "❌ Collection introuvable. Ré-indexation requise.", "sources": []}
-
-        if embedding_model is None:
-            return {"answer": "❌ Modèle d'embedding indisponible sur le worker.", "sources": []}
-
-        if USE_QUERY_EMBED:
-            qv = embedding_model.encode([question], convert_to_numpy=True).tolist()
-            results = collection.query(query_embeddings=qv, n_results=5)
-        else:
-            results = collection.query(query_texts=[question], n_results=5)
-
-        if not results.get('documents') or not results['documents']:
-            return {"answer": "❌ Aucun document pertinent trouvé.", "sources": []}
-
-        chunks = results['documents']
-        metas = results['metadatas']
-        context = "\n\n".join([f"Source: {m['source']} (Article: {m['article_id']})\n{c}" for c, m in zip(chunks, metas)])
-
-        rag_prompt = (
-            "Tu es un assistant de recherche. Réponds à la question suivante UNIQUEMENT avec le contexte fourni.\n"
-            f"Question: {question}\n\nContexte:\n{context}\n\n"
-            "- Réponds précisément et cite les ID d'articles.\n- Dis si l'info manque.\nRéponse:"
-        )
-        answer = call_ollama_api(rag_prompt, profile.get('synthesis_model', 'llama3.1:8b'))
-        sources = list({f"Article: {m['article_id']}" for m in metas})
+        # Appel LLM
+        answer_text = call_ollama_api(prompt, model="llama3.1:8b")
+        answer = answer_text if isinstance(answer_text, str) else str(answer_text)
 
         # Sauvegarder l'historique du chat
         session = Session()
@@ -968,6 +837,9 @@ def answer_chat_question_task(project_id: str, question: str, profile: dict):
         logger.error(f"Erreur answer_chat_question_task: {e}", exc_info=True)
         return {"answer": f"❌ Erreur: {e}", "sources": []}
 
+# ================================================================
+# === ZOTERO: IMPORT À PARTIR D'UN FICHIER CSL JSON
+# ================================================================
 
 def import_from_zotero_file_task(project_id, zotero_json_data):
     """Importe des articles + PDF depuis un export CSL JSON Zotero (user/group auto)."""
@@ -982,7 +854,6 @@ def import_from_zotero_file_task(project_id, zotero_json_data):
         library_type_raw = parts[3]  # 'users' ou 'groups'
         library_id = parts[4]
         library_type = 'user' if library_type_raw == 'users' else 'group'
-
         from pyzotero import zotero
         zot = zotero.Zotero(library_id, library_type, os.getenv('ZOTERO_API_KEY'))
         zot.key_info()
@@ -1040,12 +911,12 @@ def import_from_zotero_file_task(project_id, zotero_json_data):
         except Exception as e:
             logger.warning(f"Erreur import PDF Zotero key {key}: {e}")
 
-    send_project_notification(
-        project_id,
-        'zotero_import_completed',
-        f'Import Fichier Zotero terminé: {successful}/{len(zotero_json_data)} PDF importés'
-    )
+    send_project_notification(project_id, 'zotero_import_completed',
+                              f'Import Fichier Zotero terminé: {successful}/{len(zotero_json_data)} PDF importés')
 
+# ================================================================
+# === KAPPA
+# ================================================================
 
 def calculate_kappa_task(project_id: str):
     """Calcule le coefficient Kappa de Cohen entre evaluator_1 et evaluator_2 stockés dans extractions.validations."""

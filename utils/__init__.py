@@ -11,6 +11,19 @@ from .file_handlers import sanitize_filename, extract_text_from_pdf
 from .notifications import send_project_notification, send_global_notification
 from .helpers import http_get_with_retries, safe_json_loads, format_file_size
 
+from .prompt_templates import (
+    get_screening_prompt_template,
+    get_full_extraction_prompt_template,
+    get_synthesis_prompt_template,
+    get_rag_chat_prompt_template,
+)
+__all__ += [
+    "get_screening_prompt_template",
+    "get_full_extraction_prompt_template",
+    "get_synthesis_prompt_template",
+    "get_rag_chat_prompt_template",
+]
+
 __version__ = "4.1.0"
 __author__ = "AnalyLit Team"
 
