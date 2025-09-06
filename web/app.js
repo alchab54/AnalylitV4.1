@@ -66,6 +66,7 @@ async function initializeApplication() {
         await loadInitialData();
         showSection('projects');
         attachValidationFileInputListener();
+		attachZoteroFileInputListener();
         console.log('✅ Application initialisée avec succès');
     } catch (error) {
         console.error('❌ Erreur initialisation application:', error);
@@ -208,34 +209,26 @@ function escapeHtml(text) {
 }
 
 function sanitize_filename(name) {
-    if (!name) return 'unnamed_file';
-    let s = String(name).replace(/[<>:"/\\|?*]/g, '_').trim();
-    if (s.length > 200) s = s.slice(0, 200);
-    return s || 'unnamed_file';
+  if (!name) return 'unnamed_file';
+  let s = String(name).replace(/[<>:"/\\|?*]/g, '_').trim();
+  if (s.length > 200) s = s.slice(0, 200);
+  return s || 'unnamed_file';
 }
 
 function showToast(message, type = 'info') {
-    if (!elements.toastContainer) return;
-    
-    const toast = document.createElement('div');
-    toast.className = `toast toast--${type}`;
-    
-    const icons = {
-        success: '✅',
-        error: '❌', 
-        warning: '⚠️',
-        info: 'ℹ️'
-    };
-    
-    toast.innerHTML = `
-        <div class="toast__icon">${icons[type] || icons.info}</div>
-        <div class="toast__content">${escapeHtml(message)}</div>
-        <button class="toast__close" onclick="this.parentElement.remove()">×</button>
-    `;
-    
-    elements.toastContainer.appendChild(toast);
-    
-    setTimeout(() => toast.remove(), 5000);
+  if (!elements.toastContainer) return;
+  const toast = document.createElement('div');
+  toast.className = `toast toast--${type}`;
+  const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+  toast.innerHTML = `<span class="toast__icon">${icons[type] || 'ℹ️'}</span><span class="toast__msg">${escapeHtml(message || '')}</span>`;
+  elements.toastContainer.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('toast--show');
+  }, 10);
+  setTimeout(() => {
+    toast.classList.remove('toast--show');
+    toast.remove();
+  }, 4000);
 }
 
 function showLoadingOverlay(show, message = 'Chargement...') {
@@ -293,6 +286,48 @@ function showSection(sectionName) {
     // Rafraîchir le contenu si nécessaire
     refreshCurrentSection();
 }
+async function renderProjectArticlesList(projectId) {
+  const container = document.getElementById('project-articles-list');
+  if (!container) return;
+  try {
+    const [articles, pdfFiles] = await Promise.all([
+      fetchAPI(`/projects/${projectId}/search-results?per_page=1000`),
+      fetchAPI(`/projects/${projectId}/files`)
+    ]);
+    const pdfFilenames = new Set((pdfFiles || []).map(f => f.filename));
+    if (!articles?.results || articles.results.length === 0) {
+      container.innerHTML = `
+        <p class="text-muted">Aucun article dans ce projet.</p>
+        <p class="text-muted">Ajoutez des résultats via la recherche ou un import Zotero.</p>
+      `;
+      return;
+    }
+    const listHtml = articles.results.map(article => {
+      const safeFilename = `${sanitize_filename(article.article_id || article.id || '')}.pdf`;
+      const hasPdf = pdfFilenames.has(safeFilename);
+      const pdfActionHtml = hasPdf
+        ? `<a href="/api/projects/${projectId}/files/${encodeURIComponent(safeFilename)}" target="_blank" class="btn btn--sm btn--outline">Ouvrir PDF</a>`
+        : `<span class="status status--warning">PDF manquant</span>`;
+      return `
+        <li class="article-row">
+          <div class="article-main">
+            <div class="article-title">${escapeHtml(article.title || '')}</div>
+            <div class="article-meta">${escapeHtml(article.database_source || '')} • ${escapeHtml(article.article_id || '')}</div>
+          </div>
+          <div class="article-actions">
+            ${pdfActionHtml}
+          </div>
+        </li>
+      `;
+    }).join('');
+    container.innerHTML = `<ul class="article-list">${listHtml}</ul>`;
+  } catch (error) {
+    console.error('Erreur renderProjectArticlesList:', error);
+    showToast("Erreur lors du chargement des articles du projet", 'error');
+  } finally {
+    // no-op
+  }
+}
 
 function refreshCurrentSection(project = appState.currentProject) {
     switch (appState.currentSection) {
@@ -326,6 +361,14 @@ function refreshCurrentSection(project = appState.currentProject) {
             renderSettingsSection();
             break;
     }
+	if (typeof renderImportSection === 'function') {
+    renderImportSection(project);
+  } else if (project?.id) {
+    // Fallback minimal: afficher la liste des articles + état des PDFs
+    if (typeof renderProjectArticlesList === 'function') {
+      renderProjectArticlesList(project.id);
+    }
+  }
 }
 
 // ================================================================
@@ -559,18 +602,27 @@ function setupEventListeners() {
 }
 
 function attachValidationFileInputListener() {
-    const validationFileInput = document.getElementById('validationFileInput');
-    if (!validationFileInput) return;
-    
-    // Remplacer l'élément par un clone pour purger les anciens écouteurs
-    const newValidationFileInput = validationFileInput.cloneNode(true);
-    validationFileInput.parentNode.replaceChild(newValidationFileInput, validationFileInput);
-    
-    newValidationFileInput.addEventListener('change', (e) => {
-        if (e.target.files.length > 0 && appState.currentProject) {
-            handleImportValidations(e.target.files[0], appState.currentProject.id);
-        }
-    });
+  const oldEl = document.getElementById('validationFileInput');
+  if (!oldEl) return;
+  const el = oldEl.cloneNode(true);
+  oldEl.parentNode.replaceChild(el, oldEl);
+  el.addEventListener('change', (e) => {
+    const file = e.target?.files?.;
+    if (!file || !appState.currentProject?.id) return;
+    handleImportValidations(file, appState.currentProject.id);
+  });
+}
+
+function attachZoteroFileInputListener() {
+  const oldEl = document.getElementById('zoteroFileInput');
+  if (!oldEl) return;
+  const el = oldEl.cloneNode(true);
+  oldEl.parentNode.replaceChild(el, oldEl);
+  el.addEventListener('change', (e) => {
+    if (typeof handleZoteroFileUpload === 'function') {
+      handleZoteroFileUpload(e);
+    }
+  });
 }
 
 // ================================================================
@@ -3058,6 +3110,33 @@ window.openModal = openModal;
 window.closeModal = closeModal;
 window.showSection = showSection;
 window.loadProjectSearchResults = loadProjectSearchResults;
+
+// Exposition contrôlée des handlers au scope global (évite ReferenceError)
+window.handleZoteroFileUpload = typeof handleZoteroFileUpload === 'function' ? handleZoteroFileUpload : () => {};
+window.handleImportValidations = typeof handleImportValidations === 'function' ? handleImportValidations : () => {};
+window.handleExportValidations = typeof handleExportValidations === 'function' ? handleExportValidations : () => {};
+window.handleCalculateKappa = typeof handleCalculateKappa === 'function' ? handleCalculateKappa : () => {};
+
+window.handleRunIndexing = typeof handleRunIndexing === 'function' ? handleRunIndexing : () => {};
+window.handleFetchOnlinePdfs = typeof handleFetchOnlinePdfs === 'function' ? handleFetchOnlinePdfs : () => {};
+window.handleManualPDFUpload = typeof handleManualPDFUpload === 'function' ? handleManualPDFUpload : () => {};
+window.handleImportZotero = typeof handleImportZotero === 'function' ? handleImportZotero : () => {};
+
+window.handlePullModel = typeof handlePullModel === 'function' ? handlePullModel : () => {};
+window.handleSaveZoteroSettings = typeof handleSaveZoteroSettings === 'function' ? handleSaveZoteroSettings : () => {};
+window.handleClearQueue = typeof handleClearQueue === 'function' ? handleClearQueue : () => {};
+
+window.sendChatMessage = typeof sendChatMessage === 'function' ? sendChatMessage : () => {};
+window.clearChatHistory = typeof clearChatHistory === 'function' ? clearChatHistory : () => {};
+
+window.openGridModal = typeof openGridModal === 'function' ? openGridModal : () => {};
+window.handleDeleteGrid = typeof handleDeleteGrid === 'function' ? handleDeleteGrid : () => {};
+window.openPromptModal = typeof openPromptModal === 'function' ? openPromptModal : () => {};
+window.openProfileModal = typeof openProfileModal === 'function' ? openProfileModal : () => {};
+window.handleDeleteProfile = typeof handleDeleteProfile === 'function' ? handleDeleteProfile : () => {};
+
+window.runAdvancedAnalysis = typeof runAdvancedAnalysis === 'function' ? runAdvancedAnalysis : () => {};
+window.viewAnalysisPlot = typeof viewAnalysisPlot === 'function' ? viewAnalysisPlot : () => {};
 
 // Log de fin de chargement
 console.log('✅ AnalyLit V4.1 Frontend - Chargement complet terminé');
