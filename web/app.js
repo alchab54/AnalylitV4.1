@@ -1225,7 +1225,7 @@ function renderExtractedDataPreview(extractedData) {
 
 async function openExtractionDetailModal(extractionId) {
     const modal = document.getElementById('extractionDetailModal');
-    const container = document.getElementById('extractionModalBody');
+    const container = document.getElementById('extractionDetailContainer');
     if (!modal || !container) {
         console.error("La modale d'extraction ou son conteneur n'a pas été trouvé.");
         return;
@@ -1475,6 +1475,166 @@ function renderAnalysisSection() {
             </div>
         `;
     }).join('');
+}
+
+function renderImportSection() {
+    const container = elements.importContainer;
+    const project = appState.currentProject;
+
+    if (!project) {
+        container.innerHTML = `
+            <div class="import-placeholder">
+                <div class="import-placeholder__icon">👈</div>
+                <h4>Sélectionnez un projet</h4>
+                <p>Les options d'import s'afficheront ici.</p>
+            </div>`;
+        return;
+    }
+	
+	const hasArticles = project.pmids_count > 0;
+    const disabledAttribute = !hasArticles ? 'disabled' : '';
+    const disabledTooltip = !hasArticles ? 'title="Veuillez d\'abord effectuer une recherche et ajouter des articles au projet."' : '';
+ 
+    container.innerHTML = `
+        <div class="import-sections">
+            <div class="import-card">
+                <h4>1. 📄 Récupérer les PDF</h4>
+                <p>Importez les PDF des articles de votre projet.</p>
+                <div class="import-actions">
+                    <button class="btn btn--primary" data-action="fetch-online-pdfs" data-project-id="${project.id}">
+                        🌐 Chercher PDF en ligne (OA)
+                    </button>
+                    <button class="btn btn--secondary" data-action="import-zotero" data-project-id="${project.id}">
+                        📚 Importer depuis Zotero
+                    </button>
+                </div>
+                <div id="pdfDropZone" class="pdf-drop-zone">
+                    <div class="pdf-drop-zone__content">
+                        <div class="pdf-drop-zone__icon">📄</div>
+                        <p>Glissez-déposez vos fichiers PDF ici</p>
+                        <small>Ou cliquez pour sélectionner (max 20 fichiers)</small>
+                    </div>
+                    <input type="file" id="pdfFileInput" multiple accept=".pdf" class="hidden">
+                </div>
+                <ul id="pdfUploadStatus" class="upload-status-list"></ul>
+            </div>
+            
+            <div class="import-card">
+                <h4>2. 🔍 Indexer le Corpus</h4>
+                <p>Une fois les PDF importés, lancez l'indexation pour pouvoir utiliser la fonction de Chat.</p>
+                <button class="btn btn--primary" data-action="run-indexing" data-project-id="${project.id}">
+                    ⚙️ Lancer l'Indexation
+                </button>
+            </div>
+        </div>
+    `;
+    
+    setupPDFDragDrop();
+}
+
+function setupPDFDragDrop() {
+    const dropZone = document.getElementById('pdfDropZone');
+    const fileInput = document.getElementById('pdfFileInput');
+    
+    if (!dropZone || !fileInput) return;
+    
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, e => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+    });
+    
+    dropZone.addEventListener('dragenter', () => dropZone.classList.add('pdf-drop-zone--dragover'));
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('pdf-drop-zone--dragover'));
+    
+    dropZone.addEventListener('drop', e => {
+        dropZone.classList.remove('pdf-drop-zone--dragover');
+        handlePDFUpload(e.dataTransfer.files);
+    });
+    
+    fileInput.addEventListener('change', e => handlePDFUpload(e.target.files));
+}
+
+async function handlePDFUpload(files) {
+    const project = appState.currentProject;
+    if (!project) {
+        showToast("Veuillez d'abord sélectionner un projet.", 'error');
+        return;
+    }
+    
+    if (files.length > 20) {
+        showToast("Vous ne pouvez importer que 20 fichiers à la fois.", "error");
+        return;
+    }
+
+    const formData = new FormData();
+    Array.from(files).forEach(file => formData.append('files', file));
+
+    showLoadingOverlay(true, `Import de ${files.length} fichier(s)...`);
+    const statusContainer = document.getElementById('pdfUploadStatus');
+    if (statusContainer) statusContainer.innerHTML = '';
+
+    try {
+        const result = await fetchAPI(`/projects/${project.id}/upload-pdfs-bulk`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (statusContainer) {
+            result.successful?.forEach(name => {
+                statusContainer.innerHTML += `<li class="upload-success">✅ ${escapeHtml(name)}</li>`;
+            });
+            result.failed?.forEach(name => {
+                statusContainer.innerHTML += `<li class="upload-error">❌ ${escapeHtml(name)}</li>`;
+            });
+        }
+        
+        showToast(`Import terminé: ${result.successful?.length || 0}/${files.length} fichiers.`, 'success');
+
+    } catch (error) {
+        console.error('Erreur upload PDF:', error);
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+async function handleImportZotero(projectId) {
+    showLoadingOverlay(true, 'Lancement de l\'import Zotero...');
+    try {
+        await fetchAPI(`/projects/${projectId}/import-zotero`, { method: 'POST' });
+        showToast('Import depuis Zotero lancé en arrière-plan.', 'info');
+    } catch (error) {
+        console.error('Erreur import Zotero:', error);
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+async function handleFetchOnlinePdfs(projectId) {
+    showLoadingOverlay(true, 'Lancement de la recherche de PDF...');
+    try {
+        await fetchAPI(`/projects/${projectId}/fetch-online-pdfs`, { method: 'POST' });
+        showToast('Recherche de PDF en ligne lancée en arrière-plan.', 'info');
+    } catch (error) {
+        console.error('Erreur recherche PDF:', error);
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+async function handleRunIndexing(projectId) {
+    showLoadingOverlay(true, "Lancement de l'indexation...");
+    try {
+        await fetchAPI(`/projects/${projectId}/index`, { method: 'POST' });
+        showToast('Indexation du corpus lancée. Vous recevrez une notification quand ce sera terminé.', 'info');
+    } catch (error) {
+        console.error('Erreur indexation:', error);
+    } finally {
+        showLoadingOverlay(false);
+    }
 }
 
 async function runAdvancedAnalysis(analysisType, projectId) {
