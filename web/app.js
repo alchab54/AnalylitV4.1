@@ -414,19 +414,35 @@ function showSection(sectionName) {
 }
 
 function refreshCurrentSection() {
+    // Ce dictionnaire associe une section à sa fonction de rendu.
     const renderMap = {
         projects: () => { renderProjectsList(); renderProjectDetail(); },
         search: renderSearchInterface,
         results: renderResultsSection,
         validation: renderValidationSection,
         analysis: renderAnalysisSection,
-        import: renderImportSection,
         chat: renderChatSection,
         settings: renderSettingsSection,
     };
 
-    // Appelle simplement la fonction de rendu correspondante à la section actuelle
-    if (renderMap[appState.currentSection]) {
+    // On gère le cas 'import' séparément pour ajouter la vérification
+    if (appState.currentSection === 'import') {
+        if (typeof renderImportSection === 'function') {
+            renderImportSection();
+        } else {
+            // Fallback si la fonction n'est pas encore créée
+            console.warn('renderImportSection n\'est pas encore implémentée.');
+            const importContainer = document.getElementById('importContainer');
+            if (importContainer) {
+              importContainer.innerHTML = `<div class="import-placeholder">
+                <span class="import-placeholder__icon">📥</span>
+                <h4>Section en construction</h4>
+                <p>Sélectionnez un projet pour voir les options d'import.</p>
+              </div>`;
+            }
+        }
+    } else if (renderMap[appState.currentSection]) {
+        // On appelle la fonction de rendu pour les autres sections
         renderMap[appState.currentSection]();
     }
 }

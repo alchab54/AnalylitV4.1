@@ -50,3 +50,4 @@ blinker==1.7.0
 setuptools>=65.0.0
 wheel>=0.38.0
 gevent-websocket==0.10.1
+psycopg2-binary==2.9.10
