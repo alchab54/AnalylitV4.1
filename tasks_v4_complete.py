@@ -540,29 +540,24 @@ def run_meta_analysis_task(project_id: str):
 
         if len(scores) < 2:
             update_project_status(project_id, "failed")
-            send_project_notification(project_id, 'analysis_failed', 'Pas assez de données pour une méta-analyse.')
+            send_project_notification(project_id, 'analysis_failed', 'Trop peu de scores pour la méta-analyse.')
             return
 
-        scores_arr = np.array(scores, dtype=float)
-        mean_score = float(np.mean(scores_arr))
-        std_score = float(np.std(scores_arr, ddof=1))
-        n = len(scores_arr)
+        arr = np.array(scores, dtype=float)
+        mean = float(np.mean(arr))
+        std = float(np.std(arr, ddof=1)) if len(arr) > 1 else 0.0
+        n = len(arr)
 
-        # Intervalle de confiance 95% sur la moyenne (approx t de Student)
-        se = std_score / math.sqrt(n)
-        t_crit = float(stats.t.ppf(0.975, df=n-1)) if n > 1 else 0.0
-        ci_low = float(mean_score - t_crit * se)
-        ci_high = float(mean_score + t_crit * se)
+        alpha = 0.05
+        tcrit = float(stats.t.ppf(1 - alpha/2, df=n - 1)) if n > 1 else 0.0
+        margin = tcrit * std / math.sqrt(n) if n > 1 else 0.0
+        ci_low, ci_high = (mean - margin, mean + margin)
 
-        # Visualisation simple (histogramme)
-        fig, ax = plt.subplots(figsize=(8, 5))
-        ax.hist(scores_arr, bins=min(20, max(5, n // 2)), color='#2980b9', alpha=0.7, edgecolor='white')
-        ax.axvline(mean_score, color='red', linestyle='--', label=f"Moyenne = {mean_score:.2f}")
+        fig, ax = plt.subplots(figsize=(6, 4))
+        ax.hist(arr, bins=max(10, min(30, n // 2)), color='skyblue', edgecolor='black')
+        ax.axvline(mean, color='red', linestyle='--', label=f'Moyenne {mean:.2f}')
         ax.set_title('Distribution des scores de pertinence')
-        ax.set_xlabel('Score IA')
-        ax.set_ylabel('Fréquence')
         ax.legend()
-
         pdir = PROJECTS_DIR / project_id
         pdir.mkdir(exist_ok=True)
         plot_path = str(pdir / 'meta_analysis_hist.png')
@@ -571,16 +566,16 @@ def run_meta_analysis_task(project_id: str):
 
         result = {
             "n_articles": n,
-            "mean_score": mean_score,
-            "std_score": std_score,
-            "confidence_interval": [ci_low, ci_high],
+            "mean_score": mean,
+            "std_dev": std,
+            "confidence_interval": [ci_low, ci_high]
         }
-        update_project_status(project_id, status="completed", analysis_result=result, analysis_plot_path=plot_path)
+        update_project_status(project_id, "completed", analysis_result=result, analysis_plot_path=plot_path)
         send_project_notification(project_id, 'analysis_completed', 'Méta-analyse terminée.')
     except Exception as e:
         logger.error(f"Erreur run_meta_analysis_task: {e}", exc_info=True)
         update_project_status(project_id, "failed")
-        send_project_notification(project_id, 'analysis_failed', f'Erreur: {e}')
+        send_project_notification(project_id, 'analysis_failed', f'Erreur lors de la méta-analyse: {e}')
     finally:
         session.close()
 
@@ -638,84 +633,61 @@ def run_descriptive_stats_task(project_id: str):
 # === CHAT RAG (Version finale avec profil)
 # ================================================================
 
-def answer_chat_question_task(project_id: str, question: str, profile: dict, top_k: int = 5):
-    """
-    RAG: répond à une question basée sur les PDFs indexés via embeddings.
-    --- CORRECTION ---
-    Signature mise à jour pour accepter le 'profile'.
-    - Recherche sémantique dans un index Chroma par projet
-    - Construction d’un prompt robuste via get_rag_chat_prompt_template (override DB si présent)
-    - Utilisation du modèle de synthèse défini par le profil
-    - Persistance de l’historique des échanges dans chat_messages
-    """
-    logger.info(f"💬 Question RAG pour projet {project_id}")
+def answer_chat_question_task(project_id: str, question: str, profile: dict, topk: int = 5):
+    """RAG simple basé sur abstracts (ou index plus tard), avec historique en DB."""
+    logger.info(f"💬 Question RAG pour projet {project_id}: {question[:80]}...")
     try:
-        # 1) Charger/initialiser la collection Chroma du projet
-        client = chromadb.Client()
-        collection_name = f"project_{project_id}"
-        collection = client.get_or_create_collection(name=collection_name)
-
-        # 2) Vérifier la disponibilité des embeddings
-        if embedding_model is None:
-            logger.warning("Modèle d'embedding indisponible")
-            return {"answer": "Embedding indisponible sur le worker.", "sources": []}
-
-        # 3) Encoder la question et interroger l’index
-        q_emb = embedding_model.encode([question]).tolist()
-        results = collection.query(query_embeddings=[q_emb], n_results=max(1, int(top_k)))
-
-        docs = results.get("documents", [[]])
-        metadatas = results.get("metadatas", [[]])
-
-        # 4) Construire le contexte et la liste des sources
-        context_parts, sources = [], []
-        for i, d in enumerate(docs):
-            if not d:
-                continue
-            context_parts.append(d)
-            md = metadatas[i] if i < len(metadatas) else {}
-            src = md.get("source_id") or md.get("pmid") or md.get("article_id") or md.get("title") or f"doc_{i+1}"
-            sources.append(src)
-
-        context = "\n\n---\n\n".join(context_parts) if context_parts else ""
-
-        # 5) Construire le prompt RAG (avec override DB si présent)
-        base_tpl = get_rag_chat_prompt_template()
-        tpl = get_effective_prompt_template("rag_chat_prompt", base_tpl)
-        rag_prompt = tpl.format(context=context, question=question)
-
-        # 6) Choisir le modèle depuis le profil (fallback: llama3.1:8b)
-        model_name = (profile or {}).get('synthesis_model', 'llama3.1:8b')
-
-        # 7) Appel LLM via Ollama
-        answer_text = call_ollama_api(rag_prompt, model_name)
-        answer = answer_text if isinstance(answer_text, str) else str(answer_text)
-
-        # 8) Sauvegarder l’historique dans PostgreSQL
+        # Récupération d’un contexte minimal depuis les abstracts
         session = Session()
         try:
-            ts = datetime.now().isoformat()
-            # Message utilisateur
-            session.execute(text("""
-                INSERT INTO chat_messages (id, project_id, role, content, timestamp)
-                VALUES (:id, :pid, 'user', :c, :ts)
-            """), {"id": str(uuid.uuid4()), "pid": project_id, "c": question, "ts": ts})
-            # Réponse assistant
-            session.execute(text("""
-                INSERT INTO chat_messages (id, project_id, role, content, sources, timestamp)
-                VALUES (:id, :pid, 'assistant', :c, :s, :ts)
-            """), {"id": str(uuid.uuid4()), "pid": project_id, "c": answer, "s": json.dumps(sources), "ts": ts})
-            session.commit()
-        except Exception as e:
-            session.rollback()
-            logger.error(f"Erreur sauvegarde historique chat: {e}", exc_info=True)
+            docs = session.execute(text("""
+                SELECT title, abstract FROM search_results
+                WHERE project_id = :pid
+                ORDER BY created_at DESC
+                LIMIT :k
+            """), {"pid": project_id, "k": int(topk)}).mappings().all()
         finally:
             session.close()
 
+        context = "\n\n---\n\n".join(
+            [f"Titre: {d.get('title','')}\nRésumé: {d.get('abstract','')}" for d in docs if d.get('abstract')]
+        )
+
+        if not context.strip():
+            answer = "Aucun document indexé ne contient d'information exploitable pour cette question."
+            sources = []
+        else:
+            base_tpl = get_rag_chat_prompt_template()
+            tpl = get_effective_prompt_template("rag_chat_prompt", base_tpl)
+            rag_prompt = tpl.format(context=context, question=question)
+            model_name = profile.get('synthesis_model', 'llama3.1:8b')
+            answer_text = call_ollama_api(rag_prompt, model_name)
+            answer = answer_text if isinstance(answer_text, str) else str(answer_text)
+            sources = [d.get('title','') for d in docs[:3]]
+
+        # Sauvegarder l’historique
+        session = Session()
+        try:
+            ts = datetime.now().isoformat()
+            session.execute(text("""
+                INSERT INTO chat_messages (id, project_id, role, content, timestamp)
+                VALUES (:id, :pid, :role, :content, :ts)
+            """), {"id": str(uuid.uuid4()), "pid": project_id, "role": "user", "content": question, "ts": ts})
+            session.execute(text("""
+                INSERT INTO chat_messages (id, project_id, role, content, sources, timestamp)
+                VALUES (:id, :pid, :role, :content, :sources, :ts)
+            """), {"id": str(uuid.uuid4()), "pid": project_id, "role": "assistant",
+                   "content": answer, "sources": json.dumps(sources), "ts": ts})
+            session.commit()
+        finally:
+            session.close()
+
+        send_project_notification(project_id, 'analysis_completed', 'Réponse de chat générée.')
         return {"answer": answer, "sources": sources}
     except Exception as e:
         logger.error(f"Erreur answer_chat_question_task: {e}", exc_info=True)
-        return {"answer": f"❌ Erreur: {e}", "sources": []}
+        send_project_notification(project_id, 'analysis_failed', f'Erreur RAG: {e}')
+        return {"answer": f"Erreur: {e}", "sources": []}
 
 # ================================================================
 # === ZOTERO: IMPORT À PARTIR D'UN FICHIER CSL JSON (fusion des fonctions manquantes)

@@ -1128,6 +1128,83 @@ def api_project_chat(project_id):
     )
     return jsonify({'message': 'Question envoyée au moteur RAG.', 'job_id': job.id}), 202
 
+@api_bp.route('/ollama/models', methods=['GET'])
+def list_ollama_models():
+    # Interroge le service Ollama pour lister les modèles disponibles (ollama list)
+    import requests
+    try:
+        resp = requests.get(f"{config.OLLAMA_BASE_URL}/api/tags", timeout=10)
+        resp.raise_for_status()
+        data = resp.json() or {}
+        # Normaliser la sortie en simple liste de noms attendue par le front
+        models = []
+        for m in data.get('models', []):
+            name = m.get('name')
+            if name:
+                models.append({"name": name, "size": m.get("size", 0)})
+        return jsonify(models)
+    except Exception as e:
+        logger.error(f"Erreur /ollama/models: {e}", exc_info=True)
+        return jsonify([]), 404
+
+@api_bp.route('/prompts', methods=['GET'])
+def list_prompts():
+    session = Session()
+    try:
+        rows = session.execute(text("SELECT id, name, description, template FROM prompts ORDER BY name")).mappings().all()
+        return jsonify([dict(r) for r in rows])
+    except Exception as e:
+        logger.error(f"Erreur /prompts GET: {e}", exc_info=True)
+        return jsonify([]), 404
+    finally:
+        session.close()
+
+@api_bp.route('/projects/<project_id>/extractions', methods=['GET'])
+def list_project_extractions(project_id):
+    session = Session()
+    try:
+        rows = session.execute(text("""
+            SELECT id, pmid, title, relevance_score, relevance_justification, created_at, analysis_source, extracted_data, validations
+            FROM extractions WHERE project_id = :pid
+            ORDER BY created_at DESC
+        """), {"pid": project_id}).mappings().all()
+        # Front attend un tableau simple
+        return jsonify([{
+            "id": r["id"],
+            "pmid": r["pmid"],
+            "title": r["title"],
+            "relevance_score": r["relevance_score"],
+            "relevance_justification": r["relevance_justification"],
+            "created_at": r["created_at"],
+            "analysis_source": r["analysis_source"],
+            "extracted_data": r["extracted_data"],
+            "validations": r["validations"]
+        } for r in rows])
+    except Exception as e:
+        logger.error(f"Erreur /projects/<id>/extractions: {e}", exc_info=True)
+        return jsonify([]), 404
+    finally:
+        session.close()
+
+@api_bp.route('/queue-status', methods=['GET'])
+def queue_status():
+    try:
+        # Comptages RQ par file
+        q_proc = Queue('analylit_processing_v4', connection=redis_conn)
+        q_syn = Queue('analylit_synthesis_v4', connection=redis_conn)
+        q_ana = Queue('analylit_analysis_v4', connection=redis_conn)
+        q_bg = Queue('analylit_background_v4', connection=redis_conn)
+        status = {
+            "analylit_processing_v4": q_proc.count,
+            "analylit_synthesis_v4": q_syn.count,
+            "analylit_analysis_v4": q_ana.count,
+            "analylit_background_v4": q_bg.count,
+        }
+        return jsonify(status)
+    except Exception as e:
+        logger.error(f"Erreur /queue-status: {e}", exc_info=True)
+        return jsonify({}), 404
+
 # ================================================================
 # Enregistrement Blueprint & Static
 # ================================================================
