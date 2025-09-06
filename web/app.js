@@ -69,6 +69,14 @@ function attachValidationFileInputListener() {
     });
 }
 
+function sanitize_filename(name) {
+  if (!name) return 'unnamed_file';
+  // Remplace les caractères interdits et tronque à 200 chars (aligné backend)
+  let s = String(name).replace(/[<>:"/\\|?*]/g, '_').trim();
+  if (s.length > 200) s = s.slice(0, 200);
+  return s || 'unnamed_file';
+}
+
 async function initializeApplication() {
     showLoadingOverlay(true, 'Initialisation...');
     try {
@@ -230,32 +238,35 @@ async function loadInitialData() {
 // ================================================================
 
 async function fetchAPI(endpoint, options = {}) {
-    const url = `/api${endpoint}`;
-    const headers = options.body instanceof FormData ? {} : { 'Content-Type': 'application/json', ...options.headers };
-    const config = { ...options, headers };
+  const url = `/api${endpoint}`;
+  const headers = (options.body instanceof FormData)
+    ? {}
+    : { 'Content-Type': 'application/json', ...(options.headers || {}) };
 
-    if (options.body && !(options.body instanceof FormData)) {
-        config.body = JSON.stringify(options.body);
-    }
+  const config = { ...options, headers };
 
-    try {
-        const response = await fetch(url, config);
-        if (!response.ok) {
-            const data = await response.json().catch(() => ({ error: `Erreur HTTP ${response.status}` }));
-            throw new Error(data.error || `Erreur ${response.status}`);
-        }
-        if (response.status === 204 || response.headers.get('Content-Length') === '0') return null;
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.indexOf("application/json") !== -1) {
-            return await response.json();
-        } else {
-            return await response.text();
-        }
-    } catch (error) {
-        console.error(`Erreur API pour ${endpoint}:`, error);
-        showToast(error.message, 'error');
-        throw error;
+  if (options.body && !(options.body instanceof FormData) && typeof options.body !== 'string') {
+    config.body = JSON.stringify(options.body);
+  }
+
+  try {
+    const response = await fetch(url, config);
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({ error: `Erreur HTTP ${response.status}` }));
+      throw new Error(data.error || `Erreur ${response.status}`);
     }
+    if (response.status === 204 || response.headers.get('Content-Length') === '0') return null;
+
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      return await response.json();
+    }
+    return await response.text();
+  } catch (error) {
+    console.error(`Erreur API pour ${endpoint}:`, error);
+    showToast(error.message, 'error');
+    throw error;
+  }
 }
 
 function initializeWebSocket() {
@@ -2144,515 +2155,78 @@ async function handleManualPDFUpload(articleId, file) {
 }
 
 async function renderProjectArticlesList(projectId) {
-    const container = document.getElementById('project-articles-list');
-    if (!container) return;
+  const container = document.getElementById('project-articles-list');
+  if (!container) return;
+  try {
+    const [articles, pdfFiles] = await Promise.all([
+      fetchAPI(`/projects/${projectId}/search-results?per_page=1000`),
+      fetchAPI(`/projects/${projectId}/files`)
+    ]);
 
-    try {
-        const [articles, pdfFiles] = await Promise.all([
-            fetchAPI(`/projects/${projectId}/search-results?per_page=1000`),
-            fetchAPI(`/projects/${projectId}/files`)
-        ]);
-
-        const pdfFilenames = new Set(pdfFiles.map(f => f.filename));
-
-        if (!articles.results || articles.results.length === 0) {
-            container.innerHTML = '<p>Aucun article dans ce projet. Commencez par en ajouter via l\'onglet "Recherche" ou un import Zotero.</p>';
-            return;
-        }
-
-        container.innerHTML = `
-        <ul class="articles-list">
-            ${articles.results.map(article => {
-                const safeFilename = sanitize_filename(article.article_id) + ".pdf";
-                const hasPdf = pdfFilenames.has(safeFilename);
-                const pdfActionHtml = hasPdf 
-                    ? `<a href="/api/projects/${projectId}/files/${safeFilename}" target="_blank" class="btn btn--secondary btn--sm" title="Ouvrir le PDF">📄</a>`
-                    : `<button class="btn btn--primary btn--sm" data-action="upload-single-pdf" data-article-id="${escapeHtml(article.article_id)}" title="Ajouter un PDF">➕</button>`;
-
-                return `
-                    <li class="article-item">
-                        <input type="checkbox" class="article-select-checkbox" data-article-id="${escapeHtml(article.article_id)}">
-                        <span class="article-title">${escapeHtml(article.title)}</span>
-                        <div class="article-actions">
-                            <span class="article-id">${escapeHtml(article.article_id)}</span>
-                            ${pdfActionHtml}
-                        </div>
-                    </li>`;
-            }).join('')}
-        </ul>`;
-}
-
-async function renderImportSection() {
-    const container = elements.importContainer;
-    const project = appState.currentProject;
-
-    if (!project) {
-        container.innerHTML = `<div class="import-placeholder">
-            <h4>Sélectionnez un projet</h4>
-            <p>Veuillez sélectionner un projet pour pouvoir importer des documents.</p>
-        </div>`;
-        return;
+    const pdfFilenames = new Set((pdfFiles || []).map(f => f.filename));
+    if (!articles?.results || articles.results.length === 0) {
+      container.innerHTML = '<p>Aucun article dans ce projet. Commencez par en ajouter via l\'onglet "Recherche" ou un import Zotero.</p>';
+      return;
     }
 
     container.innerHTML = `
-        <div class="import-sections">
-            <div class="import-card">
-                <h4>1. Ajouter des Articles</h4>
-                <p>Utilisez l'une des méthodes ci-dessous pour ajouter des articles à votre projet.</p>
-                <div class="form-group">
-                    <label class="form-label">Liste d'identifiants (un par ligne)</label>
-                    <textarea id="manualPmidTextarea" class="form-control" rows="6" placeholder="Collez des PMIDs ou DOIs ici..."></textarea>
-                </div>
-                <div class="import-actions">
-                    <button class="btn btn--secondary" data-action="import-zotero-list" data-project-id="${project.id}">📚 Zotero (via ID)</button>
-                    <button class="btn btn--secondary" data-action="fetch-online-pdfs" data-project-id="${project.id}">🌐 Open Access (via ID)</button>
-                </div>
-                <hr>
-                <p>Ou importez un fichier pour ajouter des articles et leurs PDF en une seule fois (recommandé).</p>
-                <div class="import-actions">
-                    <button class="btn btn--primary" data-action="import-zotero-file">📂 Importer Fichier Zotero (.json)</button>
-                </div>
-            </div>
-
-            <div class="import-card" style="grid-column: 1 / -1;">
-                <h4>2. Gérer les Articles du Projet (${project.pmids_count || 0})</h4>
-                <div class="project-actions-header">
-                    <p>Cochez les articles à supprimer, puis cliquez sur le bouton.</p>
-                    <button class="btn btn--danger" data-action="delete-selected-articles">🗑️ Supprimer la sélection</button>
-                </div>
-                <div id="project-articles-list" class="articles-list-container"><div class="loading-spinner"></div></div>
-            </div>
-
-            <div class="import-card" style="grid-column: 1 / -1;">
-                <h4>3. Indexer le Corpus</h4>
-                <p>Après avoir récupéré les PDF, lancez l'indexation pour activer le Chat.</p>
-                <button class="btn btn--primary" data-action="run-indexing" data-project-id="${project.id}">⚙️ Lancer l'Indexation</button>
-            </div>
-        </div>`;
-
-    await renderProjectArticlesList(project.id);
+      <ul class="articles-list">
+        ${articles.results.map(article => {
+          const safeFilename = sanitize_filename(article.article_id) + ".pdf";
+          const hasPdf = pdfFilenames.has(safeFilename);
+          const pdfActionHtml = hasPdf
+            ? `<a href="/api/projects/${projectId}/files/${safeFilename}" target="_blank" class="btn btn--secondary btn--sm" title="Ouvrir le PDF">📄</a>`
+            : `<button class="btn btn--primary btn--sm" data-action="upload-single-pdf" data-article-id="${escapeHtml(article.article_id)}" title="Ajouter un PDF">➕</button>`;
+          return `
+            <li class="article-item">
+              <input type="checkbox" class="article-select-checkbox" data-article-id="${escapeHtml(article.article_id)}">
+              <span class="article-title">${escapeHtml(article.title)}</span>
+              <div class="article-actions">
+                <span class="article-id">${escapeHtml(article.article_id)}</span>
+                ${pdfActionHtml}
+              </div>
+            </li>`;
+        }).join('')}
+      </ul>
+    `;
+  } catch (error) {
+    console.error('Erreur renderProjectArticlesList:', error);
+    showToast('Erreur lors du chargement des articles du projet.', 'error');
+    container.innerHTML = '<p class="text-error">Erreur lors du chargement des articles.</p>';
+  } finally {
+    // Masquer un éventuel loader ici
+  }
 }
 
-function setupPDFDragDrop() {
-    const dropZone = document.getElementById('pdfDropZone');
-    const fileInput = document.getElementById('pdfFileInput');
-    
-    if (!dropZone || !fileInput) return;
-    
-    dropZone.addEventListener('click', () => fileInput.click());
-    
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, e => {
-            e.preventDefault();
-            e.stopPropagation();
-        });
-    });
-    
-    dropZone.addEventListener('dragenter', () => dropZone.classList.add('pdf-drop-zone--dragover'));
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('pdf-drop-zone--dragover'));
-    
-    dropZone.addEventListener('drop', e => {
-        dropZone.classList.remove('pdf-drop-zone--dragover');
-        handlePDFUpload(e.dataTransfer.files);
-    });
-    
-    fileInput.addEventListener('change', e => handlePDFUpload(e.target.files));
-}
-
-async function handlePDFUpload(files) {
-    const project = appState.currentProject;
-    if (!project) {
-        showToast("Veuillez d'abord sélectionner un projet.", 'error');
-        return;
-    }
-    
-    if (files.length > 20) {
-        showToast("Vous ne pouvez importer que 20 fichiers à la fois.", "error");
-        return;
-    }
-
-    const formData = new FormData();
-    Array.from(files).forEach(file => formData.append('files', file));
-
-    showLoadingOverlay(true, `Import de ${files.length} fichier(s)...`);
-    const statusContainer = document.getElementById('pdfUploadStatus');
-    if (statusContainer) statusContainer.innerHTML = '';
-
-    try {
-        const result = await fetchAPI(`/projects/${project.id}/upload-pdfs-bulk`, {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (statusContainer) {
-            result.successful?.forEach(name => {
-                statusContainer.innerHTML += `<li class="upload-success">✅ ${escapeHtml(name)}</li>`;
-            });
-            result.failed?.forEach(name => {
-                statusContainer.innerHTML += `<li class="upload-error">❌ ${escapeHtml(name)}</li>`;
-            });
-        }
-        
-        showToast(`Import terminé: ${result.successful?.length || 0}/${files.length} fichiers.`, 'success');
-
-    } catch (error) {
-        console.error('Erreur upload PDF:', error);
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
-
-async function handleZoteroFileUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+async function handleZoteroFileUpload(e) {
+  try {
     if (!appState.currentProject) {
-        showToast('Veuillez sélectionner un projet.', 'error');
-        return;
+      showToast("Veuillez sélectionner un projet avant d'importer.", 'warning');
+      return;
     }
-
-    showLoadingOverlay(true, 'Traitement du fichier Zotero...');
-    
+    const file = e.target?.files?.,
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.json')) {
+      showToast("Veuillez sélectionner un fichier .json exporté depuis Zotero.", 'warning');
+      e.target.value = '';
+      return;
+    }
+    showLoadingOverlay(true, `Import Zotero (${file.name})...`);
     const formData = new FormData();
     formData.append('file', file);
-
-    try {
-        const result = await fetchAPI(`/projects/${appState.currentProject.id}/import-zotero-file`, {
-            method: 'POST',
-            body: formData,
-        });
-        
-        showToast(result.message || 'Import depuis le fichier Zotero lancé.', 'info');
-        // Refresh project data to show new articles
-        await selectProject(appState.currentProject.id, true);
-    } catch (error) {
-        console.error('Erreur import fichier Zotero:', error);
-    } finally {
-        showLoadingOverlay(false);
-        event.target.value = ''; // Reset file input
-    }
+    const projectId = appState.currentProject.id;
+    const resp = await fetchAPI(`/projects/${projectId}/import-zotero-file`, {
+      method: 'POST',
+      body: formData
+    });
+    showToast(resp?.message || 'Import Zotero lancé.', 'success');
+    await selectProject(projectId, true);
+  } catch (err) {
+    console.error('Erreur import Zotero:', err);
+    showToast(err.message || "Erreur lors de l'import Zotero.", 'error');
+  } finally {
+    showLoadingOverlay(false);
+    const zoteroFileInput = document.getElementById('zoteroFileInput');
+    if (zoteroFileInput) zoteroFileInput.value = '';
+  }
 }
-
-async function handleImportZotero(projectId) {
-    const textarea = document.getElementById('manualPmidTextarea');
-    // CORRECTION : On utilise .split('\n') pour correctement séparer les lignes
-    const articleIds = textarea?.value.split('\n').map(id => id.trim()).filter(Boolean) || [];
-
-    if (articleIds.length === 0) {
-        showToast("Veuillez fournir au moins un PMID ou DOI.", 'warning');
-        return;
-    }
-
-    showLoadingOverlay(true, `Ajout et import Zotero pour ${articleIds.length} article(s)...`);
-    try {
-        await fetchAPI(`/projects/${projectId}/import-zotero`, {
-            method: 'POST',
-            body: { articles: articleIds }
-        });
-        showToast('Tâche d\'import depuis Zotero lancée en arrière-plan.', 'info');
-        textarea.value = ''; // On vide le champ de texte
-        await selectProject(projectId, true); // On rafraîchit les données du projet
-    } catch (error) {
-        console.error('Erreur import Zotero:', error);
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
-
-async function handleFetchOnlinePdfs(projectId) {
-    const textarea = document.getElementById('manualPmidTextarea');
-    // CORRECTION : On utilise .split('\n') pour correctement séparer les lignes
-    const articleIds = textarea?.value.split('\n').map(id => id.trim()).filter(Boolean) || [];
-
-    if (articleIds.length === 0) {
-        showToast("Veuillez fournir au moins un PMID ou DOI.", 'warning');
-        return;
-    }
-
-    showLoadingOverlay(true, `Ajout et recherche de PDF pour ${articleIds.length} article(s)...`);
-    try {
-        await fetchAPI(`/projects/${projectId}/fetch-online-pdfs`, {
-            method: 'POST',
-            body: { articles: articleIds }
-        });
-        showToast('Tâche de recherche de PDF lancée en arrière-plan.', 'info');
-        textarea.value = ''; // On vide le champ de texte
-        await selectProject(projectId, true); // On rafraîchit les données du projet
-    } catch (error) {
-        console.error('Erreur recherche PDF:', error);
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
-
-async function handleRunIndexing(projectId) {
-    showLoadingOverlay(true, "Lancement de l'indexation...");
-    try {
-        await fetchAPI(`/projects/${projectId}/index`, { method: 'POST' });
-        showToast('Indexation du corpus lancée. Vous recevrez une notification quand ce sera terminé.', 'info');
-    } catch (error) {
-        console.error('Erreur indexation:', error);
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
-
-function renderChatSection() {
-    const container = elements.chatContainer;
-    const project = appState.currentProject;
-
-    if (!project) {
-        container.innerHTML = `
-            <div class="chat-placeholder">
-                <div class="chat-placeholder__icon">👈</div>
-                <h4>Sélectionnez un projet</h4>
-                <p>Sélectionnez un projet pour discuter avec ses documents.</p>
-            </div>`;
-        return;
-    }
-
-    container.innerHTML = `
-        <div class="chat-header">
-            <h3>💬 Chat avec ${escapeHtml(project.name)}</h3>
-            <button class="btn btn--outline btn--sm" data-action="clearChatHistory">
-                🗑️ Effacer historique
-            </button>
-        </div>
-        
-        <div id="chatMessages" class="chat-messages">
-            <div class="chat-message chat-message--assistant">
-                <div class="chat-message__content">
-                    Bonjour ! Posez-moi une question sur les documents indexés de votre projet.
-                </div>
-            </div>
-        </div>
-        
-        <div class="chat-input-area">
-            <textarea id="chatTextarea" class="form-control" 
-                      placeholder="Posez votre question ici..." 
-                      rows="3"></textarea>
-            <button class="btn btn--primary" data-action="sendChatMessage">
-                📤 Envoyer
-            </button>
-        </div>
-    `;
-    
-    loadChatHistory(project.id);
-}
-
-async function loadChatHistory(projectId) {
-    try {
-        const history = await fetchAPI(`/projects/${projectId}/chat-history`);
-        const messagesContainer = document.getElementById('chatMessages');
-        
-        if (!messagesContainer) return;
-        
-        // Conserver le message d'accueil
-        const welcomeMessage = messagesContainer.querySelector('.chat-message--assistant');
-        messagesContainer.innerHTML = '';
-        if (welcomeMessage) messagesContainer.appendChild(welcomeMessage);
-        
-        history.forEach(msg => {
-            appendChatMessage(msg.role, msg.content, msg.sources);
-        });
-        
-    } catch (e) {
-        showToast("Impossible de charger l'historique du chat.", "error");
-    }
-}
-
-async function sendChatMessage() {
-    const project = appState.currentProject;
-    if (!project) return;
-    
-    const textarea = document.getElementById('chatTextarea');
-    const question = textarea?.value.trim();
-    
-    if (!question) {
-        showToast("Veuillez saisir une question.", "warning");
-        return;
-    }
-
-    appendChatMessage('user', question);
-    textarea.value = '';
-    textarea.disabled = true;
-
-    try {
-        const result = await fetchAPI(`/projects/${project.id}/chat`, {
-            method: 'POST',
-            body: { 
-                question, 
-                profile: project.profile_used || 'standard' 
-            }
-        });
-        
-        appendChatMessage('assistant', result.answer, result.sources);
-        
-    } catch (error) {
-        console.error('Erreur chat:', error);
-        appendChatMessage('assistant', "Désolé, une erreur est survenue lors de la génération de la réponse.", []);
-    } finally {
-        textarea.disabled = false;
-        textarea.focus();
-    }
-}
-
-function appendChatMessage(role, content, sources = null) {
-    const container = document.getElementById('chatMessages');
-    if (!container) return;
-    
-    const msgDiv = document.createElement('div');
-    msgDiv.className = `chat-message chat-message--${role}`;
-
-    let sourcesHtml = '';
-    if (sources) {
-        try {
-            const sourcesList = typeof sources === 'string' ? JSON.parse(sources) : sources;
-            if (Array.isArray(sourcesList) && sourcesList.length > 0) {
-                sourcesHtml = `<div class="chat-message__sources"><strong>Sources:</strong> ${sourcesList.join(', ')}</div>`;
-            }
-        } catch (e) {
-            console.warn('Erreur parsing sources:', e);
-        }
-    }
-
-    msgDiv.innerHTML = `
-        <div class="chat-message__content">
-            ${escapeHtml(content).replace(/\n/g, '<br>')}
-            ${sourcesHtml}
-        </div>
-    `;
-    
-    container.appendChild(msgDiv);
-    container.scrollTop = container.scrollHeight;
-}
-
-function clearChatHistory() {
-    if (!confirm("Effacer tout l'historique de chat pour ce projet ?")) return;
-    
-    const messagesContainer = document.getElementById('chatMessages');
-    if (messagesContainer) {
-        messagesContainer.innerHTML = `
-            <div class="chat-message chat-message--assistant">
-                <div class="chat-message__content">
-                    Historique effacé. Posez-moi une nouvelle question !
-                </div>
-            </div>
-        `;
-    }
-}
-
-// ================================================================
-// ===== 11. FONCTIONS UTILITAIRES FINALES
-// ================================================================
-
-function viewAnalysisPlot(projectId, plotType) {
-    const url = `/api/projects/${projectId}/analysis-plot/${plotType}`;
-    window.open(url, '_blank');
-}
-
-async function handleValidateExtraction(extractionId, decision) {
-    if (!appState.currentProject) return;
-    
-    try {
-        await fetchAPI(`/extractions/${extractionId}/validate`, {
-            method: 'POST',
-            body: { decision }
-        });
-        showToast(`Article marqué comme "${decision === 'include' ? 'Inclus' : 'Exclu'}".`, 'success');
-        
-        
-        await loadProjectExtractions(appState.currentProject.id);
-        refreshCurrentSection(); 
-        
-    } catch (error) {
-        console.error('Erreur validation:', error);
-    }
-}
-
-function sanitizeFilename(articleId) {
-    if (!articleId) return '';
-    // Remplace les caractères non alphanumériques (sauf le point) par un underscore.
-    // Correspond à la logique Python re.sub(r'[^a-zA-Z0-9.-]', '_', article_id)
-    return String(articleId).replace(/[^a-zA-Z0-9.-]/g, '_');
-}
-
-async function handleDeleteSelectedArticles() {
-    const selectedCheckboxes = document.querySelectorAll('#project-articles-list .article-select-checkbox:checked');
-    const articleIdsToDelete = Array.from(selectedCheckboxes).map(cb => cb.dataset.articleId);
-
-    if (articleIdsToDelete.length === 0) {
-        showToast("Veuillez sélectionner au moins un article à supprimer.", "warning");
-        return;
-    }
-
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer définitivement ${articleIdsToDelete.length} article(s) ?`)) {
-        return;
-    }
-
-    showLoadingOverlay(true, 'Suppression des articles...');
-    try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/delete-articles`, {
-            method: 'POST',
-            body: { article_ids: articleIdsToDelete }
-        });
-        showToast(`${articleIdsToDelete.length} article(s) supprimé(s).`, 'success');
-        await selectProject(appState.currentProject.id, true); // Rafraîchir
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
-
-async function handleExportValidations(projectId) {
-    if (!projectId) return;
-    window.location.href = `/api/projects/${projectId}/export-validations`;
-}
-
-async function handleImportValidations(file, projectId) {
-    if (!file || !projectId) return;
-    const formData = new FormData();
-    formData.append('file', file);
-
-    showLoadingOverlay(true, 'Importation des validations...');
-    try {
-        const result = await fetchAPI(`/projects/${projectId}/import-validations`, {
-            method: 'POST',
-            body: formData
-        });
-        showToast(result.message, 'success');
-        await selectProject(projectId, true); // Rafraîchir
-    } catch (error) {
-        showToast(`Erreur d'importation : ${error.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-        const input = document.getElementById('validationFileInput');
-        if (input) input.value = '';
-    }
-}
-
-async function handleCalculateKappa(projectId) {
-    if (!projectId) return;
-    showLoadingOverlay(true, 'Lancement du calcul du Kappa...');
-    try {
-        const result = await fetchAPI(`/projects/${projectId}/calculate-kappa`, { method: 'POST' });
-        showToast(result.message, 'info');
-    } catch (error) {
-        showToast(`Erreur : ${error.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
-
-function displayKappaResult(resultText) {
-    const display = document.getElementById('kappaResultDisplay');
-    if (display) {
-        display.textContent = resultText || 'Résultat du Kappa non disponible.';
-        display.classList.remove('hidden');
-    }
-}
-
-// ================================================================
-// ===== 12. INITIALISATION FINALE
-// ================================================================
-
-// Fonction appelée quand le DOM est prêt (déjà définie plus haut)
-console.log('📚 AnalyLit V4.0 Frontend - Script chargé et prêt');

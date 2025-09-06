@@ -1,0 +1,11 @@
+# Dockerfile-nginx
+FROM nginx:1.25-alpine
+
+# Copie la configuration (garde les proxys /api/ et /socket.io/)
+COPY nginx_complete.conf /etc/nginx/conf.d/default.conf
+
+# Copie le frontend SPA (index.html, app.js, style.css, assets)
+COPY web/ /usr/share/nginx/html/
+
+# Santé optionnelle (curl présent dans l'image de base alpine nginx)
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD wget -qO- http://localhost/ >/dev/null 2>&1 || exit 1
