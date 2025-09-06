@@ -1,14 +1,15 @@
-# AnalyLit V4.0 - Configuration centrale
+# AnalyLit V4.1 - Configuration centrale
+
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
 @dataclass
 class Config:
-    """Configuration pour AnalyLit V4.0"""
+    """Configuration pour AnalyLit V4.1"""
     
     # Version de l'application
-    ANALYLIT_VERSION: str = "4.0.0"
+    ANALYLIT_VERSION: str = "4.1.0"
     
     # Configuration Redis
     REDIS_URL: str = os.getenv('REDIS_URL', 'redis://redis:6379/0')
@@ -16,38 +17,19 @@ class Config:
     # Configuration Ollama
     OLLAMA_BASE_URL: str = os.getenv('OLLAMA_BASE_URL', 'http://ollama:11434')
     
-    # Configuration base de données
-    DATABASE_PATH: str = "/app/projects/database.db"
+    # Configuration base de données (PostgreSQL)
+    DATABASE_URL: str = os.getenv('DATABASE_URL', 'postgresql+psycopg2://analylit_user:strong_password@db:5432/analylit_db')
     PROJECTS_DIR: Path = Path("/app/projects")
     
     # Configuration Flask
     SECRET_KEY: str = os.getenv('SECRET_KEY', 'your-super-secret-key-change-this-in-production')
     
-    # Configuration des modèles par défaut
-    DEFAULT_MODELS: dict = field(default_factory=lambda: {
-        'fast': {
-            'preprocess': 'gemma:2b',
-            'extract': 'phi3:mini',
-            'synthesis': 'llama3.1:8b'
-        },
-        'standard': {
-            'preprocess': 'phi3:mini',
-            'extract': 'llama3.1:8b',
-            'synthesis': 'llama3.1:8b'
-        },
-        'deep': {
-            'preprocess': 'llama3.1:8b',
-            'extract': 'mixtral:8x7b',
-            'synthesis': 'llama3.1:70b'
-        }
-    }),
-
     # Configuration timeouts
-    REQUEST_TIMEOUT: int = 900   # 15 minutes
-    JOB_TIMEOUT: int = 3600      # 1 heure
+    REQUEST_TIMEOUT: int = 900  # 15 minutes
+    JOB_TIMEOUT: int = 3600     # 1 heure
     WEBSOCKET_PING_INTERVAL: int = 25
     WEBSOCKET_PING_TIMEOUT: int = 60
-
+    
     # Configuration logging
     LOG_LEVEL: str = os.getenv('LOG_LEVEL', 'INFO')
     
@@ -68,24 +50,7 @@ class Config:
     IEEE_API_KEY: str = os.getenv('IEEE_API_KEY', '')
     CROSSREF_EMAIL: str = os.getenv('CROSSREF_EMAIL', 'researcher@analylit.com')
     MAX_PDF_SIZE: int = 50 * 1024 * 1024  # Exemple: 50MB
-    
-    def get_database_config(self) -> dict:
-        """Configuration des bases de données externes"""
-        return {
-            'ieee': {
-                'enabled': bool(self.IEEE_API_KEY),
-                'api_key': self.IEEE_API_KEY
-            },
-            'crossref': {
-                'email': self.CROSSREF_EMAIL
-            },
-            'unpaywall': {
-                'email': self.UNPAYWALL_EMAIL
-            }
-        }
 
 def get_config() -> Config:
     """Retourne une instance de configuration"""
     return Config()
-    
-    

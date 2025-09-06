@@ -50,6 +50,7 @@ RUN python -m pip install --no-cache-dir --ignore-installed --no-deps blinker==1
 
 # --- Copie du reste de l'application ---
 # Ces fichiers peuvent changer fréquemment, donc ils sont copiés à la fin
+COPY utils/ ./utils/
 COPY config_v4.py .
 COPY server_v4_complete.py .
 COPY tasks_v4_complete.py .
