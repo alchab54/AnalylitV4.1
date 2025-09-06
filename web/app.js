@@ -1132,6 +1132,123 @@ function renderResultsSection() {
         </div>
     `;
 }
+
+function renderValidationSection() {
+    const container = elements.validationContainer;
+    if (!appState.currentProject) {
+        container.innerHTML = `<div class="validation-placeholder"><p>Sélectionnez un projet pour voir la section de validation.</p></div>`;
+        return;
+    }
+
+    const extractions = appState.currentProjectExtractions;
+    if (!extractions || extractions.length === 0) {
+        container.innerHTML = `<div class="validation-placeholder"><p>Aucune extraction à valider pour ce projet.</p></div>`;
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="validation-actions">
+            <h4>Actions de Double Codage</h4>
+            <div class="button-group">
+                <button class="btn btn--secondary" data-action="export-validations">Exporter mes validations (CSV)</button>
+                <button class="btn btn--secondary" data-action="import-validations">Importer validations d'un pair (CSV)</button>
+                <input type="file" id="validationFileInput" class="hidden" accept=".csv" />
+                <button class="btn btn--primary" data-action="calculate-kappa">Calculer le Kappa</button>
+            </div>
+            <div id="kappaResult" class="kappa-result-display" style="display: none;"></div>
+        </div>
+        <div class="table-container">
+            </div>
+    `;
+    // Le reste du rendu du tableau de validation se fait dans renderResultsSection pour la cohérence
+}
+
+async function handleValidateExtraction(extractionId, decision) {
+    if (!appState.currentProject) return;
+    
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/extractions/${extractionId}`, {
+            method: 'PATCH',
+            body: { user_validation_status: decision }
+        });
+        showToast(`Article marqué comme "${decision === 'include' ? 'Inclus' : 'Exclu'}".`, 'success');
+        
+        const extraction = appState.currentProjectExtractions.find(e => e.id === extractionId);
+        if (extraction) {
+            extraction.user_validation_status = decision;
+        }
+        renderResultsSection(); // Redessine la table des résultats avec le nouvel état
+        
+    } catch (error) {
+        console.error('Erreur validation:', error);
+    }
+}
+
+async function handleExportValidations(projectId) {
+    if (!projectId) return;
+    showLoadingOverlay(true, 'Export des validations...');
+    try {
+        const response = await fetch(`/api/projects/${projectId}/export-validations`);
+        if (!response.ok) throw new Error('Échec de l\'exportation');
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `validations_projet_${projectId}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        showToast('Exportation réussie.', 'success');
+    } catch (error) {
+        showToast(`Erreur d'exportation : ${error.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+async function handleImportValidations(file, projectId) {
+    if (!file || !projectId) return;
+    showLoadingOverlay(true, 'Import des validations...');
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+        const result = await fetchAPI(`/projects/${projectId}/import-validations`, {
+            method: 'POST',
+            body: formData
+        });
+        showToast(result.message, 'success');
+        await selectProject(projectId, true); // Rafraîchir
+    } catch (error) {
+        showToast(`Erreur d'importation : ${error.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+async function handleCalculateKappa(projectId) {
+    if (!projectId) return;
+    showLoadingOverlay(true, 'Calcul du Kappa...');
+    try {
+        await fetchAPI(`/projects/${projectId}/calculate-kappa`, {
+            method: 'POST'
+        });
+        showToast('Le calcul du Kappa a été lancé. Vous recevrez une notification.', 'info');
+    } catch (error) {
+        showToast(`Erreur : ${error.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+function displayKappaResult(message) {
+    const container = document.getElementById('kappaResult');
+    if (container) {
+        container.textContent = message;
+        container.style.display = 'block';
+    }
+}
 	
 // Affiche une ligne dans le tableau des résultats (corrigé pour l'extraction détaillée)
 function renderExtractionRow(extraction, isScreening) {
@@ -1634,6 +1751,151 @@ async function handleRunIndexing(projectId) {
         console.error('Erreur indexation:', error);
     } finally {
         showLoadingOverlay(false);
+    }
+}
+
+function renderChatSection() {
+    const container = elements.chatContainer;
+    const project = appState.currentProject;
+
+    if (!project) {
+        container.innerHTML = `
+            <div class="chat-placeholder">
+                <div class="chat-placeholder__icon">👈</div>
+                <h4>Sélectionnez un projet</h4>
+                <p>Sélectionnez un projet pour discuter avec ses documents.</p>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="chat-header">
+            <h3>💬 Chat avec ${escapeHtml(project.name)}</h3>
+            <button class="btn btn--outline btn--sm" data-action="clearChatHistory">
+                🗑️ Effacer historique
+            </button>
+        </div>
+        
+        <div id="chatMessages" class="chat-messages">
+            <div class="chat-message chat-message--assistant">
+                <div class="chat-message__content">
+                    Bonjour ! Posez-moi une question sur les documents indexés de votre projet.
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-input-area">
+            <textarea id="chatTextarea" class="form-control" 
+                      placeholder="Posez votre question ici..." 
+                      rows="3"></textarea>
+            <button class="btn btn--primary" data-action="sendChatMessage">
+                📤 Envoyer
+            </button>
+        </div>
+    `;
+    
+    loadChatHistory(project.id);
+}
+
+async function loadChatHistory(projectId) {
+    try {
+        const history = await fetchAPI(`/projects/${projectId}/chat-history`);
+        const messagesContainer = document.getElementById('chatMessages');
+        
+        if (!messagesContainer) return;
+        
+        // Conserver le message d'accueil
+        const welcomeMessage = messagesContainer.querySelector('.chat-message--assistant');
+        messagesContainer.innerHTML = '';
+        if (welcomeMessage) messagesContainer.appendChild(welcomeMessage);
+        
+        history.forEach(msg => {
+            appendChatMessage(msg.role, msg.content, msg.sources);
+        });
+        
+    } catch (e) {
+        showToast("Impossible de charger l'historique du chat.", "error");
+    }
+}
+
+async function sendChatMessage() {
+    const project = appState.currentProject;
+    if (!project) return;
+    
+    const textarea = document.getElementById('chatTextarea');
+    const question = textarea?.value.trim();
+    
+    if (!question) {
+        showToast("Veuillez saisir une question.", "warning");
+        return;
+    }
+
+    appendChatMessage('user', question);
+    textarea.value = '';
+    textarea.disabled = true;
+
+    try {
+        const result = await fetchAPI(`/projects/${project.id}/chat`, {
+            method: 'POST',
+            body: { 
+                question, 
+                profile: project.profile_used || 'standard' 
+            }
+        });
+        
+        appendChatMessage('assistant', result.answer, result.sources);
+        
+    } catch (error) {
+        console.error('Erreur chat:', error);
+        appendChatMessage('assistant', "Désolé, une erreur est survenue lors de la génération de la réponse.", []);
+    } finally {
+        textarea.disabled = false;
+        textarea.focus();
+    }
+}
+
+function appendChatMessage(role, content, sources = null) {
+    const container = document.getElementById('chatMessages');
+    if (!container) return;
+    
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `chat-message chat-message--${role}`;
+
+    let sourcesHtml = '';
+    if (sources) {
+        try {
+            const sourcesList = typeof sources === 'string' ? JSON.parse(sources) : sources;
+            if (Array.isArray(sourcesList) && sourcesList.length > 0) {
+                sourcesHtml = `<div class="chat-message__sources"><strong>Sources:</strong> ${sourcesList.join(', ')}</div>`;
+            }
+        } catch (e) {
+            console.warn('Erreur parsing sources:', e);
+        }
+    }
+
+    msgDiv.innerHTML = `
+        <div class="chat-message__content">
+            ${escapeHtml(content).replace(/\n/g, '<br>')}
+            ${sourcesHtml}
+        </div>
+    `;
+    
+    container.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+}
+
+function clearChatHistory() {
+    if (!confirm("Effacer tout l'historique de chat pour ce projet ?")) return;
+    
+    const messagesContainer = document.getElementById('chatMessages');
+    if (messagesContainer) {
+        messagesContainer.innerHTML = \`
+            <div class="chat-message chat-message--assistant">
+                <div class="chat-message__content">
+                    Historique effacé. Posez-moi une nouvelle question !
+                </div>
+            </div>
+        \`;
     }
 }
 
