@@ -427,6 +427,14 @@ function refreshCurrentSection() {
     if (renderMap[appState.currentSection]) {
         renderMap[appState.currentSection]();
     }
+	if (typeof renderImportSection === 'function') {
+    renderImportSection(project);
+  } else {
+    // Fallback: recharger la liste des articles + états d’import
+    if (project?.id) {
+      renderProjectArticlesList(project.id);
+    }
+  }
 }
 
 // ================================================================
@@ -2204,7 +2212,7 @@ async function handleZoteroFileUpload(e) {
       showToast("Veuillez sélectionner un projet avant d'importer.", 'warning');
       return;
     }
-    const file = e.target?.files?.;
+    const file = e.target?.files[0];
     if (!file) return;
     if (!file.name.toLowerCase().endsWith('.json')) {
       showToast("Veuillez sélectionner un fichier .json exporté depuis Zotero.", 'warning');
