@@ -182,7 +182,14 @@ function setupEventListeners() {
 			'delete-profile': () => handleDeleteProfile(profileId),
 			pullModel: () => handlePullModel(),
 			'refresh-queues': () => renderQueueStatus(),
-			clearQueue: () => handleClearQueue(queueName),
+			'clearQueue': (e) => {
+			  const qn = e?.target?.dataset?.queueName || e?.currentTarget?.dataset?.queueName;
+			  if (!qn) {
+				showToast("Nom de file introuvable.", 'warning');
+				return;
+			  }
+			  handleClearQueue(qn);
+			},
 			saveZoteroSettings: () => handleSaveZoteroSettings(),
 			'delete-selected-articles': () => handleDeleteSelectedArticles(),
 			'refresh-queues': () => renderQueueStatus(),
@@ -323,17 +330,17 @@ function handleWebSocketNotification(data) {
 
     switch (type) {
         case 'search_completed':
-        case 'article_processed':
-        case 'synthesis_completed':
-        case 'analysis_completed':
-        case 'pdf_upload_completed':
-        case 'indexing_completed':
-            if (project_id === appState.currentProject?.id) {
-                selectProject(project_id, true);
-            } else {
-                loadProjects();
-            }
-			break;
+		case 'article_processed':
+		case 'synthesis_completed':
+		case 'analysis_completed':
+		case 'pdf_upload_completed':
+		case 'indexing_completed':
+		  if (project_id === appState.currentProject?.id) {
+			selectProject(project_id, true);
+		  } else {
+			loadProjects();
+		  }
+		  break;
 		case 'kappa_calculated':
 			showToast('Calcul du Kappa terminé !', 'success');
 			if (project_id === appState.currentProject?.id) {
@@ -403,53 +410,80 @@ function closeModal(modalId) {
 // ================================================================
 
 function showSection(sectionName) {
+  try {
     appState.currentSection = sectionName;
-    appState.unreadNotifications = 0;
-    updateNotificationIndicator();
-    
-    elements.sections.forEach(section => {
-        section.classList.toggle('section--active', section.id === `${sectionName}Section`);
+
+    // Basculer l’état actif des boutons de navigation
+    elements.navButtons?.forEach(btn => {
+      const isActive = btn.getAttribute('data-section') === sectionName;
+      if (isActive) btn.classList.add('active'); else btn.classList.remove('active');
     });
 
-    elements.navButtons.forEach(button => {
-        button.classList.toggle('app-nav__button--active', button.dataset.section === sectionName);
+    // Afficher/Masquer les sections
+    elements.sections?.forEach(sec => {
+      const isTarget = sec.getAttribute('data-section') === sectionName;
+      sec.style.display = isTarget ? 'block' : 'none';
     });
 
-    refreshCurrentSection();
+    // Rafraîchir le contenu contextuel de la section
+    refreshCurrentSection(appState.currentProject);
+  } catch (e) {
+    console.error('Erreur showSection:', e);
+    showToast('Erreur lors du changement de section.', 'error');
+  }
 }
 
-function refreshCurrentSection() {
-    // Ce dictionnaire associe une section à sa fonction de rendu.
-    const renderMap = {
-        projects: () => { renderProjectsList(); renderProjectDetail(); },
-        search: renderSearchInterface,
-        results: renderResultsSection,
-        validation: renderValidationSection,
-        analysis: renderAnalysisSection,
-        chat: renderChatSection,
-        settings: renderSettingsSection,
-    };
-
-    // On gère le cas 'import' séparément pour ajouter la vérification
-    if (appState.currentSection === 'import') {
+function refreshCurrentSection(project) {
+  try {
+    switch (appState.currentSection) {
+      case 'projects':
+        // rien de spécifique
+        break;
+      case 'search':
+        // ex: recharger les résultats si un projet est sélectionné
+        if (project?.id) loadSearchResults(project.id);
+        break;
+      case 'validation':
+        if (project?.id) loadProjectExtractions(project.id);
+        break;
+      case 'analysis':
+        // placeholder (ex: recharger résumé d’analyse si besoin)
+        break;
+      case 'import':
+        // Protéger l’appel si la fonction n’existe pas encore
         if (typeof renderImportSection === 'function') {
-            renderImportSection();
-        } else {
-            // Fallback si la fonction n'est pas encore créée
-            console.warn('renderImportSection n\'est pas encore implémentée.');
-            const importContainer = document.getElementById('importContainer');
-            if (importContainer) {
-              importContainer.innerHTML = `<div class="import-placeholder">
-                <span class="import-placeholder__icon">📥</span>
-                <h4>Section en construction</h4>
-                <p>Sélectionnez un projet pour voir les options d'import.</p>
-              </div>`;
-            }
+          renderImportSection(project);
+        } else if (project?.id) {
+          // Fallback utile: lister les articles + PDFs
+          renderProjectArticlesList(project.id);
         }
-    } else if (renderMap[appState.currentSection]) {
-        // On appelle la fonction de rendu pour les autres sections
-        renderMap[appState.currentSection]();
+        break;
+      case 'chat':
+        // rien de spécifique ici
+        break;
+      case 'settings':
+        // charger le statut des files automatiquement
+        if (typeof renderQueueStatus === 'function') renderQueueStatus();
+        break;
     }
+  } catch (e) {
+    console.error('Erreur refreshCurrentSection:', e);
+  }
+  // Import: éviter un crash si la fonction n'est pas encore définie
+  if (typeof renderImportSection === 'function') {
+    try { renderImportSection(project); } catch (e) { console.error('Import render error:', e); }
+  } else {
+    // Fallback utile: recharge la liste d’articles et les PDFs du projet
+    if (project?.id) {
+      // ces helpers existent déjà dans app.js
+      loadSearchResults(project.id).catch(() => {});
+      // si vous avez un helper pour la liste de fichiers, sinon ignorer
+      // renderProjectArticlesList(project.id); // optionnel si présent
+    }
+  }
+
+  // Rebrancher le listener d'import CSV après un re-render de la section Validation
+  attachValidationFileInputListener();
 }
 
 // ================================================================
@@ -2159,68 +2193,34 @@ async function loadQueueStatus() {
 }
 
 async function renderQueueStatus() {
-    const container = document.getElementById('queueStatusContainer');
-    if (!container) return;
-
-    try {
-        showLoadingOverlay(true, 'Chargement du statut des files...');
-        const status = await fetchAPI('/queue-status');
-        
-        let html = '<div class="queue-status-grid">';
-        
-        for (const [queueName, queueData] of Object.entries(status)) {
-            const displayName = queueName.replace('analylit_', '').replace('_v4', '');
-            const hasError = queueData.error;
-            const totalJobs = hasError ? 0 : (queueData.count + queueData.failed + queueData.started);
-            
-            html += `
-                <div class="queue-card ${hasError ? 'queue-card--error' : ''}">
-                    <h4>${escapeHtml(displayName)}</h4>
-                    ${hasError ? 
-                        `<p class="error">Erreur: ${escapeHtml(queueData.error)}</p>` :
-                        `
-                        <div class="queue-stats">
-                            <div class="stat">
-                                <span class="stat-label">En attente:</span>
-                                <span class="stat-value">${queueData.count}</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">En cours:</span>
-                                <span class="stat-value">${queueData.started}</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Échouées:</span>
-                                <span class="stat-value error">${queueData.failed}</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Terminées:</span>
-                                <span class="stat-value success">${queueData.finished}</span>
-                            </div>
-                        </div>
-                        ${totalJobs > 0 ? `
-                            <button class="btn btn--danger btn--sm" 
-                                    data-action="clearQueue" 
-                                    data-queue-name="${queueName}">
-                                Vider la file
-                            </button>
-                        ` : ''}
-                        `
-                    }
-                </div>
-            `;
-        }
-        
-        html += '</div>';
-        container.innerHTML = html;
-        
-    } catch (error) {
-        console.error('Erreur lors du chargement du statut des files:', error);
-        if (container) {
-            container.innerHTML = '<p class="error">Impossible de récupérer l\'état des files.</p>';
-        }
-    } finally {
-        showLoadingOverlay(false);
-    }
+  const container = document.getElementById('queuesStatus');
+  if (!container) return;
+  container.innerHTML = 'Chargement du statut des files...';
+  try {
+    const data = await fetchAPI('/queue-status');
+    const names = [
+      'analylit_processing_v4',
+      'analylit_background_v4',
+      'analylit_analysis_v4',
+      'analylit_synthesis_v4'
+    ];
+    const safe = (o, k) => (o && Number.isFinite(o[k]) ? o[k] : 0);
+    const blocks = names.map(name => {
+      const q = data[name] || {};
+      return `
+        <div class="queue-block">
+          <div class="queue-block__title">${name.replace('analylit_', '').replace('_v4','')}</div>
+          <div>En attente: <strong>${safe(q,'enqueued')}</strong></div>
+          <div>En cours: <strong>${safe(q,'started')}</strong></div>
+          <div>Échouées: <strong>${safe(q,'failed')}</strong></div>
+          <div>Terminées: <strong>${safe(q,'finished')}</strong></div>
+          <button class="btn btn--secondary" data-action="clearQueue" data-queue-name="${name}">Vider</button>
+        </div>`;
+    }).join('');
+    container.innerHTML = blocks;
+  } catch (e) {
+    container.innerHTML = 'Impossible de récupérer l’état des files.';
+  }
 }
 
 // ================================================================
@@ -2507,26 +2507,28 @@ async function handlePullModel() {
 }
 
 async function handleClearQueue(queueName) {
-    if (!confirm(`Êtes-vous sûr de vouloir vider la file "${queueName}" ? Cette action est irréversible.`)) {
-        return;
+  try {
+    const qn = typeof queueName === 'string' ? queueName.trim() : '';
+    if (!qn) {
+      showToast("File invalide.", 'warning');
+      return;
     }
-    
-    try {
-        showLoadingOverlay(true, 'Vidage de la file...');
-        await fetchAPI('/queues/clear', {
-            method: 'POST',
-            body: { queue_name: queueName }
-        });
-        
-        showToast(`File "${queueName}" vidée avec succès.`, 'success');
-        renderQueueStatus(); // Rafraîchir l'affichage
-        
-    } catch (error) {
-        console.error('Erreur lors du vidage de la file:', error);
-        showToast('Erreur lors du vidage de la file.', 'error');
-    } finally {
-        showLoadingOverlay(false);
+    showLoadingOverlay(true, `Vidage de la file "${qn}"...`);
+    const res = await fetchAPI('/queues/clear', {
+      method: 'POST',
+      body: { queue_name: qn }
+    });
+    showToast(res?.message || `File "${qn}" vidée.`, 'success');
+    // Rafraîchir l’état des files après purge
+    if (typeof renderQueueStatus === 'function') {
+      await renderQueueStatus();
     }
+  } catch (e) {
+    console.error('Erreur clearQueue:', e);
+    showToast(e.message || "Erreur lors du vidage de la file.", 'error');
+  } finally {
+    showLoadingOverlay(false);
+  }
 }
 
 async function handleRunPipeline(e) {
