@@ -185,6 +185,11 @@ function setupEventListeners() {
 			clearQueue: () => handleClearQueue(queueName),
 			saveZoteroSettings: () => handleSaveZoteroSettings(),
 			'delete-selected-articles': () => handleDeleteSelectedArticles(),
+			'refresh-queues': () => renderQueueStatus(),
+			'clearQueue': (e) => {
+				const queueName = e.target.dataset.queueName;
+				if (queueName) handleClearQueue(queueName);
+			},
 			'upload-single-pdf': () => {
 				// Crée un input de fichier temporaire pour un article spécifique
 				const fileInput = document.createElement('input');
@@ -932,63 +937,6 @@ function handlePipelineSourceChange() {
         if (manualGroup) {
             manualGroup.style.display = sourceSelect.value === 'manual' ? 'block' : 'none';
         }
-    }
-}
-
-async function handleRunPipeline(e) {
-    e.preventDefault();
-    if (!appState.currentProject) {
-        showToast('Aucun projet sélectionné.', 'error');
-        return;
-    }
-
-    const formData = new FormData(e.target);
-    const source = formData.get('source');
-    const profileId = formData.get('profile');
-    const customGridId = formData.get('custom_grid_id');
-    const analysis_mode = formData.get('analysis_mode');
-
-    let articles = [];
-    if (source === 'manual') {
-        // CORRECTED: Read the value directly from the textarea element
-        const manualIds = document.getElementById('manualIdsTextarea').value;
-        if (!manualIds) {
-            showToast("Veuillez fournir des identifiants d'articles dans la zone de texte.", 'error');
-            return;
-        }
-        articles = manualIds.split('\n').map(id => id.trim()).filter(Boolean);
-    } else if (source === 'selected') {
-        articles = Array.from(appState.selectedSearchResults);
-    } else { // 'all'
-        articles = appState.searchResults.map(r => r.article_id);
-    }
-
-    if (articles.length === 0) {
-        showToast('Aucun article à traiter.', 'error');
-        return;
-    }
-
-    closeModal('runPipelineModal');
-    showLoadingOverlay(true, 'Lancement du pipeline...');
-
-    try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
-            method: 'POST',
-            body: {
-                articles,
-                profile: profileId,
-                custom_grid_id: customGridId || null,
-                analysis_mode
-            }
-        });
-
-        showToast(`Analyse lancée pour ${articles.length} article(s).`, 'info');
-        await selectProject(appState.currentProject.id, true);
-
-    } catch (error) {
-        console.error('Erreur lancement pipeline:', error);
-    } finally {
-        showLoadingOverlay(false);
     }
 }
 
@@ -2210,27 +2158,69 @@ async function loadQueueStatus() {
     }
 }
 
-function renderQueueStatus() {
-    loadQueueStatus().then(queuesStatus => {
-        const container = document.getElementById('queueStatusContainer');
-        if (!container) return;
+async function renderQueueStatus() {
+    const container = document.getElementById('queueStatusContainer');
+    if (!container) return;
+
+    try {
+        showLoadingOverlay(true, 'Chargement du statut des files...');
+        const status = await fetchAPI('/queue-status');
         
-        container.innerHTML = Object.keys(queuesStatus).length > 0 ? 
-            Object.entries(queuesStatus).map(([name, status]) => `
-                <div class="queue-item">
-                    <div class="queue-info">
-                        <span class="queue-name">${escapeHtml(name)}</span>
-                        <span class="queue-count">${status.count} tâches</span>
-                    </div>
-                    <button class="btn btn--danger btn--sm" 
-                            data-action="clearQueue" 
-                            data-queue-name="${name}">
-                        Vider
-                    </button>
+        let html = '<div class="queue-status-grid">';
+        
+        for (const [queueName, queueData] of Object.entries(status)) {
+            const displayName = queueName.replace('analylit_', '').replace('_v4', '');
+            const hasError = queueData.error;
+            const totalJobs = hasError ? 0 : (queueData.count + queueData.failed + queueData.started);
+            
+            html += `
+                <div class="queue-card ${hasError ? 'queue-card--error' : ''}">
+                    <h4>${escapeHtml(displayName)}</h4>
+                    ${hasError ? 
+                        `<p class="error">Erreur: ${escapeHtml(queueData.error)}</p>` :
+                        `
+                        <div class="queue-stats">
+                            <div class="stat">
+                                <span class="stat-label">En attente:</span>
+                                <span class="stat-value">${queueData.count}</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">En cours:</span>
+                                <span class="stat-value">${queueData.started}</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Échouées:</span>
+                                <span class="stat-value error">${queueData.failed}</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Terminées:</span>
+                                <span class="stat-value success">${queueData.finished}</span>
+                            </div>
+                        </div>
+                        ${totalJobs > 0 ? `
+                            <button class="btn btn--danger btn--sm" 
+                                    data-action="clearQueue" 
+                                    data-queue-name="${queueName}">
+                                Vider la file
+                            </button>
+                        ` : ''}
+                        `
+                    }
                 </div>
-            `).join('') :
-            '<p>Impossible de récupérer l\'état des files.</p>';
-    });
+            `;
+        }
+        
+        html += '</div>';
+        container.innerHTML = html;
+        
+    } catch (error) {
+        console.error('Erreur lors du chargement du statut des files:', error);
+        if (container) {
+            container.innerHTML = '<p class="error">Impossible de récupérer l\'état des files.</p>';
+        }
+    } finally {
+        showLoadingOverlay(false);
+    }
 }
 
 // ================================================================
@@ -2517,20 +2507,126 @@ async function handlePullModel() {
 }
 
 async function handleClearQueue(queueName) {
-    if (!confirm(`Vider la file "${queueName}" ?`)) return;
+    if (!confirm(`Êtes-vous sûr de vouloir vider la file "${queueName}" ? Cette action est irréversible.`)) {
+        return;
+    }
     
     try {
+        showLoadingOverlay(true, 'Vidage de la file...');
         await fetchAPI('/queues/clear', {
             method: 'POST',
             body: { queue_name: queueName }
         });
         
-        showToast(`File "${queueName}" vidée.`, 'success');
-        renderQueueStatus();
+        showToast(`File "${queueName}" vidée avec succès.`, 'success');
+        renderQueueStatus(); // Rafraîchir l'affichage
         
     } catch (error) {
-        console.error('Erreur vidage file:', error);
+        console.error('Erreur lors du vidage de la file:', error);
+        showToast('Erreur lors du vidage de la file.', 'error');
+    } finally {
+        showLoadingOverlay(false);
     }
+}
+
+async function handleRunPipeline(e) {
+  e.preventDefault();
+
+  // 1) Préconditions
+  if (!appState.currentProject || !appState.currentProject.id) {
+    showToast("Aucun projet sélectionné.", "error");
+    return;
+  }
+
+  // 2) Récupération des champs du formulaire (tous sont optionnels selon la source)
+  const form = e.target;
+  const formData = new FormData(form);
+
+  // IDs d'éléments attendus dans la modale (index.html) :
+  // - pipelineSourceSelect (name="source") -> 'manual' | 'selected' | 'all'
+  // - pipelineProfileSelect (name="profile")
+  // - pipelineModeSelect (name="analysis_mode")
+  // - customGridSelect (name="custom_grid_id")
+  // - manualIdsTextarea (textarea pour la saisie manuelle)
+  const source = (formData.get('source') || 'selected').toString();
+  const profileId = (formData.get('profile') || 'standard').toString();
+  const analysis_mode = (formData.get('analysis_mode') || 'screening').toString();
+  const customGridId = formData.get('custom_grid_id');
+  const custom_grid_id = customGridId && String(customGridId).trim() !== '' ? String(customGridId) : null;
+
+  // 3) Construire la liste d'articles selon la source
+  let articles = [];
+
+  if (source === 'manual') {
+    // Chercher le textarea de manière robuste
+    const manualTextarea =
+      document.getElementById('manualIdsTextarea') ||
+      form.querySelector('#manualIdsTextarea') ||
+      form.querySelector('textarea[name="manual_ids"]');
+
+    const raw = manualTextarea ? manualTextarea.value : '';
+    if (!raw || raw.trim() === '') {
+      showToast("Veuillez fournir des identifiants d'articles dans la zone de texte.", "error");
+      return;
+    }
+
+    // Split par ligne, trim, retirer vides/duplicats
+    const lines = raw.split('\n').map(s => s.trim()).filter(Boolean);
+    const uniq = Array.from(new Set(lines));
+    if (uniq.length === 0) {
+      showToast("Aucun identifiant valide détecté.", "error");
+      return;
+    }
+    articles = uniq;
+  } else if (source === 'selected') {
+    // Utiliser la sélection réalisée dans la liste de résultats
+    if (!appState.selectedSearchResults || appState.selectedSearchResults.size === 0) {
+      showToast("Veuillez sélectionner au moins un article.", "error");
+      return;
+    }
+    articles = Array.from(appState.selectedSearchResults);
+  } else {
+    // 'all' -> tous les résultats du projet déjà chargés en mémoire
+    if (!Array.isArray(appState.searchResults) || appState.searchResults.length === 0) {
+      showToast("Aucun résultat disponible dans le projet.", "error");
+      return;
+    }
+    articles = appState.searchResults
+      .map(r => r.article_id)
+      .filter(Boolean);
+    // Uniq
+    articles = Array.from(new Set(articles));
+  }
+
+  if (!Array.isArray(articles) || articles.length === 0) {
+    showToast("Aucun article à traiter.", "error");
+    return;
+  }
+
+  // 4) Fermer la modale puis lancer l’API
+  closeModal('runPipelineModal');
+  showLoadingOverlay(true, 'Lancement du pipeline...');
+
+  try {
+    await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
+      method: 'POST',
+      body: {
+        articles,
+        profile: profileId,
+        custom_grid_id,
+        analysis_mode
+      }
+    });
+    showToast(`Analyse lancée pour ${articles.length} article(s).`, 'info');
+
+    // Rechargement de la vue du projet et de la section
+    await selectProject(appState.currentProject.id, true);
+  } catch (err) {
+    console.error('Erreur lancement pipeline:', err);
+    showToast(err.message || "Erreur lors du lancement du pipeline.", "error");
+  } finally {
+    showLoadingOverlay(false);
+  }
 }
 
 async function handleSaveZoteroSettings() {

@@ -37,7 +37,7 @@ from tasks_v4_complete import (
     answer_chat_question_task,
     fetch_online_pdf_task,
     import_from_zotero_file_task,
-    calculate_kappa_task,
+    calculate_kappa_task
 )
 
 from utils.fetchers import db_manager, fetch_article_details
@@ -923,24 +923,21 @@ def export_validations(project_id):
             FROM extractions
             WHERE project_id = :pid AND validations IS NOT NULL
         """), {"pid": project_id}).mappings().all()
-
         records = []
         for r in rows:
             try:
-                v = json.loads(r["validations"])
-                if "evaluator_1" in v:
+                v = json.loads(r['validations'])
+                if 'evaluator_1' in v:
                     records.append({
-                        "article_id": r["pmid"],
-                        "title": r["title"],
-                        "decision": v["evaluator_1"],
-                        "ia_score": r["relevance_score"],
+                        'article_id': r['pmid'],
+                        'title': r['title'],
+                        'decision': v['evaluator_1'],
+                        'ia_score': r['relevance_score'],
                     })
             except Exception:
                 continue
-
         if not records:
-            return jsonify({"message": "Aucune validation de l'évaluateur 1 à exporter."}), 404
-
+            return jsonify({'message': "Aucune validation de l'évaluateur 1 à exporter."}), 404
         df = pd.DataFrame(records)
         csv_data = df.to_csv(index=False, encoding='utf-8')
         return Response(
@@ -950,10 +947,10 @@ def export_validations(project_id):
         )
     except Exception as e:
         logger.error(f"Erreur d'export validations: {e}", exc_info=True)
-        return jsonify({"error": "Erreur interne du serveur"}), 500
+        return jsonify({'error': 'Erreur interne du serveur'}), 500
     finally:
         session.close()
-
+        
 @api_bp.route('/projects/<project_id>/import-validations', methods=['POST'])
 def import_validations(project_id):
     if 'file' not in request.files:
@@ -1205,6 +1202,62 @@ def queue_status():
         logger.error(f"Erreur /queue-status: {e}", exc_info=True)
         return jsonify({}), 404
 
+# --- GESTION DES FILES D'ATTENTE ---
+@api_bp.route('/queue-status', methods=['GET'])
+def get_queue_status():
+    """Récupère l'état des files d'attente."""
+    try:
+        queues = {
+            'analylit_processing_v4': processing_queue,
+            'analylit_synthesis_v4': synthesis_queue,
+            'analylit_analysis_v4': analysis_queue,
+            'analylit_background_v4': background_queue
+        }
+        
+        status = {}
+        for name, queue in queues.items():
+            try:
+                status[name] = {
+                    'count': queue.count,
+                    'failed': queue.failed_job_registry.count,
+                    'started': queue.started_job_registry.count,
+                    'deferred': queue.deferred_job_registry.count,
+                    'finished': queue.finished_job_registry.count
+                }
+            except Exception as e:
+                logger.error(f"Erreur status queue {name}: {e}")
+                status[name] = {'error': str(e)}
+        
+        return jsonify(status)
+    except Exception as e:
+        logger.error(f"Erreur get_queue_status: {e}")
+        return jsonify({'error': 'Erreur lors de la récupération du statut'}), 500
+
+@api_bp.route('/queues/clear', methods=['POST'])
+def clear_queue():
+    """Vide une file d'attente spécifiée."""
+    try:
+        data = request.get_json(force=True)
+        queue_name = data.get('queue_name')
+
+        queues_map = {
+            'analylit_processing_v4': processing_queue,
+            'analylit_synthesis_v4': synthesis_queue,
+            'analylit_analysis_v4': analysis_queue,
+            'analylit_background_v4': background_queue
+        }
+
+        if queue_name not in queues_map:
+            return jsonify({'error': f"File inconnue: '{queue_name}'"}), 400
+
+        queue = queues_map[queue_name]
+        queue.empty()
+        return jsonify({'message': f"File '{queue_name}' vidée."}), 200
+
+    except Exception as e:
+        logger.error(f"Erreur clear_queue: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur interne'}), 500
+        
 # ================================================================
 # Enregistrement Blueprint & Static
 # ================================================================
