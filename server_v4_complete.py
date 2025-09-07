@@ -14,6 +14,7 @@ from datetime import datetime
 from flask import Flask, jsonify, request, Blueprint, send_from_directory, Response
 from flask_cors import CORS
 from rq import Queue
+from rq.worker import Worker
 import redis
 from flask_socketio import SocketIO
 from sqlalchemy import create_engine, text
@@ -33,11 +34,16 @@ from tasks_v4_complete import (
     answer_chat_question_task,
     fetch_online_pdf_task,
     import_from_zotero_file_task,
+    pull_ollama_model_task,
+    calculate_kappa_task,
+    run_atn_score_task
 )
 
 from utils.fetchers import db_manager, fetch_article_details
 from utils.file_handlers import sanitize_filename
 from utils.notifications import send_project_notification
+from sklearn.metrics import cohen_kappa_score
+
 
 # --- Configuration ---
 config = get_config()
@@ -60,6 +66,7 @@ socketio = SocketIO(
     async_mode='gevent',
     path='/socket.io/'
 )
+
 
 # --- Redis / Queues ---
 redis_conn = redis.from_url(config.REDIS_URL)
@@ -773,161 +780,114 @@ def export_validations(project_id):
     session = Session()
     try:
         rows = session.execute(text("""
-        SELECT pmid, title, validations, relevance_score FROM extractions 
-        WHERE project_id = :pid AND validations IS NOT NULL
+            SELECT pmid, title, validations, relevance_score
+            FROM extractions
+            WHERE project_id = :pid AND validations IS NOT NULL
         """), {"pid": project_id}).mappings().all()
-
+        
         records = []
         for r in rows:
             try:
-                v = json.loads(r["validations"] or "{}")
-                if "evaluator_1" in v:
+                v = json.loads(r["validations"]) if r.get("validations") else {}
+                if "evaluator1" in v:
                     records.append({
                         "article_id": r["pmid"],
                         "title": r["title"],
-                        "decision": v["evaluator_1"],
-                        "ia_score": r["relevance_score"]
+                        "decision": v["evaluator1"],
+                        "ia_score": r.get("relevance_score", None)
                     })
-            except (json.JSONDecodeError, TypeError):
+            except Exception:
                 continue
-
+        
         if not records:
-            return jsonify({"message": "Aucune validation de l'évaluateur 1 à exporter."}), 404
-
+            return jsonify({"message": "Aucune validation évaluateur 1 à exporter."}), 404
+        
         df = pd.DataFrame(records)
-        csv_data = df.to_csv(index=False, encoding='utf-8')
-
+        csv_data = df.to_csv(index=False)
+        
         return Response(
             csv_data,
             mimetype='text/csv',
-            headers={"Content-Disposition": f"attachment; filename=validations_eval1_{project_id}.csv"}
+            headers={'Content-Disposition': f'attachment; filename=validations_eval1_{project_id}.csv'}
         )
-
     except Exception as e:
         logger.error(f"Erreur export validations: {e}", exc_info=True)
         return jsonify({"error": "Erreur interne du serveur"}), 500
     finally:
         session.close()
-
+        
 @api_bp.route('/projects/<project_id>/import-validations', methods=['POST'])
 def import_validations(project_id):
     if 'file' not in request.files:
-        return jsonify({'error': 'Aucun fichier fourni'}), 400
+        return jsonify({"error": "Aucun fichier fourni"}), 400
 
     file = request.files['file']
     session = Session()
     try:
         df = pd.read_csv(file.stream)
-        required = {'article_id', 'decision'}
-
-        if not required.issubset(set(df.columns.str.lower())):
-            return jsonify({'error': f"Le CSV doit contenir les colonnes {sorted(required)}"}), 400
+        normalized = {str(c).strip().lower(): c for c in df.columns}
+        
+        if not {"articleid", "decision"}.issubset(set(normalized.keys())):
+            return jsonify({"error": "Le fichier CSV doit contenir les colonnes ['articleId','decision']"}), 400
 
         updated = 0
-        # Colonne flexible: normaliser les noms
-        cols = {c.lower(): c for c in df.columns}
-
         for _, row in df.iterrows():
-            article_id = str(row[cols.get('article_id')]).strip()
-            decision = str(row[cols.get('decision')]).strip().lower()
+            article_id = str(row[normalized["articleid"]]).strip()
+            decision = str(row[normalized["decision"]]).strip().lower()
+            
+            # Normalisation FR/EN
+            mapping = {"inclure": "include", "inclu": "include", "include": "include",
+                      "exclure": "exclude", "exclu": "exclude", "exclude": "exclude"}
+            decision = mapping.get(decision, decision)
 
-            if decision not in ('include', 'exclude', 'inclu', 'exclu', 'à inclure', 'à exclure'):
+            if not article_id or decision not in ("include", "exclude"):
                 continue
 
-            # Normaliser en 'include'/'exclude'
-            decision_norm = 'include' if decision in ('include', 'inclu', 'à inclure') else 'exclude'
-
             ext = session.execute(text("""
-            SELECT id, validations FROM extractions
-            WHERE project_id = :pid AND pmid = :pmid
+                SELECT id, validations FROM extractions
+                WHERE project_id = :pid AND pmid = :pmid
             """), {"pid": project_id, "pmid": article_id}).mappings().fetchone()
 
             if not ext:
                 continue
 
-            v = {}
             try:
-                if ext["validations"]:
-                    v = json.loads(ext["validations"])
+                v = json.loads(ext["validations"]) if ext.get("validations") else {}
             except Exception:
                 v = {}
 
-            v["evaluator_2"] = decision_norm
-
+            v["evaluator2"] = decision
             session.execute(text("""
-            UPDATE extractions SET validations = :val WHERE id = :id
-            """), {"val": json.dumps(v), "id": ext["id"]})
+                UPDATE extractions SET validations = :val WHERE id = :id
+            """), {"val": json.dumps(v, ensure_ascii=False), "id": ext["id"]})
             updated += 1
 
         session.commit()
-        return jsonify({"message": f"{updated} validations importées pour l'évaluateur 2."})
+        return jsonify({"message": f"{updated} validations importées pour l'évaluateur 2."}), 200
 
     except Exception as e:
         session.rollback()
         logger.error(f"Erreur import validations: {e}", exc_info=True)
-        return jsonify({'error': 'Erreur interne ou format CSV invalide'}), 500
+        return jsonify({"error": "Erreur interne ou format invalide"}), 500
     finally:
         session.close()
 
 @api_bp.route('/projects/<project_id>/calculate-kappa', methods=['POST'])
 def calculate_kappa(project_id):
-    # Créer une tâche simple inline puisque calculate_kappa_task peut ne pas exister
-    from sklearn.metrics import cohen_kappa_score
-    
-    session = Session()
-    try:
-        # Récupérer les validations
-        rows = session.execute(text("""
-        SELECT validations FROM extractions 
-        WHERE project_id = :pid AND validations IS NOT NULL
-        """), {"pid": project_id}).mappings().all()
-
-        evaluator1_decisions = []
-        evaluator2_decisions = []
-
-        for r in rows:
-            try:
-                v = json.loads(r["validations"])
-                if "evaluator_1" in v and "evaluator_2" in v:
-                    evaluator1_decisions.append(v["evaluator_1"])
-                    evaluator2_decisions.append(v["evaluator_2"])
-            except (json.JSONDecodeError, TypeError):
-                continue
-
-        if len(evaluator1_decisions) < 5:
-            result_text = f"Pas assez de données communes ({len(evaluator1_decisions)} articles) pour un calcul de Kappa fiable."
-        else:
-            kappa_score = cohen_kappa_score(evaluator1_decisions, evaluator2_decisions)
-            result_text = f"Coefficient Kappa de Cohen: {kappa_score:.3f} basé sur {len(evaluator1_decisions)} articles"
-
-        # Sauvegarder le résultat
-        session.execute(text("""
-        UPDATE projects SET inter_rater_reliability = :kappa WHERE id = :id
-        """), {"kappa": result_text, "id": project_id})
-        session.commit()
-
-        # Envoyer une notification
-        send_project_notification(project_id, 'kappa_calculated', result_text)
-
-        return jsonify({'message': 'Calcul du Kappa terminé.', 'result': result_text}), 200
-
-    except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur calculate kappa: {e}", exc_info=True)
-        return jsonify({'error': f'Erreur lors du calcul du Kappa: {e}'}), 500
-    finally:
-        session.close()
+    job = analysis_queue.enqueue(calculate_kappa_task, project_id=project_id, job_timeout='10m')
+    return jsonify({"message": "Calcul du Kappa lancé.", "job_id": job.id}), 202
 
 @api_bp.route('/projects/<project_id>/inter-rater-stats', methods=['GET'])
 def get_inter_rater_stats(project_id):
     session = Session()
     try:
-        row = session.execute(text("SELECT inter_rater_reliability FROM projects WHERE id = :pid"),
-                             {"pid": project_id}).mappings().fetchone()
-        return jsonify({'kappa_result': (row['inter_rater_reliability'] if row else 'Non calculé')})
+        row = session.execute(text("""
+            SELECT inter_rater_reliability FROM projects WHERE id = :pid
+        """), {"pid": project_id}).mappings().fetchone()
+        return jsonify({"kappa_result": row["inter_rater_reliability"] if row else "Non calculé"})
     except Exception as e:
-        logger.error(f"Erreur inter-rater-stats: {e}", exc_info=True)
-        return jsonify({'error': 'Erreur interne du serveur'}), 500
+        logger.error(f"Erreur inter-rater stats: {e}", exc_info=True)
+        return jsonify({"error": "Erreur interne du serveur"}), 500
     finally:
         session.close()
 
@@ -1171,6 +1131,123 @@ def get_prompts():
     finally:
         session.close()
 
+# --- Modèles Ollama ---
+@api_bp.route('/ollama/models', methods=['GET'])
+def get_ollama_models():
+    try:
+        import requests
+        response = requests.get(f"{config.OLLAMA_BASE_URL}/api/tags", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            return jsonify(data.get('models', []))
+        return jsonify([])
+    except Exception as e:
+        logger.error(f"Erreur get_ollama_models: {e}")
+        return jsonify([])
+
+@api_bp.route('/ollama/pull', methods=['POST'])
+def pull_ollama_model():
+    data = request.get_json(force=True)
+    model_name = data.get('model')
+    if not model_name:
+        return jsonify({'error': 'Nom du modèle requis'}), 400
+    
+    try:
+        # Lancer le téléchargement en arrière-plan
+        from tasks_v4_complete import pull_ollama_model_task
+        job = background_queue.enqueue(pull_ollama_model_task, model_name=model_name, job_timeout='1h')
+        return jsonify({'message': f'Téléchargement du modèle {model_name} lancé', 'job_id': job.id}), 202
+    except Exception as e:
+        logger.error(f"Erreur pull model: {e}")
+        return jsonify({'error': 'Erreur lors du lancement du téléchargement'}), 500
+
+# --- Files RQ (Unique et stables) ---
+
+@api_bp.route('/queues/info', methods=['GET'], endpoint='queues_info')
+def api_queues_info():
+    try:
+        queue_map = {
+            'processing': processing_queue,
+            'synthesis': synthesis_queue,
+            'analysis': analysis_queue,
+            'background': background_queue
+        }
+        info = []
+        for name, q in queue_map.items():
+            info.append({'name': name, 'size': len(q), 'workers': len(q.workers)})
+        return jsonify(info)
+    except Exception as e:
+        logger.error(f'Erreur queues info: {e}', exc_info=True)
+        return jsonify([]), 500
+
+@api_bp.route('/queues/<queue_name>/clear', methods=['POST'], endpoint='queues_clear')
+def api_queues_clear(queue_name):
+    try:
+        queue_map = {
+            'processing': processing_queue,
+            'synthesis': synthesis_queue,
+            'analysis': analysis_queue,
+            'background': background_queue
+        }
+        q = queue_map.get(queue_name)
+        if not q:
+            return jsonify({'error': 'File inconnue'}), 404
+        q.empty()
+        return jsonify({'message': f'File {queue_name} vidée'})
+    except Exception as e:
+        logger.error(f'Erreur clear queue: {e}', exc_info=True)
+        return jsonify({'error': 'Erreur lors du vidage'}), 500
+        
+# --- Analyses avancées ---
+@api_bp.route('/projects/<project_id>/run-analysis', methods=['POST'])
+def run_advanced_analysis(project_id):
+    data = request.get_json(force=True)
+    analysis_type = data.get('type')
+    
+    if not analysis_type:
+        return jsonify({'error': 'Type d\'analyse requis'}), 400
+    
+    try:
+        session = Session()
+        session.execute(text("UPDATE projects SET status = 'generating_analysis' WHERE id = :pid"),
+                       {"pid": project_id})
+        session.commit()
+        session.close()
+        
+        if analysis_type == 'meta_analysis':
+            from tasks_v4_complete import run_meta_analysis_task
+            job = analysis_queue.enqueue(run_meta_analysis_task, project_id=project_id, job_timeout='30m')
+        elif analysis_type == 'atn_scores':
+            from tasks_v4_complete import run_atn_score_task
+            job = analysis_queue.enqueue(run_atn_score_task, project_id=project_id, job_timeout='30m')
+        elif analysis_type == 'discussion':
+            from tasks_v4_complete import run_discussion_generation_task
+            job = analysis_queue.enqueue(run_discussion_generation_task, project_id=project_id, job_timeout='30m')
+        elif analysis_type == 'knowledge_graph':
+            from tasks_v4_complete import run_knowledge_graph_task
+            job = analysis_queue.enqueue(run_knowledge_graph_task, project_id=project_id, job_timeout='30m')
+        elif analysis_type == 'prisma_flow':
+            from tasks_v4_complete import run_prisma_flow_task
+            job = analysis_queue.enqueue(run_prisma_flow_task, project_id=project_id, job_timeout='30m')
+        else:
+            return jsonify({'error': 'Type d\'analyse non supporté'}), 400
+            
+        return jsonify({'message': f'Analyse {analysis_type} lancée', 'job_id': job.id}), 202
+    except Exception as e:
+        logger.error(f"Erreur run analysis: {e}")
+        return jsonify({'error': 'Erreur lors du lancement de l\'analyse'}), 500
+
+# --- Validation inter-évaluateurs ---
+@api_bp.route('/projects/<project_id>/calculate-kappa', methods=['POST'])
+def calculate_project_kappa(project_id):
+    try:
+        from tasks_v4_complete import calculate_kappa_task
+        job = background_queue.enqueue(calculate_kappa_task, project_id=project_id, job_timeout='15m')
+        return jsonify({'message': 'Calcul du Kappa lancé', 'job_id': job.id}), 202
+    except Exception as e:
+        logger.error(f"Erreur calculate kappa: {e}")
+        return jsonify({'error': 'Erreur lors du calcul du Kappa'}), 500
+
 # --- Chat RAG ---
 @api_bp.route('/projects/<project_id>/chat', methods=['POST'])
 def api_project_chat(project_id):
@@ -1285,7 +1362,7 @@ def export_project(project_id):
         return jsonify({'error': 'Erreur lors de la génération de l’export'}), 500
     finally:
         session.close()
-
+    
 # --- Enregistrement Blueprint API ---
 app.register_blueprint(api_bp)
 

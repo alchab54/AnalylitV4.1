@@ -27,8 +27,7 @@ let elements = {};
 // ================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Démarrage de AnalyLit V4.1 Frontend CORRIGÉ...');
-    
+    console.log('🚀 Démarrage de AnalyLit V4.1 Frontend...');
     elements = {
         sections: document.querySelectorAll('.section'),
         navButtons: document.querySelectorAll('.app-nav__button'),
@@ -63,16 +62,25 @@ async function initializeApplication() {
     showLoadingOverlay(true, 'Initialisation...');
     try {
         initializeWebSocket();
-        await loadInitialData();
+        await loadInitialData(); // Appelle le bloc de fonctions ci-dessus
         showSection('projects');
-        attachValidationFileInputListener();
-		attachZoteroFileInputListener();
+        renderProjectList();
         console.log('✅ Application initialisée avec succès');
     } catch (error) {
         console.error('❌ Erreur initialisation application:', error);
-        showToast("Erreur lors de l'initialisation", 'error');
+        showToast("Erreur lors de l'initialisation de l'application.", 'error');
     } finally {
         showLoadingOverlay(false);
+    }
+}
+
+async function loadProjects() {
+    try {
+        appState.projects = await fetchAPI('/projects');
+        console.log(`📊 Projets chargés: ${appState.projects ? appState.projects.length : 0}`);
+    } catch (error) {
+        console.error('Erreur chargement projets:', error);
+        appState.projects = []; // Assurer un état stable en cas d'échec
     }
 }
 
@@ -216,35 +224,75 @@ function sanitize_filename(name) {
 }
 
 function showToast(message, type = 'info') {
-  if (!elements.toastContainer) return;
-  const toast = document.createElement('div');
-  toast.className = `toast toast--${type}`;
-  const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
-  toast.innerHTML = `<span class="toast__icon">${icons[type] || 'ℹ️'}</span><span class="toast__msg">${escapeHtml(message || '')}</span>`;
-  elements.toastContainer.appendChild(toast);
-  setTimeout(() => {
-    toast.classList.add('toast--show');
-  }, 10);
-  setTimeout(() => {
-    toast.classList.remove('toast--show');
-    toast.remove();
-  }, 4000);
+    if (!elements.toastContainer) return;
+    const toast = document.createElement('div');
+    toast.className = `toast toast--${type}`;
+    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+    // Correction: Assure un HTML valide et simple
+    toast.innerHTML = `<span class="toast__icon">${icons[type] || 'ℹ️'}</span><p>${escapeHtml(message)}</p>`;
+    elements.toastContainer.appendChild(toast);
+    setTimeout(() => toast.classList.add('toast--show'), 10);
+    setTimeout(() => {
+        toast.classList.remove('toast--show');
+        toast.addEventListener('transitionend', () => toast.remove());
+    }, 4000);
 }
 
-function showLoadingOverlay(show, message = 'Chargement...') {
-    if (!elements.loadingOverlay) return;
-    
-    if (show) {
-        elements.loadingOverlay.innerHTML = `
-            <div class="loading-content">
-                <div class="loading-spinner"></div>
-                <div class="loading-text">${escapeHtml(message)}</div>
-            </div>
-        `;
-        elements.loadingOverlay.style.display = 'flex';
-    } else {
-        elements.loadingOverlay.style.display = 'none';
-    }
+function renderProjectList() {
+  if (!elements.projectsList) return;
+
+  // État vide
+  if (!Array.isArray(appState.projects) || appState.projects.length === 0) {
+    elements.projectsList.innerHTML = `
+      <li class="empty-state">
+        <p>Aucun projet. Créez-en un pour commencer.</p>
+      </li>
+    `;
+    return;
+  }
+
+  // Rendu des projets
+  const html = appState.projects.map(p => `
+    <li class="project-item" data-project-id="${p.id}">
+      <div class="project-card">
+        <h4>${escapeHtml(p.name || 'Projet sans nom')}</h4>
+        <p>${escapeHtml(p.description || 'Pas de description')}</p>
+        <div class="project-meta">
+          <span class="status-badge">${escapeHtml(p.status || 'pending')}</span>
+          <span class="count">${Number(p.pmids_count || 0)} articles</span>
+        </div>
+      </div>
+    </li>
+  `).join('');
+
+  elements.projectsList.innerHTML = html;
+
+  // Sélection d’un projet au clic
+  elements.projectsList.querySelectorAll('.project-item').forEach(li => {
+    li.addEventListener('click', () => {
+      const pid = li.getAttribute('data-project-id');
+      selectProject(pid, true);
+    });
+  });
+}
+
+function showLoadingOverlay(show, text = 'Chargement...') {
+  if (!elements.loadingOverlay) {
+    console.warn('loadingOverlay introuvable dans le DOM');  // [web:1]
+    return;  // [web:1]
+  }
+  // Tente de cibler un élément message si présent, sinon fallback
+  const msgEl = elements.loadingOverlay.querySelector('[data-loading-message]') || elements.loadingOverlay.querySelector('p');  // [web:1]
+  if (msgEl) {
+    msgEl.textContent = text;  // [web:1]
+  }
+  // Supporte à la fois une classe utilitaire et le style inline
+  if (elements.loadingOverlay.classList) {
+    // Si votre CSS gère .loading-overlay--show (recommandé)
+    elements.loadingOverlay.classList.toggle('loading-overlay--show', !!show);  // [web:1]
+  }
+  // Fallback inline (utile si la classe n’existe pas encore)
+  elements.loadingOverlay.style.display = show ? 'flex' : 'none';  // [web:1]
 }
 
 function updateNotificationIndicator() {
@@ -264,28 +312,68 @@ function updateNotificationIndicator() {
 // === GESTION DES SECTIONS
 // ================================================================
 
-function showSection(sectionName) {
-    appState.currentSection = sectionName;
-    
-    // Masquer toutes les sections
-    elements.sections.forEach(section => section.classList.remove('section--active'));
-    elements.navButtons.forEach(btn => btn.classList.remove('app-nav__button--active'));
-    
-    // Afficher la section demandée
-    const targetSection = document.querySelector(`[data-section="${sectionName}"]`);
-    if (targetSection) {
-        targetSection.classList.add('section--active');
-    }
-    
-    // Activer le bouton de navigation
-    const targetButton = document.querySelector(`[data-section="${sectionName}"]`);
-    if (targetButton) {
-        targetButton.classList.add('app-nav__button--active');
-    }
-    
-    // Rafraîchir le contenu si nécessaire
-    refreshCurrentSection();
+// ================================================================
+// === GESTION DE L'AFFICHAGE (LOGIQUE MANQUANTE)
+// ================================================================
+function normalizeSectionKey(key) {
+  const map = {
+    'projets': 'projects',
+    'projet': 'projects',
+    'projects': 'projects',
+    'recherche': 'search',
+    'search': 'search',
+    'validation': 'validation',
+    'analyses': 'analysis',
+    'analyse': 'analysis',
+    'analysis': 'analysis',
+    'import': 'import',
+    'importer': 'import',
+    'chat': 'chat',
+    'parametres': 'settings',
+    'paramètres': 'settings',
+    'settings': 'settings',
+  };
+  const k = String(key || '').trim().toLowerCase();
+  return map[k] || k;
 }
+
+function showSection(sectionKey) {
+  const key = normalizeSectionKey(sectionKey);
+  console.log(`🔍 Affichage de la section: ${key}`);
+  if (!elements.sections || elements.sections.length === 0) {
+    console.warn('Aucun conteneur de section détecté (elements.sections vide).');
+    return;
+  }
+  let found = false;
+  elements.sections.forEach(sec => {
+    if (!sec) return;
+    const secKey = (sec.getAttribute('data-section') || sec.id || '').toLowerCase();
+    const isTarget = secKey === key;
+    if (sec.style) sec.style.display = isTarget ? 'block' : 'none';
+    if (isTarget) found = true;
+  });
+  if (!found) {
+    console.warn(`Section '${key}' introuvable (data-section ou id).`);
+    const first = elements.sections;
+    if (first && first.style) {
+      first.style.display = 'block';
+      appState.currentSection = (first.getAttribute('data-section') || first.id || 'unknown').toLowerCase();
+    }
+    return;
+  }
+  appState.currentSection = key;
+}
+
+function updateActiveNav(sectionId) {
+    elements.navButtons.forEach(btn => {
+        if (btn.getAttribute('data-section') === sectionId) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+}
+
 async function renderProjectArticlesList(projectId) {
   const container = document.getElementById('project-articles-list');
   if (!container) return;
@@ -376,59 +464,68 @@ function refreshCurrentSection(project = appState.currentProject) {
 // ================================================================
 
 async function loadInitialData() {
+    // Exécute tous les chargements en parallèle pour accélérer le démarrage
     await Promise.all([
         loadProjects(),
-        loadAnalysisProfiles(), 
+        loadAnalysisProfiles(),
+        loadPrompts(), // Correction: s'assurer que cette fonction est appelée
         loadOllamaModels(),
-        loadPrompts(),
         loadAvailableDatabases()
     ]);
-}
-
-async function loadProjects() {
-    try {
-        appState.projects = await fetchAPI('/projects');
-        renderProjectsList();
-    } catch (error) {
-        console.error('Erreur chargement projets:', error);
-        appState.projects = [];
-    }
 }
 
 async function loadAnalysisProfiles() {
     try {
         appState.analysisProfiles = await fetchAPI('/analysis-profiles');
     } catch (error) {
-        console.error('Erreur chargement profils:', error);
+        console.error('Erreur chargement profils d\'analyse:', error);
         appState.analysisProfiles = [];
-    }
-}
-
-async function loadOllamaModels() {
-    try {
-        appState.ollamaModels = await fetchAPI('/ollama/models');
-    } catch (error) {
-        console.error('Erreur chargement modèles Ollama:', error);
-        appState.ollamaModels = [];
     }
 }
 
 async function loadPrompts() {
     try {
         appState.prompts = await fetchAPI('/prompts');
+        if (!Array.isArray(appState.prompts)) {
+            console.warn('Réponse inattendue pour /prompts, utilisation d’une liste vide.');
+            appState.prompts = [];
+        }
     } catch (error) {
-        console.error('Erreur chargement prompts:', error);
-        appState.prompts = [];
+        console.error('Erreur chargement des prompts:', error);
+        appState.prompts = []; // Reset en cas d'erreur
     }
 }
 
+async function loadOllamaModels() {
+  try {
+    const data = await fetchAPI('/ollama/models');
+    appState.ollamaModels = Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error('Erreur chargement modèles Ollama:', err);
+    appState.ollamaModels = [];
+  }
+}
+
 async function loadAvailableDatabases() {
-    try {
-        appState.availableDatabases = await fetchAPI('/databases');
-    } catch (error) {
-        console.error('Erreur chargement bases:', error);
-        appState.availableDatabases = [];
+  try {
+    appState.availableDatabases = await fetchAPI('/databases');
+    if (!Array.isArray(appState.availableDatabases)) {
+      console.warn('Réponse inattendue pour /databases, utilisation d’une liste vide.');
+      appState.availableDatabases = [];
     }
+  } catch (error) {
+    console.error('Erreur chargement bases de données disponibles:', error);
+    appState.availableDatabases = [];
+  }
+}
+
+async function loadQueueStatus() {
+  try {
+    const data = await fetchAPI('/queues/info');
+    appState.queueStatus = data;
+  } catch (e) {
+    console.error('Erreur chargement statut files:', e);
+  }
 }
 
 // ================================================================
@@ -436,169 +533,323 @@ async function loadAvailableDatabases() {
 // ================================================================
 
 function setupEventListeners() {
-    // Navigation
-    elements.navButtons.forEach(button => button.addEventListener('click', (e) => {
-        e.preventDefault();
-        showSection(e.currentTarget.getAttribute('data-section'));
-    }));
-
-    // Formulaires principaux
-    elements.createProjectBtn?.addEventListener('click', () => openModal('newProjectModal'));
-    elements.newProjectForm?.addEventListener('submit', handleCreateProject);
-    elements.multiSearchForm?.addEventListener('submit', handleMultiSearch);
-    elements.runPipelineForm?.addEventListener('submit', handleRunPipeline);
-    elements.gridForm?.addEventListener('submit', handleSaveGrid);
-    elements.promptForm?.addEventListener('submit', handleSavePrompt);
-    elements.profileForm?.addEventListener('submit', handleSaveProfile);
-
-    // Upload de fichiers
-    const gridFileInput = document.getElementById('gridFileInput');
-    if (gridFileInput) {
-        gridFileInput.addEventListener('change', handleGridImport);
-    }
-
-    const zoteroFileInput = document.getElementById('zoteroFileInput');
-    if (zoteroFileInput) {
-        zoteroFileInput.addEventListener('change', handleZoteroFileUpload);
-    }
-
-    // Ajout dynamique de champs
-    document.getElementById('addGridFieldBtn')?.addEventListener('click', () => addGridFieldInput());
-    document.getElementById('pipelineSourceSelect')?.addEventListener('change', handlePipelineSourceChange);
-
-    // Gestionnaire principal d'actions via data-action
-    document.body.addEventListener('click', e => {
-        const target = e.target.closest('[data-action]');
-        if (!target) return;
-        
-        const action = target.dataset.action;
-        const { projectId, articleId, gridId, promptId, profileId, queueName, plotType, extractionId, decision } = target.dataset;
-
-        // Cas spécial pour view-article-online
-        if (action === 'view-article-online') {
-            e.preventDefault();
-            const url = target.href;
-            if (url && url !== '#' && !url.endsWith('null')) {
-                window.open(url, '_blank');
-            } else {
-                showToast("URL de l'article non disponible.", 'warning');
-            }
-            return;
+  // Navigation principale (boutons avec data-section)
+  if (elements.navButtons && elements.navButtons.forEach) {
+    elements.navButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const sectionId = button.getAttribute('data-section');
+        if (!sectionId) return;
+        // Exiger un projet sélectionné pour les sections autres que projects/settings
+        const needsProject = !['projects', 'settings'].includes(sectionId);
+        if (needsProject && !appState.currentProject) {
+          showToast("Veuillez d'abord sélectionner un projet.", 'warning');
+          return;
         }
+        showSection(sectionId);
+      });
+    });
+  }
 
-        // Toutes les autres actions
-        const actions = {
-            // Gestion projets
-            selectProject: () => selectProject(projectId),
-            deleteProject: () => handleDeleteProject(projectId),
-            
-            // Pipeline et analyses
-            runPipeline: () => openRunPipelineModal(),
-            runSynthesis: () => handleRunSynthesis(),
-            exportProject: () => handleExportProject(projectId),
-            
-            // Résultats de recherche
-            selectSearchResult: () => selectSearchResult(articleId),
-            selectAllSearchResults: () => selectAllSearchResults(),
-            'delete-selected-articles': () => handleDeleteSelectedArticles(),
-            
-            // Validation inter-évaluateurs
-            validateExtraction: () => handleValidateExtraction(extractionId, decision),
-            'export-validations': () => handleExportValidations(appState.currentProject?.id),
-            'import-validations': () => document.getElementById('validationFileInput')?.click(),
-            'calculate-kappa': () => handleCalculateKappa(appState.currentProject?.id),
-            
-            // Interface interactions
-            toggleAbstract: () => {
-                const row = target.closest('tr');
-                const next = row?.nextElementSibling;
-                if (next && next.classList.contains('abstract-row')) {
-                    next.classList.toggle('hidden');
-                }
-            },
-            viewExtractionDetails: () => openExtractionDetailModal(extractionId),
-            
-            // Analyses avancées
-            'generate-discussion': () => runAdvancedAnalysis('generate-discussion', projectId),
-            'generate-knowledge-graph': () => runAdvancedAnalysis('generate-knowledge-graph', projectId),
-            'generate-prisma-flow': () => runAdvancedAnalysis('generate-prisma-flow', projectId),
-            'run-meta-analysis': () => runAdvancedAnalysis('run-meta-analysis', projectId),
-            'run-descriptive-stats': () => runAdvancedAnalysis('run-descriptive-stats', projectId),
-            'run-atn-score': () => runAdvancedAnalysis('run-atn-score', projectId),
-            viewAnalysisPlot: () => viewAnalysisPlot(projectId, plotType),
-            
-            // Import et fichiers
-            'import-zotero-file': () => document.getElementById('zoteroFileInput')?.click(),
-            'import-zotero-list': () => handleImportZotero(projectId),
-            'fetch-online-pdfs': () => handleFetchOnlinePdfs(projectId),
-            'run-indexing': () => handleRunIndexing(projectId),
-            'upload-single-pdf': () => {
-                const fileInput = document.createElement('input');
-                fileInput.type = 'file';
-                fileInput.accept = '.pdf';
-                fileInput.style.display = 'none';
-                fileInput.addEventListener('change', (e) => {
-                    handleManualPDFUpload(target.dataset.articleId, e.target.files[0]);
-                });
-                document.body.appendChild(fileInput);
-                fileInput.click();
-                fileInput.remove();
-            },
-            
-            // Chat
-            sendChatMessage: () => sendChatMessage(),
-            clearChatHistory: () => clearChatHistory(),
-            
-            // Grilles d'extraction
-            'create-grid': () => openGridModal(),
-            'edit-grid': () => openGridModal(gridId),
-            'delete-grid': () => handleDeleteGrid(gridId),
-            'import-grid': () => document.getElementById('gridFileInput')?.click(),
-            removeGridField: () => target.closest('.form-group-dynamic')?.remove(),
-            
-            // Prompts et profils
-            'edit-prompt': () => openPromptModal(promptId),
-            'create-profile': () => openProfileModal(),
-            'edit-profile': () => openProfileModal(profileId),
-            'delete-profile': () => handleDeleteProfile(profileId),
-            
-            // Ollama et files
-            pullModel: () => handlePullModel(),
-            'refresh-queues': () => renderQueueStatus(),
-            'clearQueue': (e) => {
-                const qn = e?.target?.dataset?.queueName || e?.currentTarget?.dataset?.queueName;
-                if (!qn) {
-                    showToast("Nom de file introuvable.", 'warning');
-                    return;
-                }
-                handleClearQueue(qn);
-            },
-            
-            // Paramètres
-            saveZoteroSettings: () => handleSaveZoteroSettings(),
+  // Bouton: ouvrir la modale de création de projet
+  if (elements.createProjectBtn) {
+    elements.createProjectBtn.addEventListener('click', () => {
+      openModal('newProjectModal');
+    });
+  }
+
+  // Formulaire: création de projet
+  if (elements.newProjectForm) {
+    elements.newProjectForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        const formData = new FormData(elements.newProjectForm);
+        const payload = {
+          name: (formData.get('name') || '').toString().trim(),
+          description: (formData.get('description') || '').toString().trim(),
+          mode: (formData.get('mode') || 'screening').toString().trim(),
         };
-
-        if (actions[action]) {
-            e.preventDefault();
-            actions[action]();
+        if (!payload.name) {
+          showToast('Le nom du projet est requis.', 'warning');
+          return;
         }
+        showLoadingOverlay(true, 'Création du projet...');
+        const newProject = await fetchAPI('/projects', { method: 'POST', body: payload });
+        appState.projects = [newProject, ...appState.projects];
+        renderProjectList();
+        closeModal('newProjectModal');
+        showToast('Projet créé avec succès', 'success');
+        await selectProject(newProject.id);
+      } catch (err) {
+        console.error('Erreur création projet:', err);
+        showToast(err.message || 'Erreur lors de la création du projet', 'error');
+      } finally {
+        showLoadingOverlay(false);
+        elements.newProjectForm.reset();
+      }
     });
+  }
 
-    // Raccourcis clavier
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            const activeModal = document.querySelector('.modal--show');
-            if (activeModal) closeModal(activeModal.id);
+  // Formulaire: recherche multi-bases
+  if (elements.multiSearchForm) {
+    elements.multiSearchForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!appState.currentProject) {
+        showToast('Sélectionner un projet avant de lancer une recherche.', 'warning');
+        return;
+      }
+      try {
+        const formData = new FormData(elements.multiSearchForm);
+        const query = (formData.get('query') || '').toString().trim();
+        const databases = Array.from(elements.multiSearchForm.querySelectorAll('input[name="databases"]:checked'))
+          .map(cb => cb.value);
+        const maxResults = parseInt(formData.get('max_results') || '50', 10);
+        if (!query) {
+          showToast('La requête de recherche est requise.', 'warning');
+          return;
         }
-    });
-
-    // Gestion des modales
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal(modal.id);
+        if (databases.length === 0) {
+          showToast('Sélectionner au moins une base.', 'warning');
+          return;
+        }
+        showLoadingOverlay(true, 'Recherche en cours...');
+        await fetchAPI('/search', {
+          method: 'POST',
+          body: {
+            project_id: appState.currentProject.id,
+            query,
+            databases,
+            max_results_per_db: maxResults
+          }
         });
-        modal.querySelector('.modal__close')?.addEventListener('click', () => closeModal(modal.id));
+        showToast('Recherche lancée.', 'success');
+        // Recharger plus tard via notifications; on déclenche un rafraîchissement doux
+        setTimeout(() => selectProject(appState.currentProject.id, true), 1200);
+      } catch (err) {
+        console.error('Erreur recherche:', err);
+        showToast(err.message || 'Erreur lors de la recherche', 'error');
+      } finally {
+        showLoadingOverlay(false);
+      }
     });
+  }
+
+  // Formulaire: lancer le pipeline d’analyse (screening/extraction)
+  if (elements.runPipelineForm) {
+    elements.runPipelineForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+	    if (!appState.currentProject) {
+        showToast('Sélectionner un projet avant de lancer une analyse.', 'warning');
+        return;
+      }
+
+      try {
+        const formData = new FormData(elements.runPipelineForm);
+        const profile = (formData.get('profile') || 'standard').toString();
+        const analysis_mode = (formData.get('analysis_mode') || 'screening').toString();
+        const custom_grid_id_raw = (formData.get('custom_grid_id') || '').toString().trim();
+
+        // Récupère les articles sélectionnés (cohérent avec la sélection dans la liste des résultats)
+        // Si appState.selectedSearchResults est vide, tenter un fallback sur les checkboxes du DOM
+        let selectedArticles = Array.from(appState.selectedSearchResults || []);
+        if (selectedArticles.length === 0) {
+          const checkboxes = document.querySelectorAll('[data-result-id][data-select-checkbox]');
+          selectedArticles = Array.from(checkboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.getAttribute('data-result-id'))
+            .filter(Boolean);
+        }
+
+        if (selectedArticles.length === 0) {
+          showToast('Sélectionner au moins un article dans les résultats.', 'warning');
+          return;
+        }
+
+        showLoadingOverlay(true, 'Lancement de l’analyse...');
+
+        // Appel API conforme au backend /api/projects/<project_id>/run (server_v4_complete.py)
+        // Corps JSON: { articles: [], profile, analysis_mode, custom_grid_id? }
+        await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
+          method: 'POST',
+          body: {
+            articles: selectedArticles,
+            profile,
+            analysis_mode,
+            ...(custom_grid_id_raw ? { custom_grid_id: custom_grid_id_raw } : {})
+          }
+        });
+
+        showToast('Analyse lancée.', 'success');
+
+        // Naviguer intelligemment:
+        // - Screening: aller à la validation pour suivre les scores/justifications
+        // - Full extraction: rester sur projects (le panneau détail affiche la progression)
+        if (analysis_mode === 'screening') {
+          showSection('validation');
+        } else {
+          showSection('projects');
+        }
+
+        // Rafraîchir l’état du projet après un court délai pour refléter "processing"
+        setTimeout(() => selectProject(appState.currentProject.id, true), 1200);
+      } catch (err) {
+        console.error('Erreur run pipeline:', err);
+        showToast(err.message || 'Erreur lors du lancement de l’analyse', 'error');
+      } finally {
+        showLoadingOverlay(false);
+      }
+    });
+  }
+
+  // Import Zotero via fichier
+  const zoteroFileInput = document.getElementById('zoteroFileInput');
+  if (zoteroFileInput) {
+    zoteroFileInput.addEventListener('change', handleZoteroFileUpload);
+  }
+
+  // Import Zotero via saisie manuelle (bouton)
+  const zoteroManualBtn = document.getElementById('zoteroManualBtn');
+  if (zoteroManualBtn) {
+    zoteroManualBtn.addEventListener('click', async () => {
+      if (!appState.currentProject) {
+        showToast("Sélectionner un projet d'abord.", 'warning');
+        return;
+      }
+      await handleImportZotero(appState.currentProject.id);
+    });
+  }
+
+  // Récupération PDFs en ligne (Unpaywall)
+  const fetchPdfOnlineBtn = document.getElementById('fetchPdfOnlineBtn');
+  if (fetchPdfOnlineBtn) {
+    fetchPdfOnlineBtn.addEventListener('click', async () => {
+      if (!appState.currentProject) {
+        showToast("Sélectionner un projet d'abord.", 'warning');
+        return;
+      }
+      await handleFetchOnlinePdfs(appState.currentProject.id);
+    });
+  }
+
+  // Indexation des PDFs
+  const runIndexingBtn = document.getElementById('runIndexingBtn');
+  if (runIndexingBtn) {
+    runIndexingBtn.addEventListener('click', async () => {
+      if (!appState.currentProject) {
+        showToast("Sélectionner un projet d'abord.", 'warning');
+        return;
+      }
+      await handleRunIndexing(appState.currentProject.id);
+    });
+  }
+
+  // Upload PDF en masse
+  const bulkPDFInput = document.getElementById('bulkPDFInput');
+  if (bulkPDFInput) {
+    // Le listener de change est installé via setupBulkPDFUpload, mais on s’assure qu’il est prêt
+    setupBulkPDFUpload = setupBulkPDFUpload || function() {};
+    setupBulkPDFUpload(appState.currentProject?.id || '');
+  }
+
+  // Chat: envoyer une question
+  const chatForm = document.getElementById('chatForm');
+  if (chatForm) {
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        const input = chatForm.querySelector('input[name="question"]');
+        const question = (input?.value || '').trim();
+        if (!question) return;
+        if (!appState.currentProject) {
+          showToast('Sélectionner un projet avant de poser une question.', 'warning');
+          return;
+        }
+        showLoadingOverlay(true, 'Génération de réponse...');
+        const resp = await fetchAPI(`/projects/${appState.currentProject.id}/chat`, {
+          method: 'POST',
+          body: { question }
+        });
+        // Ajoutez ici le rendu d’un nouveau message dans l’historique
+        showToast('Réponse générée.', 'success');
+        input.value = '';
+      } catch (err) {
+        console.error('Erreur chat:', err);
+        showToast(err.message || 'Erreur lors du chat', 'error');
+      } finally {
+        showLoadingOverlay(false);
+      }
+    });
+  }
+
+  // Paramètres Zotero: sauvegarde
+  const saveZoteroBtn = document.getElementById('saveZoteroBtn');
+  if (saveZoteroBtn) {
+    saveZoteroBtn.addEventListener('click', handleSaveZoteroSettings);
+  }
+
+  // Calcul Kappa (validation)
+  const calculateKappaBtn = document.getElementById('calculateKappaBtn');
+  if (calculateKappaBtn) {
+    calculateKappaBtn.addEventListener('click', async () => {
+      if (!appState.currentProject) {
+        showToast('Sélectionner un projet.', 'warning');
+        return;
+      }
+      await handleCalculateKappa(appState.currentProject.id);
+    });
+  }
+
+  // Export validations (validation)
+  const exportValidationsBtn = document.getElementById('exportValidationsBtn');
+  if (exportValidationsBtn) {
+    exportValidationsBtn.addEventListener('click', async () => {
+      if (!appState.currentProject) {
+        showToast('Sélectionner un projet.', 'warning');
+        return;
+      }
+      await handleExportValidations(appState.currentProject.id);
+    });
+  }
+
+  // Import validations (validation)
+  const validationFileInput = document.getElementById('validationFileInput');
+  if (validationFileInput) {
+    validationFileInput.addEventListener('change', async (e) => {
+      const file = e.target?.files?.[0];
+      if (!file || !appState.currentProject) return;
+      await handleImportValidations(file, appState.currentProject.id);
+    });
+  }
+
+  // Pull d’un modèle Ollama (settings)
+  const pullModelBtn = document.getElementById('pullModelBtn');
+  if (pullModelBtn) {
+    pullModelBtn.addEventListener('click', handlePullModel);
+  }
+
+  // Vider une file RQ (settings) — boutons avec data-queue-name
+  document.querySelectorAll('[data-action="clear-queue"]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const q = btn.getAttribute('data-queue-name');
+      if (!q) return;
+      await handleClearQueue(q);
+    });
+  });
+
+  // Sélection d’articles dans les résultats (checkboxes dynamiques) — délégué au container
+  if (elements.resultsContainer) {
+    elements.resultsContainer.addEventListener('change', (e) => {
+      const target = e.target;
+      if (target && target.matches('input[type="checkbox"][data-article-id]')) {
+        const aid = target.getAttribute('data-article-id');
+        if (!aid) return;
+        if (target.checked) {
+          appState.selectedSearchResults.add(aid);
+        } else {
+          appState.selectedSearchResults.delete(aid);
+        }
+      }
+    });
+  }
 }
 
 function attachValidationFileInputListener() {
@@ -607,11 +858,14 @@ function attachValidationFileInputListener() {
   const el = oldEl.cloneNode(true);
   oldEl.parentNode.replaceChild(el, oldEl);
   el.addEventListener('change', (e) => {
-    const file = e.target?.files?.;
+    const file = e.target?.files?.[0];  // ← CORRIGÉ
     if (!file || !appState.currentProject?.id) return;
     handleImportValidations(file, appState.currentProject.id);
   });
 }
+
+
+
 
 function attachZoteroFileInputListener() {
   const oldEl = document.getElementById('zoteroFileInput');
@@ -630,137 +884,121 @@ function attachZoteroFileInputListener() {
 // ================================================================
 
 async function selectProject(projectId, forceRefresh = false) {
-    try {
-        if (!forceRefresh && appState.currentProject?.id === projectId) {
-            showSection('recherche');
-            return;
-        }
+  try {
+    if (!projectId) return;
+    // Charger le projet courant
+    const project = await fetchAPI(`/projects/${projectId}`);
+    appState.currentProject = project;
 
-        showLoadingOverlay(true, 'Chargement du projet...');
-        
-        const project = await fetchAPI(`/projects/${projectId}`);
-        appState.currentProject = project;
-        
-        // Rejoindre la room WebSocket
-        if (appState.socketConnected && appState.socket) {
-            appState.socket.emit('join_room', { room: projectId });
-        }
-        
-        // Charger les données du projet
-        await Promise.all([
-            loadProjectSearchResults(projectId),
-            loadProjectExtractions(projectId),
-            loadProjectGrids(projectId),
-            loadChatHistory(projectId)
-        ]);
-        
-        renderProjectDetail(project);
-        refreshCurrentSection(project);
-        
-        // Mise à jour UI
-        document.querySelectorAll('.project-item').forEach(item => {
-            item.classList.toggle('project-item--active', item.dataset.projectId === projectId);
-        });
-        
-    } catch (error) {
-        console.error('Erreur lors de la sélection du projet:', error);
-        showToast('Erreur lors du chargement du projet', 'error');
-    } finally {
-        showLoadingOverlay(false);
+    // Rejoindre la room WS pour ce projet
+    if (appState.socket) {
+      appState.socket.emit('join_room', { room: projectId });
     }
+
+    // Charger en parallèle données du projet
+    const [extractions, searchData, files] = await Promise.all([
+      loadProjectExtractions(projectId),     // remplit appState.currentProjectExtractions
+      loadProjectSearchResults(projectId),   // remplit appState.searchResults ou similaire
+      loadProjectFiles(projectId),           // remplit la section fichiers
+    ]);
+
+    // Rendu du détail du projet
+    renderProjectDetail(project);            // doit appeler renderValidationSection, renderImportSection, etc.
+
+    // Rester sur la section "projects" pour stabilité UI
+    showSection('projects');
+
+  } catch (err) {
+    console.error(`Erreur lors de la sélection du projet ${projectId}:`, err);
+    showToast(`Erreur lors de la sélection du projet`, 'error');
+    // Sécurité: rester sur la section projects en cas d'erreur
+    showSection('projects');
+  }
 }
 
-function renderProjectsList() {
+function renderProjectList() {
     if (!elements.projectsList) return;
-    
-    if (appState.projects.length === 0) {
-        elements.projectsList.innerHTML = `
-            <div class="empty-state">
-                <p>Aucun projet disponible.</p>
-                <button class="btn btn--primary" data-action="create-project">
-                    Créer votre premier projet
-                </button>
-            </div>
-        `;
+
+    if (!Array.isArray(appState.projects) || appState.projects.length === 0) {
+        elements.projectsList.innerHTML = `<li class="empty-state"><p>Aucun projet. Créez-en un pour commencer.</p></li>`;
         return;
     }
-    
-    elements.projectsList.innerHTML = appState.projects.map(project => `
-        <div class="project-item ${project.id === appState.currentProject?.id ? 'project-item--active' : ''}" 
-             data-project-id="${project.id}"
-             data-action="selectProject" data-project-id="${project.id}">
-            <div class="project-item__content">
-                <h4 class="project-item__title">${escapeHtml(project.name)}</h4>
-                <p class="project-item__meta">
-                    ${project.pmids_count || 0} articles • 
-                    ${new Date(project.updated_at || project.created_at).toLocaleDateString()}
-                </p>
-                ${project.status !== 'pending' ? `
-                    <div class="project-item__status">
-                        <span class="status status--${getStatusColor(project.status)}">${getStatusLabel(project.status)}</span>
-                    </div>
-                ` : ''}
+
+    const html = appState.projects.map(p => `
+        <li class="project-item" data-project-id="${p.id}">
+            <div class="project-card">
+                <h4>${escapeHtml(p.name || 'Projet sans nom')}</h4>
+                <p>${escapeHtml(p.description || 'Pas de description')}</p>
+                <div class="project-meta">
+                    <span class="status-badge">${escapeHtml(p.status || 'pending')}</span>
+                    <span class="count">${Number(p.pmids_count || 0)} articles</span>
+                </div>
             </div>
-            <div class="project-item__actions">
-                <button class="btn btn--sm btn--outline" 
-                        data-action="deleteProject" data-project-id="${project.id}"
-                        title="Supprimer le projet">
-                    🗑️
-                </button>
-            </div>
-        </div>
+        </li>
     `).join('');
+
+    elements.projectsList.innerHTML = html;
+
+    elements.projectsList.querySelectorAll('.project-item').forEach(li => {
+        li.addEventListener('click', () => {
+            const pid = li.getAttribute('data-project-id');
+            selectProject(pid);
+        });
+    });
 }
 
 function renderProjectDetail(project) {
-    if (!elements.projectDetailContent) return;
-    
-    if (!project) {
-        elements.projectDetailContent.innerHTML = `
-            <div class="empty-state">
-                <h3>Aucun projet sélectionné</h3>
-                <p>Sélectionner un projet dans la liste de gauche.</p>
-            </div>
-        `;
+    // Garde: conteneur principal ou projet manquant => retour à la liste
+    if (!elements.projectDetailContent || !project) {
+        showSection('projects'); // re-basculer vers la section Projets
         return;
     }
-    
-    const statusColor = getStatusColor(project.status);
-    const statusLabel = getStatusLabel(project.status);
-    
-    elements.projectDetailContent.innerHTML = `
-        <div class="project-header">
-            <h2>${escapeHtml(project.name)}</h2>
-            <span class="status status--${statusColor}">${statusLabel}</span>
-        </div>
-        
-        <div class="project-meta">
-            <div class="project-stat">
-                <span class="project-stat__label">Articles</span>
-                <span class="project-stat__value">${project.pmids_count || 0}</span>
-            </div>
-            <div class="project-stat">
-                <span class="project-stat__label">Traités</span>
-                <span class="project-stat__value">${project.processed_count || 0}</span>
-            </div>
-            ${project.total_processing_time ? `
-                <div class="project-stat">
-                    <span class="project-stat__label">Temps total</span>
-                    <span class="project-stat__value">${Math.round(project.total_processing_time)}s</span>
-                </div>
-            ` : ''}
-        </div>
-        
-        <div class="project-description">
-            <h4>Description</h4>
-            <p>${escapeHtml(project.description) || 'Aucune description.'}</p>
-        </div>
-        
-        ${project.synthesis_result ? renderSynthesisResult(JSON.parse(project.synthesis_result)) : ''}
-        ${project.discussion_draft ? renderDiscussion(project.discussion_draft) : ''}
-        ${project.analysis_result ? renderAnalysisResult(JSON.parse(project.analysis_result)) : ''}
-    `;
+
+    // Mettre à jour le titre du projet dans le header (si présent)
+    const projectTitleElement = document.getElementById('project-title-header');
+    if (projectTitleElement) {
+        projectTitleElement.textContent = project.name || 'Projet';
+    }
+
+    // Afficher le panneau de détails et masquer le placeholder
+    if (elements.projectDetail) elements.projectDetail.style.display = 'block';
+    if (elements.projectPlaceholder) elements.projectPlaceholder.style.display = 'none';
+
+    // Masquer toutes les sous-sections du panneau principal
+    const subsections = elements.projectDetailContent.querySelectorAll('.section');
+    subsections.forEach(sec => sec.style.display = 'none');
+
+    // Rendre les sections métiers pour ce projet (les fonctions doivent exister)
+    // 1) Recherche & Résultats
+    renderSearchSection(project);
+    // 2) Validation inter-évaluateurs
+    renderValidationSection(project);
+    // 3) Analyses avancées (si nécessaire)
+    if (typeof renderAnalysisSection === 'function') {
+        renderAnalysisSection(project);
+    }
+    // 4) Import & Fichiers (si un renderer dédié existe)
+    if (typeof renderImportSection === 'function') {
+        renderImportSection(project);
+    }
+    // 5) Chat RAG (optionnel, si la section existe)
+    if (typeof renderChatSection === 'function') {
+        renderChatSection(project);
+    }
+
+    // Choisir une section par défaut à afficher si aucune section active n’est visible
+    // Par convention: afficher la section "recherche" si présente
+    const defaultSectionId = 'recherche';
+    const defaultSectionEl = document.getElementById(defaultSectionId);
+    if (defaultSectionEl) {
+        defaultSectionEl.style.display = 'block';
+        updateActiveNav(defaultSectionId);
+    } else {
+        // Sinon fallback vers 'projects' pour éviter un écran vide
+        showSection('projects');
+    }
 }
+
 
 function renderSynthesisResult(synthesis) {
     return `
@@ -946,66 +1184,242 @@ function getStatusLabel(status) {
 // === RECHERCHE MULTI-BASES
 // ================================================================
 
-function renderSearchSection(project) {
-    if (!elements.searchResults) return;
-    
-    if (!project) {
-        elements.searchResults.innerHTML = `
-            <div class="empty-state">
-                <h3>Aucun projet sélectionné</h3>
-                <p>Sélectionnez un projet pour effectuer des recherches.</p>
-            </div>
-        `;
-        return;
+async function renderSearchSection(project) {
+  const container = document.getElementById('recherche');
+  if (!container || !project) return; // garde [12]
+
+  const dbOptions = (appState.availableDatabases || []).map(db => {
+    const id = `db_${db}`;
+    return `<label class="checkbox-item">
+      <input type="checkbox" name="databases" value="${db}" id="${id}" checked />
+      <span>${escapeHtml(db)}</span>
+    </label>`;
+  }).join(''); // options de bases [12]
+
+  // Filtrage pagination (état local)
+  const page = 1;
+  const perPage = 50;
+
+  container.innerHTML = `
+    <div class="card">
+      <h4>Recherche multi-bases</h4>
+      <form id="multiSearchForm" class="form-grid">
+        <div class="form-row">
+          <label>Requête</label>
+          <input type="text" id="searchQueryInput" name="query" placeholder="mots-clés, AND, OR..." required />
+        </div>
+        <div class="form-row">
+          <label>Bases</label>
+          <div class="checkbox-group">
+            ${dbOptions || '<em>Aucune base disponible</em>'}
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Max/résultats par base</label>
+          <input type="number" id="maxPerDbInput" name="max_results_per_db" min="1" max="200" value="50" />
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn--primary">Lancer la recherche</button>
+          <button type="button" id="reloadResultsBtn" class="btn">Recharger les résultats</button>
+          <button type="button" id="showStatsBtn" class="btn">Statistiques</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="project-actions-header">
+        <h4>Résultats</h4>
+        <div>
+          <select id="analysisProfileSelect"></select>
+          <select id="analysisModeSelect">
+            <option value="screening">Screening IA</option>
+            <option value="full_extraction">Extraction complète</option>
+          </select>
+          <button id="runPipelineBtn" class="btn btn--primary">Lancer l'analyse</button>
+        </div>
+      </div>
+      <div id="resultsContainer"></div>
+    </div>
+  `; // squelette rendu [12]
+
+  // Remplit les profils
+  const profileSelect = container.querySelector('#analysisProfileSelect');
+  profileSelect.innerHTML = (appState.analysisProfiles || []).map(p =>
+    `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join(''); // profils depuis /analysis-profiles [12]
+
+  // Gestion soumission recherche
+  const form = container.querySelector('#multiSearchForm');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      showLoadingOverlay(true, 'Recherche en cours...');
+      const query = container.querySelector('#searchQueryInput')?.value.trim();
+      const maxPerDb = Number(container.querySelector('#maxPerDbInput')?.value || 50);
+      const selectedDbs = Array.from(container.querySelectorAll('input[name="databases"]:checked'))
+        .map(i => i.value);
+      if (!query) return showToast('Veuillez saisir une requête', 'warning');
+
+      await fetchAPI('/search', {
+        method: 'POST',
+        body: {
+          project_id: project.id,
+          query,
+          databases: selectedDbs.length ? selectedDbs : ['pubmed'],
+          max_results_per_db: maxPerDb
+        }
+      }); // POST /api/search lance la tâche RQ [12]
+
+      showToast('Recherche lancée', 'success');
+      await loadProjectSearchResults(project.id, page, perPage);
+      renderSearchResultsTable(project, page, perPage);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      showLoadingOverlay(false);
     }
-    
-    elements.searchResults.innerHTML = `
-        <div class="search-header">
-            <h3>Recherche multi-bases</h3>
-            <form id="multiSearchForm" class="multi-search-form">
-                <div class="search-inputs">
-                    <div class="form-group">
-                        <label class="form-label">Requête de recherche</label>
-                        <input type="text" name="query" class="form-control" 
-                               placeholder="Ex: machine learning healthcare" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Bases de données</label>
-                        <div class="databases-grid">
-                            ${appState.availableDatabases.map(db => `
-                                <label class="checkbox-item">
-                                    <input type="checkbox" name="databases" value="${db.id}" 
-                                           ${['pubmed'].includes(db.id) ? 'checked' : ''}>
-                                    <span>${db.name}</span>
-                                </label>
-                            `).join('')}
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Résultats par base (max)</label>
-                        <select name="max_results" class="form-control">
-                            <option value="25">25</option>
-                            <option value="50" selected>50</option>
-                            <option value="100">100</option>
-                            <option value="200">200</option>
-                        </select>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn--primary">Lancer la recherche</button>
-            </form>
-        </div>
-        
-        <div class="search-results-section">
-            <h4>Résultats</h4>
-            <div id="resultsContainer">
-                ${appState.searchResults.length === 0 ? 
-                    '<p class="text-muted">Lancez une recherche pour voir les résultats ici.</p>' : 
-                    renderSearchResults()
-                }
-            </div>
-        </div>
-    `;
-}
+  }); // handler POST /api/search [12]
+
+  // Recharger les résultats
+  container.querySelector('#reloadResultsBtn')?.addEventListener('click', async () => {
+    await loadProjectSearchResults(project.id, page, perPage);
+    renderSearchResultsTable(project, page, perPage);
+  }); // GET /api/projects/:id/search-results [12]
+
+  // Stats
+  container.querySelector('#showStatsBtn')?.addEventListener('click', async () => {
+    try {
+      const stats = await fetchAPI(`/projects/${project.id}/search-stats`);
+      const list = Object.entries(stats.results_by_database || {}).map(
+        ([db, count]) => `- ${db}: ${count}`
+      ).join('\n');
+      showToast(`Total: ${stats.total_results}\n${list}`, 'info');
+    } catch (e) {
+      showToast("Erreur lors du chargement des stats", 'error');
+    }
+  }); // GET /api/projects/:id/search-stats [12]
+
+  // Lancer pipeline
+  container.querySelector('#runPipelineBtn')?.addEventListener('click', async () => {
+    try {
+      const selected = Array.from(appState.selectedSearchResults);
+      if (selected.length === 0) return showToast('Sélectionner au moins 1 article', 'warning');
+      const profile = profileSelect.value || 'standard';
+      const mode = container.querySelector('#analysisModeSelect')?.value || 'screening';
+
+      showLoadingOverlay(true, 'Lancement du pipeline...');
+      await fetchAPI(`/projects/${project.id}/run`, {
+        method: 'POST',
+        body: {
+          articles: selected,
+          profile,
+          analysis_mode: mode
+        }
+      }); // POST /api/projects/:id/run [12]
+      showToast('Pipeline lancé', 'success');
+    } catch (e) {
+      showToast('Erreur lancement pipeline', 'error');
+    } finally {
+      showLoadingOverlay(false);
+    }
+  }); // POST /api/projects/:id/run [12]
+
+  // Charger initialement
+  await loadProjectSearchResults(project.id, page, perPage);
+  renderSearchResultsTable(project, page, perPage);
+} // fin renderSearchSection [12]
+
+function renderSearchResultsTable(project, page = 1, perPage = 50) {
+  const container = document.getElementById('resultsContainer');
+  if (!container) return; // garde [12]
+  const rows = appState.searchResults || [];
+  const meta = appState.searchResultsMeta || {};
+
+  const thead = `
+    <thead>
+      <tr>
+        <th><input type="checkbox" id="selectAllResults"/></th>
+        <th>Titre</th>
+        <th>Auteurs</th>
+        <th>Date</th>
+        <th>Journal</th>
+        <th>DOI</th>
+        <th>Source</th>
+      </tr>
+    </thead>
+  `; // colonnes clés [12]
+
+  const tbody = `
+    <tbody>
+      ${rows.map(r => {
+        const id = escapeHtml(r.article_id || r.id || '');
+        const checked = appState.selectedSearchResults.has(id) ? 'checked' : '';
+        return `
+          <tr>
+            <td><input type="checkbox" class="row-select" data-id="${id}" ${checked}/></td>
+            <td>${escapeHtml(r.title || '')}</td>
+            <td>${escapeHtml(r.authors || '')}</td>
+            <td>${escapeHtml(r.publication_date || '')}</td>
+            <td>${escapeHtml(r.journal || '')}</td>
+            <td>${escapeHtml(r.doi || '')}</td>
+            <td>${escapeHtml(r.database_source || '')}</td>
+          </tr>
+        `;
+      }).join('')}
+    </tbody>
+  `; // lignes [12]
+
+  const pager = `
+    <div class="pagination">
+      <button id="prevPageBtn" class="btn" ${meta.has_prev ? '' : 'disabled'}>Précédent</button>
+      <span>Page ${meta.page} — ${meta.total} résultat(s)</span>
+      <button id="nextPageBtn" class="btn" ${meta.has_next ? '' : 'disabled'}>Suivant</button>
+    </div>
+  `; // pagination [12]
+
+  container.innerHTML = `
+    <div class="table-responsive">
+      <table class="table table--dense">
+        ${thead}
+        ${tbody}
+      </table>
+    </div>
+    ${pager}
+  `; // rendu final [12]
+
+  // Sélection globale
+  container.querySelector('#selectAllResults')?.addEventListener('change', (e) => {
+    const checked = e.target.checked;
+    container.querySelectorAll('.row-select').forEach(cb => {
+      cb.checked = checked;
+      const id = cb.getAttribute('data-id');
+      if (checked) appState.selectedSearchResults.add(id);
+      else appState.selectedSearchResults.delete(id);
+    });
+  }); // sélection multiple [12]
+
+  // Sélection ligne
+  container.querySelectorAll('.row-select').forEach(cb => {
+    cb.addEventListener('change', (e) => {
+      const id = e.target.getAttribute('data-id');
+      if (e.target.checked) appState.selectedSearchResults.add(id);
+      else appState.selectedSearchResults.delete(id);
+    });
+  }); // toggle set [12]
+
+  // Pagination
+  container.querySelector('#prevPageBtn')?.addEventListener('click', async () => {
+    if (!meta.has_prev) return;
+    const newPage = Math.max(1, (meta.page || 1) - 1);
+    await loadProjectSearchResults(project.id, newPage, meta.per_page || 50);
+    renderSearchResultsTable(project, newPage, meta.per_page || 50);
+  }); // page précédente [12]
+  container.querySelector('#nextPageBtn')?.addEventListener('click', async () => {
+    if (!meta.has_next) return;
+    const newPage = (meta.page || 1) + 1;
+    await loadProjectSearchResults(project.id, newPage, meta.per_page || 50);
+    renderSearchResultsTable(project, newPage, meta.per_page || 50);
+  }); // page suivante [12]
+} // fin renderSearchResultsTable [12]
 
 async function handleMultiSearch(e) {
     e.preventDefault();
@@ -1056,86 +1470,54 @@ async function handleMultiSearch(e) {
     }
 }
 
-async function loadProjectSearchResults(projectId, page = 1) {
-    try {
-        const response = await fetchAPI(`/projects/${projectId}/search-results?page=${page}&per_page=50`);
-        appState.searchResults = response.results || [];
-        appState.searchResultsPagination = {
-            total: response.total,
-            page: response.page,
-            per_page: response.per_page,
-            has_next: response.has_next,
-            has_prev: response.has_prev
-        };
-        
-        if (appState.currentSection === 'recherche') {
-            renderSearchResults();
-        }
-    } catch (error) {
-        console.error('Erreur chargement résultats:', error);
-        appState.searchResults = [];
-    }
+async function loadProjectSearchResults(projectId, page = 1, per_page = 50, database = null) {
+  if (!projectId) {
+    console.warn('loadProjectSearchResults appelé sans projectId');
+    appState.searchResults = [];
+    return;
+  }
+  const params = new URLSearchParams({ page, per_page });
+  if (database) params.set('database', database);
+  try {
+    const resp = await fetchAPI(`/projects/${projectId}/search-results?${params.toString()}`);
+    // Backend renvoie {results, total, page, per_page, has_next, has_prev}
+    appState.searchResults = Array.isArray(resp?.results) ? resp.results : [];
+    appState.searchPagination = {
+      total: Number(resp?.total || 0),
+      page: Number(resp?.page || page),
+      per_page: Number(resp?.per_page || per_page),
+      has_next: Boolean(resp?.has_next),
+      has_prev: Boolean(resp?.has_prev),
+      database_filter: database || null,
+    };
+  } catch (err) {
+    console.error('Erreur chargement résultats de recherche:', err);
+    appState.searchResults = [];
+    appState.searchPagination = { total: 0, page: 1, per_page: 50, has_next: false, has_prev: false, database_filter: null };
+  }
 }
 
 function renderSearchResults() {
     if (!elements.resultsContainer) return;
-    
     if (appState.searchResults.length === 0) {
-        elements.resultsContainer.innerHTML = `
-            <div class="empty-state">
-                <p>Aucun résultat disponible.</p>
-                <p class="text-muted">Lancez une recherche pour voir les résultats ici.</p>
-            </div>
-        `;
+        elements.resultsContainer.innerHTML = '<div class="results-placeholder"><span class="results-placeholder__icon">🧐</span><p>Lancez une recherche pour voir les résultats ici.</p></div>';
         return;
     }
-    
-    const selectedCount = appState.selectedSearchResults.size;
-    
+    // Un rendu de tableau simple pour l'exemple
     elements.resultsContainer.innerHTML = `
-        <div class="results-header">
-            <div class="results-stats">
-                <p>${appState.searchResults.length} résultats trouvés</p>
-                ${selectedCount > 0 ? `<p class="selected-count">${selectedCount} sélectionnés</p>` : ''}
-            </div>
-            <div class="results-actions">
-                <button class="btn btn--sm btn--outline" data-action="selectAllSearchResults">
-                    ${selectedCount === appState.searchResults.length ? 'Tout désélectionner' : 'Tout sélectionner'}
-                </button>
-                ${selectedCount > 0 ? `
-                    <button class="btn btn--sm btn--outline" data-action="delete-selected-articles">
-                        Supprimer (${selectedCount})
-                    </button>
-                    <button class="btn btn--sm btn--primary" data-action="runPipeline">
-                        Analyser (${selectedCount})
-                    </button>
-                ` : ''}
-            </div>
-        </div>
-        
-        <div class="results-table-container">
-            <table class="results-table">
-                <thead>
-                    <tr>
-                        <th width="40">
-                            <input type="checkbox" 
-                                   ${selectedCount === appState.searchResults.length && selectedCount > 0 ? 'checked' : ''}
-                                   data-action="selectAllSearchResults">
-                        </th>
-                        <th>Titre</th>
-                        <th>Auteurs</th>
-                        <th>Journal</th>
-                        <th>Base</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${appState.searchResults.map(result => renderSearchResultRow(result)).join('')}
-                </tbody>
-            </table>
-        </div>
-        
-        ${renderSearchPagination()}
+        <p>${appState.searchResults.length} résultats trouvés.</p>
+        <table class="table">
+            <thead><tr><th>Titre</th><th>Auteurs</th><th>Source</th></tr></thead>
+            <tbody>
+            ${appState.searchResults.map(r => `
+                <tr>
+                    <td>${escapeHtml(r.title)}</td>
+                    <td>${escapeHtml(r.authors)}</td>
+                    <td>${escapeHtml(r.database_source)}</td>
+                </tr>
+            `).join('')}
+            </tbody>
+        </table>
     `;
 }
 
@@ -1325,49 +1707,45 @@ function openRunPipelineModal() {
 }
 
 async function handleRunPipeline(e) {
-    e.preventDefault();
-    
-    if (!appState.currentProject) {
-        showToast('Aucun projet sélectionné', 'error');
-        return;
-    }
-    
-    const formData = new FormData(e.target);
-    const selectedIds = Array.from(appState.selectedSearchResults);
-    
-    if (selectedIds.length === 0) {
-        showToast('Aucun article sélectionné', 'error');
-        return;
-    }
-    
-    const pipelineData = {
-        articles: selectedIds,
-        profile: formData.get('profile') || 'standard',
-        analysis_mode: formData.get('analysis_mode') || 'screening',
-        custom_grid_id: formData.get('custom_grid_id') || null
-    };
-    
-    try {
-        showLoadingOverlay(true, 'Lancement de l\'analyse...');
-        
-        const response = await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
-            method: 'POST',
-            body: pipelineData
-        });
-        
-        closeModal('runPipelineModal');
-        appState.selectedSearchResults.clear();
-        showToast(`Analyse lancée pour ${selectedIds.length} articles`, 'success');
-        
-        // Actualiser le projet
-        await selectProject(appState.currentProject.id, true);
-        
-    } catch (error) {
-        console.error('Erreur lors du lancement du pipeline:', error);
-        showToast('Erreur lors du lancement de l\'analyse', 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
+  e?.preventDefault?.();
+  if (!appState.currentProject) {
+    showToast('Aucun projet sélectionné', 'error');
+    return;
+  }
+  // Récupérer sélection d’articles
+  const selected = Array.from(appState.selectedSearchResults || []);
+  if (selected.length === 0) {
+    showToast('Sélectionnez au moins un article', 'warning');
+    return;
+  }
+  // Choix du profil et mode (récupérer depuis formulaire si présent)
+  const profileSelect = document.getElementById('pipelineProfileSelect');
+  const modeSelect = document.getElementById('pipelineModeSelect');
+  const gridSelect = document.getElementById('pipelineGridSelect');
+  const profile = profileSelect?.value || 'standard';
+  const analysis_mode = modeSelect?.value || 'screening';
+  const custom_grid_id = gridSelect?.value || null;
+
+  try {
+    showLoadingOverlay(true, 'Lancement du pipeline...');
+    const resp = await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
+      method: 'POST',
+      body: {
+        articles: selected,
+        profile,
+        analysis_mode,
+        custom_grid_id,
+      },
+    });
+    showToast('Pipeline démarré', 'success');
+    // Revenir à la vue projets ou rester
+    showSection('projects');
+  } catch (err) {
+    console.error('Erreur lancement pipeline:', err);
+    showToast(err.message || 'Erreur lancement pipeline', 'error');
+  } finally {
+    showLoadingOverlay(false);
+  }
 }
 
 function handlePipelineSourceChange(e) {
@@ -1411,58 +1789,198 @@ async function loadProjectExtractions(projectId) {
     try {
         appState.currentProjectExtractions = await fetchAPI(`/projects/${projectId}/extractions`);
     } catch (error) {
-        console.error('Erreur chargement extractions:', error);
+        console.error(`Erreur chargement extractions pour ${projectId}:`, error);
         appState.currentProjectExtractions = [];
     }
 }
+
 
 // ================================================================
 // === VALIDATION INTER-ÉVALUATEURS
 // ================================================================
 
-function renderValidationSection(project) {
-    if (!elements.validationContainer) return;
-    
-    if (!project) {
-        elements.validationContainer.innerHTML = `
-            <div class="empty-state">
-                <h3>Sélectionnez un projet pour voir la section de validation.</h3>
-            </div>
-        `;
+async function renderValidationSection(project) {
+  const container = document.getElementById('validation');
+  if (!container || !project) return;
+
+  // Charge/rafraîchit les extractions
+  try {
+    showLoadingOverlay(true, 'Chargement des extractions...');
+    await loadProjectExtractions(project.id);
+  } catch (e) {
+    console.error(e);
+    showToast('Erreur chargement des extractions', 'error');
+  } finally {
+    showLoadingOverlay(false);
+  }
+
+  const rows = appState.currentProjectExtractions || [];
+  const isScreening = (project.analysis_mode || 'screening') === 'screening';
+
+  const headerActions = `
+    <div class="validation-actions">
+      <div class="button-group">
+        <button id="exportValidationsBtn" class="btn">Exporter (éval 1)</button>
+        <label class="btn">
+          Importer (éval 1)
+          <input id="validationFileInput" type="file" accept=".csv" style="display:none" />
+        </label>
+        <button id="calcKappaBtn" class="btn btn--primary">Calculer Kappa</button>
+      </div>
+      <div class="kappa-result-display" style="display:${project.inter_rater_reliability ? 'block' : 'none'}">
+        ${escapeHtml(project.inter_rater_reliability || '')}
+      </div>
+    </div>
+  `;
+
+  const thead = `
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Titre</th>
+        ${isScreening ? `
+          <th>Score IA</th>
+          <th>Décision IA</th>
+          <th>Décision humaine</th>
+        ` : `
+          <th>Données extraites</th>
+          <th>Actions</th>
+        `}
+      </tr>
+    </thead>
+  `;
+
+  const tbody = `
+    <tbody>
+      ${rows.length === 0 ? '<tr><td colspan="5" class="empty-state">Aucune extraction à valider. Lancez une analyse.</td></tr>' : 
+        rows.map(ex => {
+        const pmid = escapeHtml(ex.pmid || '');
+        const title = escapeHtml(ex.title || '');
+        if (isScreening) {
+          const score = typeof ex.relevance_score === 'number' ? ex.relevance_score.toFixed(1) : (ex.relevance_score || 'N/A');
+          const aiDec = escapeHtml(ex.relevance_justification || '');
+          const userDec = escapeHtml(ex.user_validation_status || '');
+          return `
+            <tr class="extraction-row ${userDec === 'include' ? 'extraction-row--included' : userDec === 'exclude' ? 'extraction-row--excluded' : ''}">
+              <td>${pmid}</td>
+              <td>${title}</td>
+              <td>${score}</td>
+              <td>${aiDec}</td>
+              <td>
+                <select class="human-decision" data-id="${pmid}">
+                  <option value="">—</option>
+                  <option value="include" ${userDec === 'include' ? 'selected' : ''}>Inclure</option>
+                  <option value="exclude" ${userDec === 'exclude' ? 'selected' : ''}>Exclure</option>
+                </select>
+              </td>
+            </tr>
+          `;
+        } else {
+          // extraction détaillée
+          let preview = '';
+          try {
+            const data = ex.extracted_data ? JSON.parse(ex.extracted_data) : null;
+            if (data && typeof data === 'object') {
+              const keys = Object.keys(data).slice(0, 3);
+              preview = `<ul class="extraction-preview-list">${
+                keys.map(k => `<li><strong>${escapeHtml(k)}:</strong> ${escapeHtml(String(data[k]).substring(0, 50))}...</li>`).join('')
+              }</ul>`;
+            } else {
+              preview = `<em>Pas de données</em>`;
+            }
+          } catch {
+            preview = `<em>JSON invalide</em>`;
+          }
+          return `
+            <tr>
+              <td>${pmid}</td>
+              <td>${title}</td>
+              <td>${preview}</td>
+              <td class="actions-cell">
+                <button class="btn btn--sm" data-action="details" data-id="${pmid}">Détails</button>
+              </td>
+            </tr>
+          `;
+        }
+      }).join('')}
+    </tbody>
+  `;
+
+  container.innerHTML = `
+    <div class="card">
+      <div class="card__header">
+        <h4>Résultats à valider</h4>
+        ${headerActions}
+      </div>
+      <div class="card__body">
+        <div class="table-responsive">
+          <table class="table table--dense">
+            ${thead}
+            ${tbody}
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Actions top (export / import / kappa)
+  container.querySelector('#exportValidationsBtn')?.addEventListener('click', () => {
+    handleExportValidations(project.id);
+  });
+  
+  const validationFileInput = container.querySelector('#validationFileInput');
+  if (validationFileInput) {
+    validationFileInput.addEventListener('change', async (e) => {
+      // ===== CORRECTION ICI =====
+      const file = e.target.files?.[0]; // Utilise ?.[0] au lieu de ?.;
+      // ========================
+      if (file) {
+        await handleImportValidations(file, project.id);
+      }
+    });
+  }
+  
+  container.querySelector('#calcKappaBtn')?.addEventListener('click', async () => {
+    await handleCalculateKappa(project.id);
+  });
+
+  // Sauvegarde des décisions humaines inline
+  container.querySelectorAll('.human-decision').forEach(sel => {
+    sel.addEventListener('change', async (e) => {
+      const choice = e.target.value;
+      const pmid = e.target.getAttribute('data-id');
+      try {
+        await fetchAPI(`/projects/${project.id}/extractions/${pmid}/decision`, {
+          method: 'PUT',
+          body: { decision: choice }
+        });
+        showToast('Décision sauvegardée', 'success');
+        // Optionnel : Mettre à jour visuellement la ligne
+        const row = e.target.closest('tr');
+        row.classList.remove('extraction-row--included', 'extraction-row--excluded');
+        if(choice === 'include') row.classList.add('extraction-row--included');
+        if(choice === 'exclude') row.classList.add('extraction-row--excluded');
+
+      } catch(err) {
+        showToast(`Erreur sauvegarde: ${err.message}`, 'error');
+      }
+    });
+  });
+
+  // Bouton Détails (extraction complète)
+  container.querySelectorAll('[data-action="details"]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const pmid = e.currentTarget.getAttribute('data-id');
+      const extraction = (appState.currentProjectExtractions || []).find(x => String(x.pmid) === String(pmid));
+      if (!extraction) {
+        showToast('Détails non trouvés.', 'warning');
         return;
-    }
-    
-    elements.validationContainer.innerHTML = `
-        <div class="validation-header">
-            <h3>Validation inter-évaluateurs</h3>
-            <div class="validation-actions">
-                <h4>Actions de Double Codage</h4>
-                <div class="button-group">
-                    <button class="btn btn--outline" data-action="export-validations">
-                        Exporter CSV (Éval. 1)
-                    </button>
-                    <button class="btn btn--outline" data-action="import-validations">
-                        Importer CSV (Éval. 2)
-                    </button>
-                    <button class="btn btn--primary" data-action="calculate-kappa">
-                        Calculer Kappa
-                    </button>
-                </div>
-                ${project.inter_rater_reliability ? `
-                    <div class="kappa-result-display">
-                        ${escapeHtml(project.inter_rater_reliability)}
-                    </div>
-                ` : ''}
-            </div>
-        </div>
-        
-        <div class="validation-results">
-            <h4>Résultats à valider</h4>
-            ${renderValidationTable()}
-        </div>
-        
-        <input type="file" id="validationFileInput" accept=".csv" style="display: none;">
-    `;
+      }
+      const modalBody = document.getElementById('extractionDetailBody');
+      if (modalBody) modalBody.innerHTML = formatExtractionDetailsForModal(extraction);
+      openModal('extractionDetailModal');
+    });
+  });
 }
 
 function renderValidationTable() {
@@ -2458,86 +2976,106 @@ async function clearChatHistory() {
 // ================================================================
 
 function renderSettingsSection() {
-    if (!elements.settingsContainer) return;
-    
-    elements.settingsContainer.innerHTML = `
-        <div class="settings-header">
-            <h3>Paramètres</h3>
+  if (!elements.settingsContainer) return;
+  const prompts = Array.isArray(appState.prompts) ? appState.prompts : [];
+  const profiles = Array.isArray(appState.analysisProfiles) ? appState.analysisProfiles : [];
+  const models = Array.isArray(appState.ollamaModels) ? appState.ollamaModels : [];
+
+  const promptsHtml = prompts.length
+    ? prompts.map(p => `
+      <div class="prompt-item">
+        <div class="prompt-item__info">
+          <h5>${escapeHtml(p.name || '')}</h5>
+          <p>${escapeHtml(p.description || '')}</p>
         </div>
-        
-        <div class="settings-sections">
-            <div class="settings-section">
-                <h4>Configuration Zotero</h4>
-                <p>Connectez votre compte Zotero pour importer automatiquement les PDF.</p>
-                <div class="form-group">
-                    <label class="form-label">User ID Zotero</label>
-                    <input type="text" id="zoteroUserId" class="form-control" 
-                           placeholder="Votre User ID Zotero">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Clé API Zotero</label>
-                    <input type="password" id="zoteroApiKey" class="form-control" 
-                           placeholder="Votre clé API Zotero">
-                </div>
-                <button class="btn btn--primary" data-action="saveZoteroSettings">
-                    Sauvegarder les paramètres Zotero
-                </button>
-            </div>
-            
-            <div class="settings-section">
-                <h4>Gestion des Prompts</h4>
-                <p>Modifiez les templates de prompts utilisés par l'IA.</p>
-                <div id="promptsList">
-                    ${renderPromptsList()}
-                </div>
-                <button class="btn btn--outline" data-action="edit-prompt">
-                    Modifier un prompt
-                </button>
-            </div>
-            
-            <div class="settings-section">
-                <h4>Profils d'Analyse</h4>
-                <p>Gérez les ensembles de modèles IA pour chaque type d'analyse.</p>
-                <div id="profilesList">
-                    ${renderProfilesList()}
-                </div>
-                <button class="btn btn--primary" data-action="create-profile">
-                    Créer un profil
-                </button>
-            </div>
-            
-            <div class="settings-section">
-                <h4>Modèles Ollama</h4>
-                <p>Gérez les modèles IA installés localement.</p>
-                <div id="ollamaModelsList">
-                    ${renderOllamaModelsList()}
-                </div>
-                <div class="ollama-actions">
-                    <input type="text" id="modelNameInput" class="form-control" 
-                           placeholder="Nom du modèle (ex: llama3.1:8b)">
-                    <button class="btn btn--outline" data-action="pullModel">
-                        Télécharger un modèle
-                    </button>
-                </div>
-            </div>
-            
-            <div class="settings-section">
-                <h4>Files de tâches</h4>
-                <div id="queueStatus">
-                    <p class="text-muted">Chargement du statut des files...</p>
-                </div>
-                <button class="btn btn--outline" data-action="refresh-queues">
-                    Actualiser
-                </button>
-            </div>
+      </div>`).join('')
+    : `<p>Aucun prompt trouvé.</p>`;
+
+  const profilesHtml = profiles.length
+    ? profiles.map(pr => `
+      <div class="profile-card">
+        <h5>${escapeHtml(pr.name || '')}</h5>
+        <div class="profile-models">
+          <div class="model-item">
+            <span class="model-label">Preprocess</span>
+            <span class="model-value">${escapeHtml(pr.preprocess_model || '')}</span>
+          </div>
+          <div class="model-item">
+            <span class="model-label">Extraction</span>
+            <span class="model-value">${escapeHtml(pr.extract_model || '')}</span>
+          </div>
+          <div class="model-item">
+            <span class="model-label">Synthèse</span>
+            <span class="model-value">${escapeHtml(pr.synthesis_model || '')}</span>
+          </div>
         </div>
-    `;
-    
-    // Charger les paramètres Zotero existants
-    loadZoteroSettings();
-    
-    // Charger le statut des files
-    renderQueueStatus();
+      </div>`).join('')
+    : `<p>Aucun profil trouvé.</p>`;
+
+  const modelsHtml = models.length
+    ? models.map(m => `
+      <div class="model-item">
+        <span class="model-name">${escapeHtml(m.name || '')}</span>
+        <span class="model-size">${escapeHtml(m.size || '')}</span>
+      </div>`).join('')
+    : `<p>Aucun modèle local trouvé.</p>`;
+
+  elements.settingsContainer.innerHTML = `
+    <div class="settings-grid">
+      <div class="settings-card">
+        <div class="settings-card__header"><h4>Prompts</h4></div>
+        <div class="settings-card__content">${promptsHtml}</div>
+      </div>
+      <div class="settings-card">
+        <div class="settings-card__header"><h4>Profils d'analyse</h4></div>
+        <div class="settings-card__content">${profilesHtml}</div>
+      </div>
+      <div class="settings-card">
+        <div class="settings-card__header"><h4>Modèles Ollama</h4></div>
+        <div class="settings-card__content">
+          <div class="models-list">${modelsHtml}</div>
+          <div class="settings-actions" style="margin-top:12px;">
+            <input id="modelNameInput" placeholder="llama3.1:8b" />
+            <button class="btn btn--primary" id="pullModelBtn">Télécharger</button>
+          </div>
+        </div>
+      </div>
+      <div class="settings-card">
+        <div class="settings-card__header"><h4>Paramètres Zotero</h4></div>
+        <div class="settings-card__content">
+          <div class="form-row">
+            <label>User ID</label>
+            <input id="zoteroUserId" placeholder="Votre User ID" />
+          </div>
+          <div class="form-row">
+            <label>API Key</label>
+            <input id="zoteroApiKey" type="password" placeholder="Votre clé API Zotero" />
+          </div>
+          <button class="btn btn--primary" id="saveZoteroBtn">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Wiring
+  document.getElementById('pullModelBtn')?.addEventListener('click', handlePullModel);
+  document.getElementById('saveZoteroBtn')?.addEventListener('click', handleSaveZoteroSettings);
+
+  // Charger valeurs Zotero
+  loadZoteroSettings().catch(() => {});
+}
+
+// --- Chargements initiaux regroupés ---
+async function loadInitialData() {
+  await Promise.all([
+    loadProjects(),
+    loadAnalysisProfiles(),
+    loadPrompts(),
+    loadOllamaModels(),
+    loadAvailableDatabases(),
+  ]);
+  // Après chargement, construire la page paramètres
+  renderSettingsSection();
 }
 
 function renderPromptsList() {
@@ -3006,26 +3544,33 @@ async function handleGridImport(e) {
 // ================================================================
 
 function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.add('modal--show');
-        document.body.style.overflow = 'hidden';
-        
-        // Focus sur le premier input
-        const firstInput = modal.querySelector('input, textarea, select');
-        if (firstInput) {
-            setTimeout(() => firstInput.focus(), 100);
-        }
-    }
+  const modal = document.getElementById(modalId);  // [web:1]
+  if (!modal) {
+    console.warn(`Modal ${modalId} introuvable`);  // [web:1]
+    return;  // [web:1]
+  }
+  // Ajoute la classe d’ouverture si votre CSS la gère
+  modal.classList.add('modal--show');  // [web:1]
+  // Accessibilité basique
+  modal.setAttribute('aria-hidden', 'false');  // [web:1]
+  // Focus piégé minimal: place le focus à l’intérieur si possible
+  const focusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');  // [web:1]
+  if (focusable) {
+    try { focusable.focus(); } catch (_) {}  // [web:1]
+  }
 }
 
+
 function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.remove('modal--show');
-        document.body.style.overflow = '';
-    }
+  const modal = document.getElementById(modalId);  // [web:1]
+  if (!modal) {
+    console.warn(`Modal ${modalId} introuvable`);  // [web:1]
+    return;  // [web:1]
+  }
+  modal.classList.remove('modal--show');  // [web:1]
+  modal.setAttribute('aria-hidden', 'true');  // [web:1]
 }
+
 
 // ================================================================
 // === GESTION DES PROFILS ET PROMPTS (PLACEHOLDERS)

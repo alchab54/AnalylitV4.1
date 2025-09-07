@@ -623,74 +623,37 @@ def run_meta_analysis_task(project_id: str):
         session.close()
 
 def run_descriptive_stats_task(project_id: str):
-    """Statistiques descriptives basées sur les données extraites si présentes."""
+    """Génère des statistiques descriptives sur les extractions."""
+    logger.info(f"📊 Statistiques descriptives pour projet {project_id}")
     update_project_status(project_id, 'generating_analysis')
+    
     session = Session()
     try:
-        # Récupérer les données extraites
         rows = session.execute(text("""
-            SELECT extracted_data FROM extractions 
-            WHERE project_id = :pid AND extracted_data IS NOT NULL
+            SELECT relevance_score FROM extractions 
+            WHERE project_id = :pid AND relevance_score IS NOT NULL
         """), {"pid": project_id}).mappings().all()
         
         if not rows:
             update_project_status(project_id, 'failed')
-            send_project_notification(project_id, 'analysis_failed', 
-                                    'Aucune donnée d\'extraction disponible pour les statistiques descriptives.')
             return
-        
-        # Parser les données JSON
-        records = []
-        for r in rows:
-            try:
-                data = json.loads(r['extracted_data'])
-                if isinstance(data, dict):
-                    records.append(data)
-            except Exception:
-                continue
-        
-        if not records:
-            update_project_status(project_id, 'failed')
-            send_project_notification(project_id, 'analysis_failed', 
-                                    'Impossible de parser les données extraites pour les statistiques descriptives.')
-            return
-        
-        # Créer un DataFrame pour l'analyse
-        df = pd.json_normalize(records)
-        
-        p_dir = PROJECTS_DIR / project_id
-        p_dir.mkdir(exist_ok=True)
-        plot_paths = {}
-        
-        # Exemple: histogramme des types d'étude si présents
-        if 'methodologie.type_etude' in df.columns:
-            s = df['methodologie.type_etude'].value_counts()
-            fig, ax = plt.subplots(figsize=(10, 6))
-            s.plot(kind='bar', ax=ax)
-            ax.set_title('Répartition des Types d\'Études')
-            ax.set_ylabel('Nombre d\'Articles')
-            plt.xticks(rotation=45, ha='right')
             
-            plot_path = str(p_dir / 'study_types.png')
-            plt.savefig(plot_path, bbox_inches='tight')
-            plt.close(fig)
-            plot_paths['study_types'] = plot_path
-        
-        # Statistiques résumées
-        summary_stats = {
-            "total_articles": int(len(df)),
-            "available_fields": list(df.columns)
+        scores = [r['relevance_score'] for r in rows]
+        stats_result = {
+            'total_extractions': len(scores),
+            'mean_score': float(np.mean(scores)),
+            'median_score': float(np.median(scores)),
+            'std_dev': float(np.std(scores)),
+            'min_score': float(np.min(scores)),
+            'max_score': float(np.max(scores))
         }
         
-        update_project_status(project_id, 'completed', 
-                            analysis_result=summary_stats,
-                            analysis_plot_path=json.dumps(plot_paths) if plot_paths else None)
-        send_project_notification(project_id, 'analysis_completed', 'Statistiques descriptives générées.')
+        update_project_status(project_id, 'completed', analysis_result=stats_result)
+        send_project_notification(project_id, 'analysis_completed', 'Statistiques descriptives générées')
         
     except Exception as e:
-        logger.error(f"Erreur run_descriptive_stats_task: {e}", exc_info=True)
+        logger.error(f"Erreur run_descriptive_stats_task: {e}")
         update_project_status(project_id, 'failed')
-        send_project_notification(project_id, 'analysis_failed', f'Erreur: {e}')
     finally:
         session.close()
 
@@ -698,62 +661,66 @@ def run_descriptive_stats_task(project_id: str):
 # === CHAT RAG (Version finale avec profil)
 # ================================================================
 
-def answer_chat_question_task(project_id: str, question: str, profile: dict, topk: int = 5):
-    """RAG simple basé sur abstracts (ou index plus tard), avec historique en DB."""
-    logger.info(f"💬 Question RAG pour projet {project_id}: {question[:80]}...")
+def answer_chat_question_task(project_id: str, question: str):
+    """Répond à une question via RAG sur les PDFs indexés."""
+    logger.info(f"💬 Question chat pour projet {project_id}")
+    
+    session = Session()
     try:
-        # Récupération d’un contexte minimal depuis les abstracts
-        session = Session()
+        if embedding_model is None:
+            return "Modèle d'embedding non disponible"
+            
+        # Simulation RAG simple
+        client = chromadb.Client()
         try:
-            docs = session.execute(text("""
-                SELECT title, abstract FROM search_results
-                WHERE project_id = :pid
-                ORDER BY created_at DESC
-                LIMIT :k
-            """), {"pid": project_id, "k": int(topk)}).mappings().all()
-        finally:
-            session.close()
+            collection = client.get_collection(name=f"project_{project_id}")
+            query_embedding = embedding_model.encode([question]).tolist()
+            
+            results = collection.query(
+                query_embeddings=[query_embedding],
+                n_results=3
+            )
+            
+            if results['documents'] and results['documents'][0]:
+                context = "\n---\n".join(results['documents'][0])
+                
+                prompt = f"""En te basant sur ces extraits de documents, réponds à la question:
 
-        context = "\n\n---\n\n".join(
-            [f"Titre: {d.get('title','')}\nRésumé: {d.get('abstract','')}" for d in docs if d.get('abstract')]
-        )
+Question: {question}
 
-        if not context.strip():
-            answer = "Aucun document indexé ne contient d'information exploitable pour cette question."
-            sources = []
-        else:
-            base_tpl = get_rag_chat_prompt_template()
-            tpl = get_effective_prompt_template("rag_chat_prompt", base_tpl)
-            rag_prompt = tpl.format(context=context, question=question)
-            model_name = profile.get('synthesis_model', 'llama3.1:8b')
-            answer_text = call_ollama_api(rag_prompt, model_name)
-            answer = answer_text if isinstance(answer_text, str) else str(answer_text)
-            sources = [d.get('title','') for d in docs[:3]]
+Contexte:
+{context}
 
-        # Sauvegarder l’historique
-        session = Session()
-        try:
-            ts = datetime.now().isoformat()
-            session.execute(text("""
-                INSERT INTO chat_messages (id, project_id, role, content, timestamp)
-                VALUES (:id, :pid, :role, :content, :ts)
-            """), {"id": str(uuid.uuid4()), "pid": project_id, "role": "user", "content": question, "ts": ts})
-            session.execute(text("""
-                INSERT INTO chat_messages (id, project_id, role, content, sources, timestamp)
-                VALUES (:id, :pid, :role, :content, :sources, :ts)
-            """), {"id": str(uuid.uuid4()), "pid": project_id, "role": "assistant",
-                   "content": answer, "sources": json.dumps(sources), "ts": ts})
-            session.commit()
-        finally:
-            session.close()
-
-        send_project_notification(project_id, 'analysis_completed', 'Réponse de chat générée.')
-        return {"answer": answer, "sources": sources}
+Réponds de façon concise et précise."""
+                
+                # Utiliser un modèle par défaut pour le chat
+                from utils.ai_processors import call_ollama_api
+                response = call_ollama_api(prompt, "llama3.1:8b")
+                
+                # Sauvegarder la conversation
+                session.execute(text("""
+                    INSERT INTO chat_messages (id, project_id, role, content, timestamp)
+                    VALUES (:id1, :pid, 'user', :q, :ts1), (:id2, :pid, 'assistant', :a, :ts2)
+                """), {
+                    "id1": str(uuid.uuid4()), "id2": str(uuid.uuid4()),
+                    "pid": project_id, "q": question, "a": response,
+                    "ts1": datetime.now().isoformat(), "ts2": datetime.now().isoformat()
+                })
+                session.commit()
+                
+                return response
+            else:
+                return "Aucun document indexé trouvé pour répondre à cette question."
+                
+        except Exception:
+            return "Erreur lors de la recherche dans la base de connaissances."
+            
     except Exception as e:
-        logger.error(f"Erreur answer_chat_question_task: {e}", exc_info=True)
-        send_project_notification(project_id, 'analysis_failed', f'Erreur RAG: {e}')
-        return {"answer": f"Erreur: {e}", "sources": []}
-
+        logger.error(f"Erreur answer_chat_question_task: {e}")
+        return "Erreur lors du traitement de la question."
+    finally:
+        session.close()
+        
 # ================================================================
 # === ZOTERO: IMPORT À PARTIR D'UN FICHIER CSL JSON (fusion des fonctions manquantes)
 # ================================================================
@@ -1080,39 +1047,55 @@ def run_atn_score_task(project_id: str):
 # ================================================================
 
 def calculate_kappa_task(project_id: str):
-    """Calcule le coefficient Kappa de Cohen entre evaluator_1 et evaluator_2 stockés dans extractions.validations."""
+    """Calcule le coefficient Kappa de Cohen entre deux évaluateurs."""
     session = Session()
     try:
         rows = session.execute(text("""
             SELECT validations FROM extractions
             WHERE project_id = :pid AND validations IS NOT NULL
         """), {"pid": project_id}).mappings().all()
-
-        r1, r2 = [], []
+        
+        eval1_decisions, eval2_decisions = [], []
+        
         for r in rows:
             try:
-                v = json.loads(r["validations"])
-                if "evaluator_1" in v and "evaluator_2" in v:
-                    r1.append(v["evaluator_1"])
-                    r2.append(v["evaluator_2"])
+                v = json.loads(r["validations"]) if r.get("validations") else {}
+                if "evaluator1" in v and "evaluator2" in v:
+                    eval1_decisions.append(1 if v["evaluator1"] == "include" else 0)
+                    eval2_decisions.append(1 if v["evaluator2"] == "include" else 0)
             except Exception:
                 continue
-
-        if len(r1) < 5:
-            result_text = f"Pas assez de données communes ({len(r1)}) pour un calcul de Kappa fiable."
+        
+        if len(eval1_decisions) < 2:
+            result = "Pas assez de données pour calculer le Kappa (minimum 2 validations communes)"
         else:
-            kappa = float(cohen_kappa_score(r1, r2))
-            result_text = f"Coefficient Kappa de Cohen : {kappa:.3f} (basé sur {len(r1)} articles)"
-
+            kappa = cohen_kappa_score(eval1_decisions, eval2_decisions)
+            result = f"Kappa de Cohen: {kappa:.3f}"
+            
+            if kappa < 0:
+                interpretation = "Accord inférieur au hasard"
+            elif kappa < 0.20:
+                interpretation = "Accord faible"
+            elif kappa < 0.40:
+                interpretation = "Accord passable"
+            elif kappa < 0.60:
+                interpretation = "Accord modéré"
+            elif kappa < 0.80:
+                interpretation = "Accord bon"
+            else:
+                interpretation = "Accord excellent"
+            
+            result += f" ({interpretation})"
+        
         session.execute(text("""
-            UPDATE projects SET inter_rater_reliability = :k WHERE id = :pid
-        """), {"k": result_text, "pid": project_id})
+            UPDATE projects SET inter_rater_reliability = :result WHERE id = :pid
+        """), {"result": result, "pid": project_id})
         session.commit()
-        send_project_notification(project_id, 'kappa_calculated', result_text)
-        logger.info(f"Kappa calculé: {result_text}")
+        
+        send_project_notification(project_id, 'kappa_calculated', result)
+        
     except Exception as e:
-        session.rollback()
         logger.error(f"Erreur calculate_kappa_task: {e}", exc_info=True)
-        send_project_notification(project_id, 'error', f"Erreur lors du calcul du Kappa: {e}")
+        send_project_notification(project_id, 'kappa_failed', f'Erreur calcul Kappa: {e}')
     finally:
         session.close()

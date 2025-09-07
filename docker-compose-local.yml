@@ -77,7 +77,7 @@ services:
       redis:
         condition: service_healthy
     deploy:
-      replicas: 3
+      replicas: 1
     networks:
       - analylit-network
 
