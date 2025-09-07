@@ -1,117 +1,59 @@
 # utils/prompt_templates.py
-from typing import Optional, Dict, Any, List
-from sqlalchemy import create_engine, text
-from config_v4 import get_config
-
-config = get_config()
-engine = create_engine(config.DATABASE_URL, pool_pre_ping=True)
 
 def get_screening_prompt_template() -> str:
-    return """
-ROLE: Vous êtes un assistant de recherche expert en revue systématique.
-TÂCHE: Évaluer la pertinence d'un article basé sur son titre et son résumé.
-CONTRAINTES:
-1. Répondez UNIQUEMENT avec un objet JSON valide.
-2. Le score de pertinence doit être un entier entre 0 et 10.
-3. La décision doit être "À inclure" si le score >= 7, sinon "À exclure".
-4. La justification doit être une phrase concise (maximum 30 mots).
+    # Modèle de screening: JSON de sortie avec accolades échappées
+    return (
+        "En tant qu'assistant de recherche spécialisé, analysez cet article et déterminez sa pertinence.\n\n"
+        "Titre: {title}\n\n"
+        "Résumé: {abstract}\n\n"
+        "Source: {database_source}\n\n"
+        "Répondez UNIQUEMENT en JSON:\n"
+        "{{\"relevance_score\": 0-10, \"decision\": \"À inclure\"|\"À exclure\", \"justification\": \"...\"}}\n"
+    )
 
-EXEMPLE 1:
----
-Titre: The impact of digital therapeutic alliance on patient engagement.
-Résumé: This study explores how a strong digital therapeutic alliance improves engagement.
----
-RÉPONSE ATTENDUE:
-{
-    "relevance_score": 9,
-    "decision": "À inclure",
-    "justification": "L'article traite directement de l'alliance thérapeutique numérique et de son impact sur l'engagement des patients."
-}
+def get_full_extraction_prompt_template(fields: list) -> str:
+    # Construit un JSON cible avec toutes les clés demandées, accolades échappées
+    # 'fields' attendu: liste de dicts [{"name": "...", "description": "..."}]
+    # On utilise uniquement les noms pour générer le squelette
+    keys = [f.get("name", "").strip() for f in fields if isinstance(f, dict) and f.get("name")]
+    # Par défaut si vide
+    if not keys:
+        keys = ["type_etude", "population", "intervention", "resultats_principaux", "limites", "methodologie"]
 
-ARTICLE À ANALYSER:
----
-Titre: {title}
-Résumé: {abstract}
-Source: {database_source}
----
-RÉPONSE ATTENDUE:
-"""
+    json_lines = []
+    for i, k in enumerate(keys):
+        comma = "," if i < len(keys) - 1 else ""
+        # chaque ligne du JSON échappe les accolades via doublement
+        json_lines.append(f"\"{k}\": \"...\"{comma}")
 
-def get_full_extraction_prompt_template(fields: List[Dict[str, str]]) -> str:
-    example_json = {f['name']: f"Exemple de valeur pour {f.get('description', f['name'])}" for f in fields}
-    example = json.dumps(example_json, indent=4, ensure_ascii=False)
-    return f"""
-ROLE: Vous êtes un expert en extraction de données structurées.
-TÂCHE: Analyser le texte fourni et remplir la grille d'extraction JSON.
-CONTRAINTES STRICTES:
-1. Votre réponse doit être UNIQUEMENT un objet JSON valide.
-2. Respectez scrupuleusement la structure de la grille fournie.
-3. Si une information est absente, utilisez la valeur null ou "".
+    json_block = "{{\n{body}\n}}".format(body=",\n".join(json_lines))
 
-GRILLE D'EXTRACTION (EXEMPLE):
----
-{example}
----
-
-TEXTE COMPLET À ANALYSER:
----
-{{text}}
----
-VOTRE RÉPONSE (JSON UNIQUEMENT):
-"""
+    return (
+        "ROLE: Assistant expert. Répondez UNIQUEMENT avec un JSON valide.\n"
+        "TEXTE À ANALYSER:\n---\n{text}\n---\n"
+        "SOURCE: {database_source}\n"
+        f"{json_block}\n"
+    )
 
 def get_synthesis_prompt_template() -> str:
-    return """
-PERSONA: Vous êtes un chercheur médical rédigeant la section "Résultats" d'une revue systématique.
-TÂCHE: Produire une synthèse structurée au format JSON.
-CONTEXTE: {project_description}
-
-RÉSUMÉS:
----
-{data_for_prompt}
----
-
-INSTRUCTIONS:
-Répondez UNIQUEMENT avec un JSON contenant:
-- "main_themes": [3 à 5 thèmes principaux],
-- "key_findings": [conclusions récurrentes],
-- "notable_contradictions": [divergences majeures],
-- "synthesis_summary": "paragraphe de synthèse",
-- "research_gaps": [lacunes identifiées]
-"""
+    # JSON échappé pour la synthèse
+    return (
+        "Contexte: {project_description}\n"
+        "Résumés:\n---\n{data_for_prompt}\n---\n"
+        "Réponds en JSON: "
+        "{{\"relevance_evaluation\":[],\"main_themes\":[],\"key_findings\":[],"
+        "\"methodologies_used\":[],\"synthesis_summary\":\"\",\"research_gaps\":[]}}\n"
+    )
 
 def get_rag_chat_prompt_template() -> str:
-    return """
-ROLE: Assistant de recherche répondant EXCLUSIVEMENT sur un contexte fourni.
-CONTEXTE:
----
-{context}
----
-QUESTION: {question}
----
-INSTRUCTIONS:
-1. Basez la réponse UNIQUEMENT sur le contexte.
-2. Citez les sources (ex: [Article: 1234567]).
-3. Si le contexte est insuffisant, répondez EXACTEMENT: "Les documents fournis ne contiennent pas d'informations pour répondre à cette question."
-4. Aucune supposition.
-VOTRE RÉPONSE:
-"""
+    # Utilitaire possible: pas de formatage JSON ici
+    return (
+        "En te basant sur ces extraits de documents, réponds à la question de façon concise et précise.\n"
+        "Question: {question}\n"
+        "Contexte:\n{context}\n"
+    )
 
-def get_prompt_override_from_db(prompt_name: str) -> Optional[str]:
-    try:
-        with engine.connect() as conn:
-            row = conn.execute(
-                text("SELECT template FROM prompts WHERE name = :n"),
-                {"n": prompt_name}
-            ).scalar_one_or_none()
-            if row and isinstance(row, str) and row.strip():
-                return row
-    except Exception:
-        # journaliser côté appelant si nécessaire
-        return None
-    return None
-
-def get_effective_prompt_template(prompt_name: str, default_template: str) -> str:
-    """Retourne le template DB si présent, sinon le template robuste par défaut."""
-    override = get_prompt_override_from_db(prompt_name)
-    return override if override else default_template
+def get_effective_prompt_template(name: str, base_template: str) -> str:
+    # Hook éventuel pour substitutions supplémentaires côté base
+    # Par défaut on renvoie tel quel. Les accolades JSON sont déjà échappées.
+    return base_template

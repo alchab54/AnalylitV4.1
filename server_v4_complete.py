@@ -1,7 +1,6 @@
 # ================================================================
-# AnalyLit V4.1 - Serveur Flask (100% PostgreSQL/SQLAlchemy) - Corrigé
+# AnalyLit V4.1 - Serveur Flask (100% PostgreSQL/SQLAlchemy) - CORRIGÉ
 # ================================================================
-
 import os
 import uuid
 import json
@@ -44,7 +43,6 @@ from utils.file_handlers import sanitize_filename
 from utils.notifications import send_project_notification
 from sklearn.metrics import cohen_kappa_score
 
-
 # --- Configuration ---
 config = get_config()
 logging.basicConfig(level=getattr(logging, config.LOG_LEVEL))
@@ -67,7 +65,6 @@ socketio = SocketIO(
     path='/socket.io/'
 )
 
-
 # --- Redis / Queues ---
 redis_conn = redis.from_url(config.REDIS_URL)
 processing_queue = Queue('analylit_processing_v4', connection=redis_conn)
@@ -82,130 +79,121 @@ PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 # ================================================================
 # 1) Initialisation / Migrations
 # ================================================================
-
 def init_db():
     """Initialise ou migre le schéma PostgreSQL."""
     with engine.begin() as conn:
         try:
-            # Tables
             conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS projects (
-                id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                description TEXT,
-                status TEXT DEFAULT 'pending',
-                profile_used TEXT,
-                job_id TEXT,
-                created_at TEXT,
-                updated_at TEXT,
-                synthesis_result TEXT,
-                discussion_draft TEXT,
-                knowledge_graph TEXT,
-                prisma_flow_path TEXT,
-                analysis_mode TEXT DEFAULT 'screening',
-                analysis_result TEXT,
-                analysis_plot_path TEXT,
-                pmids_count INTEGER DEFAULT 0,
-                processed_count INTEGER DEFAULT 0,
-                total_processing_time DOUBLE PRECISION DEFAULT 0,
-                indexed_at TEXT,
-                search_query TEXT,
-                databases_used TEXT,
-                inter_rater_reliability TEXT
-            )
-            """))
-
+CREATE TABLE IF NOT EXISTS projects (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    status TEXT DEFAULT 'pending',
+    profile_used TEXT,
+    job_id TEXT,
+    created_at TEXT,
+    updated_at TEXT,
+    synthesis_result TEXT,
+    discussion_draft TEXT,
+    knowledge_graph TEXT,
+    prisma_flow_path TEXT,
+    analysis_mode TEXT DEFAULT 'screening',
+    analysis_result TEXT,
+    analysis_plot_path TEXT,
+    pmids_count INTEGER DEFAULT 0,
+    processed_count INTEGER DEFAULT 0,
+    total_processing_time DOUBLE PRECISION DEFAULT 0,
+    indexed_at TEXT,
+    search_query TEXT,
+    databases_used TEXT,
+    inter_rater_reliability TEXT
+)
+"""))
             conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS search_results (
-                id TEXT PRIMARY KEY,
-                project_id TEXT NOT NULL,
-                article_id TEXT NOT NULL,
-                title TEXT,
-                abstract TEXT,
-                authors TEXT,
-                publication_date TEXT,
-                journal TEXT,
-                doi TEXT,
-                url TEXT,
-                database_source TEXT NOT NULL,
-                created_at TEXT,
-                FOREIGN KEY (project_id) REFERENCES projects(id),
-                UNIQUE(project_id, article_id)
-            )
-            """))
-
+CREATE TABLE IF NOT EXISTS search_results (
+    id TEXT PRIMARY KEY,
+    project_id TEXT NOT NULL,
+    article_id TEXT NOT NULL,
+    title TEXT,
+    abstract TEXT,
+    authors TEXT,
+    publication_date TEXT,
+    journal TEXT,
+    doi TEXT,
+    url TEXT,
+    database_source TEXT NOT NULL,
+    created_at TEXT,
+    FOREIGN KEY (project_id) REFERENCES projects(id),
+    UNIQUE(project_id, article_id)
+)
+"""))
             conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS extractions (
-                id TEXT PRIMARY KEY,
-                project_id TEXT,
-                pmid TEXT,
-                title TEXT,
-                validation_score DOUBLE PRECISION,
-                created_at TEXT,
-                extracted_data TEXT,
-                relevance_score DOUBLE PRECISION DEFAULT 0,
-                relevance_justification TEXT,
-                user_validation_status TEXT,
-                analysis_source TEXT,
-                validations TEXT,
-                FOREIGN KEY (project_id) REFERENCES projects(id)
-            )
-            """))
-
+CREATE TABLE IF NOT EXISTS extractions (
+    id TEXT PRIMARY KEY,
+    project_id TEXT,
+    pmid TEXT,
+    title TEXT,
+    validation_score DOUBLE PRECISION,
+    created_at TEXT,
+    extracted_data TEXT,
+    relevance_score DOUBLE PRECISION DEFAULT 0,
+    relevance_justification TEXT,
+    user_validation_status TEXT,
+    analysis_source TEXT,
+    validations TEXT,
+    FOREIGN KEY (project_id) REFERENCES projects(id)
+)
+"""))
             conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS processing_log (
-                id SERIAL PRIMARY KEY,
-                project_id TEXT,
-                pmid TEXT,
-                status TEXT,
-                details TEXT,
-                "timestamp" TIMESTAMP,
-                FOREIGN KEY (project_id) REFERENCES projects(id)
-            )
-            """))
-
+CREATE TABLE IF NOT EXISTS processing_log (
+    id SERIAL PRIMARY KEY,
+    project_id TEXT,
+    pmid TEXT,
+    status TEXT,
+    details TEXT,
+    "timestamp" TIMESTAMP,
+    FOREIGN KEY (project_id) REFERENCES projects(id)
+)
+"""))
             conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS analysis_profiles (
-                id TEXT PRIMARY KEY,
-                name TEXT NOT NULL UNIQUE,
-                is_custom BOOLEAN DEFAULT TRUE,
-                preprocess_model TEXT NOT NULL,
-                extract_model TEXT NOT NULL,
-                synthesis_model TEXT NOT NULL
-            )
-            """))
-
+CREATE TABLE IF NOT EXISTS analysis_profiles (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    is_custom BOOLEAN DEFAULT TRUE,
+    preprocess_model TEXT NOT NULL,
+    extract_model TEXT NOT NULL,
+    synthesis_model TEXT NOT NULL
+)
+"""))
             conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS prompts (
-                id SERIAL PRIMARY KEY,
-                name TEXT NOT NULL UNIQUE,
-                description TEXT,
-                template TEXT NOT NULL
-            )
-            """))
-
+CREATE TABLE IF NOT EXISTS prompts (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    description TEXT,
+    template TEXT NOT NULL
+)
+"""))
             conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS extraction_grids (
-                id TEXT PRIMARY KEY,
-                project_id TEXT NOT NULL,
-                name TEXT NOT NULL,
-                fields TEXT NOT NULL,
-                created_at TEXT,
-                FOREIGN KEY (project_id) REFERENCES projects(id)
-            )
-            """))
-
+CREATE TABLE IF NOT EXISTS extraction_grids (
+    id TEXT PRIMARY KEY,
+    project_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    fields TEXT NOT NULL,
+    created_at TEXT,
+    FOREIGN KEY (project_id) REFERENCES projects(id)
+)
+"""))
             conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS chat_messages (
-                id TEXT PRIMARY KEY,
-                project_id TEXT NOT NULL,
-                role TEXT NOT NULL,
-                content TEXT NOT NULL,
-                sources TEXT,
-                timestamp TEXT,
-                FOREIGN KEY (project_id) REFERENCES projects(id)
-            )
-            """))
+CREATE TABLE IF NOT EXISTS chat_messages (
+    id TEXT PRIMARY KEY,
+    project_id TEXT NOT NULL,
+    role TEXT NOT NULL,
+    content TEXT NOT NULL,
+    sources TEXT,
+    timestamp TEXT,
+    FOREIGN KEY (project_id) REFERENCES projects(id)
+)
+"""))
 
             # Migrations idempotentes
             conn.execute(text("ALTER TABLE projects ADD COLUMN IF NOT EXISTS inter_rater_reliability TEXT"))
@@ -215,18 +203,21 @@ def init_db():
             count_profiles = conn.execute(text("SELECT COUNT(*) FROM analysis_profiles")).scalar_one()
             if count_profiles == 0:
                 default_profiles = [
-                    {"id": "fast", "name": "Rapide", "is_custom": False, "preprocess_model": "gemma:2b", "extract_model": "phi3:mini", "synthesis_model": "llama3.1:8b"},
-                    {"id": "standard", "name": "Standard", "is_custom": False, "preprocess_model": "phi3:mini", "extract_model": "llama3.1:8b", "synthesis_model": "llama3.1:8b"},
-                    {"id": "deep", "name": "Approfondi", "is_custom": False, "preprocess_model": "llama3.1:8b", "extract_model": "mixtral:8x7b", "synthesis_model": "llama3.1:70b"},
+                    {"id": "fast", "name": "Rapide", "is_custom": False, "preprocess_model": "gemma:2b",
+                     "extract_model": "phi3:mini", "synthesis_model": "llama3.1:8b"},
+                    {"id": "standard", "name": "Standard", "is_custom": False, "preprocess_model": "phi3:mini",
+                     "extract_model": "llama3.1:8b", "synthesis_model": "llama3.1:8b"},
+                    {"id": "deep", "name": "Approfondi", "is_custom": False, "preprocess_model": "llama3.1:8b",
+                     "extract_model": "mixtral:8x7b", "synthesis_model": "llama3.1:70b"},
                 ]
                 stmt = text("""
-                INSERT INTO analysis_profiles (id, name, is_custom, preprocess_model, extract_model, synthesis_model)
-                VALUES (:id, :name, :is_custom, :preprocess_model, :extract_model, :synthesis_model)
-                """)
+INSERT INTO analysis_profiles (id, name, is_custom, preprocess_model, extract_model, synthesis_model)
+VALUES (:id, :name, :is_custom, :preprocess_model, :extract_model, :synthesis_model)
+""")
                 for p in default_profiles:
                     conn.execute(stmt, p)
 
-            # Seeding prompts
+            # Seeding prompts (JSON échappé)
             count_prompts = conn.execute(text("SELECT COUNT(*) FROM prompts")).scalar_one()
             if count_prompts == 0:
                 default_prompts = [
@@ -236,7 +227,8 @@ def init_db():
                         "template": (
                             "En tant qu'assistant de recherche spécialisé, analysez cet article et déterminez sa pertinence.\n\n"
                             "Titre: {title}\n\nRésumé: {abstract}\n\nSource: {database_source}\n\n"
-                            "Répondez UNIQUEMENT en JSON: {\"relevance_score\": 0-10, \"decision\": \"À inclure\"|\"À exclure\", \"justification\": \"...\"}"
+                            "Répondez UNIQUEMENT en JSON: "
+                            "{{\"relevance_score\": 0-10, \"decision\": \"À inclure\"|\"À exclure\", \"justification\": \"...\"}}"
                         ),
                     },
                     {
@@ -245,8 +237,8 @@ def init_db():
                         "template": (
                             "ROLE: Assistant expert. Répondez UNIQUEMENT avec un JSON valide.\n"
                             "TEXTE À ANALYSER:\n---\n{text}\n---\nSOURCE: {database_source}\n"
-                            "{\n\"type_etude\":\"...\",\"population\":\"...\",\"intervention\":\"...\",\"resultats_principaux\":\"...\","
-                            "\"limites\":\"...\",\"methodologie\":\"...\"\n}"
+                            "{{\n\"type_etude\":\"...\",\"population\":\"...\",\"intervention\":\"...\","
+                            "\"resultats_principaux\":\"...\",\"limites\":\"...\",\"methodologie\":\"...\"\n}}"
                         ),
                     },
                     {
@@ -255,8 +247,8 @@ def init_db():
                         "template": (
                             "Contexte: {project_description}\n"
                             "Résumés:\n---\n{data_for_prompt}\n---\n"
-                            "Réponds en JSON: {\"relevance_evaluation\":[],\"main_themes\":[],\"key_findings\":[],"
-                            "\"methodologies_used\":[],\"synthesis_summary\":\"\",\"research_gaps\":[]}"
+                            "Réponds en JSON: {{\"relevance_evaluation\":[],\"main_themes\":[],\"key_findings\":[],"
+                            "\"methodologies_used\":[],\"synthesis_summary\":\"\",\"research_gaps\":[]}}"
                         ),
                     },
                 ]
@@ -268,7 +260,7 @@ def init_db():
         except Exception as e:
             logger.error(f"❌ Erreur initialisation DB: {e}", exc_info=True)
             raise
-
+            
 # ================================================================
 # 2) API Routes
 # ================================================================
@@ -280,7 +272,6 @@ def health_check():
         redis_status = "connected" if redis_conn.ping() else "disconnected"
     except Exception:
         pass
-
     session = Session()
     try:
         session.execute(text("SELECT 1"))
@@ -289,7 +280,6 @@ def health_check():
         logger.error(f"Erreur health check DB: {e}")
     finally:
         session.close()
-
     return jsonify({
         "status": "ok",
         "version": config.ANALYLIT_VERSION,
@@ -297,7 +287,6 @@ def health_check():
         "services": {"database": db_status, "redis": redis_status, "ollama": "unknown"}
     })
 
-# Bases disponibles (source utils.fetchers)
 @api_bp.route('/databases', methods=['GET'])
 def get_available_databases():
     try:
@@ -314,7 +303,6 @@ def handle_projects():
         if request.method == 'GET':
             rows = session.execute(text("SELECT * FROM projects ORDER BY updated_at DESC")).mappings().all()
             return jsonify([dict(r) for r in rows])
-
         if request.method == 'POST':
             data = request.get_json(force=True)
             now = datetime.now().isoformat()
@@ -347,7 +335,6 @@ def handle_single_project(project_id):
         if request.method == 'GET':
             row = session.execute(text("SELECT * FROM projects WHERE id = :id"), {"id": project_id}).mappings().fetchone()
             return (jsonify(dict(row)) if row else (jsonify({'error': 'Projet non trouvé'}), 404))
-
         if request.method == 'DELETE':
             session.execute(text("DELETE FROM search_results WHERE project_id = :pid"), {"pid": project_id})
             session.execute(text("DELETE FROM extractions WHERE project_id = :pid"), {"pid": project_id})
@@ -372,7 +359,6 @@ def search_multiple_databases():
     query = data.get('query')
     databases = data.get('databases', ['pubmed'])
     max_results_per_db = data.get('max_results_per_db', 50)
-
     if not project_id or not query:
         return jsonify({'error': 'project_id et query requis'}), 400
 
@@ -399,7 +385,6 @@ def search_multiple_databases():
         max_results_per_db=max_results_per_db,
         job_timeout='30m'
     )
-
     return jsonify({'message': f'Recherche lancée dans {len(databases)} base(s)'}), 202
 
 @api_bp.route('/projects/<project_id>/search-results', methods=['GET'])
@@ -407,19 +392,17 @@ def get_project_search_results(project_id):
     session = Session()
     try:
         page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 50, type=int)
+        per_page = request.args.get('per_page', 500, type=int)
         database_filter = request.args.get('database')
         offset = (page - 1) * per_page
 
         base_query = "FROM search_results WHERE project_id = :pid"
         params = {"pid": project_id}
-
         if database_filter:
             base_query += " AND database_source = :db"
             params["db"] = database_filter
 
         total = session.execute(text(f"SELECT COUNT(*) {base_query}"), params).scalar_one()
-
         rows = session.execute(text(f"""
         SELECT * {base_query}
         ORDER BY created_at DESC
@@ -446,10 +429,8 @@ def get_project_search_stats(project_id):
         FROM search_results WHERE project_id = :pid
         GROUP BY database_source
         """), {"pid": project_id}).mappings().all()
-
         total = session.execute(text("SELECT COUNT(*) FROM search_results WHERE project_id = :pid"),
-                               {"pid": project_id}).scalar_one()
-
+                                {"pid": project_id}).scalar_one()
         return jsonify({
             "total_results": total,
             "results_by_database": {r["database_source"]: r["count"] for r in stats}
@@ -457,22 +438,19 @@ def get_project_search_stats(project_id):
     finally:
         session.close()
 
-# --- Fichiers / Uploads / Indexation ---
+# --- Upload et gestion des fichiers ---
 @api_bp.route('/projects/<project_id>/upload-pdfs-bulk', methods=['POST'])
 def upload_pdfs_bulk(project_id):
-    # Supporte à la fois 'files' multiple et 'file' unique (FormData depuis app.js)
     files = []
     if 'files' in request.files:
         files = request.files.getlist('files')
     elif 'file' in request.files:
         files = [request.files['file']]
-
     if not files:
         return jsonify({'error': 'Aucun fichier fourni'}), 400
 
     project_dir = PROJECTS_DIR / project_id
     project_dir.mkdir(exist_ok=True)
-
     successful, failed = [], []
     for file in files:
         if file and file.filename:
@@ -486,21 +464,43 @@ def upload_pdfs_bulk(project_id):
                 failed.append(f"{safe_filename}: {str(e)}")
 
     send_project_notification(project_id, 'pdf_upload_completed',
-                             f"{len(successful)} PDF importés, {len(failed)} échecs.",
-                             {'successful': successful, 'failed': failed})
-
+                              f"{len(successful)} PDF importés, {len(failed)} échecs.",
+                              {'successful': successful, 'failed': failed})
     return jsonify({'successful': successful, 'failed': failed}), 200
+
+@api_bp.route('/projects/<project_id>/upload-pdf-for-article', methods=['POST'])
+def upload_pdf_for_article(project_id):
+    """Upload manuel d'un PDF lié à un article (utilisé par le frontend)."""
+    if 'file' not in request.files:
+        return jsonify({'error': 'Aucun fichier fourni'}), 400
+    file = request.files['file']
+    if not file.filename or not file.filename.lower().endswith('.pdf'):
+        return jsonify({'error': 'Veuillez fournir un fichier PDF.'}), 400
+
+    article_id = request.args.get('article_id', '') or Path(file.filename).stem
+    if not article_id:
+        article_id = str(uuid.uuid4())
+
+    project_dir = PROJECTS_DIR / project_id
+    project_dir.mkdir(exist_ok=True)
+    safe_name = f"{sanitize_filename(article_id)}.pdf"
+    try:
+        file.save(str(project_dir / safe_name))
+        send_project_notification(project_id, 'pdf_upload_completed', f'PDF uploadé pour {article_id}')
+        return jsonify({'message': 'PDF uploadé avec succès', 'filename': safe_name}), 200
+    except Exception as e:
+        logger.error(f"Erreur upload_pdf_for_article: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur lors de l’upload'}), 500
 
 @api_bp.route('/projects/<project_id>/files', methods=['GET'])
 def list_project_files(project_id):
     project_dir = PROJECTS_DIR / project_id
     if not project_dir.is_dir():
         return jsonify([])
-
     pdf_files = [{"filename": f.name} for f in project_dir.glob("*.pdf")]
     return jsonify(pdf_files)
 
-@api_bp.route('/projects/<project_id>/files/<path:filename>', methods=['GET'])
+@api_bp.route('/projects/<project_id>/files/<filename>', methods=['GET'])
 def get_project_file(project_id, filename):
     project_dir = PROJECTS_DIR / project_id
     if ".." in filename or filename.startswith("/"):
@@ -513,11 +513,10 @@ def run_indexing(project_id):
     session = Session()
     try:
         session.execute(text("UPDATE projects SET status = 'indexing', updated_at = :t WHERE id = :pid"),
-                       {"t": datetime.now().isoformat(), "pid": project_id})
+                        {"t": datetime.now().isoformat(), "pid": project_id})
         session.commit()
     finally:
         session.close()
-
     return jsonify({'message': "Indexation lancée.", 'job_id': job.id}), 202
 
 # --- Extractions ---
@@ -526,34 +525,144 @@ def get_project_extractions(project_id):
     session = Session()
     try:
         rows = session.execute(text("""
-        SELECT * FROM extractions 
-        WHERE project_id = :pid 
+        SELECT * FROM extractions
+        WHERE project_id = :pid
         ORDER BY relevance_score DESC
         """), {"pid": project_id}).mappings().all()
-        
         return jsonify([dict(r) for r in rows])
     finally:
         session.close()
 
-# --- Zotero / Fetch en ligne ---
-@api_bp.route('/settings/zotero', methods=['POST'])
-def save_zotero_settings():
-    data = request.get_json(force=True)
-    zotero_config = {'user_id': data.get('userId'), 'api_key': data.get('apiKey')}
-    config_path = PROJECTS_DIR / 'zotero_config.json'
-    with open(config_path, 'w') as f:
-        json.dump(zotero_config, f)
-    return jsonify({'message': 'Paramètres Zotero sauvegardés.'})
+# --- Profils et prompts ---
+@api_bp.route('/profiles', methods=['GET', 'POST'])
+def handle_analysis_profiles():
+    session = Session()
+    try:
+        if request.method == 'GET':
+            rows = session.execute(text("SELECT * FROM analysis_profiles ORDER BY name")).mappings().all()
+            return jsonify([dict(r) for r in rows])
 
-@api_bp.route('/settings/zotero', methods=['GET'])
-def get_zotero_settings():
-    config_path = PROJECTS_DIR / 'zotero_config.json'
-    if config_path.exists():
-        with open(config_path, 'r') as f:
-            zotero_config = json.load(f)
-        return jsonify({'userId': zotero_config.get('user_id', ''), 'hasApiKey': bool(zotero_config.get('api_key'))})
-    return jsonify({'userId': '', 'hasApiKey': False})
+        if request.method == 'POST':
+            data = request.get_json(force=True)
+            profile = {
+                "id": str(uuid.uuid4()),
+                "name": data['name'],
+                "is_custom": True,
+                "preprocess_model": data['preprocess_model'],
+                "extract_model": data['extract_model'],
+                "synthesis_model": data['synthesis_model']
+            }
+            session.execute(text("""
+            INSERT INTO analysis_profiles (id, name, is_custom, preprocess_model, extract_model, synthesis_model)
+            VALUES (:id, :name, :is_custom, :preprocess_model, :extract_model, :synthesis_model)
+            """), profile)
+            session.commit()
+            return jsonify(profile), 201
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Erreur handle_analysis_profiles: {e}")
+        return jsonify({'error': 'Erreur interne'}), 500
+    finally:
+        session.close()
 
+# ALIAS pour compatibilité frontend: /analysis-profiles
+@api_bp.route('/analysis-profiles', methods=['GET', 'POST'])
+def handle_analysis_profiles_alias():
+    if request.method == 'GET':
+        return handle_analysis_profiles()
+    if request.method == 'POST':
+        return handle_analysis_profiles()
+
+@api_bp.route('/prompts', methods=['GET', 'POST'])
+def handle_prompts():
+    session = Session()
+    try:
+        if request.method == 'GET':
+            rows = session.execute(text("SELECT * FROM prompts ORDER BY name")).mappings().all()
+            return jsonify([dict(r) for r in rows])
+
+        if request.method == 'POST':
+            data = request.get_json(force=True)
+            session.execute(text("""
+            INSERT INTO prompts (name, description, template)
+            VALUES (:name, :description, :template)
+            ON CONFLICT (name) DO UPDATE SET
+              description = EXCLUDED.description,
+              template = EXCLUDED.template
+            """), {
+                "name": data['name'],
+                "description": data['description'],
+                "template": data['template']
+            })
+            session.commit()
+            return jsonify({'message': 'Prompt sauvegardé'}), 201
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Erreur handle_prompts: {e}")
+        return jsonify({'error': 'Erreur interne'}), 500
+    finally:
+        session.close()
+
+# --- Grilles d'extraction ---
+@api_bp.route('/projects/<project_id>/grids', methods=['GET', 'POST'])
+def handle_extraction_grids(project_id):
+    session = Session()
+    try:
+        if request.method == 'GET':
+            rows = session.execute(text("""
+            SELECT * FROM extraction_grids
+            WHERE project_id = :pid
+            ORDER BY created_at DESC
+            """), {"pid": project_id}).mappings().all()
+            return jsonify([dict(r) for r in rows])
+
+        if request.method == 'POST':
+            data = request.get_json(force=True)
+            grid = {
+                "id": str(uuid.uuid4()),
+                "project_id": project_id,
+                "name": data['name'],
+                "fields": json.dumps(data['fields']),
+                "created_at": datetime.now().isoformat()
+            }
+            session.execute(text("""
+            INSERT INTO extraction_grids (id, project_id, name, fields, created_at)
+            VALUES (:id, :project_id, :name, :fields, :created_at)
+            """), grid)
+            session.commit()
+            return jsonify(grid), 201
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Erreur handle_extraction_grids: {e}")
+        return jsonify({'error': 'Erreur interne'}), 500
+    finally:
+        session.close()
+
+# --- Paramètres Zotero ---
+@api_bp.route('/settings/zotero', methods=['GET', 'POST'])
+def handle_zotero_settings():
+    config_path = PROJECTS_DIR / 'zotero_config.json'
+    if request.method == 'GET':
+        if config_path.exists():
+            with open(config_path, 'r') as f:
+                zotero_config = json.load(f)
+            return jsonify({
+                'userId': zotero_config.get('user_id', ''),
+                'hasApiKey': bool(zotero_config.get('api_key'))
+            })
+        return jsonify({'userId': '', 'hasApiKey': False})
+
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        zotero_config = {
+            'user_id': data.get('userId'),
+            'api_key': data.get('apiKey')
+        }
+        with open(config_path, 'w') as f:
+            json.dump(zotero_config, f)
+        return jsonify({'message': 'Paramètres Zotero sauvegardés.'})
+
+# --- Import Zotero ---
 def add_manual_articles_to_project(project_id, article_ids):
     processed_ids = []
     session = Session()
@@ -561,11 +670,9 @@ def add_manual_articles_to_project(project_id, article_ids):
         for article_id in article_ids:
             if not article_id or not isinstance(article_id, str):
                 continue
-
             exists = session.execute(text("""
             SELECT 1 FROM search_results WHERE project_id = :pid AND article_id = :aid
             """), {"pid": project_id, "aid": article_id}).fetchone()
-
             if exists:
                 processed_ids.append(article_id)
                 continue
@@ -595,11 +702,9 @@ def add_manual_articles_to_project(project_id, article_ids):
         total_articles = session.execute(text(
             "SELECT COUNT(*) FROM search_results WHERE project_id = :pid"
         ), {"pid": project_id}).scalar_one()
-
         session.execute(text(
             "UPDATE projects SET pmids_count = :c WHERE id = :pid"
         ), {"c": total_articles, "pid": project_id})
-
         session.commit()
         return processed_ids
     except Exception as e:
@@ -613,7 +718,6 @@ def add_manual_articles_to_project(project_id, article_ids):
 def import_from_zotero(project_id):
     data = request.get_json(force=True)
     manual_ids = data.get('articles', [])
-
     try:
         with open(PROJECTS_DIR / 'zotero_config.json', 'r') as f:
             zotero_config = json.load(f)
@@ -632,14 +736,15 @@ def import_from_zotero(project_id):
         zotero_api_key=zotero_config.get('api_key'),
         job_timeout='1h'
     )
-
-    return jsonify({'message': f'Import Zotero lancé pour {len(article_ids_to_process)} articles.', 'job_id': job.id}), 202
+    return jsonify({
+        'message': f'Import Zotero lancé pour {len(article_ids_to_process)} articles.',
+        'job_id': job.id
+    }), 202
 
 @api_bp.route('/projects/<project_id>/import-zotero-file', methods=['POST'])
 def import_from_zotero_file(project_id):
     if 'file' not in request.files:
         return jsonify({'error': 'Aucun fichier fourni'}), 400
-
     file = request.files['file']
     if not file.filename.endswith('.json'):
         return jsonify({'error': 'Veuillez fournir un fichier .json'}), 400
@@ -648,7 +753,6 @@ def import_from_zotero_file(project_id):
     temp_dir.mkdir(exist_ok=True)
     temp_filename = f"{uuid.uuid4()}.json"
     temp_filepath = temp_dir / temp_filename
-
     try:
         file.save(str(temp_filepath))
     except Exception as e:
@@ -661,14 +765,12 @@ def import_from_zotero_file(project_id):
         json_file_path=str(temp_filepath),
         job_timeout='1h'
     )
-
     return jsonify({'message': 'Import du fichier Zotero lancé.', 'job_id': job.id}), 202
 
 @api_bp.route('/projects/<project_id>/fetch-online-pdfs', methods=['POST'])
 def fetch_online_pdfs(project_id):
     data = request.get_json(force=True)
     manual_ids = data.get('articles', [])
-
     article_ids_to_process = add_manual_articles_to_project(project_id, manual_ids)
     if not article_ids_to_process:
         return jsonify({'error': 'Aucun article valide à traiter pour ce projet.'}), 400
@@ -680,10 +782,11 @@ def fetch_online_pdfs(project_id):
             article_id=article_id,
             job_timeout='1h'
         )
+    return jsonify({
+        'message': f'Recherche OA lancée pour {len(article_ids_to_process)} articles.'
+    }), 202
 
-    return jsonify({'message': f'Recherche OA lancée pour {len(article_ids_to_process)} articles.'}), 202
-
-# --- Pipeline / Analyses ---
+# --- Pipeline d'analyse ---
 @api_bp.route('/projects/<project_id>/run', methods=['POST'])
 def run_project_pipeline(project_id):
     data = request.get_json(force=True)
@@ -698,7 +801,7 @@ def run_project_pipeline(project_id):
     session = Session()
     try:
         profile_row = session.execute(text("SELECT * FROM analysis_profiles WHERE id = :id"),
-                                     {"id": profile_id}).mappings().fetchone()
+                                      {"id": profile_id}).mappings().fetchone()
         if not profile_row:
             return jsonify({'error': f"Profil invalide: '{profile_id}'"}), 400
 
@@ -735,9 +838,7 @@ def run_project_pipeline(project_id):
                 custom_grid_id=custom_grid_id,
                 job_timeout=1800
             )
-
         return jsonify({"status": "processing"}), 202
-
     except Exception as e:
         session.rollback()
         logger.error(f"run_project_pipeline error: {e}", exc_info=True)
@@ -753,7 +854,7 @@ def run_synthesis_endpoint(project_id):
     session = Session()
     try:
         profile_row = session.execute(text("SELECT * FROM analysis_profiles WHERE id = :id"),
-                                     {"id": profile_id}).mappings().fetchone()
+                                      {"id": profile_id}).mappings().fetchone()
         if not profile_row:
             return jsonify({'error': f"Profil invalide: '{profile_id}'"}), 400
 
@@ -769,7 +870,6 @@ def run_synthesis_endpoint(project_id):
             "UPDATE projects SET status = 'synthesizing', job_id = :jid WHERE id = :pid"
         ), {"jid": job.id, "pid": project_id})
         session.commit()
-
         return jsonify({"status": "synthesizing", "message": "Synthèse lancée."}), 202
     finally:
         session.close()
@@ -780,11 +880,11 @@ def export_validations(project_id):
     session = Session()
     try:
         rows = session.execute(text("""
-            SELECT pmid, title, validations, relevance_score
-            FROM extractions
-            WHERE project_id = :pid AND validations IS NOT NULL
+        SELECT pmid, title, validations, relevance_score
+        FROM extractions
+        WHERE project_id = :pid AND validations IS NOT NULL
         """), {"pid": project_id}).mappings().all()
-        
+
         records = []
         for r in rows:
             try:
@@ -798,13 +898,12 @@ def export_validations(project_id):
                     })
             except Exception:
                 continue
-        
+
         if not records:
             return jsonify({"message": "Aucune validation évaluateur 1 à exporter."}), 404
-        
+
         df = pd.DataFrame(records)
         csv_data = df.to_csv(index=False)
-        
         return Response(
             csv_data,
             mimetype='text/csv',
@@ -815,18 +914,17 @@ def export_validations(project_id):
         return jsonify({"error": "Erreur interne du serveur"}), 500
     finally:
         session.close()
-        
+
 @api_bp.route('/projects/<project_id>/import-validations', methods=['POST'])
 def import_validations(project_id):
     if 'file' not in request.files:
         return jsonify({"error": "Aucun fichier fourni"}), 400
-
     file = request.files['file']
+
     session = Session()
     try:
         df = pd.read_csv(file.stream)
         normalized = {str(c).strip().lower(): c for c in df.columns}
-        
         if not {"articleid", "decision"}.issubset(set(normalized.keys())):
             return jsonify({"error": "Le fichier CSV doit contenir les colonnes ['articleId','decision']"}), 400
 
@@ -834,20 +932,18 @@ def import_validations(project_id):
         for _, row in df.iterrows():
             article_id = str(row[normalized["articleid"]]).strip()
             decision = str(row[normalized["decision"]]).strip().lower()
-            
-            # Normalisation FR/EN
-            mapping = {"inclure": "include", "inclu": "include", "include": "include",
-                      "exclure": "exclude", "exclu": "exclude", "exclude": "exclude"}
+            mapping = {
+                "inclure": "include", "inclu": "include", "include": "include",
+                "exclure": "exclude", "exclu": "exclude", "exclude": "exclude"
+            }
             decision = mapping.get(decision, decision)
-
             if not article_id or decision not in ("include", "exclude"):
                 continue
 
             ext = session.execute(text("""
-                SELECT id, validations FROM extractions
-                WHERE project_id = :pid AND pmid = :pmid
+            SELECT id, validations FROM extractions
+            WHERE project_id = :pid AND pmid = :pmid
             """), {"pid": project_id, "pmid": article_id}).mappings().fetchone()
-
             if not ext:
                 continue
 
@@ -855,16 +951,15 @@ def import_validations(project_id):
                 v = json.loads(ext["validations"]) if ext.get("validations") else {}
             except Exception:
                 v = {}
-
             v["evaluator2"] = decision
+
             session.execute(text("""
-                UPDATE extractions SET validations = :val WHERE id = :id
+            UPDATE extractions SET validations = :val WHERE id = :id
             """), {"val": json.dumps(v, ensure_ascii=False), "id": ext["id"]})
             updated += 1
 
         session.commit()
         return jsonify({"message": f"{updated} validations importées pour l'évaluateur 2."}), 200
-
     except Exception as e:
         session.rollback()
         logger.error(f"Erreur import validations: {e}", exc_info=True)
@@ -873,7 +968,7 @@ def import_validations(project_id):
         session.close()
 
 @api_bp.route('/projects/<project_id>/calculate-kappa', methods=['POST'])
-def calculate_kappa(project_id):
+def calculate_project_kappa(project_id):
     job = analysis_queue.enqueue(calculate_kappa_task, project_id=project_id, job_timeout='10m')
     return jsonify({"message": "Calcul du Kappa lancé.", "job_id": job.id}), 202
 
@@ -882,9 +977,11 @@ def get_inter_rater_stats(project_id):
     session = Session()
     try:
         row = session.execute(text("""
-            SELECT inter_rater_reliability FROM projects WHERE id = :pid
+        SELECT inter_rater_reliability FROM projects WHERE id = :pid
         """), {"pid": project_id}).mappings().fetchone()
-        return jsonify({"kappa_result": row["inter_rater_reliability"] if row else "Non calculé"})
+        return jsonify({
+            "kappa_result": row["inter_rater_reliability"] if row else "Non calculé"
+        })
     except Exception as e:
         logger.error(f"Erreur inter-rater stats: {e}", exc_info=True)
         return jsonify({"error": "Erreur interne du serveur"}), 500
@@ -892,410 +989,63 @@ def get_inter_rater_stats(project_id):
         session.close()
 
 # --- Analyses avancées ---
-@api_bp.route('/projects/<project_id>/generate-discussion', methods=['POST'])
-def generate_discussion(project_id):
-    job = analysis_queue.enqueue(run_discussion_generation_task, project_id=project_id, job_timeout='30m')
-    return jsonify({'message': 'Génération de discussion lancée.', 'job_id': job.id}), 202
-
-@api_bp.route('/projects/<project_id>/generate-knowledge-graph', methods=['POST'])
-def generate_knowledge_graph(project_id):
-    job = analysis_queue.enqueue(run_knowledge_graph_task, project_id=project_id, job_timeout='30m')
-    return jsonify({'message': 'Génération du graphe de connaissances lancée.', 'job_id': job.id}), 202
-
-@api_bp.route('/projects/<project_id>/generate-prisma-flow', methods=['POST'])
-def generate_prisma_flow(project_id):
-    job = analysis_queue.enqueue(run_prisma_flow_task, project_id=project_id, job_timeout='30m')
-    return jsonify({'message': 'Génération du diagramme PRISMA lancée.', 'job_id': job.id}), 202
-
-@api_bp.route('/projects/<project_id>/run-meta-analysis', methods=['POST'])
-def run_meta_analysis(project_id):
-    job = analysis_queue.enqueue(run_meta_analysis_task, project_id=project_id, job_timeout='30m')
-    return jsonify({'message': 'Méta-analyse lancée.', 'job_id': job.id}), 202
-
-@api_bp.route('/projects/<project_id>/run-descriptive-stats', methods=['POST'])
-def run_descriptive_stats(project_id):
-    job = analysis_queue.enqueue(run_descriptive_stats_task, project_id=project_id, job_timeout='30m')
-    return jsonify({'message': 'Statistiques descriptives lancées.', 'job_id': job.id}), 202
-
-# --- Profils d'analyse ---
-@api_bp.route('/analysis-profiles', methods=['GET'])
-def get_analysis_profiles():
-    session = Session()
-    try:
-        rows = session.execute(text("SELECT * FROM analysis_profiles ORDER BY is_custom, name")).mappings().all()
-        return jsonify([dict(r) for r in rows])
-    finally:
-        session.close()
-
-@api_bp.route('/analysis-profiles', methods=['POST'])
-def create_analysis_profile():
-    data = request.get_json(force=True)
-    required = ['name', 'preprocess_model', 'extract_model', 'synthesis_model']
-    if not all(field in data for field in required):
-        return jsonify({'error': 'Tous les champs sont requis'}), 400
-
-    profile_id = str(uuid.uuid4())
-    session = Session()
-    try:
-        session.execute(text("""
-        INSERT INTO analysis_profiles (id, name, is_custom, preprocess_model, extract_model, synthesis_model)
-        VALUES (:id, :name, 1, :pre, :ext, :syn)
-        """), {"id": profile_id, "name": data['name'], "pre": data['preprocess_model'],
-               "ext": data['extract_model'], "syn": data['synthesis_model']})
-        session.commit()
-        return jsonify({'message': 'Profil créé avec succès', 'id': profile_id}), 201
-    except Exception as e:
-        session.rollback()
-        if "unique" in str(e).lower():
-            return jsonify({'error': 'Un profil avec ce nom existe déjà'}), 409
-        logger.error(f"Erreur création profil: {e}")
-        return jsonify({'error': 'Erreur interne du serveur'}), 500
-    finally:
-        session.close()
-
-@api_bp.route('/analysis-profiles/<profile_id>', methods=['PUT'])
-def update_analysis_profile(profile_id):
-    data = request.get_json(force=True)
-    required = ['name', 'preprocess_model', 'extract_model', 'synthesis_model']
-    if not all(field in data for field in required):
-        return jsonify({'error': 'Tous les champs sont requis'}), 400
-
-    session = Session()
-    try:
-        res = session.execute(text("""
-        UPDATE analysis_profiles SET
-            name = :n, preprocess_model = :pre, extract_model = :ext, synthesis_model = :syn
-        WHERE id = :id AND is_custom = 1
-        """), {"n": data['name'], "pre": data['preprocess_model'], "ext": data['extract_model'],
-               "syn": data['synthesis_model'], "id": profile_id})
-        
-        if res.rowcount == 0:
-            return jsonify({'error': 'Profil non trouvé ou non modifiable'}), 404
-        
-        session.commit()
-        return jsonify({'message': 'Profil mis à jour avec succès'})
-    except Exception as e:
-        session.rollback()
-        if "unique" in str(e).lower():
-            return jsonify({'error': 'Un profil avec ce nom existe déjà'}), 409
-        logger.error(f"Erreur maj profil: {e}")
-        return jsonify({'error': 'Erreur interne du serveur'}), 500
-    finally:
-        session.close()
-
-@api_bp.route('/analysis-profiles/<profile_id>', methods=['DELETE'])
-def delete_analysis_profile(profile_id):
-    session = Session()
-    try:
-        res = session.execute(text("DELETE FROM analysis_profiles WHERE id = :id AND is_custom = 1"),
-                             {"id": profile_id})
-        if res.rowcount == 0:
-            return jsonify({'error': 'Profil non trouvé ou non modifiable'}), 404
-        
-        session.commit()
-        return jsonify({'message': 'Profil supprimé avec succès'})
-    except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur suppression profil: {e}")
-        return jsonify({'error': 'Erreur interne du serveur'}), 500
-    finally:
-        session.close()
-
-# --- Grilles d'extraction ---
-@api_bp.route('/projects/<project_id>/grids', methods=['GET', 'POST'])
-def grids_collection(project_id):
-    session = Session()
-    try:
-        if request.method == 'GET':
-            rows = session.execute(text("""
-            SELECT id, name, fields, created_at FROM extraction_grids
-            WHERE project_id = :pid ORDER BY created_at DESC
-            """), {"pid": project_id}).mappings().all()
-            
-            grids = []
-            for r in rows:
-                g = dict(r)
-                try:
-                    g['fields'] = json.loads(g['fields'])
-                except Exception:
-                    g['fields'] = []
-                grids.append(g)
-            return jsonify(grids)
-
-        if request.method == 'POST':
-            data = request.get_json(force=True)
-            name, fields = data.get('name'), data.get('fields')
-            if not name or not isinstance(fields, list) or not fields:
-                return jsonify({'error': 'Le nom et une liste de champs sont requis.'}), 400
-
-            grid_id = str(uuid.uuid4())
-            session.execute(text("""
-            INSERT INTO extraction_grids (id, project_id, name, fields, created_at)
-            VALUES (:id, :pid, :n, :f, :t)
-            """), {"id": grid_id, "pid": project_id, "n": name, "f": json.dumps(fields), 
-                   "t": datetime.now().isoformat()})
-            session.commit()
-            
-            return jsonify({"id": grid_id, "project_id": project_id, "name": name, "fields": fields,
-                           "created_at": datetime.now().isoformat()}), 201
-    except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur grids_collection: {e}", exc_info=True)
-        return jsonify({'error': 'Erreur interne du serveur'}), 500
-    finally:
-        session.close()
-
-@api_bp.route('/projects/<project_id>/grids/<grid_id>', methods=['PUT', 'DELETE'])
-def grid_resource(project_id, grid_id):
-    session = Session()
-    try:
-        if request.method == 'PUT':
-            data = request.get_json(force=True)
-            name, fields = data.get('name'), data.get('fields')
-            if not name or not isinstance(fields, list) or not fields:
-                return jsonify({'error': 'Le nom et une liste de champs sont requis.'}), 400
-
-            res = session.execute(text("""
-            UPDATE extraction_grids SET name = :n, fields = :f
-            WHERE id = :id AND project_id = :pid
-            """), {"n": name, "f": json.dumps(fields), "id": grid_id, "pid": project_id})
-            
-            if res.rowcount == 0:
-                return jsonify({'error': "Grille non trouvée ou n'appartient pas à ce projet."}), 404
-            
-            session.commit()
-            return jsonify({'message': 'Grille mise à jour avec succès.'})
-
-        if request.method == 'DELETE':
-            res = session.execute(text("""
-            DELETE FROM extraction_grids WHERE id = :id AND project_id = :pid
-            """), {"id": grid_id, "pid": project_id})
-            
-            if res.rowcount == 0:
-                return jsonify({'error': "Grille non trouvée ou n'appartient pas à ce projet."}), 404
-            
-            session.commit()
-            return jsonify({'message': 'Grille supprimée avec succès.'})
-    except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur grid_resource: {e}", exc_info=True)
-        return jsonify({'error': 'Erreur interne du serveur'}), 500
-    finally:
-        session.close()
-
-@api_bp.route('/projects/<project_id>/grids/import', methods=['POST'])
-def import_grid_from_file(project_id):
-    if 'file' not in request.files:
-        return jsonify({"error": "Aucun fichier n'a été envoyé"}), 400
-
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "Aucun fichier sélectionné"}), 400
-
-    if not file.filename.endswith('.json'):
-        return jsonify({"error": "Type de fichier non supporté. Veuillez utiliser un fichier .json"}), 400
-
-    try:
-        grid_data = json.load(file.stream)
-        grid_name = grid_data.get('name')
-        grid_fields = grid_data.get('fields')
-
-        if not grid_name or not isinstance(grid_fields, list):
-            return jsonify({"error": "Le JSON doit contenir 'name' et 'fields' (liste)"}), 400
-
-        session = Session()
-        try:
-            session.execute(text("""
-            INSERT INTO extraction_grids (id, project_id, name, fields, created_at)
-            VALUES (:id, :pid, :n, :f, :t)
-            """), {"id": str(uuid.uuid4()), "pid": project_id, "n": grid_name,
-                   "f": json.dumps(grid_fields), "t": datetime.now().isoformat()})
-            session.commit()
-        finally:
-            session.close()
-
-        return jsonify({"message": "Grille importée avec succès"}), 201
-    except json.JSONDecodeError:
-        return jsonify({"error": "Fichier JSON invalide"}), 400
-    except Exception as e:
-        logger.error(f"Erreur import grid: {e}", exc_info=True)
-        return jsonify({"error": "Erreur interne du serveur"}), 500
-
-# --- Prompts ---
-@api_bp.route('/prompts', methods=['GET'])
-def get_prompts():
-    session = Session()
-    try:
-        rows = session.execute(text("SELECT * FROM prompts ORDER BY name")).mappings().all()
-        return jsonify([dict(r) for r in rows])
-    finally:
-        session.close()
-
-# --- Modèles Ollama ---
-@api_bp.route('/ollama/models', methods=['GET'])
-def get_ollama_models():
-    try:
-        import requests
-        response = requests.get(f"{config.OLLAMA_BASE_URL}/api/tags", timeout=10)
-        if response.status_code == 200:
-            data = response.json()
-            return jsonify(data.get('models', []))
-        return jsonify([])
-    except Exception as e:
-        logger.error(f"Erreur get_ollama_models: {e}")
-        return jsonify([])
-
-@api_bp.route('/ollama/pull', methods=['POST'])
-def pull_ollama_model():
-    data = request.get_json(force=True)
-    model_name = data.get('model')
-    if not model_name:
-        return jsonify({'error': 'Nom du modèle requis'}), 400
-    
-    try:
-        # Lancer le téléchargement en arrière-plan
-        from tasks_v4_complete import pull_ollama_model_task
-        job = background_queue.enqueue(pull_ollama_model_task, model_name=model_name, job_timeout='1h')
-        return jsonify({'message': f'Téléchargement du modèle {model_name} lancé', 'job_id': job.id}), 202
-    except Exception as e:
-        logger.error(f"Erreur pull model: {e}")
-        return jsonify({'error': 'Erreur lors du lancement du téléchargement'}), 500
-
-# --- Files RQ (Unique et stables) ---
-
-@api_bp.route('/queues/info', methods=['GET'], endpoint='queues_info')
-def api_queues_info():
-    try:
-        queue_map = {
-            'processing': processing_queue,
-            'synthesis': synthesis_queue,
-            'analysis': analysis_queue,
-            'background': background_queue
-        }
-        info = []
-        for name, q in queue_map.items():
-            info.append({'name': name, 'size': len(q), 'workers': len(q.workers)})
-        return jsonify(info)
-    except Exception as e:
-        logger.error(f'Erreur queues info: {e}', exc_info=True)
-        return jsonify([]), 500
-
-@api_bp.route('/queues/<queue_name>/clear', methods=['POST'], endpoint='queues_clear')
-def api_queues_clear(queue_name):
-    try:
-        queue_map = {
-            'processing': processing_queue,
-            'synthesis': synthesis_queue,
-            'analysis': analysis_queue,
-            'background': background_queue
-        }
-        q = queue_map.get(queue_name)
-        if not q:
-            return jsonify({'error': 'File inconnue'}), 404
-        q.empty()
-        return jsonify({'message': f'File {queue_name} vidée'})
-    except Exception as e:
-        logger.error(f'Erreur clear queue: {e}', exc_info=True)
-        return jsonify({'error': 'Erreur lors du vidage'}), 500
-        
-# --- Analyses avancées ---
 @api_bp.route('/projects/<project_id>/run-analysis', methods=['POST'])
 def run_advanced_analysis(project_id):
     data = request.get_json(force=True)
     analysis_type = data.get('type')
-    
     if not analysis_type:
         return jsonify({'error': 'Type d\'analyse requis'}), 400
-    
     try:
         session = Session()
         session.execute(text("UPDATE projects SET status = 'generating_analysis' WHERE id = :pid"),
-                       {"pid": project_id})
+                        {"pid": project_id})
         session.commit()
         session.close()
-        
         if analysis_type == 'meta_analysis':
-            from tasks_v4_complete import run_meta_analysis_task
             job = analysis_queue.enqueue(run_meta_analysis_task, project_id=project_id, job_timeout='30m')
         elif analysis_type == 'atn_scores':
-            from tasks_v4_complete import run_atn_score_task
             job = analysis_queue.enqueue(run_atn_score_task, project_id=project_id, job_timeout='30m')
         elif analysis_type == 'discussion':
-            from tasks_v4_complete import run_discussion_generation_task
             job = analysis_queue.enqueue(run_discussion_generation_task, project_id=project_id, job_timeout='30m')
         elif analysis_type == 'knowledge_graph':
-            from tasks_v4_complete import run_knowledge_graph_task
             job = analysis_queue.enqueue(run_knowledge_graph_task, project_id=project_id, job_timeout='30m')
         elif analysis_type == 'prisma_flow':
-            from tasks_v4_complete import run_prisma_flow_task
             job = analysis_queue.enqueue(run_prisma_flow_task, project_id=project_id, job_timeout='30m')
         else:
             return jsonify({'error': 'Type d\'analyse non supporté'}), 400
-            
         return jsonify({'message': f'Analyse {analysis_type} lancée', 'job_id': job.id}), 202
     except Exception as e:
         logger.error(f"Erreur run analysis: {e}")
         return jsonify({'error': 'Erreur lors du lancement de l\'analyse'}), 500
 
-# --- Validation inter-évaluateurs ---
-@api_bp.route('/projects/<project_id>/calculate-kappa', methods=['POST'])
-def calculate_project_kappa(project_id):
-    try:
-        from tasks_v4_complete import calculate_kappa_task
-        job = background_queue.enqueue(calculate_kappa_task, project_id=project_id, job_timeout='15m')
-        return jsonify({'message': 'Calcul du Kappa lancé', 'job_id': job.id}), 202
-    except Exception as e:
-        logger.error(f"Erreur calculate kappa: {e}")
-        return jsonify({'error': 'Erreur lors du calcul du Kappa'}), 500
-
 # --- Chat RAG ---
-@api_bp.route('/projects/<project_id>/chat', methods=['POST'])
-def api_project_chat(project_id):
-    data = request.get_json(force=True)
-    question = data.get('question', '').strip()
-    profile_id = data.get('profile', 'standard')
+@api_bp.route('/projects/<project_id>/chat', methods=['POST', 'GET'])
+def handle_project_chat(project_id):
+    if request.method == 'GET':
+        session = Session()
+        try:
+            rows = session.execute(text("""
+            SELECT * FROM chat_messages
+            WHERE project_id = :pid
+            ORDER BY timestamp ASC
+            """), {"pid": project_id}).mappings().all()
+            return jsonify([dict(r) for r in rows])
+        finally:
+            session.close()
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        question = data.get('question', '').strip()
+        if not question:
+            return jsonify({'error': 'La question est requise.'}), 400
+        job = background_queue.enqueue(
+            answer_chat_question_task,
+            project_id=project_id,
+            question=question,
+            job_timeout='15m'
+        )
+        return jsonify({'message': 'Question envoyée au moteur RAG.', 'job_id': job.id}), 202
 
-    if not question:
-        return jsonify({'error': 'La question est requise.'}), 400
-
-    session = Session()
-    try:
-        profile_row = session.execute(text("SELECT * FROM analysis_profiles WHERE id = :id"),
-                                     {"id": profile_id}).mappings().fetchone()
-        profile = dict(profile_row) if profile_row else {'synthesis_model': 'llama3.1:8b'}
-    finally:
-        session.close()
-
-    job = background_queue.enqueue(
-        answer_chat_question_task,
-        project_id=project_id,
-        question=question,
-        profile=profile,
-        job_timeout='15m'
-    )
-
-    return jsonify({'message': 'Question envoyée au moteur RAG.', 'job_id': job.id}), 202
-
-# --- Pull d’un modèle Ollama (optionnel) ---
-@api_bp.route('/ollama/pull', methods=['POST'])
-def ollama_pull_model():
-    data = request.get_json(force=True)
-    model = data.get('model')
-    if not model:
-        return jsonify({'error': 'Champ "model" requis.'}), 400
-
-    # Tâche de pull si elle existe, sinon appel direct REST
-    try:
-        import requests
-        resp = requests.post(f"{config.OLLAMA_BASE_URL}/api/pull", json={"name": model}, timeout=10, stream=True)
-        if resp.status_code not in (200, 201):
-            return jsonify({'error': f"Échec du pull du modèle {model}"}), 500
-        return jsonify({'message': f'Modèle {model} en cours de pull.'}), 202
-    except Exception as e:
-        logger.error(f"Erreur ollama_pull_model: {e}", exc_info=True)
-        return jsonify({'error': 'Erreur côté Ollama'}), 500
-
-# --- Lister les modèles Ollama installés ---
+# --- Ollama ---
 @api_bp.route('/ollama/models', methods=['GET'])
 def list_ollama_models():
     import requests
@@ -1313,20 +1063,72 @@ def list_ollama_models():
         logger.error(f"Erreur /ollama/models: {e}", exc_info=True)
         return jsonify([]), 200
 
-# --- Export projet (ZIP) ---
+@api_bp.route('/ollama/pull', methods=['POST'])
+def ollama_pull_model():
+    data = request.get_json(force=True)
+    model = data.get('model')
+    if not model:
+        return jsonify({'error': 'Champ "model" requis.'}), 400
+    try:
+        job = background_queue.enqueue(pull_ollama_model_task, model_name=model, job_timeout='1h')
+        return jsonify({'message': f'Téléchargement du modèle {model} lancé', 'job_id': job.id}), 202
+    except Exception as e:
+        logger.error(f"Erreur pull model: {e}")
+        return jsonify({'error': 'Erreur lors du lancement du téléchargement'}), 500
+
+# --- Statut des files ---
+@api_bp.route('/queues/info', methods=['GET'])
+def get_queues_information():
+    try:
+        queues_info = []
+        queue_map = {
+            'processing': processing_queue,
+            'synthesis': synthesis_queue,
+            'analysis': analysis_queue,
+            'background': background_queue
+        }
+        for name, queue in queue_map.items():
+            queues_info.append({
+                'name': name,
+                'size': len(queue),
+                'workers': len(queue.workers)
+            })
+        return jsonify(queues_info)
+    except Exception as e:
+        logger.error(f"Erreur queues info: {e}")
+        return jsonify([]), 500
+
+@api_bp.route('/queues/<queue_name>/clear', methods=['POST'])
+def clear_specific_queue(queue_name):
+    try:
+        queue_map = {
+            'processing': processing_queue,
+            'synthesis': synthesis_queue,
+            'analysis': analysis_queue,
+            'background': background_queue
+        }
+        if queue_name not in queue_map:
+            return jsonify({'error': 'File inconnue'}), 404
+        queue_map[queue_name].empty()
+        return jsonify({'message': f'File {queue_name} vidée'})
+    except Exception as e:
+        logger.error(f"Erreur clear queue: {e}")
+        return jsonify({'error': 'Erreur lors du vidage'}), 500
+
+# --- Export projet ---
 @api_bp.route('/projects/<project_id>/export', methods=['GET'])
 def export_project(project_id):
     session = Session()
     try:
-        proj = session.execute(text("SELECT * FROM projects WHERE id = :pid"), {"pid": project_id}).mappings().fetchone()
+        proj = session.execute(text("SELECT * FROM projects WHERE id = :pid"),
+                               {"pid": project_id}).mappings().fetchone()
         if not proj:
             return jsonify({'error': 'Projet introuvable'}), 404
 
-        # Récupérer données
         results = session.execute(text("SELECT * FROM search_results WHERE project_id = :pid"),
                                   {"pid": project_id}).mappings().all()
         extractions = session.execute(text("SELECT * FROM extractions WHERE project_id = :pid"),
-                                     {"pid": project_id}).mappings().all()
+                                      {"pid": project_id}).mappings().all()
         logs = session.execute(text("SELECT * FROM processing_log WHERE project_id = :pid ORDER BY timestamp DESC"),
                                {"pid": project_id}).mappings().all()
         grids = session.execute(text("SELECT * FROM extraction_grids WHERE project_id = :pid"),
@@ -1334,7 +1136,6 @@ def export_project(project_id):
         chats = session.execute(text("SELECT * FROM chat_messages WHERE project_id = :pid ORDER BY timestamp"),
                                 {"pid": project_id}).mappings().all()
 
-        # Construire ZIP en mémoire
         buf = io.BytesIO()
         with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
             zf.writestr('project.json', json.dumps(dict(proj), ensure_ascii=False, indent=2))
@@ -1344,47 +1145,165 @@ def export_project(project_id):
             zf.writestr('extraction_grids.json', json.dumps([dict(g) for g in grids], ensure_ascii=False, indent=2))
             zf.writestr('chat_messages.json', json.dumps([dict(c) for c in chats], ensure_ascii=False, indent=2))
 
-            # Joindre éventuellement les fichiers du projet (PDF, images)
-            pdir = PROJECTS_DIR / project_id
-            if pdir.exists():
-                for fp in pdir.glob('*'):
-                    if fp.is_file():
-                        zf.write(fp, arcname=f"files/{fp.name}")
+            project_dir = PROJECTS_DIR / project_id
+            if project_dir.exists():
+                for pdf_file in project_dir.glob("*.pdf"):
+                    zf.write(pdf_file, f"pdfs/{pdf_file.name}")
 
         buf.seek(0)
         return Response(
             buf.getvalue(),
             mimetype='application/zip',
-            headers={'Content-Disposition': f'attachment; filename=project_{project_id}.zip'}
+            headers={'Content-Disposition': f'attachment; filename=project_{project_id}_export.zip'}
         )
     except Exception as e:
-        logger.error(f"Erreur export_project: {e}", exc_info=True)
-        return jsonify({'error': 'Erreur lors de la génération de l’export'}), 500
+        logger.error(f"Erreur export projet: {e}")
+        return jsonify({'error': 'Erreur lors de l\'export'}), 500
+    finally:
+        session.close()
+
+@api_bp.route('/projects/<project_id>/add-manual-articles', methods=['POST'])
+def add_manual_articles(project_id):
+    """Ajoute manuellement des articles au projet via leurs identifiants."""
+    data = request.get_json(force=True)
+    articles = data.get('articles', [])
+    fetch_metadata = data.get('fetch_metadata', True)
+
+    if not articles:
+        return jsonify({'error': 'Liste d\'articles requise'}), 400
+
+    session = Session()
+    try:
+        added_count = 0
+        failed_count = 0
+        failed_articles = []
+
+        for article_id in articles:
+            if not article_id or not isinstance(article_id, str):
+                failed_count += 1
+                continue
+
+            # Vérifier si l'article existe déjà
+            exists = session.execute(text("""
+                SELECT 1 FROM search_results WHERE project_id = :pid AND article_id = :aid
+            """), {"pid": project_id, "aid": article_id}).fetchone()
+
+            if exists:
+                continue  # Ignorer les doublons
+
+            # Récupérer les métadonnées si demandé
+            if fetch_metadata:
+                try:
+                    details = fetch_article_details(article_id)
+                    if details and details.get('title') != 'Erreur de récupération':
+                        session.execute(text("""
+                            INSERT INTO search_results (
+                                id, project_id, article_id, title, abstract, authors,
+                                publication_date, journal, doi, url, database_source, created_at
+                            ) VALUES (
+                                :id, :pid, :aid, :title, :abstract, :authors,
+                                :pub_date, :journal, :doi, :url, :db_source, :ts
+                            )
+                        """), {
+                            "id": str(uuid.uuid4()),
+                            "pid": project_id,
+                            "aid": article_id,
+                            "title": details.get('title', 'Titre non trouvé'),
+                            "abstract": details.get('abstract', ''),
+                            "authors": details.get('authors', ''),
+                            "pub_date": details.get('publication_date', ''),
+                            "journal": details.get('journal', ''),
+                            "doi": details.get('doi', ''),
+                            "url": details.get('url', ''),
+                            "db_source": 'manual',
+                            "ts": datetime.now().isoformat()
+                        })
+                        added_count += 1
+                    else:
+                        failed_articles.append(article_id)
+                        failed_count += 1
+                except Exception as e:
+                    logger.warning(f"Erreur récupération métadonnées pour {article_id}: {e}")
+                    failed_articles.append(article_id)
+                    failed_count += 1
+            else:
+                # Ajouter l'article sans métadonnées
+                session.execute(text("""
+                    INSERT INTO search_results (
+                        id, project_id, article_id, title, database_source, created_at
+                    ) VALUES (
+                        :id, :pid, :aid, :title, :db_source, :ts
+                    )
+                """), {
+                    "id": str(uuid.uuid4()),
+                    "pid": project_id,
+                    "aid": article_id,
+                    "title": f"Article {article_id}",
+                    "db_source": 'manual',
+                    "ts": datetime.now().isoformat()
+                })
+                added_count += 1
+
+        # Mettre à jour le compteur du projet
+        total_articles = session.execute(text(
+            "SELECT COUNT(*) FROM search_results WHERE project_id = :pid"
+        ), {"pid": project_id}).scalar_one()
+
+        session.execute(text(
+            "UPDATE projects SET pmids_count = :c, updated_at = :ts WHERE id = :pid"
+        ), {"c": total_articles, "ts": datetime.now().isoformat(), "pid": project_id})
+
+        session.commit()
+
+        message = f"{added_count} article(s) ajouté(s)"
+        if failed_count > 0:
+            message += f", {failed_count} échec(s)"
+
+        send_project_notification(project_id, 'articles_added', message)
+
+        return jsonify({
+            'message': message,
+            'added_count': added_count,
+            'failed_count': failed_count,
+            'failed_articles': failed_articles
+        }), 200
+
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Erreur add_manual_articles: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur interne du serveur'}), 500
     finally:
         session.close()
     
-# --- Enregistrement Blueprint API ---
+# ================================================================
+# 3) WebSocket Events
+# ================================================================
+@socketio.on('connect')
+def handle_connect(auth):
+    logger.info(f"Client connecté: {request.sid}")
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    logger.info(f"Client déconnecté: {request.sid}")
+
+@socketio.on('join_room')
+def handle_join_room(data):
+    room = data.get('room')
+    if room:
+        from flask_socketio import join_room, emit
+        join_room(room)
+        emit('room_joined', {'project_id': room})
+        logger.info(f"Client {request.sid} a rejoint la room {room}")
+
+# ================================================================
+# 4) Enregistrement du blueprint et route front
+# ================================================================
 app.register_blueprint(api_bp)
 
-# --- Routes statiques (SPA) ---
 @app.route('/')
-def index_root():
+def serve_frontend():
     return app.send_static_file('index.html')
 
-# --- Socket.IO hooks de base ---
-@socketio.on('join_room')
-def on_join_room(data):
-    try:
-        room = data.get('room')
-        if room:
-            from flask_socketio import join_room, emit
-            join_room(room)
-            emit('room_joined', {'project_id': room})
-    except Exception as e:
-        logger.error(f"join_room error: {e}", exc_info=True)
-
-# --- Entrée Gunicorn/Flask ---
 if __name__ == '__main__':
-    # Pour développement local (non utilisé en production avec Gunicorn)
     init_db()
-    socketio.run(app, host='0.0.0.0', port=5001)
+    socketio.run(app, host='0.0.0.0', port=5001, debug=True)

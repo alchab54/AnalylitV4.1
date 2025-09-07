@@ -1,4 +1,5 @@
-# utils/helpers.py - Fonctions utilitaires diverses
+# utils/helpers.py - Fonctions utilitaires diverses (corrigé)
+
 import logging
 import requests
 import time
@@ -11,24 +12,19 @@ logger = logging.getLogger(__name__)
 def http_get_with_retries(url: str, timeout: int = 30, max_retries: int = 3) -> Optional[requests.Response]:
     """Effectue une requête GET avec retry automatique."""
     session = requests.Session()
-    
-    # Configuration des retry
     retry_strategy = Retry(
         total=max_retries,
         status_forcelist=[429, 500, 502, 503, 504],
-        method_whitelist=["HEAD", "GET", "OPTIONS"],
-        backoff_factor=1
+        allowed_methods=["HEAD", "GET", "OPTIONS"],
+        backoff_factor=1,
     )
-    
     adapter = HTTPAdapter(max_retries=retry_strategy)
     session.mount("http://", adapter)
     session.mount("https://", adapter)
-    
     try:
         response = session.get(url, timeout=timeout)
         response.raise_for_status()
         return response
-        
     except Exception as e:
         logger.error(f"Erreur HTTP GET {url}: {e}")
         return None
@@ -46,27 +42,20 @@ def format_file_size(size_bytes: int) -> str:
     """Formate une taille de fichier de manière lisible."""
     if size_bytes == 0:
         return "0 B"
-    
     size_names = ["B", "KB", "MB", "GB"]
     i = 0
     while size_bytes >= 1024 and i < len(size_names) - 1:
         size_bytes /= 1024.0
         i += 1
-    
     return f"{size_bytes:.1f} {size_names[i]}"
 
 def clean_text(text: str) -> str:
     """Nettoie et normalise du texte."""
     if not text:
         return ""
-    
-    # Supprime les espaces multiples
     import re
     text = re.sub(r'\s+', ' ', text)
-    
-    # Supprime les espaces en début/fin
     text = text.strip()
-    
     return text
 
 def validate_email(email: str) -> bool:
@@ -83,5 +72,4 @@ def truncate_text(text: str, max_length: int = 100, suffix: str = "...") -> str:
     """Tronque un texte à une longueur maximale."""
     if not text or len(text) <= max_length:
         return text
-    
     return text[:max_length - len(suffix)] + suffix

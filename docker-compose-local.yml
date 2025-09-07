@@ -78,6 +78,12 @@ services:
         condition: service_healthy
     deploy:
       replicas: 1
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     networks:
       - analylit-network
 
@@ -121,6 +127,8 @@ services:
     depends_on:
       web:
         condition: service_healthy
+    volumes:
+      - ./web:/usr/share/nginx/html
     networks:
       - analylit-network
 
