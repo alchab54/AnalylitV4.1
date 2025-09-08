@@ -2580,22 +2580,41 @@ async function handleBulkPDFUpload(event) {
     }
 
     // Initialisation finale
-    window.analylit = {
-        // API publique pour les fonctions accessibles depuis le HTML
-        toggleArticleSelection,
-        selectAllArticles,
-        toggleAbstractRow,
-        showExtractionDetails,
-        handleValidationAction,
-        handleSendChatMessage,
-        handleManualArticleImport,
-        handleExportValidations: () => handleExportValidations(appState.currentProject?.id),
-        handleImportValidations: () => handleImportValidations(appState.currentProject?.id),
-        handleCalculateKappa: () => handleCalculateKappa(appState.currentProject?.id),
-        handleSaveZoteroSettings,
-        handlePullOllamaModel,
-        handleClearQueue
-    };
+// ============================
+// INITIALISATION FINALE
+// ============================
+
+    // Exposer certaines fonctions globalement pour les événements inline HTML
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+    window.showSection = showSection;
+    window.loadProjectSearchResults = loadProjectSearchResults;
+
+    // Exposition contrôlée des handlers au scope global (évite ReferenceError)
+    window.handleZoteroFileUpload = typeof handleZoteroFileUpload === 'function' ? handleZoteroFileUpload : () => {};
+    window.handleImportValidations = typeof handleImportValidations === 'function' ? handleImportValidations : () => {};
+    window.handleExportValidations = typeof handleExportValidations === 'function' ? handleExportValidations : () => {};
+    window.handleCalculateKappa = typeof handleCalculateKappa === 'function' ? handleCalculateKappa : () => {};
+
+    window.handleRunIndexing = typeof handleRunIndexing === 'function' ? handleRunIndexing : () => {};
+    window.handleFetchOnlinePdfs = typeof handleFetchOnlinePdfs === 'function' ? handleFetchOnlinePdfs : () => {};
+    window.handleManualPDFUpload = typeof handleManualPDFUpload === 'function' ? handleManualPDFUpload : () => {};
+    window.handleImportZotero = typeof handleImportZotero === 'function' ? handleImportZotero : () => {};
+    window.handlePullModel = typeof handlePullModel === 'function' ? handlePullModel : () => {};
+    window.handleSaveZoteroSettings = typeof handleSaveZoteroSettings === 'function' ? handleSaveZoteroSettings : () => {};
+    window.handleClearQueue = typeof handleClearQueue === 'function' ? handleClearQueue : () => {};
+    window.sendChatMessage = typeof sendChatMessage === 'function' ? sendChatMessage : () => {};
+    window.clearChatHistory = typeof clearChatHistory === 'function' ? clearChatHistory : () => {};
+
+    window.openGridModal = typeof openGridModal === 'function' ? openGridModal : () => {};
+    window.handleDeleteGrid = typeof handleDeleteGrid === 'function' ? handleDeleteGrid : () => {};
+    window.openPromptModal = typeof openPromptModal === 'function' ? openPromptModal : () => {};
+    window.openProfileModal = typeof openProfileModal === 'function' ? openProfileModal : () => {};
+    window.handleDeleteProfile = typeof handleDeleteProfile === 'function' ? handleDeleteProfile : () => {};
+
+    window.runAdvancedAnalysis = typeof runAdvancedAnalysis === 'function' ? runAdvancedAnalysis : () => {};
+    window.viewAnalysisPlot = typeof viewAnalysisPlot === 'function' ? viewAnalysisPlot : () => {};
     
-    console.log('AnalyLit v4.1 initialisé');
+    // Log de fin de chargement
+    console.log('✅ AnalyLit V4.1 Frontend - Chargement complet terminé');
 })();
