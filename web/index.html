@@ -37,37 +37,42 @@
     <nav class="app-nav">
         <div class="container">
             <ul class="app-nav__list">
-                <li class="app-nav__item">
-                    <button class="app-nav__button app-nav__button--active" data-section="projects">
-                        📁 Projets
-                    </button>
-                </li>
-                <li class="app-nav__item">
-                    <button class="app-nav__button" data-section="results">
-                        📄 Résultats
-                    </button>
-                </li>
-                <li class="app-nav__item">
-                    <button class="app-nav__button" data-section="analyses">
-                        📊 Analyses
-                    </button>
-                </li>
-                <li class="app-nav__item">
-                    <button class="app-nav__button" data-section="import">
-                        📚 Import & Fichiers
-                    </button>
-                </li>
-                <li class="app-nav__item">
-                    <button class="app-nav__button" data-section="chat">
-                        💬 Chat
-                    </button>
-                </li>
-                <li class="app-nav__item">
-                    <button class="app-nav__button" data-section="settings">
-                        ⚙️ Paramètres
-                    </button>
-                </li>
-            </ul>
+				<li class="app-nav__item">
+					<button class="app-nav__button app-nav__button--active" data-section="projects">
+						📁 Projets
+					</button>
+				</li>
+				<li class="app-nav__item">
+					<button class="app-nav__button" data-section="results">
+						📄 Résultats
+					</button>
+				</li>
+				<li class="app-nav__item">
+					<button class="app-nav__button" data-section="validation">
+						⚖️ Validation
+					</button>
+				</li>
+				<li class="app-nav__item">
+					<button class="app-nav__button" data-section="analyses">
+						📊 Analyses
+					</button>
+				</li>
+				<li class="app-nav__item">
+					<button class="app-nav__button" data-section="import">
+						📚 Import & Fichiers
+					</button>
+				</li>
+				<li class="app-nav__item">
+					<button class="app-nav__button" data-section="chat">
+						💬 Chat
+					</button>
+				</li>
+				<li class="app-nav__item">
+					<button class="app-nav__button" data-section="settings">
+						⚙️ Paramètres
+					</button>
+				</li>
+			</ul>
         </div>
     </nav>
 
@@ -132,6 +137,22 @@
                     </div>
                 </div>
             </section>
+			
+			<section class="section" data-section="validation">
+				<div class="section-header">
+					<div class="section-header__content">
+						<h2>Validation Inter-Évaluateurs</h2>
+						<p>Comparez les décisions, importez/exportez les validations et calculez le Kappa.</p>
+					</div>
+				</div>
+				<div id="validationContainer">
+					<div class="validation-placeholder">
+						<span class="validation-placeholder__icon">⚖️</span>
+						<h3>Aucun projet sélectionné</h3>
+						<p>Sélectionnez un projet pour voir les données de validation.</p>
+					</div>
+				</div>
+			</section>
 
             <!-- Section Analyses -->
             <section class="section" data-section="analyses">
@@ -354,7 +375,38 @@
             <div class="loading-overlay__message">Chargement...</div>
         </div>
     </div>
+	<div class="loading-overlay" id="loadingOverlay">
+		<div class="loading-overlay__content">
+			<div class="loading-spinner loading-spinner--lg"></div>
+			<div class="loading-overlay__message">Chargement...</div>
+		</div>
+	</div>
 
+	<div id="modalsContainer">
+		<div id="promptEditorModal" class="modal" tabindex="-1">
+			<div class="modal__content modal__content--large">
+				<div class="modal__header">
+					<h3 id="promptEditorTitle" class="modal__title">Modifier le Prompt</h3>
+					<button class="modal__close" onclick="closeModal()">&times;</button>
+				</div>
+				<div class="modal__body">
+					<form onsubmit="handleSavePrompt(event)">
+						<input type="hidden" id="promptNameInput">
+						<div class="form-group">
+							<label for="promptTemplateTextarea" class="form-label">Template du Prompt</label>
+							<textarea id="promptTemplateTextarea" name="template" class="form-control" rows="15" required></textarea>
+							<div class="form-text">Variables disponibles : {title}, {abstract}, {text}, {database_source}, etc.</div>
+						</div>
+						<div class="modal__actions">
+							<button type="button" class="btn btn--secondary" onclick="closeModal()">Annuler</button>
+							<button type="submit" class="btn btn--primary">Sauvegarder</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	
     <!-- Conteneur des notifications toast -->
     <div class="toast-container" id="toastContainer">
         <!-- Toasts générés dynamiquement -->
