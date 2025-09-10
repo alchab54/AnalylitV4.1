@@ -82,43 +82,84 @@ function renderSearchResultsTable() {
         return;
     }
 
-    // En-têtes de tableau cliquables pour le tri
-    const headers = `
-        <th class="sortable" onclick="sortResults('relevance_score')">Score IA</th>
-        <th class="sortable" onclick="sortResults('title')">Titre</th>
-        <th class="sortable" onclick="sortResults('publication_date')">Année</th>
-        <th>Auteurs</th>
-        <th>PDF</th>
-    `;
+    // Regrouper les articles par source
+    const groupedBySource = articles.reduce((acc, article) => {
+        const source = article.database_source || 'Inconnue';
+        if (!acc[source]) {
+            acc[source] = [];
+        }
+        acc[source].push(article);
+        return acc;
+    }, {});
 
-    const rows = articles.map(article => {
-        const extraction = appState.currentProjectExtractions.find(e => e.pmid === article.article_id) || {};
-        const hasPdf = hasPdfForArticle(article.article_id);
-
-        return `
-            <tr class="${extraction.user_validation_status === 'include' ? 'row-included' : ''}">
-                <td>${(extraction.relevance_score || 0).toFixed(1)}</td>
-                <td>${escapeHtml(article.title)}</td>
-                <td>${escapeHtml(article.publication_date)}</td>
-                <td>${escapeHtml(article.authors)}</td>
-                <td>${hasPdf ? '✔️' : '❌'}</td>
-            </tr>
+    let tableHtml = '';
+    for (const source in groupedBySource) {
+        const sourceArticles = groupedBySource[source];
+        tableHtml += `
+            <h4 class="source-group-header">${escapeHtml(source)} (${sourceArticles.length})</h4>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)"></th>
+                            <th class="sortable" onclick="sortResults('relevance_score')">Score</th>
+                            <th class="sortable" onclick="sortResults('title')">Titre</th>
+                            <th class="sortable" onclick="sortResults('publication_date')">Année</th>
+                            <th>Auteurs</th>
+                            <th>PDF</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sourceArticles.map(article => {
+                            const extraction = appState.currentProjectExtractions.find(e => e.pmid === article.article_id) || {};
+                            const hasPdf = hasPdfForArticle(article.article_id);
+                            const isSelected = appState.selectedSearchResults.has(article.article_id);
+                            return `
+                                <tr class="${extraction.user_validation_status === 'include' ? 'row-included' : ''}">
+                                    <td><input type="checkbox" class="article-checkbox" data-id="${article.article_id}" ${isSelected ? 'checked' : ''}></td>
+                                    <td>${(extraction.relevance_score || 0).toFixed(1)}</td>
+                                    <td>${escapeHtml(article.title)}</td>
+                                    <td>${escapeHtml(article.publication_date)}</td>
+                                    <td>${escapeHtml(article.authors)}</td>
+                                    <td>${hasPdf ? '✔️' : '❌'}</td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
         `;
-    }).join('');
+    }
 
     container.innerHTML = `
         <div class="card">
             <div class="card__header">
-                <h4>${articles.length} Articles</h4>
+                <div class="results-header-left">
+                    <h4>${articles.length} Articles</h4>
+                    <div id="selection-counter">0 article(s) sélectionné(s)</div>
+                </div>
+                <div class="results-header-right">
+                    <button class="btn btn--danger btn--sm" onclick="handleDeleteSelectedArticles()">Supprimer la sélection</button>
+                </div>
             </div>
-            <div class="table-container">
-                <table class="table">
-                    <thead><tr>${headers}</tr></thead>
-                    <tbody>${rows}</tbody>
-                </table>
+            <div class="card__body">
+                ${tableHtml}
             </div>
         </div>
     `;
+
+    // Attacher les listeners pour les checkboxes
+    document.querySelectorAll('.article-checkbox').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+            const id = e.target.dataset.id;
+            if (e.target.checked) {
+                appState.selectedSearchResults.add(id);
+            } else {
+                appState.selectedSearchResults.delete(id);
+            }
+            updateSelectionCounter();
+        });
+    });
 }
 
 let sortState = { key: 'relevance_score', asc: false };
@@ -151,6 +192,59 @@ function sortResults(key) {
     renderSearchResultsTable();
 }
 
+function toggleSelectAll(checked) {
+    const checkboxes = document.querySelectorAll('.article-checkbox');
+    checkboxes.forEach(cb => {
+        const id = cb.dataset.id;
+        cb.checked = checked;
+        if (checked) {
+            appState.selectedSearchResults.add(id);
+        } else {
+            appState.selectedSearchResults.delete(id);
+        }
+    });
+    updateSelectionCounter();
+}
+
+function updateSelectionCounter() {
+    const counter = document.getElementById('selection-counter');
+    if (counter) {
+        counter.textContent = `${appState.selectedSearchResults.size} article(s) sélectionné(s)`;
+    }
+}
+
+async function handleDeleteSelectedArticles() {
+    const selectedIds = Array.from(appState.selectedSearchResults);
+    if (selectedIds.length === 0) {
+        showToast('Aucun article sélectionné.', 'warning');
+        return;
+    }
+
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer définitivement ${selectedIds.length} article(s) ?`)) {
+        return;
+    }
+
+    showLoadingOverlay(true, 'Suppression en cours...');
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/articles`, {
+            method: 'DELETE',
+            body: { article_ids: selectedIds }
+        });
+        
+        // Mettre à jour l'état local pour refléter la suppression
+        appState.searchResults = appState.searchResults.filter(a => !selectedIds.includes(a.article_id));
+        appState.currentProjectExtractions = appState.currentProjectExtractions.filter(e => !selectedIds.includes(e.pmid));
+        appState.selectedSearchResults.clear();
+        
+        showToast('Articles supprimés avec succès.', 'success');
+        renderSearchResultsTable(); // Re-afficher le tableau mis à jour
+    } catch (error) {
+        showToast(`Erreur : ${error.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
 // Fonction utilitaire pour vérifier la présence d'un PDF
 function hasPdfForArticle(articleId) {
     if (!appState.projectFiles) return false;
@@ -160,3 +254,8 @@ function hasPdfForArticle(articleId) {
 function sanitizeForFilename(name) {
     return String(name || '').replace(/[<>:"/\\|?*]/g, '_').trim();
 }
+
+
+// Assurez-vous d'exposer les nouvelles fonctions si elles sont appelées par onclick
+window.toggleSelectAll = toggleSelectAll;
+window.handleDeleteSelectedArticles = handleDeleteSelectedArticles;
