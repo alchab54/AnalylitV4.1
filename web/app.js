@@ -1,7 +1,6 @@
 // ================================================================
 // AnalyLit V4.1 - Application Frontend (Version finale consolidée)
 // ================================================================
-
 import { fetchAPI } from './js/api.js';
 import { loadProjects, handleCreateProject, renderProjectList, renderProjectSynthesis, renderProjectDetail, selectProject, deleteProject } from './js/projects.js';
 import { loadProjectAnalyses, exportAnalyses, renderAnalysesSection, runProjectAnalysis, renderDiscussionDraft, renderKnowledgeGraph, initializeKnowledgeGraph, renderPrismaFlow, renderGenericAnalysisResult, handleRunDiscussionDraft, handleRunKnowledgeGraph, handleRunPrismaFlow, handleRunMetaAnalysis, handleRunDescriptiveStats } from './js/analyses.js';
@@ -88,11 +87,6 @@ async function handleRunIndexing() {
         showLoadingOverlay(false);
     }
 }
-
-
-
-// --- Fonctions de chargement des données (manquantes) ---
-
 
 
 
@@ -667,29 +661,6 @@ async function handleBulkActions() {
     }
 }
 
-// ============================ 
-// Analyses Section
-// ============================ 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ============================ 
-// Settings Section
-// ============================ 
 async function renderSettings() {
     if (!elements.settingsContainer) return;
     const queuesHtml = await renderQueuesStatus();
