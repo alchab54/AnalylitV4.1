@@ -16,6 +16,7 @@ from rq import Queue
 from rq.worker import Worker
 import redis
 from flask_socketio import SocketIO
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, scoped_session
 from config_v4 import get_config
@@ -79,6 +80,19 @@ background_queue = Queue('analylit_background_v4', connection=redis_conn)
 # --- Projets: répertoire fichiers ---
 PROJECTS_DIR = Path(config.PROJECTS_DIR)
 PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
+
+# ================================================================
+# 0) Gestion de la session SQLAlchemy
+# ================================================================
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    """Ferme la session SQLAlchemy à la fin de la requête."""
+    session = Session()
+    if session:
+        if exception:
+            session.rollback()
+        session.remove()
+
 
 # ================================================================
 # 1) Initialisation / Migrations
@@ -370,6 +384,11 @@ VALUES (:id, :name, :is_custom, :preprocess_model, :extract_model, :synthesis_mo
 @api_bp.route('/projects/<project_id>/export/thesis', methods=['GET'])
 def export_for_thesis(project_id):
     """Export spécialisé pour thèse : données ATN + graphiques haute résolution."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     session = Session()
     try:
         # 1. Données ATN avec gestion des erreurs
@@ -447,10 +466,8 @@ def export_for_thesis(project_id):
         )
         
     except Exception as e:
-        logger.error(f"Erreur export ATN: {e}", exc_info=True)
+        logger.exception(f"Erreur export ATN: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
-    finally:
-        session.close()
 
 def generate_thesis_report(zf, atn_data, metrics, project_info):
     """Génère un rapport LaTeX complet pour la thèse."""
@@ -565,6 +582,11 @@ Ces fichiers sont prêts à être insérés dans votre document de thèse.
 @api_bp.route('/projects/<project_id>/prisma-checklist', methods=['GET', 'POST'])
 def handle_prisma_checklist(project_id):
     """Gère la checklist PRISMA-ScR du projet."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     session = Session()
     try:
         if request.method == 'GET':
@@ -603,15 +625,17 @@ def handle_prisma_checklist(project_id):
             return jsonify({"message": "Checklist PRISMA-ScR sauvegardée"}), 200
             
     except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur handle_prisma_checklist: {e}", exc_info=True)
+        logger.exception(f"Erreur handle_prisma_checklist: {e}")
         return jsonify({'error': 'Erreur interne'}), 500
-    finally:
-        session.close()
 
 @api_bp.route('/projects/<project_id>/atn-analysis', methods=['POST'])
 def run_atn_analysis(project_id):
     """Lance l'analyse ATN multipartie prenante."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     job = analysis_queue.enqueue(
         run_atn_stakeholder_analysis_task,
         project_id=project_id,
@@ -626,6 +650,11 @@ def run_atn_analysis(project_id):
 @api_bp.route('/projects/<project_id>/atn-metrics', methods=['GET'])
 def get_atn_metrics(project_id):
     """Récupère les métriques ATN agrégées."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     session = Session()
     try:
         # Métriques d'empathie
@@ -665,10 +694,8 @@ def get_atn_metrics(project_id):
         })
         
     except Exception as e:
-        logger.error(f"Erreur get_atn_metrics: {e}", exc_info=True)
+        logger.exception(f"Erreur get_atn_metrics: {e}")
         return jsonify({'error': 'Erreur lors du calcul des métriques ATN'}), 500
-    finally:
-        session.close()
 
 @api_bp.route('/health', methods=['GET'])
 def health_check():
@@ -683,8 +710,6 @@ def health_check():
         db_status = "connected"
     except Exception as e:
         logger.error(f"Erreur health check DB: {e}")
-    finally:
-        session.close()
     return jsonify({
         "status": "ok",
         "version": config.ANALYLIT_VERSION,
@@ -727,16 +752,20 @@ def handle_projects():
             session.commit()
             return jsonify(project), 201
     except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur handle_projects: {e}", exc_info=True)
+        logger.exception(f"Erreur handle_projects: {e}")
         return jsonify({'error': 'Erreur interne'}), 500
-    finally:
-        session.close()
 
 @api_bp.route('/projects/<project_id>', methods=['GET', 'DELETE'])
 def handle_single_project(project_id):
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     session = Session()
     try:
+        # Validation de l'UUID déjà faite
+
         if request.method == 'GET':
             row = session.execute(text("SELECT * FROM projects WHERE id = :id"), {"id": project_id}).mappings().fetchone()
             return (jsonify(dict(row)) if row else (jsonify({'error': 'Projet non trouvé'}), 404))
@@ -749,16 +778,21 @@ def handle_single_project(project_id):
             session.execute(text("DELETE FROM projects WHERE id = :pid"), {"pid": project_id})
             session.commit()
             return jsonify({'message': 'Projet supprimé'})
+    except SQLAlchemyError as e:
+        logger.error(f"Erreur DB dans handle_single_project: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur de base de données'}), 500
     except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur handle_single_project: {e}", exc_info=True)
+        logger.exception(f"Erreur inattendue dans handle_single_project: {e}")
         return jsonify({'error': 'Erreur interne'}), 500
-    finally:
-        session.close()
 
 @api_bp.route('/projects/<project_id>/articles', methods=['DELETE'])
 def delete_project_articles(project_id):
     """Supprime une liste d'articles d'un projet ainsi que leurs extractions associées."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     data = request.get_json(force=True)
     article_ids_to_delete = data.get('article_ids', [])
 
@@ -793,12 +827,10 @@ def delete_project_articles(project_id):
         
         return jsonify({'message': f'{len(article_ids_to_delete)} article(s) supprimé(s) avec succès'}), 200
     except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur lors de la suppression d'articles: {e}", exc_info=True)
+        logger.exception(f"Erreur lors de la suppression d'articles: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
-    finally:
-        session.close()
-        
+
+
 # --- Recherche multi-bases ---
 @api_bp.route('/search', methods=['POST'])
 def search_multiple_databases():
@@ -818,12 +850,9 @@ def search_multiple_databases():
         WHERE id = :pid
         """), {"q": query, "dbs": json.dumps(databases), "now": datetime.now().isoformat(), "pid": project_id})
         session.commit()
-    except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur saving search params: {e}")
+    except SQLAlchemyError as e:
+        logger.error(f"Erreur DB saving search params: {e}", exc_info=True)
         return jsonify({'error': 'Erreur interne'}), 500
-    finally:
-        session.close()
 
     background_queue.enqueue(
         multi_database_search_task,
@@ -838,6 +867,11 @@ def search_multiple_databases():
 @api_bp.route('/projects/<project_id>/search-results', methods=['GET'])
 def get_project_search_results(project_id):
     session = Session()
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     try:
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 500, type=int)
@@ -865,13 +899,19 @@ def get_project_search_results(project_id):
             "has_next": (offset + per_page) < total,
             "has_prev": page > 1
         })
-    finally:
-        session.close()
+    except Exception as e:
+        logger.exception(f"Erreur dans get_project_search_results: {e}")
+        return jsonify({'error': 'Erreur interne'}), 500
 
 @api_bp.route('/projects/<project_id>/search-stats', methods=['GET'])
 def get_project_search_stats(project_id):
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
     session = Session()
     try:
+        # Validation de l'UUID déjà faite
         stats = session.execute(text("""
         SELECT database_source, COUNT(*) as count
         FROM search_results WHERE project_id = :pid
@@ -883,12 +923,18 @@ def get_project_search_stats(project_id):
             "total_results": total,
             "results_by_database": {r["database_source"]: r["count"] for r in stats}
         })
-    finally:
-        session.close()
+    except Exception as e:
+        logger.exception(f"Erreur dans get_project_search_stats: {e}")
+        return jsonify({'error': 'Erreur interne'}), 500
 
 # --- Upload et gestion des fichiers ---
 @api_bp.route('/projects/<project_id>/upload-pdfs-bulk', methods=['POST'])
 def upload_pdfs_bulk(project_id):
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     files = []
     if 'files' in request.files:
         files = request.files.getlist('files')
@@ -919,6 +965,11 @@ def upload_pdfs_bulk(project_id):
 @api_bp.route('/projects/<project_id>/upload-pdf-for-article', methods=['POST'])
 def upload_pdf_for_article(project_id):
     """Upload manuel d'un PDF lié à un article (utilisé par le frontend)."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     if 'file' not in request.files:
         return jsonify({'error': 'Aucun fichier fourni'}), 400
     file = request.files['file']
@@ -937,11 +988,16 @@ def upload_pdf_for_article(project_id):
         send_project_notification(project_id, 'pdf_upload_completed', f'PDF uploadé pour {article_id}')
         return jsonify({'message': 'PDF uploadé avec succès', 'filename': safe_name}), 200
     except Exception as e:
-        logger.error(f"Erreur upload_pdf_for_article: {e}", exc_info=True)
+        logger.exception(f"Erreur upload_pdf_for_article: {e}")
         return jsonify({'error': 'Erreur lors de l’upload'}), 500
 
 @api_bp.route('/projects/<project_id>/files', methods=['GET'])
 def list_project_files(project_id):
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     project_dir = PROJECTS_DIR / project_id
     if not project_dir.is_dir():
         return jsonify([])
@@ -950,10 +1006,18 @@ def list_project_files(project_id):
 
 @api_bp.route('/projects/<project_id>/files/<filename>', methods=['GET'])
 def get_project_file(project_id, filename):
-    project_dir = PROJECTS_DIR / project_id
-    if ".." in filename or filename.startswith("/"):
-        return jsonify({"error": "Chemin de fichier invalide."}), 400
-    return send_from_directory(str(project_dir), filename)
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
+    safe_filename = secure_filename(filename)
+    project_dir = (PROJECTS_DIR / project_id).resolve()
+    file_path = (project_dir / safe_filename).resolve()
+
+    if not str(file_path).startswith(str(project_dir)):
+        return jsonify({"error": "Accès non autorisé"}), 403
+    return send_from_directory(str(project_dir), safe_filename)
 
 @api_bp.route('/projects/<project_id>/index', methods=['POST'])
 def run_indexing(project_id):
@@ -963,8 +1027,6 @@ def run_indexing(project_id):
         session.execute(text("UPDATE projects SET status = 'indexing', updated_at = :t WHERE id = :pid"),
                         {"t": datetime.now().isoformat(), "pid": project_id})
         session.commit()
-    finally:
-        session.close()
     return jsonify({'message': "Indexation lancée.", 'job_id': job.id}), 202
 
 # --- Extractions ---
@@ -972,6 +1034,12 @@ def run_indexing(project_id):
 def get_project_extractions(project_id):
     session = Session()
     try:
+        try:
+            uuid.UUID(project_id, version=4)
+        except ValueError:
+            return jsonify({'error': 'ID de projet invalide'}), 400
+
+        # Validation de l'UUID déjà faite
         rows = session.execute(text("""
         SELECT * FROM extractions
         WHERE project_id = :pid
@@ -979,12 +1047,17 @@ def get_project_extractions(project_id):
         """), {"pid": project_id}).mappings().all()
         return jsonify([dict(r) for r in rows])
     finally:
-        session.close()
+        pass # Session gérée par teardown
 
 @api_bp.route('/projects/<project_id>/files', methods=['GET'])
 def get_project_files(project_id):
     """Retourne la liste des fichiers (PDFs) associés à un projet."""
     try:
+        try:
+            uuid.UUID(project_id, version=4)
+        except ValueError:
+            return jsonify({'error': 'ID de projet invalide'}), 400
+
         project_dir = PROJECTS_DIR / project_id
         if not project_dir.is_dir():
             # Le répertoire projet n'existe pas, donc pas de fichiers
@@ -1004,13 +1077,19 @@ def get_project_files(project_id):
                     
         return jsonify(files_info)
     except Exception as e:
-        logger.error(f"Erreur lors de la récupération des fichiers pour le projet {project_id}: {e}", exc_info=True)
+        logger.exception(f"Erreur lors de la récupération des fichiers pour le projet {project_id}: {e}")
         return jsonify({'error': 'Erreur interne du serveur lors de la récupération des fichiers.'}), 500
 
 @api_bp.route('/projects/<project_id>/index-pdfs', methods=['POST'])
 def run_index_pdfs(project_id):
     """Lance l'indexation des PDFs pour le chat RAG."""
     try:
+        try:
+            uuid.UUID(project_id, version=4)
+        except ValueError:
+            return jsonify({'error': 'ID de projet invalide'}), 400
+
+        # Validation de l'UUID déjà faite
         # On met la tâche dans la file d'attente "background"
         job = background_queue.enqueue(
             index_project_pdfs_task,
@@ -1025,7 +1104,7 @@ def run_index_pdfs(project_id):
         )
         return jsonify({'message': 'Indexation des PDFs lancée en arrière-plan.', 'job_id': job.id}), 202
     except Exception as e:
-        logger.error(f"Erreur lors du lancement de l'indexation pour le projet {project_id}: {e}", exc_info=True)
+        logger.exception(f"Erreur lors du lancement de l'indexation pour le projet {project_id}: {e}")
         return jsonify({'error': 'Erreur interne du serveur lors du lancement de la tâche.'}), 500
 
 @api_bp.route('/projects/<project_id>/results', methods=['GET'])
@@ -1033,6 +1112,12 @@ def get_project_results(project_id):
     """Récupère les résultats de recherche d'un projet."""
     session = Session()
     try:
+        try:
+            uuid.UUID(project_id, version=4)
+        except ValueError:
+            return jsonify({'error': 'ID de projet invalide'}), 400
+
+        # Validation de l'UUID déjà faite
         # Récupérer les résultats de recherche pour le projet
         rows = session.execute(text("""
             SELECT * FROM search_results 
@@ -1043,11 +1128,9 @@ def get_project_results(project_id):
         results = [dict(row) for row in rows]
         return jsonify(results), 200
         
-    except Exception as e:
-        logger.error(f"Erreur get_project_results: {e}", exc_info=True)
+    except SQLAlchemyError as e:
+        logger.error(f"Erreur DB get_project_results: {e}", exc_info=True)
         return jsonify({"error": "Erreur lors de la récupération des résultats"}), 500
-    finally:
-        session.close()
         
 # --- Profils et prompts ---
 @api_bp.route('/profiles', methods=['GET', 'POST'])
@@ -1075,11 +1158,8 @@ def handle_analysis_profiles():
             session.commit()
             return jsonify(profile), 201
     except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur handle_analysis_profiles: {e}")
+        logger.exception(f"Erreur handle_analysis_profiles: {e}")
         return jsonify({'error': 'Erreur interne'}), 500
-    finally:
-        session.close()
 
 # ALIAS pour compatibilité frontend: /analysis-profiles
 @api_bp.route('/analysis-profiles', methods=['GET', 'POST'])
@@ -1113,17 +1193,20 @@ def handle_prompts():
             session.commit()
             return jsonify({'message': 'Prompt sauvegardé'}), 201
     except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur handle_prompts: {e}")
+        logger.exception(f"Erreur handle_prompts: {e}")
         return jsonify({'error': 'Erreur interne'}), 500
-    finally:
-        session.close()
 
 # --- Grilles d'extraction ---
 @api_bp.route('/projects/<project_id>/grids', methods=['GET', 'POST'])
 def grids_collection(project_id):
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     session = Session()
     try:
+        # Validation de l'UUID déjà faite
         if request.method == 'GET':
             rows = session.execute(text("""
             SELECT id, name, fields, created_at FROM extraction_grids
@@ -1157,16 +1240,20 @@ def grids_collection(project_id):
             return jsonify({"id": grid_id, "project_id": project_id, "name": name, "fields": fields,
                             "created_at": datetime.now().isoformat()}), 201
     except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur grids_collection: {e}", exc_info=True)
+        logger.exception(f"Erreur grids_collection: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
-    finally:
-        session.close()
 
 @api_bp.route('/projects/<project_id>/grids/<grid_id>', methods=['PUT', 'DELETE'])
 def grid_resource(project_id, grid_id):
+    try:
+        uuid.UUID(project_id, version=4)
+        uuid.UUID(grid_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet ou de grille invalide'}), 400
+
     session = Session()
     try:
+        # Validation des UUIDs déjà faite
         if request.method == 'PUT':
             data = request.get_json(force=True)
             name, fields = data.get('name'), data.get('fields')
@@ -1195,14 +1282,16 @@ def grid_resource(project_id, grid_id):
             session.commit()
             return jsonify({'message': 'Grille supprimée avec succès.'})
     except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur grid_resource: {e}", exc_info=True)
+        logger.exception(f"Erreur grid_resource: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
-    finally:
-        session.close()
         
 @api_bp.route('/projects/<project_id>/grids/import', methods=['POST'])
 def import_grid_from_file(project_id):
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     if 'file' not in request.files:
         return jsonify({"error": "Aucun fichier n'a été envoyé"}), 400
 
@@ -1229,14 +1318,15 @@ def import_grid_from_file(project_id):
             """), {"id": str(uuid.uuid4()), "pid": project_id, "n": grid_name,
                    "f": json.dumps(formatted_fields), "t": datetime.now().isoformat()})
             session.commit()
-        finally:
-            session.close()
+        except Exception as e:
+            logger.exception(f"Erreur DB import grid: {e}")
+            return jsonify({"error": "Erreur interne du serveur"}), 500
 
         return jsonify({"message": "Grille importée avec succès"}), 201
     except json.JSONDecodeError:
         return jsonify({"error": "Fichier JSON invalide"}), 400
     except Exception as e:
-        logger.error(f"Erreur import grid: {e}", exc_info=True)
+        logger.exception(f"Erreur import grid: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
         
 # --- Grilles d'extraction ---
@@ -1280,16 +1370,21 @@ def handle_extraction_grids(project_id):
             grid['fields'] = data.get('fields', [])
             return jsonify(grid), 201
     except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur handle_extraction_grids: {e}")
+        logger.exception(f"Erreur handle_extraction_grids: {e}")
         return jsonify({'error': 'Erreur interne'}), 500
-    finally:
-        session.close()
 
 @api_bp.route('/projects/<project_id>/grids/<grid_id>', methods=['PUT', 'DELETE'])
 def handle_single_grid(project_id, grid_id):
+    try:
+        uuid.UUID(project_id, version=4)
+        uuid.UUID(grid_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet ou de grille invalide'}), 400
+
     session = Session()
     try:
+        # Validation des UUIDs déjà faite
+
         if request.method == 'PUT':
             data = request.get_json(force=True)
             session.execute(text("""
@@ -1310,11 +1405,8 @@ def handle_single_grid(project_id, grid_id):
             session.commit()
             return jsonify({'message': 'Grille supprimée'})
     except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur handle_single_grid: {e}")
+        logger.exception(f"Erreur handle_single_grid: {e}")
         return jsonify({'error': 'Erreur interne'}), 500
-    finally:
-        session.close()
         
 # --- Paramètres Zotero ---
 @api_bp.route('/settings/zotero', methods=['GET', 'POST'])
@@ -1348,6 +1440,11 @@ def get_project_analyses(project_id):
     pour alimenter l'onglet 'Analyses' du frontend.
     """
     session = Session()
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     try:
         row = session.execute(text("""
             SELECT 
@@ -1383,10 +1480,8 @@ def get_project_analyses(project_id):
         }
         return jsonify(analysis_data), 200
     except Exception as e:
-        logger.error(f"Erreur get_project_analyses: {e}", exc_info=True)
+        logger.exception(f"Erreur get_project_analyses: {e}")
         return jsonify({"error": "Erreur interne"}), 500
-    finally:
-        session.close()
         
 # --- Export projet ---
 @api_bp.route('/projects/<project_id>/add-manual-articles', methods=['POST'])
@@ -1394,6 +1489,11 @@ def add_manual_articles(project_id):
     """
     Lance l'ajout asynchrone d'articles manuellement (PMID, DOI, arXiv) au projet.
     """
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     try:
         data = request.get_json(force=True) or {}
         raw = data.get('identifiers', '') or ''
@@ -1417,7 +1517,7 @@ def add_manual_articles(project_id):
         return jsonify({'message': f'Ajout de {len(identifiers)} article(s) lancé en arrière-plan.', 'job_id': job.id}), 202
         
     except Exception as e:
-        logger.error(f"Erreur add_manual_articles: {e}", exc_info=True)
+        logger.exception(f"Erreur add_manual_articles: {e}")
         return jsonify({'error': "Erreur lors du lancement de l'ajout des articles."}), 500
 
 @api_bp.route('/projects/<project_id>/export-analyses', methods=['GET'])
@@ -1429,6 +1529,11 @@ def export_project_analyses(project_id):
 def export_project_data(project_id):
     """Exporte TOUTES les données d'un projet dans une archive ZIP."""
     session = Session()
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     try:
         project = session.execute(text("""
             SELECT name, description, discussion_draft, knowledge_graph, prisma_flow_path, analysis_result, synthesis_result
@@ -1500,10 +1605,8 @@ def export_project_data(project_id):
             headers={'Content-Disposition': f'attachment; filename=export_complet_{project_name_safe}.zip'}
         )
     except Exception as e:
-        logger.error(f"Erreur lors de l'export des données pour le projet {project_id}: {e}", exc_info=True)
+        logger.exception(f"Erreur lors de l'export des données pour le projet {project_id}: {e}")
         return jsonify({'error': "Erreur lors de la création de l'export."}), 500
-    finally:
-        session.close()
         
 # --- Statut détaillé des files (remplace/complète les endpoints de queues) ---
 @api_bp.route('/admin/queues-status', methods=['GET'])
@@ -1542,13 +1645,19 @@ def get_queues_status():
             })
         return jsonify({"queues": payload, "timestamp": datetime.now().isoformat()}), 200
     except Exception as e:
-        logger.error(f"Erreur get_queues_status: {e}", exc_info=True)
+        logger.exception(f"Erreur get_queues_status: {e}")
         return jsonify({"queues": []}), 200
 
 @api_bp.route('/projects/<project_id>/import-zotero', methods=['POST'])
 def import_from_zotero(project_id):
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     data = request.get_json(force=True)
     manual_ids = data.get('articles', [])
+
     try:
         with open(PROJECTS_DIR / 'zotero_config.json', 'r') as f:
             zotero_config = json.load(f)
@@ -1576,6 +1685,11 @@ def import_from_zotero(project_id):
 
 @api_bp.route('/projects/<project_id>/import-zotero-file', methods=['POST'])
 def import_from_zotero_file(project_id):
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     if 'file' not in request.files:
         return jsonify({'error': 'Aucun fichier fourni'}), 400
     file = request.files['file']
@@ -1602,6 +1716,11 @@ def import_from_zotero_file(project_id):
 
 @api_bp.route('/projects/<project_id>/fetch-online-pdfs', methods=['POST'])
 def fetch_online_pdfs(project_id):
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     data = request.get_json(force=True)
     article_ids = data.get('articles', [])
     if not article_ids:
@@ -1621,6 +1740,11 @@ def fetch_online_pdfs(project_id):
 # --- Pipeline d'analyse ---
 @api_bp.route('/projects/<project_id>/run', methods=['POST'])
 def run_project_pipeline(project_id):
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     data = request.get_json(force=True)
     selected_articles = data.get('articles', [])
     profile_id = data.get('profile', 'standard')
@@ -1672,14 +1796,16 @@ def run_project_pipeline(project_id):
             )
         return jsonify({"status": "processing"}), 202
     except Exception as e:
-        session.rollback()
-        logger.error(f"run_project_pipeline error: {e}", exc_info=True)
+        logger.exception(f"run_project_pipeline error: {e}")
         return jsonify({'error': 'Erreur interne'}), 500
-    finally:
-        session.close()
 
 @api_bp.route('/projects/<project_id>/run-synthesis', methods=['POST'])
 def run_synthesis_endpoint(project_id):
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     data = request.get_json(force=True)
     profile_id = data.get('profile', 'standard')
 
@@ -1702,14 +1828,20 @@ def run_synthesis_endpoint(project_id):
             "UPDATE projects SET status = 'synthesizing', job_id = :jid WHERE id = :pid"
         ), {"jid": job.id, "pid": project_id})
         session.commit()
-        return jsonify({"status": "synthesizing", "message": "Synthèse lancée."}), 202
-    finally:
-        session.close()
+    except SQLAlchemyError as e:
+        logger.error(f"Erreur DB dans run_synthesis_endpoint: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur de base de données'}), 500
+    except Exception as e:
+        logger.exception(f"Erreur inattendue dans run_synthesis_endpoint: {e}")
+        return jsonify({'error': 'Erreur interne'}), 500
+    return jsonify({"status": "synthesizing", "message": "Synthèse lancée."}), 202
 
 # --- Ajout pour la validation ---
 @api_bp.route('/projects/<project_id>/extractions/<extraction_id>/decision', methods=['PUT'])
 def save_extraction_decision(project_id, extraction_id):
     """Sauvegarde la décision d'un évaluateur pour une extraction."""
+    # Pas de validation UUID ici car extraction_id n'est pas un UUID
+
     data = request.get_json(force=True)
     decision = data.get('decision')
     evaluator = data.get('evaluator', 'evaluator1')
@@ -1749,11 +1881,8 @@ def save_extraction_decision(project_id, extraction_id):
         return jsonify({'message': 'Décision enregistrée'}), 200
 
     except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur save_extraction_decision: {e}", exc_info=True)
+        logger.exception(f"Erreur save_extraction_decision: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
-    finally:
-        session.close()
                 
 @api_bp.route('/projects/<project_id>/validate-article', methods=['POST'])
 def validate_article_endpoint(project_id):
@@ -1761,6 +1890,11 @@ def validate_article_endpoint(project_id):
     CORRECTION: Route manquante pour la validation manuelle depuis la section Validation.
     Met à jour le statut de validation d'un article (extraction).
     """
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     session = Session()
     try:
         data = request.get_json(force=True)
@@ -1837,13 +1971,16 @@ def export_validations(project_id):
             headers={'Content-Disposition': f'attachment; filename=validations_eval1_{project_id}.csv'}
         )
     except Exception as e:
-        logger.error(f"Erreur export validations: {e}", exc_info=True)
+        logger.exception(f"Erreur export validations: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
-    finally:
-        session.close()
 
 @api_bp.route('/projects/<project_id>/import-validations', methods=['POST'])
 def import_validations(project_id):
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     if 'file' not in request.files:
         return jsonify({"error": "Aucun fichier fourni"}), 400
     file = request.files['file']
@@ -1887,15 +2024,20 @@ def import_validations(project_id):
 
         session.commit()
         return jsonify({"message": f"{updated} validations importées pour l'évaluateur 2."}), 200
+    except SQLAlchemyError as e:
+        logger.error(f"Erreur DB import validations: {e}", exc_info=True)
+        return jsonify({"error": "Erreur de base de données"}), 500
     except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur import validations: {e}", exc_info=True)
+        logger.exception(f"Erreur import validations: {e}")
         return jsonify({"error": "Erreur interne ou format invalide"}), 500
-    finally:
-        session.close()
 
 @api_bp.route('/projects/<project_id>/calculate-kappa', methods=['POST'])
 def calculate_project_kappa(project_id):
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     job = analysis_queue.enqueue(calculate_kappa_task, project_id=project_id, job_timeout='10m')
     return jsonify({"message": "Calcul du Kappa lancé.", "job_id": job.id}), 202
 
@@ -1903,6 +2045,12 @@ def calculate_project_kappa(project_id):
 def get_inter_rater_stats(project_id):
     session = Session()
     try:
+        try:
+            uuid.UUID(project_id, version=4)
+        except ValueError:
+            return jsonify({'error': 'ID de projet invalide'}), 400
+
+        # Validation de l'UUID déjà faite
         row = session.execute(text("""
         SELECT inter_rater_reliability FROM projects WHERE id = :pid
         """), {"pid": project_id}).mappings().fetchone()
@@ -1910,10 +2058,8 @@ def get_inter_rater_stats(project_id):
             "kappa_result": row["inter_rater_reliability"] if row else "Non calculé"
         })
     except Exception as e:
-        logger.error(f"Erreur inter-rater stats: {e}", exc_info=True)
+        logger.exception(f"Erreur inter-rater stats: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
-    finally:
-        session.close()
 
 # ================================================================
 # --- Rapports & Exports pour la Thèse ---
@@ -1922,6 +2068,11 @@ def get_inter_rater_stats(project_id):
 @api_bp.route('/projects/<project_id>/reports/summary-table', methods=['GET'])
 def get_summary_table_data(project_id):
     """Fournit les données extraites des articles inclus pour un tableau de synthèse."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     session = Session()
     try:
         # On ne prend que les articles validés par l'utilisateur comme 'inclus'
@@ -1947,10 +2098,8 @@ def get_summary_table_data(project_id):
         
         return jsonify(records)
     except Exception as e:
-        logger.error(f"Erreur get_summary_table_data: {e}", exc_info=True)
+        logger.exception(f"Erreur get_summary_table_data: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
-    finally:
-        session.close()
 
 def format_citation(article, style='apa'):
     """Formate une citation simple pour un article."""
@@ -1972,6 +2121,11 @@ def format_citation(article, style='apa'):
 @api_bp.route('/projects/<project_id>/reports/bibliography', methods=['GET'])
 def get_bibliography(project_id):
     """Génère une bibliographie formatée pour les articles inclus."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     style = request.args.get('style', 'apa')
     session = Session()
     try:
@@ -1986,15 +2140,20 @@ def get_bibliography(project_id):
         bibliography = [format_citation(dict(art), style) for art in articles]
         
         return jsonify(bibliography)
-    except Exception as e:
-        logger.error(f"Erreur get_bibliography: {e}", exc_info=True)
+    except SQLAlchemyError as e:
+        logger.error(f"Erreur DB get_bibliography: {e}", exc_info=True)
         return jsonify({'error': 'Erreur interne du serveur'}), 500
-    finally:
-        session.close()
+    except Exception as e:
+        logger.exception(f"Erreur get_bibliography: {e}")
+        return jsonify({'error': 'Erreur interne du serveur'}), 500
 
 @api_bp.route('/projects/<project_id>/risk-of-bias', methods=['GET', 'POST'])
 def handle_risk_of_bias(project_id):
     """Gère la récupération et la sauvegarde des évaluations de risque de biais."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
     session = Session()
     try:
         if request.method == 'GET':
@@ -2029,9 +2188,6 @@ def handle_risk_of_bias(project_id):
             send_project_notification(project_id, 'rob_updated', f"Évaluation RoB mise à jour pour {data.get('article_id')}")
             return jsonify({'message': 'Évaluation sauvegardée'}), 200
 
-    finally:
-        session.close()
-
 # ================================================================
 # 8) Analyses
 # ================================================================
@@ -2039,18 +2195,33 @@ def handle_risk_of_bias(project_id):
 @api_bp.route('/projects/<project_id>/run-prisma-flow', methods=['POST'])
 def run_prisma_flow(project_id):
     """Lance la génération du diagramme PRISMA."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     job = analysis_queue.enqueue(run_prisma_flow_task, project_id=project_id, job_timeout='10m')
     return jsonify({'message': 'Génération du diagramme PRISMA lancée.', 'job_id': job.id}), 202
 
 @api_bp.route('/projects/<project_id>/run-meta-analysis', methods=['POST'])
 def run_meta_analysis(project_id):
     """Lance une méta-analyse."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     job = analysis_queue.enqueue(run_meta_analysis_task, project_id=project_id, job_timeout='20m')
     return jsonify({'message': 'Méta-analyse lancée.', 'job_id': job.id}), 202
 
 @api_bp.route('/projects/<project_id>/run-descriptive-stats', methods=['POST'])
 def run_descriptive_stats(project_id):
     """Lance le calcul des statistiques descriptives."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     job = analysis_queue.enqueue(run_descriptive_stats_task, project_id=project_id, job_timeout='15m')
     return jsonify({'message': 'Calcul des statistiques descriptives lancé.', 'job_id': job.id}), 202
 
@@ -2058,6 +2229,11 @@ def run_descriptive_stats(project_id):
 # --- Analyses avancées ---
 @api_bp.route('/projects/<project_id>/run-analysis', methods=['POST'])
 def run_advanced_analysis(project_id):
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     data = request.get_json(force=True)
     analysis_type = data.get('type')
     if not analysis_type:
@@ -2085,46 +2261,57 @@ def run_advanced_analysis(project_id):
             job = analysis_queue.enqueue(run_prisma_flow_task, project_id=project_id, job_timeout='30m')
         return jsonify({'message': f'Analyse {analysis_type} lancée', 'job_id': job.id}), 202
     except Exception as e:
-        logger.error(f"Erreur run analysis: {e}")
+        logger.exception(f"Erreur run analysis: {e}")
         return jsonify({'error': 'Erreur lors du lancement de l\'analyse'}), 500
-    finally:
-        session.close()
 
 @api_bp.route('/projects/<project_id>/run-discussion-draft', methods=['POST'])
 def run_discussion_draft(project_id):
     """Lance la génération du brouillon de discussion."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     session = Session()
     try:
+        # Validation de l'UUID déjà faite
         session.execute(text("UPDATE projects SET status = 'generating_analysis' WHERE id = :pid"), {"pid": project_id})
         session.commit()
         job = analysis_queue.enqueue(run_discussion_generation_task, project_id=project_id, job_timeout='30m')
         return jsonify({'message': 'Génération du brouillon de discussion lancée', 'job_id': job.id}), 202
     except Exception as e:
         session.rollback()
-        logger.error(f"Erreur run discussion draft: {e}", exc_info=True)
+        logger.exception(f"Erreur run discussion draft: {e}")
         return jsonify({'error': str(e)}), 500
-    finally:
-        session.close()
 
 @api_bp.route('/projects/<project_id>/run-knowledge-graph', methods=['POST'])
 def run_knowledge_graph(project_id):
     """Lance la génération du graphe de connaissances."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     session = Session()
     try:
+        # Validation de l'UUID déjà faite
         session.execute(text("UPDATE projects SET status = 'generating_analysis' WHERE id = :pid"), {"pid": project_id})
         session.commit()
         job = analysis_queue.enqueue(run_knowledge_graph_task, project_id=project_id, job_timeout='30m')
         return jsonify({'message': 'Génération du graphe de connaissances lancée', 'job_id': job.id}), 202
     except Exception as e:
         session.rollback()
-        logger.error(f"Erreur run knowledge graph: {e}", exc_info=True)
+        logger.exception(f"Erreur run knowledge graph: {e}")
         return jsonify({'error': str(e)}), 500
-    finally:
-        session.close()
         
 # --- Chat RAG ---
 @api_bp.route('/projects/<project_id>/chat', methods=['POST', 'GET'])
 def handle_project_chat(project_id):
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     if request.method == 'GET':
         session = Session()
         try:
@@ -2134,8 +2321,6 @@ def handle_project_chat(project_id):
             ORDER BY timestamp ASC
             """), {"pid": project_id}).mappings().all()
             return jsonify([dict(r) for r in rows])
-        finally:
-            session.close()
     if request.method == 'POST':
         data = request.get_json(force=True)
         question = data.get('question', '').strip()
@@ -2152,6 +2337,11 @@ def handle_project_chat(project_id):
 @api_bp.route('/projects/<project_id>/chat-messages', methods=['GET'])
 def get_chat_messages(project_id):
     """Récupère l'historique des messages pour le chat."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     session = Session()
     try:
         rows = session.execute(text("""
@@ -2161,10 +2351,8 @@ def get_chat_messages(project_id):
         """), {"pid": project_id}).mappings().all()
         return jsonify([dict(r) for r in rows])
     except Exception as e:
-        logger.error(f"Erreur get_chat_messages: {e}", exc_info=True)
+        logger.exception(f"Erreur get_chat_messages: {e}")
         return jsonify({'error': 'Erreur interne'}), 500
-    finally:
-        session.close()
 
 # --- Ollama ---
 @api_bp.route('/ollama/models', methods=['GET'])
@@ -2181,7 +2369,7 @@ def list_ollama_models():
                 models.append({"name": name, "size": m.get("size", 0)})
         return jsonify(models)
     except Exception as e:
-        logger.error(f"Erreur /ollama/models: {e}", exc_info=True)
+        logger.exception(f"Erreur /ollama/models: {e}")
         return jsonify([]), 200
 
 @api_bp.route('/ollama/pull', methods=['POST'])
@@ -2194,7 +2382,7 @@ def ollama_pull_model():
         job = background_queue.enqueue(pull_ollama_model_task, model_name=model, job_timeout='1h')
         return jsonify({'message': f'Téléchargement du modèle {model} lancé', 'job_id': job.id}), 202
     except Exception as e:
-        logger.error(f"Erreur pull model: {e}")
+        logger.exception(f"Erreur pull model: {e}")
         return jsonify({'error': 'Erreur lors du lancement du téléchargement'}), 500
 
 # --- Statut des files ---
@@ -2292,16 +2480,21 @@ def export_project(project_id):
             headers={'Content-Disposition': f'attachment; filename=export_complet_{project_name_safe}.zip'}
         )
     except Exception as e:
-        logger.error(f"Erreur export projet: {e}")
+        logger.exception(f"Erreur export projet: {e}")
         return jsonify({'error': 'Erreur lors de l\'export'}), 500
-    finally:
-        session.close()
 
 # Route pour les statistiques de validation (récupérée de la v4.0 et adaptée)
 @api_bp.route('/projects/<project_id>/validation-stats', methods=['GET'])
 def get_validation_stats(project_id):
     """Calcule les statistiques de validation pour un projet."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     session = Session()
+    try:
+        # Validation de l'UUID déjà faite
     try:
         # Récupérer toutes les extractions avec une décision utilisateur
         extractions = session.execute(text("""
@@ -2362,15 +2555,20 @@ def get_validation_stats(project_id):
             }
         })
     except Exception as e:
-        logger.error(f"Erreur get_validation_stats: {e}", exc_info=True)
+        logger.exception(f"Erreur get_validation_stats: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
-    finally:
-        session.close()
 
 @api_bp.route('/projects/<project_id>/stakeholders', methods=['GET', 'POST'])
 def handle_stakeholders(project_id):
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     session = Session()
     try:
+        # Validation de l'UUID déjà faite
+
         if request.method == 'GET':
             rows = session.execute(text("""
                 SELECT * FROM stakeholder_groups 
@@ -2413,11 +2611,8 @@ def handle_stakeholders(project_id):
             return jsonify(stakeholder), 201
             
     except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur handle_stakeholders: {e}", exc_info=True)
+        logger.exception(f"Erreur handle_stakeholders: {e}")
         return jsonify({'error': 'Erreur interne'}), 500
-    finally:
-        session.close()
 
 # ================================================================
 # 3) WebSocket Events
@@ -2442,6 +2637,11 @@ def handle_join_room(data):
 @api_bp.route('/projects/<project_id>/articles', methods=['DELETE'])
 def delete_project_articles(project_id):
     """Supprime une liste d'articles d'un projet."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     data = request.get_json(force=True)
     article_ids = data.get('article_ids', [])
     if not article_ids:
@@ -2463,15 +2663,17 @@ def delete_project_articles(project_id):
         send_project_notification(project_id, 'articles_updated', f'{len(article_ids)} article(s) ont été supprimés.')
         return jsonify({'message': f'{len(article_ids)} article(s) supprimé(s) avec succès'}), 200
     except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur delete_project_articles: {e}", exc_info=True)
+        logger.exception(f"Erreur delete_project_articles: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
-    finally:
-        session.close()
         
 @api_bp.route('/projects/<project_id>/run-rob-analysis', methods=['POST'])
 def run_rob_analysis(project_id):
     """Lance l'analyse du risque de biais pour les articles sélectionnés."""
+    try:
+        uuid.UUID(project_id, version=4)
+    except ValueError:
+        return jsonify({'error': 'ID de projet invalide'}), 400
+
     data = request.get_json(force=True)
     article_ids = data.get('article_ids', [])
     if not article_ids:
