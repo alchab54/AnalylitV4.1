@@ -250,6 +250,18 @@ async function loadProjects() {
     appState.projects = await fetchAPI('/projects');
 }
 
+async function loadProjectFilesSet(projectId) {
+    if (!projectId) return new Set();
+    try {
+        const files = await fetchAPI(`/projects/${projectId}/files`);
+        const filenames = (files || []).map(f => String(f.filename || '').replace(/\.pdf$/i, ''));
+        return new Set(filenames);
+    } catch (error) {
+        console.error('Erreur chargement des fichiers projet:', error);
+        return new Set();
+    }
+}
+
 async function loadAnalysisProfiles() {
     appState.analysisProfiles = await fetchAPI('/profiles');
 }
@@ -297,9 +309,6 @@ function refreshCurrentSection() {
         case 'grids':
             renderGridsSection(appState.currentProject);
             break;
-		case 'import':
-			renderImportSection(appState.currentProject);
-			break;
         case 'rob':
             loadRobSection();
             break;
@@ -2436,6 +2445,7 @@ async function addStakeholderGroup() {
 }
 
 async function selectProject(projectId) {
+    await loadProjectGrids(projectId);
     try {
         const project = await fetchAPI(`/projects/${projectId}`);
         appState.currentProject = project;
@@ -2988,6 +2998,7 @@ async function handleGridFormSubmit(event) {
         showLoadingOverlay(false);
     }
 }
+
 
 // ================================================================
 // === INITIALISATION FINALE

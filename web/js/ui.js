@@ -26,26 +26,44 @@ function escapeHtml(unsafe) {
  * @param {'info'|'success'|'warning'|'error'} type - Le type de toast.
  */
 function showToast(message, type = 'info') {
-    const container = document.getElementById('toastContainer');
-    if (!container) {
-        console.warn('toastContainer not found');
-        return;
-    }
+    if (!elements.toastContainer) return;
 
     const toast = document.createElement('div');
     toast.className = `toast toast--${type}`;
-    toast.textContent = message;
+    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
 
-    container.appendChild(toast);
+    // Contenu de la notification
+    const messageElement = document.createElement('p');
+    messageElement.innerHTML = `<span class="toast__icon">${icons[type] || 'ℹ️'}</span> ${escapeHtml(message)}`;
+    toast.appendChild(messageElement);
 
-    setTimeout(() => {
-        toast.classList.add('toast--fade-out');
+    // Bouton de fermeture
+    const closeButton = document.createElement('button');
+    closeButton.className = 'toast__close';
+    closeButton.innerHTML = '&times;'; // Symbole "x"
+    closeButton.setAttribute('aria-label', 'Fermer');
+    
+    // Fonction pour cacher et supprimer la notification
+    const hideToast = () => {
+        // Empêche le double déclenchement
+        if (toast.classList.contains('toast--hiding')) return;
+        
+        toast.classList.add('toast--hiding');
         toast.addEventListener('transitionend', () => {
-            if (toast.parentNode) {
-                toast.parentNode.removeChild(toast);
-            }
+            toast.remove();
         });
-    }, 5000);
+    };
+
+    closeButton.onclick = hideToast;
+    toast.appendChild(closeButton);
+    
+    elements.toastContainer.appendChild(toast);
+    
+    // Fait apparaître la notification
+    setTimeout(() => toast.classList.add('toast--show'), 10);
+
+    // Fait disparaître la notification après 5 secondes
+    setTimeout(hideToast, 5000);
 }
 
 /**

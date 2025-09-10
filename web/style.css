@@ -4044,3 +4044,42 @@ textarea.form-control {
     display: none; /* Masquer la justification sur mobile */
   }
 }
+
+/* Améliorations pour les Toasts */
+.toast {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all 0.3s ease-in-out;
+}
+
+.toast--show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast--hiding {
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+.toast p {
+    margin: 0;
+    flex-grow: 1;
+}
+
+.toast__close {
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 4px;
+    margin-left: var(--space-12);
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.toast__close:hover {
+    opacity: 1;
+}
