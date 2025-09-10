@@ -108,7 +108,7 @@
                         <p>Gérez et ouvrez un projet pour commencer.</p>
                     </div>
                     <div class="section-header__actions">
-                        <button class="btn btn--primary" id="createProjectBtn">
+                        <button class="btn btn--primary" data-action="create-project-modal">
                             ➕ Nouveau projet
                         </button>
                     </div>
@@ -160,7 +160,7 @@
                         <p>Affiche les résultats de recherche du projet sélectionné.</p>
                     </div>
                     <div class="section-header__actions">
-                        <button class="btn btn--primary" onclick="window.showSearchModal()">
+                        <button class="btn btn--primary" data-action="show-search-modal">
                             🔍 Nouvelle recherche
                         </button>                        
                     </div>
@@ -183,8 +183,8 @@
                     <div class="section-header__actions">
                         <div class="validation-actions">
                             <h4>Lancer l'extraction complète</h4>
-                            <p>Lancez une extraction détaillée sur les articles que vous avez validés ("Inclus").</p>
-                            <button class="btn btn--primary" id="runFullExtractionBtn">Lancer l'extraction</button>
+                            <p>Lancez une extraction détaillée sur les articles que vous avez validés ("Inclus").</p> 
+                            <button class="btn btn--primary" data-action="run-extraction-modal">Lancer l'extraction</button>
                         </div>
                     </div>
 				</div>
@@ -214,7 +214,7 @@
                         <p>Lancez des analyses avancées et visualisez leurs sorties.</p>
                     </div>
                     <div class="section-header__actions">
-                        <button class="btn btn--primary" onclick="window.showRunAnalysisModal()">Lancer une analyse avancée</button>
+                        <button class="btn btn--primary" data-action="show-run-analysis-modal">Lancer une analyse avancée</button>
                     </div>
                 </div>
 
@@ -269,7 +269,7 @@
 					<div class="import-card">
 						<h4>📝 Ajouter des articles manuellement</h4>
 						<p>Saisissez des identifiants d'articles (PMID, DOI, ArXiv ID) séparés par des retours à la ligne.</p>
-						<button class="btn btn--primary" onclick="window.showAddManualArticlesModal()">
+						<button class="btn btn--primary" data-action="show-manual-add">
 							Ajouter des articles
 						</button>
 					</div>

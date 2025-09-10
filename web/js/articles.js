@@ -126,7 +126,7 @@ export function renderSearchResultsTable() {
           ${justification ? `<div class="score-justification" title="${escapeHtml(justification)}">${escapeHtml(justification.length > 50 ? justification.substring(0, 50) + '...' : justification)}</div>` : ''}
         </td>
         <td class="actions-cell">
-          <button class="btn btn--sm btn--outline view-details-btn" data-article-id="${escapeHtml(article.article_id)}" title="Voir détails">👁️</button>
+          <button class="btn btn--sm btn--outline" data-action="view-details" data-article-id="${escapeHtml(article.article_id)}" title="Voir détails">👁️</button>
           ${article.url ? `<a href="${article.url}" target="_blank" class="btn btn--sm btn--outline">🔗</a>` : ''}
         </td>
       </tr>`;
@@ -137,9 +137,9 @@ export function renderSearchResultsTable() {
       <div class="card__header">
         <h3>Résultats (${results.length} articles)</h3>
         <div class="results-actions">
-          <button class="btn btn--primary btn--sm" onclick="window.showSearchModal()">🔍 Nouvelle recherche</button>
-          <button class="btn btn--secondary btn--sm select-all-btn">Tout sélectionner</button>
-          <button class="btn btn--accent btn--sm batch-process-btn">Traiter la sélection (<span id="selectionCounter">0</span>)</button>
+          <button class="btn btn--primary btn--sm" data-action="show-search-modal">🔍 Nouvelle recherche</button>
+          <button class="btn btn--secondary btn--sm" data-action="select-all-articles">Tout sélectionner</button>
+          <button class="btn btn--accent btn--sm" data-action="batch-process-modal">Traiter la sélection (<span id="selectionCounter">0</span>)</button>
         </div>
       </div>
       <div class="card__body">
@@ -147,11 +147,11 @@ export function renderSearchResultsTable() {
           <table class="table table--compact">
             <thead>
               <tr>
-                <th class="col-select"><input type="checkbox" class="select-all-btn" title="Tout sélectionner/désélectionner"></th>
-                <th class="col-main sortable" data-sort-key="title">Article & Métadonnées</th>
-                <th class="col-source sortable" data-sort-key="database_source">Source</th>
+                <th class="col-select"><input type="checkbox" data-action="select-all-articles" title="Tout sélectionner/désélectionner"></th>
+                <th class="col-main" data-action="sort-results" data-sort-key="title">Article & Métadonnées</th>
+                <th class="col-source" data-action="sort-results" data-sort-key="database_source">Source</th>
                 <th class="col-pdf">PDF</th>
-                <th class="col-score sortable" data-sort-key="relevance_score">Score IA</th>
+                <th class="col-score" data-action="sort-results" data-sort-key="relevance_score">Score IA</th>
                 <th class="col-actions">Actions</th>
               </tr>
             </thead>

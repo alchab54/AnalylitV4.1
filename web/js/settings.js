@@ -91,14 +91,14 @@ function renderAnalysisProfiles() {
                     </div> 
                     <div class="profile-actions"> 
                         ${profile.is_custom ? ` 
-                            <button class="btn btn--sm btn--outline" data-action="edit-profile" data-id="${profile.id}">Modifier</button> 
+                            <button class="btn btn--sm btn--outline" data-action="edit-profile" data-id="${profile.id}">Modifier</button>
                             <button class="btn btn--sm btn--danger" data-action="delete-profile" data-id="${profile.id}">Supprimer</button> 
                         ` : '<span class="badge badge--secondary">Défaut</span>'} 
                     </div> 
                 </div> 
             `).join('')} 
         </div> 
-        <button class="btn btn--primary" data-action="create-profile">Créer un profil</button> 
+        <button class="btn btn--primary" data-action="create-profile-modal">Créer un profil</button> 
     `; 
 } 
 
@@ -132,7 +132,7 @@ function renderOllamaModels() {
                 </div> 
             `).join('') : '<p>Aucun modèle local trouvé.</p>'} 
         </div> 
-        <button class="btn btn--primary" data-action="pull-model">Télécharger un modèle</button> 
+        <button class="btn btn--primary" data-action="pull-model-modal">Télécharger un modèle</button> 
     `; 
 } 
 
