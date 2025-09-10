@@ -106,7 +106,7 @@ function renderValidationSection(kappaData) {
     `;
 }
 
-async function validateExtraction(extractionId, decision) {
+async function handleValidateExtraction(extractionId, decision) {
     if (!appState.currentProject?.id) {
         showToast('Sélectionnez un projet', 'warning');
         return;
@@ -219,3 +219,5 @@ async function calculateKappa() {
         showLoadingOverlay(false);
     }
 }
+
+window.validateExtraction = handleValidateExtraction;

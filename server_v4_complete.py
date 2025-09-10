@@ -9,7 +9,7 @@ import io
 import zipfile
 import pandas as pd
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import Flask, jsonify, request, Blueprint, send_from_directory, Response
 from flask_cors import CORS
 from rq import Queue
@@ -29,14 +29,18 @@ from tasks_v4_complete import (
     run_meta_analysis_task,
     run_descriptive_stats_task,
     import_pdfs_from_zotero_task,
+    run_atn_stakeholder_analysis_task, # Correction: Import de la bonne fonction ATN
+    import_from_zotero_file_task,
     index_project_pdfs_task,
     answer_chat_question_task,
     fetch_online_pdf_task,
-    import_from_zotero_file_task,
     pull_ollama_model_task,
     calculate_kappa_task,
-    run_atn_score_task
+    run_atn_score_task,
+    run_risk_of_bias_task, # Ajout de la nouvelle tâche
+    add_manual_articles_task # Ajout de la nouvelle tâche
 )
+from werkzeug.utils import secure_filename
 
 from utils.fetchers import db_manager, fetch_article_details
 from utils.file_handlers import sanitize_filename
@@ -195,9 +199,106 @@ CREATE TABLE IF NOT EXISTS chat_messages (
 )
 """))
 
-            # Migrations idempotentes
-            conn.execute(text("ALTER TABLE projects ADD COLUMN IF NOT EXISTS inter_rater_reliability TEXT"))
-            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS validations TEXT"))
+            conn.execute(text("""
+CREATE TABLE IF NOT EXISTS atn_metrics (
+    id TEXT PRIMARY KEY,
+    extraction_id TEXT NOT NULL,
+    empathy_score_ai FLOAT,
+    empathy_score_human FLOAT,
+    wai_sr_score FLOAT,
+    adherence_rate FLOAT,
+    algorithmic_trust FLOAT,
+    acceptability_score FLOAT,
+    stakeholder_group TEXT,
+    created_at TEXT,
+    FOREIGN KEY (extraction_id) REFERENCES extractions(id)
+)
+"""))
+
+            # Table pour les groupes de parties prenantes (manquait)
+            conn.execute(text("""
+CREATE TABLE IF NOT EXISTS stakeholder_groups (
+    id TEXT PRIMARY KEY,
+    project_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    color TEXT DEFAULT '#4CAF50',
+    description TEXT,
+    created_at TEXT,
+    FOREIGN KEY (project_id) REFERENCES projects(id)
+)
+"""))
+
+
+            # Colonnes spécialisées pour l'ATN
+            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS stakeholder_perspective TEXT"))
+            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS ai_type TEXT"))
+            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS platform_used TEXT"))
+            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS ethical_considerations TEXT"))
+
+# Table pour la conformité réglementaire
+# Ajout de la colonne PRISMA checklist
+            conn.execute(text("ALTER TABLE projects ADD COLUMN IF NOT EXISTS prisma_checklist TEXT"))
+
+            # Nouvelle table pour le Risque de Biais (RoB)
+            conn.execute(text("""
+CREATE TABLE IF NOT EXISTS risk_of_bias (
+    id TEXT PRIMARY KEY,
+    project_id TEXT NOT NULL,
+    article_id TEXT NOT NULL,
+    domain_1_bias TEXT,
+    domain_1_justification TEXT,
+    domain_2_bias TEXT,
+    domain_2_justification TEXT,
+    overall_bias TEXT,
+    overall_justification TEXT,
+    created_at TEXT,
+    FOREIGN KEY (project_id) REFERENCES projects(id)
+)
+"""))
+
+            # Ajout de colonnes pour la gestion multipartie prenante
+            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS stakeholder_perspective TEXT"))
+            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS stakeholder_barriers TEXT"))
+            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS stakeholder_facilitators TEXT"))
+            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS stakeholder_outcomes TEXT"))
+
+            # --- Début du bloc à remplacer ---
+
+            # Vérifier si le projet par défaut existe, sinon le créer
+            default_project_exists = conn.execute(text("SELECT id FROM projects WHERE id = 'default'")).first()
+            if not default_project_exists:
+                conn.execute(text("""
+                    INSERT INTO projects (id, name, description, status, created_at, updated_at)
+                    VALUES ('default', 'Modèles par défaut', 'Projet système pour les grilles par défaut', 'completed', NOW(), NOW())
+                """))
+                logger.info("✅ Projet par défaut créé.")
+
+            # Vérifier si la grille ATN par défaut existe, sinon la créer
+            atn_grid_exists = conn.execute(text("SELECT id FROM extraction_grids WHERE name = 'Grille ATN Standardisée' AND project_id = 'default'")).first()
+            if not atn_grid_exists:
+                try:
+                    with open('grille-ATN.json', 'r', encoding='utf-8') as f:
+                        atn_data = json.load(f)
+                    
+                    atn_grid_params = {
+                        "id": str(uuid.uuid4()),
+                        "project_id": "default",  # Lier au projet par défaut maintenant existant
+                        "name": atn_data.get("name", "Grille ATN Standardisée"),
+                        "fields": json.dumps([
+                            {"name": field, "description": f"Extraction pour {field}"} for field in atn_data.get("fields", [])
+                        ]),
+                        "created_at": datetime.now(timezone.utc)
+                    }
+                    
+                    conn.execute(text("""
+                        INSERT INTO extraction_grids (id, project_id, name, fields, created_at)
+                        VALUES (:id, :project_id, :name, :fields, :created_at)
+                    """), atn_grid_params)
+                    logger.info("✅ Grille ATN standardisée créée et liée au projet par défaut.")
+                except FileNotFoundError:
+                    logger.warning("⚠️ Fichier grille-ATN.json non trouvé. La grille par défaut ne sera pas créée.")
+                except Exception as e:
+                    logger.error(f"❌ Erreur lors de la création de la grille ATN par défaut: {e}")
 
             # Seeding profils
             count_profiles = conn.execute(text("SELECT COUNT(*) FROM analysis_profiles")).scalar_one()
@@ -260,10 +361,314 @@ VALUES (:id, :name, :is_custom, :preprocess_model, :extract_model, :synthesis_mo
         except Exception as e:
             logger.error(f"❌ Erreur initialisation DB: {e}", exc_info=True)
             raise
+        finally:
+            conn.commit() # S'assurer que la transaction est validée
             
 # ================================================================
 # 2) API Routes
 # ================================================================
+@api_bp.route('/projects/<project_id>/export/thesis', methods=['GET'])
+def export_for_thesis(project_id):
+    """Export spécialisé pour thèse : données ATN + graphiques haute résolution."""
+    session = Session()
+    try:
+        # 1. Données ATN avec gestion des erreurs
+        atn_data = session.execute(text("""
+            SELECT extracted_data, stakeholder_perspective, ai_type, 
+                   ethical_considerations, stakeholder_barriers, stakeholder_facilitators
+            FROM extractions 
+            WHERE project_id = :pid AND extracted_data IS NOT NULL
+        """), {"pid": project_id}).mappings().all()
+
+        # 2. Métriques ATN avec valeurs par défaut et syntaxe PostgreSQL
+        metrics_query = """
+            SELECT 
+                AVG(CASE WHEN extracted_data->>'Score_empathie_IA' ~ '^[0-9.]+$' 
+                    THEN CAST(extracted_data->>'Score_empathie_IA' AS FLOAT) END) as avg_ai_empathy,
+                AVG(CASE WHEN extracted_data->>'Score_empathie_humain' ~ '^[0-9.]+$' 
+                    THEN CAST(extracted_data->>'Score_empathie_humain' AS FLOAT) END) as avg_human_empathy,
+                COUNT(*) as total_studies,
+                COUNT(CASE WHEN extracted_data->>'RGPD_conformité' = 'Oui' THEN 1 END) as gdpr_compliant,
+                COUNT(CASE WHEN extracted_data->>'Type_IA' IS NOT NULL THEN 1 END) as ai_type_identified
+            FROM extractions 
+            WHERE project_id = :pid
+        """
+        
+        metrics = session.execute(text(metrics_query), {"pid": project_id}).mappings().fetchone()
+        
+        # 3. Récupérer les infos du projet
+        project_info = session.execute(text("""
+            SELECT name, description, created_at, search_query, databases_used
+            FROM projects WHERE id = :pid
+        """), {"pid": project_id}).mappings().fetchone()
+
+        # 4. Créer le ZIP d'export thèse
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
+            
+            # Excel avec données ATN pour tableaux
+            if atn_data:
+                df_atn = pd.DataFrame([dict(row) for row in atn_data])
+                excel_buffer = io.BytesIO()
+                with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
+                    df_atn.to_excel(writer, sheet_name='Données_ATN', index=False)
+                    
+                    # Feuille métriques
+                    metrics_df = pd.DataFrame([dict(metrics)])
+                    metrics_df.to_excel(writer, sheet_name='Métriques_Agrégées', index=False)
+                    
+                zf.writestr('donnees_atn_these.xlsx', excel_buffer.getvalue())
+
+            # JSON détaillé pour analyses
+            export_data = {
+                "project_info": dict(project_info) if project_info else {},
+                "metrics": dict(metrics) if metrics else {},
+                "export_date": datetime.now().isoformat(),
+                "total_extractions": len(atn_data)
+            }
+            zf.writestr('export_metadata.json', json.dumps(export_data, indent=2, ensure_ascii=False))
+
+            # Graphiques haute résolution
+            project_dir = PROJECTS_DIR / project_id
+            if project_dir.exists():
+                for graph_file in project_dir.glob("*.png"):
+                    zf.write(graph_file, f"graphiques_these/{graph_file.name}")
+                for graph_file in project_dir.glob("*.pdf"):  # Versions vectorielles
+                    zf.write(graph_file, f"graphiques_these/{graph_file.name}")
+
+            # Rapport automatique LaTeX
+            generate_thesis_report(zf, atn_data, metrics, project_info)
+
+        buf.seek(0)
+        return Response(
+            buf.getvalue(),
+            mimetype='application/zip',  # CORRECTION : Ajout d'une virgule ici
+            headers={'Content-Disposition': f'attachment; filename=these_atn_{project_id}.zip'}
+        )
+        
+    except Exception as e:
+        logger.error(f"Erreur export ATN: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur interne du serveur'}), 500
+    finally:
+        session.close()
+
+def generate_thesis_report(zf, atn_data, metrics, project_info):
+    """Génère un rapport LaTeX complet pour la thèse."""
+    
+    # Données sécurisées
+    project_name = project_info.get('name', 'Projet ATN') if project_info else 'Projet ATN'
+    total_studies = metrics.get('total_studies', 0) if metrics else 0
+    avg_ai_empathy = metrics.get('avg_ai_empathy') or 0
+    avg_human_empathy = metrics.get('avg_human_empathy') or 0
+    gdpr_compliant = metrics.get('gdpr_compliant', 0) if metrics else 0
+    
+    latex_template = f"""\\documentclass[12pt,a4paper]{{article}}
+\\usepackage[utf8]{{inputenc}}
+\\usepackage[french]{{babel}}
+\\usepackage{{graphicx}}
+\\usepackage{{booktabs}}
+\\usepackage{{longtable}}
+\\usepackage{{geometry}}
+\\geometry{{margin=2.5cm}}
+
+\\title{{Alliance Thérapeutique Numérique\\\\
+Résultats de la Revue Systématique}}
+\\author{{Thèse de Médecine Générale}}
+\\date{{\\today}}
+
+\\begin{{document}}
+\\maketitle
+
+\\section*{{Informations sur le projet}}
+\\begin{{itemize}}
+    \\item \\textbf{{Nom du projet}}: {project_name.replace('_', ' ')}
+    \\item \\textbf{{Nombre d'études incluses}}: {total_studies}
+    \\item \\textbf{{Date d'export}}: \\today
+\\end{{itemize}}
+
+\\section{{Résumé de l'analyse}}
+
+\\subsection{{Métriques d'Empathie}}
+\\begin{{table}}[h]
+\\centering
+\\begin{{tabular}}{{lc}}
+\\toprule
+\\textbf{{Métrique}} & \\textbf{{Valeur}} \\\\
+\\midrule
+Score moyen d'empathie IA & {avg_ai_empathy:.2f}/10 \\\\
+Score moyen d'empathie humaine & {avg_human_empathy:.2f}/10 \\\\
+Études conformes RGPD & {gdpr_compliant}/{total_studies} \\\\
+\\bottomrule
+\\end{{tabular}}
+\\caption{{Métriques d'empathie et conformité réglementaire}}
+\\end{{table}}
+
+\\subsection{{Visualisations}}
+
+\\begin{{figure}}[h]
+    \\centering
+    \\includegraphics[width=0.9\\textwidth]{{graphiques_these/prisma_flow.png}}
+    \\caption{{Diagramme PRISMA-ScR de sélection des études sur l'Alliance Thérapeutique Numérique.}}
+    \\label{{fig:prisma}}
+
+\\begin{{figure}}[h]
+    \\centering
+    \\includegraphics[width=0.8\\textwidth]{{graphiques_these/meta_analysis_plot.png}}
+    \\caption{{Distribution des scores de pertinence des études analysées}}
+    \\label{{fig:scores}}
+\\end{{figure}}
+
+\\section{{Méthodologie}}
+Cette analyse a été réalisée avec AnalyLit v4.1, un outil d'intelligence artificielle spécialisé dans les revues de littérature systématiques. Les données ont été extraites automatiquement selon la grille ATN standardisée et validées manuellement.
+
+\\section{{Fichiers disponibles}}
+\\begin{{itemize}}
+    \\item \\texttt{{donnees\_atn\_these.xlsx}} : Données complètes au format Excel
+    \\item \\texttt{{graphiques\_these/}} : Graphiques haute résolution (PNG et PDF)
+    \\item \\texttt{{export\_metadata.json}} : Métadonnées de l'export
+\\end{{itemize}}
+
+\\end{{document}}
+"""
+    
+    zf.writestr('rapport_these.tex', latex_template)
+    
+    # Rapport Markdown pour Word
+    markdown_template = f"""# Alliance Thérapeutique Numérique - Résultats
+
+## Informations du projet
+- **Projet** : {project_name}
+- **Études analysées** : {total_studies}
+- **Date d'export** : {datetime.now().strftime('%d/%m/%Y')}
+
+## Métriques clés
+- **Empathie IA moyenne** : {avg_ai_empathy:.2f}/10
+- **Empathie humaine moyenne** : {avg_human_empathy:.2f}/10
+- **Conformité RGPD** : {gdpr_compliant}/{total_studies} études
+
+## Graphiques Disponibles
+1. **Diagramme PRISMA-ScR** : `graphiques_these/prisma_flow.png`
+2. **Méta-analyse** : `graphiques_these/meta_analysis_plot.png`
+3. **Graphe de connaissances** : `graphiques_these/knowledge_graph.png`
+
+Ces fichiers sont prêts à être insérés dans votre document de thèse.
+
+## Données disponibles
+- `donnees_atn_these.xlsx` : Tableaux Excel pour insertion directe
+- `export_metadata.json` : Métadonnées détaillées
+- `rapport_these.tex` : Template LaTeX compilable
+
+*Export généré par AnalyLit v4.1 ATN*"""
+    
+    zf.writestr('rapport_these.md', markdown_template)
+
+@api_bp.route('/projects/<project_id>/prisma-checklist', methods=['GET', 'POST'])
+def handle_prisma_checklist(project_id):
+    """Gère la checklist PRISMA-ScR du projet."""
+    session = Session()
+    try:
+        if request.method == 'GET':
+            project = session.execute(text("""
+                SELECT prisma_checklist FROM projects WHERE id = :pid
+            """), {"pid": project_id}).mappings().fetchone()
+            
+            if project and project.get('prisma_checklist'):
+                checklist_data = json.loads(project['prisma_checklist'])
+            else:
+                from utils.prisma_scr import PRISMA_SCR_CHECKLIST
+                checklist_data = PRISMA_SCR_CHECKLIST
+            
+            from utils.prisma_scr import get_prisma_scr_completion_rate
+            completion_rate = get_prisma_scr_completion_rate(checklist_data)
+            
+            return jsonify({
+                "checklist": checklist_data,
+                "completion_rate": completion_rate
+            })
+        
+        elif request.method == 'POST':
+            data = request.get_json(force=True)
+            
+            session.execute(text("""
+                UPDATE projects 
+                SET prisma_checklist = :checklist, updated_at = :ts 
+                WHERE id = :pid
+            """), {
+                "checklist": json.dumps(data.get('checklist', {})),
+                "ts": datetime.now().isoformat(),
+                "pid": project_id
+            })
+            session.commit()
+            
+            return jsonify({"message": "Checklist PRISMA-ScR sauvegardée"}), 200
+            
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Erreur handle_prisma_checklist: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur interne'}), 500
+    finally:
+        session.close()
+
+@api_bp.route('/projects/<project_id>/atn-analysis', methods=['POST'])
+def run_atn_analysis(project_id):
+    """Lance l'analyse ATN multipartie prenante."""
+    job = analysis_queue.enqueue(
+        run_atn_stakeholder_analysis_task,
+        project_id=project_id,
+        job_timeout='30m'
+    )
+    
+    return jsonify({
+        "message": "Analyse ATN multipartie prenante lancée.",
+        "job_id": job.id
+    }), 202
+
+@api_bp.route('/projects/<project_id>/atn-metrics', methods=['GET'])
+def get_atn_metrics(project_id):
+    """Récupère les métriques ATN agrégées."""
+    session = Session()
+    try:
+        # Métriques d'empathie
+        # CORRECTION: Remplacement de JSON_EXTRACT par la syntaxe PostgreSQL
+        empathy_metrics = session.execute(text("""
+            SELECT AVG((extracted_data->>'Score_empathie_IA')::FLOAT) as avg_ai_empathy,
+                   AVG((extracted_data->>'Score_empathie_humain')::FLOAT) as avg_human_empathy,
+                   COUNT(*) as total_with_empathy
+            FROM extractions 
+            WHERE project_id = :pid 
+            AND extracted_data->>'Score_empathie_IA' IS NOT NULL
+        """), {"pid": project_id}).mappings().fetchone()
+        
+        # Distribution des types d'IA
+        ai_types = session.execute(text("""
+            SELECT extracted_data->>'Type_IA' as ai_type, COUNT(*) as count
+            FROM extractions 
+            WHERE project_id = :pid 
+            AND extracted_data->>'Type_IA' IS NOT NULL
+            GROUP BY extracted_data->>'Type_IA'
+        """), {"pid": project_id}).mappings().all()
+        
+        # Conformité réglementaire
+        regulatory_stats = session.execute(text("""
+            SELECT 
+                SUM(CASE WHEN extracted_data->>'RGPD_conformité' = 'Oui' THEN 1 ELSE 0 END) as gdpr_compliant,
+                COUNT(CASE WHEN extracted_data->>'RGPD_conformité' IS NOT NULL THEN 1 END) as total_gdpr_mentioned,
+                COUNT(CASE WHEN extracted_data->>'AI_Act_risque' IS NOT NULL THEN 1 END) as total_ai_act_mentioned
+            FROM extractions 
+            WHERE project_id = :pid
+        """), {"pid": project_id}).mappings().fetchone()
+        
+        return jsonify({
+            "empathy_metrics": dict(empathy_metrics) if empathy_metrics else {},
+            "ai_types_distribution": [dict(r) for r in ai_types],
+            "regulatory_compliance": dict(regulatory_stats) if regulatory_stats else {}
+        })
+        
+    except Exception as e:
+        logger.error(f"Erreur get_atn_metrics: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur lors du calcul des métriques ATN'}), 500
+    finally:
+        session.close()
 
 @api_bp.route('/health', methods=['GET'])
 def health_check():
@@ -533,6 +938,74 @@ def get_project_extractions(project_id):
     finally:
         session.close()
 
+@api_bp.route('/projects/<project_id>/files', methods=['GET'])
+def get_project_files(project_id):
+    """Retourne la liste des fichiers (PDFs) associés à un projet."""
+    try:
+        project_dir = PROJECTS_DIR / project_id
+        if not project_dir.is_dir():
+            # Le répertoire projet n'existe pas, donc pas de fichiers
+            return jsonify([])
+
+        files_info = []
+        for f in project_dir.iterdir():
+            if f.is_file():
+                try:
+                    # Ajoute la taille du fichier pour information
+                    size = f.stat().st_size
+                    files_info.append({'filename': f.name, 'size': size})
+                except Exception as e:
+                    # Si la lecture d'un fichier échoue, on continue
+                    logger.warning(f"Impossible de lire les infos du fichier {f.name}: {e}")
+                    continue
+                    
+        return jsonify(files_info)
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération des fichiers pour le projet {project_id}: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur interne du serveur lors de la récupération des fichiers.'}), 500
+
+@api_bp.route('/projects/<project_id>/index-pdfs', methods=['POST'])
+def run_index_pdfs(project_id):
+    """Lance l'indexation des PDFs pour le chat RAG."""
+    try:
+        # On met la tâche dans la file d'attente "background"
+        job = background_queue.enqueue(
+            index_project_pdfs_task,
+            project_id=project_id,
+            job_timeout='1h'  # Timeout généreux pour les gros projets
+        )
+        # Notifier l'utilisateur que la tâche a bien été lancée
+        send_project_notification(
+            project_id, 
+            'info', 
+            'Lancement de l\'indexation des PDFs en arrière-plan.'
+        )
+        return jsonify({'message': 'Indexation des PDFs lancée en arrière-plan.', 'job_id': job.id}), 202
+    except Exception as e:
+        logger.error(f"Erreur lors du lancement de l'indexation pour le projet {project_id}: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur interne du serveur lors du lancement de la tâche.'}), 500
+
+@api_bp.route('/projects/<project_id>/results', methods=['GET'])
+def get_project_results(project_id):
+    """Récupère les résultats de recherche d'un projet."""
+    session = Session()
+    try:
+        # Récupérer les résultats de recherche pour le projet
+        rows = session.execute(text("""
+            SELECT * FROM search_results 
+            WHERE project_id = :pid 
+            ORDER BY created_at DESC
+        """), {"pid": project_id}).mappings().all()
+        
+        results = [dict(row) for row in rows]
+        return jsonify(results), 200
+        
+    except Exception as e:
+        logger.error(f"Erreur get_project_results: {e}", exc_info=True)
+        return jsonify({"error": "Erreur lors de la récupération des résultats"}), 500
+    finally:
+        session.close()
+        
 # --- Profils et prompts ---
 @api_bp.route('/profiles', methods=['GET', 'POST'])
 def handle_analysis_profiles():
@@ -663,56 +1136,209 @@ def handle_zotero_settings():
         return jsonify({'message': 'Paramètres Zotero sauvegardés.'})
 
 # --- Import Zotero ---
-def add_manual_articles_to_project(project_id, article_ids):
-    processed_ids = []
+@api_bp.route('/projects/<project_id>/analyses', methods=['GET'])
+def get_project_analyses(project_id):
+    """
+    Retourne un petit objet JSON résumant l'état et les sorties d'analyse
+    pour alimenter l'onglet 'Analyses' du frontend.
+    """
     session = Session()
     try:
-        for article_id in article_ids:
-            if not article_id or not isinstance(article_id, str):
-                continue
-            exists = session.execute(text("""
-            SELECT 1 FROM search_results WHERE project_id = :pid AND article_id = :aid
-            """), {"pid": project_id, "aid": article_id}).fetchone()
-            if exists:
-                processed_ids.append(article_id)
-                continue
+        row = session.execute(text("""
+            SELECT 
+                status,
+                analysis_result,
+                analysis_plot_path,
+                synthesis_result,
+                discussion_draft,
+                knowledge_graph,
+                prisma_flow_path
+            FROM projects
+            WHERE id = :pid
+        """), {"pid": project_id}).mappings().fetchone()
 
-            details = fetch_article_details(article_id)
-            if details and details.get('title') != 'Erreur de récupération':
-                session.execute(text("""
-                INSERT INTO search_results
-                (id, project_id, article_id, title, abstract, database_source, created_at, url, doi, authors, journal, publication_date)
-                VALUES (:id, :pid, :aid, :title, :abstract, :db, :ts, :url, :doi, :authors, :journal, :pub)
-                """), {
-                    "id": str(uuid.uuid4()),
-                    "pid": project_id,
-                    "aid": article_id,
-                    "title": details.get('title', 'Titre non trouvé'),
-                    "abstract": details.get('abstract', ''),
-                    "db": details.get('database_source', 'manual'),
-                    "ts": datetime.now().isoformat(),
-                    "url": details.get('url'),
-                    "doi": details.get('doi'),
-                    "authors": details.get('authors'),
-                    "journal": details.get('journal'),
-                    "publication_date": details.get('publication_date'),
-                })
-                processed_ids.append(article_id)
+        if not row:
+            return jsonify({"error": "Projet introuvable"}), 404
 
-        total_articles = session.execute(text(
-            "SELECT COUNT(*) FROM search_results WHERE project_id = :pid"
-        ), {"pid": project_id}).scalar_one()
-        session.execute(text(
-            "UPDATE projects SET pmids_count = :c WHERE id = :pid"
-        ), {"c": total_articles, "pid": project_id})
-        session.commit()
-        return processed_ids
+        # Normalisation des champs (JSON string -> dict)
+        def _safe_load(s):
+            try:
+                return json.loads(s) if isinstance(s, str) and s.strip() else None
+            except (json.JSONDecodeError, TypeError):
+                return s if isinstance(s, (dict, list)) else None # Retourne la donnée si déjà un dict/list
+
+        analysis_data = {
+            "status": row.get("status"),
+            "analysis_result": _safe_load(row.get("analysis_result")),
+            "analysis_plot_path": row.get("analysis_plot_path"),
+            "synthesis_result": _safe_load(row.get("synthesis_result")),
+            "discussion_draft": row.get("discussion_draft"),
+            "knowledge_graph": _safe_load(row.get("knowledge_graph")),
+            "prisma_flow_path": row.get("prisma_flow_path"),
+        }
+        return jsonify(analysis_data), 200
     except Exception as e:
-        session.rollback()
-        logger.error(f"add_manual_articles_to_project error: {e}")
-        return processed_ids
+        logger.error(f"Erreur get_project_analyses: {e}", exc_info=True)
+        return jsonify({"error": "Erreur interne"}), 500
     finally:
         session.close()
+        
+# --- Export projet ---
+@api_bp.route('/projects/<project_id>/add-manual-articles', methods=['POST'])
+def add_manual_articles(project_id):
+    """
+    Lance l'ajout asynchrone d'articles manuellement (PMID, DOI, arXiv) au projet.
+    """
+    try:
+        data = request.get_json(force=True) or {}
+        raw = data.get('identifiers', '') or ''
+        items = data.get('items')
+        
+        if isinstance(items, list) and items:
+            identifiers = [str(x).strip() for x in items if str(x).strip()]
+        else:
+            identifiers = [line.strip() for line in str(raw).splitlines() if line.strip()]
+        
+        if not identifiers:
+            return jsonify({'error': 'Aucun identifiant fourni.'}), 400
+
+        job = background_queue.enqueue(
+            add_manual_articles_task,
+            project_id=project_id,
+            identifiers=identifiers,
+            job_timeout='30m'
+        )
+        
+        return jsonify({'message': f'Ajout de {len(identifiers)} article(s) lancé en arrière-plan.', 'job_id': job.id}), 202
+        
+    except Exception as e:
+        logger.error(f"Erreur add_manual_articles: {e}", exc_info=True)
+        return jsonify({'error': "Erreur lors du lancement de l'ajout des articles."}), 500
+
+@api_bp.route('/projects/<project_id>/export-analyses', methods=['GET'])
+def export_project_analyses(project_id):
+    """Exporte les résultats d'analyse d'un projet dans une archive ZIP."""
+    # CORRECTION : Renommer la fonction pour refléter son contenu plus large
+    return export_project_data(project_id)
+
+def export_project_data(project_id):
+    """Exporte TOUTES les données d'un projet dans une archive ZIP."""
+    session = Session()
+    try:
+        project = session.execute(text("""
+            SELECT name, description, discussion_draft, knowledge_graph, prisma_flow_path, analysis_result, synthesis_result
+            FROM projects WHERE id = :pid
+        """), {"pid": project_id}).mappings().fetchone()
+
+        if not project:
+            return jsonify({'error': 'Projet non trouvé'}), 404
+
+        project_name_safe = sanitize_filename(project.get('name', 'projet_sans_nom'))
+        
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
+            # --- Fichiers d'analyse ---
+            # Exporter le brouillon de discussion
+            if project.get('discussion_draft'):
+                zf.writestr('brouillon_discussion.txt', project['discussion_draft'])
+
+            # Exporter le graphe de connaissances
+            if project.get('knowledge_graph'):
+                try:
+                    kg_data = json.loads(project['knowledge_graph'])
+                    zf.writestr('graphe_connaissances.json', json.dumps(kg_data, indent=2, ensure_ascii=False))
+                except (json.JSONDecodeError, TypeError):
+                    zf.writestr('graphe_connaissances.txt', str(project['knowledge_graph']))
+
+            # Exporter les autres résultats d'analyse
+            if project.get('analysis_result'):
+                try:
+                    analysis_data = json.loads(project['analysis_result'])
+                    zf.writestr('resultats_analyse_generale.json', json.dumps(analysis_data, indent=2, ensure_ascii=False))
+                except (json.JSONDecodeError, TypeError):
+                    zf.writestr('resultats_analyse_generale.txt', str(project['analysis_result']))
+
+            # Exporter la synthèse principale
+            if project.get('synthesis_result'):
+                try:
+                    synthesis_data = json.loads(project['synthesis_result'])
+                    zf.writestr('synthese_principale.json', json.dumps(synthesis_data, indent=2, ensure_ascii=False))
+                except (json.JSONDecodeError, TypeError):
+                    zf.writestr('synthese_principale.txt', str(project['synthesis_result']))
+
+            # Ajouter l'image PRISMA si elle existe
+            if project.get('prisma_flow_path'):
+                prisma_path = Path(project['prisma_flow_path'])
+                if prisma_path.exists():
+                    zf.write(prisma_path, prisma_path.name)
+            
+            # --- Données brutes (CSV) ---
+            # Exporter les résultats de recherche
+            search_results = pd.read_sql(text("SELECT * FROM search_results WHERE project_id = :pid"), session.bind, params={"pid": project_id})
+            if not search_results.empty:
+                zf.writestr('articles_recherches.csv', search_results.to_csv(index=False))
+
+            # Exporter les extractions
+            extractions = pd.read_sql(text("SELECT * FROM extractions WHERE project_id = :pid"), session.bind, params={"pid": project_id})
+            if not extractions.empty:
+                zf.writestr('donnees_extraites_ia.csv', extractions.to_csv(index=False))
+
+            # Exporter les évaluations de risque de biais
+            risk_of_bias = pd.read_sql(text("SELECT * FROM risk_of_bias WHERE project_id = :pid"), session.bind, params={"pid": project_id})
+            if not risk_of_bias.empty:
+                zf.writestr('risques_de_biais.csv', risk_of_bias.to_csv(index=False))
+
+        buf.seek(0)
+        return Response(
+            buf.getvalue(),
+            mimetype='application/zip',
+            headers={'Content-Disposition': f'attachment; filename=export_complet_{project_name_safe}.zip'}
+        )
+    except Exception as e:
+        logger.error(f"Erreur lors de l'export des données pour le projet {project_id}: {e}", exc_info=True)
+        return jsonify({'error': "Erreur lors de la création de l'export."}), 500
+    finally:
+        session.close()
+        
+# --- Statut détaillé des files (remplace/complète les endpoints de queues) ---
+@api_bp.route('/admin/queues-status', methods=['GET'])
+def get_queues_status():
+    """Retourne un statut consolidé et stable pour l’UI (évite [object Promise])."""
+    try:
+        queues = [
+            ('analylit_processing_v4', processing_queue, 'Traitement des articles'),
+            ('analylit_synthesis_v4', synthesis_queue, 'Synthèses et analyses'),
+            ('analylit_analysis_v4', analysis_queue, 'Analyses avancées'),
+            ('analylit_background_v4', background_queue, 'Arrière-plan')
+        ]
+        all_workers = Worker.all(connection=redis_conn)
+        # Compte des workers à l’écoute de chaque file réelle RQ
+        worker_map = {qname: 0 for qname, _, _ in queues}
+        for w in all_workers:
+            try:
+                names = [n.decode() if isinstance(n, bytes) else n for n in w.queue_names()]
+            except Exception:
+                names = []
+            for qname, qobj, _ in queues:
+                if qobj.name in names:
+                    worker_map[qname] += 1
+
+        payload = []
+        for qname, qobj, label in queues:
+            payload.append({
+                "rq_name": qobj.name,
+                "display": label,
+                "pending": len(qobj),
+                "started": len(qobj.started_job_registry),
+                "failed": len(qobj.failed_job_registry),
+                "finished": len(qobj.finished_job_registry),
+                "scheduled": len(qobj.scheduled_job_registry),
+                "workers": worker_map.get(qname, 0)
+            })
+        return jsonify({"queues": payload, "timestamp": datetime.now().isoformat()}), 200
+    except Exception as e:
+        logger.error(f"Erreur get_queues_status: {e}", exc_info=True)
+        return jsonify({"queues": []}), 200
 
 @api_bp.route('/projects/<project_id>/import-zotero', methods=['POST'])
 def import_from_zotero(project_id):
@@ -724,20 +1350,22 @@ def import_from_zotero(project_id):
     except FileNotFoundError:
         return jsonify({'error': 'Veuillez configurer Zotero dans les paramètres.'}), 400
 
-    article_ids_to_process = add_manual_articles_to_project(project_id, manual_ids)
-    if not article_ids_to_process:
-        return jsonify({'error': 'Aucun article valide à importer pour ce projet.'}), 400
+    if not manual_ids:
+        return jsonify({'error': 'Aucun article à importer pour ce projet.'}), 400
 
+    # La logique d'ajout d'article est déjà gérée côté client ou via une autre route.
+    # Cette tâche se concentre sur la récupération des PDFs.
+    # CORRECTION: Appel de la bonne tâche pour récupérer les PDFs depuis Zotero.
     job = background_queue.enqueue(
         import_pdfs_from_zotero_task,
         project_id=project_id,
-        pmids=article_ids_to_process,
+        pmids=manual_ids,
         zotero_user_id=zotero_config.get('user_id'),
         zotero_api_key=zotero_config.get('api_key'),
         job_timeout='1h'
     )
     return jsonify({
-        'message': f'Import Zotero lancé pour {len(article_ids_to_process)} articles.',
+        'message': f'Import Zotero lancé pour {len(manual_ids)} articles.',
         'job_id': job.id
     }), 202
 
@@ -770,12 +1398,11 @@ def import_from_zotero_file(project_id):
 @api_bp.route('/projects/<project_id>/fetch-online-pdfs', methods=['POST'])
 def fetch_online_pdfs(project_id):
     data = request.get_json(force=True)
-    manual_ids = data.get('articles', [])
-    article_ids_to_process = add_manual_articles_to_project(project_id, manual_ids)
-    if not article_ids_to_process:
+    article_ids = data.get('articles', [])
+    if not article_ids:
         return jsonify({'error': 'Aucun article valide à traiter pour ce projet.'}), 400
 
-    for article_id in article_ids_to_process:
+    for article_id in article_ids:
         background_queue.enqueue(
             fetch_online_pdf_task,
             project_id=project_id,
@@ -783,7 +1410,7 @@ def fetch_online_pdfs(project_id):
             job_timeout='1h'
         )
     return jsonify({
-        'message': f'Recherche OA lancée pour {len(article_ids_to_process)} articles.'
+        'message': f'Recherche OA lancée pour {len(article_ids)} articles.'
     }), 202
 
 # --- Pipeline d'analyse ---
@@ -923,7 +1550,53 @@ def save_extraction_decision(project_id, extraction_id):
         return jsonify({'error': 'Erreur interne du serveur'}), 500
     finally:
         session.close()
-        
+
+@api_bp.route('/projects/<project_id>/validate-article', methods=['POST'])
+def validate_article_endpoint(project_id):
+    """
+    CORRECTION: Route manquante pour la validation manuelle depuis la section Validation.
+    Met à jour le statut de validation d'un article (extraction).
+    """
+    session = Session()
+    try:
+        data = request.get_json(force=True)
+        article_id = data.get('article_id')
+        decision = data.get('decision') # 'include' ou 'exclude'
+        score = data.get('score')
+        justification = data.get('justification')
+
+        if not all([article_id, decision]):
+            return jsonify({'error': 'article_id et decision sont requis'}), 400
+
+        # Trouver l'extraction correspondante
+        extraction = session.execute(text("""
+            SELECT id FROM extractions WHERE project_id = :pid AND pmid = :pmid
+        """), {"pid": project_id, "pmid": article_id}).mappings().fetchone()
+
+        if not extraction:
+            return jsonify({'error': 'Extraction non trouvée pour cet article'}), 404
+
+        # Mettre à jour l'extraction
+        session.execute(text("""
+            UPDATE extractions 
+            SET user_validation_status = :decision, relevance_score = :score, relevance_justification = :justification
+            WHERE id = :id
+        """), {
+            "decision": decision,
+            "score": score,
+            "justification": justification,
+            "id": extraction['id']
+        })
+        session.commit()
+        send_project_notification(project_id, 'validation_updated', f'Article {article_id} validé comme "{decision}".')
+        return jsonify({'message': 'Validation enregistrée avec succès'}), 200
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Erreur validate_article_endpoint: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur interne du serveur'}), 500
+    finally:
+        session.close()
+                
 # --- Validation inter-évaluateurs ---
 @api_bp.route('/projects/<project_id>/export-validations', methods=['GET'])
 def export_validations(project_id):
@@ -1038,6 +1711,88 @@ def get_inter_rater_stats(project_id):
     finally:
         session.close()
 
+@api_bp.route('/projects/<project_id>/risk-of-bias', methods=['GET', 'POST'])
+def handle_risk_of_bias(project_id):
+    """Gère la récupération et la sauvegarde des évaluations de risque de biais."""
+    session = Session()
+    try:
+        if request.method == 'GET':
+            article_id = request.args.get('article_id')
+            if not article_id:
+                return jsonify({'error': 'article_id est requis'}), 400
+            
+            rob = session.execute(text("""
+                SELECT * FROM risk_of_bias WHERE project_id = :pid AND article_id = :aid
+            """), {"pid": project_id, "aid": article_id}).mappings().fetchone()
+            
+            return jsonify(dict(rob) if rob else {})
+
+        if request.method == 'POST':
+            data = request.get_json(force=True)
+            rob_id = data.get('id') or str(uuid.uuid4())
+            
+            # Logique de sauvegarde ou de mise à jour
+            session.execute(text("""
+                INSERT INTO risk_of_bias (id, project_id, article_id, domain_1_bias, domain_1_justification, domain_2_bias, domain_2_justification, overall_bias, overall_justification, created_at)
+                VALUES (:id, :pid, :aid, :d1b, :d1j, :d2b, :d2j, :ob, :oj, :ts)
+                ON CONFLICT (id) DO UPDATE SET
+                    domain_1_bias = EXCLUDED.domain_1_bias,
+                    domain_1_justification = EXCLUDED.domain_1_justification,
+                    domain_2_bias = EXCLUDED.domain_2_bias,
+                    domain_2_justification = EXCLUDED.domain_2_justification,
+                    overall_bias = EXCLUDED.overall_bias,
+                    overall_justification = EXCLUDED.overall_justification
+            """), {**data, "id": rob_id, "pid": project_id, "ts": datetime.now().isoformat()})
+            
+            session.commit()
+            send_project_notification(project_id, 'rob_updated', f"Évaluation RoB mise à jour pour {data.get('article_id')}")
+            return jsonify({'message': 'Évaluation sauvegardée'}), 200
+
+    finally:
+        session.close()
+
+@api_bp.route('/projects/<project_id>/run-rob-analysis', methods=['POST'])
+def run_rob_analysis(project_id):
+    """Lance l'analyse du risque de biais pour les articles sélectionnés."""
+    session = Session()
+    try:
+        data = request.get_json(force=True)
+        article_ids = data.get('article_ids', [])
+        if not article_ids:
+            return jsonify({'error': 'Aucun article sélectionné'}), 400
+
+        for article_id in article_ids:
+            analysis_queue.enqueue(run_risk_of_bias_task, project_id=project_id, article_id=article_id, job_timeout='20m')
+        
+        return jsonify({
+            "message": f"Analyse du risque de biais lancée pour {len(article_ids)} article(s)."
+        }), 202
+    finally:
+        session.close()
+
+# ================================================================
+# 8) Analyses
+# ================================================================
+
+@api_bp.route('/projects/<project_id>/run-prisma-flow', methods=['POST'])
+def run_prisma_flow(project_id):
+    """Lance la génération du diagramme PRISMA."""
+    job = analysis_queue.enqueue(run_prisma_flow_task, project_id=project_id, job_timeout='10m')
+    return jsonify({'message': 'Génération du diagramme PRISMA lancée.', 'job_id': job.id}), 202
+
+@api_bp.route('/projects/<project_id>/run-meta-analysis', methods=['POST'])
+def run_meta_analysis(project_id):
+    """Lance une méta-analyse."""
+    job = analysis_queue.enqueue(run_meta_analysis_task, project_id=project_id, job_timeout='20m')
+    return jsonify({'message': 'Méta-analyse lancée.', 'job_id': job.id}), 202
+
+@api_bp.route('/projects/<project_id>/run-descriptive-stats', methods=['POST'])
+def run_descriptive_stats(project_id):
+    """Lance le calcul des statistiques descriptives."""
+    job = analysis_queue.enqueue(run_descriptive_stats_task, project_id=project_id, job_timeout='15m')
+    return jsonify({'message': 'Calcul des statistiques descriptives lancé.', 'job_id': job.id}), 202
+
+
 # --- Analyses avancées ---
 @api_bp.route('/projects/<project_id>/run-analysis', methods=['POST'])
 def run_advanced_analysis(project_id):
@@ -1045,12 +1800,17 @@ def run_advanced_analysis(project_id):
     analysis_type = data.get('type')
     if not analysis_type:
         return jsonify({'error': 'Type d\'analyse requis'}), 400
+
+    # Vérifier que le type est valide AVANT de changer le statut
+    valid_types = ['meta_analysis', 'atn_scores', 'discussion', 'knowledge_graph', 'prisma_flow']
+    if analysis_type not in valid_types:
+        return jsonify({'error': 'Type d\'analyse non supporté'}), 400
+
     try:
         session = Session()
         session.execute(text("UPDATE projects SET status = 'generating_analysis' WHERE id = :pid"),
                         {"pid": project_id})
         session.commit()
-        session.close()
         if analysis_type == 'meta_analysis':
             job = analysis_queue.enqueue(run_meta_analysis_task, project_id=project_id, job_timeout='30m')
         elif analysis_type == 'atn_scores':
@@ -1061,13 +1821,45 @@ def run_advanced_analysis(project_id):
             job = analysis_queue.enqueue(run_knowledge_graph_task, project_id=project_id, job_timeout='30m')
         elif analysis_type == 'prisma_flow':
             job = analysis_queue.enqueue(run_prisma_flow_task, project_id=project_id, job_timeout='30m')
-        else:
-            return jsonify({'error': 'Type d\'analyse non supporté'}), 400
         return jsonify({'message': f'Analyse {analysis_type} lancée', 'job_id': job.id}), 202
     except Exception as e:
         logger.error(f"Erreur run analysis: {e}")
         return jsonify({'error': 'Erreur lors du lancement de l\'analyse'}), 500
+    finally:
+        session.close()
 
+@api_bp.route('/projects/<project_id>/run-discussion-draft', methods=['POST'])
+def run_discussion_draft(project_id):
+    """Lance la génération du brouillon de discussion."""
+    session = Session()
+    try:
+        session.execute(text("UPDATE projects SET status = 'generating_analysis' WHERE id = :pid"), {"pid": project_id})
+        session.commit()
+        job = analysis_queue.enqueue(run_discussion_generation_task, project_id=project_id, job_timeout='30m')
+        return jsonify({'message': 'Génération du brouillon de discussion lancée', 'job_id': job.id}), 202
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Erreur run discussion draft: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+    finally:
+        session.close()
+
+@api_bp.route('/projects/<project_id>/run-knowledge-graph', methods=['POST'])
+def run_knowledge_graph(project_id):
+    """Lance la génération du graphe de connaissances."""
+    session = Session()
+    try:
+        session.execute(text("UPDATE projects SET status = 'generating_analysis' WHERE id = :pid"), {"pid": project_id})
+        session.commit()
+        job = analysis_queue.enqueue(run_knowledge_graph_task, project_id=project_id, job_timeout='30m')
+        return jsonify({'message': 'Génération du graphe de connaissances lancée', 'job_id': job.id}), 202
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Erreur run knowledge graph: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+    finally:
+        session.close()
+        
 # --- Chat RAG ---
 @api_bp.route('/projects/<project_id>/chat', methods=['POST', 'GET'])
 def handle_project_chat(project_id):
@@ -1094,6 +1886,23 @@ def handle_project_chat(project_id):
             job_timeout='15m'
         )
         return jsonify({'message': 'Question envoyée au moteur RAG.', 'job_id': job.id}), 202
+
+@api_bp.route('/projects/<project_id>/chat-messages', methods=['GET'])
+def get_chat_messages(project_id):
+    """Récupère l'historique des messages pour le chat."""
+    session = Session()
+    try:
+        rows = session.execute(text("""
+            SELECT * FROM chat_messages
+            WHERE project_id = :pid
+            ORDER BY timestamp ASC
+        """), {"pid": project_id}).mappings().all()
+        return jsonify([dict(r) for r in rows])
+    except Exception as e:
+        logger.error(f"Erreur get_chat_messages: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur interne'}), 500
+    finally:
+        session.close()
 
 # --- Ollama ---
 @api_bp.route('/ollama/models', methods=['GET'])
@@ -1137,17 +1946,32 @@ def get_queues_information():
             'analysis': analysis_queue,
             'background': background_queue
         }
+
+        # Récupérer tous les workers et compter par file
+        all_workers = Worker.all(connection=redis_conn)
+        queues_workers_count = {name: 0 for name in queue_map.keys()}
+        for w in all_workers:
+            # w.queue_names() retourne les noms des files écoutées par le worker
+            try:
+                names = [q.decode() if isinstance(q, bytes) else q for q in w.queue_names()]
+            except Exception:
+                names = []
+            for name in queue_map.keys():
+                # Le nom réel de la file dans RQ = queue.name (ex: 'analylit_processing_v4')
+                if queue_map[name].name in names:
+                    queues_workers_count[name] += 1
+
         for name, queue in queue_map.items():
             queues_info.append({
                 'name': name,
                 'size': len(queue),
-                'workers': len(queue.workers)
+                'workers': queues_workers_count.get(name, 0)
             })
         return jsonify(queues_info)
     except Exception as e:
         logger.error(f"Erreur queues info: {e}")
         return jsonify([]), 500
-
+        
 @api_bp.route('/queues/<queue_name>/clear', methods=['POST'])
 def clear_specific_queue(queue_name):
     try:
@@ -1202,126 +2026,12 @@ def export_project(project_id):
 
         buf.seek(0)
         return Response(
-            buf.getvalue(),
             mimetype='application/zip',
-            headers={'Content-Disposition': f'attachment; filename=project_{project_id}_export.zip'}
+            headers={'Content-Disposition': f'attachment; filename=export_complet_{project_name_safe}.zip'}
         )
     except Exception as e:
         logger.error(f"Erreur export projet: {e}")
         return jsonify({'error': 'Erreur lors de l\'export'}), 500
-    finally:
-        session.close()
-
-@api_bp.route('/projects/<project_id>/add-manual-articles', methods=['POST'])
-def add_manual_articles(project_id):
-    """Ajoute manuellement des articles au projet via leurs identifiants."""
-    data = request.get_json(force=True)
-    articles = data.get('articles', [])
-    fetch_metadata = data.get('fetch_metadata', True)
-
-    if not articles:
-        return jsonify({'error': 'Liste d\'articles requise'}), 400
-
-    session = Session()
-    try:
-        added_count = 0
-        failed_count = 0
-        failed_articles = []
-
-        for article_id in articles:
-            if not article_id or not isinstance(article_id, str):
-                failed_count += 1
-                continue
-
-            # Vérifier si l'article existe déjà
-            exists = session.execute(text("""
-                SELECT 1 FROM search_results WHERE project_id = :pid AND article_id = :aid
-            """), {"pid": project_id, "aid": article_id}).fetchone()
-
-            if exists:
-                continue  # Ignorer les doublons
-
-            # Récupérer les métadonnées si demandé
-            if fetch_metadata:
-                try:
-                    details = fetch_article_details(article_id)
-                    if details and details.get('title') != 'Erreur de récupération':
-                        session.execute(text("""
-                            INSERT INTO search_results (
-                                id, project_id, article_id, title, abstract, authors,
-                                publication_date, journal, doi, url, database_source, created_at
-                            ) VALUES (
-                                :id, :pid, :aid, :title, :abstract, :authors,
-                                :pub_date, :journal, :doi, :url, :db_source, :ts
-                            )
-                        """), {
-                            "id": str(uuid.uuid4()),
-                            "pid": project_id,
-                            "aid": article_id,
-                            "title": details.get('title', 'Titre non trouvé'),
-                            "abstract": details.get('abstract', ''),
-                            "authors": details.get('authors', ''),
-                            "pub_date": details.get('publication_date', ''),
-                            "journal": details.get('journal', ''),
-                            "doi": details.get('doi', ''),
-                            "url": details.get('url', ''),
-                            "db_source": 'manual',
-                            "ts": datetime.now().isoformat()
-                        })
-                        added_count += 1
-                    else:
-                        failed_articles.append(article_id)
-                        failed_count += 1
-                except Exception as e:
-                    logger.warning(f"Erreur récupération métadonnées pour {article_id}: {e}")
-                    failed_articles.append(article_id)
-                    failed_count += 1
-            else:
-                # Ajouter l'article sans métadonnées
-                session.execute(text("""
-                    INSERT INTO search_results (
-                        id, project_id, article_id, title, database_source, created_at
-                    ) VALUES (
-                        :id, :pid, :aid, :title, :db_source, :ts
-                    )
-                """), {
-                    "id": str(uuid.uuid4()),
-                    "pid": project_id,
-                    "aid": article_id,
-                    "title": f"Article {article_id}",
-                    "db_source": 'manual',
-                    "ts": datetime.now().isoformat()
-                })
-                added_count += 1
-
-        # Mettre à jour le compteur du projet
-        total_articles = session.execute(text(
-            "SELECT COUNT(*) FROM search_results WHERE project_id = :pid"
-        ), {"pid": project_id}).scalar_one()
-
-        session.execute(text(
-            "UPDATE projects SET pmids_count = :c, updated_at = :ts WHERE id = :pid"
-        ), {"c": total_articles, "ts": datetime.now().isoformat(), "pid": project_id})
-
-        session.commit()
-
-        message = f"{added_count} article(s) ajouté(s)"
-        if failed_count > 0:
-            message += f", {failed_count} échec(s)"
-
-        send_project_notification(project_id, 'articles_added', message)
-
-        return jsonify({
-            'message': message,
-            'added_count': added_count,
-            'failed_count': failed_count,
-            'failed_articles': failed_articles
-        }), 200
-
-    except Exception as e:
-        session.rollback()
-        logger.error(f"Erreur add_manual_articles: {e}", exc_info=True)
-        return jsonify({'error': 'Erreur interne du serveur'}), 500
     finally:
         session.close()
 
@@ -1392,6 +2102,58 @@ def get_validation_stats(project_id):
     except Exception as e:
         logger.error(f"Erreur get_validation_stats: {e}", exc_info=True)
         return jsonify({'error': 'Erreur interne du serveur'}), 500
+    finally:
+        session.close()
+
+@api_bp.route('/projects/<project_id>/stakeholders', methods=['GET', 'POST'])
+def handle_stakeholders(project_id):
+    session = Session()
+    try:
+        if request.method == 'GET':
+            rows = session.execute(text("""
+                SELECT * FROM stakeholder_groups 
+                WHERE project_id = :pid 
+                ORDER BY created_at ASC
+            """), {"pid": project_id}).mappings().all()
+            
+            stakeholders = [dict(r) for r in rows]
+            
+            # Si aucun groupe défini, retourner les groupes par défaut
+            if not stakeholders:
+                default_groups = [
+                    {"id": "patients", "name": "Patients/Soignés", "color": "#4CAF50", "description": "Utilisateurs finaux des solutions numériques"},
+                    {"id": "healthcare", "name": "Professionnels de santé", "color": "#2196F3", "description": "Médecins, infirmiers, autres soignants"},
+                    {"id": "developers", "name": "Développeurs/Tech", "color": "#FF9800", "description": "Concepteurs et développeurs de solutions"},
+                    {"id": "regulators", "name": "Régulateurs/Décideurs", "color": "#9C27B0", "description": "Autorités, décideurs politiques"},
+                    {"id": "payers", "name": "Payeurs/Assurances", "color": "#F44336", "description": "Organismes de financement"}
+                ]
+                return jsonify(default_groups)
+            
+            return jsonify(stakeholders)
+            
+        if request.method == 'POST':
+            data = request.get_json(force=True)
+            stakeholder = {
+                "id": str(uuid.uuid4()),
+                "project_id": project_id,
+                "name": data['name'],
+                "color": data.get('color', '#4CAF50'),
+                "description": data.get('description', ''),
+                "created_at": datetime.now().isoformat()
+            }
+            
+            session.execute(text("""
+                INSERT INTO stakeholder_groups (id, project_id, name, color, description, created_at)
+                VALUES (:id, :project_id, :name, :color, :description, :created_at)
+            """), stakeholder)
+            session.commit()
+            
+            return jsonify(stakeholder), 201
+            
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Erreur handle_stakeholders: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur interne'}), 500
     finally:
         session.close()
 
