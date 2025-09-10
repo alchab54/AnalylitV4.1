@@ -1,4 +1,7 @@
 // web/js/search.js
+import { appState, elements } from '../app.js';
+import { fetchAPI } from './api.js';
+import { showLoadingOverlay, showToast, escapeHtml, openModal, closeModal } from './ui.js';
 
 function renderSearchSection(project) {
     const container = document.getElementById('searchContainer');
@@ -42,7 +45,7 @@ function renderSearchSection(project) {
     document.getElementById('multiSearchForm').addEventListener('submit', handleMultiSearch);
     // Afficher les résultats existants
     renderSearchResultsTable();
-}
+} 
 
 async function handleMultiSearch(event) {
     event.preventDefault();
@@ -70,6 +73,33 @@ async function handleMultiSearch(event) {
     } finally {
         showLoadingOverlay(false);
     }
+}
+
+export function showSearchModal() {
+    if (!appState.currentProject) {
+        showToast('Veuillez sélectionner un projet pour lancer une recherche.', 'warning');
+        return;
+    }
+
+    const dbOptions = appState.availableDatabases.map(db => `
+        <label class="checkbox-item">
+            <input type="checkbox" name="databases" value="${db.id}" ${db.enabled ? 'checked' : ''}>
+            ${escapeHtml(db.name)}
+        </label>
+    `).join('');
+
+    const content = `
+        <form id="modalSearchForm" onsubmit="handleModalSearch(event)">
+            <div class="form-group">
+                <label for="modalSearchQuery" class="form-label">Requête de recherche</label>
+                <input type="text" id="modalSearchQuery" name="query" class="form-control" placeholder="Ex: therapeutic alliance AND digital..." required>
+            </div>
+            <div class="form-group"><label class="form-label">Bases de données</label><div class="checkbox-group">${dbOptions}</div></div>
+            <div class="form-group"><label for="modalMaxResults" class="form-label">Résultats max par base</label><input type="number" id="modalMaxResults" name="max_results" class="form-control" value="50" min="10" max="200"></div>
+            <button type="submit" class="btn btn--primary">Lancer la recherche</button>
+        </form>
+    `;
+    openModal('Nouvelle Recherche', content);
 }
 
 function renderSearchResultsTable() {
@@ -263,3 +293,4 @@ function sanitizeForFilename(name) {
 // Assurez-vous d'exposer les nouvelles fonctions si elles sont appelées par onclick
 window.toggleSelectAll = toggleSelectAll;
 window.handleDeleteSelectedArticles = handleDeleteSelectedArticles;
+window.showSearchModal = showSearchModal;

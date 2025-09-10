@@ -1717,7 +1717,6 @@ async function handleGridFormSubmit(event) {
 
 window.handleImportValidations = typeof handleImportValidations === 'function' ? handleImportValidations : (e) => { e.preventDefault(); console.warn("handleImportValidations non implémenté ou mal référencé."); };
 
-window.showSearchModal = typeof showSearchModal === 'function' ? showSearchModal : () => {};
 window.deleteProject = typeof deleteProject === 'function' ? deleteProject : () => {};
 window.selectProject = typeof selectProject === 'function' ? selectProject : () => {};
 
