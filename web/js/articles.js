@@ -37,110 +37,110 @@ export async function loadSearchResults() {
   }
 }
 
+function renderResultsHeader(count) {
+  return `
+    <h3>Résultats (${count} articles)</h3>
+    <div class="results-actions">
+      <button class="btn btn--primary btn--sm" data-action="show-search-modal">🔍 Nouvelle recherche</button>
+      <button class="btn btn--secondary btn--sm" data-action="select-all-articles">Tout sélectionner</button>
+      <button class="btn btn--accent btn--sm" data-action="batch-process-modal">Traiter la sélection (<span id="selectionCounter">0</span>)</button>
+    </div>
+  `;
+}
+
+function renderArticleRow(article, extraction, pdfExists, isSelected) {
+  const score = extraction.relevance_score ?? '';
+  const justification = extraction.relevance_justification || '';
+
+  const pdfBadge = pdfExists
+    ? `<span class="badge badge--success">PDF</span>`
+    : `<span class="badge badge--secondary">Aucun</span>`;
+
+  const titleDisplay = (article.title || 'Titre non disponible').length > 80
+    ? (article.title || 'Titre non disponible').substring(0, 80) + '...'
+    : (article.title || 'Titre non disponible');
+
+  const authorsDisplay = (article.authors || '').length > 40
+    ? (article.authors || '').substring(0, 40) + '...'
+    : (article.authors || '');
+
+  const scoreDisplay = (score !== undefined && score !== null && score !== '')
+    ? `<span class="score-badge ${score >= 7 ? 'score--high' : score >= 4 ? 'score--medium' : 'score--low'}">${score}/10</span>`
+    : `<span class="badge badge--secondary">Pas analysé</span>`;
+
+  return `
+    <tr class="article-row" data-article-id="${escapeHtml(article.article_id)}">
+      <td class="select-cell"><input type="checkbox" class="article-checkbox" data-article-id="${escapeHtml(article.article_id)}" ${isSelected ? 'checked' : ''}></td>
+      <td class="article-main">
+        <div class="article-title" title="${escapeHtml(article.title || '')}">${escapeHtml(titleDisplay)}</div>
+        <div class="article-meta">
+          <span class="article-id">ID: ${escapeHtml(article.article_id)}</span>
+          ${article.journal ? `• <span class="article-journal">${escapeHtml(article.journal)}</span>` : ''}
+          ${article.publication_date ? `• <span class="article-year">${escapeHtml(article.publication_date)}</span>` : ''}
+        </div>
+        <div class="article-authors" title="${escapeHtml(article.authors || '')}">${escapeHtml(authorsDisplay)}</div>
+      </td>
+      <td class="source-cell">
+        <span class="source-badge source--${escapeHtml((article.database_source || 'unknown').toLowerCase())}">${escapeHtml((article.database_source || '').toUpperCase())}</span>
+      </td>
+      <td class="pdf-cell">${pdfBadge}</td>
+      <td class="score-cell">
+        ${scoreDisplay}
+        ${justification ? `<div class="score-justification" title="${escapeHtml(justification)}">${escapeHtml(justification.length > 50 ? justification.substring(0, 50) + '...' : justification)}</div>` : ''}
+      </td>
+      <td class="actions-cell">
+        <button class="btn btn--sm btn--outline" data-action="view-details" data-article-id="${escapeHtml(article.article_id)}" title="Voir détails">👁️</button>
+        ${article.url ? `<a href="${article.url}" target="_blank" class="btn btn--sm btn--outline">🔗</a>` : ''}
+      </td>
+    </tr>`;
+}
+
+function renderResultsEmptyState(reason) {
+  let message = '';
+  switch (reason) {
+    case 'no-project':
+      message = 'Sélectionnez un projet pour voir les résultats.';
+      break;
+    case 'no-results':
+      message = '<h4>Aucun résultat</h4><p>Lancez une recherche pour voir les articles trouvés.</p>';
+      break;
+    default:
+      message = 'Aucun résultat à afficher.';
+  }
+  return `<div class="card"><div class="card__body text-center">${message}</div></div>`;
+}
+
 export function renderSearchResultsTable() {
   if (!elements.resultsContainer) return;
 
-  const project = appState.currentProject;
-  const results = Array.isArray(appState.searchResults) ? appState.searchResults : [];
-  const extractions = Array.isArray(appState.currentProjectExtractions) ? appState.currentProjectExtractions : [];
-
-  // CORRECTION: Unification de la logique de chargement des fichiers PDF
-  if (!appState.currentProjectFiles) {
-    if (project?.id) {
-      loadProjectFilesSet().then(renderSearchResultsTable); // Relance le rendu après chargement
-    }
-    elements.resultsContainer.innerHTML = `
-      <div class="card"><div class="card__body">
-        Chargement des fichiers PDF du projet...
-      </div></div>`;
+  if (!appState.currentProject?.id) {
+    elements.resultsContainer.innerHTML = renderResultsEmptyState('no-project');
     return;
   }
 
-  if (!project?.id) {
-    elements.resultsContainer.innerHTML = `
-      <div class="card"><div class="card__body">
-        Sélectionnez un projet pour voir les résultats.
-      </div></div>`;
-    return;
-  }
-
+  const results = appState.searchResults || [];
   if (results.length === 0) {
-    elements.resultsContainer.innerHTML = `
-      <div class="card">
-        <div class="card__body text-center">
-          <h4>Aucun résultat</h4>
-          <p>Lancez une recherche pour voir les articles trouvés.</p>
-        </div>
-      </div>`;
+    elements.resultsContainer.innerHTML = renderResultsEmptyState('no-results');
     return;
   }
 
-  // CORRECTION: Indexation unifiée des extractions par article_id
-  // Utilisation de Object.fromEntries pour une syntaxe plus concise
-  const extractionById = Object.fromEntries(extractions.map(e => [e.pmid, e]));
+  const extractionById = Object.fromEntries(
+    (appState.currentProjectExtractions || []).map(e => [e.pmid, e])
+  );
 
-  // Version tableau compact et responsive
   const rows = results.map(article => {
-    const ex = extractionById[article.article_id] || {};
-    const score = ex.relevance_score ?? '';
-    const justification = ex.relevance_justification || '';
-
+    const extraction = extractionById[article.article_id] || {};
     const pdfExists = hasPdfForArticle(article.article_id);
-    const pdfBadge = pdfExists
-      ? `<span class="badge badge--success">PDF</span>`
-      : `<span class="badge badge--secondary">Aucun</span>`;
-
-    // Tronquer le titre si trop long
-    const titleDisplay = (article.title || 'Titre non disponible').length > 80 
-      ? (article.title || 'Titre non disponible').substring(0, 80) + '...' 
-      : (article.title || 'Titre non disponible');
-
-    // Tronquer les auteurs
-    const authorsDisplay = (article.authors || '').length > 40
-      ? (article.authors || '').substring(0, 40) + '...' 
-      : (article.authors || '');
-
-    // CORRECTION: Affichage du score avec couleurs et justification
-    const scoreDisplay = (score !== undefined && score !== null)
-      ? `<span class="score-badge ${score >= 7 ? 'score--high' : score >= 4 ? 'score--medium' : 'score--low'}">${score}/10</span>`
-      : `<span class="badge badge--secondary">Pas analysé</span>`;
-
-    return `
-      <tr class="article-row" data-article-id="${escapeHtml(article.article_id)}">
-        <td class="select-cell"><input type="checkbox" class="article-checkbox" data-article-id="${escapeHtml(article.article_id)}" ${appState.selectedSearchResults.has(article.article_id) ? 'checked' : ''}></td>
-        <td class="article-main">
-          <div class="article-title" title="${escapeHtml(article.title || '')}">${escapeHtml(titleDisplay)}</div>
-          <div class="article-meta">
-            <span class="article-id">ID: ${escapeHtml(article.article_id)}</span>
-            ${article.journal ? `• <span class="article-journal">${escapeHtml(article.journal)}</span>` : ''}
-            ${article.publication_date ? `• <span class="article-year">${escapeHtml(article.publication_date)}</span>` : ''}
-          </div>
-          <div class="article-authors" title="${escapeHtml(article.authors || '')}">${escapeHtml(authorsDisplay)}</div>
-        </td>
-        <td class="source-cell">
-          <span class="source-badge source--${escapeHtml((article.database_source || 'unknown').toLowerCase())}">${escapeHtml((article.database_source || '').toUpperCase())}</span>
-        </td>
-        <td class="pdf-cell">${pdfBadge}</td>
-        <td class="score-cell">
-          ${scoreDisplay}
-          ${justification ? `<div class="score-justification" title="${escapeHtml(justification)}">${escapeHtml(justification.length > 50 ? justification.substring(0, 50) + '...' : justification)}</div>` : ''}
-        </td>
-        <td class="actions-cell">
-          <button class="btn btn--sm btn--outline" data-action="view-details" data-article-id="${escapeHtml(article.article_id)}" title="Voir détails">👁️</button>
-          ${article.url ? `<a href="${article.url}" target="_blank" class="btn btn--sm btn--outline">🔗</a>` : ''}
-        </td>
-      </tr>`;
+    const isSelected = appState.selectedSearchResults.has(article.article_id);
+    return renderArticleRow(article, extraction, pdfExists, isSelected);
   }).join('');
+
+  const headerHtml = renderResultsHeader(results.length);
 
   elements.resultsContainer.innerHTML = `
     <div class="card">
       <div class="card__header">
-        <h3>Résultats (${results.length} articles)</h3>
-        <div class="results-actions">
-          <button class="btn btn--primary btn--sm" data-action="show-search-modal">🔍 Nouvelle recherche</button>
-          <button class="btn btn--secondary btn--sm" data-action="select-all-articles">Tout sélectionner</button>
-          <button class="btn btn--accent btn--sm" data-action="batch-process-modal">Traiter la sélection (<span id="selectionCounter">0</span>)</button>
-        </div>
+        ${headerHtml}
       </div>
       <div class="card__body">
         <div class="table-container">
@@ -148,10 +148,10 @@ export function renderSearchResultsTable() {
             <thead>
               <tr>
                 <th class="col-select"><input type="checkbox" data-action="select-all-articles" title="Tout sélectionner/désélectionner"></th>
-                <th class="col-main" data-action="sort-results" data-sort-key="title">Article & Métadonnées</th>
-                <th class="col-source" data-action="sort-results" data-sort-key="database_source">Source</th>
+                <th class="col-main sortable" data-action="sort-results" data-sort-key="title">Article & Métadonnées</th>
+                <th class="col-source sortable" data-action="sort-results" data-sort-key="database_source">Source</th>
                 <th class="col-pdf">PDF</th>
-                <th class="col-score" data-action="sort-results" data-sort-key="relevance_score">Score IA</th>
+                <th class="col-score sortable" data-action="sort-results" data-sort-key="relevance_score">Score IA</th>
                 <th class="col-actions">Actions</th>
               </tr>
             </thead>
@@ -160,8 +160,7 @@ export function renderSearchResultsTable() {
         </div>
       </div>
     </div>`;
-
-    updateSelectionCounter();
+  updateSelectionCounter();
 }
 
 export function viewArticleDetails(articleId) {
@@ -279,13 +278,17 @@ export function updateSelectionCounter() {
 }
 
 export function selectAllArticles() {
-	const checkboxes = document.querySelectorAll('.article-checkbox');
-	const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-	
-	checkboxes.forEach(cb => {
-		cb.checked = !allChecked; // Inverse la sélection
-        toggleArticleSelection(cb.dataset.articleId, !allChecked);
-	});
+  const allIds = (appState.searchResults || []).map(a => a.article_id);
+  const allSelected = allIds.length > 0 && allIds.every(id => appState.selectedSearchResults.has(id));
+
+  if (allSelected) {
+    // If everything is selected, clear the selection
+    appState.selectedSearchResults.clear();
+  } else {
+    // Otherwise, select all
+    allIds.forEach(id => appState.selectedSearchResults.add(id));
+  }
+  renderSearchResultsTable(); // Re-render to update checkboxes
 }
 
 export function toggleSelectAll(checked, source) {
