@@ -78,14 +78,12 @@ function renderSearchResultsTable() {
 
     const articles = appState.searchResults || [];
     
-    // Barre d'actions pour la sélection
+    // Barre d'actions qui apparaît au-dessus du tableau
     const actionsHeader = `
         <div class="results-actions-header">
             <div id="selection-counter">0 article(s) sélectionné(s)</div>
             <div class="button-group">
-                <button class="btn btn--secondary btn--sm" onclick="handleFetchOnlinePdfs()">Chercher PDFs en ligne</button>
-                <button class="btn btn--secondary btn--sm" onclick="handleRunRobAnalysis()">Analyser Risque de Biais</button>
-                <button class="btn btn--danger btn--sm" onclick="handleDeleteSelectedArticles()">Supprimer</button>
+                <button class="btn btn--danger btn--sm" onclick="handleDeleteSelectedArticles()">Supprimer la sélection</button>
             </div>
         </div>
     `;
@@ -153,15 +151,19 @@ function renderSearchResultsTable() {
         </div>
     `;
 
-    // Attacher les listeners
+    // Attacher les listeners pour les checkboxes
     document.querySelectorAll('.article-checkbox').forEach(cb => {
         cb.addEventListener('change', (e) => {
             const id = e.target.dataset.id;
-            if (e.target.checked) appState.selectedSearchResults.add(id);
-            else appState.selectedSearchResults.delete(id);
+            if (e.target.checked) {
+                appState.selectedSearchResults.add(id);
+            } else {
+                appState.selectedSearchResults.delete(id);
+            }
             updateSelectionCounter();
         });
     });
+    updateSelectionCounter(); // Mettre à jour le compteur au premier affichage
 }
 
 let sortState = { key: 'relevance_score', asc: false };

@@ -753,7 +753,7 @@ def import_from_zotero_file_task(project_id: str, json_file_path: str):
 
         imported_count = 0
         for record in records:
-            if not record.get('article_id'): continue # Ignorer les entrées sans ID
+            if not record.get('article_id'): continue
 
             exists = session.execute(text("""
                 SELECT 1 FROM search_results WHERE project_id = :pid AND article_id = :aid
@@ -761,13 +761,8 @@ def import_from_zotero_file_task(project_id: str, json_file_path: str):
 
             if not exists:
                 session.execute(text("""
-                    INSERT INTO search_results (
-                        id, project_id, article_id, title, abstract, authors,
-                        publication_date, journal, doi, url, database_source, created_at
-                    ) VALUES (
-                        :id, :pid, :aid, :title, :abstract, :authors,
-                        :pub_date, :journal, :doi, :url, :src, :ts
-                    )
+                    INSERT INTO search_results (id, project_id, article_id, title, abstract, authors, publication_date, journal, doi, url, database_source, created_at)
+                    VALUES (:id, :pid, :aid, :title, :abstract, :authors, :pub_date, :journal, :doi, :url, :src, :ts)
                 """), {
                     "id": str(uuid.uuid4()), "pid": project_id, "aid": record['article_id'],
                     "title": record.get('title', 'Sans titre'), "abstract": record.get('abstract', ''),
@@ -777,7 +772,7 @@ def import_from_zotero_file_task(project_id: str, json_file_path: str):
                     "ts": datetime.now().isoformat()
                 })
                 imported_count += 1
-
+        
         session.commit()
 
         total_articles = session.execute(text("SELECT COUNT(*) FROM search_results WHERE project_id = :pid"), {"pid": project_id}).scalar_one()
@@ -785,7 +780,7 @@ def import_from_zotero_file_task(project_id: str, json_file_path: str):
         session.commit()
 
         send_project_notification(project_id, 'import_completed', f'Import Zotero terminé: {imported_count} nouveaux articles ajoutés.')
-
+        
         try:
             os.remove(json_file_path)
         except Exception as e:

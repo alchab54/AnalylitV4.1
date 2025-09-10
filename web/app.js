@@ -2,6 +2,8 @@
 // AnalyLit V4.1 - Application Frontend (Version finale consolidée)
 // ================================================================
 
+import { loadProjects, handleCreateProject, renderProjectList, renderProjectSynthesis, renderProjectDetail } from './js/projects.js';
+
 const appState = {
     currentProject: null,
     projects: [],
@@ -62,125 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeApplication();
 });
 
-async function initializeApplication() {
-    showLoadingOverlay(true, 'Initialisation...');
-    try {
-        initializeWebSocket();
-        await loadInitialData();
-        showSection('projects');
-        console.log('✅ Application initialisée avec succès');
-    } catch (error) {
-        console.error('❌ Erreur initialisation application:', error);
-        showToast("Erreur lors de l'initialisation de l'application.", 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
 
-function setupEventListeners() {
-  // Navigation onglets
-  elements.navButtons.forEach(btn => {
-    btn.addEventListener('click', () => showSection(btn.dataset.section));
-  });
-
-  // Nouveau projet
-  if (elements.createProjectBtn) {
-    elements.createProjectBtn.addEventListener('click', () => openModal('newProjectModal'));
-  }
-
-  // Imports
-  if (elements.zoteroFileInput) {
-    elements.zoteroFileInput.addEventListener('change', handleZoteroFileUpload);
-  }
-  if (elements.bulkPDFInput) {
-    elements.bulkPDFInput.addEventListener('change', handleBulkPDFUpload);
-  }
-  if (elements.runIndexingBtn) {
-    elements.runIndexingBtn.addEventListener('click', () => {
-      if (!appState.currentProject?.id) {
-        showToast('Sélectionnez un projet avant indexation', 'warning');
-        return;
-      }
-      handleRunIndexing();
-    });
-  }
-  if (elements.importZoteroPdfsBtn) {
-    elements.importZoteroPdfsBtn.addEventListener('click', handleImportZoteroPdfs);
-  }
-
-  // Gestion centralisée des clics (fermeture des modales)
-  document.body.addEventListener('click', (e) => {
-    if (e.target.classList.contains('modal') || e.target.classList.contains('modal__close')) {
-      const modal = e.target.closest('.modal');
-      if (modal) closeModal(modal.id);
-    }
-  });
-  
-  document.body.addEventListener('click', event => {
-        if (event.target.id === 'runFullExtractionBtn') {
-            showRunExtractionModal();
-        }
-    });
-
-  // Centralisation de la gestion des clics pour les actions dynamiques (délégation)
-  document.body.addEventListener('click', (e) => {
-    // Clic sur "Voir détails" d'un article
-    const viewDetailsButton = e.target.closest('.view-details-btn');
-    if (viewDetailsButton) {
-      const articleId = viewDetailsButton.dataset.articleId;
-      if (articleId) viewArticleDetails(articleId);
-      return;
-    }
-
-    // Clic sur une checkbox d'article
-    const articleCheckbox = e.target.closest('.article-checkbox');
-    if (articleCheckbox) {
-      const articleId = articleCheckbox.dataset.articleId;
-      if (articleId) {
-        toggleArticleSelection(articleId, articleCheckbox.checked);
-      }
-      return;
-    }
-
-    if (e.target.id === 'runFullExtractionBtn') {
-        showRunExtractionModal();
-    }
-  });
-
-  // Uploads PDF manuels
-  const manualPDFInput = document.getElementById('manualPDFInput');
-  if (manualPDFInput) {
-    manualPDFInput.addEventListener('change', handleManualPDFUpload);
-  }
-
-  // Formulaires de modale
-  const gridForm = document.getElementById('gridForm');
-  if (gridForm) {
-    gridForm.addEventListener('submit', handleGridFormSubmit);
-  }
-  const manualArticleForm = document.getElementById('manualArticleForm');
-  if (manualArticleForm) {
-    manualArticleForm.addEventListener('submit', handleAddManualArticles);
-  }
-  const newProjectForm = document.getElementById('newProjectForm');
-  if (newProjectForm) {
-    newProjectForm.addEventListener('submit', handleCreateProject);
-  }
-
-  // ============================ 
-  // Notifications: remise à zéro
-  // ============================ 
-  // Cible plusieurs sélecteurs possibles pour la “cloche”/bouton
-  const notifButtons = document.querySelectorAll('.notifications-btn, [data-notifications-toggle], .notification-indicator');
-  if (notifButtons.length) {
-    notifButtons.forEach(btn => btn.addEventListener('click', clearNotifications));
-  }
-
-  // Quand la fenêtre reprend le focus, on considère les notifications comme lues
-  window.addEventListener('focus', () => {
-    clearNotifications();
-  });
-}
 
 async function handleRunIndexing() {
     if (!appState.currentProject?.id) {
@@ -201,54 +85,12 @@ async function handleRunIndexing() {
     }
 }
 
-async function handleCreateProject(event) {
-    event.preventDefault();
-    const form = event.target;
-    const name = form.elements.name.value;
-    const description = form.elements.description.value;
-    const mode = form.elements.mode.value;
 
-    if (!name) {
-        showToast('Le nom du projet est requis.', 'warning');
-        return;
-    }
-
-    try {
-        showLoadingOverlay(true, 'Création du projet...');
-        closeModal('newProjectModal');
-
-        const newProject = await fetchAPI('/projects', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, description, mode })
-        });
-
-        await loadProjects();
-        selectProject(newProject.id);
-        showToast('Projet créé avec succès!', 'success');
-    } catch (e) {
-        showToast(`Erreur: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
-async function loadInitialData() {
-    await Promise.all([
-        loadProjects(),
-        loadAnalysisProfiles(),
-        loadPrompts(),
-        loadOllamaModels(),
-        loadAvailableDatabases(),
-    ]);
-    renderProjectList();
-}
 
 // --- Fonctions de chargement des données (manquantes) ---
 
 
-async function loadProjects() {
-    appState.projects = await fetchAPI('/projects');
-}
+
 
 async function loadProjectFilesSet(projectId) {
     if (!projectId) return new Set();
@@ -475,119 +317,10 @@ function hasPdfForArticle(articleId) {
   return appState.currentProjectFiles.has(stem);
 }
 
-function renderProjectList() {
-    if (!elements.projectsList) return;
-
-    const projects = Array.isArray(appState.projects) ? appState.projects : [];
-
-    if (projects.length === 0) {
-        elements.projectsList.innerHTML = `
-            <div class="empty-state">
-                <p>Aucun projet trouvé.</p>
-                <p>Créez un projet pour commencer votre revue de littérature.</p>
-            </div>
-        `;
-        return;
-    }
-
-    const projectsHtml = projects.map(project => {
-        const isActive = appState.currentProject && appState.currentProject.id === project.id;
-        const statusClass = getStatusClass(project.status);
-        
-        return `
-            <div class="project-list-item ${isActive ? 'project-list-item--active' : ''}" 
-                 onclick="selectProject('${project.id}')">
-                <div class="project-list-item-info">
-                    <div class="project-list-item-name">${escapeHtml(project.name)}</div>
-                    <div class="project-list-item-status">
-                        <span class="status-badge ${statusClass}">${escapeHtml(project.status || 'pending')}</span>
-                    </div>
-                </div>
-                <button class="btn btn--danger btn--sm" 
-                        onclick="event.stopPropagation(); deleteProject('${project.id}')"
-                        title="Supprimer le projet">
-                    ×
-                </button>
-            </div>
-        `;
-    }).join('');
-
-    elements.projectsList.innerHTML = projectsHtml;
-}
 
 
 
 
-function getStatusClass(status) {
-    const statusMap = {
-        'pending': 'info',
-        'searching': 'warning',
-        'search_completed': 'info',
-        'search_failed': 'error',
-        'processing': 'warning',
-        'synthesizing': 'warning',
-        'generating_analysis': 'warning',
-        'completed': 'success',
-        'failed': 'error'
-    };
-    return statusMap[status] || 'info';
-}
-
-function renderProjectSynthesis(synthesisResult, projectDescription) {
-    if (!synthesisResult) {
-        return `<div class="synthesis-placeholder"><p>Aucune synthèse disponible. Lancez une analyse pour en générer une.</p></div>`;
-    }
-    try {
-        const synthesis = JSON.parse(synthesisResult);
-        return `
-            <div class="synthesis-result">
-                <h4>Synthèse du projet</h4>
-                <p>${escapeHtml(synthesis.synthesis_summary || 'Synthèse non disponible.')}</p>
-            </div>`;
-    } catch (e) {
-        return `<div class="synthesis-placeholder"><p>Erreur lors de l'affichage de la synthèse.</p></div>`;
-    }
-}
-function renderProjectDetail(project) {
-    if (!project || !elements.projectDetailContent) return;
-
-    const synthesis = renderProjectSynthesis(project.synthesis_result, project.description);
-    
-    elements.projectDetailContent.innerHTML = `
-        <div class="project-detail">
-            <div class="project-header">
-                <h2>${escapeHtml(project.name)}</h2>
-                <span class="status ${getStatusClass(project.status)}">${project.status}</span>
-            </div>
-            
-            <div class="project-description">
-                <p>${escapeHtml(project.description || 'Aucune description')}</p>
-            </div>
-            
-            <div class="project-stats">
-                <div class="stat-item">
-                    <span class="stat-label">Articles trouvés</span>
-                    <span class="stat-value">${project.pmids_count || 0}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Articles traités</span>
-                    <span class="stat-value">${project.processed_count || 0}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Temps total</span>
-                    <span class="stat-value">${Math.round(project.total_processing_time || 0)}s</span>
-                </div>
-            </div>
-            
-            ${synthesis}
-            
-            <div class="project-actions">
-                <button class="btn btn--primary" onclick="showSearchModal()">🔍 Rechercher articles</button>
-                <button class="btn btn--secondary" onclick="showSection('results')">📄 Voir résultats</button>
-            </div>
-        </div>
-    `;
-}
 async function loadSearchResults() {
   showLoadingOverlay(true, 'Chargement des résultats...');
   if (!appState.currentProject?.id) {
@@ -1033,9 +766,10 @@ async function handleDeleteSelectedArticles() {
         showToast('Aucun article sélectionné.', 'warning');
         return;
     }
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer définitivement ${selectedIds.length} article(s) ?`)) {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer définitivement ${selectedIds.length} article(s) ? Cette action est irréversible.`)) {
         return;
     }
+
     showLoadingOverlay(true, 'Suppression en cours...');
     try {
         await fetchAPI(`/projects/${appState.currentProject.id}/articles`, {
@@ -1043,12 +777,13 @@ async function handleDeleteSelectedArticles() {
             body: { article_ids: selectedIds }
         });
         
+        // Mettre à jour l'état local pour un affichage instantané
         appState.searchResults = appState.searchResults.filter(a => !selectedIds.includes(a.article_id));
         appState.currentProjectExtractions = appState.currentProjectExtractions.filter(e => !selectedIds.includes(e.pmid));
-        appState.selectedSearchResults.clear();
+        selectedIds.forEach(id => appState.selectedSearchResults.delete(id));
         
         showToast('Articles supprimés avec succès.', 'success');
-        renderSearchResultsTable();
+        renderSearchResultsTable(); // Re-afficher le tableau mis à jour
     } catch (error) {
         showToast(`Erreur : ${error.message}`, 'error');
     } finally {

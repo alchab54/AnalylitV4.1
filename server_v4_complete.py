@@ -756,6 +756,49 @@ def handle_single_project(project_id):
     finally:
         session.close()
 
+@api_bp.route('/projects/<project_id>/articles', methods=['DELETE'])
+def delete_project_articles(project_id):
+    """Supprime une liste d'articles d'un projet ainsi que leurs extractions associées."""
+    data = request.get_json(force=True)
+    article_ids_to_delete = data.get('article_ids', [])
+
+    if not article_ids_to_delete:
+        return jsonify({'error': 'Aucun ID d\'article fourni'}), 400
+
+    session = Session()
+    try:
+        # Supprimer les extractions associées en premier
+        session.execute(text("""
+            DELETE FROM extractions 
+            WHERE project_id = :pid AND pmid = ANY(:aids)
+        """), {"pid": project_id, "aids": article_ids_to_delete})
+
+        # Ensuite, supprimer les articles eux-mêmes
+        session.execute(text("""
+            DELETE FROM search_results 
+            WHERE project_id = :pid AND article_id = ANY(:aids)
+        """), {"pid": project_id, "aids": article_ids_to_delete})
+        
+        # Mettre à jour le compteur total d'articles dans le projet
+        total_articles = session.execute(text(
+            "SELECT COUNT(*) FROM search_results WHERE project_id = :pid"
+        ), {"pid": project_id}).scalar_one()
+        session.execute(text(
+            "UPDATE projects SET pmids_count = :count WHERE id = :pid"
+        ), {"count": total_articles, "pid": project_id})
+
+        session.commit()
+        
+        send_project_notification(project_id, 'articles_updated', f'{len(article_ids_to_delete)} article(s) ont été supprimés.')
+        
+        return jsonify({'message': f'{len(article_ids_to_delete)} article(s) supprimé(s) avec succès'}), 200
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Erreur lors de la suppression d'articles: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur interne du serveur'}), 500
+    finally:
+        session.close()
+        
 # --- Recherche multi-bases ---
 @api_bp.route('/search', methods=['POST'])
 def search_multiple_databases():
@@ -2435,7 +2478,6 @@ def run_rob_analysis(project_id):
         return jsonify({'error': 'Aucun article sélectionné'}), 400
 
     for article_id in article_ids:
-        # On met la tâche dans la file d'analyse
         analysis_queue.enqueue(run_risk_of_bias_task, project_id=project_id, article_id=article_id, job_timeout='20m')
     
     return jsonify({

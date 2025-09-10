@@ -57,52 +57,41 @@ async function loadProjectGrids(projectId) {
 }
 
 function openGridModal(gridId = null) {
-    const grid = gridId ? appState.currentProjectGrids.find(g => g.id === gridId) : null;
-    const fields = grid ? JSON.parse(grid.fields) : [{ name: '', description: '' }];
+    const isEdit = !!gridId;
+    const grid = isEdit ? appState.currentProjectGrids.find(g => g.id === gridId) : null;
 
-    const fieldsHtml = fields.map((field, index) => `
-        <div class="form-group-row" data-field-index="${index}">
-            <input type="text" placeholder="Nom du champ" value="${escapeHtml(field.name)}" class="form-control">
-            <input type="text" placeholder="Description (optionnel)" value="${escapeHtml(field.description)}" class="form-control">
-            <button type="button" class="btn btn--danger btn--sm" onclick="this.parentElement.remove()">-</button>
-        </div>
-    `).join('');
-
-    const content = `
-        <form id="gridForm" onsubmit="handleSaveGrid(event, '${gridId || ''}')">
+    const modalContent = `
+        <form id="gridForm" data-grid-id="${gridId || ''}">
             <div class="form-group">
-                <label class="form-label">Nom de la grille</label>
-                <input type="text" name="name" class="form-control" required value="${grid ? escapeHtml(grid.name) : ''}">
+                <label for="gridName" class="form-label">Nom de la grille</label>
+                <input type="text" id="gridName" name="name" class="form-control" value="${isEdit ? escapeHtml(grid.name) : ''}" required>
             </div>
             <div class="form-group">
                 <label class="form-label">Champs d'extraction</label>
-                <div id="gridFieldsContainer">
-                    ${fieldsHtml}
-                </div>
-                <button type="button" class="btn btn--sm btn--outline" id="addGridFieldBtn">+ Ajouter un champ</button>
-            </div>
-            <div class="modal__actions">
-                <button type="submit" class="btn btn--primary">Sauvegarder</button>
+                <div id="gridFieldsContainer"></div>
+                <button type="button" class="btn btn--secondary btn--sm mt-8" id="addGridFieldBtn">Ajouter un champ</button>
             </div>
         </form>
     `;
+    showModal(isEdit ? 'Modifier la grille' : 'Créer une grille', modalContent, `handleSaveGrid()`);
 
-    showModal(gridId ? 'Modifier la grille' : 'Créer une grille', content);
+    const fieldsContainer = document.getElementById('gridFieldsContainer');
+    const fields = isEdit && Array.isArray(grid.fields) ? grid.fields : [{ name: '', description: '' }];
+    
+    fields.forEach(field => addGridFieldInput(fieldsContainer, field));
 
-    // Add event listener for adding new fields
-    document.getElementById('addGridFieldBtn').addEventListener('click', () => {
-        const container = document.getElementById('gridFieldsContainer');
-        const newFieldIndex = container.children.length;
-        const newField = document.createElement('div');
-        newField.className = 'form-group-row';
-        newField.dataset.fieldIndex = newFieldIndex;
-        newField.innerHTML = `
-            <input type="text" placeholder="Nom du champ" class="form-control">
-            <input type="text" placeholder="Description (optionnel)" class="form-control">
-            <button type="button" class="btn btn--danger btn--sm" onclick="this.parentElement.remove()">-</button>
-        `;
-        container.appendChild(newField);
-    });
+    document.getElementById('addGridFieldBtn').addEventListener('click', () => addGridFieldInput(fieldsContainer));
+}
+
+function addGridFieldInput(container, field = { name: '', description: '' }) {
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = 'grid-field-item';
+    fieldDiv.innerHTML = `
+        <input type="text" name="field_name" class="form-control" placeholder="Nom du champ" value="${escapeHtml(field.name)}">
+        <input type="text" name="field_description" class="form-control" placeholder="Description (optionnel)" value="${escapeHtml(field.description)}">
+        <button type="button" class="btn btn--danger btn--sm" onclick="this.parentElement.remove()">×</button>
+    `;
+    container.appendChild(fieldDiv);
 }
 
 async function handleSaveGrid(event, gridId) {
