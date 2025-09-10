@@ -1990,25 +1990,6 @@ def handle_risk_of_bias(project_id):
     finally:
         session.close()
 
-@api_bp.route('/projects/<project_id>/run-rob-analysis', methods=['POST'])
-def run_rob_analysis(project_id):
-    """Lance l'analyse du risque de biais pour les articles sélectionnés."""
-    session = Session()
-    try:
-        data = request.get_json(force=True)
-        article_ids = data.get('article_ids', [])
-        if not article_ids:
-            return jsonify({'error': 'Aucun article sélectionné'}), 400
-
-        for article_id in article_ids:
-            analysis_queue.enqueue(run_risk_of_bias_task, project_id=project_id, article_id=article_id, job_timeout='20m')
-        
-        return jsonify({
-            "message": f"Analyse du risque de biais lancée pour {len(article_ids)} article(s)."
-        }), 202
-    finally:
-        session.close()
-
 # ================================================================
 # 8) Analyses
 # ================================================================
@@ -2455,7 +2436,23 @@ def delete_project_articles(project_id):
         return jsonify({'error': 'Erreur interne du serveur'}), 500
     finally:
         session.close()
-        
+
+@api_bp.route('/projects/<project_id>/run-rob-analysis', methods=['POST'])
+def run_rob_analysis(project_id):
+    """Lance l'analyse du risque de biais pour les articles sélectionnés."""
+    data = request.get_json(force=True)
+    article_ids = data.get('article_ids', [])
+    if not article_ids:
+        return jsonify({'error': 'Aucun article sélectionné'}), 400
+
+    for article_id in article_ids:
+        # On met la tâche dans la file d'analyse
+        analysis_queue.enqueue(run_risk_of_bias_task, project_id=project_id, article_id=article_id, job_timeout='20m')
+    
+    return jsonify({
+        "message": f"Analyse du risque de biais lancée pour {len(article_ids)} article(s)."
+    }), 202
+            
 # ================================================================
 # 4) Enregistrement du blueprint et route front
 # ================================================================

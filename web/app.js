@@ -1512,20 +1512,19 @@ function getBiasClass(bias) {
 }
 
 async function handleRunRobAnalysis() {
+    if (!appState.currentProject) return;
     const selectedIds = Array.from(appState.selectedSearchResults);
     if (selectedIds.length === 0) {
-        showToast("Veuillez sÃƒÂ©lectionner au moins un article pour l'analyse RoB.", 'warning');
+        showToast("Veuillez sélectionner au moins un article pour l'analyse RoB.", 'warning');
         return;
     }
-
+    showLoadingOverlay(true, `Lancement de l'analyse RoB pour ${selectedIds.length} article(s)...`);
     try {
-        showLoadingOverlay(true, `Lancement de l'analyse RoB pour ${selectedIds.length} article(s)...`);
         await fetchAPI(`/projects/${appState.currentProject.id}/run-rob-analysis`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ article_ids: selectedIds })
+            body: { article_ids: selectedIds }
         });
-        showToast("Analyse du risque de biais lancÃƒÂ©e. Les rÃƒÂ©sultats apparaÃƒÂ®tront progressivement.", 'success');
+        showToast("Analyse du risque de biais lancée. Les résultats apparaîtront progressivement.", 'success');
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
     } finally {
@@ -2444,6 +2443,20 @@ async function addStakeholderGroup() {
     }
 }
 
+function toggleSelectAll(checked, source) {
+    const checkboxes = document.querySelectorAll(`.article-checkbox[data-source="${source}"]`);
+    checkboxes.forEach(cb => {
+        const id = cb.dataset.id;
+        cb.checked = checked;
+        if (checked) {
+            appState.selectedSearchResults.add(id);
+        } else {
+            appState.selectedSearchResults.delete(id);
+        }
+    });
+    updateSelectionCounter();
+}
+
 async function selectProject(projectId) {
     await loadProjectGrids(projectId);
     try {
@@ -2560,31 +2573,22 @@ async function handleAddManualArticles(event) {
     }
 }
 
-async function handleFetchOnlinePDFs() {
-    if (!appState.currentProject?.id) {
-        showToast('Veuillez sélectionner un projet.', 'warning');
+async function handleFetchOnlinePdfs() {
+    if (!appState.currentProject) return;
+    const selectedIds = Array.from(appState.selectedSearchResults);
+    if (selectedIds.length === 0) {
+        showToast("Veuillez d'abord sélectionner des articles dans la section 'Recherche'.", 'warning');
         return;
     }
-    
-    const articlesWithDoi = appState.searchResults.filter(r => r.doi);
-    
-    if (articlesWithDoi.length === 0) {
-        showToast("Aucun article avec DOI trouvé dans ce projet.", 'info');
-        return;
-    }
-
-    const articleIds = articlesWithDoi.map(r => r.article_id);
-    
-    showLoadingOverlay(true, `Lancement de la récupération de ${articleIds.length} PDF(s)...`);
+    showLoadingOverlay(true, `Recherche de ${selectedIds.length} PDF(s) en ligne...`);
     try {
-        const response = await fetchAPI(`/projects/${appState.currentProject.id}/fetch-online-pdfs`, {
+        await fetchAPI(`/projects/${appState.currentProject.id}/fetch-online-pdfs`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ articles: articleIds })
+            body: { articles: selectedIds }
         });
-        showToast(response.message || 'Récupération des PDFs lancée.', 'success');
-    } catch (e) {
-        showToast(`Erreur : ${e.message}`, 'error');
+        showToast('Recherche de PDFs lancée en arrière-plan. Les notifications indiqueront les succès.', 'success');
+    } catch (error) {
+        showToast(`Erreur : ${error.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }
@@ -3109,3 +3113,5 @@ window.showBatchProcessModal = showBatchProcessModal;
 window.startBatchProcessing = startBatchProcessing;
 window.showRunExtractionModal = showRunExtractionModal;
 window.startFullExtraction = startFullExtraction;
+window.handleFetchOnlinePdfs = handleFetchOnlinePdfs;
+window.handleRunRobAnalysis = handleRunRobAnalysis;
