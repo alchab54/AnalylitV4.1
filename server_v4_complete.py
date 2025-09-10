@@ -696,6 +696,10 @@ def get_atn_metrics(project_id):
     except Exception as e:
         logger.exception(f"Erreur get_atn_metrics: {e}")
         return jsonify({'error': 'Erreur lors du calcul des métriques ATN'}), 500
+    finally:
+        # La session est gérée par le teardown context
+        pass
+
 
 @api_bp.route('/health', methods=['GET'])
 def health_check():
@@ -829,6 +833,10 @@ def delete_project_articles(project_id):
     except Exception as e:
         logger.exception(f"Erreur lors de la suppression d'articles: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
+    finally:
+        # La session est gérée par le teardown context
+        pass
+
 
 
 # --- Recherche multi-bases ---
@@ -2443,6 +2451,10 @@ def clear_specific_queue(queue_name):
 @api_bp.route('/projects/<project_id>/export', methods=['GET'])
 def export_project(project_id):
     session = Session()
+    # Définition de project_name_safe qui était manquante
+    proj_info = session.execute(text("SELECT name FROM projects WHERE id = :pid"), {"pid": project_id}).mappings().fetchone()
+    project_name_safe = sanitize_filename(proj_info.get('name', 'export')) if proj_info else 'export'
+
     try:
         proj = session.execute(text("SELECT * FROM projects WHERE id = :pid"),
                                {"pid": project_id}).mappings().fetchone()
@@ -2482,6 +2494,9 @@ def export_project(project_id):
     except Exception as e:
         logger.exception(f"Erreur export projet: {e}")
         return jsonify({'error': 'Erreur lors de l\'export'}), 500
+    finally:
+        # La session est gérée par le teardown context
+        pass
 
 # Route pour les statistiques de validation (récupérée de la v4.0 et adaptée)
 @api_bp.route('/projects/<project_id>/validation-stats', methods=['GET'])

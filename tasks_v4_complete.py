@@ -18,6 +18,7 @@ import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from pyzotero import zotero
 from scipy import stats
 from sklearn.metrics import cohen_kappa_score
 import chromadb
@@ -293,13 +294,6 @@ def run_discussion_generation_task(session, project_id: str):
     if not rows:
         raise ValueError("Aucune donnée d'extraction pertinente trouvée pour générer la discussion.")
         
-        # Récupérer les données nécessaires depuis la base
-        rows = session.execute(text("""
-            SELECT e.extracted_data, e.pmid, s.title, e.relevance_score
-            FROM extractions e
-            JOIN search_results s ON e.project_id = s.project_id AND e.pmid = s.article_id
-            WHERE e.project_id = :pid AND e.relevance_score >= 7 AND e.extracted_data IS NOT NULL
-        """), {"pid": project_id}).mappings().all()
     df = pd.DataFrame(rows)
     profile = session.execute(text("SELECT profile_used FROM projects WHERE id = :pid"), {"pid": project_id}).scalar_one_or_none() or 'standard'
     model_name = config.DEFAULT_MODELS.get(profile, {}).get('synthesis', 'llama3.1:8b')
@@ -311,8 +305,6 @@ def run_discussion_generation_task(session, project_id: str):
 @with_db_session
 def run_knowledge_graph_task(session, project_id: str):
     """Génère un graphe de connaissances JSON à partir des titres d'articles extraits."""
-    update_project_status(project_id, status='generating_graph')
-    session = Session()
     update_project_status(session, project_id, status='generating_graph')
     
     profile_info = session.execute(text("""
@@ -690,11 +682,6 @@ def calculate_kappa_task(session, project_id: str):
         except Exception:
             continue
     
-    except Exception as e:
-        logger.error(f"Erreur calculate_kappa_task: {e}", exc_info=True)
-        send_project_notification(project_id, 'kappa_failed', f'Erreur: {e}')
-    finally:
-        session.close()
     if len(eval1_decisions) < 2:
         send_project_notification(project_id, 'kappa_failed', 'Pas assez de validations communes (minimum 2 requises).')
         return
@@ -783,58 +770,6 @@ def run_atn_score_task(session, project_id: str):
         send_project_notification(project_id, 'analysis_failed', 'Aucune donnée d\'extraction disponible pour le calcul du score ATN.')
         return
     
-    try:
-        extractions = session.execute(text("""
-            SELECT pmid, title, extracted_data FROM extractions
-            WHERE project_id = :pid AND extracted_data IS NOT NULL
-        """), {"pid": project_id}).mappings().all()
-        
-        if not extractions:
-            update_project_status(project_id, 'failed')
-            send_project_notification(project_id, 'analysis_failed',
-                                    'Aucune donnée d\'extraction disponible pour le calcul du score ATN.')
-            return
-        
-        scores = []
-        for ext in extractions:
-            try:
-                data = json.loads(ext["extracted_data"])
-                
-                # Calcul ATN simulé basé sur des mots-clés
-                s = 0
-                text_blob = json.dumps(data, ensure_ascii=False).lower()
-                
-                if 'alliance' in text_blob or 'therapeutic' in text_blob:
-                    s += 3
-                if any(k in text_blob for k in ['numérique', 'digital', 'app', 'plateforme', 'ia']):
-                    s += 3
-                if any(k in text_blob for k in ['patient', 'soignant', 'développeur']):
-                    s += 2
-                if any(k in text_blob for k in ['empathie', 'adherence', 'confiance']):
-                    s += 2
-                
-                scores.append({
-                    'pmid': ext['pmid'],
-                    'title': ext['title'],
-                    'atn_score': min(s, 10)
-                })
-            except Exception:
-                continue
-        
-        if not scores:
-            update_project_status(project_id, 'failed')
-            send_project_notification(project_id, 'analysis_failed',
-                                    'Aucun score ATN calculable à partir des données extraites.')
-            return
-        
-        mean_atn = float(np.mean([s['atn_score'] for s in scores]))
-        analysis_result = {
-            "atn_scores": scores,
-            "mean_atn": mean_atn,
-            "total_articles_scored": len(scores)
-        }
-        
-        # Créer le graphique
     scores = []
     for ext in extractions:
         try:
@@ -925,6 +860,10 @@ def run_risk_of_bias_task(session, project_id: str, article_id: str):
             overall_bias = EXCLUDED.overall_bias, overall_justification = EXCLUDED.overall_justification;
     """), rob_data)
 
+    except Exception as e:
+        logger.error(f"Erreur dans run_risk_of_bias_task pour {article_id}: {e}", exc_info=True)
+        send_project_notification(project_id, 'rob_failed', f"Erreur d'analyse RoB pour {article_id}: {e}")
+
     send_project_notification(project_id, 'rob_completed', f"Analyse RoB terminée pour {article_id}.")
 
 # ================================================================
@@ -945,6 +884,10 @@ def add_manual_articles_task(session, project_id: str, identifiers: list):
     for article_id in identifiers:
         try:
             details = fetch_article_details(article_id)
+        except Exception as e:
+            logger.warning(f"Impossible de récupérer les détails pour {article_id}: {e}")
+            continue
+        try:
             exists = session.execute(text("SELECT 1 FROM search_results WHERE project_id = :pid AND article_id = :aid"), {"pid": project_id, "aid": details.get('id') or article_id}).fetchone()
             if exists:
                 continue
