@@ -315,6 +315,9 @@ function refreshCurrentSection() {
         case 'reporting':
             renderReportingSection(appState.currentProject?.id);
             break;
+        case 'search':
+            renderSearchSection(appState.currentProject);
+            break;
         default:
             // Ne rien faire pour les sections inconnues
             break;
@@ -2438,6 +2441,8 @@ async function selectProject(projectId) {
         if (appState.socket) {
             appState.socket.emit('join_room', { room: projectId });
         }
+
+        appState.projectFiles = await loadProjectFilesSet(projectId);
 
         renderProjectList();
         renderProjectDetail(project);
