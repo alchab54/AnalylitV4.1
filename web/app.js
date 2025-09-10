@@ -295,10 +295,7 @@ async function refreshCurrentProjectData() {
 // ============================ 
 
 
-function sanitizeForFilename(name) {
-  // Miroir du backend: remplace <>:"/\|?* par _ et met en minuscules
-  return String(name || '').replace(/[<>:"/\\|?*]/g, '_').trim().toLowerCase();
-}
+
 
 async function loadProjectFilesSet() {
   if (!appState.currentProject?.id) {
@@ -312,45 +309,13 @@ async function loadProjectFilesSet() {
   appState.currentProjectFiles = new Set(stems);
 }
 
-function hasPdfForArticle(articleId) {
-  if (!appState.currentProjectFiles) return false;
-  const stem = sanitizeForFilename(articleId);
-  return appState.currentProjectFiles.has(stem);
-}
 
 
 
 
 
-async function loadSearchResults() {
-  showLoadingOverlay(true, 'Chargement des résultats...');
-  if (!appState.currentProject?.id) {
-    elements.resultsContainer.innerHTML = `
-      <div class="card"><div class="card__body">
-        Sélectionnez un projet pour voir les résultats.
-      </div></div>`;
-    showLoadingOverlay(false);
-    return;
-  }
 
-  try {
-    const [searchResults, extractions] = await Promise.all([
-      fetchAPI(`/projects/${appState.currentProject.id}/results`),
-      fetchAPI(`/projects/${appState.currentProject.id}/extractions`)
-    ]);
 
-    appState.searchResults = searchResults || [];
-    appState.currentProjectExtractions = extractions || [];
-    
-    // La fonction de rendu est appelée ici, après le chargement des données.
-    renderSearchResultsTable();
-  } catch (e) {
-    elements.resultsContainer.innerHTML = '<p>Erreur lors du chargement des résultats.</p>';
-    console.error('Erreur loadSearchResults:', e);
-  } finally {
-    showLoadingOverlay(false);
-  }
-}
 
 // CORRECTION : Fonction pour valider manuellement un article
 async function validateArticle(articleId, decision) {
@@ -386,12 +351,7 @@ async function validateArticle(articleId, decision) {
     }
 }
 
-function toggleAbstractRow(articleId) {
-    const abstractRow = document.getElementById(`abstract-${articleId}`);
-    if (abstractRow) {
-        abstractRow.classList.toggle('hidden');
-    }
-}
+
 
 // ============================ 
 // Import Section
@@ -754,75 +714,12 @@ function clearNotifications() {
   }
 }
 
-function updateSelectionCounter() {
-    const counter = document.getElementById('selection-counter');
-    if (counter) {
-        counter.textContent = `${appState.selectedSearchResults.size} article(s) sélectionné(s)`;
-    }
-}
 
-async function handleDeleteSelectedArticles() {
-    const selectedIds = Array.from(appState.selectedSearchResults);
-    if (selectedIds.length === 0) {
-        showToast('Aucun article sélectionné.', 'warning');
-        return;
-    }
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer définitivement ${selectedIds.length} article(s) ? Cette action est irréversible.`)) {
-        return;
-    }
 
-    showLoadingOverlay(true, 'Suppression en cours...');
-    try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/articles`, {
-            method: 'DELETE',
-            body: { article_ids: selectedIds }
-        });
-        
-        // Mettre à jour l'état local pour un affichage instantané
-        appState.searchResults = appState.searchResults.filter(a => !selectedIds.includes(a.article_id));
-        appState.currentProjectExtractions = appState.currentProjectExtractions.filter(e => !selectedIds.includes(e.pmid));
-        selectedIds.forEach(id => appState.selectedSearchResults.delete(id));
-        
-        showToast('Articles supprimés avec succès.', 'success');
-        renderSearchResultsTable(); // Re-afficher le tableau mis à jour
-    } catch (error) {
-        showToast(`Erreur : ${error.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
+
 
 // Fonctions pour le workflow d'extraction complète
-function showRunExtractionModal() {
-    const includedArticles = appState.currentValidations.filter(e => e.user_validation_status === 'include');
-    if (includedArticles.length === 0) {
-        showToast("Aucun article n'a été validé comme 'Inclus'.", 'warning');
-        return;
-    }
 
-    if (appState.currentProjectGrids.length === 0) {
-        showToast("Aucune grille d'extraction n'a été créée ou importée pour ce projet.", 'error');
-        showSection('grids'); // Redirige l'utilisateur pour créer une grille
-        return;
-    }
-
-    const modalContent = `
-        <p>Vous êtes sur le point de lancer une extraction complète sur les <strong>${includedArticles.length} article(s)</strong> que vous avez inclus.</p>
-        <div class="form-group">
-            <label for="extractionGridSelect" class="form-label">Choisir une grille d'extraction :</label>
-            <select id="extractionGridSelect" class="form-control">
-                ${appState.currentProjectGrids.map(grid => `<option value="${grid.id}">${escapeHtml(grid.name)}</option>`).join('')}
-            </select>
-        </div>
-         <div class="form-group">
-            <label for="extractionProfileSelect" class="form-label">Choisir un profil d'analyse :</label>
-            <select id="extractionProfileSelect" class="form-control">
-                ${appState.analysisProfiles.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}
-            </select>
-        </div>
-    `;
-    showModal('Lancer l\'extraction complète', modalContent, 'startFullExtraction()');
-}
 
 async function startFullExtraction() {
     const gridId = document.getElementById('extractionGridSelect').value;
@@ -856,222 +753,12 @@ async function startFullExtraction() {
     }
 }
 
-function toggleArticleSelection(articleId, checked) {
-    if (checked) {
-        appState.selectedSearchResults.add(articleId);
-    } else {
-        appState.selectedSearchResults.delete(articleId);
-    }
-    updateSelectionCounter();
-}
+
 
 // CORRECTION : Ajout de la fonction manquante viewArticleDetails
-function viewArticleDetails(articleId) {
-  if (!articleId) {
-    showToast('ID article manquant', 'error');
-    return;
-  }
 
-  // Chercher l'article dans les résultats de recherche
-  const article = appState.searchResults.find(r => r.article_id === articleId);
-  const extraction = appState.currentProjectExtractions.find(e => e.pmid === articleId);
 
-  if (!article) {
-    showToast('Article non trouvé', 'error');
-    return;
-  }
 
-  // Créer le contenu de la modale avec les détails
-  const modalContent = `
-    <div class="article-details">
-      <h3>${escapeHtml(article.title || 'Titre non disponible')}</h3>
-      
-      <div class="article-meta">
-        <p><strong>Auteurs:</strong> ${escapeHtml(article.authors || 'Non spécifiés')}</p>
-        <p><strong>Journal:</strong> ${escapeHtml(article.journal || 'Non spécifié')}</p>
-        <p><strong>Date:</strong> ${escapeHtml(article.publication_date || 'Non spécifiée')}</p>
-        <p><strong>DOI:</strong> ${article.doi ? `<a href="https://doi.org/${article.doi}" target="_blank">${article.doi}</a>` : 'Non disponible'}</p>
-        <p><strong>Source:</strong> ${escapeHtml(article.database_source || 'Inconnue')}</p>
-      </div>
-
-      ${article.abstract ? `
-        <div class="article-abstract">
-          <h4>Résumé</h4>
-          <p>${escapeHtml(article.abstract)}</p>
-        </div>
-      ` : ''}
-
-      ${extraction ? `
-        <div class="article-extraction">
-          <h4>Évaluation IA</h4>
-          <p><strong>Score de pertinence:</strong> ${extraction.relevance_score || 'N/A'}/10</p>
-          <p><strong>Justification:</strong> ${escapeHtml(extraction.relevance_justification || 'Aucune')}</p>
-          
-          ${extraction.extracted_data ? `
-            <h4>Données extraites</h4>
-            <pre class="extraction-data">${escapeHtml(JSON.stringify(JSON.parse(extraction.extracted_data), null, 2))}</pre>
-          ` : ''}
-        </div>
-      ` : ''}
-
-      <div class="article-actions">
-        ${article.url ? `<a href="${article.url}" target="_blank" class="btn btn--secondary btn--sm">Voir sur ${article.database_source}</a>` : ''}
-      </div>
-    </div>
-  `;
-
-  // Créer et afficher la modale
-  const modal = document.createElement('div');
-  modal.className = 'modal modal--show';
-  modal.innerHTML = `
-    <div class="modal__content modal__content--large">
-      <div class="modal__header">
-        <h3>Détails de l'article</h3>
-        <button type="button" class="modal__close" onclick="closeModal()">&times;</button>
-      </div>
-      <div class="modal__body">
-        ${modalContent}
-      </div>
-    </div>
-  `;
-
-  // Ajouter la modale au DOM
-  document.body.appendChild(modal);
-
-  // Gestion de fermeture par clic sur le fond
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal || e.target.classList.contains('modal__close')) {
-      document.body.removeChild(modal);
-    }
-  });
-}
-
-function renderSearchResultsTable() {
-  if (!elements.resultsContainer) return;
-
-  const project = appState.currentProject;
-  const results = Array.isArray(appState.searchResults) ? appState.searchResults : [];
-  const extractions = Array.isArray(appState.currentProjectExtractions) ? appState.currentProjectExtractions : [];
-
-  // CORRECTION: Unification de la logique de chargement des fichiers PDF
-  if (!appState.currentProjectFiles) {
-    if (project?.id) {
-      loadProjectFilesSet().then(renderSearchResultsTable); // Relance le rendu après chargement
-    }
-    elements.resultsContainer.innerHTML = `
-      <div class="card"><div class="card__body">
-        Chargement des fichiers PDF du projet...
-      </div></div>`;
-    return;
-  }
-
-  if (!project?.id) {
-    elements.resultsContainer.innerHTML = `
-      <div class="card"><div class="card__body">
-        Sélectionnez un projet pour voir les résultats.
-      </div></div>`;
-    return;
-  }
-
-  if (results.length === 0) {
-    elements.resultsContainer.innerHTML = `
-      <div class="card">
-        <div class="card__body text-center">
-          <h4>Aucun résultat</h4>
-          <p>Lancez une recherche pour voir les articles trouvés.</p>
-        </div>
-      </div>`;
-    return;
-  }
-
-  // CORRECTION: Indexation unifiée des extractions par article_id
-  // Utilisation de Object.fromEntries pour une syntaxe plus concise
-  const extractionById = Object.fromEntries(extractions.map(e => [e.pmid, e]));
-
-  // Version tableau compact et responsive
-  const rows = results.map(article => {
-    const ex = extractionById[article.article_id] || {};
-    const score = ex.relevance_score ?? '';
-    const justification = ex.relevance_justification || '';
-
-    const pdfExists = hasPdfForArticle(article.article_id);
-    const pdfBadge = pdfExists
-      ? `<span class="badge badge--success">PDF</span>`
-      : `<span class="badge badge--secondary">Aucun</span>`;
-
-    // Tronquer le titre si trop long
-    const titleDisplay = (article.title || 'Titre non disponible').length > 80 
-      ? (article.title || 'Titre non disponible').substring(0, 80) + '...' 
-      : (article.title || 'Titre non disponible');
-
-    // Tronquer les auteurs
-    const authorsDisplay = (article.authors || '').length > 40
-      ? (article.authors || '').substring(0, 40) + '...' 
-      : (article.authors || '');
-
-    // CORRECTION: Affichage du score avec couleurs et justification
-    const scoreDisplay = (score !== undefined && score !== null)
-      ? `<span class="score-badge ${score >= 7 ? 'score--high' : score >= 4 ? 'score--medium' : 'score--low'}">${score}/10</span>`
-      : '<span class="badge badge--secondary">Pas analysé</span>';
-
-    return `
-      <tr class="article-row" data-article-id="${escapeHtml(article.article_id)}">
-        <td class="select-cell"><input type="checkbox" class="article-checkbox" data-article-id="${escapeHtml(article.article_id)}" ${appState.selectedSearchResults.has(article.article_id) ? 'checked' : ''}></td>
-        <td class="article-main">
-          <div class="article-title" title="${escapeHtml(article.title || '')}">${escapeHtml(titleDisplay)}</div>
-          <div class="article-meta">
-            <span class="article-id">ID: ${escapeHtml(article.article_id)}</span>
-            ${article.journal ? `• <span class="article-journal">${escapeHtml(article.journal)}</span>` : ''}
-            ${article.publication_date ? `• <span class="article-year">${escapeHtml(article.publication_date)}</span>` : ''}
-          </div>
-          <div class="article-authors" title="${escapeHtml(article.authors || '')}">${escapeHtml(authorsDisplay)}</div>
-        </td>
-        <td class="source-cell">
-          <span class="source-badge source--${escapeHtml((article.database_source || 'unknown').toLowerCase())}">${escapeHtml((article.database_source || '').toUpperCase())}</span>
-        </td>
-        <td class="pdf-cell">${pdfBadge}</td>
-        <td class="score-cell">
-          ${scoreDisplay}
-          ${justification ? `<div class="score-justification" title="${escapeHtml(justification)}">${escapeHtml(justification.length > 50 ? justification.substring(0, 50) + '...' : justification)}</div>` : ''}
-        </td>
-        <td class="actions-cell">
-          <button class="btn btn--sm btn--outline view-details-btn" data-article-id="${escapeHtml(article.article_id)}">
-            👁️
-          </button>
-          ${article.url ? `<a href="${escapeHtml(article.url)}" target="_blank" class="btn btn--sm btn--outline">🔗</a>` : ''}
-        </td>
-      </tr>`;
-  }).join('');
-
-  elements.resultsContainer.innerHTML = `
-    <div class="card">
-      <div class="card__header">
-        <h3>Résultats (${results.length} articles)</h3>
-        <div class="results-actions">
-          <button class="btn btn--primary btn--sm" onclick="showSearchModal()">🔍 Nouvelle recherche</button>
-          <button class="btn btn--secondary btn--sm" onclick="selectAllArticles()">Tout sélectionner</button>
-          <button class="btn btn--accent btn--sm" id="batchProcessBtn" onclick="showBatchProcessModal()">Traiter la sélection (<span id="selectionCounter">0</span>)</button>
-        </div>
-      </div>
-      <div class="card__body">
-        <div class="table-container">
-          <table class="table table--compact">
-            <thead>
-              <tr>
-                <th class="col-select">Sél.</th>
-                <th class="col-main">Article & Métadonnées</th>
-                <th class="col-source">Source</th>
-                <th class="col-pdf">PDF</th>
-                <th class="col-score">Score IA</th>
-                <th class="col-actions">Actions</th>
-              </tr>
-            </thead>
-            <tbody>${rows}</tbody>
-          </table>
-        </div>
-      </div>
-    </div>`;
-}
 
 function renderValidationSection(kappaData) {
     if (!elements.validationContainer) return;
@@ -2516,15 +2203,7 @@ console.log('✅ AnalyLit V4.1 Frontend chargé et prêt !');
 
 
 
-function selectAllArticles() {
-	const checkboxes = document.querySelectorAll('.article-checkbox');
-	const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-	
-	checkboxes.forEach(cb => {
-		cb.checked = !allChecked; // Inverse la sélection
-        toggleArticleSelection(cb.dataset.articleId, !allChecked);
-	});
-}
+
 
 async function handlePullOllamaModel() {
     const input = document.getElementById('ollamaModelInput');
@@ -2826,52 +2505,9 @@ window.addStakeholderGroup = addStakeholderGroup;
 
 console.log('✅ AnalyLit V4.1 Frontend - Chargement complet terminé');
 
-function showBatchProcessModal() {
-    const selectedCount = appState.selectedSearchResults.size;
-    if (selectedCount === 0) {
-        showToast('Veuillez sélectionner au moins un article.', 'warning');
-        return;
-    }
 
-    const content = `
-        <p>Vous êtes sur le point de lancer un traitement par lot sur ${selectedCount} article(s).</p>
-        <p>Veuillez choisir un profil d'analyse:</p>
-        <select id="batch-analysis-profile" class="form-control">
-            ${appState.analysisProfiles.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
-        </select>
-        <div class="modal__actions">
-            <button type="button" class="btn btn--secondary" onclick="closeModal('genericModal')">Annuler</button>
-            <button type="button" class="btn btn--primary" onclick="startBatchProcessing()">Lancer</button>
-        </div>
-    `;
-    showModal('Traitement par lot', content);
-}
 
-function startBatchProcessing() {
-    const selectedIds = Array.from(appState.selectedSearchResults);
-    const profileId = document.getElementById('batch-analysis-profile').value;
-    
-    try {
-        showLoadingOverlay(true, 'Lancement du traitement par lot...');
-        closeModal('genericModal');
-        
-        fetchAPI(`/projects/${appState.currentProject.id}/run`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                articles: selectedIds,
-                profile: profileId,
-                analysis_mode: 'screening'
-            })
-        });
-        
-        showToast('Traitement par lot lancé.', 'success');
-    } catch (e) {
-        showToast(`Erreur: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
+
 
 window.showBatchProcessModal = showBatchProcessModal;
 window.startBatchProcessing = startBatchProcessing;
