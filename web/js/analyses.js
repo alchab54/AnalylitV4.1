@@ -112,6 +112,7 @@ export async function runProjectAnalysis(analysisType) {
         
         await fetchAPI(endpoint, { method: 'POST' });
         showToast(`La génération pour ${analysisNames[analysisType]} a été lancée.`, 'success');
+        closeModal(); // Fermer la modale après le lancement
     } catch (e) {
         showToast(`Erreur lors du lancement de l\'analyse: ${e.message}`, 'error');
     } finally {
@@ -122,35 +123,35 @@ export async function runProjectAnalysis(analysisType) {
 export function showRunAnalysisModal() {
     const content = `
         <div class="analysis-options">
-            <div class="analysis-option" onclick="selectAnalysisType('discussion')">
+            <div class="analysis-option" onclick="window.runProjectAnalysis('discussion')">
                 <div class="analysis-icon">📝</div>
                 <div class="analysis-details">
                     <h4>Brouillon de Discussion</h4>
                     <p>Génère une ébauche de la section discussion de votre article.</p>
                 </div>
             </div>
-            <div class="analysis-option" onclick="selectAnalysisType('knowledge_graph')">
+            <div class="analysis-option" onclick="window.runProjectAnalysis('knowledge_graph')">
                 <div class="analysis-icon">🌐</div>
                 <div class="analysis-details">
                     <h4>Graphe de Connaissances</h4>
                     <p>Visualise les relations entre les articles et les concepts clés.</p>
                 </div>
             </div>
-            <div class="analysis-option" onclick="selectAnalysisType('prisma_flow')">
+            <div class="analysis-option" onclick="window.runProjectAnalysis('prisma_flow')">
                 <div class="analysis-icon">🌊</div>
                 <div class="analysis-details">
                     <h4>Diagramme PRISMA</h4>
                     <p>Génère le diagramme de flux de sélection des études.</p>
                 </div>
             </div>
-            <div class="analysis-option" onclick="selectAnalysisType('meta_analysis')">
+            <div class="analysis-option" onclick="window.runProjectAnalysis('meta_analysis')">
                 <div class="analysis-icon">📊</div>
                 <div class="analysis-details">
                     <h4>Méta-analyse (scores)</h4>
                     <p>Analyse la distribution des scores de pertinence.</p>
                 </div>
             </div>
-             <div class="analysis-option" onclick="selectAnalysisType('descriptive_stats')">
+             <div class="analysis-option" onclick="window.runProjectAnalysis('descriptive_stats')">
                 <div class="analysis-icon">📈</div>
                 <div class="analysis-details">
                     <h4>Statistiques Descriptives</h4>
@@ -160,6 +161,9 @@ export function showRunAnalysisModal() {
         </div>
     `;
     openModal('Lancer une Analyse Avancée', content);
+
+    // Exposer la fonction pour qu'elle soit accessible depuis le HTML de la modale
+    window.runProjectAnalysis = runProjectAnalysis;
 }
 
 
@@ -272,6 +276,7 @@ export async function handleRunDiscussionDraft() {
     try {
         await fetchAPI(`/projects/${appState.currentProject.id}/run-discussion-draft`, { method: 'POST' });
         showToast('Tâche de génération lancée.', 'success');
+        closeModal();
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
     } finally {
@@ -285,6 +290,7 @@ export async function handleRunKnowledgeGraph() {
     try {
         await fetchAPI(`/projects/${appState.currentProject.id}/run-knowledge-graph`, { method: 'POST' });
         showToast('Génération du graphe de connaissances lancée.', 'success');
+        closeModal();
     } finally {
         showLoadingOverlay(false);
     }
@@ -296,6 +302,7 @@ export async function handleRunPrismaFlow() {
     try {
         await fetchAPI(`/projects/${appState.currentProject.id}/run-prisma-flow`, { method: 'POST' });
         showToast('Génération du diagramme PRISMA lancée.', 'success');
+        closeModal();
     } finally {
         showLoadingOverlay(false);
     }
@@ -307,6 +314,7 @@ export async function handleRunMetaAnalysis() {
     try {
         await fetchAPI(`/projects/${appState.currentProject.id}/run-meta-analysis`, { method: 'POST' });
         showToast('Méta-analyse lancée avec succès.', 'success');
+        closeModal();
     } finally {
         showLoadingOverlay(false);
     }
@@ -318,6 +326,7 @@ export async function handleRunDescriptiveStats() {
     try {
         await fetchAPI(`/projects/${appState.currentProject.id}/run-descriptive-stats`, { method: 'POST' });
         showToast('Calcul des statistiques lancé.', 'success');
+        closeModal();
     } finally {
         showLoadingOverlay(false);
     }

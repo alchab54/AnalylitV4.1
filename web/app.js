@@ -1,7 +1,6 @@
 // ================================================================
 // AnalyLit V4.1 - Application Frontend (Version finale consolidée)
 // ================================================================
-import { fetchAPI } from './js/api.js';
 import { loadProjects, handleCreateProject, renderProjectList, renderProjectSynthesis, renderProjectDetail, selectProject, deleteProject } from './js/projects.js';
 import { loadProjectAnalyses, exportAnalyses, renderAnalysesSection, runProjectAnalysis, renderDiscussionDraft, renderKnowledgeGraph, initializeKnowledgeGraph, renderPrismaFlow, renderGenericAnalysisResult, handleRunDiscussionDraft, handleRunKnowledgeGraph, handleRunPrismaFlow, handleRunMetaAnalysis, handleRunDescriptiveStats } from './js/analyses.js';
 import { loadSearchResults, handleDeleteSelectedArticles, selectAllArticles, showBatchProcessModal, startBatchProcessing, showRunExtractionModal, startFullExtraction, toggleSelectAll } from './js/articles.js';
@@ -1718,10 +1717,6 @@ async function handleGridFormSubmit(event) {
 window.handleImportValidations = typeof handleImportValidations === 'function' ? handleImportValidations : (e) => { e.preventDefault(); console.warn("handleImportValidations non implémenté ou mal référencé."); };
 
 window.deleteProject = typeof deleteProject === 'function' ? deleteProject : () => {};
-window.selectProject = typeof selectProject === 'function' ? selectProject : () => {};
-
-window.exportValidations = typeof exportValidations === 'function' ? exportValidations : () => {};
-window.calculateKappa = typeof calculateKappa === 'function' ? calculateKappa : () => {};
 
 
 window.handlePullModel = typeof handlePullModel === 'function' ? handlePullModel : () => {};
@@ -1745,7 +1740,6 @@ window.exportPRISMAReport = exportPRISMAReport;
 window.runAdvancedAnalysis = typeof runAdvancedAnalysis === 'function' ? runAdvancedAnalysis : () => {};
 window.viewAnalysisPlot = typeof viewAnalysisPlot === 'function' ? viewAnalysisPlot : () => {};
 
-window.exportAnalyses = exportAnalyses;
 // Log de fin de chargement
 
 window.exportForThesis = exportForThesis;
