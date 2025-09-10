@@ -4,7 +4,7 @@
 
 import { fetchAPI } from './js/api.js';
 import { loadProjects, handleCreateProject, renderProjectList, renderProjectSynthesis, renderProjectDetail, selectProject, deleteProject } from './js/projects.js';
-
+import { loadSearchResults, handleDeleteSelectedArticles, selectAllArticles, showBatchProcessModal, startBatchProcessing, showRunExtractionModal, startFullExtraction, toggleSelectAll } from './js/articles.js';
 const appState = {
     currentProject: null,
     projects: [],
@@ -535,162 +535,7 @@ async function loadRobSection() {
     elements.robContainer.innerHTML = `<div class="rob-list">${articlesHtml}</div>`;
 }
 
-async function loadProjectAnalyses() {
-    if (!appState.currentProject) {
-        if (elements.analysisContainer) {
-            elements.analysisContainer.innerHTML = '<p>Sélectionnez un projet pour voir les analyses.</p>';
-        }
-        return;
-    }
-    
-    try {
-        const analyses = await fetchAPI(`/projects/${appState.currentProject.id}/analyses`);
-        appState.analysisResults = analyses || {};
-        renderAnalysesSection();
-    } catch (e) {
-        console.error('Erreur chargement analyses:', e);
-        showToast('Erreur lors du chargement des analyses', 'error');
-    }
-}
-
-function exportAnalyses() {
-    if (!appState.currentProject?.id) {
-        showToast('Veuillez sélectionner un projet.', 'warning');
-        return;
-    }
-    // Ouvre l'URL de l'endpoint d'export dans un nouvel onglet, ce qui déclenche le téléchargement
-    window.open(`/api/projects/${appState.currentProject.id}/export-analyses`, '_blank');
-    showToast('Export des analyses en cours de téléchargement...', 'info');
-}
-
-function renderAnalysesSection() {
-    if (!elements.analysisContainer) return;
-
-    const analyses = appState.analysisResults || {};
-    const projectId = appState.currentProject?.id;
-
-    // 1. Section pour lancer les analyses
-    const analysisLauncherHtml = `
-        <div class="card">
-             <div class="card__header">
-                <h3>Actions</h3>
-                <button class="btn btn--secondary btn--sm" onclick="exportAnalyses()">Exporter les analyses (ZIP)</button>
-            </div>
-        </div>
-        <div class="card card--collapsible card--collapsible--collapsed">
-            <div class="card__header"><h3>Lancer une nouvelle analyse</h3></div>
-            <div class="card__content analysis-options">
-                <div class="analysis-option" onclick="runProjectAnalysis('discussion')">
-                    <div class="analysis-icon">💬</div>
-                    <div class="analysis-details">
-                        <h4>Brouillon de Discussion</h4>
-                        <p>Génère une synthèse narrative des conclusions et limitations des études incluses.</p>
-                    </div>
-                </div>
-                <div class="analysis-option" onclick="runProjectAnalysis('knowledge_graph')">
-                    <div class="analysis-icon">🕸️</div>
-                    <div class="analysis-details">
-                        <h4>Graphe de Connaissances</h4>
-                        <p>Identifie et visualise les relations entre les articles (thèmes, auteurs, etc.).</p>
-                    </div>
-                </div>
-                <div class="analysis-option" onclick="runProjectAnalysis('prisma_flow')">
-                    <div class="analysis-icon">📊</div>
-                    <div class="analysis-details">
-                        <h4>Diagramme de flux PRISMA</h4>
-                        <p>Crée un diagramme de flux PRISMA basé sur les étapes de la revue.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    // 2. Brouillon de discussion
-    const discussionHtml = analyses.discussion_draft ? `
-        <div class="card">
-            <div class="card__header"><h3>Brouillon de Discussion</h3></div>
-            <div class="card__content formatted-text">
-                ${escapeHtml(analyses.discussion_draft).replace(/\n/g, '<br>')}
-            </div>
-        </div>
-    ` : '';
-
-    // 3. Graphe de connaissances
-    let graphHtml = analyses.knowledge_graph ? `
-        <div class="card">
-            <div class="card__header"><h3>Graphe de Connaissances</h3></div>
-            <div class="card__content">
-                <div id="knowledgeGraphContainer" class="knowledge-graph-container"></div>
-            </div>
-        </div>
-    ` : '';
-    
-    // 4. Diagramme PRISMA
-    const prismaHtml = analyses.prisma_flow_path ? `
-        <div class="card">
-            <div class="card__header"><h3>Diagramme de flux PRISMA</h3></div>
-            <div class="card__content">
-                <img src="${analyses.prisma_flow_path}?v=${new Date().getTime()}" alt="Diagramme PRISMA" class="prisma-image">
-            </div>
-        </div>
-    ` : '';
-
-    // Assemblage final
-    elements.analysisContainer.innerHTML = `
-        ${analysisLauncherHtml}
-        <div class="layout-grid">
-            ${discussionHtml ? `<div class="grid-column">${discussionHtml}</div>` : ''}
-            ${(graphHtml || prismaHtml) ? `<div class="grid-column">${graphHtml}${prismaHtml}</div>` : ''}
-        </div>
-    `;
-
-    // Initialiser le graphe si les données existent
-    if (analyses.knowledge_graph && typeof vis !== 'undefined') {
-        initializeKnowledgeGraph(analyses.knowledge_graph);
-    }
-}
-
-// Fonction pour lancer une analyse (doit aussi être présente)
-async function runProjectAnalysis(analysisType) {
-    if (!appState.currentProject?.id) {
-        showToast('Veuillez d\'abord sélectionner un projet.', 'warning');
-        return;
-    }
-    
-    // Mappage pour les messages affichés à l'utilisateur
-    const analysisNames = {
-        discussion: 'le brouillon de discussion',
-        knowledge_graph: 'le graphe de connaissances',
-        prisma_flow: 'le diagramme PRISMA'
-    };
-
-    try {
-        showLoadingOverlay(true, `Lancement de la génération pour ${analysisNames[analysisType] || analysisType}...`);
-        // Note: L'endpoint varie en fonction de l'analyse
-        let endpoint = '';
-        switch(analysisType) {
-            case 'discussion':
-                endpoint = `/projects/${appState.currentProject.id}/run-discussion-draft`;
-                break;
-            case 'knowledge_graph':
-                 endpoint = `/projects/${appState.currentProject.id}/run-knowledge-graph`;
-                 break;
-            case 'prisma_flow':
-                endpoint = `/projects/${appState.currentProject.id}/run-prisma-flow`;
-                break;
-            default:
-                showToast('Type d\'analyse inconnu.', 'error');
-                return;
-        }
-        
-        await fetchAPI(endpoint, { method: 'POST' });
-        showToast(`La génération pour ${analysisNames[analysisType]} a été lancée.`, 'success');
-    } catch (e) {
-        showToast(`Erreur lors du lancement de l\'analyse: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
+import { loadProjectAnalyses, exportAnalyses, runProjectAnalysis, renderAnalysesSection } from './js/analyses.js';
 
 function updateNotificationIndicator() {
     const indicator = document.querySelector('.notification-indicator');
@@ -713,52 +558,6 @@ function clearNotifications() {
     if (list) list.innerHTML = '';
   }
 }
-
-
-
-
-
-// Fonctions pour le workflow d'extraction complète
-
-
-async function startFullExtraction() {
-    const gridId = document.getElementById('extractionGridSelect').value;
-    const profileId = document.getElementById('extractionProfileSelect').value;
-    const includedArticlesIds = appState.currentValidations
-        .filter(e => e.user_validation_status === 'include')
-        .map(e => e.pmid);
-
-    if (!gridId) {
-        showToast("Veuillez sélectionner une grille.", "warning");
-        return;
-    }
-
-    closeModal();
-    showLoadingOverlay(true, 'Lancement de l\'extraction...');
-    try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
-            method: 'POST',
-            body: {
-                articles: includedArticlesIds,
-                profile: profileId,
-                analysis_mode: 'full_extraction',
-                custom_grid_id: gridId
-            }
-        });
-        showToast('Tâche d\'extraction lancée avec succès.', 'success');
-    } catch (error) {
-        showToast(`Erreur lors du lancement de l'extraction: ${error.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
-
-
-
-// CORRECTION : Ajout de la fonction manquante viewArticleDetails
-
-
-
 
 function renderValidationSection(kappaData) {
     if (!elements.validationContainer) return;
@@ -1053,45 +852,7 @@ async function handleBulkActions() {
 // Analyses Section
 // ============================ 
 
-function renderDiscussionDraft(draft) {
-    if (!draft) return '';
-    return `
-        <div class="analysis-card">
-            <h4><i class="fas fa-file-alt"></i> Brouillon de la Discussion</h4>
-            <div class="text-content">${escapeHtml(draft).replace(/\n/g, '<br>')}</div>
-        </div>
-    `;
-}
-
-function renderKnowledgeGraph(graphData) {
-    if (!graphData || !graphData.nodes || graphData.nodes.length === 0) {
-         return `
-            <div class="analysis-card">
-                <h4><i class="fas fa-project-diagram"></i> Graphe de Connaissances</h4>
-                <p class="status-message">Aucune donnée pour le graphe. Lancez l'analyse pour le générer.</p>
-            </div>
-        `;
-    }
-    return `
-        <div class="analysis-card">
-            <h4><i class="fas fa-project-diagram"></i> Graphe de Connaissances</h4>
-            <div id="knowledgeGraph" class="knowledge-graph-container"></div>
-            <p class="help-text">${graphData.nodes.length} noeuds et ${graphData.edges.length} relations.</p>
-        </div>
-    `;
-}
-
-function renderPrismaFlow(prismaPath) {
-    if (!prismaPath) return '';
-    // On ajoute un timestamp pour forcer le rechargement de l'image
-    const cacheBuster = new Date().getTime();
-    return `
-        <div class="analysis-card">
-            <h4><i class="fas fa-sitemap"></i> Diagramme de flux PRISMA</h4>
-            <img src="${prismaPath}?v=${cacheBuster}" alt="Diagramme PRISMA" style="max-width:100%; height:auto; border-radius: var(--radius-base);">
-        </div>
-    `;
-}
+import { loadProjectAnalyses, exportAnalyses, runProjectAnalysis, renderAnalysesSection, renderDiscussionDraft, renderKnowledgeGraph, initializeKnowledgeGraph, renderPrismaFlow } from './js/analyses.js';
 
 function renderGenericAnalysisResult(title, analysis) {
     if (!analysis) return '';
@@ -1197,31 +958,7 @@ async function handleRunPrismaFlow() {
 
 
 
-async function handleRunMetaAnalysis() {
-    if (!appState.currentProject?.id) return;
-    showLoadingOverlay(true, 'Lancement de la méta-analyse...');
-    try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-meta-analysis`, { method: 'POST' });
-        showToast('Méta-analyse lancée avec succès.', 'success');
-    } catch (e) {
-        showToast(`Erreur: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
-
-async function handleRunDescriptiveStats() {
-    if (!appState.currentProject?.id) return;
-    showLoadingOverlay(true, 'Calcul des statistiques descriptives...');
-    try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-descriptive-stats`, { method: 'POST' });
-        showToast('Calcul des statistiques lancé.', 'success');
-    } catch (e) {
-        showToast(`Erreur: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
+import { loadProjectAnalyses, exportAnalyses, runProjectAnalysis, renderAnalysesSection, renderDiscussionDraft, renderKnowledgeGraph, initializeKnowledgeGraph, renderPrismaFlow, renderGenericAnalysisResult, handleRunDiscussionDraft, handleRunKnowledgeGraph, handleRunPrismaFlow, handleRunMetaAnalysis, handleRunDescriptiveStats } from './js/analyses.js';
 
 // ============================ 
 // Settings Section

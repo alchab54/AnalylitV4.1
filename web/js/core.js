@@ -1,4 +1,5 @@
 // web/js/core.js
+import { loadSearchResults } from './articles.js';
 
 export async function initializeApplication() {
     showLoadingOverlay(true, 'Chargement initial des données...');
