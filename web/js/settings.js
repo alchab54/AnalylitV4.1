@@ -351,7 +351,7 @@ async function refreshQueuesStatus() {
     if (appState.currentSection === 'settings') {
         await renderSettings(); // Recharge toute la section paramètres
     }
-} 
+}
 
 async function deleteProfile(profileId) { 
     if (!confirm('Êtes-vous sûr de vouloir supprimer ce profil ?')) return; 
@@ -372,3 +372,7 @@ async function deleteProfile(profileId) {
 function editProfile(profileId) { 
     showToast('La modification de profil n\'est pas encore implémentée.', 'info'); 
 } 
+
+window.showCreateProfileModal = showCreateProfileModal;
+window.handleCreateProfile = handleCreateProfile;
+window.handlePullModel = handlePullModel;

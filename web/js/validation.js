@@ -107,30 +107,28 @@ function renderValidationSection(kappaData) {
 }
 
 async function handleValidateExtraction(extractionId, decision) {
-    if (!appState.currentProject?.id) {
-        showToast('Sélectionnez un projet', 'warning');
+    if (!appState.currentProject?.id || !extractionId) {
+        showToast('Erreur : projet ou ID d\'extraction manquant.', 'error');
         return;
     }
 
     try {
-        showLoadingOverlay(true, 'Validation en cours...');
-        
-        await fetchAPI(`/projects/${appState.currentProject.id}/validate-extraction`, {
-            method: 'POST',
+        // La route correcte attend une méthode PUT et l'ID dans l'URL
+        await fetchAPI(`/projects/${appState.currentProject.id}/extractions/${extractionId}/decision`, {
+            method: 'PUT',
             body: {
-                extraction_id: extractionId,
-                decision: decision
+                decision: decision,
+                evaluator: 'evaluator1' // ou un autre identifiant si nécessaire
             }
         });
-
-        showToast(`Validation enregistrée: ${decision}`, 'success');
+        showToast('Validation enregistrée avec succès.', 'success');
+        
+        // Rafraîchir les données pour voir le changement
         await loadValidationSection();
         
-    } catch (e) {
-        console.error('Erreur validation extraction:', e);
-        showToast(`Erreur: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
+    } catch (error) {
+        console.error('Erreur validation extraction:', error);
+        showToast(`Erreur lors de la validation : ${error.message}`, 'error');
     }
 }
 

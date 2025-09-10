@@ -1078,6 +1078,126 @@ def handle_prompts():
 
 # --- Grilles d'extraction ---
 @api_bp.route('/projects/<project_id>/grids', methods=['GET', 'POST'])
+def grids_collection(project_id):
+    session = Session()
+    try:
+        if request.method == 'GET':
+            rows = session.execute(text("""
+            SELECT id, name, fields, created_at FROM extraction_grids
+            WHERE project_id = :pid ORDER BY created_at DESC
+            """), {"pid": project_id}).mappings().all()
+            
+            grids = []
+            for r in rows:
+                g = dict(r)
+                try:
+                    g['fields'] = json.loads(g['fields'])
+                except Exception:
+                    g['fields'] = []
+                grids.append(g)
+            return jsonify(grids)
+
+        if request.method == 'POST':
+            data = request.get_json(force=True)
+            name, fields = data.get('name'), data.get('fields')
+            if not name or not isinstance(fields, list) or not fields:
+                return jsonify({'error': 'Le nom et une liste de champs sont requis.'}), 400
+
+            grid_id = str(uuid.uuid4())
+            session.execute(text("""
+            INSERT INTO extraction_grids (id, project_id, name, fields, created_at)
+            VALUES (:id, :pid, :n, :f, :t)
+            """), {"id": grid_id, "pid": project_id, "n": name, "f": json.dumps(fields), 
+                   "t": datetime.now().isoformat()})
+            session.commit()
+            
+            return jsonify({"id": grid_id, "project_id": project_id, "name": name, "fields": fields,
+                            "created_at": datetime.now().isoformat()}), 201
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Erreur grids_collection: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur interne du serveur'}), 500
+    finally:
+        session.close()
+
+@api_bp.route('/projects/<project_id>/grids/<grid_id>', methods=['PUT', 'DELETE'])
+def grid_resource(project_id, grid_id):
+    session = Session()
+    try:
+        if request.method == 'PUT':
+            data = request.get_json(force=True)
+            name, fields = data.get('name'), data.get('fields')
+            if not name or not isinstance(fields, list) or not fields:
+                return jsonify({'error': 'Le nom et une liste de champs sont requis.'}), 400
+
+            res = session.execute(text("""
+            UPDATE extraction_grids SET name = :n, fields = :f
+            WHERE id = :id AND project_id = :pid
+            """), {"n": name, "f": json.dumps(fields), "id": grid_id, "pid": project_id})
+            
+            if res.rowcount == 0:
+                return jsonify({'error': "Grille non trouvée ou n'appartient pas à ce projet."}), 404
+            
+            session.commit()
+            return jsonify({'message': 'Grille mise à jour avec succès.'})
+
+        if request.method == 'DELETE':
+            res = session.execute(text("""
+            DELETE FROM extraction_grids WHERE id = :id AND project_id = :pid
+            """), {"id": grid_id, "pid": project_id})
+            
+            if res.rowcount == 0:
+                return jsonify({'error': "Grille non trouvée ou n'appartient pas à ce projet."}), 404
+            
+            session.commit()
+            return jsonify({'message': 'Grille supprimée avec succès.'})
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Erreur grid_resource: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur interne du serveur'}), 500
+    finally:
+        session.close()
+        
+@api_bp.route('/projects/<project_id>/grids/import', methods=['POST'])
+def import_grid_from_file(project_id):
+    if 'file' not in request.files:
+        return jsonify({"error": "Aucun fichier n'a été envoyé"}), 400
+
+    file = request.files['file']
+    if file.filename == '' or not file.filename.endswith('.json'):
+        return jsonify({"error": "Veuillez sélectionner un fichier .json"}), 400
+
+    try:
+        grid_data = json.load(file.stream)
+        grid_name = grid_data.get('name')
+        grid_fields = grid_data.get('fields')
+
+        if not grid_name or not isinstance(grid_fields, list):
+            return jsonify({"error": "Le JSON doit contenir 'name' (string) et 'fields' (liste de strings)"}), 400
+        
+        # Transformer la liste de strings en liste d'objets pour être cohérent
+        formatted_fields = [{"name": field, "description": ""} for field in grid_fields]
+
+        session = Session()
+        try:
+            session.execute(text("""
+            INSERT INTO extraction_grids (id, project_id, name, fields, created_at)
+            VALUES (:id, :pid, :n, :f, :t)
+            """), {"id": str(uuid.uuid4()), "pid": project_id, "n": grid_name,
+                   "f": json.dumps(formatted_fields), "t": datetime.now().isoformat()})
+            session.commit()
+        finally:
+            session.close()
+
+        return jsonify({"message": "Grille importée avec succès"}), 201
+    except json.JSONDecodeError:
+        return jsonify({"error": "Fichier JSON invalide"}), 400
+    except Exception as e:
+        logger.error(f"Erreur import grid: {e}", exc_info=True)
+        return jsonify({"error": "Erreur interne du serveur"}), 500
+        
+# --- Grilles d'extraction ---
+@api_bp.route('/projects/<project_id>/grids', methods=['GET', 'POST'])
 def handle_extraction_grids(project_id):
     session = Session()
     try:

@@ -53,6 +53,11 @@
 						⚖️ Validation
 					</button>
 				</li>
+                <li class="app-nav__item">
+                    <button class="app-nav__button" data-section="grids">
+                        Grilles
+                    </button>
+                </li>
 				<li class="app-nav__item">
 					<button class="app-nav__button" data-section="rob">
 						⚖️ Risque de Biais
@@ -151,6 +156,13 @@
 						<h2>Validation Inter-Évaluateurs</h2>
 						<p>Comparez les décisions, importez/exportez les validations et calculez le Kappa.</p>
 					</div>
+                    <div class="section-header__actions">
+                        <div class="validation-actions">
+                            <h4>Lancer l'extraction complète</h4>
+                            <p>Lancez une extraction détaillée sur les articles que vous avez validés ("Inclus").</p>
+                            <button class="btn btn--primary" id="runFullExtractionBtn">Lancer l'extraction</button>
+                        </div>
+                    </div>
 				</div>
 				<div id="validationContainer">
 					<div class="validation-placeholder">
@@ -160,6 +172,15 @@
 					</div>
 				</div>
 			</section>
+
+            <section class="section" data-section="grids">
+                <div class="section-header">
+                    <h2>Grilles d'Extraction</h2>
+                    <p>Gérez vos modèles d'extraction de données pour chaque projet.</p>
+                </div>
+                <div id="gridsContainer">
+                </div>
+            </section>
 
             <!-- Section Risque de Biais -->
             <section class="section" data-section="rob">
@@ -473,7 +494,7 @@
             </div>
         </div>
 
-		<!-- Modal: Recherche multi-bases -->
+	<!-- Modal: Recherche multi-bases -->
 	<div id="multiDatabaseSearchModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="multiDbSearchTitle">
 	  <div class="modal__content">
 		<div class="modal__header">
@@ -545,6 +566,13 @@
                         <label for="newProjectDescription" class="form-label">Description (optionnel)</label>
                         <textarea id="newProjectDescription" name="description" class="form-control" rows="4" placeholder="Décrivez brièvement l'objectif de votre revue de littérature..."></textarea>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">Mode d'analyse initial</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="mode" value="screening" checked> Pre-screening</label>
+                            <label><input type="radio" name="mode" value="full_extraction"> Extraction Complète</label>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal__actions">
                     <button type="button" class="btn btn--secondary" onclick="closeModal('newProjectModal')">Annuler</button>
@@ -562,6 +590,7 @@
     <script src="/js/validation.js"></script>
     <script src="/js/settings.js"></script>
     <script src="/js/chat.js"></script>
+    <script src="/js/grids.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

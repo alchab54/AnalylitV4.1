@@ -135,6 +135,10 @@ function setupEventListeners() {
       }
       return;
     }
+
+    if (e.target.id === 'runFullExtractionBtn') {
+        showRunExtractionModal();
+    }
   });
 
   // Uploads PDF manuels
@@ -157,9 +161,9 @@ function setupEventListeners() {
     newProjectForm.addEventListener('submit', handleCreateProject);
   }
 
-  // ============================
+  // ============================ 
   // Notifications: remise à zéro
-  // ============================
+  // ============================ 
   // Cible plusieurs sélecteurs possibles pour la “cloche”/bouton
   const notifButtons = document.querySelectorAll('.notifications-btn, [data-notifications-toggle], .notification-indicator');
   if (notifButtons.length) {
@@ -185,7 +189,7 @@ async function handleRunIndexing() {
         });
         showToast('L\'indexation des PDFs a été lancée en arrière-plan.', 'info');
     } catch (e) {
-        showToast(`Erreur lors du lancement de l'indexation: ${e.message}`, 'error');
+        showToast(`Erreur lors du lancement de l\'indexation: ${e.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }
@@ -196,6 +200,7 @@ async function handleCreateProject(event) {
     const form = event.target;
     const name = form.elements.name.value;
     const description = form.elements.description.value;
+    const mode = form.elements.mode.value;
 
     if (!name) {
         showToast('Le nom du projet est requis.', 'warning');
@@ -209,7 +214,7 @@ async function handleCreateProject(event) {
         const newProject = await fetchAPI('/projects', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, description })
+            body: JSON.stringify({ name, description, mode })
         });
 
         await loadProjects();
@@ -282,6 +287,9 @@ function refreshCurrentSection() {
             break;
         case 'validation':
             loadValidationSection();
+            break;
+        case 'grids':
+            renderGridsSection(appState.currentProject);
             break;
         case 'rob':
             loadRobSection();
@@ -402,6 +410,9 @@ async function refreshCurrentProjectData() {
                 break;
             case 'validation':
                 await loadValidationSection();
+                break;
+            case 'grids':
+                renderGridsSection(appState.currentProject);
                 break;
             case 'rob':
                 await loadRobSection();
@@ -628,7 +639,7 @@ function toggleAbstractRow(articleId) {
 // Import Section
 // ============================ 
 function renderImportSection() {
-    if (!elements.importContainer) return;
+    if (!elements.importContainer) return; 
     
     if (!appState.currentProject) {
         elements.importContainer.innerHTML = `
@@ -646,7 +657,7 @@ function renderImportSection() {
             <div class="import-sources">
                 <div class="import-card">
                     <h3>📚 Importer un export Zotero (.json)</h3>
-                    <p>Chargez un fichier d'export Zotero pour ajouter des références.</p>
+                    <p>Chargez un fichier d\'export Zotero pour ajouter des références.</p>
                     <input type="file" id="zoteroFileInput" accept=".json" style="display: none;">
                     <button class="btn btn--primary" onclick="document.getElementById('zoteroFileInput').click()">
                         Choisir fichier JSON
@@ -957,7 +968,7 @@ async function runProjectAnalysis(analysisType) {
         await fetchAPI(endpoint, { method: 'POST' });
         showToast(`La génération pour ${analysisNames[analysisType]} a été lancée.`, 'success');
     } catch (e) {
-        showToast(`Erreur lors du lancement de l'analyse: ${e.message}`, 'error');
+        showToast(`Erreur lors du lancement de l\'analyse: ${e.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }
@@ -1138,12 +1149,12 @@ function renderSearchResultsTable() {
 
     // Tronquer le titre si trop long
     const titleDisplay = (article.title || 'Titre non disponible').length > 80 
-      ? (article.title || 'Titre non disponible').substring(0, 80) + '...'
+      ? (article.title || 'Titre non disponible').substring(0, 80) + '...' 
       : (article.title || 'Titre non disponible');
 
     // Tronquer les auteurs
     const authorsDisplay = (article.authors || '').length > 40
-      ? (article.authors || '').substring(0, 40) + '...'
+      ? (article.authors || '').substring(0, 40) + '...' 
       : (article.authors || '');
 
     // CORRECTION: Affichage du score avec couleurs et justification
@@ -1331,7 +1342,7 @@ async function handleImportValidations(event) {
         showToast('Validations importÃƒÂ©es avec succÃƒÂ¨s', 'success');
         await loadValidationSection();
     } catch (e) {
-        showToast(`Erreur lors de l'import: ${e.message}`, 'error');
+        showToast(`Erreur lors de l\'import: ${e.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }
@@ -1342,7 +1353,7 @@ async function exportValidations() {
         window.open(`/api/projects/${appState.currentProject.id}/export-validations`);
         showToast('Export des validations lancÃƒÂ©', 'success');
     } catch (e) {
-        showToast(`Erreur lors de l'export: ${e.message}`, 'error');
+        showToast(`Erreur lors de l\'export: ${e.message}`, 'error');
     }
 }
 
@@ -1500,9 +1511,9 @@ async function handleBulkActions() {
     }
 }
 
-// ============================
+// ============================ 
 // Analyses Section
-// ============================
+// ============================ 
 
 function renderDiscussionDraft(draft) {
     if (!draft) return '';
@@ -1674,9 +1685,9 @@ async function handleRunDescriptiveStats() {
     }
 }
 
-// ============================
+// ============================ 
 // Settings Section
-// ============================
+// ============================ 
 async function renderSettings() {
     if (!elements.settingsContainer) return;
     const queuesHtml = await renderQueuesStatus();
@@ -2014,7 +2025,7 @@ async function runATNAnalysis() {
 
 function displayATNResults(metrics) {
     const content = document.getElementById('atnResultsContent');
-    if (!content) return;
+    if (!content) return; 
     
     const empathyData = metrics.empathy_metrics || {};
     const aiTypes = metrics.ai_types_distribution || [];
@@ -2142,7 +2153,7 @@ function renderPRISMAChecklist(prismaState) {
 }
 
 function togglePRISMAItem(checkbox, itemId) {
-    const prismaState = window.currentPrismaState; // Utiliser une référence globale temporaire
+    const prismaState = window.currentPrismaState; // Utiliser une référence globale flottante
     // Trouver et basculer l'item
     for (const section of Object.values(prismaState.checklist)) {
         const item = section.find(i => i.id === itemId);

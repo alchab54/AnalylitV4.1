@@ -263,9 +263,11 @@ def process_single_article_task(project_id: str, article_id: str, profile: dict,
                         SELECT fields FROM extraction_grids WHERE id = :gid AND project_id = :pid
                     """), {"gid": custom_grid_id, "pid": project_id}).mappings().fetchone()
                     if grid_row and grid_row.get("fields"):
-                        parsed = json.loads(grid_row["fields"])
-                        if isinstance(parsed, list):
-                            fields_list = parsed
+                        # Le champ 'fields' est un JSON string d'une liste d'objets
+                        fields_list_of_dicts = json.loads(grid_row["fields"])
+                        if isinstance(fields_list_of_dicts, list):
+                            # Extrait juste les noms pour le prompt
+                            fields_list = [d.get("name") for d in fields_list_of_dicts if d.get("name")]
                 except Exception as e:
                     logger.warning(f"Grille custom invalide: {e}")
 
