@@ -1207,7 +1207,17 @@ def handle_extraction_grids(project_id):
             WHERE project_id = :pid
             ORDER BY created_at DESC
             """), {"pid": project_id}).mappings().all()
-            return jsonify([dict(r) for r in rows])
+            
+            # Convertir la chaîne JSON des champs en liste
+            grids = []
+            for row in rows:
+                grid = dict(row)
+                try:
+                    grid['fields'] = json.loads(grid['fields'])
+                except (json.JSONDecodeError, TypeError):
+                    grid['fields'] = []
+                grids.append(grid)
+            return jsonify(grids)
 
         if request.method == 'POST':
             data = request.get_json(force=True)
@@ -1215,7 +1225,7 @@ def handle_extraction_grids(project_id):
                 "id": str(uuid.uuid4()),
                 "project_id": project_id,
                 "name": data['name'],
-                "fields": json.dumps(data['fields']),
+                "fields": json.dumps(data.get('fields', [])),
                 "created_at": datetime.now().isoformat()
             }
             session.execute(text("""
@@ -1223,6 +1233,8 @@ def handle_extraction_grids(project_id):
             VALUES (:id, :project_id, :name, :fields, :created_at)
             """), grid)
             session.commit()
+            # Re-convertir les champs en liste pour la réponse
+            grid['fields'] = data.get('fields', [])
             return jsonify(grid), 201
     except Exception as e:
         session.rollback()
@@ -1231,6 +1243,36 @@ def handle_extraction_grids(project_id):
     finally:
         session.close()
 
+@api_bp.route('/projects/<project_id>/grids/<grid_id>', methods=['PUT', 'DELETE'])
+def handle_single_grid(project_id, grid_id):
+    session = Session()
+    try:
+        if request.method == 'PUT':
+            data = request.get_json(force=True)
+            session.execute(text("""
+            UPDATE extraction_grids SET name = :name, fields = :fields
+            WHERE id = :id AND project_id = :pid
+            """), {
+                "name": data['name'],
+                "fields": json.dumps(data.get('fields', [])),
+                "id": grid_id,
+                "pid": project_id
+            })
+            session.commit()
+            return jsonify({'message': 'Grille mise à jour'})
+
+        if request.method == 'DELETE':
+            session.execute(text("DELETE FROM extraction_grids WHERE id = :id AND project_id = :pid"),
+                            {"id": grid_id, "pid": project_id})
+            session.commit()
+            return jsonify({'message': 'Grille supprimée'})
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Erreur handle_single_grid: {e}")
+        return jsonify({'error': 'Erreur interne'}), 500
+    finally:
+        session.close()
+        
 # --- Paramètres Zotero ---
 @api_bp.route('/settings/zotero', methods=['GET', 'POST'])
 def handle_zotero_settings():
