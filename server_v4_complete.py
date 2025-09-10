@@ -1873,6 +1873,83 @@ def get_inter_rater_stats(project_id):
     finally:
         session.close()
 
+# ================================================================
+# --- Rapports & Exports pour la Thèse ---
+# ================================================================
+
+@api_bp.route('/projects/<project_id>/reports/summary-table', methods=['GET'])
+def get_summary_table_data(project_id):
+    """Fournit les données extraites des articles inclus pour un tableau de synthèse."""
+    session = Session()
+    try:
+        # On ne prend que les articles validés par l'utilisateur comme 'inclus'
+        query = text("""
+            SELECT pmid, title, extracted_data 
+            FROM extractions 
+            WHERE project_id = :pid AND user_validation_status = 'include'
+        """)
+        rows = session.execute(query, {"pid": project_id}).mappings().all()
+        
+        records = []
+        for row in rows:
+            try:
+                data = json.loads(row['extracted_data']) if row['extracted_data'] else {}
+                record = {
+                    'PMID': row['pmid'],
+                    'Titre': row['title'],
+                    **data
+                }
+                records.append(record)
+            except (json.JSONDecodeError, TypeError):
+                continue
+        
+        return jsonify(records)
+    except Exception as e:
+        logger.error(f"Erreur get_summary_table_data: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur interne du serveur'}), 500
+    finally:
+        session.close()
+
+def format_citation(article, style='apa'):
+    """Formate une citation simple pour un article."""
+    authors = article.get('authors', 'Auteur inconnu')
+    year = article.get('publication_date', 's.d.')
+    title = article.get('title', 'Titre inconnu')
+    journal = article.get('journal', 'Journal inconnu')
+    
+    # Simplification : ne prend que le premier auteur pour l'instant
+    first_author = authors.split(',')[0].split(' ')[0] if authors else 'Auteur inconnu'
+    
+    if style == 'apa':
+        return f"{first_author}, {year}. {title}. *{journal}*."
+    elif style == 'vancouver':
+        return f"{first_author}. {title}. {journal}. {year}."
+    else:
+        return f"[{first_author} ({year})] {title}"
+
+@api_bp.route('/projects/<project_id>/reports/bibliography', methods=['GET'])
+def get_bibliography(project_id):
+    """Génère une bibliographie formatée pour les articles inclus."""
+    style = request.args.get('style', 'apa')
+    session = Session()
+    try:
+        # On récupère les détails des articles inclus depuis la table search_results
+        query = text("""
+            SELECT sr.* FROM search_results sr
+            JOIN extractions e ON sr.article_id = e.pmid AND sr.project_id = e.project_id
+            WHERE e.project_id = :pid AND e.user_validation_status = 'include'
+        """)
+        articles = session.execute(query, {"pid": project_id}).mappings().all()
+        
+        bibliography = [format_citation(dict(art), style) for art in articles]
+        
+        return jsonify(bibliography)
+    except Exception as e:
+        logger.error(f"Erreur get_bibliography: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur interne du serveur'}), 500
+    finally:
+        session.close()
+
 @api_bp.route('/projects/<project_id>/risk-of-bias', methods=['GET', 'POST'])
 def handle_risk_of_bias(project_id):
     """Gère la récupération et la sauvegarde des évaluations de risque de biais."""

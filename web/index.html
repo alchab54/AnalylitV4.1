@@ -83,6 +83,11 @@
 						⚙️ Paramètres
 					</button>
 				</li>
+                <li class="app-nav__item">
+                    <button class="app-nav__button" data-section="reporting">
+                        Rapports & Exports
+                    </button>
+                </li>
 			</ul>
         </div>
     </nav>
@@ -120,6 +125,15 @@
                             <p>Sélectionnez un projet pour voir les détails.</p>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            <section class="section" data-section="reporting">
+                <div class="section-header">
+                    <h2>Rapports & Exports</h2>
+                    <p>Générez les éléments finaux pour votre manuscrit de thèse.</p>
+                </div>
+                <div id="reportingContainer" class="reporting-grid">
                 </div>
             </section>
 
@@ -583,6 +597,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
     <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script src="/js/api.js"></script>
@@ -591,6 +606,7 @@
     <script src="/js/settings.js"></script>
     <script src="/js/chat.js"></script>
     <script src="/js/grids.js"></script>
+    <script src="/js/reporting.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

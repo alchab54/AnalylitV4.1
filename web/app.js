@@ -306,6 +306,9 @@ function refreshCurrentSection() {
         case 'settings':
             renderSettings();
             break;
+        case 'reporting':
+            renderReportingSection(appState.currentProject?.id);
+            break;
         default:
             // Ne rien faire pour les sections inconnues
             break;
