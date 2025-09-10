@@ -1,52 +1,47 @@
 // web/js/grids.js
 
-async function renderGridsSection(project) {
+function renderGridsSection(project) {
     const container = document.getElementById('gridsContainer');
-    if (!container) return;
+    if (!container || !project) return;
 
-    if (!project) {
-        container.innerHTML = '<p>Sélectionnez un projet pour gérer les grilles.</p>';
-        return;
-    }
-
-    await loadProjectGrids(project.id);
-
-    const grids = appState.currentProjectGrids || [];
-
-    const gridsHtml = grids.map(grid => `
-        <div class="grid-card">
-            <h4>${escapeHtml(grid.name)}</h4>
-            <div class="grid-card-actions">
-                <button class="btn btn--sm btn--outline" onclick="openGridModal('${grid.id}')">Modifier</button>
-                <button class="btn btn--sm btn--danger" onclick="handleDeleteGrid('${grid.id}')">Supprimer</button>
+    const gridsHtml = appState.currentProjectGrids.length > 0
+        ? appState.currentProjectGrids.map(grid => `
+            <div class="grid-item">
+                <div class="grid-item__content">
+                    <h5>${escapeHtml(grid.name)}</h5>
+                    <p class="grid-meta">${grid.fields.length} champs • ${new Date(grid.created_at).toLocaleDateString()}</p>
+                </div>
+                <div class="grid-item__actions">
+                    <button class="btn btn--sm btn--outline" data-action="edit-grid" data-grid-id="${grid.id}">Modifier</button>
+                    <button class="btn btn--sm btn--danger" data-action="delete-grid" data-grid-id="${grid.id}">Supprimer</button>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `).join('')
+        : '<p class="text-muted">Aucune grille personnalisée pour ce projet.</p>';
 
     container.innerHTML = `
-        <div class="section-actions">
-            <button class="btn btn--primary" onclick="openGridModal()">Créer une grille</button>
-            <label class="btn btn--secondary">
-                Importer une grille (.json)
-                <input type="file" onchange="handleImportGridFile(event)" accept=".json" style="display:none;">
-            </label>
-        </div>
-        <div class="grids-list">
-            ${grids.length > 0 ? gridsHtml : '<p>Aucune grille personnalisée pour ce projet.</p>'}
+        <div class="card">
+            <div class="card__header">
+                <h4>Grilles personnalisées</h4>
+                <div class="grid-actions">
+                    <button class="btn btn--primary btn--sm" data-action="create-grid">Créer une grille</button>
+                    <input type="file" id="importGridFileInput" accept=".json" style="display: none;">
+                    <button class="btn btn--secondary btn--sm" onclick="document.getElementById('importGridFileInput').click()">Importer une grille</button>
+                </div>
+            </div>
+            <div class="card__body">
+                <div class="grids-list">${gridsHtml}</div>
+            </div>
         </div>
     `;
+
     // Attacher les listeners après le rendu
+    document.querySelector('[data-action="create-grid"]').addEventListener('click', () => openGridModal());
     document.querySelectorAll('[data-action="edit-grid"]').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const gridId = e.currentTarget.dataset.gridId;
-            openGridModal(gridId);
-        });
+        button.addEventListener('click', (e) => openGridModal(e.currentTarget.dataset.gridId));
     });
     document.querySelectorAll('[data-action="delete-grid"]').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const gridId = e.currentTarget.dataset.gridId;
-            handleDeleteGrid(gridId);
-        });
+        button.addEventListener('click', (e) => handleDeleteGrid(e.currentTarget.dataset.gridId));
     });
     document.getElementById('importGridFileInput').addEventListener('change', handleImportGridFile);
 }

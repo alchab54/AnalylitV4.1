@@ -66,90 +66,65 @@ async function handleValidateExtraction(extractionId, decision) {
     }
 }
 
-function renderValidationSection(kappaData) {
-    if (!elements.validationContainer) return;
+async function renderValidationSection(project) {
+    const container = document.getElementById('validationContainer');
+    if (!container || !project) return;
+    showLoadingOverlay(true, 'Chargement des validations...');
+    try {
+        await Promise.all([
+            loadProjectExtractions(project.id),
+            loadProjectGrids(project.id) // Charger les grilles pour la modale d'extraction
+        ]);
 
-    const extractions = appState.currentValidations || [];
-    const validatedCount = extractions.filter(ext => ext.user_validation_status).length;
-    
-    let kappaDisplay = '';
-    if (kappaData && kappaData.kappa_result && kappaData.kappa_result !== "Non calculé") {
-        try {
-            const kappa = JSON.parse(kappaData.kappa_result);
-            kappaDisplay = `
-                <div class="kappa-result-display">
-                    <strong>Coefficient Kappa:</strong> ${kappa.kappa?.toFixed(3) || 'N/A'} 
-                    (${kappa.interpretation || 'Non interprété'})
-                    <br>
-                    <small>${kappa.n_comparisons || 0} comparaisons - Accord: ${(kappa.agreement_rate * 100)?.toFixed(1) || 0}%</small>
+        const extractions = appState.currentValidations || [];
+        const validationItemsHtml = extractions.map(extraction => {
+            const article = appState.searchResults.find(art => art.article_id === extraction.pmid);
+            const title = article?.title || extraction.title || 'Titre non disponible';
+            let actionHtml;
+
+            if (extraction.user_validation_status === 'include') {
+                actionHtml = `<div class="status status--success">Inclus</div>`;
+            } else if (extraction.user_validation_status === 'exclude') {
+                actionHtml = `<div class="status status--error">Exclus</div>`;
+            } else {
+                actionHtml = `
+                    <button class="btn btn--success btn--sm" onclick="handleValidateExtraction('${extraction.id}', 'include')">✓ Inclure</button>
+                    <button class="btn btn--error btn--sm" onclick="handleValidateExtraction('${extraction.id}', 'exclude')">✗ Exclure</button>
+                `;
+            }
+
+            return `
+                <div class="validation-item" data-extraction-id="${extraction.id}">
+                    <div class="validation-item__info">
+                        <h4>${escapeHtml(title)}</h4>
+                        <p><strong>Score IA:</strong> ${extraction.relevance_score || 'N/A'}/10 | <strong>Justification:</strong> ${escapeHtml(extraction.relevance_justification || 'Aucune')}</p>
+                    </div>
+                    <div class="validation-item__actions">${actionHtml}</div>
                 </div>
             `;
-        } catch (e) {
-            kappaDisplay = `<div class="kappa-result-display">${kappaData.kappa_result}</div>`;
-        }
-    }
+        }).join('');
 
-    const validationItemsHtml = extractions.map(extraction => {
-        const article = appState.searchResults.find(art => art.article_id === extraction.pmid);
-        const title = article?.title || extraction.title || 'Titre non disponible';
-        
-        return `
-            <div class="validation-item" data-extraction-id="${extraction.id}">
-                <div class="validation-item__info">
-                    <h4>${escapeHtml(title)}</h4>
-                    <p><strong>Score IA:</strong> ${extraction.relevance_score || 'N/A'}/10</p>
-                    <p><strong>Justification:</strong> ${escapeHtml(extraction.relevance_justification || 'Aucune')}</p>
+        container.innerHTML = `
+            <div class="card">
+                <div class="card__header"><h4>Validation des articles</h4></div>
+                <div class="card__body">
+                    ${extractions.length > 0 ? validationItemsHtml : '<p class="text-muted">Aucune extraction à valider.</p>'}
                 </div>
-                <div class="validation-item__actions">
-                    <button class="btn btn--success btn--sm" onclick="validateExtraction('${extraction.id}', 'include')">
-                        ✔ Inclure
-                    </button>
-                    <button class="btn btn--error btn--sm" onclick="validateExtraction('${extraction.id}', 'exclude')">
-                        ✖ Exclure
-                    </button>
+            </div>
+            <div class="card mt-24">
+                <div class="card__header"><h4>Étape suivante : Extraction complète</h4></div>
+                <div class="card__body">
+                    <p>Une fois vos articles validés, lancez une extraction détaillée en utilisant une de vos grilles.</p>
+                    <button class="btn btn--primary" id="runFullExtractionBtn">Lancer l'extraction sur les articles inclus</button>
                 </div>
             </div>
         `;
-    }).join('');
-
-    elements.validationContainer.innerHTML = `
-        <div class="validation-content">
-            <div class="validation-stats">
-                <div class="stat-card">
-                    <h4>Statistiques de validation</h4>
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <h5>Total</h5>
-                            <div class="metric-value">${extractions.length}</div>
-                        </div>
-                        <div class="metric-card">
-                            <h5>Validés</h5>
-                            <div class="metric-value">${validatedCount}</div>
-                        </div>
-                        <div class="metric-card">
-                            <h5>Restants</h5>
-                            <div class="metric-value">${extractions.length - validatedCount}</div>
-                        </div>
-                    </div>
-                    ${kappaDisplay}
-                </div>
-            </div>
-
-            <div class="validation-actions">
-                <h4>Actions de validation</h4>
-                <div class="button-group">
-                    <button class="btn btn--primary" onclick="exportValidations()">Exporter validations (CSV)</button>
-                    <button class="btn btn--secondary" onclick="showImportValidationsModal()">Importer validations</button>
-                    <button class="btn btn--secondary" onclick="calculateKappa()">Calculer Kappa</button>
-                </div>
-            </div>
-
-            <div class="validation-list">
-                <h4>Articles à valider (${extractions.length})</h4>
-                ${extractions.length > 0 ? validationItemsHtml : '<p>Aucune extraction à valider.</p>'}
-            </div>
-        </div>
-    `;
+    } catch (e) {
+        console.error('Erreur renderValidationSection:', e);
+        container.innerHTML = '<p class="text-error">Erreur lors de l\'affichage de la section de validation.</p>';
+    } finally {
+        showLoadingOverlay(false);
+    }
 }
 
 async function handleValidateExtraction(extractionId, decision) {
