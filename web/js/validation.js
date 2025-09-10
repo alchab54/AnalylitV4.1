@@ -20,6 +20,52 @@ async function loadValidationSection() {
     }
 }
 
+async function handleValidateExtraction(extractionId, decision) {
+    if (!appState.currentProject?.id || !extractionId) {
+        showToast('Erreur : projet ou ID d\'extraction manquant.', 'error');
+        return;
+    }
+    const buttonGroup = document.querySelector(`.validation-item[data-extraction-id="${extractionId}"] .validation-item__actions`);
+    if (buttonGroup) buttonGroup.innerHTML = `<div class="loading-spinner"></div>`;
+
+    try {
+        // CORRECTION : Appel de la bonne route avec la bonne méthode (PUT)
+        await fetchAPI(`/projects/${appState.currentProject.id}/extractions/${extractionId}/decision`, {
+            method: 'PUT',
+            body: {
+                decision: decision,
+                evaluator: 'evaluator1' // L'évaluateur est défini ici
+            }
+        });
+
+        // Mise à jour de l'état local pour refléter le changement
+        const extraction = appState.currentValidations.find(e => e.id === extractionId);
+        if (extraction) {
+            extraction.user_validation_status = decision;
+        }
+
+        // Mise à jour visuelle de l'interface sans recharger toute la page
+        const validatedItem = document.querySelector(`.validation-item[data-extraction-id="${extractionId}"]`);
+        if (validatedItem) {
+            const statusBadge = document.createElement('div');
+            statusBadge.className = `status status--${decision === 'include' ? 'success' : 'error'}`;
+            statusBadge.textContent = decision === 'include' ? 'Inclus' : 'Exclus';
+            if (buttonGroup) {
+                buttonGroup.innerHTML = '';
+                buttonGroup.appendChild(statusBadge);
+            }
+        }
+        showToast('Validation enregistrée.', 'success');
+    } catch (error) {
+        console.error('Erreur validation extraction:', error);
+        showToast(`Erreur de validation : ${error.message}`, 'error');
+        // En cas d'erreur, on ré-affiche les boutons pour que l'utilisateur puisse réessayer
+        if (buttonGroup) {
+             buttonGroup.innerHTML = `<button class="btn btn--success btn--sm" onclick="handleValidateExtraction('${extractionId}', 'include')">✓ Inclure</button> <button class="btn btn--error btn--sm" onclick="handleValidateExtraction('${extractionId}', 'exclude')">✗ Exclure</button>`;
+        }
+    }
+}
+
 function renderValidationSection(kappaData) {
     if (!elements.validationContainer) return;
 
