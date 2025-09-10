@@ -68,17 +68,15 @@ export function renderProjectList() {
         const statusClass = getStatusClass(project.status);
         
         return `
-            <div class="project-list-item ${isActive ? 'project-list-item--active' : ''}" 
-                 onclick="selectProject('${project.id}')">
+            <div class="project-item project-list-item ${isActive ? 'project-list-item--active' : ''}" 
+                 data-project-id="${project.id}">
                 <div class="project-list-item-info">
                     <div class="project-list-item-name">${escapeHtml(project.name)}</div>
                     <div class="project-list-item-status">
                         <span class="status-badge ${statusClass}">${escapeHtml(project.status || 'pending')}</span>
                     </div>
                 </div>
-                <button class="btn btn--danger btn--sm" 
-                        onclick="event.stopPropagation(); deleteProject('${project.id}')"
-                        title="Supprimer le projet">
+                <button class="btn btn--danger btn--sm project-delete-btn" data-project-id="${project.id}" title="Supprimer le projet">
                     ×
                 </button>
             </div>

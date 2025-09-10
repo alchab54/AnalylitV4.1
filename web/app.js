@@ -2,7 +2,6 @@
 // AnalyLit V4.1 - Application Frontend (Version finale consolidée)
 // ================================================================
 import { loadProjects, handleCreateProject, renderProjectList, renderProjectSynthesis, renderProjectDetail, selectProject, deleteProject } from './js/projects.js';
-import { loadProjectAnalyses, exportAnalyses, renderAnalysesSection, runProjectAnalysis, renderDiscussionDraft, renderKnowledgeGraph, initializeKnowledgeGraph, renderPrismaFlow, renderGenericAnalysisResult, handleRunDiscussionDraft, handleRunKnowledgeGraph, handleRunPrismaFlow, handleRunMetaAnalysis, handleRunDescriptiveStats } from './js/analyses.js';
 import { loadSearchResults, handleDeleteSelectedArticles, selectAllArticles, showBatchProcessModal, startBatchProcessing, showRunExtractionModal, startFullExtraction, toggleSelectAll } from './js/articles.js';
 import { loadRobSection, fetchAndDisplayRob, getBiasClass, handleRunRobAnalysis, getRobDomainFromKey } from './js/rob.js';
 import { loadChatMessages, renderChatMessages, renderChatSection, sendChatMessage } from './js/chat.js';
@@ -1624,29 +1623,15 @@ async function handleGridFormSubmit(event) {
     }
 }
 
-
 // ================================================================
 // === INITIALISATION FINALE
 // ================================================================
-
-
-
-
-
-// Exposer certaines fonctions globalement pour les événements inline HTML
-
 // Exposition contrôlée des handlers au scope global (évite ReferenceError)
 
 window.handleImportValidations = typeof handleImportValidations === 'function' ? handleImportValidations : (e) => { e.preventDefault(); console.warn("handleImportValidations non implémenté ou mal référencé."); };
-
 window.deleteProject = typeof deleteProject === 'function' ? deleteProject : () => {};
-
-
 window.handlePullModel = typeof handlePullModel === 'function' ? handlePullModel : () => {};
 window.handleSaveZoteroSettings = typeof handleSaveZoteroSettings === 'function' ? handleSaveZoteroSettings : () => {};
-
-
-
 window.openGridModal = typeof openGridModal === 'function' ? openGridModal : () => {};
 window.handleDeleteGrid = typeof handleDeleteGrid === 'function' ? handleDeleteGrid : () => {};
 window.openPromptModal = typeof openPromptModal === 'function' ? openPromptModal : () => {};
@@ -1654,27 +1639,18 @@ window.editPrompt = typeof editPrompt === 'function' ? editPrompt : () => {};
 window.openProfileModal = typeof openProfileModal === 'function' ? openProfileModal : () => {};
 window.fetchAndDisplayRob = typeof fetchAndDisplayRob === 'function' ? fetchAndDisplayRob : () => {};
 window.deleteProfile = typeof deleteProfile === 'function' ? deleteProfile : () => {};
-
 window.showPRISMAModal = showPRISMAModal;
 window.togglePRISMAItem = togglePRISMAItem;
 window.savePRISMAProgress = savePRISMAProgress;
 window.exportPRISMAReport = exportPRISMAReport;
-
 window.runAdvancedAnalysis = typeof runAdvancedAnalysis === 'function' ? runAdvancedAnalysis : () => {};
-window.viewAnalysisPlot = typeof viewAnalysisPlot === 'function' ? viewAnalysisPlot : () => {};
-
-// Log de fin de chargement
-
 window.exportForThesis = exportForThesis;
 window.showStakeholderManagement = showStakeholderManagement;
 window.addStakeholderGroup = addStakeholderGroup;
 
 console.log('✅ AnalyLit V4.1 Frontend - Chargement complet terminé');
 
-
-
-
-
+// Log de fin de chargement
 window.showBatchProcessModal = showBatchProcessModal;
 window.startBatchProcessing = startBatchProcessing;
 window.showRunExtractionModal = showRunExtractionModal;

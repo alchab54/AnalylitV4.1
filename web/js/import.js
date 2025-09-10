@@ -18,7 +18,7 @@ export function renderImportSection(project) {
                 <h4>📚 Importer un fichier Zotero (.json)</h4>
                 <p>Ajoutez des références à votre projet à partir d'un fichier d'export Zotero.</p>
                 <input type="file" id="zoteroFileInput" accept=".json" style="display: none;">
-                <button class="btn btn--primary" onclick="document.getElementById('zoteroFileInput').click()">
+                <button class="btn btn--primary" data-action="trigger-zotero-upload">
                     Choisir un fichier JSON
                 </button>
             </div>
@@ -27,7 +27,7 @@ export function renderImportSection(project) {
                 <h4>📄 Uploader des PDFs</h4>
                 <p>Associez directement des fichiers PDF à votre projet.</p>
                 <input type="file" id="bulkPDFInput" accept=".pdf" multiple style="display: none;">
-                <button class="btn btn--primary" onclick="document.getElementById('bulkPDFInput').click()">
+                <button class="btn btn--primary" data-action="trigger-pdf-upload">
                     Choisir des PDFs
                 </button>
             </div>
@@ -35,7 +35,7 @@ export function renderImportSection(project) {
             <div class="import-card">
                 <h4>🔍 Indexer les PDFs pour le Chat RAG</h4>
                 <p>Permet à l'IA de lire le contenu de vos PDFs pour répondre à vos questions dans la section "Chat".</p>
-                <button class="btn btn--secondary" onclick="window.handleRunIndexing()">
+                <button class="btn btn--secondary" data-action="run-indexing">
                     Lancer l'indexation
                 </button>
             </div>
@@ -43,7 +43,7 @@ export function renderImportSection(project) {
             <div class="import-card">
                 <h4>🌐 Récupération automatique de PDFs</h4>
                 <p>Recherche automatique via Unpaywall pour les articles avec DOI.</p>
-                <button class="btn btn--secondary" onclick="window.handleFetchOnlinePdfs()">
+                <button class="btn btn--secondary" data-action="fetch-online-pdfs">
                     Lancer recherche
                 </button>
             </div>
@@ -51,7 +51,7 @@ export function renderImportSection(project) {
             <div class="import-card">
                 <h4>📝 Ajouter des articles manuellement</h4>
                 <p>Saisissez des identifiants d'articles (PMID, DOI, ArXiv ID) séparés par des retours à la ligne.</p>
-                <button class="btn btn--secondary" onclick="window.showAddManualArticlesModal()">
+                <button class="btn btn--secondary" data-action="show-manual-add">
                     Ajouter articles
                 </button>
             </div>
@@ -59,7 +59,7 @@ export function renderImportSection(project) {
             <div class="import-card">
                 <h4>📥 Importer des PDFs depuis Zotero</h4>
                 <p>Synchronise les PDFs de votre bibliothèque Zotero avec les articles de votre projet.</p>
-                <button class="btn btn--secondary" onclick="window.handleImportZoteroPdfs()">
+                <button class="btn btn--secondary" data-action="import-zotero-pdfs">
                     Importer PDFs Zotero
                 </button>
             </div>

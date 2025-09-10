@@ -1,5 +1,11 @@
 // web/js/core.js
 import { loadSearchResults } from './articles.js';
+import { selectProject, deleteProject } from './projects.js';
+import { viewArticleDetails, toggleArticleSelection, sortResults, selectAllArticles, showBatchProcessModal } from './articles.js';
+import { handleRunIndexing, handleFetchOnlinePdfs, showAddManualArticlesModal, handleImportZoteroPdfs } from './import.js';
+import { editProfile, deleteProfile, showCreateProfileModal, editPrompt, showPullModelModal } from './settings.js';
+import { runProjectAnalysis } from './analyses.js';
+
 
 export function getStatusClass(status) {
     const s = (status || 'pending').toLowerCase();
@@ -29,6 +35,86 @@ export async function initializeApplication() {
         document.getElementById('bulkPDFInput').addEventListener('change', handleBulkPDFUpload);
         document.getElementById('runIndexingBtn').addEventListener('click', handleRunIndexing);
         document.getElementById('importZoteroPdfsBtn').addEventListener('click', handleImportZoteroPdfs);
+
+        // Gestion des événements délégués pour la liste des projets
+        if (elements.projectsList) {
+            elements.projectsList.addEventListener('click', (event) => {
+                const projectItem = event.target.closest('.project-item');
+                const deleteBtn = event.target.closest('.project-delete-btn');
+
+                if (deleteBtn) {
+                    event.stopPropagation(); // Empêche le clic de se propager à l'item du projet
+                    deleteProject(deleteBtn.dataset.projectId);
+                } else if (projectItem) {
+                    selectProject(projectItem.dataset.projectId);
+                }
+            });
+        }
+
+        // Gestion des événements délégués pour la section des résultats
+        if (elements.resultsContainer) {
+            elements.resultsContainer.addEventListener('click', (event) => {
+                const detailsBtn = event.target.closest('.view-details-btn');
+                const sortableHeader = event.target.closest('.sortable');
+                const selectAllBtn = event.target.closest('.select-all-btn');
+                const batchProcessBtn = event.target.closest('.batch-process-btn');
+
+                if (detailsBtn) viewArticleDetails(detailsBtn.dataset.articleId);
+                if (sortableHeader) sortResults(sortableHeader.dataset.sortKey);
+                if (selectAllBtn) selectAllArticles();
+                if (batchProcessBtn) showBatchProcessModal();
+            });
+
+            elements.resultsContainer.addEventListener('change', (event) => {
+                const checkbox = event.target.closest('.article-checkbox');
+                if (checkbox) {
+                    toggleArticleSelection(checkbox.dataset.articleId, checkbox.checked);
+                }
+            });
+        }
+
+        // Gestion des événements délégués pour la section d'import
+        if (elements.importContainer) {
+            elements.importContainer.addEventListener('click', (event) => {
+                const button = event.target.closest('button[data-action]');
+                if (!button) return;
+
+                const action = button.dataset.action;
+                if (action === 'trigger-zotero-upload') document.getElementById('zoteroFileInput').click();
+                if (action === 'trigger-pdf-upload') document.getElementById('bulkPDFInput').click();
+                if (action === 'run-indexing') handleRunIndexing();
+                if (action === 'fetch-online-pdfs') handleFetchOnlinePdfs();
+                if (action === 'show-manual-add') showAddManualArticlesModal();
+                if (action === 'import-zotero-pdfs') handleImportZoteroPdfs();
+            });
+        }
+
+        // Gestion des événements délégués pour la section des paramètres
+        if (elements.settingsContainer) {
+            elements.settingsContainer.addEventListener('click', (event) => {
+                const button = event.target.closest('button[data-action]');
+                if (!button) return;
+
+                const action = button.dataset.action;
+                const id = button.dataset.id;
+
+                if (action === 'edit-profile') editProfile(id);
+                if (action === 'delete-profile') deleteProfile(id);
+                if (action === 'create-profile') showCreateProfileModal();
+                if (action === 'edit-prompt') editPrompt(id);
+                if (action === 'pull-model') showPullModelModal();
+            });
+        }
+
+        // Gestion des événements délégués pour les modales
+        if (elements.modalsContainer) {
+            elements.modalsContainer.addEventListener('click', (event) => {
+                const analysisOption = event.target.closest('.analysis-option');
+                if (analysisOption && analysisOption.dataset.analysisType) {
+                    runProjectAnalysis(analysisOption.dataset.analysisType);
+                }
+            });
+        }
         
         // Gestionnaires d'événements pour la navigation
         elements.navButtons.forEach(button => {

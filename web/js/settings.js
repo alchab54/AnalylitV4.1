@@ -91,14 +91,14 @@ function renderAnalysisProfiles() {
                     </div> 
                     <div class="profile-actions"> 
                         ${profile.is_custom ? ` 
-                            <button class="btn btn--sm btn--outline" onclick="editProfile('${profile.id}')">Modifier</button> 
-                            <button class="btn btn--sm btn--danger" onclick="deleteProfile('${profile.id}')">Supprimer</button> 
+                            <button class="btn btn--sm btn--outline" data-action="edit-profile" data-id="${profile.id}">Modifier</button> 
+                            <button class="btn btn--sm btn--danger" data-action="delete-profile" data-id="${profile.id}">Supprimer</button> 
                         ` : '<span class="badge badge--secondary">Défaut</span>'} 
                     </div> 
                 </div> 
             `).join('')} 
         </div> 
-        <button class="btn btn--primary" onclick="showCreateProfileModal()">Créer un profil</button> 
+        <button class="btn btn--primary" data-action="create-profile">Créer un profil</button> 
     `; 
 } 
 
@@ -114,7 +114,7 @@ function renderPrompts() {
                         <h5>${escapeHtml(prompt.name)}</h5> 
                         <p>${escapeHtml(prompt.description || 'Aucune description')}</p> 
                     </div> 
-                    <button class="btn btn--sm btn--outline" onclick="editPrompt('${prompt.name}')">Modifier</button> 
+                    <button class="btn btn--sm btn--outline" data-action="edit-prompt" data-id="${prompt.name}">Modifier</button> 
                 </div> 
             `).join('')} 
         </div> 
@@ -132,7 +132,7 @@ function renderOllamaModels() {
                 </div> 
             `).join('') : '<p>Aucun modèle local trouvé.</p>'} 
         </div> 
-        <button class="btn btn--primary" onclick="showPullModelModal()">Télécharger un modèle</button> 
+        <button class="btn btn--primary" data-action="pull-model">Télécharger un modèle</button> 
     `; 
 } 
 
