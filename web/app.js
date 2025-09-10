@@ -2,7 +2,8 @@
 // AnalyLit V4.1 - Application Frontend (Version finale consolidée)
 // ================================================================
 
-import { loadProjects, handleCreateProject, renderProjectList, renderProjectSynthesis, renderProjectDetail } from './js/projects.js';
+import { fetchAPI } from './js/api.js';
+import { loadProjects, handleCreateProject, renderProjectList, renderProjectSynthesis, renderProjectDetail, selectProject, deleteProject } from './js/projects.js';
 
 const appState = {
     currentProject: null,
