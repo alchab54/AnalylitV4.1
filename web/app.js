@@ -233,22 +233,7 @@ async function loadInitialData() {
 }
 
 // --- Fonctions de chargement des données (manquantes) ---
-async function fetchAPI(endpoint, options = {}) {
-    try {
-        const response = await fetch(`/api${endpoint}`, options);
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: response.statusText }));
-            throw new Error(errorData.message || `Erreur HTTP ${response.status}`);
-        }
-        if (response.status === 204) { // No Content
-            return null;
-        }
-        return response.json();
-    } catch (error) {
-        console.error(`Erreur API pour ${endpoint}:`, error);
-        throw error;
-    }
-}
+
 
 async function loadProjects() {
     appState.projects = await fetchAPI('/projects');
@@ -430,13 +415,7 @@ async function refreshCurrentProjectData() {
 // ============================ 
 // UI rendering
 // ============================ 
-function escapeHtml(text) {
-    if (text === null || typeof text === 'undefined') return '';
-    const map = {
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;'
-    };
-    return String(text).replace(/[&<>"']/g, (m) => map[m]);
-}
+
 
 function sanitizeForFilename(name) {
   // Miroir du backend: remplace <>:"/\|?* par _ et met en minuscules
@@ -500,26 +479,9 @@ function renderProjectList() {
 
     elements.projectsList.innerHTML = projectsHtml;
 }
-function showToast(message, type = 'info') {
-    if (!elements.toastContainer) return;
-    const toast = document.createElement('div');
-    toast.className = `toast toast--${type}`;
-    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
-    toast.innerHTML = `<span class="toast__icon">${icons[type] || 'ℹ️'}</span><p>${escapeHtml(message)}</p>`;
-    elements.toastContainer.appendChild(toast);
-    setTimeout(() => toast.classList.add('toast--show'), 10);
-    setTimeout(() => {
-        toast.classList.remove('toast--show');
-        toast.addEventListener('transitionend', () => toast.remove());
-    }, 4000);
-}
 
-function showLoadingOverlay(show, text = 'Chargement...') {
-  if (!elements.loadingOverlay) return;
-  const msgEl = elements.loadingOverlay.querySelector('[data-loading-message]') || elements.loadingOverlay.querySelector('p');
-  if (msgEl) msgEl.textContent = text;
-  elements.loadingOverlay.style.display = show ? 'flex' : 'none';
-}
+
+
 
 function getStatusClass(status) {
     const statusMap = {
@@ -2232,10 +2194,7 @@ async function savePRISMAProgress() {
         showToast(`Erreur: ${e.message}`, 'error');
     }
 }
-window.openModal = (modalId) => {
-    const modal = document.getElementById(modalId);
-    if (modal) modal.classList.add('modal--show');
-};
+
 
 // Exposition globale
 window.runATNAnalysis = runATNAnalysis;
@@ -2683,49 +2642,9 @@ window.addEventListener('beforeunload', () => {
 
 console.log('✅ AnalyLit V4.1 Frontend chargé et prêt !');
 
-function showModal(title, content, modalClass = '') {
-    const modalId = 'genericModal';
-    let modal = document.getElementById(modalId);
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = modalId;
-        modal.className = 'modal';
-        elements.modalsContainer.appendChild(modal);
-    }
 
-    modal.innerHTML = `
-        <div class="modal__content ${modalClass}">
-            <div class="modal__header">
-                <h3>${title}</h3>
-                <button class="modal__close" onclick="closeModal('${modalId}')">×</button>
-            </div>
-            <div class="modal__body">
-                ${content}
-            </div>
-        </div>
-    `;
-    openModal(modalId);
-}
 
-window.openModal = (modalId) => {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        document.body.classList.add('modal-open');
-        modal.classList.add('modal--show');
-    } else {
-        console.error(`La modale avec l\'ID #${modalId} n\'a pas été trouvée.`);
-    }
-};
 
-window.closeModal = (modalId) => {
-    const modalsToClose = modalId ? [document.getElementById(modalId)] : document.querySelectorAll('.modal--show');
-    modalsToClose.forEach(modal => {
-        if (modal) modal.classList.remove('modal--show');
-    });
-    if (document.querySelectorAll('.modal--show').length === 0) {
-        document.body.classList.remove('modal-open');
-    }
-};
 
 function selectAllArticles() {
 	const checkboxes = document.querySelectorAll('.article-checkbox');
@@ -2840,24 +2759,7 @@ function openGridModal(action = 'create', gridId = null) {
 }
 
 // CORRECTION : Fonctions de gestion des modales unifiées
-function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.add('modal--show');
-        document.body.classList.add('modal-open');
-    }
-}
 
-function closeModal(modalId) {
-    if (modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) modal.classList.remove('modal--show');
-    } else {
-        document.querySelectorAll('.modal--show').forEach(modal => {
-            modal.classList.remove('modal--show');
-        });
-    }
-}
 
 async function renderQueuesStatus() {
     try {
