@@ -1,6 +1,9 @@
-// web/js/import.js
+import { appState, elements } from '../app.js';
+import { fetchAPI } from './api.js';
+import { showToast, showLoadingOverlay, escapeHtml, openModal, closeModal } from './ui.js';
+import { loadSearchResults } from './articles.js';
 
-function renderImportSection(project) {
+export function renderImportSection(project) {
     const container = document.getElementById('importContainer');
     if (!container) return;
 
@@ -36,6 +39,30 @@ function renderImportSection(project) {
                     Lancer l'indexation
                 </button>
             </div>
+
+            <div class="import-card">
+                <h4>🌐 Récupération automatique de PDFs</h4>
+                <p>Recherche automatique via Unpaywall pour les articles avec DOI.</p>
+                <button class="btn btn--secondary" onclick="handleFetchOnlinePdfs()">
+                    Lancer recherche
+                </button>
+            </div>
+
+            <div class="import-card">
+                <h4>📝 Ajouter des articles manuellement</h4>
+                <p>Saisissez des identifiants d'articles (PMID, DOI, ArXiv ID) séparés par des retours à la ligne.</p>
+                <button class="btn btn--secondary" onclick="showAddManualArticlesModal()">
+                    Ajouter articles
+                </button>
+            </div>
+
+            <div class="import-card">
+                <h4>📥 Importer des PDFs depuis Zotero</h4>
+                <p>Synchronise les PDFs de votre bibliothèque Zotero avec les articles de votre projet.</p>
+                <button class="btn btn--secondary" onclick="handleImportZoteroPdfs()">
+                    Importer PDFs Zotero
+                </button>
+            </div>
         </div>
     `;
 
@@ -44,7 +71,7 @@ function renderImportSection(project) {
     document.getElementById('bulkPDFInput').addEventListener('change', handleBulkPDFUpload);
 }
 
-async function handleZoteroFileUpload(event) {
+export async function handleZoteroFileUpload(event) {
     const file = event.target.files[0];
     if (!file || !appState.currentProject) return;
     const formData = new FormData();
@@ -64,7 +91,7 @@ async function handleZoteroFileUpload(event) {
     }
 }
 
-async function handleBulkPDFUpload(event) {
+export async function handleBulkPDFUpload(event) {
     const files = event.target.files;
     if (!files.length || !appState.currentProject) return;
     const formData = new FormData();
@@ -76,7 +103,7 @@ async function handleBulkPDFUpload(event) {
             body: formData
         });
         showToast('PDFs uploadés avec succès.', 'success');
-        appState.projectFiles = await loadProjectFilesSet(appState.currentProject.id); // Mettre à jour la liste des fichiers
+        // appState.projectFiles = await loadProjectFilesSet(appState.currentProject.id); // Mettre à jour la liste des fichiers
     } catch (error) {
         showToast(`Erreur: ${error.message}`, 'error');
     } finally {
@@ -85,7 +112,7 @@ async function handleBulkPDFUpload(event) {
     }
 }
 
-async function handleRunIndexing() {
+export async function handleRunIndexing() {
     if (!appState.currentProject) return;
     showLoadingOverlay(true, 'Lancement de l\'indexation des PDFs...');
     try {
@@ -98,7 +125,90 @@ async function handleRunIndexing() {
     }
 }
 
-// Rendre la fonction d'indexation accessible globalement
-window.handleRunIndexing = handleRunIndexing;
-window.handleFetchOnlinePdfs = handleFetchOnlinePdfs;
+export async function handleFetchOnlinePdfs() {
+    if (!appState.currentProject) return;
+    const selectedIds = Array.from(appState.selectedSearchResults);
+    if (selectedIds.length === 0) {
+        showToast("Veuillez d'abord sélectionner des articles dans la section 'Recherche'.", 'warning');
+        return;
+    }
+    showLoadingOverlay(true, `Recherche de ${selectedIds.length} PDF(s) en ligne...`);
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/fetch-online-pdfs`, {
+            method: 'POST',
+            body: { article_ids: selectedIds }
+        });
+        showToast('Recherche de PDFs lancée en arrière-plan. Les notifications indiqueront les succès.', 'success');
+    } catch (error) {
+        showToast(`Erreur : ${error.message}`, 'error');
+    }
+}
 
+export function showAddManualArticlesModal() {
+    openModal('addManualArticlesModal');
+}
+
+export async function handleAddManualArticles(event) {
+    event.preventDefault();
+
+    if (!appState.currentProject?.id) {
+        showToast('Sélectionnez d’abord un projet.', 'warning');
+        return;
+    }
+
+    const form = event.target;
+    const textarea = form.querySelector('textarea[name="manual_ids"]') || form.querySelector('textarea');
+    const raw = textarea ? textarea.value.trim() : '';
+
+    // CORRECTION : on accepte un champ texte multi-lignes et on l’envoie sous "identifiers"
+    if (!raw) {
+        showToast('Ajoutez au moins un identifiant (PMID, DOI, arXiv).', 'warning');
+        return;
+    }
+
+    try {
+        showLoadingOverlay(true, 'Ajout manuel en cours...');
+        const res = await fetchAPI(`/projects/${appState.currentProject.id}/add-manual-articles`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifiers: raw })
+        });
+
+        await loadSearchResults();
+        showToast(`${res.added || 0} article(s) ajouté(s).`, 'success');
+        // Optionnel : vider le champ
+        if (textarea) textarea.value = '';
+    } catch (e) {
+        showToast(`Erreur: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+export async function handleImportZoteroPdfs() {
+    if (!appState.currentProject?.id) {
+        showToast('Veuillez sélectionner un projet.', 'warning');
+        return;
+    }
+    
+    if (appState.searchResults.length === 0) {
+        showToast("Aucun article dans ce projet à synchroniser avec Zotero.", 'info');
+        return;
+    }
+
+    const articleIds = appState.searchResults.map(r => r.article_id);
+    
+    showLoadingOverlay(true, 'Lancement de la récupération des PDFs via Zotero...');
+    try {
+        const response = await fetchAPI(`/projects/${appState.currentProject.id}/import-zotero`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ articles: articleIds })
+        });
+        showToast(response.message || 'Récupération des PDFs depuis Zotero lancée.', 'success');
+    } catch (e) {
+        showToast(`Erreur : ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}

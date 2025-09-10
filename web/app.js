@@ -4,7 +4,10 @@
 
 import { fetchAPI } from './js/api.js';
 import { loadProjects, handleCreateProject, renderProjectList, renderProjectSynthesis, renderProjectDetail, selectProject, deleteProject } from './js/projects.js';
+import { loadProjectAnalyses, exportAnalyses, renderAnalysesSection, runProjectAnalysis, renderDiscussionDraft, renderKnowledgeGraph, initializeKnowledgeGraph, renderPrismaFlow, renderGenericAnalysisResult, handleRunDiscussionDraft, handleRunKnowledgeGraph, handleRunPrismaFlow, handleRunMetaAnalysis, handleRunDescriptiveStats } from './js/analyses.js';
 import { loadSearchResults, handleDeleteSelectedArticles, selectAllArticles, showBatchProcessModal, startBatchProcessing, showRunExtractionModal, startFullExtraction, toggleSelectAll } from './js/articles.js';
+import { loadRobSection, fetchAndDisplayRob, getBiasClass, handleRunRobAnalysis, getRobDomainFromKey } from './js/rob.js';
+import { loadChatMessages, renderChatMessages, renderChatSection, sendChatMessage } from './js/chat.js';
 const appState = {
     currentProject: null,
     projects: [],
@@ -422,66 +425,9 @@ function renderImportSection() {
 // ============================ 
 // Chat Section
 // ============================ 
-async function loadChatMessages() {
-    if (!elements.chatContainer) return; 
-    
-    if (!appState.currentProject || !appState.currentProject.id) {
-        elements.chatContainer.innerHTML = `
-            <div class="empty-state">
-                <p>Sélectionnez un projet pour accéder au chat.</p>
-            </div>
-        `;
-        return;
-    }
 
-    try {
-        const messages = await fetchAPI(`/projects/${appState.currentProject.id}/chat-messages`);
-        appState.chatMessages = Array.isArray(messages) ? messages : [];
-        renderChatInterface(appState.chatMessages);
-    } catch (e) {
-        console.error('Erreur chargement chat:', e);
-        elements.chatContainer.innerHTML = `
-            <div class="error-state">
-                <p>Erreur lors du chargement du chat.</p>
-            </div>
-        `;
-    }
-}
 
-function renderChatInterface(messages = []) {
-    if (!elements.chatContainer) return;
 
-    const messagesHtml = messages.map(msg => `
-        <div class="chat-message chat-message--${msg.role}">
-            <div class="chat-message-content">
-                ${escapeHtml(msg.content)}
-            </div>
-            <div class="chat-message-meta">
-                ${new Date(msg.timestamp).toLocaleString()}
-            </div>
-        </div>
-    `).join('');
-
-    elements.chatContainer.innerHTML = `
-        <div class="chat-interface">
-            <div class="chat-messages">
-                ${messagesHtml || '<p class="empty-state">Aucun message pour le moment.</p>'}
-            </div>
-            <div class="chat-input-container">
-                <textarea 
-                    id="chatInput" 
-                    placeholder="Posez votre question..." 
-                    class="chat-input-field">
-                </textarea>
-                <button 
-                    class="btn btn--primary" 
-                    onclick="handleSendChatMessage()">
-                    Envoyer
-                </button>
-            </div>
-        </div>
-    `;
-}
 
 // ============================ 
 // Validation Section
@@ -504,38 +450,9 @@ async function loadValidationSection() {
     }
 }
 
-async function loadRobSection() {
-    if (!elements.robContainer) return;
 
-    if (!appState.currentProject?.id) {
-        elements.robContainer.innerHTML = `<div class="empty-state"><p>Sélectionnez un projet pour évaluer le risque de biais.</p></div>`;
-        return;
-    }
 
-    // On se base sur les articles déjà chargés dans `searchResults`
-    const articles = appState.searchResults || [];
-    if (articles.length === 0) {
-        elements.robContainer.innerHTML = `<div class="empty-state"><p>Aucun article dans ce projet. Lancez une recherche d'abord.</p></div>`;
-        return;
-    }
 
-    const articlesHtml = articles.map(article => `
-        <div class="rob-article-card" id="rob-card-${article.article_id}">
-            <div class="rob-article-header">
-                <input type="checkbox" class="article-select-checkbox" value="${escapeHtml(article.article_id)}" onchange="toggleArticleSelection('${escapeHtml(article.article_id)}', this.checked)">
-                <h4 class="rob-article-title">${escapeHtml(article.title)}</h4>
-                <button class="btn btn--sm btn--outline" onclick="fetchAndDisplayRob('${article.article_id}')">Voir/Éditer</button>
-            </div>
-            <div class="rob-assessment-summary" id="rob-summary-${article.article_id}">
-                <!-- Le résumé de l'évaluation sera chargé ici -->
-            </div>
-        </div>
-    `).join('');
-
-    elements.robContainer.innerHTML = `<div class="rob-list">${articlesHtml}</div>`;
-}
-
-import { loadProjectAnalyses, exportAnalyses, runProjectAnalysis, renderAnalysesSection } from './js/analyses.js';
 
 function updateNotificationIndicator() {
     const indicator = document.querySelector('.notification-indicator');
@@ -714,83 +631,13 @@ async function calculateKappa() {
 }
 
 
-async function fetchAndDisplayRob(articleId) {
-    const summaryContainer = document.getElementById(`rob-summary-${articleId}`);
-    if (!summaryContainer) return;
 
-    try {
-        summaryContainer.innerHTML = `<div class="loading-spinner"></div>`;
-        const robData = await fetchAPI(`/projects/${appState.currentProject.id}/risk-of-bias?article_id=${articleId}`);
 
-        if (Object.keys(robData).length === 0) {
-            summaryContainer.innerHTML = `<p class="text-secondary">Aucune ÃƒÂ©valuation de biais pour cet article. Lancez l'analyse.</p>`;
-            return;
-        }
 
-        summaryContainer.innerHTML = `
-            <div class="rob-details">
-                <div class="rob-domain">
-                    <strong>Randomisation:</strong>
-                    <span class="status status--${getBiasClass(robData.domain_1_bias)}">${robData.domain_1_bias || 'N/A'}</span>
-                    <p class="rob-justification">${escapeHtml(robData.domain_1_justification)}</p>
-                </div>
-                <div class="rob-domain">
-                    <strong>DonnÃƒÂ©es manquantes:</strong>
-                    <span class="status status--${getBiasClass(robData.domain_2_bias)}">${robData.domain_2_bias || 'N/A'}</span>
-                    <p class="rob-justification">${escapeHtml(robData.domain_2_justification)}</p>
-                </div>
-                <div class="rob-domain rob-overall">
-                    <strong>Ãƒâ€°valuation globale:</strong>
-                    <span class="status status--${getBiasClass(robData.overall_bias)}">${robData.overall_bias || 'N/A'}</span>
-                    <p class="rob-justification">${escapeHtml(robData.overall_justification)}</p>
-                </div>
-            </div>
-        `;
 
-    } catch (e) {
-        summaryContainer.innerHTML = `<p class="error">Erreur: ${e.message}</p>`;
-    }
-}
 
-function getBiasClass(bias) {
-    if (!bias) return 'info';
-    const biasLower = bias.toLowerCase();
-    if (biasLower.includes('low')) return 'success';
-    if (biasLower.includes('some concerns')) return 'warning';
-    if (biasLower.includes('high')) return 'error';
-    return 'info';
-}
 
-async function handleRunRobAnalysis() {
-    if (!appState.currentProject) return;
-    const selectedIds = Array.from(appState.selectedSearchResults);
-    if (selectedIds.length === 0) {
-        showToast("Veuillez sélectionner au moins un article pour l'analyse RoB.", 'warning');
-        return;
-    }
-    showLoadingOverlay(true, `Lancement de l'analyse RoB pour ${selectedIds.length} article(s)...`);
-    try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-rob-analysis`, {
-            method: 'POST',
-            body: { article_ids: selectedIds }
-        });
-        showToast("Analyse du risque de biais lancée. Les résultats apparaîtront progressivement.", 'success');
-    } catch (e) {
-        showToast(`Erreur: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
 
-function getRobDomainFromKey(key) {
-    const domainMap = {
-        'domain_1_bias': 'Biais dans le processus de randomisation',
-        'domain_2_bias': 'Biais dus aux écarts par rapport aux interventions prévues',
-        // Ajoutez d'autres domaines ici si nécessaire
-        'overall_bias': 'Biais global'
-    };
-    return domainMap[key] || key.replace(/_/g, ' ');
-}
 
 function showRunAnalysisModal() {
     const selectedCount = appState.selectedSearchResults.size;
@@ -852,113 +699,21 @@ async function handleBulkActions() {
 // Analyses Section
 // ============================ 
 
-import { loadProjectAnalyses, exportAnalyses, runProjectAnalysis, renderAnalysesSection, renderDiscussionDraft, renderKnowledgeGraph, initializeKnowledgeGraph, renderPrismaFlow } from './js/analyses.js';
-
-function renderGenericAnalysisResult(title, analysis) {
-    if (!analysis) return '';
-     let content;
-    if (typeof analysis === 'object' && analysis !== null) {
-        content = `<pre class="code-block">${escapeHtml(JSON.stringify(analysis, null, 2))}</pre>`;
-    } else {
-        content = `<div class="text-content">${escapeHtml(analysis)}</div>`;
-    }
-    return `
-        <div class="analysis-card">
-            <h4><i class="fas fa-chart-bar"></i> ${title}</h4>
-            ${content}
-        </div>
-    `;
-}
-
-function initializeKnowledgeGraph(data) {
-    const container = document.getElementById('knowledgeGraph');
-    if (!container || !vis) return;
-
-    const nodes = new vis.DataSet(data.nodes);
-    const edges = new vis.DataSet(data.edges);
-
-    const graphData = { nodes, edges };
-    const options = {
-        nodes: {
-            shape: 'box',
-            margin: 10,
-            widthConstraint: {
-                maximum: 200
-            },
-            font: {
-                color: '#fff' // Texte en blanc pour le mode sombre
-            }
-        },
-        edges: {
-            arrows: 'to',
-            font: {
-                align: 'horizontal',
-                color: '#fff',
-                strokeWidth: 2,
-                strokeColor: '#222'
-            }
-        },
-        physics: {
-            forceAtlas2Based: {
-                gravitationalConstant: -26,
-                centralGravity: 0.005,
-                springLength: 230,
-                springConstant: 0.18
-            },
-            maxVelocity: 146,
-            solver: 'forceAtlas2Based',
-            timestep: 0.35,
-            stabilization: { iterations: 150 }
-        },
-        layout: {
-            hierarchical: false
-        }
-    };
-    new vis.Network(container, graphData, options);
-}
-
-async function handleRunDiscussionDraft() {
-    if (!appState.currentProject?.id) return;
-    showLoadingOverlay(true, 'Génération du brouillon de discussion...');
-    try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-discussion-draft`, { method: 'POST' });
-        showToast('Tâche de génération lancée.', 'success');
-    } catch (e) {
-        showToast(`Erreur: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
-
-async function handleRunKnowledgeGraph() {
-    if (!appState.currentProject?.id) return;
-    showLoadingOverlay(true, 'Génération du graphe...');
-    try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-knowledge-graph`, { method: 'POST' });
-        showToast('Génération du graphe de connaissances lancée.', 'success');
-    } catch (e) {
-        showToast(`Erreur: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
-
-async function handleRunPrismaFlow() {
-    if (!appState.currentProject?.id) return;
-    showLoadingOverlay(true, 'Génération du diagramme PRISMA...');
-    try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-prisma-flow`, { method: 'POST' });
-        showToast('Génération du diagramme PRISMA lancée.', 'success');
-    } catch (e) {
-        showToast(`Erreur: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
 
 
 
-import { loadProjectAnalyses, exportAnalyses, runProjectAnalysis, renderAnalysesSection, renderDiscussionDraft, renderKnowledgeGraph, initializeKnowledgeGraph, renderPrismaFlow, renderGenericAnalysisResult, handleRunDiscussionDraft, handleRunKnowledgeGraph, handleRunPrismaFlow, handleRunMetaAnalysis, handleRunDescriptiveStats } from './js/analyses.js';
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ============================ 
 // Settings Section
@@ -1667,40 +1422,7 @@ async function selectProject(projectId) {
     }
 }
 
-async function handleMultiDatabaseSearch(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const query = formData.get('query');
-    const maxResults = parseInt(formData.get('max_results'));
-    const selectedDatabases = Array.from(event.target.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
 
-    if (!query || selectedDatabases.length === 0) {
-        showToast('Veuillez remplir tous les champs', 'warning');
-        return;
-    }
-
-    try {
-        closeModal();
-        showLoadingOverlay(true, 'Lancement de la recherche...');
-        
-        await fetchAPI('/search', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                project_id: appState.currentProject.id,
-                query,
-                databases: selectedDatabases,
-                max_results_per_db: maxResults
-            })
-        });
-        
-        showToast('Recherche lancée', 'success');
-    } catch (e) {
-        showToast(`Erreur: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
 
 async function selectAnalysisType(analysisType) { // CORRECTION : Nom de fonction unifié
     try {
@@ -1724,63 +1446,9 @@ async function selectAnalysisType(analysisType) { // CORRECTION : Nom de fonctio
 }
 
 // Formulaire: ajout manuel d’articles
-async function handleAddManualArticles(event) {
-    event.preventDefault();
 
-    if (!appState.currentProject?.id) {
-        showToast('Sélectionnez d’abord un projet.', 'warning');
-        return;
-    }
 
-    const form = event.target;
-    const textarea = form.querySelector('textarea[name="manual_ids"]') || form.querySelector('textarea');
-    const raw = textarea ? textarea.value.trim() : '';
 
-    // CORRECTION : on accepte un champ texte multi-lignes et on l’envoie sous "identifiers"
-    if (!raw) {
-        showToast('Ajoutez au moins un identifiant (PMID, DOI, arXiv).', 'warning');
-        return;
-    }
-
-    try {
-        showLoadingOverlay(true, 'Ajout manuel en cours...');
-        const res = await fetchAPI(`/projects/${appState.currentProject.id}/add-manual-articles`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ identifiers: raw })
-        });
-
-        await loadSearchResults();
-        showToast(`${res.added || 0} article(s) ajouté(s).`, 'success');
-        // Optionnel : vider le champ
-        if (textarea) textarea.value = '';
-    } catch (e) {
-        showToast(`Erreur: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
-
-async function handleFetchOnlinePdfs() {
-    if (!appState.currentProject) return;
-    const selectedIds = Array.from(appState.selectedSearchResults);
-    if (selectedIds.length === 0) {
-        showToast("Veuillez d'abord sélectionner des articles dans la section 'Recherche'.", 'warning');
-        return;
-    }
-    showLoadingOverlay(true, `Recherche de ${selectedIds.length} PDF(s) en ligne...`);
-    try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/fetch-online-pdfs`, {
-            method: 'POST',
-            body: { articles: selectedIds }
-        });
-        showToast('Recherche de PDFs lancée en arrière-plan. Les notifications indiqueront les succès.', 'success');
-    } catch (error) {
-        showToast(`Erreur : ${error.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
 
 async function handleZoteroFileUpload(event) {
     const file = event.target.files[0];
@@ -1832,81 +1500,10 @@ async function handleBulkPDFUpload(event) {
     }
 }
 
-async function handleImportZoteroPdfs() {
-    if (!appState.currentProject?.id) {
-        showToast('Veuillez sélectionner un projet.', 'warning');
-        return;
-    }
-    
-    if (appState.searchResults.length === 0) {
-        showToast("Aucun article dans ce projet à synchroniser avec Zotero.", 'info');
-        return;
-    }
-
-    const articleIds = appState.searchResults.map(r => r.article_id);
-    
-    showLoadingOverlay(true, 'Lancement de la récupération des PDFs via Zotero...');
-    try {
-        const response = await fetchAPI(`/projects/${appState.currentProject.id}/import-zotero`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ articles: articleIds })
-        });
-        showToast(response.message || 'Récupération des PDFs depuis Zotero lancée.', 'success');
-    } catch (e) {
-        showToast(`Erreur : ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
 
 
-function renderAnalysisSection(project) {
-    if (!elements.analysisContainer) return;
-    const analysis = project && project.analysis_result || null;
-    const plotPath = project && project.analysis_plot_path || null;
-    const knowledgeGraphData = project && project.knowledge_graph ? JSON.parse(project.knowledge_graph) : null;
 
-    elements.analysisContainer.innerHTML = `
-        <div class="card">
-            <div class="card__header"><h4>📊 Analyses du projet</h4></div>
-            <div class="card__body">
-                <div id="knowledgeGraphContainer" style="width: 100%; height: 600px; border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: 24px;">
-                    ${!knowledgeGraphData ? '<div class="empty-state"><p>Générez le graphe de connaissances pour le visualiser ici.</p></div>' : ''}
-                </div>
-                ${analysis ? `<pre class="code-block">${escapeHtml(JSON.stringify(analysis, null, 2))}</pre>` : `
-                    <div class="empty-state">
-                        <p>Aucune analyse disponible pour le moment.</p>
-                    </div>`
-                }
-                ${plotPath ? `<img src="/api/projects/${appState.currentProject.id}/files/${plotPath.split('/').pop()}" alt="Graphique d'analyse" class="analysis-plot" style="max-width:100%;height:auto;margin-top:16px;">` : ''}
-            </div>
-        </div>
-    `;
 
-    if (knowledgeGraphData && window.vis) {
-        const container = document.getElementById('knowledgeGraphContainer');
-        const options = {
-            nodes: {
-                shape: 'dot',
-                size: 16,
-                font: { size: 14, color: 'var(--color-text)' }
-            },
-            edges: {
-                width: 2,
-                color: { inherit: 'from' },
-                arrows: { to: { enabled: true, scaleFactor: 0.5 } }
-            },
-            physics: {
-                forceAtlas2Based: { gravitationalConstant: -26, centralGravity: 0.005, springLength: 230, springConstant: 0.18 },
-                maxVelocity: 146,
-                solver: 'forceAtlas2Based',
-                timestep: 0.35,
-            },
-        };
-        new vis.Network(container, knowledgeGraphData, options);
-    }
-}
 
 function formatDate(dateString) {
     if (!dateString) return 'Non spécifié';
@@ -2188,18 +1785,16 @@ async function handleGridFormSubmit(event) {
 // === INITIALISATION FINALE
 // ================================================================
 
-function showAddManualArticlesModal() {
-    openModal('addManualArticlesModal');
-}
 
-window.showAddManualArticlesModal = showAddManualArticlesModal;
+
+
 
 // Exposer certaines fonctions globalement pour les événements inline HTML
 
 // Exposition contrôlée des handlers au scope global (évite ReferenceError)
-window.handleZoteroFileUpload = typeof handleZoteroFileUpload === 'function' ? handleZoteroFileUpload : () => {};
+
 window.handleImportValidations = typeof handleImportValidations === 'function' ? handleImportValidations : (e) => { e.preventDefault(); console.warn("handleImportValidations non implémenté ou mal référencé."); };
-window.handleBulkPDFUpload = typeof handleBulkPDFUpload === 'function' ? handleBulkPDFUpload : () => {};
+
 window.showSearchModal = typeof showSearchModal === 'function' ? showSearchModal : () => {};
 window.deleteProject = typeof deleteProject === 'function' ? deleteProject : () => {};
 window.selectProject = typeof selectProject === 'function' ? selectProject : () => {};
@@ -2207,14 +1802,14 @@ window.selectProject = typeof selectProject === 'function' ? selectProject : () 
 window.exportValidations = typeof exportValidations === 'function' ? exportValidations : () => {};
 window.calculateKappa = typeof calculateKappa === 'function' ? calculateKappa : () => {};
 
-window.handleRunIndexing = typeof handleRunIndexing === 'function' ? handleRunIndexing : () => {};
+
 window.handleFetchOnlinePDFs = typeof handleFetchOnlinePDFs === 'function' ? handleFetchOnlinePDFs : () => {};
 window.handleManualPDFUpload = typeof handleManualPDFUpload === 'function' ? handleManualPDFUpload : (e) => { e.preventDefault(); console.warn("handleManualPDFUpload non implémenté ou mal référencé."); };
-window.handleImportZotero = typeof handleImportZotero === 'function' ? handleImportZotero : () => {};
+
 window.handlePullModel = typeof handlePullModel === 'function' ? handlePullModel : () => {};
 window.handleSaveZoteroSettings = typeof handleSaveZoteroSettings === 'function' ? handleSaveZoteroSettings : () => {};
-window.handleSendChatMessage = typeof handleSendChatMessage === 'function' ? handleSendChatMessage : () => {};
-window.handleAddManualArticles = typeof handleAddManualArticles === 'function' ? handleAddManualArticles : () => {};
+
+
 
 window.openGridModal = typeof openGridModal === 'function' ? openGridModal : () => {};
 window.handleDeleteGrid = typeof handleDeleteGrid === 'function' ? handleDeleteGrid : () => {};
@@ -2235,7 +1830,7 @@ window.viewAnalysisPlot = typeof viewAnalysisPlot === 'function' ? viewAnalysisP
 
 window.exportAnalyses = exportAnalyses;
 // Log de fin de chargement
-window.handleRunRobAnalysis = handleRunRobAnalysis;
+
 window.exportForThesis = exportForThesis;
 window.showStakeholderManagement = showStakeholderManagement;
 window.addStakeholderGroup = addStakeholderGroup;
@@ -2251,6 +1846,6 @@ window.startBatchProcessing = startBatchProcessing;
 window.showRunExtractionModal = showRunExtractionModal;
 window.startFullExtraction = startFullExtraction;
 window.handleFetchOnlinePdfs = handleFetchOnlinePdfs;
-window.handleRunRobAnalysis = handleRunRobAnalysis;
+
 window.toggleSelectAll = toggleSelectAll;
 window.handleDeleteSelectedArticles = handleDeleteSelectedArticles;
