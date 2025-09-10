@@ -1711,7 +1711,7 @@ def save_extraction_decision(project_id, extraction_id):
         return jsonify({'error': 'Erreur interne du serveur'}), 500
     finally:
         session.close()
-        
+                
 @api_bp.route('/projects/<project_id>/validate-article', methods=['POST'])
 def validate_article_endpoint(project_id):
     """
