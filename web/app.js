@@ -1724,9 +1724,6 @@ window.exportValidations = typeof exportValidations === 'function' ? exportValid
 window.calculateKappa = typeof calculateKappa === 'function' ? calculateKappa : () => {};
 
 
-window.handleFetchOnlinePDFs = typeof handleFetchOnlinePDFs === 'function' ? handleFetchOnlinePDFs : () => {};
-window.handleManualPDFUpload = typeof handleManualPDFUpload === 'function' ? handleManualPDFUpload : (e) => { e.preventDefault(); console.warn("handleManualPDFUpload non implémenté ou mal référencé."); };
-
 window.handlePullModel = typeof handlePullModel === 'function' ? handlePullModel : () => {};
 window.handleSaveZoteroSettings = typeof handleSaveZoteroSettings === 'function' ? handleSaveZoteroSettings : () => {};
 

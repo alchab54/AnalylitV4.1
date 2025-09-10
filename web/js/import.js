@@ -35,7 +35,7 @@ export function renderImportSection(project) {
             <div class="import-card">
                 <h4>🔍 Indexer les PDFs pour le Chat RAG</h4>
                 <p>Permet à l'IA de lire le contenu de vos PDFs pour répondre à vos questions dans la section "Chat".</p>
-                <button class="btn btn--secondary" onclick="handleRunIndexing()">
+                <button class="btn btn--secondary" onclick="window.handleRunIndexing()">
                     Lancer l'indexation
                 </button>
             </div>
@@ -43,7 +43,7 @@ export function renderImportSection(project) {
             <div class="import-card">
                 <h4>🌐 Récupération automatique de PDFs</h4>
                 <p>Recherche automatique via Unpaywall pour les articles avec DOI.</p>
-                <button class="btn btn--secondary" onclick="handleFetchOnlinePdfs()">
+                <button class="btn btn--secondary" onclick="window.handleFetchOnlinePdfs()">
                     Lancer recherche
                 </button>
             </div>
@@ -51,7 +51,7 @@ export function renderImportSection(project) {
             <div class="import-card">
                 <h4>📝 Ajouter des articles manuellement</h4>
                 <p>Saisissez des identifiants d'articles (PMID, DOI, ArXiv ID) séparés par des retours à la ligne.</p>
-                <button class="btn btn--secondary" onclick="showAddManualArticlesModal()">
+                <button class="btn btn--secondary" onclick="window.showAddManualArticlesModal()">
                     Ajouter articles
                 </button>
             </div>
@@ -59,7 +59,7 @@ export function renderImportSection(project) {
             <div class="import-card">
                 <h4>📥 Importer des PDFs depuis Zotero</h4>
                 <p>Synchronise les PDFs de votre bibliothèque Zotero avec les articles de votre projet.</p>
-                <button class="btn btn--secondary" onclick="handleImportZoteroPdfs()">
+                <button class="btn btn--secondary" onclick="window.handleImportZoteroPdfs()">
                     Importer PDFs Zotero
                 </button>
             </div>
@@ -124,6 +124,12 @@ export async function handleRunIndexing() {
         showLoadingOverlay(false);
     }
 }
+
+// Exposition globale pour les `onclick`
+window.handleRunIndexing = handleRunIndexing;
+window.handleFetchOnlinePdfs = handleFetchOnlinePdfs;
+window.showAddManualArticlesModal = showAddManualArticlesModal;
+window.handleImportZoteroPdfs = handleImportZoteroPdfs;
 
 export async function handleFetchOnlinePdfs() {
     if (!appState.currentProject) return;
