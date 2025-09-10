@@ -25,7 +25,6 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, scoped_session
 from redis import Redis
 from rq import get_current_job
-from utils.importers import ZoteroAbstractExtractor
 
 # --- Importer la config de l'application ---
 from config_v4 import get_config
@@ -36,6 +35,7 @@ from utils.ai_processors import call_ollama_api
 from utils.file_handlers import sanitize_filename, extract_text_from_pdf
 from utils.notifications import send_project_notification
 from utils.helpers import http_get_with_retries
+from utils.importers import ZoteroAbstractExtractor
 
 # Prompts templates
 from utils.prompt_templates import (
@@ -744,7 +744,6 @@ def import_from_zotero_file_task(project_id: str, json_file_path: str):
     logger.info(f"📚 Import Zotero depuis {json_file_path} pour projet {project_id}")
     session = Session()
     try:
-        # Utilisation du parseur dédié et robuste
         extractor = ZoteroAbstractExtractor(json_file_path)
         records = extractor.process()
 
@@ -754,7 +753,8 @@ def import_from_zotero_file_task(project_id: str, json_file_path: str):
 
         imported_count = 0
         for record in records:
-            # Vérifier si l'article n'existe pas déjà
+            if not record.get('article_id'): continue # Ignorer les entrées sans ID
+
             exists = session.execute(text("""
                 SELECT 1 FROM search_results WHERE project_id = :pid AND article_id = :aid
             """), {"pid": project_id, "aid": record['article_id']}).fetchone()
@@ -769,36 +769,23 @@ def import_from_zotero_file_task(project_id: str, json_file_path: str):
                         :pub_date, :journal, :doi, :url, :src, :ts
                     )
                 """), {
-                    "id": str(uuid.uuid4()),
-                    "pid": project_id,
-                    "aid": record['article_id'],
-                    "title": record.get('title', 'Sans titre'),
-                    "abstract": record.get('abstract', ''),
-                    "authors": record.get('authors', ''),
-                    "pub_date": record.get('publication_date', ''),
-                    "journal": record.get('journal', ''),
-                    "doi": record.get('doi', ''),
-                    "url": record.get('url', ''),
-                    "src": record.get('database_source', 'zotero'),
+                    "id": str(uuid.uuid4()), "pid": project_id, "aid": record['article_id'],
+                    "title": record.get('title', 'Sans titre'), "abstract": record.get('abstract', ''),
+                    "authors": record.get('authors', ''), "pub_date": record.get('publication_date', ''),
+                    "journal": record.get('journal', ''), "doi": record.get('doi', ''),
+                    "url": record.get('url', ''), "src": record.get('database_source', 'zotero'),
                     "ts": datetime.now().isoformat()
                 })
                 imported_count += 1
 
         session.commit()
 
-        # Mettre à jour le compteur du projet
-        total_articles = session.execute(text(
-            "SELECT COUNT(*) FROM search_results WHERE project_id = :pid"
-        ), {"pid": project_id}).scalar_one()
-        session.execute(text(
-            "UPDATE projects SET pmids_count = :count WHERE id = :pid"
-        ), {"count": total_articles, "pid": project_id})
+        total_articles = session.execute(text("SELECT COUNT(*) FROM search_results WHERE project_id = :pid"), {"pid": project_id}).scalar_one()
+        session.execute(text("UPDATE projects SET pmids_count = :count WHERE id = :pid"), {"count": total_articles, "pid": project_id})
         session.commit()
 
-        send_project_notification(project_id, 'import_completed',
-                                  f'Import Zotero terminé: {imported_count} nouveaux articles ajoutés.')
+        send_project_notification(project_id, 'import_completed', f'Import Zotero terminé: {imported_count} nouveaux articles ajoutés.')
 
-        # Nettoyer le fichier temporaire
         try:
             os.remove(json_file_path)
         except Exception as e:
@@ -810,7 +797,7 @@ def import_from_zotero_file_task(project_id: str, json_file_path: str):
         send_project_notification(project_id, 'import_failed', f'Erreur lors de l\'import Zotero: {e}')
     finally:
         session.close()
-
+        
 def import_pdfs_from_zotero_task(project_id: str, pmids: list, zotero_user_id: str, zotero_api_key: str):
     
     """Importe les PDFs depuis Zotero pour les articles spécifiés."""

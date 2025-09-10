@@ -1,24 +1,4 @@
-// ============================
-// Validation Section
-// ============================
-
-async function loadValidationSection() {
-    if (!appState.currentProject) {
-        if (elements.validationContainer) {
-            elements.validationContainer.innerHTML = '<p>Sélectionnez un projet pour voir les données de validation.</p>';
-        }
-        return;
-    }
-    
-    try {
-        const extractions = await fetchAPI(`/projects/${appState.currentProject.id}/extractions`);
-        appState.currentValidations = extractions || [];
-        renderValidationSection();
-    } catch (e) {
-        console.error('Erreur chargement validation:', e);
-        showToast('Erreur lors du chargement de la validation', 'error');
-    }
-}
+// web/js/validation.js
 
 async function renderValidationSection(project) {
     const container = document.getElementById('validationContainer');
@@ -30,7 +10,7 @@ async function renderValidationSection(project) {
             loadProjectExtractions(project.id),
             loadProjectGrids(project.id)
         ]);
-        
+
         const extractions = appState.currentValidations || [];
         const included = extractions.filter(e => e.user_validation_status === 'include');
         const excluded = extractions.filter(e => e.user_validation_status === 'exclude');
@@ -38,22 +18,20 @@ async function renderValidationSection(project) {
 
         container.innerHTML = `
             <div class="card">
-                <div class="card__header">
-                    <h4>Statut de la Validation</h4>
-                </div>
+                <div class="card__header"><h4>Statut de la Validation</h4></div>
                 <div class="card__body metrics-grid">
-                    <div class="metric-card">
-                        <h5>Inclus</h5>
-                        <div class="metric-value">${included.length}</div>
-                    </div>
-                    <div class="metric-card">
-                        <h5>Exclus</h5>
-                        <div class="metric-value">${excluded.length}</div>
-                    </div>
-                    <div class="metric-card">
-                        <h5>En attente</h5>
-                        <div class="metric-value">${pending.length}</div>
-                    </div>
+                    <div class="metric-card"><h5 class="metric-value">${included.length}</h5><p>Inclus</p></div>
+                    <div class="metric-card"><h5 class="metric-value">${excluded.length}</h5><p>Exclus</p></div>
+                    <div class="metric-card"><h5 class="metric-value">${pending.length}</h5><p>En attente</p></div>
+                </div>
+            </div>
+
+            <div class="card mt-24">
+                <div class="card__header">
+                    <h4>Articles en attente de validation</h4>
+                </div>
+                <div class="card__body validation-list">
+                    ${pending.length > 0 ? pending.map(renderValidationItem).join('') : '<p class="text-muted">Aucun article en attente.</p>'}
                 </div>
             </div>
 
@@ -61,11 +39,11 @@ async function renderValidationSection(project) {
                 <div class="card__header">
                     <h4>Articles Validés</h4>
                     <div class="button-group">
-                        <button class="btn btn--sm" onclick="filterValidationList('included')">Voir Inclus</button>
-                        <button class="btn btn--sm" onclick="filterValidationList('excluded')">Voir Exclus</button>
+                        <button class="btn btn--sm" onclick="filterValidationList('include')">Voir Inclus</button>
+                        <button class="btn btn--sm" onclick="filterValidationList('exclude')">Voir Exclus</button>
                     </div>
                 </div>
-                <div class="card__body" id="validatedListContainer">
+                <div class="card__body validation-list" id="validatedListContainer">
                     </div>
             </div>
 
@@ -77,9 +55,8 @@ async function renderValidationSection(project) {
                  </div>
             </div>
         `;
-        
-        // Afficher la liste des inclus par défaut
-        filterValidationList('included');
+
+        filterValidationList('include'); // Afficher les inclus par défaut
 
     } catch (e) {
         console.error('Erreur renderValidationSection:', e);
@@ -89,158 +66,59 @@ async function renderValidationSection(project) {
     }
 }
 
+function renderValidationItem(extraction) {
+    const article = appState.searchResults.find(art => art.article_id === extraction.pmid);
+    const title = article?.title || extraction.title || 'Titre non disponible';
+    let actionHtml;
+
+    if (extraction.user_validation_status === 'include') {
+        actionHtml = `<div class="status status--success">Inclus</div><button class="btn btn--sm" onclick="resetValidationStatus('${extraction.id}')">Annuler</button>`;
+    } else if (extraction.user_validation_status === 'exclude') {
+        actionHtml = `<div class="status status--error">Exclus</div><button class="btn btn--sm" onclick="resetValidationStatus('${extraction.id}')">Annuler</button>`;
+    } else {
+        actionHtml = `
+            <button class="btn btn--success btn--sm" onclick="handleValidateExtraction('${extraction.id}', 'include')">✓ Inclure</button>
+            <button class="btn btn--error btn--sm" onclick="handleValidateExtraction('${extraction.id}', 'exclude')">✗ Exclure</button>
+        `;
+    }
+
+    return `
+        <div class="validation-item" data-extraction-id="${extraction.id}">
+            <div class="validation-item__info">
+                <h4>${escapeHtml(title)}</h4>
+                <p><strong>Score IA:</strong> ${extraction.relevance_score != null ? extraction.relevance_score.toFixed(1) : 'N/A'}/10 | <strong>Justification:</strong> ${escapeHtml(extraction.relevance_justification || 'Aucune')}</p>
+            </div>
+            <div class="validation-item__actions">${actionHtml}</div>
+        </div>
+    `;
+}
+
 function filterValidationList(status) {
     const container = document.getElementById('validatedListContainer');
     if (!container) return;
-
-    const filteredArticles = appState.currentValidations.filter(e => e.user_validation_status === status);
-
-    if (filteredArticles.length === 0) {
+    const filtered = appState.currentValidations.filter(e => e.user_validation_status === status);
+    if (filtered.length === 0) {
         container.innerHTML = `<p class="text-muted">Aucun article dans cette catégorie.</p>`;
         return;
     }
-
-    const listHtml = filteredArticles.map(extraction => {
-        const article = appState.searchResults.find(art => art.article_id === extraction.pmid);
-        const title = article?.title || extraction.title || 'Titre non disponible';
-        return `
-            <div class="validation-item">
-                <div class="validation-item__info">
-                    <h4>${escapeHtml(title)}</h4>
-                </div>
-                <div class="validation-item__actions">
-                    <button class="btn btn--secondary btn--sm" onclick="resetValidationStatus('${extraction.id}')">Annuler la décision</button>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    container.innerHTML = listHtml;
+    container.innerHTML = filtered.map(renderValidationItem).join('');
 }
 
 async function resetValidationStatus(extractionId) {
-    if (!confirm("Êtes-vous sûr de vouloir annuler cette décision ? L'article retournera dans la liste de validation.")) {
-        return;
-    }
-    // Appel à la même fonction de validation avec une décision vide
     await handleValidateExtraction(extractionId, ''); 
-    // Recharger la section pour mettre à jour les compteurs et les listes
-    await renderValidationSection(appState.currentProject);
 }
 
 async function handleValidateExtraction(extractionId, decision) {
-    if (!appState.currentProject?.id || !extractionId) {
-        showToast('Erreur : projet ou ID d\'extraction manquant.', 'error');
-        return;
-    }
-
+    if (!appState.currentProject?.id || !extractionId) return;
     try {
         await fetchAPI(`/projects/${appState.currentProject.id}/extractions/${extractionId}/decision`, {
             method: 'PUT',
-            body: {
-                decision: decision,
-                evaluator: 'evaluator1'
-            }
+            body: { decision: decision, evaluator: 'evaluator1' }
         });
-
-        // Mettre à jour l'état local
-        const extraction = appState.currentValidations.find(e => e.id === extractionId);
-        if (extraction) {
-            extraction.user_validation_status = decision;
-        }
-        
-        // Re-afficher la section pour mettre à jour les compteurs et listes
-        await renderValidationSection(appState.currentProject);
-        showToast('Validation enregistrée.', 'success');
-
+        await renderValidationSection(appState.currentProject); // Re-render la section complète
+        showToast('Décision mise à jour.', 'success');
     } catch (error) {
-        console.error('Erreur validation extraction:', error);
         showToast(`Erreur de validation : ${error.message}`, 'error');
-    }
-}
-function showImportValidationsModal() {
-    const content = `
-        <form onsubmit="handleImportValidations(event)">
-            <div class="form-group">
-                <label class="form-label">Fichier CSV des validations</label>
-                <input type="file" name="validations_file" accept=".csv" class="form-control" required>
-                <div class="form-text">
-                    Le fichier doit contenir les colonnes: articleId, decision
-                </div>
-            </div>
-            <div class="modal__actions">
-                <button type="button" class="btn btn--secondary" onclick="closeModal('genericModal')">Annuler</button>
-                <button type="submit" class="btn btn--primary">Importer</button>
-            </div>
-        </form>
-    `;
-    showModal('Importer des validations', content);
-}
-
-async function handleImportValidations(event) {
-    event.preventDefault();
-    const form = event.target;
-    const fileInput = form.querySelector('input[type="file"]');
-    if (!fileInput.files[0]) {
-        showToast('Veuillez sélectionner un fichier.', 'warning');
-        return;
-    }
-    const formData = new FormData();
-    formData.append('validations_file', fileInput.files[0]);
-    
-    try {
-        closeModal('genericModal');
-        showLoadingOverlay(true, 'Import des validations...');
-        
-        await fetchAPI(`/projects/${appState.currentProject.id}/import-validations`, {
-            method: 'POST',
-            body: formData
-        });
-        
-        showToast('Validations importées avec succès', 'success');
-        await loadValidationSection();
-    } catch (e) {
-        showToast(`Erreur lors de l'import: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
-
-async function exportValidations() {
-    if (!appState.currentProject?.id) {
-        showToast('Sélectionnez un projet pour exporter.', 'warning');
-        return;
-    }
-    try {
-        window.open(`/api/projects/${appState.currentProject.id}/export-validations`);
-        showToast('Export des validations lancé', 'info');
-    } catch (e) {
-        showToast(`Erreur lors de l'export: ${e.message}`, 'error');
-    }
-}
-
-async function calculateKappa() {
-    if (!appState.currentProject?.id) {
-        showToast('Sélectionnez un projet pour calculer Kappa.', 'warning');
-        return;
-    }
-    try {
-        showLoadingOverlay(true, 'Calcul du coefficient Kappa...');
-        
-        const result = await fetchAPI(`/projects/${appState.currentProject.id}/calculate-kappa`, {
-            method: 'POST'
-        });
-        
-        showToast('Calcul du Kappa terminé', 'success');
-        await loadValidationSection(); 
-        if(result) {
-            renderValidationSection(result);
-        }
-
-    } catch (e) {
-        showToast(`Erreur lors du calcul: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
     }
 }
 
