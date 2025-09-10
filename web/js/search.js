@@ -77,17 +77,27 @@ function renderSearchResultsTable() {
     if (!container) return;
 
     const articles = appState.searchResults || [];
+    
+    // Barre d'actions pour la sélection
+    const actionsHeader = `
+        <div class="results-actions-header">
+            <div id="selection-counter">0 article(s) sélectionné(s)</div>
+            <div class="button-group">
+                <button class="btn btn--secondary btn--sm" onclick="handleFetchOnlinePdfs()">Chercher PDFs en ligne</button>
+                <button class="btn btn--secondary btn--sm" onclick="handleRunRobAnalysis()">Analyser Risque de Biais</button>
+                <button class="btn btn--danger btn--sm" onclick="handleDeleteSelectedArticles()">Supprimer</button>
+            </div>
+        </div>
+    `;
+
     if (articles.length === 0) {
         container.innerHTML = '<div class="card"><div class="card__body text-center"><p>Aucun article trouvé pour ce projet.</p></div></div>';
         return;
     }
 
-    // Regrouper les articles par source
     const groupedBySource = articles.reduce((acc, article) => {
         const source = article.database_source || 'Inconnue';
-        if (!acc[source]) {
-            acc[source] = [];
-        }
+        if (!acc[source]) acc[source] = [];
         acc[source].push(article);
         return acc;
     }, {});
@@ -101,7 +111,7 @@ function renderSearchResultsTable() {
                 <table class="table">
                     <thead>
                         <tr>
-                            <th style="width: 5%;"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)"></th>
+                            <th style="width: 5%;"><input type="checkbox" onchange="toggleSelectAll(this.checked, '${source}')"></th>
                             <th class="sortable" onclick="sortResults('relevance_score')">Score</th>
                             <th class="sortable" onclick="sortResults('title')">Titre</th>
                             <th class="sortable" onclick="sortResults('publication_date')">Année</th>
@@ -116,8 +126,8 @@ function renderSearchResultsTable() {
                             const isSelected = appState.selectedSearchResults.has(article.article_id);
                             return `
                                 <tr class="${extraction.user_validation_status === 'include' ? 'row-included' : ''}">
-                                    <td><input type="checkbox" class="article-checkbox" data-id="${article.article_id}" ${isSelected ? 'checked' : ''}></td>
-                                    <td>${(extraction.relevance_score || 0).toFixed(1)}</td>
+                                    <td><input type="checkbox" class="article-checkbox" data-source="${source}" data-id="${article.article_id}" ${isSelected ? 'checked' : ''}></td>
+                                    <td>${(extraction.relevance_score != null ? extraction.relevance_score.toFixed(1) : 'N/A')}</td>
                                     <td>${escapeHtml(article.title)}</td>
                                     <td>${escapeHtml(article.publication_date)}</td>
                                     <td>${escapeHtml(article.authors)}</td>
@@ -134,29 +144,21 @@ function renderSearchResultsTable() {
     container.innerHTML = `
         <div class="card">
             <div class="card__header">
-                <div class="results-header-left">
-                    <h4>${articles.length} Articles</h4>
-                    <div id="selection-counter">0 article(s) sélectionné(s)</div>
-                </div>
-                <div class="results-header-right">
-                    <button class="btn btn--danger btn--sm" onclick="handleDeleteSelectedArticles()">Supprimer la sélection</button>
-                </div>
+                <h4>${articles.length} Articles Trouvés</h4>
             </div>
             <div class="card__body">
+                ${actionsHeader}
                 ${tableHtml}
             </div>
         </div>
     `;
 
-    // Attacher les listeners pour les checkboxes
+    // Attacher les listeners
     document.querySelectorAll('.article-checkbox').forEach(cb => {
         cb.addEventListener('change', (e) => {
             const id = e.target.dataset.id;
-            if (e.target.checked) {
-                appState.selectedSearchResults.add(id);
-            } else {
-                appState.selectedSearchResults.delete(id);
-            }
+            if (e.target.checked) appState.selectedSearchResults.add(id);
+            else appState.selectedSearchResults.delete(id);
             updateSelectionCounter();
         });
     });

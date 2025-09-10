@@ -25,6 +25,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, scoped_session
 from redis import Redis
 from rq import get_current_job
+from utils.importers import ZoteroAbstractExtractor
 
 # --- Importer la config de l'application ---
 from config_v4 import get_config
@@ -739,82 +740,76 @@ Réponds de façon concise et précise."""
 # ================================================================
 
 def import_from_zotero_file_task(project_id: str, json_file_path: str):
-    """Importe les articles depuis un fichier JSON Zotero exporté."""
-    logger.info(f"📚 Import Zotero file pour projet {project_id}: {json_file_path}")
+    """Importe les articles depuis un fichier JSON Zotero en utilisant le parseur robuste."""
+    logger.info(f"📚 Import Zotero depuis {json_file_path} pour projet {project_id}")
     session = Session()
     try:
-        with open(json_file_path, 'r', encoding='utf-8') as f:
-            zotero_data = json.load(f)
-        if not isinstance(zotero_data, list):
-            logger.error("Le fichier JSON doit contenir une liste d'articles")
-            send_project_notification(project_id, 'import_failed', 'Format JSON invalide')
+        # Utilisation du parseur dédié et robuste
+        extractor = ZoteroAbstractExtractor(json_file_path)
+        records = extractor.process()
+
+        if not records:
+            send_project_notification(project_id, 'import_failed', 'Aucun article valide trouvé dans le fichier Zotero.')
             return
 
         imported_count = 0
-        for item in zotero_data:
-            try:
-                title = item.get('title', '')
-                abstract = item.get('abstractNote', '')
-                authors = ', '.join([f"{a.get('firstName', '')} {a.get('lastName', '')}"
-                                   for a in item.get('creators', [])])
-                doi = item.get('DOI', '')
-                url = item.get('url', '')
-                article_id = doi or f"zotero_{item.get('key', str(uuid.uuid4()))}"
-                # Vérifier si l'article n'existe pas déjà
-                exists = session.execute(text("""
-                    SELECT 1 FROM search_results WHERE project_id = :pid AND article_id = :aid
-                """), {"pid": project_id, "aid": article_id}).fetchone()
+        for record in records:
+            # Vérifier si l'article n'existe pas déjà
+            exists = session.execute(text("""
+                SELECT 1 FROM search_results WHERE project_id = :pid AND article_id = :aid
+            """), {"pid": project_id, "aid": record['article_id']}).fetchone()
 
-                if not exists:
-                    session.execute(text("""
-                        INSERT INTO search_results (
-                            id, project_id, article_id, title, abstract, authors,
-                            doi, url, database_source, created_at
-                        ) VALUES (
-                            :id, :pid, :aid, :title, :abstract, :authors,
-                            :doi, :url, 'zotero', :ts
-                        )
-                    """), {
-                        "id": str(uuid.uuid4()),
-                        "pid": project_id,
-                        "aid": article_id,
-                        "title": title,
-                        "abstract": abstract,
-                        "authors": authors,
-                        "doi": doi,
-                        "url": url,
-                        "ts": datetime.now().isoformat()
-                    })
-                    imported_count += 1
-            except Exception as e:
-                logger.warning(f"Erreur import article: {e}")
-                continue
+            if not exists:
+                session.execute(text("""
+                    INSERT INTO search_results (
+                        id, project_id, article_id, title, abstract, authors,
+                        publication_date, journal, doi, url, database_source, created_at
+                    ) VALUES (
+                        :id, :pid, :aid, :title, :abstract, :authors,
+                        :pub_date, :journal, :doi, :url, :src, :ts
+                    )
+                """), {
+                    "id": str(uuid.uuid4()),
+                    "pid": project_id,
+                    "aid": record['article_id'],
+                    "title": record.get('title', 'Sans titre'),
+                    "abstract": record.get('abstract', ''),
+                    "authors": record.get('authors', ''),
+                    "pub_date": record.get('publication_date', ''),
+                    "journal": record.get('journal', ''),
+                    "doi": record.get('doi', ''),
+                    "url": record.get('url', ''),
+                    "src": record.get('database_source', 'zotero'),
+                    "ts": datetime.now().isoformat()
+                })
+                imported_count += 1
 
         session.commit()
 
         # Mettre à jour le compteur du projet
-        session.execute(text("""
-            UPDATE projects SET pmids_count = (
-                SELECT COUNT(*) FROM search_results WHERE project_id = :pid
-            ) WHERE id = :pid
-        """), {"pid": project_id})
+        total_articles = session.execute(text(
+            "SELECT COUNT(*) FROM search_results WHERE project_id = :pid"
+        ), {"pid": project_id}).scalar_one()
+        session.execute(text(
+            "UPDATE projects SET pmids_count = :count WHERE id = :pid"
+        ), {"count": total_articles, "pid": project_id})
         session.commit()
 
         send_project_notification(project_id, 'import_completed',
-                                  f'Import Zotero terminé: {imported_count} articles ajoutés')
+                                  f'Import Zotero terminé: {imported_count} nouveaux articles ajoutés.')
 
         # Nettoyer le fichier temporaire
         try:
             os.remove(json_file_path)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Impossible de supprimer le fichier temporaire {json_file_path}: {e}")
+
     except Exception as e:
         session.rollback()
         logger.error(f"Erreur import_from_zotero_file_task: {e}", exc_info=True)
-        send_project_notification(project_id, 'import_failed', f'Erreur import Zotero: {e}')
+        send_project_notification(project_id, 'import_failed', f'Erreur lors de l\'import Zotero: {e}')
     finally:
         session.close()
-
 
 def import_pdfs_from_zotero_task(project_id: str, pmids: list, zotero_user_id: str, zotero_api_key: str):
     
