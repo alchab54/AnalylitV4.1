@@ -20,6 +20,39 @@ async function loadChatMessages() {
     }
 }
 
+function renderChatMessages(messages = []) {
+    if (!messages || messages.length === 0) {
+        return `<div class="empty-state"><p>Aucun message.</p></div>`;
+    }
+    // Ligne manquante ajoutée ici pour corriger l'erreur de syntaxe
+    const urlRegex = /(https?:\/\/[^\s]+)/g; 
+    
+    return messages.map(message => {
+        // La ligne ci-dessous utilise maintenant une variable définie
+        const formattedContent = escapeHtml(message.content).replace(urlRegex, '<a href="$&" target="_blank">$&</a>');
+        
+        return `
+        <div class="chat-message chat-message--${message.role}">
+            <div class="chat-message__header">
+                <span class="chat-message__role">${message.role === 'user' ? 'Vous' : 'Assistant IA'}</span>
+                <span class="chat-message__time">${new Date(message.timestamp).toLocaleTimeString()}</span>
+            </div>
+            <div class="chat-message__content">
+                ${formattedContent}
+            </div>
+            ${message.sources && message.sources.length > 0 ? `
+                <div class="chat-message__sources">
+                    <strong>Sources:</strong>
+                    <ul>
+                        ${JSON.parse(message.sources).map(source => `<li>${escapeHtml(source)}</li>`).join('')}
+                    </ul>
+                </div>
+            ` : ''}
+        </div>
+    `;
+    }).join('');
+}
+
 function renderChatSection(messages, error = false) {
     if (!elements.chatContainer) return;
 
