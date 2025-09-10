@@ -1,4 +1,6 @@
 // web/js/validation.js
+import { setCurrentValidations } from './state.js';
+
 async function renderValidationSection(project) {
     const container = document.getElementById('validationContainer');
     if (!container || !project) return;
@@ -10,7 +12,7 @@ async function renderValidationSection(project) {
             loadProjectGrids(project.id)
         ]);
         
-        const extractions = appState.currentValidations || [];
+        const extractions = appState.currentValidations || []; // This should be set by a setter
         const included = extractions.filter(e => e.user_validation_status === 'include');
         const excluded = extractions.filter(e => e.user_validation_status === 'exclude');
         const pending = extractions.filter(e => !e.user_validation_status);
@@ -117,6 +119,18 @@ async function handleValidateExtraction(extractionId, decision) {
         showToast(`Erreur de validation : ${error.message}`, 'error');
     }
 }
+
+async function loadValidationSection() {
+    if (!appState.currentProject) {
+        if (elements.validationContainer) {
+            elements.validationContainer.innerHTML = '<p>Sélectionnez un projet pour voir les données de validation.</p>';
+        }
+        return;
+    }
+    const extractions = await fetchAPI(`/projects/${appState.currentProject.id}/extractions`);
+    setCurrentValidations(extractions);
+}
+
 
 window.validateExtraction = handleValidateExtraction;
 window.filterValidationList = filterValidationList;

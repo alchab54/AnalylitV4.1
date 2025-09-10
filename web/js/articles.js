@@ -3,6 +3,7 @@ import { appState, elements } from '../app.js'; // Assuming appState and element
 import { showLoadingOverlay, showToast, showModal, closeModal, escapeHtml } from './ui.js'; // Assuming these are in ui.js or core.js
 import { loadProjectFilesSet } from './projects.js'; // Assuming this is in projects.js
 import { showSearchModal } from './search.js';
+import { setSearchResults, clearSelectedArticles, toggleSelectedArticle } from './state.js';
 import { showSection } from './core.js';
 
 // Functions related to search results and articles will be moved here
@@ -24,10 +25,9 @@ export async function loadSearchResults() {
       fetchAPI(`/projects/${appState.currentProject.id}/extractions`)
     ]);
 
-    appState.searchResults = searchResults || [];
+    setSearchResults(searchResults);
     appState.currentProjectExtractions = extractions || [];
     
-    // La fonction de rendu est appelée ici, après le chargement des données.
     renderSearchResultsTable();
   } catch (e) {
     elements.resultsContainer.innerHTML = '<p>Erreur lors du chargement des résultats.</p>';
@@ -262,12 +262,7 @@ export function sanitizeForFilename(name) {
 }
 
 export function toggleArticleSelection(articleId, checked) {
-    if (checked) {
-        appState.selectedSearchResults.add(articleId);
-    } else {
-        appState.selectedSearchResults.delete(articleId);
-    }
-    updateSelectionCounter();
+    toggleSelectedArticle(articleId);
 }
 
 export function updateSelectionCounter() {
@@ -279,16 +274,14 @@ export function updateSelectionCounter() {
 
 export function selectAllArticles() {
   const allIds = (appState.searchResults || []).map(a => a.article_id);
-  const allSelected = allIds.length > 0 && allIds.every(id => appState.selectedSearchResults.has(id));
+  const allCurrentlySelected = allIds.length > 0 && allIds.every(id => appState.selectedSearchResults.has(id));
 
-  if (allSelected) {
-    // If everything is selected, clear the selection
-    appState.selectedSearchResults.clear();
+  if (allCurrentlySelected) {
+    clearSelectedArticles();
   } else {
-    // Otherwise, select all
-    allIds.forEach(id => appState.selectedSearchResults.add(id));
+    allIds.forEach(id => toggleSelectedArticle(id, true));
+    renderSearchResultsTable(); // Re-render to update checkboxes
   }
-  renderSearchResultsTable(); // Re-render to update checkboxes
 }
 
 export function toggleSelectAll(checked, source) {
@@ -323,9 +316,9 @@ export async function handleDeleteSelectedArticles() {
         });
         
         // Mettre à jour l'état local pour un affichage instantané
-        appState.searchResults = appState.searchResults.filter(a => !selectedIds.includes(a.article_id));
+        setSearchResults(appState.searchResults.filter(a => !selectedIds.includes(a.article_id)));
         appState.currentProjectExtractions = appState.currentProjectExtractions.filter(e => !selectedIds.includes(e.pmid));
-        selectedIds.forEach(id => appState.selectedSearchResults.delete(id));
+        clearSelectedArticles();
         
         showToast('Articles supprimés avec succès.', 'success');
         renderSearchResultsTable(); // Re-afficher le tableau mis à jour

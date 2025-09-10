@@ -22,7 +22,7 @@ export async function loadRobSection() {
             <div class="rob-article-header">
                 <input type="checkbox" class="article-select-checkbox" value="${escapeHtml(article.article_id)}" onchange="toggleArticleSelection('${escapeHtml(article.article_id)}', this.checked)">
                 <h4 class="rob-article-title">${escapeHtml(article.title)}</h4>
-                <button class="btn btn--sm btn--outline" onclick="fetchAndDisplayRob('${article.article_id}')">Voir/Éditer</button>
+                <button class="btn btn--secondary btn--sm" data-action="show-rob-details" data-article-id="${article.article_id}">Voir/Éditer</button>
             </div>
             <div class="rob-assessment-summary" id="rob-summary-${article.article_id}">
                 <!-- Le résumé de l'évaluation sera chargé ici -->

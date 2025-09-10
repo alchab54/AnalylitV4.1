@@ -4,8 +4,8 @@
 import { loadProjects, handleCreateProject, renderProjectList, renderProjectSynthesis, renderProjectDetail, selectProject, deleteProject } from './js/projects.js';
 import { loadSearchResults, handleDeleteSelectedArticles, selectAllArticles, showBatchProcessModal, startBatchProcessing, showRunExtractionModal, startFullExtraction, toggleSelectAll } from './js/articles.js';
 import { loadRobSection, fetchAndDisplayRob, getBiasClass, handleRunRobAnalysis, getRobDomainFromKey } from './js/rob.js';
-import { loadChatMessages, renderChatMessages, renderChatSection, sendChatMessage } from './js/chat.js';
-const appState = {
+import { loadChatMessages, renderChatMessages, renderChatSection, sendChatMessage, renderChatInterface } from './js/chat.js';
+export const appState = {
     currentProject: null,
     projects: [],
     searchResults: [],

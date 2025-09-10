@@ -1,5 +1,6 @@
 import { appState, elements } from '../app.js';
 import { fetchAPI } from './api.js';
+import { setAnalysisResults } from './state.js';
 import { showToast, showLoadingOverlay, escapeHtml, openModal, closeModal } from './ui.js';
 
 export async function loadProjectAnalyses() {
@@ -12,7 +13,7 @@ export async function loadProjectAnalyses() {
     
     try {
         const analyses = await fetchAPI(`/projects/${appState.currentProject.id}/analyses`);
-        appState.analysisResults = analyses || {};
+        setAnalysisResults(analyses);
         renderAnalysesSection();
     } catch (e) {
         console.error('Erreur chargement analyses:', e);

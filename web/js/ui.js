@@ -102,16 +102,12 @@ function openModal(modalId) {
  * Ferme une modale par son ID ou la première modale ouverte.
  * @param {string} [modalId] - L'ID de la modale à fermer.
  */
-function closeModal(modalId) {
-    let modal;
-    if (modalId) {
-        modal = document.getElementById(modalId);
-    } else {
-        modal = document.querySelector('.modal.modal--show');
-    }
-    
+export function closeModal(modalId = 'genericModal') {
+    const modal = document.getElementById(modalId);
     if (modal) {
         modal.classList.remove('modal--show');
+        const modalBody = document.getElementById('genericModalBody');
+        if (modalBody) modalBody.innerHTML = ''; // Nettoyer le contenu
     }
 }
 
@@ -121,34 +117,22 @@ function closeModal(modalId) {
  * @param {string} content - Le contenu HTML de la modale.
  * @param {string} [modalClass] - Une classe CSS additionnelle pour le contenu de la modale.
  */
-function showModal(title, content, modalClass = '') {
-    const container = document.getElementById('modalsContainer');
-    if (!container) {
-        console.error('Modals container not found!');
-        return;
+export function showModal(title, content, modalClass = '') {
+    const modal = document.getElementById('genericModal');
+    const modalTitle = document.getElementById('genericModalTitle');
+    const modalBody = document.getElementById('genericModalBody');
+    const modalContent = modal.querySelector('.modal__content');
+
+    if (!modal || !modalTitle || !modalBody || !modalContent) return;
+
+    modalTitle.textContent = title;
+    modalBody.innerHTML = content;
+
+    // Gérer les classes additionnelles
+    modalContent.className = 'modal__content'; // Reset
+    if (modalClass) {
+        modalContent.classList.add(modalClass);
     }
 
-    let modal = document.getElementById('genericModal');
-    if (modal) {
-        modal.remove();
-    }
-    
-    modal = document.createElement('div');
-    modal.id = 'genericModal';
-    modal.className = 'modal';
-    
-    modal.innerHTML = `
-        <div class="modal__content ${modalClass}">
-            <div class="modal__header">
-                <h3>${title}</h3>
-                <button type="button" class="modal__close" onclick="closeModal('genericModal')">&times;</button>
-            </div>
-            <div class="modal__body">
-                ${content}
-            </div>
-        </div>
-    `;
-    container.appendChild(modal);
-    
-    openModal('genericModal');
+    modal.classList.add('modal--show');
 }

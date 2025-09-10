@@ -4,7 +4,7 @@ import { loadInitialData, initializeWebSocket, showSection } from '../app.js';
 import { selectProject, deleteProject } from './projects.js';
 import { viewArticleDetails, toggleArticleSelection, sortResults, selectAllArticles, showBatchProcessModal, handleDeleteSelectedArticles, showRunExtractionModal } from './articles.js';
 import { handleRunIndexing, handleFetchOnlinePdfs, showAddManualArticlesModal, handleImportZoteroPdfs, handleZoteroFileUpload, handleBulkPDFUpload } from './import.js';
-import { editProfile, deleteProfile, showCreateProfileModal, editPrompt, showPullModelModal, handleSaveZoteroSettings, loadAnalysisProfiles, loadPrompts, loadOllamaModels, renderSettings } from './settings.js';
+import { editProfile, deleteProfile, showCreateProfileModal, editPrompt, showPullModelModal, handleSaveZoteroSettings, loadAnalysisProfiles, loadPrompts, loadOllamaModels, renderSettings, fetchAndDisplayRob } from './settings.js';
 import { runProjectAnalysis, exportAnalyses } from './analyses.js';
 
 
@@ -58,6 +58,12 @@ const clickActions = {
     // Other static buttons from index.html
     'show-search-modal': () => window.showSearchModal(), // Assumes showSearchModal is on window
     'show-run-analysis-modal': () => window.showRunAnalysisModal(), // Assumes showRunAnalysisModal is on window
+    'show-rob-details': (target) => {
+        const articleId = target.dataset.articleId;
+        if (articleId) {
+            fetchAndDisplayRob(articleId);
+        }
+    },
 };
 
 function setupDelegatedEventListeners() {

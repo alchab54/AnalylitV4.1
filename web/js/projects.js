@@ -3,11 +3,12 @@ import { fetchAPI } from './api.js';
 import { showToast, showLoadingOverlay, closeModal } from './ui.js';
 import { escapeHtml } from './ui.js'; // Import escapeHtml
 import { getStatusClass } from './core.js'; // Import getStatusClass and showSection
-import { renderProjectSynthesis } from './projects.js'; // Import renderProjectSynthesis
+import { setProjects, setCurrentProject } from './state.js';
 
 export async function loadProjects() {
     // Assuming appState is globally available
-    appState.projects = await fetchAPI('/projects');
+    const projects = await fetchAPI('/projects');
+    setProjects(projects);
 }
 
 export async function handleCreateProject(event) {
@@ -33,7 +34,7 @@ export async function handleCreateProject(event) {
         });
 
         await loadProjects();
-        selectProject(newProject.id);
+        await selectProject(newProject.id);
         showToast('Projet créé avec succès!', 'success');
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
@@ -42,10 +43,22 @@ export async function handleCreateProject(event) {
     }
 }
 
-// Placeholder for selectProject - will be implemented fully later
 export async function selectProject(projectId) {
-    console.log(`Selecting project: ${projectId}`);
-    // Actual implementation will be moved here from app.js
+    try {
+        const project = await fetchAPI(`/projects/${projectId}`);
+        setCurrentProject(project);
+
+        // Rejoindre la room WebSocket du projet
+        if (appState.socket) {
+            appState.socket.emit('join_room', { room: projectId });
+        }
+
+        // appState.projectFiles = await loadProjectFilesSet(projectId);
+
+        refreshCurrentSection();
+    } catch (e) {
+        showToast(`Erreur: ${e.message}`, 'error');
+    }
 }
 
 export function renderProjectList() {
@@ -86,7 +99,7 @@ export function renderProjectList() {
     elements.projectsList.innerHTML = projectsHtml;
 }
 
-export function renderProjectSynthesis(synthesisResult, projectDescription) {
+function renderProjectSynthesis(synthesisResult, projectDescription) {
     if (!synthesisResult) {
         return `<div class="synthesis-placeholder"><p>Aucune synthèse disponible. Lancez une analyse pour en générer une.</p></div>`;
     }

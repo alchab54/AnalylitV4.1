@@ -1,6 +1,21 @@
 // ============================
 // Chat Section
 // ============================
+import { appState, elements } from '../app.js';
+import { fetchAPI } from './api.js';
+import { escapeHtml } from './ui.js'; // Assure-toi que l'import est présent
+
+function formatMessageContent(content) {
+    if (!content) return '';
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    // 1. Échapper le HTML pour la sécurité
+    let safeContent = escapeHtml(content);
+    // 2. Remplacer les sauts de ligne par <br>
+    safeContent = safeContent.replace(/\n/g, '<br>');
+    // 3. Remplacer les URLs par des liens cliquables
+    safeContent = safeContent.replace(urlRegex, '<a href="$&" target="_blank" rel="noopener noreferrer">$&</a>');
+    return safeContent;
+}
 
 async function loadChatMessages() {
     if (!elements.chatContainer) return; 
@@ -12,8 +27,8 @@ async function loadChatMessages() {
 
     try {
         const messages = await fetchAPI(`/projects/${appState.currentProject.id}/chat-messages`);
-        appState.chatMessages = Array.isArray(messages) ? messages : [];
-        renderChatSection(appState.chatMessages);
+        setChatMessages(Array.isArray(messages) ? messages : []);
+        renderChatInterface(appState.chatMessages);
     } catch (e) {
         console.error('Erreur chargement chat:', e);
         renderChatSection(null, true); // Render error state
@@ -26,11 +41,8 @@ function renderChatMessages(messages = []) {
     }
     // Ligne manquante ajoutée ici pour corriger l'erreur de syntaxe
     const urlRegex = /(https?:\/\/[^\s]+)/g; 
-    
+
     return messages.map(message => {
-        // La ligne ci-dessous utilise maintenant une variable définie
-        const formattedContent = escapeHtml(message.content).replace(urlRegex, '<a href="$&" target="_blank">$&</a>');
-        
         return `
         <div class="chat-message chat-message--${message.role}">
             <div class="chat-message__header">
@@ -38,7 +50,7 @@ function renderChatMessages(messages = []) {
                 <span class="chat-message__time">${new Date(message.timestamp).toLocaleTimeString()}</span>
             </div>
             <div class="chat-message__content">
-                ${formattedContent}
+                ${formatMessageContent(message.content)}
             </div>
             ${message.sources && message.sources.length > 0 ? `
                 <div class="chat-message__sources">
@@ -130,8 +142,7 @@ async function sendChatMessage() {
     };
 
     // Add user message to UI immediately
-    appState.chatMessages.push(userMessage);
-    renderChatSection(appState.chatMessages);
+    addChatMessage(userMessage);
     
     input.value = '';
     input.disabled = true;
@@ -146,8 +157,7 @@ async function sendChatMessage() {
 
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
-        appState.chatMessages = appState.chatMessages.filter(m => m.id !== tempId);
-        renderChatSection(appState.chatMessages);
+        setChatMessages(appState.chatMessages.filter(m => m.id !== tempId));
         input.value = message;
     } finally {
         input.disabled = false;
