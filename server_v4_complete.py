@@ -1669,14 +1669,13 @@ def save_extraction_decision(project_id, extraction_id):
     """Sauvegarde la décision d'un évaluateur pour une extraction."""
     data = request.get_json(force=True)
     decision = data.get('decision')
-    evaluator = data.get('evaluator', 'evaluator1') # 'evaluator1' ou 'evaluator2'
+    evaluator = data.get('evaluator', 'evaluator1')
 
-    if not decision or decision not in ['include', 'exclude', '']:
+    if decision not in ['include', 'exclude', '']:
         return jsonify({'error': 'Décision invalide'}), 400
 
     session = Session()
     try:
-        # Récupérer l'extraction et ses validations actuelles
         extraction = session.execute(text("""
             SELECT id, validations FROM extractions
             WHERE project_id = :pid AND id = :eid
@@ -1685,22 +1684,22 @@ def save_extraction_decision(project_id, extraction_id):
         if not extraction:
             return jsonify({'error': 'Extraction non trouvée'}), 404
 
-        # Mettre à jour le JSON des validations
         try:
             validations_data = json.loads(extraction['validations']) if extraction['validations'] else {}
         except (json.JSONDecodeError, TypeError):
             validations_data = {}
 
-        if decision == '':
-            if evaluator in validations_data:
-                del validations_data[evaluator] # Supprimer la clé si la décision est vide
-        else:
-            validations_data[evaluator] = decision
-
-        # Mettre à jour la base de données
+        # Mettre à jour le JSON et le statut principal
+        validations_data[evaluator] = decision if decision else None
+        
+        # CORRECTION : Mettre à jour la colonne user_validation_status
         session.execute(text("""
-            UPDATE extractions SET validations = :validations WHERE id = :eid
-        """), {"validations": json.dumps(validations_data), "eid": extraction_id})
+            UPDATE extractions SET validations = :validations, user_validation_status = :status WHERE id = :eid
+        """), {
+            "validations": json.dumps(validations_data), 
+            "status": decision if decision else None, # Mettre à jour le statut direct
+            "eid": extraction_id
+        })
         
         session.commit()
         send_project_notification(project_id, 'validation_updated', f'Validation mise à jour pour {extraction_id}')
@@ -1712,7 +1711,7 @@ def save_extraction_decision(project_id, extraction_id):
         return jsonify({'error': 'Erreur interne du serveur'}), 500
     finally:
         session.close()
-
+        
 @api_bp.route('/projects/<project_id>/validate-article', methods=['POST'])
 def validate_article_endpoint(project_id):
     """
