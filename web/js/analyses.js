@@ -1,6 +1,6 @@
 import { appState, elements } from '../app.js';
 import { fetchAPI } from './api.js';
-import { showToast, showLoadingOverlay, escapeHtml } from './ui.js';
+import { showToast, showLoadingOverlay, escapeHtml, openModal, closeModal } from './ui.js';
 
 export async function loadProjectAnalyses() {
     if (!appState.currentProject) {
@@ -118,6 +118,50 @@ export async function runProjectAnalysis(analysisType) {
         showLoadingOverlay(false);
     }
 }
+
+export function showRunAnalysisModal() {
+    const content = `
+        <div class="analysis-options">
+            <div class="analysis-option" onclick="selectAnalysisType('discussion')">
+                <div class="analysis-icon">📝</div>
+                <div class="analysis-details">
+                    <h4>Brouillon de Discussion</h4>
+                    <p>Génère une ébauche de la section discussion de votre article.</p>
+                </div>
+            </div>
+            <div class="analysis-option" onclick="selectAnalysisType('knowledge_graph')">
+                <div class="analysis-icon">🌐</div>
+                <div class="analysis-details">
+                    <h4>Graphe de Connaissances</h4>
+                    <p>Visualise les relations entre les articles et les concepts clés.</p>
+                </div>
+            </div>
+            <div class="analysis-option" onclick="selectAnalysisType('prisma_flow')">
+                <div class="analysis-icon">🌊</div>
+                <div class="analysis-details">
+                    <h4>Diagramme PRISMA</h4>
+                    <p>Génère le diagramme de flux de sélection des études.</p>
+                </div>
+            </div>
+            <div class="analysis-option" onclick="selectAnalysisType('meta_analysis')">
+                <div class="analysis-icon">📊</div>
+                <div class="analysis-details">
+                    <h4>Méta-analyse (scores)</h4>
+                    <p>Analyse la distribution des scores de pertinence.</p>
+                </div>
+            </div>
+             <div class="analysis-option" onclick="selectAnalysisType('descriptive_stats')">
+                <div class="analysis-icon">📈</div>
+                <div class="analysis-details">
+                    <h4>Statistiques Descriptives</h4>
+                    <p>Calcule les statistiques de base sur les données extraites.</p>
+                </div>
+            </div>
+        </div>
+    `;
+    openModal('Lancer une Analyse Avancée', content);
+}
+
 
 export function renderDiscussionDraft(draft) {
     if (!draft) return '';

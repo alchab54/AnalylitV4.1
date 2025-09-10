@@ -633,34 +633,6 @@ async function calculateKappa() {
 
 
 
-
-
-
-
-
-
-function showRunAnalysisModal() {
-    const selectedCount = appState.selectedSearchResults.size;
-    if (selectedCount === 0) {
-        showToast("Veuillez sélectionner au moins un article.", "warning");
-        return;
-    }
-    openModal('bulkActionsModal');
-    // Mettre à jour le contenu de la modale immédiatement
-    const modalContent = document.querySelector('#bulkActionsModal .modal__body');
-    if(modalContent) {
-        modalContent.innerHTML = `
-            <p>Vous êtes sur le point de lancer un traitement par lot sur ${selectedCount} article(s).</p>
-            <div class="form-group">
-                <label for="bulkAnalysisProfile">Veuillez choisir un profil d'analyse:</label>
-                <select id="bulkAnalysisProfile" class="form-control">
-                    ${appState.analysisProfiles.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
-                </select>
-            </div>
-        `;
-    }
-}
-
 async function handleBulkActions() {
     const selectedIds = Array.from(appState.selectedSearchResults);
     const profileId = document.getElementById('bulkAnalysisProfile').value;
@@ -1424,27 +1396,6 @@ async function selectProject(projectId) {
 
 
 
-async function selectAnalysisType(analysisType) { // CORRECTION : Nom de fonction unifié
-    try {
-        showLoadingOverlay(true, 'Lancement de l\'analyse...');
-        closeModal();
-
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ type: analysisType })
-        });
-
-        showToast(`Analyse ${analysisType} lancée`, 'success');
-
-    } catch (e) {
-        console.error('Erreur lancement analyse:', e);
-        showToast(`Erreur: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
-
 // Formulaire: ajout manuel d’articles
 
 
@@ -1818,7 +1769,6 @@ window.editPrompt = typeof editPrompt === 'function' ? editPrompt : () => {};
 window.openProfileModal = typeof openProfileModal === 'function' ? openProfileModal : () => {};
 window.fetchAndDisplayRob = typeof fetchAndDisplayRob === 'function' ? fetchAndDisplayRob : () => {};
 window.deleteProfile = typeof deleteProfile === 'function' ? deleteProfile : () => {};
-window.selectAnalysisType = typeof selectAnalysisType === 'function' ? selectAnalysisType : () => {};
 
 window.showPRISMAModal = showPRISMAModal;
 window.togglePRISMAItem = togglePRISMAItem;
