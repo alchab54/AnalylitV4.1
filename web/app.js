@@ -2758,52 +2758,7 @@ function openGridModal(action = 'create', gridId = null) {
     openModal('gridModal');
 }
 
-// CORRECTION : Fonctions de gestion des modales unifiées
 
-
-async function renderQueuesStatus() {
-    try {
-        const data = await fetchAPI('/admin/queues-status');
-        const queues = (data && data.queues) || [];
-        if (queues.length === 0) return `<p>Aucune file d\'attente active.</p>`;
-
-        return `
-          <div class="queues-grid">
-            ${queues.map(q => `
-              <div class="queue-card">
-                <div class="queue-header">
-                  <h5>${escapeHtml(q.display)}</h5>
-                  <span class="queue-workers-badge">${q.workers} worker${q.workers !== 1 ? 's' : ''}</span>
-                </div>
-                <div class="queue-stats">
-                  <div class="stat-item"><span class="stat-value">${q.pending}</span><span class="stat-label">En attente</span></div>
-                  <div class="stat-item"><span class="stat-value">${q.started}</span><span class="stat-label">En cours</span></div>
-                  <div class="stat-item"><span class="stat-value">${q.failed}</span><span class="stat-label">Échecs</span></div>
-                  <div class="stat-item"><span class="stat-value">${q.finished}</span><span class="stat-label">Terminées</span></div>
-                </div>
-                <div class="queue-footer"><small>${escapeHtml(q.rq_name)}</small></div>
-              </div>
-            `).join('')}
-          </div>
-        `;
-    } catch (e) {
-        return `<div class="alert alert--error">Impossible de charger le statut des files.</div>`;
-    }
-}
-
-// Fonctions utilitaires pour les files
-function getQueueStatusClass(queue) {
-    if (queue.worker_count === 0) return 'queue-card--inactive';
-    if (queue.failed_job_registry > 5) return 'queue-card--error';
-    if (queue.count > 10) return 'queue-card--busy';
-    return 'queue-card--active';
-}
-
-async function refreshQueuesStatus() {
-    if (appState.currentSection === 'settings') {
-        await renderSettings(); // Recharge toute la section paramètres
-    }
-}
 
 async function handleRunIndexing() {
     if (!appState.currentProject?.id) {

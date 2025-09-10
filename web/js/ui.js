@@ -1,73 +1,136 @@
+// ============================
+// UI Utilities
+// ============================
 
-export function escapeHtml(text) {
-    if (text === null || typeof text === 'undefined') return '';
-    const map = {
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;'
-    };
-    return String(text).replace(/[&<>"'']/g, (m) => map[m]);
+/**
+ * Échappe le HTML pour éviter les injections XSS.
+ * @param {string} unsafe - La chaîne de caractères à échapper.
+ * @returns {string} - La chaîne échappée.
+ */
+function escapeHtml(unsafe) {
+    if (unsafe === null || unsafe === undefined) {
+        return '';
+    }
+    return unsafe
+         .toString()
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
 }
 
-export function showToast(message, type = 'info') {
-    if (!elements.toastContainer) return;
+/**
+ * Affiche un message toast.
+ * @param {string} message - Le message à afficher.
+ * @param {'info'|'success'|'warning'|'error'} type - Le type de toast.
+ */
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    if (!container) {
+        console.warn('toastContainer not found');
+        return;
+    }
+
     const toast = document.createElement('div');
     toast.className = `toast toast--${type}`;
-    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
-    toast.innerHTML = `<span class="toast__icon">${icons[type] || 'ℹ️'}</span><p>${escapeHtml(message)}</p>`;
-    elements.toastContainer.appendChild(toast);
-    setTimeout(() => toast.classList.add('toast--show'), 10);
+    toast.textContent = message;
+
+    container.appendChild(toast);
+
     setTimeout(() => {
-        toast.classList.remove('toast--show');
-        toast.addEventListener('transitionend', () => toast.remove());
-    }, 4000);
+        toast.classList.add('toast--fade-out');
+        toast.addEventListener('transitionend', () => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        });
+    }, 5000);
 }
 
-export function showLoadingOverlay(show, text = 'Chargement...') {
-  if (!elements.loadingOverlay) return;
-  const msgEl = elements.loadingOverlay.querySelector('[data-loading-message]') || elements.loadingOverlay.querySelector('p');
-  if (msgEl) msgEl.textContent = text;
-  elements.loadingOverlay.style.display = show ? 'flex' : 'none';
+/**
+ * Affiche ou masque l'overlay de chargement.
+ * @param {boolean} show - Afficher ou masquer.
+ * @param {string} message - Le message à afficher pendant le chargement.
+ */
+function showLoadingOverlay(show, message = '') {
+    const overlay = document.getElementById('loadingOverlay');
+    if (!overlay) return;
+
+    const overlayMessage = overlay.querySelector('.loading-message');
+
+    if (show) {
+        if (overlayMessage) {
+            overlayMessage.textContent = message;
+        }
+        overlay.style.display = 'flex';
+    } else {
+        overlay.style.display = 'none';
+    }
 }
 
-export function openModal(modalId) {
+/**
+ * Ouvre une modale spécifique par son ID.
+ * @param {string} modalId - L'ID de l'élément de la modale.
+ */
+function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
-        document.body.classList.add('modal-open');
         modal.classList.add('modal--show');
+    }
+}
+
+/**
+ * Ferme une modale par son ID ou la première modale ouverte.
+ * @param {string} [modalId] - L'ID de la modale à fermer.
+ */
+function closeModal(modalId) {
+    let modal;
+    if (modalId) {
+        modal = document.getElementById(modalId);
     } else {
-        console.error(`La modale avec l\'ID #${modalId} n\'a pas été trouvée.`);
+        modal = document.querySelector('.modal.modal--show');
+    }
+    
+    if (modal) {
+        modal.classList.remove('modal--show');
     }
 }
 
-export function closeModal(modalId) {
-    const modalsToClose = modalId ? [document.getElementById(modalId)] : document.querySelectorAll('.modal--show');
-    modalsToClose.forEach(modal => {
-        if (modal) modal.classList.remove('modal--show');
-    });
-    if (document.querySelectorAll('.modal--show').length === 0) {
-        document.body.classList.remove('modal-open');
-    }
-}
-
-export function showModal(title, content, modalClass = '') {
-    const modalId = 'genericModal';
-    let modal = document.getElementById(modalId);
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = modalId;
-        modal.className = 'modal';
-        elements.modalsContainer.appendChild(modal);
+/**
+ * Affiche une modale générique avec un titre et un contenu.
+ * @param {string} title - Le titre de la modale.
+ * @param {string} content - Le contenu HTML de la modale.
+ * @param {string} [modalClass] - Une classe CSS additionnelle pour le contenu de la modale.
+ */
+function showModal(title, content, modalClass = '') {
+    const container = document.getElementById('modalsContainer');
+    if (!container) {
+        console.error('Modals container not found!');
+        return;
     }
 
-    modal.innerHTML = "`
-        <div class=\"modal__content ${modalClass}\">
-            <div class=\"modal__header\">
+    let modal = document.getElementById('genericModal');
+    if (modal) {
+        modal.remove();
+    }
+    
+    modal = document.createElement('div');
+    modal.id = 'genericModal';
+    modal.className = 'modal';
+    
+    modal.innerHTML = `
+        <div class="modal__content ${modalClass}">
+            <div class="modal__header">
                 <h3>${title}</h3>
-                <button class=\"modal__close\" onclick=\"closeModal('${modalId}')\">×</button>
+                <button type="button" class="modal__close" onclick="closeModal('genericModal')">&times;</button>
             </div>
-            <div class=\"modal__body\">
+            <div class="modal__body">
                 ${content}
             </div>
         </div>
-    ";
-    openModal(modalId);
+    `;
+    container.appendChild(modal);
+    
+    openModal('genericModal');
 }
