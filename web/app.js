@@ -297,6 +297,9 @@ function refreshCurrentSection() {
         case 'grids':
             renderGridsSection(appState.currentProject);
             break;
+		case 'import':
+			renderImportSection(appState.currentProject);
+			break;
         case 'rob':
             loadRobSection();
             break;

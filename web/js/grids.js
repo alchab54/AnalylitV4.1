@@ -35,6 +35,20 @@ async function renderGridsSection(project) {
             ${grids.length > 0 ? gridsHtml : '<p>Aucune grille personnalisée pour ce projet.</p>'}
         </div>
     `;
+    // Attacher les listeners après le rendu
+    document.querySelectorAll('[data-action="edit-grid"]').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const gridId = e.currentTarget.dataset.gridId;
+            openGridModal(gridId);
+        });
+    });
+    document.querySelectorAll('[data-action="delete-grid"]').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const gridId = e.currentTarget.dataset.gridId;
+            handleDeleteGrid(gridId);
+        });
+    });
+    document.getElementById('importGridFileInput').addEventListener('change', handleImportGridFile);
 }
 
 async function loadProjectGrids(projectId) {
