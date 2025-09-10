@@ -288,6 +288,20 @@ export function selectAllArticles() {
 	});
 }
 
+export function toggleSelectAll(checked, source) {
+    const checkboxes = document.querySelectorAll(`.article-checkbox[data-source="${source}"]`);
+    checkboxes.forEach(cb => {
+        const id = cb.dataset.id;
+        cb.checked = checked;
+        if (checked) {
+            appState.selectedSearchResults.add(id);
+        } else {
+            appState.selectedSearchResults.delete(id);
+        }
+    });
+    updateSelectionCounter();
+}
+
 export async function handleDeleteSelectedArticles() {
     const selectedIds = Array.from(appState.selectedSearchResults);
     if (selectedIds.length === 0) {

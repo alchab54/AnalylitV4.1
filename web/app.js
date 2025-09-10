@@ -1328,20 +1328,6 @@ async function addStakeholderGroup() {
     }
 }
 
-function toggleSelectAll(checked, source) {
-    const checkboxes = document.querySelectorAll(`.article-checkbox[data-source="${source}"]`);
-    checkboxes.forEach(cb => {
-        const id = cb.dataset.id;
-        cb.checked = checked;
-        if (checked) {
-            appState.selectedSearchResults.add(id);
-        } else {
-            appState.selectedSearchResults.delete(id);
-        }
-    });
-    updateSelectionCounter();
-}
-
 async function selectProject(projectId) {
     await loadProjectGrids(projectId);
     try {
@@ -1500,69 +1486,6 @@ async function handlePullOllamaModel() {
 // ============================ 
 // FONCTIONS MANQUANTES À AJOUTER
 // ============================ 
-
-// Gestion des uploads PDF manuels
-async function handleManualPDFUpload(event) {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
-    
-    if (!appState.currentProject?.id) {
-        showToast('Sélectionnez un projet avant d\'uploader', 'warning');
-        return;
-    }
-    
-    const formData = new FormData();
-    Array.from(files).forEach(file => formData.append('files', file));
-    
-    try {
-        showLoadingOverlay(true, `Upload de ${files.length} PDF(s)...`);
-        const result = await fetchAPI(`/projects/${appState.currentProject.id}/upload-pdfs-bulk`, {
-            method: 'POST',
-            body: formData
-        });
-        
-        showToast(`${result.successful.length} PDF(s) importés avec succès`, 'success');
-        if (result.failed.length > 0) {
-            console.warn('Échecs upload:', result.failed);
-        }
-    } catch (e) {
-        showToast(`Erreur upload: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-        event.target.value = ''; // Reset input
-    }
-}
-
-// Gestion des modales pour grilles d'extraction
-function openGridModal(action = 'create', gridId = null) {
-    const modal = document.getElementById('gridModal');
-    if (!modal) return;
-    
-    const form = modal.querySelector('#gridForm');
-    const titleElement = modal.querySelector('.modal__title');
-    
-    if (action === 'create') {
-        titleElement.textContent = 'Nouvelle grille d\'extraction';
-        form.reset();
-        form.dataset.action = 'create';
-    } else if (action === 'edit' && gridId) {
-        titleElement.textContent = 'Modifier la grille';
-        form.dataset.action = 'edit';
-        form.dataset.gridId = gridId;
-        
-        // Charger les données de la grille
-        const grid = appState.currentProjectGrids.find(g => g.id === gridId);
-        if (grid) {
-            form.querySelector('#gridName').value = grid.name;
-            const fieldsData = JSON.parse(grid.fields || '[]');
-            renderGridFields(fieldsData);
-        }
-    }
-    
-    openModal('gridModal');
-}
-
-
 
 async function handleRunIndexing() {
     if (!appState.currentProject?.id) {
@@ -1756,7 +1679,4 @@ window.showBatchProcessModal = showBatchProcessModal;
 window.startBatchProcessing = startBatchProcessing;
 window.showRunExtractionModal = showRunExtractionModal;
 window.startFullExtraction = startFullExtraction;
-window.handleFetchOnlinePdfs = handleFetchOnlinePdfs;
-
-window.toggleSelectAll = toggleSelectAll;
 window.handleDeleteSelectedArticles = handleDeleteSelectedArticles;

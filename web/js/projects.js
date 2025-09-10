@@ -2,7 +2,7 @@
 import { fetchAPI } from './api.js';
 import { showToast, showLoadingOverlay, closeModal } from './ui.js';
 import { escapeHtml } from './ui.js'; // Import escapeHtml
-import { getStatusClass, showSection } from './core.js'; // Import getStatusClass and showSection
+import { getStatusClass } from './core.js'; // Import getStatusClass and showSection
 import { renderProjectSynthesis } from './projects.js'; // Import renderProjectSynthesis
 
 export async function loadProjects() {

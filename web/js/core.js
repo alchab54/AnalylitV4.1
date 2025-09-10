@@ -1,6 +1,16 @@
 // web/js/core.js
 import { loadSearchResults } from './articles.js';
 
+export function getStatusClass(status) {
+    const s = (status || 'pending').toLowerCase();
+    if (s.includes('completed') || s.includes('finished')) return 'status--success';
+    if (s.includes('error') || s.includes('failed')) return 'status--error';
+    if (s.includes('processing') || s.includes('running') || s.includes('searching')) return 'status--warning';
+    if (s.includes('pending')) return 'status--info';
+    return 'status--secondary';
+}
+
+
 export async function initializeApplication() {
     showLoadingOverlay(true, 'Chargement initial des données...');
     try {

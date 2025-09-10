@@ -112,6 +112,37 @@ export async function handleBulkPDFUpload(event) {
     }
 }
 
+export async function handleManualPDFUpload(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    
+    if (!appState.currentProject?.id) {
+        showToast('Sélectionnez un projet avant d\'uploader', 'warning');
+        return;
+    }
+    
+    const formData = new FormData();
+    Array.from(files).forEach(file => formData.append('files', file));
+    
+    try {
+        showLoadingOverlay(true, `Upload de ${files.length} PDF(s)...`);
+        const result = await fetchAPI(`/projects/${appState.currentProject.id}/upload-pdfs-bulk`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        showToast(`${result.successful.length} PDF(s) importés avec succès`, 'success');
+        if (result.failed.length > 0) {
+            console.warn('Échecs upload:', result.failed);
+        }
+    } catch (e) {
+        showToast(`Erreur upload: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+        event.target.value = ''; // Reset input
+    }
+}
+
 export async function handleRunIndexing() {
     if (!appState.currentProject) return;
     showLoadingOverlay(true, 'Lancement de l\'indexation des PDFs...');
