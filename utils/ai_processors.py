@@ -18,6 +18,9 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+class AIResponseError(Exception):
+    """Exception personnalisée pour les erreurs de réponse de l'IA."""
+
 def call_ollama_api(prompt: str, model: str = "llama3.1:8b", output_format: str = "text") -> Any:
     """
     Appelle l'API Ollama avec le prompt fourni.
@@ -32,39 +35,53 @@ def call_ollama_api(prompt: str, model: str = "llama3.1:8b", output_format: str 
     """
     try:
         url = f"{config.OLLAMA_BASE_URL}/api/generate"
-        
         payload = {
             "model": model,
             "prompt": prompt,
             "stream": False,
             "options": {
-                "temperature": 0.5,
+                "temperature": 0.2,  # CORRECTION: Température encore plus basse pour plus de déterminisme
                 "top_p": 0.9,
+                "num_predict": 1024, # CORRECTION: Augmentation pour les extractions complexes
+                "stop": ["\n\n\n", "```"]  # CORRECTION: Patterns d'arrêt plus robustes
             }
         }
         
         if output_format == "json":
             payload["format"] = "json"
-        
+            # CORRECTION: Instructions explicites pour le JSON
+            payload["prompt"] = prompt + "\n\nRépondez UNIQUEMENT avec un JSON valide et complet:"
+            
         response = requests.post(url, json=payload, timeout=config.REQUEST_TIMEOUT)
         response.raise_for_status()
-        
         result = response.json()
         raw_response = result.get("response", "").strip()
         
         if output_format == "json":
             try:
-                return json.loads(raw_response)
-            except json.JSONDecodeError:
+                # CORRECTION: Nettoyage plus robuste de la réponse avant parsing
+                # Trouve le premier '{' et le dernier '}' pour extraire le JSON potentiel
+                start = raw_response.find('{')
+                end = raw_response.rfind('}')
+                if start != -1 and end != -1:
+                    json_str = raw_response[start:end+1]
+                    return json.loads(json_str)
+                raise json.JSONDecodeError("Marqueurs JSON non trouvés", raw_response, 0)
+            except json.JSONDecodeError as e:
                 logger.warning(f"Réponse IA non-JSON valide: {raw_response[:200]}...")
-                return {}
+                # CORRECTION: Fallback plus robuste
+                return {
+                    "relevance_score": 5,
+                    "decision": "À exclure",
+                    "justification": "Erreur de parsing de la réponse IA - article écarté par sécurité"
+                }
+                logger.info("Utilisation de la réponse fallback pour éviter l'échec complet")
         else:
             return raw_response
             
     except requests.exceptions.RequestException as e:
         logger.error(f"Erreur de communication avec Ollama: {e}")
-        return {} if output_format == "json" else f"Erreur: Impossible de contacter le service Ollama."
+        raise AIResponseError("Erreur de communication avec le service Ollama.") from e
     except Exception as e:
         logger.error(f"Erreur inattendue dans call_ollama_api: {e}", exc_info=True)
-        return {} if output_format == "json" else f"Erreur inattendue: {str(e)}"
-
+        raise AIResponseError(f"Erreur inattendue: {str(e)}") from e

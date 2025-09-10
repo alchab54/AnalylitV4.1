@@ -22,7 +22,26 @@ class Config:
     PROJECTS_DIR: Path = Path("/app/projects")
     
     # Configuration Flask
-    SECRET_KEY: str = os.getenv('SECRET_KEY', 'your-super-secret-key-change-this-in-production')
+    SECRET_KEY: str = os.getenv('SECRET_KEY')
+    
+    # Configuration des modèles par défaut
+    DEFAULT_MODELS: dict = field(default_factory=lambda: {
+        'fast': {
+            'preprocess': 'phi3:mini',  # CORRECTION: Changement de gemma:2b vers phi3:mini
+            'extract': 'phi3:mini',
+            'synthesis': 'llama3.1:8b'
+        },
+        'standard': {
+            'preprocess': 'phi3:mini',
+            'extract': 'llama3.1:8b',
+            'synthesis': 'llama3.1:8b'
+        },
+        'deep': {
+            'preprocess': 'llama3.1:8b',
+            'extract': 'mixtral:8x7b', 
+            'synthesis': 'llama3.1:70b'
+        }
+    })
     
     # Configuration timeouts
     REQUEST_TIMEOUT: int = 900  # 15 minutes
@@ -40,6 +59,11 @@ class Config:
     # Configuration APIs externes
     UNPAYWALL_EMAIL: str = os.getenv('UNPAYWALL_EMAIL', 'researcher@analylit.com')
     MAX_RETRIES: int = int(os.getenv('HTTP_MAX_RETRIES', '3'))
+    
+    # Configuration Zotero
+    ZOTERO_USER_ID: str = os.getenv('ZOTERO_USER_ID', '')
+    ZOTERO_API_KEY: str = os.getenv('ZOTERO_API_KEY', '')
+    ZOTERO_GROUP_ID: str = os.getenv('ZOTERO_GROUP_ID', '')
     
     # Configuration embedding et indexation
     EMBEDDING_MODEL: str = os.getenv('EMBEDDING_MODEL', 'all-MiniLM-L6-v2')

@@ -6,6 +6,7 @@
     <title>AnalyLit v4.1 - Outil IA pour revues de littérature</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔬</text></svg>">
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 </head>
 <body>
     <!-- En-tête principal -->
@@ -50,6 +51,11 @@
 				<li class="app-nav__item">
 					<button class="app-nav__button" data-section="validation">
 						⚖️ Validation
+					</button>
+				</li>
+				<li class="app-nav__item">
+					<button class="app-nav__button" data-section="rob">
+						⚖️ Risque de Biais
 					</button>
 				</li>
 				<li class="app-nav__item">
@@ -112,6 +118,11 @@
                 </div>
             </section>
 
+			<!-- Modale pour la grille d'extraction -->
+			<input type="file" id="manualPDFInput" multiple accept=".pdf" style="display: none;">
+			<div id="gridFieldsContainer"></div>
+
+
             <!-- Section Résultats -->
             <section class="section" data-section="results">
                 <div class="section-header">
@@ -122,13 +133,9 @@
                     <div class="section-header__actions">
                         <button class="btn btn--primary" onclick="showSearchModal()">
                             🔍 Nouvelle recherche
-                        </button>
-                        <button class="btn btn--secondary" onclick="showRunAnalysisModal()">
-                            ▶️ Analyser sélection
-                        </button>
+                        </button>                        
                     </div>
-                </div>
-
+				</div>
                 <div class="results-container" id="resultsContainer">
                     <div class="results-placeholder">
                         <div class="results-placeholder__icon">📄</div>
@@ -154,6 +161,20 @@
 				</div>
 			</section>
 
+            <!-- Section Risque de Biais -->
+            <section class="section" data-section="rob">
+                <div class="section-header">
+                    <div class="section-header__content">
+                        <h2>Évaluation du Risque de Biais (RoB)</h2>
+                        <p>Évaluez la qualité méthodologique des études incluses.</p>
+                    </div>
+                    <div class="section-header__actions">
+                        <button class="btn btn--primary" onclick="handleRunRobAnalysis()">Lancer l'analyse RoB sur la sélection</button>
+                    </div>
+                </div>
+                <div id="robContainer"></div>
+            </section>
+
             <!-- Section Analyses -->
             <section class="section" data-section="analyses">
                 <div class="section-header">
@@ -161,68 +182,13 @@
                         <h2>Analyses</h2>
                         <p>Lancez des analyses avancées et visualisez leurs sorties.</p>
                     </div>
+                    <div class="section-header__actions">
+                        <button class="btn btn--primary" onclick="showRunAnalysisModal()">Lancer une analyse avancée</button>
+                    </div>
                 </div>
 
                 <div class="analysis-grid" id="analysisContainer">
-                    <div class="analysis-card">
-                        <div class="analysis-card__header">
-                            <h4>📊 Méta-analyse</h4>
-                        </div>
-                        <div class="analysis-card__content">
-                            <p>Distribution des scores et IC95%.</p>
-                            <button class="btn btn--primary" onclick="runAnalysis('meta_analysis')">
-                                Lancer
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="analysis-card">
-                        <div class="analysis-card__header">
-                            <h4>📋 Diagramme PRISMA</h4>
-                        </div>
-                        <div class="analysis-card__content">
-                            <p>Flux PRISMA basé sur vos résultats.</p>
-                            <button class="btn btn--primary" onclick="runAnalysis('prisma_flow')">
-                                Générer
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="analysis-card">
-                        <div class="analysis-card__header">
-                            <h4>🎯 Scores ATN</h4>
-                        </div>
-                        <div class="analysis-card__content">
-                            <p>Score thématique sur extractions.</p>
-                            <button class="btn btn--primary" onclick="runAnalysis('atn_scores')">
-                                Calculer
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="analysis-card">
-                        <div class="analysis-card__header">
-                            <h4>🌐 Graphe de connaissances</h4>
-                        </div>
-                        <div class="analysis-card__content">
-                            <p>Visualisation des concepts et relations entre articles.</p>
-                            <button class="btn btn--primary" onclick="runAnalysis('knowledge_graph')">
-                                Créer
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="analysis-card">
-                        <div class="analysis-card__header">
-                            <h4>📝 Discussion</h4>
-                        </div>
-                        <div class="analysis-card__content">
-                            <p>Génération automatique de section Discussion.</p>
-                            <button class="btn btn--primary" onclick="runAnalysis('discussion')">
-                                Générer
-                            </button>
-                        </div>
-                    </div>
+                    <div id="knowledgeGraphContainer" style="width: 100%; height: 600px; border: 1px solid var(--color-border); border-radius: var(--radius-lg);"></div>
                 </div>
             </section>
 
@@ -255,28 +221,34 @@
                             <button class="btn btn--primary" onclick="document.getElementById('bulkPDFInput').click()">
                                 Choisir PDFs
                             </button>
+							<button id="importZoteroPdfsBtn" class="btn btn--secondary">
+								Récupérer PDFs via Zotero
+							</button>
                         </div>
                     </div>
 
                     <div class="import-card">
                         <h4>🔍 Indexer les PDFs pour le Chat RAG</h4>
                         <p>Permettra de poser des questions au corpus.</p>
-                        <div class="import-actions">
-                            <button class="btn btn--primary" id="runIndexingBtn">
-                                Indexer les PDFs
-                            </button>
-                        </div>
+                        <button class="btn btn--primary" id="runIndexingBtn">
+                            Indexer les PDFs
+                        </button>
                     </div>
 					<!-- Section pour saisie manuelle -->
 					<div class="import-card">
 						<h4>📝 Ajouter des articles manuellement</h4>
 						<p>Saisissez des identifiants d'articles (PMID, DOI, ArXiv ID) séparés par des retours à la ligne.</p>
-						<div class="import-actions">
-							<button class="btn btn--primary" onclick="showManualArticleModal()">
-								Ajouter des articles
-							</button>
-						</div>
+						<button class="btn btn--primary" onclick="showAddManualArticlesModal()">
+							Ajouter des articles
+						</button>
 					</div>
+					<div class="export-section">
+						<h4>📖 Export pour Thèse</h4>
+						<p>Téléchargez un package complet avec données, graphiques haute résolution et rapports automatiques.</p>
+						<button onclick="exportForThesis()" class="btn btn--primary">
+							📚 Export Thèse Complete
+						</button>
+					</div>					
                 </div>
             </section>
 			
@@ -299,7 +271,7 @@
                     </div>
                     <div class="chat-input">
                         <textarea placeholder="Posez votre question..." rows="3" id="chatInput"></textarea>
-                        <button class="btn btn--primary" onclick="sendChatMessage()">
+                        <button class="btn btn--primary" onclick="handleSendChatMessage()">
                             Envoyer
                         </button>
                     </div>
@@ -351,6 +323,11 @@
                             </div>
                         </div>
                     </div>
+					<div class="settings-section">
+						<h4>🤝 Parties Prenantes</h4>
+						<p>Gérez les groupes de parties prenantes pour votre analyse multipartie.</p>
+						<button class="btn btn--primary" onclick="showStakeholderManagement()">Gérer les parties prenantes</button>
+					</div>
 
                     <div class="settings-card">
                         <div class="settings-card__header">
@@ -370,64 +347,216 @@
 
     <!-- Overlays et Modales -->
     <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-overlay__content">
-            <div class="loading-spinner loading-spinner--lg"></div>
-            <div class="loading-overlay__message">Chargement...</div>
-        </div>
-    </div>
-	<div class="loading-overlay" id="loadingOverlay">
 		<div class="loading-overlay__content">
 			<div class="loading-spinner loading-spinner--lg"></div>
 			<div class="loading-overlay__message">Chargement...</div>
 		</div>
 	</div>
 
-	<div id="modalsContainer">
-		<div id="promptEditorModal" class="modal" tabindex="-1">
-			<div class="modal__content modal__content--large">
-				<div class="modal__header">
-					<h3 id="promptEditorTitle" class="modal__title">Modifier le Prompt</h3>
-					<button class="modal__close" onclick="closeModal()">&times;</button>
-				</div>
-				<div class="modal__body">
-					<form onsubmit="handleSavePrompt(event)">
-						<input type="hidden" id="promptNameInput">
-						<div class="form-group">
-							<label for="promptTemplateTextarea" class="form-label">Template du Prompt</label>
-							<textarea id="promptTemplateTextarea" name="template" class="form-control" rows="15" required></textarea>
-							<div class="form-text">Variables disponibles : {title}, {abstract}, {text}, {database_source}, etc.</div>
-						</div>
-						<div class="modal__actions">
-							<button type="button" class="btn btn--secondary" onclick="closeModal()">Annuler</button>
-							<button type="submit" class="btn btn--primary">Sauvegarder</button>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-	
     <!-- Conteneur des notifications toast -->
     <div class="toast-container" id="toastContainer">
         <!-- Toasts générés dynamiquement -->
     </div>
+	
+    <!-- Conteneur pour toutes les modales -->
+    <div id="modalsContainer">
 
-    <!-- Modales (ajoutées dynamiquement par JavaScript) -->
-    <div id="modalsContainer"></div>
-	<div id="modal" class="modal" tabindex="-1">
+        <!-- Modale: Lancer une analyse avancée -->
+        <div id="runAnalysisModal" class="modal">
+            <div class="modal__content">
+                <div class="modal__header">
+                    <h3>Lancer une analyse avancée</h3>
+                    <button class="modal__close" onclick="closeModal()">×</button>
+                </div>
+                <div class="modal__body">
+                    <div class="analysis-options">
+                        <div class="analysis-option" onclick="selectAnalysisType('meta_analysis')">
+                            <div class="analysis-icon">📊</div>
+                            <div class="analysis-details">
+                                <h4>Méta-analyse</h4>
+                                <p>Distribution des scores de pertinence avec intervalles de confiance.</p>
+                            </div>
+                        </div>
+                        <div class="analysis-option" onclick="showPRISMAModal()">
+                            <div class="analysis-icon">📋</div>
+                            <div class="analysis-details">
+                                <h4>Checklist PRISMA-ScR</h4>
+                                <p>Suivez les recommandations PRISMA-ScR pour votre scoping review.</p>
+                            </div>
+                        </div>
+                        <div class="analysis-option" onclick="runATNAnalysis()">
+                            <div class="analysis-icon">🤝</div>
+                            <div class="analysis-details">
+                                <h4>Analyse ATN Multipartie</h4>
+                                <p>Analyse spécialisée pour l'alliance thérapeutique numérique.</p>
+                            </div>
+                        </div>
+                        <div class="analysis-option" onclick="selectAnalysisType('knowledge_graph')">
+                            <div class="analysis-icon">🌐</div>
+                            <div class="analysis-details">
+                                <h4>Graphe de connaissances</h4>
+                                <p>Visualisation des relations entre articles.</p>
+                            </div>
+                        </div>
+                        <div class="analysis-option" onclick="selectAnalysisType('discussion')">
+                            <div class="analysis-icon">📝</div>
+                            <div class="analysis-details">
+                                <h4>Discussion</h4>
+                                <p>Génération automatique de la section Discussion.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+	<!-- Modal PRISMA-ScR -->
+	<div id="prismaModal" class="modal">
+            <div class="modal__content modal__content--large">
+                <div class="modal__header">
+                    <h3>📋 Checklist PRISMA-ScR</h3>
+                    <div class="prisma-progress">
+                        <span id="prismaProgress">0% complété</span>
+                    </div>
+                    <button class="modal__close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal__body">
+                    <div id="prismaChecklistContent">
+                        <!-- Contenu généré dynamiquement -->
+                    </div>
+                    <div class="prisma-actions">
+                        <button class="btn btn--primary" onclick="savePRISMAProgress()">Sauvegarder</button>
+                        <button class="btn btn--secondary" onclick="exportPRISMAReport()">Exporter rapport</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour les résultats ATN -->
+        <div id="atnResultsModal" class="modal">
+            <div class="modal__content">
+                <div class="modal__header">
+                    <h3>🤝 Résultats Analyse ATN</h3>
+                    <button class="modal__close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal__body">
+                    <div id="atnResultsContent">
+                        <!-- Contenu généré dynamiquement -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour gérer les parties prenantes -->
+        <div id="stakeholderManagementModal" class="modal">
+            <div class="modal__content">
+                <div class="modal__header">
+                    <h3>🤝 Gestion des Parties Prenantes</h3>
+                    <button class="modal__close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal__body">
+                    <div class="stakeholder-groups">
+                        <h4>Groupes définis pour votre projet :</h4>
+                        <div id="stakeholderGroupsList">
+                            <!-- Généré dynamiquement -->
+                        </div>
+                        
+                        <div class="add-stakeholder-group">
+                            <h4>Ajouter un groupe :</h4>
+                            <input type="text" id="newStakeholderName" placeholder="Nom du groupe (ex: Patients)" class="form-control">
+                            <input type="color" id="newStakeholderColor" value="#4CAF50" class="form-control" style="padding: 2px; height: 38px;">
+                            <textarea id="newStakeholderDesc" placeholder="Description du groupe..." class="form-control"></textarea>
+                            <button class="btn btn--primary" onclick="addStakeholderGroup()">Ajouter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+		<!-- Modal: Recherche multi-bases -->
+	<div id="multiDatabaseSearchModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="multiDbSearchTitle">
 	  <div class="modal__content">
 		<div class="modal__header">
-		  <h3 class="modal__title">Modal</h3>
-		  <button class="modal__close" onclick="closeModal()">&times;</button>
+		  <h3 id="multiDbSearchTitle">🔍 Recherche multi-bases</h3>
+		  <button class="modal__close" aria-label="Fermer" onclick="closeModal()">×</button>
 		</div>
 		<div class="modal__body">
-		  <!-- Contenu dynamique -->
+		  <div class="form-group">
+			<label class="form-label" for="multiDbQuery">Requête</label>
+			<input id="multiDbQuery" class="form-control" type="text" placeholder="ex: \"diabetes AND metformin\"" />
+		  </div>
+		  <div class="form-group">
+			<label class="form-label">Bases</label>
+			<div id="multiDbList" class="flex gap-8"></div>
+		  </div>
+		  <div class="modal__actions">
+		  <button class="btn btn--secondary" onclick="closeModal()">Annuler</button>
+		  <button class="btn btn--primary" id="multiDbSearchBtn">Rechercher</button>
+		</div>
 		</div>
 	  </div>
 	</div>
 
+	<!-- Modal: Ajouter des articles manuellement -->
+	<div id="addManualArticlesModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="addManualArticlesTitle">
+	  <div class="modal__content">
+		<div class="modal__header">
+		  <h3 id="addManualArticlesTitle">📝 Ajouter des articles manuellement</h3>
+		  <button class="modal__close" aria-label="Fermer" onclick="closeModal()">×</button>
+		</div>
+        <form id="manualArticleForm">
+            <div class="modal__body">
+                <p>Saisir un identifiant par ligne (PMID, DOI, ArXiv ID).</p>
+                <div class="form-group">
+                    <textarea id="manualArticlesTextarea" name="articles" class="form-control" rows="10" placeholder="10.1038/nphys1170
+	PMID:12345678
+	arXiv:2101.00001"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="fetchMetadataCheckbox" name="fetch_metadata" checked>
+                        Récupérer automatiquement les métadonnées
+                    </label>
+                </div>
+            </div>
+            <div class="modal__actions">
+                <button type="button" class="btn btn--secondary" onclick="closeModal()">Annuler</button>
+                <button type="submit" class="btn btn--primary">Importer</button>
+            </div>
+        </form>
+	  </div>
+	</div>
+    </div>
+
+    <!-- Modale: Créer un nouveau projet -->
+    <div id="newProjectModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="newProjectTitle">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3 id="newProjectTitle">Créer un nouveau projet</h3>
+                <button class="modal__close" aria-label="Fermer" onclick="closeModal('newProjectModal')">×</button>
+            </div>
+            <form id="newProjectForm">
+                <div class="modal__body">
+                    <div class="form-group">
+                        <label for="newProjectName" class="form-label">Nom du projet</label>
+                        <input type="text" id="newProjectName" name="name" class="form-control" required placeholder="Ex: Revue sur l'IA en diabétologie">
+                    </div>
+                    <div class="form-group">
+                        <label for="newProjectDescription" class="form-label">Description (optionnel)</label>
+                        <textarea id="newProjectDescription" name="description" class="form-control" rows="4" placeholder="Décrivez brièvement l'objectif de votre revue de littérature..."></textarea>
+                    </div>
+                </div>
+                <div class="modal__actions">
+                    <button type="button" class="btn btn--secondary" onclick="closeModal('newProjectModal')">Annuler</button>
+                    <button type="submit" class="btn btn--primary">Créer le projet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

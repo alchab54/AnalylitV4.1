@@ -1,31 +1,38 @@
-// web/app.js — Frontend complet AnalyLit v4.1 (JS pur, synchronisé)
+// ================================================================
+// AnalyLit V4.1 - Application Frontend (Version finale consolidée)
+// ================================================================
 
 const appState = {
     currentProject: null,
     projects: [],
+    searchResults: [],
+    searchResultsMeta: {},
     analysisProfiles: [],
     ollamaModels: [],
     prompts: [],
     currentProjectGrids: [],
     currentProjectExtractions: [],
-    searchResults: [],
-    availableDatabases: [],
-    notifications: [],
-    unreadNotifications: 0,
-    selectedSearchResults: new Set(),
+    currentProjectChatHistory: [],
     socketConnected: false,
     currentSection: 'projects',
     socket: null,
+    availableDatabases: [],
+    notifications: [],
+    unreadNotifications: 0,
     analysisResults: {},
     chatMessages: [],
     currentValidations: [],
-    queuesInfo: []
+    queuesInfo: [],
+    selectedSearchResults: new Set()
 };
 
 let elements = {};
 
 document.addEventListener('DOMContentLoaded', () => {
-    elements = {
+    console.log('🚀 Démarrage de AnalyLit V4.1 Frontend...');
+    
+    // Initialisation des éléments DOM
+    Object.assign(elements, {
         sections: document.querySelectorAll('.section'),
         navButtons: document.querySelectorAll('.app-nav__button'),
         connectionStatus: document.querySelector('[data-connection-status]'),
@@ -33,18 +40,23 @@ document.addEventListener('DOMContentLoaded', () => {
         createProjectBtn: document.getElementById('createProjectBtn'),
         projectDetail: document.getElementById('projectDetail'),
         projectDetailContent: document.getElementById('projectDetailContent'),
+        projectPlaceholder: document.getElementById('projectPlaceholder'),
         resultsContainer: document.getElementById('resultsContainer'),
+        validationContainer: document.getElementById('validationContainer'),
         analysisContainer: document.getElementById('analysisContainer'),
         importContainer: document.getElementById('importContainer'),
         chatContainer: document.getElementById('chatContainer'),
         settingsContainer: document.getElementById('settingsContainer'),
-        validationContainer: document.getElementById('validationContainer'),
+        robContainer: document.getElementById('robContainer'),
+        modalsContainer: document.getElementById('modalsContainer'),
         loadingOverlay: document.getElementById('loadingOverlay'),
         toastContainer: document.getElementById('toastContainer'),
         zoteroFileInput: document.getElementById('zoteroFileInput'),
         bulkPDFInput: document.getElementById('bulkPDFInput'),
-        runIndexingBtn: document.getElementById('runIndexingBtn')
-    };
+        runIndexingBtn: document.getElementById('runIndexingBtn'),
+        importZoteroPdfsBtn: document.getElementById('importZoteroPdfsBtn'),
+        
+    });
 
     setupEventListeners();
     initializeApplication();
@@ -56,239 +68,337 @@ async function initializeApplication() {
         initializeWebSocket();
         await loadInitialData();
         showSection('projects');
-        await loadProjects();
-        renderProjectList();
-    } catch (e) {
-        console.error('Init error:', e);
-        showToast("Erreur lors de l'initialisation", 'error');
+        console.log('✅ Application initialisée avec succès');
+    } catch (error) {
+        console.error('❌ Erreur initialisation application:', error);
+        showToast("Erreur lors de l'initialisation de l'application.", 'error');
     } finally {
         showLoadingOverlay(false);
     }
 }
 
 function setupEventListeners() {
-    // Navigation onglets
-    elements.navButtons.forEach(btn => {
-        btn.addEventListener('click', () => showSection(btn.dataset.section));
+  // Navigation onglets
+  elements.navButtons.forEach(btn => {
+    btn.addEventListener('click', () => showSection(btn.dataset.section));
+  });
+
+  // Nouveau projet
+  if (elements.createProjectBtn) {
+    elements.createProjectBtn.addEventListener('click', () => openModal('newProjectModal'));
+  }
+
+  // Imports
+  if (elements.zoteroFileInput) {
+    elements.zoteroFileInput.addEventListener('change', handleZoteroFileUpload);
+  }
+  if (elements.bulkPDFInput) {
+    elements.bulkPDFInput.addEventListener('change', handleBulkPDFUpload);
+  }
+  if (elements.runIndexingBtn) {
+    elements.runIndexingBtn.addEventListener('click', () => {
+      if (!appState.currentProject?.id) {
+        showToast('Sélectionnez un projet avant indexation', 'warning');
+        return;
+      }
+      handleRunIndexing();
     });
+  }
+  if (elements.importZoteroPdfsBtn) {
+    elements.importZoteroPdfsBtn.addEventListener('click', handleImportZoteroPdfs);
+  }
 
-    // Nouveau projet
-    if (elements.createProjectBtn) {
-        elements.createProjectBtn.addEventListener('click', handleCreateProject);
+  // Gestion centralisée des clics (fermeture des modales)
+  document.body.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal') || e.target.classList.contains('modal__close')) {
+      const modal = e.target.closest('.modal');
+      if (modal) closeModal(modal.id);
+    }
+  });
+  
+  // Centralisation de la gestion des clics pour les actions dynamiques (délégation)
+  document.body.addEventListener('click', (e) => {
+    // Clic sur "Voir détails" d'un article
+    const viewDetailsButton = e.target.closest('.view-details-btn');
+    if (viewDetailsButton) {
+      const articleId = viewDetailsButton.dataset.articleId;
+      if (articleId) viewArticleDetails(articleId);
+      return;
     }
 
-    // Imports
-    if (elements.zoteroFileInput) {
-        elements.zoteroFileInput.addEventListener('change', handleZoteroFileUpload);
+    // Clic sur une checkbox d'article
+    const articleCheckbox = e.target.closest('.article-checkbox');
+    if (articleCheckbox) {
+      const articleId = articleCheckbox.dataset.articleId;
+      if (articleId) {
+        toggleArticleSelection(articleId, articleCheckbox.checked);
+      }
+      return;
     }
-    if (elements.bulkPDFInput) {
-        elements.bulkPDFInput.addEventListener('change', handleBulkPDFUpload);
-    }
-    if (elements.runIndexingBtn) {
-        elements.runIndexingBtn.addEventListener('click', () => {
-            if (!appState.currentProject?.id) {
-                showToast('Sélectionnez un projet avant indexation', 'warning');
-                return;
-            }
-            handleRunIndexing(appState.currentProject.id);
-        });
-    }
+  });
 
-    // Fermeture des modales
-    document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal') || e.target.classList.contains('modal__close')) {
-            closeModal();
-        }
-    });
+  // Uploads PDF manuels
+  const manualPDFInput = document.getElementById('manualPDFInput');
+  if (manualPDFInput) {
+    manualPDFInput.addEventListener('change', handleManualPDFUpload);
+  }
 
-    // Écoute de la touche Échap pour fermer les modales
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            closeModal();
-        }
-    });
+  // Formulaires de modale
+  const gridForm = document.getElementById('gridForm');
+  if (gridForm) {
+    gridForm.addEventListener('submit', handleGridFormSubmit);
+  }
+  const manualArticleForm = document.getElementById('manualArticleForm');
+  if (manualArticleForm) {
+    manualArticleForm.addEventListener('submit', handleAddManualArticles);
+  }
+  const newProjectForm = document.getElementById('newProjectForm');
+  if (newProjectForm) {
+    newProjectForm.addEventListener('submit', handleCreateProject);
+  }
+
+  // ============================
+  // Notifications: remise à zéro
+  // ============================
+  // Cible plusieurs sélecteurs possibles pour la “cloche”/bouton
+  const notifButtons = document.querySelectorAll('.notifications-btn, [data-notifications-toggle], .notification-indicator');
+  if (notifButtons.length) {
+    notifButtons.forEach(btn => btn.addEventListener('click', clearNotifications));
+  }
+
+  // Quand la fenêtre reprend le focus, on considère les notifications comme lues
+  window.addEventListener('focus', () => {
+    clearNotifications();
+  });
 }
 
-function showSection(name) {
-    appState.currentSection = name;
-    elements.sections.forEach(sec => {
-        const active = sec.dataset?.section === name;
-        sec.classList.toggle('section--active', active);
-    });
-    elements.navButtons.forEach(btn => {
-        const active = btn.dataset?.section === name;
-        btn.classList.toggle('app-nav__button--active', active);
-    });
-
-    // Charger les données de la section si projet sélectionné
-    if (appState.currentProject?.id) {
-        switch (name) {
-            case 'results':
-                loadSearchResults();
-                break;
-            case 'analyses':
-                loadProjectAnalyses();
-                break;
-            case 'import':
-                renderImportSection();
-                break;
-            case 'chat':
-                loadChatMessages();
-                break;
-            case 'settings':
-                loadSettings();
-                break;
-            case 'validation':
-                loadValidationSection();
-                break;
-        }
+async function handleRunIndexing() {
+    if (!appState.currentProject?.id) {
+        showToast('Aucun projet sélectionné.', 'warning');
+        return;
     }
-}
 
-// ============================ 
-// WebSocket Management
-// ============================
-function initializeWebSocket() {
     try {
-        appState.socket = io({
-            path: '/socket.io/',
-            transports: ['websocket', 'polling']
+        showLoadingOverlay(true, 'Lancement de l\'indexation des PDFs...');
+        await fetchAPI(`/projects/${appState.currentProject.id}/index-pdfs`, {
+            method: 'POST'
         });
-
-        appState.socket.on('connect', () => {
-            console.log('WebSocket connecté');
-            appState.socketConnected = true;
-            updateConnectionStatus(true);
-        });
-
-        appState.socket.on('disconnect', () => {
-            console.log('WebSocket déconnecté');
-            appState.socketConnected = false;
-            updateConnectionStatus(false);
-        });
-
-        appState.socket.on('notification', handleNotification);
-        appState.socket.on('project_update', handleProjectUpdate);
-        appState.socket.on('processing_complete', handleProcessingComplete);
+        showToast('L\'indexation des PDFs a été lancée en arrière-plan.', 'info');
     } catch (e) {
-        console.error('Erreur WebSocket:', e);
-        updateConnectionStatus(false);
+        showToast(`Erreur lors du lancement de l'indexation: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
     }
 }
 
-function handleNotification(data) {
-    console.log('Notification reçue:', data);
-    appState.notifications.unshift({
-        id: Date.now(),
-        ...data,
-        timestamp: new Date().toISOString()
-    });
-    appState.unreadNotifications++;
-    showToast(data.message, data.type || 'info');
+async function handleCreateProject(event) {
+    event.preventDefault();
+    const form = event.target;
+    const name = form.elements.name.value;
+    const description = form.elements.description.value;
 
-    // Rejoindre la room du projet si nécessaire
-    if (data.project_id && data.project_id !== appState.currentProject?.id) {
-        appState.socket.emit('join_room', { room: data.project_id });
-        console.log(`Rejoint la room du projet ${data.project_id}`);
+    if (!name) {
+        showToast('Le nom du projet est requis.', 'warning');
+        return;
     }
 
-    // Rafraîchir les données si c'est le projet courant
-    if (data.project_id === appState.currentProject?.id) {
-        refreshCurrentProjectData();
-    }
-}
+    try {
+        showLoadingOverlay(true, 'Création du projet...');
+        closeModal('newProjectModal');
 
-function handleProjectUpdate(data) {
-    console.log('Mise à jour projet:', data);
-    if (data.project_id === appState.currentProject?.id) {
-        refreshCurrentProjectData();
-    }
-}
+        const newProject = await fetchAPI('/projects', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, description })
+        });
 
-function handleProcessingComplete(data) {
-    console.log('Traitement terminé:', data);
-    showToast(`Traitement terminé: ${data.message}`, 'success');
-    refreshCurrentProjectData();
-}
-
-function updateConnectionStatus(connected) {
-    if (elements.connectionStatus) {
-        elements.connectionStatus.textContent = connected ? '🟢 Connecté' : '🔴 Déconnecté';
-        elements.connectionStatus.className = connected ? 'connection-status--connected' : 'connection-status--disconnected';
+        await loadProjects();
+        selectProject(newProject.id);
+        showToast('Projet créé avec succès!', 'success');
+    } catch (e) {
+        showToast(`Erreur: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
     }
 }
-
-// ============================
-// API helpers
-// ============================
-async function fetchAPI(endpoint, options = {}) {
-    const url = `/api${endpoint}`;
-    const isFormData = options.body instanceof FormData;
-    const headers = isFormData ? (options.headers || {}) : {
-        'Content-Type': 'application/json',
-        ...(options.headers || {})
-    };
-
-    const config = {
-        method: options.method || 'GET',
-        headers,
-    };
-
-    if (options.body !== undefined) {
-        if (isFormData) config.body = options.body;
-        else if (typeof options.body === 'string') config.body = options.body;
-        else config.body = JSON.stringify(options.body);
-    }
-
-    const res = await fetch(url, config);
-    if (!res.ok) {
-        let payload = null;
-        try {
-            payload = await res.json();
-        } catch (_) {}
-        const msg = payload?.error || `Erreur HTTP ${res.status}`;
-        throw new Error(msg);
-    }
-
-    if (res.status === 204 || res.headers.get('Content-Length') === '0') return null;
-    const ct = res.headers.get('content-type') || '';
-    return ct.includes('application/json') ? res.json() : res.text();
-}
-
 async function loadInitialData() {
-    try {
-        const [profiles, prompts, models, databases] = await Promise.all([
-            fetchAPI('/analysis-profiles'),
-            fetchAPI('/prompts'),
-            fetchAPI('/ollama/models'),
-            fetchAPI('/databases'),
-        ]);
+    await Promise.all([
+        loadProjects(),
+        loadAnalysisProfiles(),
+        loadPrompts(),
+        loadOllamaModels(),
+        loadAvailableDatabases(),
+    ]);
+    renderProjectList();
+}
 
-        appState.analysisProfiles = Array.isArray(profiles) ? profiles : [];
-        appState.prompts = Array.isArray(prompts) ? prompts : [];
-        appState.ollamaModels = Array.isArray(models) ? models : [];
-        appState.availableDatabases = Array.isArray(databases) ? databases : [];
-    } catch (e) {
-        showToast("Chargement partiel des paramètres", 'warning');
+// --- Fonctions de chargement des données (manquantes) ---
+async function fetchAPI(endpoint, options = {}) {
+    try {
+        const response = await fetch(`/api${endpoint}`, options);
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: response.statusText }));
+            throw new Error(errorData.message || `Erreur HTTP ${response.status}`);
+        }
+        if (response.status === 204) { // No Content
+            return null;
+        }
+        return response.json();
+    } catch (error) {
+        console.error(`Erreur API pour ${endpoint}:`, error);
+        throw error;
     }
 }
 
 async function loadProjects() {
-    try {
-        appState.projects = await fetchAPI('/projects');
-    } catch {
-        appState.projects = [];
+    appState.projects = await fetchAPI('/projects');
+}
+
+async function loadAnalysisProfiles() {
+    appState.analysisProfiles = await fetchAPI('/profiles');
+}
+
+async function loadPrompts() {
+    appState.prompts = await fetchAPI('/prompts');
+}
+
+async function loadOllamaModels() {
+    appState.ollamaModels = await fetchAPI('/ollama/models');
+}
+
+async function loadAvailableDatabases() {
+    appState.availableDatabases = await fetchAPI('/databases');
+}
+
+function showSection(sectionId) {
+    appState.currentSection = sectionId;
+
+    elements.sections.forEach(section => {
+        section.classList.toggle('section--active', section.dataset.section === sectionId);
+    });
+
+    elements.navButtons.forEach(btn => {
+        btn.classList.toggle('app-nav__button--active', btn.dataset.section === sectionId);
+    });
+
+    // Charger les données spécifiques à la section si nécessaire
+    refreshCurrentSection();
+}
+
+function refreshCurrentSection() {
+    switch (appState.currentSection) {
+        case 'projects':
+            if (appState.currentProject) {
+                renderProjectDetail(appState.currentProject);
+            }
+            break;
+        case 'results':
+            loadSearchResults();
+            break;
+        case 'validation':
+            loadValidationSection();
+            break;
+        case 'rob':
+            loadRobSection();
+            break;
+        case 'analyses':
+            loadProjectAnalyses();
+            break;
+        case 'import':
+            renderImportSection();
+            break;
+        case 'chat':
+            loadChatMessages();
+            break;
+        case 'settings':
+            renderSettings();
+            break;
+        default:
+            // Ne rien faire pour les sections inconnues
+            break;
     }
 }
 
-async function refreshCurrentProjectData() {
-    if (!appState.currentProject?.id) return;
 
+// ============================ 
+// WebSocket Management
+// ============================ 
+function initializeWebSocket() {
     try {
-        // Recharger les données du projet
-        const updatedProject = await fetchAPI(`/projects/${appState.currentProject.id}`);
-        appState.currentProject = updatedProject;
+        if (typeof io !== 'function') {
+            console.warn('Client Socket.IO indisponible.');
+            if (elements.connectionStatus) elements.connectionStatus.textContent = '❌';
+            return;
+        }
+        
+        appState.socket = io({ path: '/socket.io/' });
+        
+        appState.socket.on('connect', () => {
+            console.log('✅ WebSocket connecté');
+            appState.socketConnected = true;
+            if (elements.connectionStatus) elements.connectionStatus.textContent = '✅';
+            if (appState.currentProject) {
+                appState.socket.emit('join_room', { room: appState.currentProject.id });
+            }
+        });
+        
+        appState.socket.on('disconnect', () => {
+            console.warn('🔌 WebSocket déconnecté.');
+            appState.socketConnected = false;
+            if (elements.connectionStatus) elements.connectionStatus.textContent = '⏳';
+        });
+        
+        appState.socket.on('notification', (data) => {
+            console.log('🔔 Notification reçue:', data);
+            handleWebSocketNotification(data);
+        });
+    } catch (e) {
+        console.error('Erreur WebSocket:', e);
+        if (elements.connectionStatus) elements.connectionStatus.textContent = '❌';
+    }
+}
 
+function handleWebSocketNotification(data) {
+    showToast(data.message, data.type || 'info');
+    appState.unreadNotifications++;
+    updateNotificationIndicator();
+
+    const { type, project_id } = data;
+
+    // Si la notification concerne le projet actuellement ouvert
+    if (project_id && project_id === appState.currentProject?.id) {
+        // Fusionner directement les nouvelles données reçues
+        if (data.discussion_draft) {
+            appState.currentProject.discussion_draft = data.discussion_draft;
+        }
+        if (data.knowledge_graph) {
+            appState.currentProject.knowledge_graph = data.knowledge_graph;
+        }
+        if (data.prisma_flow_path) {
+            appState.currentProject.prisma_flow_path = data.prisma_flow_path;
+        }
+
+        // Rafraîchir la section actuellement affichée avec les nouvelles données
+        if (appState.currentSection === 'analyses') {
+            renderAnalysesSection();
+        } else {
+            refreshCurrentProjectData(); // Fallback pour les autres sections
+        }
+        
+    } else if (project_id) {
+        // Si la notif concerne un autre projet, on met juste la liste à jour
+        loadProjects().then(renderProjectList);
+    }
+}
+
+
+async function refreshCurrentProjectData() {
+    if (!appState.currentProject?.id) return; 
+    
+    try {
+        const updatedProject = await fetchAPI(`/projects/${appState.currentProject.id}`);
+        Object.assign(appState.currentProject, updatedProject);
+        
         // Rafraîchir selon la section courante
         switch (appState.currentSection) {
             case 'projects':
@@ -308,132 +418,107 @@ async function refreshCurrentProjectData() {
             case 'validation':
                 await loadValidationSection();
                 break;
+            case 'rob':
+                await loadRobSection();
+                break;
         }
     } catch (e) {
         console.error('Erreur refresh project data:', e);
     }
 }
 
-// ============================
+// ============================ 
 // UI rendering
-// ============================
+// ============================ 
 function escapeHtml(text) {
     if (text === null || typeof text === 'undefined') return '';
     const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;'
     };
     return String(text).replace(/[&<>"']/g, (m) => map[m]);
+}
+
+function sanitizeForFilename(name) {
+  // Miroir du backend: remplace <>:"/\|?* par _ et met en minuscules
+  return String(name || '').replace(/[<>:"/\\|?*]/g, '_').trim().toLowerCase();
+}
+
+async function loadProjectFilesSet() {
+  if (!appState.currentProject?.id) {
+    appState.currentProjectFiles = new Set();
+    return;
+  }
+  const files = await fetchAPI(`/projects/${appState.currentProject.id}/files`);
+  const stems = (files || []).map(f => String(f.filename || '')
+    .replace(/\.pdf$/i, '')
+    .toLowerCase());
+  appState.currentProjectFiles = new Set(stems);
+}
+
+function hasPdfForArticle(articleId) {
+  if (!appState.currentProjectFiles) return false;
+  const stem = sanitizeForFilename(articleId);
+  return appState.currentProjectFiles.has(stem);
 }
 
 function renderProjectList() {
     if (!elements.projectsList) return;
 
     const projects = Array.isArray(appState.projects) ? appState.projects : [];
+
     if (projects.length === 0) {
         elements.projectsList.innerHTML = `
-            <div class="projects-empty">
-                <span class="projects-empty__icon">📁</span>
-                <p>Aucun projet trouvé</p>
-                <p>Créez votre premier projet pour commencer.</p>
+            <div class="empty-state">
+                <p>Aucun projet trouvé.</p>
+                <p>Créez un projet pour commencer votre revue de littérature.</p>
             </div>
         `;
-        if (elements.projectDetail) {
-            elements.projectDetail.innerHTML = '<p>Sélectionnez un projet pour voir les détails.</p>';
-        }
         return;
     }
 
     const projectsHtml = projects.map(project => {
-        const isActive = appState.currentProject?.id === project.id;
+        const isActive = appState.currentProject && appState.currentProject.id === project.id;
         const statusClass = getStatusClass(project.status);
         
         return `
-            <div class="project-card ${isActive ? 'project-card--active' : ''}" data-project-id="${project.id}">
-                <div class="project-card__header">
-                    <div class="project-card__info">
-                        <h4 class="project-card__title">${escapeHtml(project.name)}</h4>
-                        <p class="project-card__description">${escapeHtml(project.description || 'Aucune description')}</p>
-                    </div>
-                    <span class="status status--${statusClass}">${escapeHtml(project.status)}</span>
-                </div>
-                <div class="project-card__body">
-                    <div class="project-card__stats">
-                        <div class="stat-item">
-                            <span class="stat-item__label">Articles</span>
-                            <span class="stat-item__value">${project.pmids_count || 0}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-item__label">Traités</span>
-                            <span class="stat-item__value">${project.processed_count || 0}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-item__label">Temps</span>
-                            <span class="stat-item__value">${project.total_processing_time ? Math.round(project.total_processing_time) + 's' : '0s'}</span>
-                        </div>
+            <div class="project-list-item ${isActive ? 'project-list-item--active' : ''}" 
+                 onclick="selectProject('${project.id}')">
+                <div class="project-list-item-info">
+                    <div class="project-list-item-name">${escapeHtml(project.name)}</div>
+                    <div class="project-list-item-status">
+                        <span class="status-badge ${statusClass}">${escapeHtml(project.status || 'pending')}</span>
                     </div>
                 </div>
-                <div class="project-card__actions">
-                    <button class="btn btn--primary btn--sm" onclick="selectProject('${project.id}')">Ouvrir</button>
-                    <button class="btn btn--outline btn--sm" onclick="showProjectExportModal('${project.id}')">Exporter</button>
-                    <button class="btn btn--danger btn--sm" onclick="deleteProject('${project.id}')">Supprimer</button>
-                </div>
+                <button class="btn btn--danger btn--sm" 
+                        onclick="event.stopPropagation(); deleteProject('${project.id}')"
+                        title="Supprimer le projet">
+                    ×
+                </button>
             </div>
         `;
     }).join('');
 
-    elements.projectsList.innerHTML = `
-        <div class="projects-grid">
-            ${projectsHtml}
-        </div>
-    `;
+    elements.projectsList.innerHTML = projectsHtml;
+}
+function showToast(message, type = 'info') {
+    if (!elements.toastContainer) return;
+    const toast = document.createElement('div');
+    toast.className = `toast toast--${type}`;
+    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+    toast.innerHTML = `<span class="toast__icon">${icons[type] || 'ℹ️'}</span><p>${escapeHtml(message)}</p>`;
+    elements.toastContainer.appendChild(toast);
+    setTimeout(() => toast.classList.add('toast--show'), 10);
+    setTimeout(() => {
+        toast.classList.remove('toast--show');
+        toast.addEventListener('transitionend', () => toast.remove());
+    }, 4000);
 }
 
-function renderProjectDetail(project) {
-    if (!project || !elements.projectDetailContent) return;
-
-    const statusClass = getStatusClass(project.status);
-    const stats = {
-        total: project.pmids_count || 0,
-        processed: project.processed_count || 0,
-        time: project.total_processing_time ? `${Math.round(project.total_processing_time)}s` : '0s'
-    };
-
-    elements.projectDetailContent.innerHTML = `
-        <div class="project-detail">
-            <div class="project-detail__header">
-                <h3>${escapeHtml(project.name)}</h3>
-                <span class="status status--${statusClass}">${escapeHtml(project.status)}</span>
-            </div>
-            <div class="project-detail__body">
-                <p class="project-description">${escapeHtml(project.description || 'Aucune description')}</p>
-                
-                <div class="project-stats">
-                    <div class="stat-card">
-                        <div class="stat-card__value">${stats.total}</div>
-                        <div class="stat-card__label">Articles trouvés</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-card__value">${stats.processed}</div>
-                        <div class="stat-card__label">Articles traités</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-card__value">${stats.time}</div>
-                        <div class="stat-card__label">Temps total</div>
-                    </div>
-                </div>
-                
-                <div class="project-actions">
-                    <button class="btn btn--primary" onclick="showMultiDatabaseSearchModal()">🔍 Nouvelle recherche</button>
-                    <button class="btn btn--secondary" onclick="showRunPipelineModal()">⚙️ Lancer analyse</button>
-                    <button class="btn btn--secondary" onclick="showRunAnalysisModal()">🔬 Analyses avancées</button>
-                </div>
-            </div>
-        </div>
-    `;
+function showLoadingOverlay(show, text = 'Chargement...') {
+  if (!elements.loadingOverlay) return;
+  const msgEl = elements.loadingOverlay.querySelector('[data-loading-message]') || elements.loadingOverlay.querySelector('p');
+  if (msgEl) msgEl.textContent = text;
+  elements.loadingOverlay.style.display = show ? 'flex' : 'none';
 }
 
 function getStatusClass(status) {
@@ -451,412 +536,191 @@ function getStatusClass(status) {
     return statusMap[status] || 'info';
 }
 
-// ============================
-// Search Results
-// ============================
+function renderProjectSynthesis(synthesisResult, projectDescription) {
+    if (!synthesisResult) {
+        return `<div class="synthesis-placeholder"><p>Aucune synthèse disponible. Lancez une analyse pour en générer une.</p></div>`;
+    }
+    try {
+        const synthesis = JSON.parse(synthesisResult);
+        return `
+            <div class="synthesis-result">
+                <h4>Synthèse du projet</h4>
+                <p>${escapeHtml(synthesis.synthesis_summary || 'Synthèse non disponible.')}</p>
+            </div>`;
+    } catch (e) {
+        return `<div class="synthesis-placeholder"><p>Erreur lors de l'affichage de la synthèse.</p></div>`;
+    }
+}
+function renderProjectDetail(project) {
+    if (!project || !elements.projectDetailContent) return;
+
+    const synthesis = renderProjectSynthesis(project.synthesis_result, project.description);
+    
+    elements.projectDetailContent.innerHTML = `
+        <div class="project-detail">
+            <div class="project-header">
+                <h2>${escapeHtml(project.name)}</h2>
+                <span class="status ${getStatusClass(project.status)}">${project.status}</span>
+            </div>
+            
+            <div class="project-description">
+                <p>${escapeHtml(project.description || 'Aucune description')}</p>
+            </div>
+            
+            <div class="project-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Articles trouvés</span>
+                    <span class="stat-value">${project.pmids_count || 0}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Articles traités</span>
+                    <span class="stat-value">${project.processed_count || 0}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Temps total</span>
+                    <span class="stat-value">${Math.round(project.total_processing_time || 0)}s</span>
+                </div>
+            </div>
+            
+            ${synthesis}
+            
+            <div class="project-actions">
+                <button class="btn btn--primary" onclick="showSearchModal()">🔍 Rechercher articles</button>
+                <button class="btn btn--secondary" onclick="showSection('results')">📄 Voir résultats</button>
+            </div>
+        </div>
+    `;
+}
 async function loadSearchResults() {
-    if (!appState.currentProject?.id || !elements.resultsContainer) return;
+  showLoadingOverlay(true, 'Chargement des résultats...');
+  if (!appState.currentProject?.id) {
+    elements.resultsContainer.innerHTML = `
+      <div class="card"><div class="card__body">
+        Sélectionnez un projet pour voir les résultats.
+      </div></div>`;
+    showLoadingOverlay(false);
+    return;
+  }
+
+  try {
+    const [searchResults, extractions] = await Promise.all([
+      fetchAPI(`/projects/${appState.currentProject.id}/results`),
+      fetchAPI(`/projects/${appState.currentProject.id}/extractions`)
+    ]);
+
+    appState.searchResults = searchResults || [];
+    appState.currentProjectExtractions = extractions || [];
+    
+    // La fonction de rendu est appelée ici, après le chargement des données.
+    renderSearchResultsTable();
+  } catch (e) {
+    elements.resultsContainer.innerHTML = '<p>Erreur lors du chargement des résultats.</p>';
+    console.error('Erreur loadSearchResults:', e);
+  } finally {
+    showLoadingOverlay(false);
+  }
+}
+
+// CORRECTION : Fonction pour valider manuellement un article
+async function validateArticle(articleId, decision) {
+    if (!appState.currentProject?.id) {
+        showToast('Sélectionnez un projet', 'warning');
+        return;
+    }
 
     try {
-        showLoadingOverlay(true, 'Chargement des résultats...');
-        const [results, extractions] = await Promise.all([
-            fetchAPI(`/projects/${appState.currentProject.id}/search-results`),
-            fetchAPI(`/projects/${appState.currentProject.id}/extractions`)
-        ]);
+        showLoadingOverlay(true, 'Validation en cours...');
         
-        appState.searchResults = results?.results || [];
-        appState.currentProjectExtractions = extractions || [];
-        renderSearchResults();
+        const response = await fetchAPI(`/projects/${appState.currentProject.id}/validate-article`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                article_id: articleId,
+                decision: decision,
+                score: decision === 'include' ? 8 : 2, // Note: score arbitraire pour la validation manuelle
+                justification: decision === 'include' ? 'Article validé manuellement comme pertinent' : 'Article exclu manuellement'
+            })
+        });
+
+        showToast(`Article ${decision === 'include' ? 'inclus' : 'exclu'}.`, 'success');
+        
+        // Rafraîchir les données
+        await loadSearchResults();
+        
     } catch (e) {
-        elements.resultsContainer.innerHTML = '<p class="error">Erreur lors du chargement des résultats.</p>';
-        console.error('Erreur chargement résultats:', e);
+        console.error('Erreur validation article:', e);
+        showToast(`Erreur: ${e.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }
 }
 
-function renderSearchResults() {
-    if (!elements.resultsContainer) return;
-    
-    const results = appState.searchResults || [];
-    const extractions = appState.currentProjectExtractions || [];
-    
-    if (results.length === 0) {
-        elements.resultsContainer.innerHTML = `
-            <div class="results-placeholder">
-                <span class="results-placeholder__icon">🔍</span>
-                <p>Aucun résultat trouvé</p>
-                <p>Lancez une recherche pour voir les articles trouvés.</p>
-            </div>
-        `;
-        return;
-    }
-
-    // Créer une map des extractions pour accès rapide
-    const extractionMap = new Map();
-    extractions.forEach(ext => {
-        extractionMap.set(ext.pmid, ext);
-    });
-
-    const resultsHeader = `
-        <div class="results-header">
-            <div class="results-stats">
-                <div class="stat-card">
-                    <div class="stat-card__value">${results.length}</div>
-                    <div class="stat-card__label">Total</div>
-                </div>
-                <div class="stat-card stat-card--success">
-                    <div class="stat-card__value">${extractions.length}</div>
-                    <div class="stat-card__label">Traités</div>
-                </div>
-            </div>
-            <div class="results-actions">
-                <button class="btn btn--primary btn--sm" onclick="showRunPipelineModal()">⚙️ Traiter sélection</button>
-                <button class="btn btn--secondary btn--sm" onclick="selectAllResults()">Tout sélectionner</button>
-                <button class="btn btn--secondary btn--sm" onclick="clearResultSelection()">Déselectionner tout</button>
-            </div>
-        </div>
-    `;
-
-    const tableRows = results.map(result => {
-        const extraction = extractionMap.get(result.article_id);
-        const isSelected = appState.selectedSearchResults.has(result.article_id);
-        const isProcessed = !!extraction;
-
-        return `
-            <tr class="result-row ${isProcessed ? 'result-row--processed' : ''}" data-article-id="${result.article_id}">
-                <td class="actions-cell">
-                    <input type="checkbox" 
-                           ${isSelected ? 'checked' : ''} 
-                           onchange="toggleResultSelection('${result.article_id}', this.checked)"
-                           class="article-select-checkbox">
-                </td>
-                <td class="title-cell">
-                    <div class="article-info">
-                        <div class="title-text" onclick="toggleAbstractRow('${result.article_id}')">
-                            ${escapeHtml(result.title || 'Titre non disponible')}
-                        </div>
-                        <div class="article-meta">
-                            <span class="meta-item"><strong>ID:</strong> ${escapeHtml(result.article_id)}</span>
-                            ${result.publication_date ? `<span class="meta-item"><strong>Date:</strong> ${escapeHtml(result.publication_date)}</span>` : ''}
-                            ${result.journal ? `<span class="meta-item"><strong>Journal:</strong> ${escapeHtml(result.journal)}</span>` : ''}
-                        </div>
-                        <div class="article-links">
-                            ${result.doi ? `<a href="https://doi.org/${result.doi}" target="_blank" class="doi-link">DOI</a>` : ''}
-                            ${result.url ? `<a href="${result.url}" target="_blank" class="url-link">URL</a>` : ''}
-                        </div>
-                    </div>
-                </td>
-                <td class="authors-cell">
-                    <div class="authors-display">${escapeHtml(result.authors || 'Non disponible')}</div>
-                </td>
-                <td>
-                    <span class="source-badge source--${result.database_source}">${escapeHtml(result.database_source)}</span>
-                </td>
-                <td class="analysis-cell">
-                    ${extraction ? `
-                        <div class="extraction-summary">
-                            <div class="score-display">
-                                <span class="score-badge">${extraction.relevance_score || 0}/10</span>
-                            </div>
-                            <div class="extraction-meta">
-                                <div class="extraction-source">Source: ${extraction.analysis_source || 'unknown'}</div>
-                                ${extraction.extracted_data ? '<button class="btn btn--sm btn--outline" onclick="showExtractionDetails(\'' + result.article_id + '\')">Détails</button>' : ''}
-                            </div>
-                            ${extraction.relevance_justification ? `
-                                <div class="extraction-justification">${escapeHtml(extraction.relevance_justification)}</div>
-                            ` : ''}
-                        </div>
-                    ` : '<span class="status status--sm status--info">Pas encore analysé</span>'}
-                </td>
-            </tr>
-            <tr class="abstract-row hidden" id="abstract-row-${result.article_id}">
-                <td colspan="5">
-                    <div class="abstract-content">
-                        <div class="abstract-section">
-                            <strong>Résumé:</strong>
-                            <p>${escapeHtml(result.abstract || 'Résumé non disponible')}</p>
-                        </div>
-                        ${result.authors || result.journal || result.publication_date ? `
-                            <div class="metadata-section">
-                                <strong>Métadonnées complètes:</strong>
-                                <div class="metadata-grid">
-                                    ${result.authors ? `<div class="metadata-item"><strong>Auteurs:</strong> <span>${escapeHtml(result.authors)}</span></div>` : ''}
-                                    ${result.journal ? `<div class="metadata-item"><strong>Journal:</strong> <span>${escapeHtml(result.journal)}</span></div>` : ''}
-                                    ${result.publication_date ? `<div class="metadata-item"><strong>Date:</strong> <span>${escapeHtml(result.publication_date)}</span></div>` : ''}
-                                </div>
-                            </div>
-                        ` : ''}
-                    </div>
-                </td>
-            </tr>
-        `;
-    }).join('');
-
-    elements.resultsContainer.innerHTML = `
-        ${resultsHeader}
-        <div class="results-table-container">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Sél.</th>
-                        <th>Article & Métadonnées</th>
-                        <th>Auteurs</th>
-                        <th>Source</th>
-                        <th>Analyse & Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableRows}
-                </tbody>
-            </table>
-        </div>
-    `;
-}
-
 function toggleAbstractRow(articleId) {
-    const abstractRow = document.getElementById(`abstract-row-${articleId}`);
+    const abstractRow = document.getElementById(`abstract-${articleId}`);
     if (abstractRow) {
         abstractRow.classList.toggle('hidden');
     }
 }
 
-function toggleResultSelection(articleId, selected) {
-    if (selected) {
-        appState.selectedSearchResults.add(articleId);
-    } else {
-        appState.selectedSearchResults.delete(articleId);
-    }
-}
-
-function selectAllResults() {
-    appState.searchResults.forEach(result => {
-        appState.selectedSearchResults.add(result.article_id);
-    });
-    renderSearchResults();
-}
-
-function clearResultSelection() {
-    appState.selectedSearchResults.clear();
-    renderSearchResults();
-}
-
-function showExtractionDetails(articleId) {
-    const extraction = appState.currentProjectExtractions.find(ext => ext.pmid === articleId);
-    const article = appState.searchResults.find(art => art.article_id === articleId);
+// ============================ 
+// Import Section
+// ============================ 
+function renderImportSection() {
+    if (!elements.importContainer) return;
     
-    if (!extraction || !article) {
-        showToast('Détails d\'extraction non trouvés', 'error');
-        return;
-    }
-
-    let extractedDataHtml = '';
-    if (extraction.extracted_data) {
-        try {
-            const data = JSON.parse(extraction.extracted_data);
-            if (typeof data === 'object') {
-                extractedDataHtml = Object.entries(data).map(([key, value]) => `
-                    <div class="detail-item">
-                        <label>${escapeHtml(key)}:</label>
-                        <div class="detail-value">${escapeHtml(String(value))}</div>
-                    </div>
-                `).join('');
-            } else {
-                extractedDataHtml = `<div class="detail-text">${escapeHtml(String(data))}</div>`;
-            }
-        } catch {
-            extractedDataHtml = `<div class="detail-text">${escapeHtml(extraction.extracted_data)}</div>`;
-        }
-    }
-
-    const content = `
-        <div class="extraction-details">
-            <div class="extraction-header">
-                <h4>${escapeHtml(article.title)}</h4>
-                <div class="article-id-display">ID: ${escapeHtml(articleId)}</div>
-            </div>
-            
-            <div class="extraction-details-grid">
-                <div class="detail-item">
-                    <label>Score de pertinence:</label>
-                    <div class="detail-value score-value">${extraction.relevance_score || 0}/10</div>
-                </div>
-                <div class="detail-item">
-                    <label>Source d'analyse:</label>
-                    <div class="detail-value">${escapeHtml(extraction.analysis_source || 'Non spécifiée')}</div>
-                </div>
-            </div>
-
-            ${extraction.relevance_justification ? `
-                <div class="detail-section">
-                    <label>Justification:</label>
-                    <div class="detail-text">${escapeHtml(extraction.relevance_justification)}</div>
-                </div>
-            ` : ''}
-
-            ${extractedDataHtml ? `
-                <div class="detail-section">
-                    <label>Données extraites:</label>
-                    <div class="extraction-details-grid">
-                        ${extractedDataHtml}
-                    </div>
-                </div>
-            ` : ''}
-
-            <div class="detail-section">
-                <label>Liens:</label>
-                <div class="detail-links">
-                    ${article.doi ? `<a href="https://doi.org/${article.doi}" target="_blank" class="detail-link">Voir DOI</a>` : ''}
-                    ${article.url ? `<a href="${article.url}" target="_blank" class="detail-link">Voir article</a>` : ''}
-                </div>
-            </div>
-        </div>
-    `;
-
-    showModal('📋 Détails de l\'extraction', content, 'modal__content--large');
-}
-
-// ============================
-// Analyses
-// ============================
-async function loadProjectAnalyses() {
-    if (!appState.currentProject?.id || !elements.analysisContainer) return;
-
-    const analyses = [
-        {
-            id: 'meta_analysis',
-            title: '📊 Méta-analyse',
-            description: 'Distribution des scores et IC95%.',
-            available: true
-        },
-        {
-            id: 'prisma_flow',
-            title: '📋 Diagramme PRISMA',
-            description: 'Flux PRISMA basé sur vos résultats.',
-            available: true
-        },
-        {
-            id: 'atn_scores',
-            title: '🎯 Scores ATN',
-            description: 'Score thématique sur extractions.',
-            available: true
-        },
-        {
-            id: 'knowledge_graph',
-            title: '🌐 Graphe de connaissances',
-            description: 'Visualisation des concepts et relations entre articles.',
-            available: true
-        },
-        {
-            id: 'discussion',
-            title: '📝 Discussion',
-            description: 'Génération automatique de section Discussion.',
-            available: true
-        }
-    ];
-
-    renderAnalyses(analyses);
-}
-
-function renderAnalyses(analyses) {
-    if (!elements.analysisContainer) return;
-
-    const analysesHtml = analyses.map(analysis => {
-        const hasResult = appState.analysisResults[analysis.id];
-        const result = hasResult ? appState.analysisResults[analysis.id] : null;
-
-        return `
-            <div class="analysis-card">
-                <div class="analysis-card__header">
-                    <h4>${analysis.title}</h4>
-                </div>
-                <div class="analysis-card__content">
-                    <p>${analysis.description}</p>
-                    ${hasResult ? `
-                        <div class="analysis-result">
-                            <h5>Résultat:</h5>
-                            ${typeof result === 'string' ? escapeHtml(result) : escapeHtml(JSON.stringify(result, null, 2))}
-                        </div>
-                    ` : ''}
-                    <button class="btn btn--primary btn--sm" onclick="runAnalysis('${analysis.id}')">
-                        ${hasResult ? 'Relancer' : 'Lancer'}
-                    </button>
-                </div>
+    if (!appState.currentProject) {
+        elements.importContainer.innerHTML = `
+            <div class="empty-state">
+                <p>Sélectionnez un projet pour importer des fichiers.</p>
             </div>
         `;
-    }).join('');
-
-    elements.analysisContainer.innerHTML = `
-        <div class="analysis-grid">
-            ${analysesHtml}
-        </div>
-    `;
-}
-
-// ============================
-// Import Section
-// ============================
-function renderImportSection() {
-    if (!elements.importContainer || !appState.currentProject?.id) {
-        if (elements.importContainer) {
-            elements.importContainer.innerHTML = `
-                <div class="import-placeholder">
-                    <span class="import-placeholder__icon">📁</span>
-                    <p>Sélectionnez un projet pour importer des fichiers.</p>
-                </div>
-            `;
-        }
         return;
     }
 
     elements.importContainer.innerHTML = `
-        <div class="import-sections">
-            <div class="import-card">
-                <h4>📚 Importer un export Zotero (.json)</h4>
-                <p>Chargez un fichier d'export Zotero pour ajouter des références.</p>
-                <div class="import-actions">
+        <div class="import-section">
+            <h2>Import & Fichiers</h2>
+            
+            <div class="import-sources">
+                <div class="import-card">
+                    <h3>📚 Importer un export Zotero (.json)</h3>
+                    <p>Chargez un fichier d'export Zotero pour ajouter des références.</p>
                     <input type="file" id="zoteroFileInput" accept=".json" style="display: none;">
                     <button class="btn btn--primary" onclick="document.getElementById('zoteroFileInput').click()">
-                        Choisir fichier Zotero
+                        Choisir fichier JSON
                     </button>
                 </div>
-            </div>
-
-            <div class="import-card">
-                <h4>📄 Uploader des PDFs (jusqu'à 20)</h4>
-                <p>Ces PDFs seront liés au projet courant.</p>
-                <div class="import-actions">
+                
+                <div class="import-card">
+                    <h3>📄 Uploader des PDFs (jusqu\'à 20)</h3>
+                    <p>Ces PDFs seront liés au projet courant.</p>
                     <input type="file" id="bulkPDFInput" accept=".pdf" multiple style="display: none;">
                     <button class="btn btn--primary" onclick="document.getElementById('bulkPDFInput').click()">
                         Choisir PDFs
                     </button>
                 </div>
-            </div>
-
-            <div class="import-card">
-                <h4>🔍 Indexer les PDFs pour le Chat RAG</h4>
-                <p>Permettra de poser des questions au corpus.</p>
-                <div class="import-actions">
-                    <button class="btn btn--primary" id="runIndexingBtn">Indexer les PDFs</button>
-                </div>
-            </div>
-
-            <div class="import-card">
-                <h4>🌐 Récupération automatique de PDFs</h4>
-                <p>Recherche automatique via Unpaywall pour les articles avec DOI.</p>
-                <div class="import-actions">
-                    <button class="btn btn--secondary" onclick="showFetchOnlinePDFsModal()">
-                        Configurer récupération
+                
+                <div class="import-card">
+                    <h3>🔍 Indexer les PDFs pour le Chat RAG</h3>
+                    <p>Permettra de poser des questions au corpus.</p>
+                    <button class="btn btn--primary" id="runIndexingBtn">
+                        Indexer maintenant
                     </button>
                 </div>
-            </div>
-
-            <div class="import-card">
-                <h4>📝 Ajouter des articles manuellement</h4>
-                <p>Saisissez des identifiants d'articles (PMID, DOI, ArXiv ID) séparés par des retours à la ligne.</p>
-                <div class="import-actions">
+                
+                <div class="import-card">
+                    <h3>🌐 Récupération automatique de PDFs</h3>
+                    <p>Recherche automatique via Unpaywall pour les articles avec DOI.</p>
+                    <button class="btn btn--secondary" onclick="handleFetchOnlinePDFs()">
+                        Lancer recherche
+                    </button>
+                </div>
+                
+                <div class="import-card">
+                    <h3>📝 Ajouter des articles manuellement</h3>
+                    <p>Saisissez des identifiants d\'articles (PMID, DOI, ArXiv ID) séparés par des retours à la ligne.</p>
                     <button class="btn btn--secondary" onclick="showAddManualArticlesModal()">
-                        Ajouter manuellement
+                        Ajouter articles
                     </button>
                 </div>
             </div>
@@ -864,28 +728,32 @@ function renderImportSection() {
     `;
 }
 
-// ============================
+// ============================ 
 // Chat Section
-// ============================
+// ============================ 
 async function loadChatMessages() {
-    if (!appState.currentProject?.id || !elements.chatContainer) {
-        if (elements.chatContainer) {
-            elements.chatContainer.innerHTML = `
-                <div class="chat-placeholder">
-                    <span class="chat-placeholder__icon">💬</span>
-                    <p>Sélectionnez un projet pour accéder au chat.</p>
-                </div>
-            `;
-        }
+    if (!elements.chatContainer) return; 
+    
+    if (!appState.currentProject || !appState.currentProject.id) {
+        elements.chatContainer.innerHTML = `
+            <div class="empty-state">
+                <p>Sélectionnez un projet pour accéder au chat.</p>
+            </div>
+        `;
         return;
     }
 
     try {
-        const messages = await fetchAPI(`/projects/${appState.currentProject.id}/chat`);
-        appState.chatMessages = messages || [];
+        const messages = await fetchAPI(`/projects/${appState.currentProject.id}/chat-messages`);
+        appState.chatMessages = Array.isArray(messages) ? messages : [];
         renderChatInterface(appState.chatMessages);
     } catch (e) {
-        elements.chatContainer.innerHTML = '<p class="error">Erreur lors du chargement du chat.</p>';
+        console.error('Erreur chargement chat:', e);
+        elements.chatContainer.innerHTML = `
+            <div class="error-state">
+                <p>Erreur lors du chargement du chat.</p>
+            </div>
+        `;
     }
 }
 
@@ -894,65 +762,490 @@ function renderChatInterface(messages = []) {
 
     const messagesHtml = messages.map(msg => `
         <div class="chat-message chat-message--${msg.role}">
-            <div class="chat-message__content">${escapeHtml(msg.content)}</div>
-            ${msg.sources ? `<div class="chat-message__sources">Sources: ${escapeHtml(msg.sources)}</div>` : ''}
+            <div class="chat-message-content">
+                ${escapeHtml(msg.content)}
+            </div>
+            <div class="chat-message-meta">
+                ${new Date(msg.timestamp).toLocaleString()}
+            </div>
         </div>
     `).join('');
 
     elements.chatContainer.innerHTML = `
         <div class="chat-interface">
-            <div class="chat-header">
-                <h3>💬 Chat avec le corpus</h3>
-                <div class="chat-status">Prêt à répondre</div>
-            </div>
             <div class="chat-messages">
-                ${messages.length > 0 ? messagesHtml : `
-                    <div class="chat-welcome">
-                        <span class="chat-welcome__icon">🤖</span>
-                        <p>Posez une question sur vos documents indexés</p>
-                    </div>
-                `}
+                ${messagesHtml || '<p class="empty-state">Aucun message pour le moment.</p>'}
             </div>
-            <div class="chat-input">
-                <textarea id="chatInput" class="form-control" placeholder="Posez votre question..." rows="3"></textarea>
-                <button class="btn btn--primary" onclick="sendChatMessage()">Envoyer</button>
+            <div class="chat-input-container">
+                <textarea 
+                    id="chatInput" 
+                    placeholder="Posez votre question..." 
+                    class="chat-input-field">
+                </textarea>
+                <button 
+                    class="btn btn--primary" 
+                    onclick="handleSendChatMessage()">
+                    Envoyer
+                </button>
             </div>
         </div>
     `;
 }
 
-// ============================
+// ============================ 
 // Validation Section
-// ============================
+// ============================ 
 async function loadValidationSection() {
-    if (!appState.currentProject?.id || !elements.validationContainer) {
+    if (!appState.currentProject) {
         if (elements.validationContainer) {
-            elements.validationContainer.innerHTML = `
-                <div class="validation-placeholder">
-                    <span class="validation-placeholder__icon">✅</span>
-                    <p>Sélectionnez un projet pour accéder à la validation.</p>
-                </div>
-            `;
+            elements.validationContainer.innerHTML = '<p>Sélectionnez un projet pour voir les données de validation.</p>';
         }
         return;
     }
-
+    
     try {
-        showLoadingOverlay(true, 'Chargement de la validation...');
-        
-        const [extractions, kappa] = await Promise.all([
-            fetchAPI(`/projects/${appState.currentProject.id}/extractions`),
-            fetchAPI(`/projects/${appState.currentProject.id}/inter-rater-stats`)
-        ]);
-
+        const extractions = await fetchAPI(`/projects/${appState.currentProject.id}/extractions`);
         appState.currentValidations = extractions || [];
-        renderValidationSection(kappa);
+        renderValidationSection();
     } catch (e) {
         console.error('Erreur chargement validation:', e);
-        elements.validationContainer.innerHTML = '<p class="error">Erreur lors du chargement de la validation.</p>';
+        showToast('Erreur lors du chargement de la validation', 'error');
+    }
+}
+
+async function loadRobSection() {
+    if (!elements.robContainer) return;
+
+    if (!appState.currentProject?.id) {
+        elements.robContainer.innerHTML = `<div class="empty-state"><p>Sélectionnez un projet pour évaluer le risque de biais.</p></div>`;
+        return;
+    }
+
+    // On se base sur les articles déjà chargés dans `searchResults`
+    const articles = appState.searchResults || [];
+    if (articles.length === 0) {
+        elements.robContainer.innerHTML = `<div class="empty-state"><p>Aucun article dans ce projet. Lancez une recherche d'abord.</p></div>`;
+        return;
+    }
+
+    const articlesHtml = articles.map(article => `
+        <div class="rob-article-card" id="rob-card-${article.article_id}">
+            <div class="rob-article-header">
+                <input type="checkbox" class="article-select-checkbox" value="${escapeHtml(article.article_id)}" onchange="toggleArticleSelection('${escapeHtml(article.article_id)}', this.checked)">
+                <h4 class="rob-article-title">${escapeHtml(article.title)}</h4>
+                <button class="btn btn--sm btn--outline" onclick="fetchAndDisplayRob('${article.article_id}')">Voir/Éditer</button>
+            </div>
+            <div class="rob-assessment-summary" id="rob-summary-${article.article_id}">
+                <!-- Le résumé de l'évaluation sera chargé ici -->
+            </div>
+        </div>
+    `).join('');
+
+    elements.robContainer.innerHTML = `<div class="rob-list">${articlesHtml}</div>`;
+}
+
+async function loadProjectAnalyses() {
+    if (!appState.currentProject) {
+        if (elements.analysisContainer) {
+            elements.analysisContainer.innerHTML = '<p>Sélectionnez un projet pour voir les analyses.</p>';
+        }
+        return;
+    }
+    
+    try {
+        const analyses = await fetchAPI(`/projects/${appState.currentProject.id}/analyses`);
+        appState.analysisResults = analyses || {};
+        renderAnalysesSection();
+    } catch (e) {
+        console.error('Erreur chargement analyses:', e);
+        showToast('Erreur lors du chargement des analyses', 'error');
+    }
+}
+
+function exportAnalyses() {
+    if (!appState.currentProject?.id) {
+        showToast('Veuillez sélectionner un projet.', 'warning');
+        return;
+    }
+    // Ouvre l'URL de l'endpoint d'export dans un nouvel onglet, ce qui déclenche le téléchargement
+    window.open(`/api/projects/${appState.currentProject.id}/export-analyses`, '_blank');
+    showToast('Export des analyses en cours de téléchargement...', 'info');
+}
+
+function renderAnalysesSection() {
+    if (!elements.analysisContainer) return;
+
+    const analyses = appState.analysisResults || {};
+    const projectId = appState.currentProject?.id;
+
+    // 1. Section pour lancer les analyses
+    const analysisLauncherHtml = `
+        <div class="card">
+             <div class="card__header">
+                <h3>Actions</h3>
+                <button class="btn btn--secondary btn--sm" onclick="exportAnalyses()">Exporter les analyses (ZIP)</button>
+            </div>
+        </div>
+        <div class="card card--collapsible card--collapsible--collapsed">
+            <div class="card__header"><h3>Lancer une nouvelle analyse</h3></div>
+            <div class="card__content analysis-options">
+                <div class="analysis-option" onclick="runProjectAnalysis('discussion')">
+                    <div class="analysis-icon">💬</div>
+                    <div class="analysis-details">
+                        <h4>Brouillon de Discussion</h4>
+                        <p>Génère une synthèse narrative des conclusions et limitations des études incluses.</p>
+                    </div>
+                </div>
+                <div class="analysis-option" onclick="runProjectAnalysis('knowledge_graph')">
+                    <div class="analysis-icon">🕸️</div>
+                    <div class="analysis-details">
+                        <h4>Graphe de Connaissances</h4>
+                        <p>Identifie et visualise les relations entre les articles (thèmes, auteurs, etc.).</p>
+                    </div>
+                </div>
+                <div class="analysis-option" onclick="runProjectAnalysis('prisma_flow')">
+                    <div class="analysis-icon">📊</div>
+                    <div class="analysis-details">
+                        <h4>Diagramme de flux PRISMA</h4>
+                        <p>Crée un diagramme de flux PRISMA basé sur les étapes de la revue.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // 2. Brouillon de discussion
+    const discussionHtml = analyses.discussion_draft ? `
+        <div class="card">
+            <div class="card__header"><h3>Brouillon de Discussion</h3></div>
+            <div class="card__content formatted-text">
+                ${escapeHtml(analyses.discussion_draft).replace(/\n/g, '<br>')}
+            </div>
+        </div>
+    ` : '';
+
+    // 3. Graphe de connaissances
+    let graphHtml = analyses.knowledge_graph ? `
+        <div class="card">
+            <div class="card__header"><h3>Graphe de Connaissances</h3></div>
+            <div class="card__content">
+                <div id="knowledgeGraphContainer" class="knowledge-graph-container"></div>
+            </div>
+        </div>
+    ` : '';
+    
+    // 4. Diagramme PRISMA
+    const prismaHtml = analyses.prisma_flow_path ? `
+        <div class="card">
+            <div class="card__header"><h3>Diagramme de flux PRISMA</h3></div>
+            <div class="card__content">
+                <img src="${analyses.prisma_flow_path}?v=${new Date().getTime()}" alt="Diagramme PRISMA" class="prisma-image">
+            </div>
+        </div>
+    ` : '';
+
+    // Assemblage final
+    elements.analysisContainer.innerHTML = `
+        ${analysisLauncherHtml}
+        <div class="layout-grid">
+            ${discussionHtml ? `<div class="grid-column">${discussionHtml}</div>` : ''}
+            ${(graphHtml || prismaHtml) ? `<div class="grid-column">${graphHtml}${prismaHtml}</div>` : ''}
+        </div>
+    `;
+
+    // Initialiser le graphe si les données existent
+    if (analyses.knowledge_graph && typeof vis !== 'undefined') {
+        initializeKnowledgeGraph(analyses.knowledge_graph);
+    }
+}
+
+// Fonction pour lancer une analyse (doit aussi être présente)
+async function runProjectAnalysis(analysisType) {
+    if (!appState.currentProject?.id) {
+        showToast('Veuillez d\'abord sélectionner un projet.', 'warning');
+        return;
+    }
+    
+    // Mappage pour les messages affichés à l'utilisateur
+    const analysisNames = {
+        discussion: 'le brouillon de discussion',
+        knowledge_graph: 'le graphe de connaissances',
+        prisma_flow: 'le diagramme PRISMA'
+    };
+
+    try {
+        showLoadingOverlay(true, `Lancement de la génération pour ${analysisNames[analysisType] || analysisType}...`);
+        // Note: L'endpoint varie en fonction de l'analyse
+        let endpoint = '';
+        switch(analysisType) {
+            case 'discussion':
+                endpoint = `/projects/${appState.currentProject.id}/run-discussion-draft`;
+                break;
+            case 'knowledge_graph':
+                 endpoint = `/projects/${appState.currentProject.id}/run-knowledge-graph`;
+                 break;
+            case 'prisma_flow':
+                endpoint = `/projects/${appState.currentProject.id}/run-prisma-flow`;
+                break;
+            default:
+                showToast('Type d\'analyse inconnu.', 'error');
+                return;
+        }
+        
+        await fetchAPI(endpoint, { method: 'POST' });
+        showToast(`La génération pour ${analysisNames[analysisType]} a été lancée.`, 'success');
+    } catch (e) {
+        showToast(`Erreur lors du lancement de l'analyse: ${e.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }
+}
+
+function updateNotificationIndicator() {
+    const indicator = document.querySelector('.notification-indicator');
+    if (indicator) {
+        indicator.textContent = appState.unreadNotifications;
+        indicator.style.display = appState.unreadNotifications > 0 ? 'block' : 'none';
+    }
+}
+
+function clearNotifications() {
+  // Réinitialise le compteur et la liste en mémoire
+  appState.unreadNotifications = 0;
+  appState.notifications = [];
+  updateNotificationIndicator();
+
+  // Optionnel : vide un éventuel panneau de liste s'il existe
+  const panel = document.getElementById('notificationsPanel');
+  if (panel) {
+    const list = panel.querySelector('.notifications-list');
+    if (list) list.innerHTML = '';
+  }
+}
+// Fonctions d'interface manquantes
+function updateSelectionCounter() {
+    const counter = document.querySelector('.selection-counter');
+    if (counter) {
+        const count = appState.selectedSearchResults.size;
+        counter.textContent = `${count} article(s) sélectionné(s)`;
+    }
+}
+
+function toggleArticleSelection(articleId, checked) {
+    if (checked) {
+        appState.selectedSearchResults.add(articleId);
+    } else {
+        appState.selectedSearchResults.delete(articleId);
+    }
+    updateSelectionCounter();
+}
+
+// CORRECTION : Ajout de la fonction manquante viewArticleDetails
+function viewArticleDetails(articleId) {
+  if (!articleId) {
+    showToast('ID article manquant', 'error');
+    return;
+  }
+
+  // Chercher l'article dans les résultats de recherche
+  const article = appState.searchResults.find(r => r.article_id === articleId);
+  const extraction = appState.currentProjectExtractions.find(e => e.pmid === articleId);
+
+  if (!article) {
+    showToast('Article non trouvé', 'error');
+    return;
+  }
+
+  // Créer le contenu de la modale avec les détails
+  const modalContent = `
+    <div class="article-details">
+      <h3>${escapeHtml(article.title || 'Titre non disponible')}</h3>
+      
+      <div class="article-meta">
+        <p><strong>Auteurs:</strong> ${escapeHtml(article.authors || 'Non spécifiés')}</p>
+        <p><strong>Journal:</strong> ${escapeHtml(article.journal || 'Non spécifié')}</p>
+        <p><strong>Date:</strong> ${escapeHtml(article.publication_date || 'Non spécifiée')}</p>
+        <p><strong>DOI:</strong> ${article.doi ? `<a href="https://doi.org/${article.doi}" target="_blank">${article.doi}</a>` : 'Non disponible'}</p>
+        <p><strong>Source:</strong> ${escapeHtml(article.database_source || 'Inconnue')}</p>
+      </div>
+
+      ${article.abstract ? `
+        <div class="article-abstract">
+          <h4>Résumé</h4>
+          <p>${escapeHtml(article.abstract)}</p>
+        </div>
+      ` : ''}
+
+      ${extraction ? `
+        <div class="article-extraction">
+          <h4>Évaluation IA</h4>
+          <p><strong>Score de pertinence:</strong> ${extraction.relevance_score || 'N/A'}/10</p>
+          <p><strong>Justification:</strong> ${escapeHtml(extraction.relevance_justification || 'Aucune')}</p>
+          
+          ${extraction.extracted_data ? `
+            <h4>Données extraites</h4>
+            <pre class="extraction-data">${escapeHtml(JSON.stringify(JSON.parse(extraction.extracted_data), null, 2))}</pre>
+          ` : ''}
+        </div>
+      ` : ''}
+
+      <div class="article-actions">
+        ${article.url ? `<a href="${article.url}" target="_blank" class="btn btn--secondary btn--sm">Voir sur ${article.database_source}</a>` : ''}
+      </div>
+    </div>
+  `;
+
+  // Créer et afficher la modale
+  const modal = document.createElement('div');
+  modal.className = 'modal modal--show';
+  modal.innerHTML = `
+    <div class="modal__content modal__content--large">
+      <div class="modal__header">
+        <h3>Détails de l'article</h3>
+        <button type="button" class="modal__close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal__body">
+        ${modalContent}
+      </div>
+    </div>
+  `;
+
+  // Ajouter la modale au DOM
+  document.body.appendChild(modal);
+
+  // Gestion de fermeture par clic sur le fond
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal || e.target.classList.contains('modal__close')) {
+      document.body.removeChild(modal);
+    }
+  });
+}
+
+function renderSearchResultsTable() {
+  if (!elements.resultsContainer) return;
+
+  const project = appState.currentProject;
+  const results = Array.isArray(appState.searchResults) ? appState.searchResults : [];
+  const extractions = Array.isArray(appState.currentProjectExtractions) ? appState.currentProjectExtractions : [];
+
+  // CORRECTION: Unification de la logique de chargement des fichiers PDF
+  if (!appState.currentProjectFiles) {
+    if (project?.id) {
+      loadProjectFilesSet().then(renderSearchResultsTable); // Relance le rendu après chargement
+    }
+    elements.resultsContainer.innerHTML = `
+      <div class="card"><div class="card__body">
+        Chargement des fichiers PDF du projet...
+      </div></div>`;
+    return;
+  }
+
+  if (!project?.id) {
+    elements.resultsContainer.innerHTML = `
+      <div class="card"><div class="card__body">
+        Sélectionnez un projet pour voir les résultats.
+      </div></div>`;
+    return;
+  }
+
+  if (results.length === 0) {
+    elements.resultsContainer.innerHTML = `
+      <div class="card">
+        <div class="card__body text-center">
+          <h4>Aucun résultat</h4>
+          <p>Lancez une recherche pour voir les articles trouvés.</p>
+        </div>
+      </div>`;
+    return;
+  }
+
+  // CORRECTION: Indexation unifiée des extractions par article_id
+  // Utilisation de Object.fromEntries pour une syntaxe plus concise
+  const extractionById = Object.fromEntries(extractions.map(e => [e.pmid, e]));
+
+  // Version tableau compact et responsive
+  const rows = results.map(article => {
+    const ex = extractionById[article.article_id] || {};
+    const score = ex.relevance_score ?? '';
+    const justification = ex.relevance_justification || '';
+
+    const pdfExists = hasPdfForArticle(article.article_id);
+    const pdfBadge = pdfExists
+      ? `<span class="badge badge--success">PDF</span>`
+      : `<span class="badge badge--secondary">Aucun</span>`;
+
+    // Tronquer le titre si trop long
+    const titleDisplay = (article.title || 'Titre non disponible').length > 80 
+      ? (article.title || 'Titre non disponible').substring(0, 80) + '...'
+      : (article.title || 'Titre non disponible');
+
+    // Tronquer les auteurs
+    const authorsDisplay = (article.authors || '').length > 40
+      ? (article.authors || '').substring(0, 40) + '...'
+      : (article.authors || '');
+
+    // CORRECTION: Affichage du score avec couleurs et justification
+    const scoreDisplay = (score !== undefined && score !== null)
+      ? `<span class="score-badge ${score >= 7 ? 'score--high' : score >= 4 ? 'score--medium' : 'score--low'}">${score}/10</span>`
+      : '<span class="badge badge--secondary">Pas analysé</span>';
+
+    return `
+      <tr class="article-row" data-article-id="${escapeHtml(article.article_id)}">
+        <td class="select-cell"><input type="checkbox" class="article-checkbox" data-article-id="${escapeHtml(article.article_id)}" ${appState.selectedSearchResults.has(article.article_id) ? 'checked' : ''}></td>
+        <td class="article-main">
+          <div class="article-title" title="${escapeHtml(article.title || '')}">${escapeHtml(titleDisplay)}</div>
+          <div class="article-meta">
+            <span class="article-id">ID: ${escapeHtml(article.article_id)}</span>
+            ${article.journal ? `• <span class="article-journal">${escapeHtml(article.journal)}</span>` : ''}
+            ${article.publication_date ? `• <span class="article-year">${escapeHtml(article.publication_date)}</span>` : ''}
+          </div>
+          <div class="article-authors" title="${escapeHtml(article.authors || '')}">${escapeHtml(authorsDisplay)}</div>
+        </td>
+        <td class="source-cell">
+          <span class="source-badge source--${escapeHtml((article.database_source || 'unknown').toLowerCase())}">${escapeHtml((article.database_source || '').toUpperCase())}</span>
+        </td>
+        <td class="pdf-cell">${pdfBadge}</td>
+        <td class="score-cell">
+          ${scoreDisplay}
+          ${justification ? `<div class="score-justification" title="${escapeHtml(justification)}">${escapeHtml(justification.length > 50 ? justification.substring(0, 50) + '...' : justification)}</div>` : ''}
+        </td>
+        <td class="actions-cell">
+          <button class="btn btn--sm btn--outline view-details-btn" data-article-id="${escapeHtml(article.article_id)}">
+            👁️
+          </button>
+          ${article.url ? `<a href="${escapeHtml(article.url)}" target="_blank" class="btn btn--sm btn--outline">🔗</a>` : ''}
+        </td>
+      </tr>`;
+  }).join('');
+
+  elements.resultsContainer.innerHTML = `
+    <div class="card">
+      <div class="card__header">
+        <h3>Résultats (${results.length} articles)</h3>
+        <div class="results-actions">
+          <button class="btn btn--primary btn--sm" onclick="showSearchModal()">🔍 Nouvelle recherche</button>
+          <button class="btn btn--secondary btn--sm" onclick="selectAllArticles()">Tout sélectionner</button>
+          <button class="btn btn--accent btn--sm" id="batchProcessBtn" onclick="showBatchProcessModal()">Traiter la sélection (<span id="selectionCounter">0</span>)</button>
+        </div>
+      </div>
+      <div class="card__body">
+        <div class="table-container">
+          <table class="table table--compact">
+            <thead>
+              <tr>
+                <th class="col-select">Sél.</th>
+                <th class="col-main">Article & Métadonnées</th>
+                <th class="col-source">Source</th>
+                <th class="col-pdf">PDF</th>
+                <th class="col-score">Score IA</th>
+                <th class="col-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
 }
 
 function renderValidationSection(kappaData) {
@@ -962,13 +1255,13 @@ function renderValidationSection(kappaData) {
     const validatedCount = extractions.filter(ext => ext.user_validation_status).length;
     
     let kappaDisplay = '';
-    if (kappaData && kappaData.kappa_result && kappaData.kappa_result !== "Non calculé") {
+    if (kappaData && kappaData.kappa_result && kappaData.kappa_result !== "Non calculÃƒÂ©") {
         try {
             const kappa = JSON.parse(kappaData.kappa_result);
             kappaDisplay = `
                 <div class="kappa-result-display">
                     <strong>Coefficient Kappa:</strong> ${kappa.kappa?.toFixed(3) || 'N/A'} 
-                    (${kappa.interpretation || 'Non interprété'})
+                    (${kappa.interpretation || 'Non interprÃƒÂ©tÃƒÂ©'})
                     <br>
                     <small>${kappa.n_comparisons || 0} comparaisons - Accord: ${(kappa.agreement_rate * 100)?.toFixed(1) || 0}%</small>
                 </div>
@@ -991,10 +1284,10 @@ function renderValidationSection(kappaData) {
                 </div>
                 <div class="validation-item__actions">
                     <button class="btn btn--success btn--sm" onclick="validateExtraction('${extraction.id}', 'include')">
-                        ✓ Inclure
+                        Ã¢Å“â€œ Inclure
                     </button>
                     <button class="btn btn--error btn--sm" onclick="validateExtraction('${extraction.id}', 'exclude')">
-                        ✗ Exclure
+                        Ã¢Å“â€” Exclure
                     </button>
                 </div>
             </div>
@@ -1012,7 +1305,7 @@ function renderValidationSection(kappaData) {
                             <div class="metric-value">${extractions.length}</div>
                         </div>
                         <div class="metric-card">
-                            <h5>Validés</h5>
+                            <h5>ValidÃƒÂ©s</h5>
                             <div class="metric-value">${validatedCount}</div>
                         </div>
                         <div class="metric-card">
@@ -1034,17 +1327,11 @@ function renderValidationSection(kappaData) {
             </div>
 
             <div class="validation-list">
-                <h4>Articles à valider (${extractions.length})</h4>
-                ${extractions.length > 0 ? validationItemsHtml : '<p>Aucune extraction à valider.</p>'}
+                <h4>Articles Ãƒ  valider (${extractions.length})</h4>
+                ${extractions.length > 0 ? validationItemsHtml : '<p>Aucune extraction Ãƒ  valider.</p>'}
             </div>
         </div>
     `;
-}
-
-function validateExtraction(extractionId, decision) {
-    // TODO: Implémenter la validation côté serveur
-    console.log(`Validation: ${extractionId} -> ${decision}`);
-    showToast(`Article ${decision === 'include' ? 'inclus' : 'exclu'}`, 'success');
 }
 
 function showImportValidationsModal() {
@@ -1063,7 +1350,7 @@ function showImportValidationsModal() {
             </div>
         </form>
     `;
-    showModal('📥 Importer des validations', content);
+    showModal('Ã°Å¸â€œÂ¥ Importer des validations', content);
 }
 
 async function handleImportValidations(event) {
@@ -1079,7 +1366,7 @@ async function handleImportValidations(event) {
             body: formData
         });
         
-        showToast('Validations importées avec succès', 'success');
+        showToast('Validations importÃƒÂ©es avec succÃƒÂ¨s', 'success');
         await loadValidationSection();
     } catch (e) {
         showToast(`Erreur lors de l'import: ${e.message}`, 'error');
@@ -1091,7 +1378,7 @@ async function handleImportValidations(event) {
 async function exportValidations() {
     try {
         window.open(`/api/projects/${appState.currentProject.id}/export-validations`);
-        showToast('Export des validations lancé', 'success');
+        showToast('Export des validations lancÃƒÂ©', 'success');
     } catch (e) {
         showToast(`Erreur lors de l'export: ${e.message}`, 'error');
     }
@@ -1105,8 +1392,8 @@ async function calculateKappa() {
             method: 'POST'
         });
         
-        showToast('Calcul du Kappa lancé', 'success');
-        // Recharger après un délai pour laisser le temps au calcul
+        showToast('Calcul du Kappa lancÃƒÂ©', 'success');
+        // Recharger aprÃƒÂ¨s un dÃƒÂ©lai pour laisser le temps au calcul
         setTimeout(() => loadValidationSection(), 2000);
     } catch (e) {
         showToast(`Erreur lors du calcul: ${e.message}`, 'error');
@@ -1115,17 +1402,322 @@ async function calculateKappa() {
     }
 }
 
+
+async function fetchAndDisplayRob(articleId) {
+    const summaryContainer = document.getElementById(`rob-summary-${articleId}`);
+    if (!summaryContainer) return;
+
+    try {
+        summaryContainer.innerHTML = `<div class="loading-spinner"></div>`;
+        const robData = await fetchAPI(`/projects/${appState.currentProject.id}/risk-of-bias?article_id=${articleId}`);
+
+        if (Object.keys(robData).length === 0) {
+            summaryContainer.innerHTML = `<p class="text-secondary">Aucune ÃƒÂ©valuation de biais pour cet article. Lancez l'analyse.</p>`;
+            return;
+        }
+
+        summaryContainer.innerHTML = `
+            <div class="rob-details">
+                <div class="rob-domain">
+                    <strong>Randomisation:</strong>
+                    <span class="status status--${getBiasClass(robData.domain_1_bias)}">${robData.domain_1_bias || 'N/A'}</span>
+                    <p class="rob-justification">${escapeHtml(robData.domain_1_justification)}</p>
+                </div>
+                <div class="rob-domain">
+                    <strong>DonnÃƒÂ©es manquantes:</strong>
+                    <span class="status status--${getBiasClass(robData.domain_2_bias)}">${robData.domain_2_bias || 'N/A'}</span>
+                    <p class="rob-justification">${escapeHtml(robData.domain_2_justification)}</p>
+                </div>
+                <div class="rob-domain rob-overall">
+                    <strong>Ãƒâ€°valuation globale:</strong>
+                    <span class="status status--${getBiasClass(robData.overall_bias)}">${robData.overall_bias || 'N/A'}</span>
+                    <p class="rob-justification">${escapeHtml(robData.overall_justification)}</p>
+                </div>
+            </div>
+        `;
+
+    } catch (e) {
+        summaryContainer.innerHTML = `<p class="error">Erreur: ${e.message}</p>`;
+    }
+}
+
+function getBiasClass(bias) {
+    if (!bias) return 'info';
+    const biasLower = bias.toLowerCase();
+    if (biasLower.includes('low')) return 'success';
+    if (biasLower.includes('some concerns')) return 'warning';
+    if (biasLower.includes('high')) return 'error';
+    return 'info';
+}
+
+async function handleRunRobAnalysis() {
+    const selectedIds = Array.from(appState.selectedSearchResults);
+    if (selectedIds.length === 0) {
+        showToast("Veuillez sÃƒÂ©lectionner au moins un article pour l'analyse RoB.", 'warning');
+        return;
+    }
+
+    try {
+        showLoadingOverlay(true, `Lancement de l'analyse RoB pour ${selectedIds.length} article(s)...`);
+        await fetchAPI(`/projects/${appState.currentProject.id}/run-rob-analysis`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ article_ids: selectedIds })
+        });
+        showToast("Analyse du risque de biais lancÃƒÂ©e. Les rÃƒÂ©sultats apparaÃƒÂ®tront progressivement.", 'success');
+    } catch (e) {
+        showToast(`Erreur: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+function getRobDomainFromKey(key) {
+    const domainMap = {
+        'domain_1_bias': 'Biais dans le processus de randomisation',
+        'domain_2_bias': 'Biais dus aux écarts par rapport aux interventions prévues',
+        // Ajoutez d'autres domaines ici si nécessaire
+        'overall_bias': 'Biais global'
+    };
+    return domainMap[key] || key.replace(/_/g, ' ');
+}
+
+function showRunAnalysisModal() {
+    const selectedCount = appState.selectedSearchResults.size;
+    if (selectedCount === 0) {
+        showToast("Veuillez sélectionner au moins un article.", "warning");
+        return;
+    }
+    openModal('bulkActionsModal');
+    // Mettre à jour le contenu de la modale immédiatement
+    const modalContent = document.querySelector('#bulkActionsModal .modal__body');
+    if(modalContent) {
+        modalContent.innerHTML = `
+            <p>Vous êtes sur le point de lancer un traitement par lot sur ${selectedCount} article(s).</p>
+            <div class="form-group">
+                <label for="bulkAnalysisProfile">Veuillez choisir un profil d'analyse:</label>
+                <select id="bulkAnalysisProfile" class="form-control">
+                    ${appState.analysisProfiles.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+                </select>
+            </div>
+        `;
+    }
+}
+
+async function handleBulkActions() {
+    const selectedIds = Array.from(appState.selectedSearchResults);
+    const profileId = document.getElementById('bulkAnalysisProfile').value;
+    const analysisMode = 'screening'; // Ou un autre mode si vous l'ajoutez
+    
+    if (selectedIds.length === 0 || !profileId) {
+        showToast('Aucun article ou profil sélectionné.', 'warning');
+        return;
+    }
+
+    closeModal('bulkActionsModal');
+    showLoadingOverlay(true, `Lancement du traitement pour ${selectedIds.length} article(s)...`);
+
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/bulk-process`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                article_ids: selectedIds,
+                profile_id: profileId,
+                analysis_mode: analysisMode
+            })
+        });
+        showToast(`Traitement par lot lancé pour ${selectedIds.length} articles.`, 'success');
+        appState.selectedSearchResults.clear(); // Vider la sélection
+        // Recharger pour voir la progression
+        loadSearchResults();
+    } catch (e) {
+        showToast(`Erreur lors du lancement du traitement par lot: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+// ============================
+// Analyses Section
+// ============================
+
+function renderDiscussionDraft(draft) {
+    if (!draft) return '';
+    return `
+        <div class="analysis-card">
+            <h4><i class="fas fa-file-alt"></i> Brouillon de la Discussion</h4>
+            <div class="text-content">${escapeHtml(draft).replace(/\n/g, '<br>')}</div>
+        </div>
+    `;
+}
+
+function renderKnowledgeGraph(graphData) {
+    if (!graphData || !graphData.nodes || graphData.nodes.length === 0) {
+         return `
+            <div class="analysis-card">
+                <h4><i class="fas fa-project-diagram"></i> Graphe de Connaissances</h4>
+                <p class="status-message">Aucune donnée pour le graphe. Lancez l'analyse pour le générer.</p>
+            </div>
+        `;
+    }
+    return `
+        <div class="analysis-card">
+            <h4><i class="fas fa-project-diagram"></i> Graphe de Connaissances</h4>
+            <div id="knowledgeGraph" class="knowledge-graph-container"></div>
+            <p class="help-text">${graphData.nodes.length} noeuds et ${graphData.edges.length} relations.</p>
+        </div>
+    `;
+}
+
+function renderPrismaFlow(prismaPath) {
+    if (!prismaPath) return '';
+    // On ajoute un timestamp pour forcer le rechargement de l'image
+    const cacheBuster = new Date().getTime();
+    return `
+        <div class="analysis-card">
+            <h4><i class="fas fa-sitemap"></i> Diagramme de flux PRISMA</h4>
+            <img src="${prismaPath}?v=${cacheBuster}" alt="Diagramme PRISMA" style="max-width:100%; height:auto; border-radius: var(--radius-base);">
+        </div>
+    `;
+}
+
+function renderGenericAnalysisResult(title, analysis) {
+    if (!analysis) return '';
+     let content;
+    if (typeof analysis === 'object' && analysis !== null) {
+        content = `<pre class="code-block">${escapeHtml(JSON.stringify(analysis, null, 2))}</pre>`;
+    } else {
+        content = `<div class="text-content">${escapeHtml(analysis)}</div>`;
+    }
+    return `
+        <div class="analysis-card">
+            <h4><i class="fas fa-chart-bar"></i> ${title}</h4>
+            ${content}
+        </div>
+    `;
+}
+
+function initializeKnowledgeGraph(data) {
+    const container = document.getElementById('knowledgeGraph');
+    if (!container || !vis) return;
+
+    const nodes = new vis.DataSet(data.nodes);
+    const edges = new vis.DataSet(data.edges);
+
+    const graphData = { nodes, edges };
+    const options = {
+        nodes: {
+            shape: 'box',
+            margin: 10,
+            widthConstraint: {
+                maximum: 200
+            },
+            font: {
+                color: '#fff' // Texte en blanc pour le mode sombre
+            }
+        },
+        edges: {
+            arrows: 'to',
+            font: {
+                align: 'horizontal',
+                color: '#fff',
+                strokeWidth: 2,
+                strokeColor: '#222'
+            }
+        },
+        physics: {
+            forceAtlas2Based: {
+                gravitationalConstant: -26,
+                centralGravity: 0.005,
+                springLength: 230,
+                springConstant: 0.18
+            },
+            maxVelocity: 146,
+            solver: 'forceAtlas2Based',
+            timestep: 0.35,
+            stabilization: { iterations: 150 }
+        },
+        layout: {
+            hierarchical: false
+        }
+    };
+    new vis.Network(container, graphData, options);
+}
+
+async function handleRunDiscussionDraft() {
+    if (!appState.currentProject?.id) return;
+    showLoadingOverlay(true, 'Génération du brouillon de discussion...');
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/run-discussion-draft`, { method: 'POST' });
+        showToast('Tâche de génération lancée.', 'success');
+    } catch (e) {
+        showToast(`Erreur: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+async function handleRunKnowledgeGraph() {
+    if (!appState.currentProject?.id) return;
+    showLoadingOverlay(true, 'Génération du graphe...');
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/run-knowledge-graph`, { method: 'POST' });
+        showToast('Génération du graphe de connaissances lancée.', 'success');
+    } catch (e) {
+        showToast(`Erreur: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+async function handleRunPrismaFlow() {
+    if (!appState.currentProject?.id) return;
+    showLoadingOverlay(true, 'Génération du diagramme PRISMA...');
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/run-prisma-flow`, { method: 'POST' });
+        showToast('Génération du diagramme PRISMA lancée.', 'success');
+    } catch (e) {
+        showToast(`Erreur: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+
+
+async function handleRunMetaAnalysis() {
+    if (!appState.currentProject?.id) return;
+    showLoadingOverlay(true, 'Lancement de la méta-analyse...');
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/run-meta-analysis`, { method: 'POST' });
+        showToast('Méta-analyse lancée avec succès.', 'success');
+    } catch (e) {
+        showToast(`Erreur: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+async function handleRunDescriptiveStats() {
+    if (!appState.currentProject?.id) return;
+    showLoadingOverlay(true, 'Calcul des statistiques descriptives...');
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/run-descriptive-stats`, { method: 'POST' });
+        showToast('Calcul des statistiques lancé.', 'success');
+    } catch (e) {
+        showToast(`Erreur: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
 // ============================
 // Settings Section
 // ============================
-async function loadSettings() {
+async function renderSettings() {
     if (!elements.settingsContainer) return;
-    renderSettings();
-}
-
-function renderSettings() {
-    if (!elements.settingsContainer) return;
-
+    const queuesHtml = await renderQueuesStatus();
     elements.settingsContainer.innerHTML = `
         <div class="settings-grid">
             <div class="settings-card">
@@ -1164,7 +1756,7 @@ function renderSettings() {
                 </div>
                 <div class="settings-card__content">
                     <p>Statut des queues de traitement.</p>
-                    ${renderQueuesStatus()}
+                    ${queuesHtml}
                 </div>
             </div>
         </div>
@@ -1251,25 +1843,6 @@ function renderOllamaModels() {
     `;
 }
 
-function renderQueuesStatus() {
-    // TODO: Charger le statut des queues depuis l'API
-    return `
-        <div class="queue-status">
-            <div class="queue-item">
-                <span class="queue-name">Processing</span>
-                <span class="queue-count">0 tâches</span>
-            </div>
-            <div class="queue-item">
-                <span class="queue-name">Synthesis</span>
-                <span class="queue-count">0 tâches</span>
-            </div>
-            <div class="queue-item">
-                <span class="queue-name">Analysis</span>
-                <span class="queue-count">0 tâches</span>
-            </div>
-        </div>
-    `;
-}
 
 function formatBytes(bytes) {
     if (bytes === 0) return '0 Bytes';
@@ -1279,7 +1852,7 @@ function formatBytes(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-function showCreateProfileModal() {
+function showCreateProfileModals() {
     const modelOptions = appState.ollamaModels.map(model => 
         `<option value="${escapeHtml(model.name)}">${escapeHtml(model.name)}</option>`
     ).join('');
@@ -1333,7 +1906,8 @@ async function handleCreateProfile(event) {
         
         await fetchAPI('/profiles', {
             method: 'POST',
-            body: profile
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(profile)
         });
 
         await loadInitialData();
@@ -1376,7 +1950,8 @@ async function handlePullModel(event) {
         
         await fetchAPI('/ollama/pull', {
             method: 'POST',
-            body: { model }
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model })
         });
 
         showToast('Téléchargement du modèle lancé', 'success');
@@ -1411,7 +1986,7 @@ function editPrompt(promptName) {
             </div>
         </form>
     `;
-    showModal('✏️ Modifier le prompt', content, 'modal__content--large');
+    showModal('✍️ Modifier le prompt', content, 'modal__content--large');
 }
 
 async function handleEditPrompt(event, promptName) {
@@ -1429,7 +2004,8 @@ async function handleEditPrompt(event, promptName) {
         
         await fetchAPI('/prompts', {
             method: 'POST',
-            body: promptData
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(promptData)
         });
 
         await loadInitialData();
@@ -1441,26 +2017,278 @@ async function handleEditPrompt(event, promptName) {
         showLoadingOverlay(false);
     }
 }
-
-// ============================
-// Project Actions
-// ============================
-async function handleCreateProject() {
-    const name = prompt('Nom du projet:');
-    const description = prompt('Description (optionnelle):');
+async function runATNAnalysis() {
+    if (!appState.currentProject) {
+        showToast('Sélectionnez un projet', 'warning');
+        return;
+    }
     
-    if (!name) return;
-
     try {
-        showLoadingOverlay(true, 'Création du projet...');
-        await fetchAPI('/projects', {
-            method: 'POST',
-            body: { name, description }
+        showLoadingOverlay(true, 'Analyse ATN en cours...');
+        
+        await fetchAPI(`/projects/${appState.currentProject.id}/atn-analysis`, {
+            method: 'POST'
         });
         
-        await loadProjects();
-        renderProjectList();
-        showToast('Projet créé', 'success');
+        showToast('Analyse ATN lancée', 'success');
+        
+        // Attendre et récupérer les résultats
+        setTimeout(async () => {
+            try {
+                const metrics = await fetchAPI(`/projects/${appState.currentProject.id}/atn-metrics`);
+                displayATNResults(metrics);
+            } catch (e) {
+                console.error('Erreur récupération métriques ATN:', e);
+            }
+        }, 5000); 
+        
+    } catch (e) {
+        console.error('Erreur analyse ATN:', e);
+        showToast(`Erreur: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+function displayATNResults(metrics) {
+    const content = document.getElementById('atnResultsContent');
+    if (!content) return;
+    
+    const empathyData = metrics.empathy_metrics || {};
+    const aiTypes = metrics.ai_types_distribution || [];
+    const regulatory = metrics.regulatory_compliance || {};
+    
+    content.innerHTML = `
+        <div class="atn-results">
+            <div class="metrics-section">
+                <h4>📊 Métriques d'Empathie</h4>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h5>Empathie IA Moyenne</h5>
+                        <div class="metric-value">${empathyData.avg_ai_empathy ? empathyData.avg_ai_empathy.toFixed(2) : 'N/A'}</div>
+                    </div>
+                    <div class="metric-card">
+                        <h5>Empathie Humaine Moyenne</h5>
+                        <div class="metric-value">${empathyData.avg_human_empathy ? empathyData.avg_human_empathy.toFixed(2) : 'N/A'}</div>
+                    </div>
+                    <div class="metric-card">
+                        <h5>Études avec scores d'empathie</h5>
+                        <div class="metric-value">${empathyData.total_with_empathy || 0}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="metrics-section">
+                <h4>🤖 Types d'IA Utilisés</h4>
+                <div class="ai-types-chart">
+                    ${aiTypes.map(type => `
+                        <div class="ai-type-item">
+                            <span class="ai-type-name">${escapeHtml(type.ai_type)}</span>
+                            <span class="ai-type-count">${type.count} études</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div class="metrics-section">
+                <h4>⚖️ Conformité Réglementaire</h4>
+                <div class="regulatory-stats">
+                    <p><strong>RGPD mentionné :</strong> ${regulatory.total_gdpr_mentioned || 0} études</p>
+                    <p><strong>Conformes RGPD :</strong> ${regulatory.gdpr_compliant || 0} études</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    openModal('atnResultsModal');
+}
+
+
+async function showPRISMAModal() {
+    if (!appState.currentProject) {
+        showToast('Sélectionnez un projet', 'warning');
+        return;
+    }
+    
+    try {
+        // Charger l'état PRISMA du projet
+        // CORRECTION : Initialisation de prismaState ici pour éviter une variable globale flottante
+        let prismaState = {
+            checklist: {},
+            projectId: null,
+            completionRate: 0
+        };
+        const prismaData = await fetchAPI(`/projects/${appState.currentProject.id}/prisma-checklist`);
+        prismaState = {
+            checklist: prismaData.checklist || getDefaultPRISMAChecklist(),
+            projectId: appState.currentProject.id,
+            completionRate: prismaData.completion_rate || 0
+        };
+        
+        renderPRISMAChecklist(prismaState);
+        openModal('prismaModal');
+        
+    } catch (e) {
+        console.error('Erreur chargement PRISMA:', e);
+        // Utiliser la checklist par défaut
+        const prismaState = {
+            checklist: getDefaultPRISMAChecklist(),
+            projectId: appState.currentProject.id,
+            completionRate: 0
+        };
+        renderPRISMAChecklist(prismaState);
+        openModal('prismaModal');
+    }
+}
+
+function renderPRISMAChecklist(prismaState) {
+    const content = document.getElementById('prismaChecklistContent');
+    if (!content) return;
+    
+    let html = '';
+    
+    for (const [section, items] of Object.entries(prismaState.checklist)) {
+        const sectionTitle = section.charAt(0).toUpperCase() + section.slice(1);
+        
+        html += `
+            <div class="prisma-section">
+                <h4 class="prisma-section-title">${sectionTitle}</h4>
+                <div class="prisma-items">
+        `;
+        
+        items.forEach(item => {
+            html += `
+                <div class="prisma-item">
+                    <label class="prisma-checkbox">
+                        <input type="checkbox" 
+                               ${item.completed ? 'checked' : ''} 
+                               onchange="togglePRISMAItem(this, '${item.id}')" />
+                        <span class="prisma-item-text">${escapeHtml(item.item)}</span>
+                    </label>
+                </div>
+            `;
+        });
+        
+        html += `
+                </div>
+            </div>
+        `;
+    }
+    
+    content.innerHTML = html;
+    updatePRISMAProgress(prismaState);
+}
+
+function togglePRISMAItem(checkbox, itemId) {
+    const prismaState = window.currentPrismaState; // Utiliser une référence globale temporaire
+    // Trouver et basculer l'item
+    for (const section of Object.values(prismaState.checklist)) {
+        const item = section.find(i => i.id === itemId);
+        if (item) {
+            item.completed = !item.completed;
+            break;
+        }
+    }
+    updatePRISMAProgress(prismaState);
+}
+
+function updatePRISMAProgress(prismaState) {
+    if (!prismaState) return;
+    const totalItems = Object.values(prismaState.checklist).flat().length;
+    const completedItems = Object.values(prismaState.checklist)
+        .flat()
+        .filter(item => item.completed).length;
+    
+    prismaState.completionRate = Math.round((completedItems / totalItems) * 100);
+    
+    const progressElement = document.getElementById('prismaProgress');
+    if (progressElement) {
+        progressElement.textContent = `${prismaState.completionRate}% complété (${completedItems}/${totalItems})`;
+    }
+}
+// ... Le reste du code de app.js (gestion des projets, recherche, validation, etc.)
+
+async function savePRISMAProgress() {
+    const prismaState = window.currentPrismaState;
+    if (!prismaState || !prismaState.projectId) {
+        showToast('Erreur: projet non sélectionné', 'error');
+        return;
+    }
+    
+    try {
+        await fetchAPI(`/projects/${prismaState.projectId}/prisma-checklist`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                checklist: prismaState.checklist,
+                completion_rate: prismaState.completionRate
+            })
+        });
+        
+        showToast('Progression PRISMA-ScR sauvegardée', 'success');
+        
+    } catch (e) {
+        console.error('Erreur sauvegarde PRISMA:', e);
+        showToast(`Erreur: ${e.message}`, 'error');
+    }
+}
+window.openModal = (modalId) => {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.add('modal--show');
+};
+
+// Exposition globale
+window.runATNAnalysis = runATNAnalysis;
+
+function exportPRISMAReport() {
+    const prismaState = window.currentPrismaState;
+    const sections = Object.entries(prismaState.checklist);
+    let report = '# Rapport PRISMA-ScR\n\n';
+    report += `**Taux de completion:** ${prismaState.completionRate}%\n\n`;
+    
+    sections.forEach(([sectionName, items]) => {
+        const sectionTitle = sectionName.charAt(0).toUpperCase() + sectionName.slice(1);
+        report += `## ${sectionTitle}\n\n`;
+        
+        items.forEach(item => {
+            const status = item.completed ? '✅' : '❌';
+            report += `${status} ${item.item}\n\n`;
+        });
+    });
+    
+    // Télécharger le fichier
+    const blob = new Blob([report], { type: 'text/markdown' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `PRISMA-ScR_${prismaState.projectId}.md`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    showToast('Rapport PRISMA-ScR exporté', 'success');
+}
+
+// Exposition globale
+
+async function exportForThesis() {
+    if (!appState.currentProject) {
+        showToast('Sélectionnez un projet', 'warning');
+        return;
+    }
+    
+    try {
+        showLoadingOverlay(true, 'Préparation export thèse...');
+        
+        const response = await fetch(`/api/projects/${appState.currentProject.id}/export/thesis`);
+        const blob = await response.blob();
+        
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `these_atn_${appState.currentProject.name}.zip`;
+        a.click();
+        
+        showToast('Export thèse téléchargé avec succès !', 'success');
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
     } finally {
@@ -1468,25 +2296,93 @@ async function handleCreateProject() {
     }
 }
 
-async function deleteProject(projectId) {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) return;
-
+// Gestion des parties prenantes
+async function showStakeholderManagement() {
+    if (!appState.currentProject) {
+        showToast('Sélectionnez un projet', 'warning');
+        return;
+    }
+    
     try {
-        showLoadingOverlay(true, 'Suppression du projet...');
-        await fetchAPI(`/projects/${projectId}`, { method: 'DELETE' });
-        
-        if (appState.currentProject?.id === projectId) {
-            appState.currentProject = null;
-            elements.projectDetailContent.innerHTML = '<p>Sélectionnez un projet pour voir les détails.</p>';
-        }
-        
-        await loadProjects();
-        renderProjectList();
-        showToast('Projet supprimé', 'success');
+        const stakeholders = await fetchAPI(`/projects/${appState.currentProject.id}/stakeholders`);
+        renderStakeholderGroups(stakeholders);
+        openModal('stakeholderManagementModal');
     } catch (e) {
+        console.error('Erreur chargement stakeholders:', e);
         showToast(`Erreur: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
+    }
+}
+
+function renderStakeholderGroups(stakeholders) {
+    const container = document.getElementById('stakeholderGroupsList');
+    if (!container) return;
+    
+    if (!stakeholders || stakeholders.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <p>Aucun groupe défini. Les groupes par défaut seront utilisés :</p>
+                <div class="default-stakeholders">
+                    <span class="stakeholder-badge" style="background: #4CAF50;">Patients/Soignés</span>
+                    <span class="stakeholder-badge" style="background: #2196F3;">Professionnels de santé</span>
+                    <span class="stakeholder-badge" style="background: #FF9800;">Développeurs/Tech</span>
+                    <span class="stakeholder-badge" style="background: #9C27B0;">Régulateurs/Décideurs</span>
+                    <span class="stakeholder-badge" style="background: #F44336;">Payeurs/Assurances</span>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    const groupsHtml = stakeholders.map(group => `
+        <div class="stakeholder-group-item" style="border-left: 4px solid ${group.color};">
+            <div class="stakeholder-group-info">
+                <h5>${escapeHtml(group.name)}</h5>
+                <p>${escapeHtml(group.description || 'Aucune description')}</p>
+            </div>
+            <div class="stakeholder-group-actions">
+                <button class="btn btn--sm btn--secondary" onclick="editStakeholderGroup('${group.id}')">Modifier</button>
+                <button class="btn btn--sm btn--error" onclick="deleteStakeholderGroup('${group.id}')">Supprimer</button>
+            </div>
+        </div>
+    `).join('');
+    
+    container.innerHTML = groupsHtml;
+}
+
+async function addStakeholderGroup() {
+    const name = document.getElementById('newStakeholderName')?.value?.trim();
+    const color = document.getElementById('newStakeholderColor')?.value;
+    const description = document.getElementById('newStakeholderDesc')?.value?.trim();
+    
+    if (!name) {
+        showToast('Le nom du groupe est requis', 'warning');
+        return;
+    }
+    
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/stakeholders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: name,
+                color: color,
+                description: description
+            })
+        });
+        
+        showToast('Groupe ajouté avec succès', 'success');
+        
+        // Reset form
+        document.getElementById('newStakeholderName').value = '';
+        document.getElementById('newStakeholderColor').value = '#4CAF50';
+        document.getElementById('newStakeholderDesc').value = '';
+        
+        // Refresh list
+        showStakeholderManagement();
+        
+    } catch (e) {
+        console.error('Erreur ajout stakeholder:', e);
+        showToast(`Erreur: ${e.message}`, 'error');
     }
 }
 
@@ -1503,65 +2399,10 @@ async function selectProject(projectId) {
         renderProjectList();
         renderProjectDetail(project);
 
-        // Charger les données selon la section courante
-        switch (appState.currentSection) {
-            case 'results':
-                await loadSearchResults();
-                break;
-            case 'analyses':
-                await loadProjectAnalyses();
-                break;
-            case 'import':
-                renderImportSection();
-                break;
-            case 'chat':
-                await loadChatMessages();
-                break;
-            case 'validation':
-                await loadValidationSection();
-                break;
-        }
+        refreshCurrentSection();
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
     }
-}
-
-function showMultiDatabaseSearchModal() {
-    if (!appState.currentProject) {
-        showToast('Sélectionnez un projet', 'warning');
-        return;
-    }
-
-    const databases = appState.availableDatabases.map(db => `
-        <div class="checkbox-item">
-            <input type="checkbox" id="db-${db.id}" value="${db.id}" checked>
-            <label for="db-${db.id}">${escapeHtml(db.name)}</label>
-        </div>
-    `).join('');
-
-    const content = `
-        <form onsubmit="handleMultiDatabaseSearch(event)">
-            <div class="form-group">
-                <label class="form-label">Requête de recherche</label>
-                <textarea name="query" class="form-control" rows="3" placeholder="Entrez votre requête de recherche..." required></textarea>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Bases de données</label>
-                <div class="checkbox-group">
-                    ${databases}
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Résultats max par base</label>
-                <input type="number" name="max_results" value="50" min="1" max="200" class="form-control">
-            </div>
-            <div class="modal__actions">
-                <button type="button" class="btn btn--secondary" onclick="closeModal()">Annuler</button>
-                <button type="submit" class="btn btn--primary">Lancer la recherche</button>
-            </div>
-        </form>
-    `;
-    showModal('🔍 Recherche multi-bases', content);
 }
 
 async function handleMultiDatabaseSearch(event) {
@@ -1582,12 +2423,13 @@ async function handleMultiDatabaseSearch(event) {
         
         await fetchAPI('/search', {
             method: 'POST',
-            body: {
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
                 project_id: appState.currentProject.id,
                 query,
                 databases: selectedDatabases,
                 max_results_per_db: maxResults
-            }
+            })
         });
         
         showToast('Recherche lancée', 'success');
@@ -1598,208 +2440,58 @@ async function handleMultiDatabaseSearch(event) {
     }
 }
 
-function showRunPipelineModal() {
-    if (!appState.currentProject) {
-        showToast('Sélectionnez un projet', 'warning');
-        return;
-    }
-
-    const profiles = appState.analysisProfiles.map(profile => `
-        <option value="${profile.id}">${escapeHtml(profile.name)}</option>
-    `).join('');
-
-    const content = `
-        <form onsubmit="handleRunPipeline(event)">
-            <div class="form-group">
-                <label class="form-label">Profil d'analyse</label>
-                <select name="profile" class="form-control" required>
-                    ${profiles}
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Mode d'analyse</label>
-                <select name="analysis_mode" class="form-control" required>
-                    <option value="screening">Screening (titre/résumé)</option>
-                    <option value="full_extraction">Extraction complète (PDF requis)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Articles sélectionnés</label>
-                <div class="form-text">
-                    ${appState.selectedSearchResults.size} article(s) sélectionné(s)
-                </div>
-            </div>
-            <div class="modal__actions">
-                <button type="button" class="btn btn--secondary" onclick="closeModal()">Annuler</button>
-                <button type="submit" class="btn btn--primary">Lancer l'analyse</button>
-            </div>
-        </form>
-    `;
-    showModal('⚙️ Lancer l\'analyse', content);
-}
-
-async function handleRunPipeline(event) {
-    event.preventDefault();
-    
-    if (!appState.currentProject || appState.selectedSearchResults.size === 0) {
-        showToast('Sélectionnez au moins un article', 'warning');
-        return;
-    }
-
-    const formData = new FormData(event.target);
-    const profile = formData.get('profile');
-    const analysisMode = formData.get('analysis_mode');
-
+async function selectAnalysisType(analysisType) { // CORRECTION : Nom de fonction unifié
     try {
+        showLoadingOverlay(true, 'Lancement de l\'analyse...');
         closeModal();
-        showLoadingOverlay(true, 'Lancement du pipeline...');
-        
-        await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
-            method: 'POST',
-            body: {
-                articles: Array.from(appState.selectedSearchResults),
-                profile,
-                analysis_mode: analysisMode
-            }
-        });
-        
-        showToast('Pipeline lancé', 'success');
-    } catch (e) {
-        showToast(`Erreur: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
 
-function showRunAnalysisModal() {
-    if (!appState.currentProject) {
-        showToast('Sélectionnez un projet', 'warning');
-        return;
-    }
-
-    const profiles = appState.analysisProfiles.map(profile => `
-        <option value="${profile.id}">${escapeHtml(profile.name)}</option>
-    `).join('');
-
-    const content = `
-        <form onsubmit="handleRunAnalysis(event)">
-            <div class="form-group">
-                <label class="form-label">Type d'analyse</label>
-                <select name="analysis_type" class="form-control" required>
-                    <option value="meta_analysis">Méta-analyse</option>
-                    <option value="prisma_flow">Diagramme PRISMA</option>
-                    <option value="atn_scores">Scores ATN</option>
-                    <option value="knowledge_graph">Graphe de connaissances</option>
-                    <option value="discussion">Génération de discussion</option>
-                </select>
-            </div>
-            <div class="modal__actions">
-                <button type="button" class="btn btn--secondary" onclick="closeModal()">Annuler</button>
-                <button type="submit" class="btn btn--primary">Lancer l'analyse</button>
-            </div>
-        </form>
-    `;
-    showModal('🔬 Lancer une analyse', content);
-}
-
-async function handleRunAnalysis(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const analysisType = formData.get('analysis_type');
-
-    try {
-        closeModal();
-        showLoadingOverlay(true, `Lancement de l'analyse ${analysisType}...`);
-        
         await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, {
             method: 'POST',
-            body: { type: analysisType }
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: analysisType })
         });
-        
-        showToast('Analyse lancée avec succès', 'success');
+
+        showToast(`Analyse ${analysisType} lancée`, 'success');
+
     } catch (e) {
+        console.error('Erreur lancement analyse:', e);
         showToast(`Erreur: ${e.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }
 }
 
-// NOUVELLE FONCTION - Ajout manuel d'articles
-function showAddManualArticlesModal() {
-    if (!appState.currentProject) {
-        showToast('Sélectionnez un projet', 'warning');
-        return;
-    }
-
-    const content = `
-        <form onsubmit="handleAddManualArticles(event)" class="manual-article-form">
-            <div class="form-group">
-                <label class="form-label">Identifiants d'articles</label>
-                <textarea name="articles" class="form-control" rows="8" placeholder="Entrez les identifiants un par ligne:&#10;PMC1234567&#10;10.1000/article.doi&#10;arXiv:2301.12345" required></textarea>
-                <div class="form-text">
-                    Formats supportés: PMID, PMC, DOI, ArXiv ID<br>
-                    Un identifiant par ligne
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="checkbox-item">
-                    <input type="checkbox" id="fetch_metadata" name="fetch_metadata" checked>
-                    <label for="fetch_metadata">Récupérer automatiquement les métadonnées</label>
-                </div>
-            </div>
-            <div class="modal__actions">
-                <button type="button" class="btn btn--secondary" onclick="closeModal()">Annuler</button>
-                <button type="submit" class="btn btn--primary">Ajouter les articles</button>
-            </div>
-        </form>
-    `;
-    showModal('📝 Ajouter des articles manuellement', content);
-}
-
-// NOUVELLE FONCTION - Gestionnaire pour l'ajout manuel d'articles
+// Formulaire: ajout manuel d’articles
 async function handleAddManualArticles(event) {
     event.preventDefault();
-    const formData = new FormData(event.target);
-    const articlesText = formData.get('articles').trim();
-    const fetchMetadata = formData.has('fetch_metadata');
 
-    if (!articlesText) {
-        showToast('Veuillez saisir au moins un identifiant d\'article', 'warning');
+    if (!appState.currentProject?.id) {
+        showToast('Sélectionnez d’abord un projet.', 'warning');
         return;
     }
 
-    // Nettoyer et diviser les identifiants
-    const articles = articlesText
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length > 0);
+    const form = event.target;
+    const textarea = form.querySelector('textarea[name="manual_ids"]') || form.querySelector('textarea');
+    const raw = textarea ? textarea.value.trim() : '';
 
-    if (articles.length === 0) {
-        showToast('Aucun identifiant valide trouvé', 'warning');
+    // CORRECTION : on accepte un champ texte multi-lignes et on l’envoie sous "identifiers"
+    if (!raw) {
+        showToast('Ajoutez au moins un identifiant (PMID, DOI, arXiv).', 'warning');
         return;
     }
 
     try {
-        closeModal();
-        showLoadingOverlay(true, `Ajout de ${articles.length} article(s)...`);
-        
-        const response = await fetchAPI(`/projects/${appState.currentProject.id}/add-manual-articles`, {
+        showLoadingOverlay(true, 'Ajout manuel en cours...');
+        const res = await fetchAPI(`/projects/${appState.currentProject.id}/add-manual-articles`, {
             method: 'POST',
-            body: {
-                articles: articles,
-                fetch_metadata: fetchMetadata
-            }
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifiers: raw })
         });
-        
-        showToast(response.message, 'success');
-        
-        // Rafraîchir les données du projet
-        await refreshCurrentProjectData();
-        
-        // Si on est sur la section résultats, les recharger
-        if (appState.currentSection === 'results') {
-            await loadSearchResults();
-        }
+
+        await loadSearchResults();
+        showToast(`${res.added || 0} article(s) ajouté(s).`, 'success');
+        // Optionnel : vider le champ
+        if (textarea) textarea.value = '';
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
     } finally {
@@ -1807,54 +2499,31 @@ async function handleAddManualArticles(event) {
     }
 }
 
-function showFetchOnlinePDFsModal() {
-    if (!appState.currentProject) {
-        showToast('Sélectionnez un projet', 'warning');
+async function handleFetchOnlinePDFs() {
+    if (!appState.currentProject?.id) {
+        showToast('Veuillez sélectionner un projet.', 'warning');
+        return;
+    }
+    
+    const articlesWithDoi = appState.searchResults.filter(r => r.doi);
+    
+    if (articlesWithDoi.length === 0) {
+        showToast("Aucun article avec DOI trouvé dans ce projet.", 'info');
         return;
     }
 
-    const content = `
-        <form onsubmit="handleFetchOnlinePDFs(event)">
-            <div class="form-group">
-                <label class="form-label">Identifiants d'articles avec DOI</label>
-                <textarea name="articles" class="form-control" rows="6" placeholder="Entrez les identifiants un par ligne:&#10;10.1000/article.doi&#10;PMC1234567" required></textarea>
-                <div class="form-text">
-                    Recherche automatique via Unpaywall pour les articles en open access
-                </div>
-            </div>
-            <div class="modal__actions">
-                <button type="button" class="btn btn--secondary" onclick="closeModal()">Annuler</button>
-                <button type="submit" class="btn btn--primary">Lancer la recherche</button>
-            </div>
-        </form>
-    `;
-    showModal('🌐 Récupération automatique de PDFs', content);
-}
-
-async function handleFetchOnlinePDFs(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const articlesText = formData.get('articles').trim();
-
-    if (!articlesText) {
-        showToast('Veuillez saisir au moins un identifiant', 'warning');
-        return;
-    }
-
-    const articles = articlesText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-
+    const articleIds = articlesWithDoi.map(r => r.article_id);
+    
+    showLoadingOverlay(true, `Lancement de la récupération de ${articleIds.length} PDF(s)...`);
     try {
-        closeModal();
-        showLoadingOverlay(true, 'Recherche de PDFs en ligne...');
-        
-        await fetchAPI(`/projects/${appState.currentProject.id}/fetch-online-pdfs`, {
+        const response = await fetchAPI(`/projects/${appState.currentProject.id}/fetch-online-pdfs`, {
             method: 'POST',
-            body: { articles }
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ articles: articleIds })
         });
-        
-        showToast('Recherche de PDFs lancée', 'success');
+        showToast(response.message || 'Récupération des PDFs lancée.', 'success');
     } catch (e) {
-        showToast(`Erreur: ${e.message}`, 'error');
+        showToast(`Erreur : ${e.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }
@@ -1910,711 +2579,571 @@ async function handleBulkPDFUpload(event) {
     }
 }
 
-    async function handleRunIndexing(projectId) {
-        try {
-            showLoadingOverlay(true, 'Indexation des PDFs...');
-            
-            const response = await fetchAPI(`/projects/${projectId}/index`, {
-                method: 'POST'
-            });
-            
-            showToast('Indexation lancée', 'success');
-            
-        } catch (e) {
-            console.error('Erreur indexation:', e);
-            showToast(`Erreur: ${e.message}`, 'error');
-        } finally {
-            showLoadingOverlay(false);
-        }
+async function handleImportZoteroPdfs() {
+    if (!appState.currentProject?.id) {
+        showToast('Veuillez sélectionner un projet.', 'warning');
+        return;
+    }
+    
+    if (appState.searchResults.length === 0) {
+        showToast("Aucun article dans ce projet à synchroniser avec Zotero.", 'info');
+        return;
     }
 
-    // ============================ 
-    // Fonctions d'analyse
-    // ============================
-
-    async function loadProjectAnalyses() {
-        if (!elements.analysisContainer) return;
-        
-        try {
-            showLoadingOverlay(true, 'Chargement des analyses...');
-            
-            const project = appState.currentProject;
-            if (!project) {
-                elements.analysisContainer.innerHTML = '<p>Sélectionnez un projet pour voir les analyses.</p>';
-                return;
-            }
-
-            renderAnalysisSection(project);
-            
-        } catch (e) {
-            console.error('Erreur chargement analyses:', e);
-            elements.analysisContainer.innerHTML = '<p>Erreur lors du chargement des analyses.</p>';
-        } finally {
-            showLoadingOverlay(false);
-        }
+    const articleIds = appState.searchResults.map(r => r.article_id);
+    
+    showLoadingOverlay(true, 'Lancement de la récupération des PDFs via Zotero...');
+    try {
+        const response = await fetchAPI(`/projects/${appState.currentProject.id}/import-zotero`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ articles: articleIds })
+        });
+        showToast(response.message || 'Récupération des PDFs depuis Zotero lancée.', 'success');
+    } catch (e) {
+        showToast(`Erreur : ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
     }
+}
 
-    async function handleRunAnalysis(projectId, analysisType) {
-        try {
-            showLoadingOverlay(true, `Lancement de l'analyse ${analysisType}...`);
-            
-            const response = await fetchAPI(`/projects/${projectId}/run-analysis`, {
-                method: 'POST',
-                body: { type: analysisType }
-            });
-            
-            showToast(`Analyse ${analysisType} lancée`, 'success');
-            
-        } catch (e) {
-            console.error(`Erreur analyse ${analysisType}:`, e);
-            showToast(`Erreur: ${e.message}`, 'error');
-        } finally {
-            showLoadingOverlay(false);
-        }
-    }
 
-    async function handleRunSynthesis(projectId) {
-        const profileSelect = document.getElementById('synthesisProfileSelect');
-        const profileId = profileSelect?.value || 'standard';
-        
-        try {
-            showLoadingOverlay(true, 'Génération de la synthèse...');
-            
-            await fetchAPI(`/projects/${projectId}/run-synthesis`, {
-                method: 'POST',
-                body: { profile: profileId }
-            });
-            
-            showToast('Synthèse lancée', 'success');
-            
-        } catch (e) {
-            console.error('Erreur synthèse:', e);
-            showToast(`Erreur: ${e.message}`, 'error');
-        } finally {
-            showLoadingOverlay(false);
-        }
-    }
+function renderAnalysisSection(project) {
+    if (!elements.analysisContainer) return;
+    const analysis = project && project.analysis_result || null;
+    const plotPath = project && project.analysis_plot_path || null;
+    const knowledgeGraphData = project && project.knowledge_graph ? JSON.parse(project.knowledge_graph) : null;
 
-    // ============================ 
-    // Fonctions de pipeline
-    // ============================
-
-    async function handleRunPipeline(projectId) {
-        const form = document.getElementById('runPipelineForm');
-        if (!form) return;
-        
-        const formData = new FormData(form);
-        const selectedArticles = Array.from(appState.selectedSearchResults);
-        
-        if (selectedArticles.length === 0) {
-            showToast('Sélectionnez au moins un article', 'warning');
-            return;
-        }
-        
-        try {
-            showLoadingOverlay(true, 'Lancement du pipeline...');
-            
-            const payload = {
-                articles: selectedArticles,
-                profile: formData.get('profile') || 'standard',
-                analysis_mode: formData.get('analysis_mode') || 'screening',
-                custom_grid_id: formData.get('custom_grid_id') || null
-            };
-            
-            await fetchAPI(`/projects/${projectId}/run`, {
-                method: 'POST',
-                body: payload
-            });
-            
-            showToast('Pipeline lancé', 'success');
-            appState.selectedSearchResults.clear();
-            await loadSearchResults();
-            
-        } catch (e) {
-            console.error('Erreur pipeline:', e);
-            showToast(`Erreur: ${e.message}`, 'error');
-        } finally {
-            showLoadingOverlay(false);
-        }
-    }
-
-    // ============================ 
-    // Fonctions upload/import
-    // ============================
-
-    async function handleZoteroFileUpload(event) {
-        const file = event.target.files[0];
-        if (!file || !appState.currentProject) return;
-        
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        try {
-            showLoadingOverlay(true, 'Import Zotero...');
-            
-            await fetchAPI(`/projects/${appState.currentProject.id}/import-zotero-file`, {
-                method: 'POST',
-                body: formData
-            });
-            
-            showToast('Import Zotero lancé', 'success');
-            event.target.value = '';
-            
-        } catch (e) {
-            console.error('Erreur import Zotero:', e);
-            showToast(`Erreur: ${e.message}`, 'error');
-        } finally {
-            showLoadingOverlay(false);
-        }
-    }
-
-    async function handleBulkPDFUpload(event) {
-        const files = Array.from(event.target.files);
-        if (files.length === 0 || !appState.currentProject) return;
-        
-        const formData = new FormData();
-        files.forEach(file => formData.append('files', file));
-        
-        try {
-            showLoadingOverlay(true, 'Upload des PDFs...');
-            
-            const result = await fetchAPI(`/projects/${appState.currentProject.id}/upload-pdfs-bulk`, {
-                method: 'POST',
-                body: formData
-            });
-            
-            showToast(`${result.successful.length} PDFs uploadés`, 'success');
-            if (result.failed.length > 0) {
-                showToast(`${result.failed.length} échecs`, 'warning');
-            }
-            
-            event.target.value = '';
-            
-        } catch (e) {
-            console.error('Erreur upload PDFs:', e);
-            showToast(`Erreur: ${e.message}`, 'error');
-        } finally {
-            showLoadingOverlay(false);
-        }
-    }
-
-    async function handleManualArticleImport() {
-        const textarea = document.getElementById('manualArticlesTextarea');
-        const fetchMetadata = document.getElementById('fetchMetadataCheckbox')?.checked || true;
-        
-        if (!textarea?.value.trim() || !appState.currentProject) {
-            showToast('Saisissez des identifiants d\'articles', 'warning');
-            return;
-        }
-        
-        const articles = textarea.value
-            .split('\n')
-            .map(line => line.trim())
-            .filter(line => line.length > 0);
-        
-        if (articles.length === 0) {
-            showToast('Aucun identifiant valide trouvé', 'warning');
-            return;
-        }
-        
-        try {
-            showLoadingOverlay(true, 'Import des articles...');
-            
-            const result = await fetchAPI(`/projects/${appState.currentProject.id}/add-manual-articles`, {
-                method: 'POST',
-                body: {
-                    articles: articles,
-                    fetch_metadata: fetchMetadata
+    elements.analysisContainer.innerHTML = `
+        <div class="card">
+            <div class="card__header"><h4>📊 Analyses du projet</h4></div>
+            <div class="card__body">
+                <div id="knowledgeGraphContainer" style="width: 100%; height: 600px; border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: 24px;">
+                    ${!knowledgeGraphData ? '<div class="empty-state"><p>Générez le graphe de connaissances pour le visualiser ici.</p></div>' : ''}
+                </div>
+                ${analysis ? `<pre class="code-block">${escapeHtml(JSON.stringify(analysis, null, 2))}</pre>` : `
+                    <div class="empty-state">
+                        <p>Aucune analyse disponible pour le moment.</p>
+                    </div>`
                 }
-            });
-            
-            showToast(result.message, 'success');
-            textarea.value = '';
-            await loadSearchResults();
-            
-        } catch (e) {
-            console.error('Erreur import manuel:', e);
-            showToast(`Erreur: ${e.message}`, 'error');
-        } finally {
-            showLoadingOverlay(false);
-        }
+                ${plotPath ? `<img src="/api/projects/${appState.currentProject.id}/files/${plotPath.split('/').pop()}" alt="Graphique d'analyse" class="analysis-plot" style="max-width:100%;height:auto;margin-top:16px;">` : ''}
+            </div>
+        </div>
+    `;
+
+    if (knowledgeGraphData && window.vis) {
+        const container = document.getElementById('knowledgeGraphContainer');
+        const options = {
+            nodes: {
+                shape: 'dot',
+                size: 16,
+                font: { size: 14, color: 'var(--color-text)' }
+            },
+            edges: {
+                width: 2,
+                color: { inherit: 'from' },
+                arrows: { to: { enabled: true, scaleFactor: 0.5 } }
+            },
+            physics: {
+                forceAtlas2Based: { gravitationalConstant: -26, centralGravity: 0.005, springLength: 230, springConstant: 0.18 },
+                maxVelocity: 146,
+                solver: 'forceAtlas2Based',
+                timestep: 0.35,
+            },
+        };
+        new vis.Network(container, knowledgeGraphData, options);
+    }
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'Non spécifié';
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Nettoyage et finalisation
+window.addEventListener('beforeunload', () => {
+    if (appState.socket && appState.socket.connected) {
+        appState.socket.disconnect();
+    }
+});
+
+console.log('✅ AnalyLit V4.1 Frontend chargé et prêt !');
+
+function showModal(title, content, modalClass = '') {
+    const modalId = 'genericModal';
+    let modal = document.getElementById(modalId);
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = modalId;
+        modal.className = 'modal';
+        elements.modalsContainer.appendChild(modal);
     }
 
-    // ============================ 
-    // Fonctions de validation
-    // ============================
+    modal.innerHTML = `
+        <div class="modal__content ${modalClass}">
+            <div class="modal__header">
+                <h3>${title}</h3>
+                <button class="modal__close" onclick="closeModal('${modalId}')">×</button>
+            </div>
+            <div class="modal__body">
+                ${content}
+            </div>
+        </div>
+    `;
+    openModal(modalId);
+}
 
-    async function handleValidationAction(extractionId, action) {
-        try {
-            await fetchAPI(`/extractions/${extractionId}/validate`, {
-                method: 'POST',
-                body: { action: action }
-            });
-            
-            showToast(`Article ${action === 'include' ? 'inclus' : 'exclu'}`, 'success');
-            await loadValidationSection();
-            
-        } catch (e) {
-            console.error('Erreur validation:', e);
-            showToast(`Erreur: ${e.message}`, 'error');
-        }
+window.openModal = (modalId) => {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        document.body.classList.add('modal-open');
+        modal.classList.add('modal--show');
+    } else {
+        console.error(`La modale avec l\'ID #${modalId} n\'a pas été trouvée.`);
     }
+};
 
-    async function handleExportValidations(projectId) {
-        try {
-            const response = await fetch(`/api/projects/${projectId}/export-validations`);
-            
-            if (!response.ok) {
-                throw new Error('Erreur export');
-            }
-            
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `validations_${projectId}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-            
-            showToast('Export terminé', 'success');
-            
-        } catch (e) {
-            console.error('Erreur export validations:', e);
-            showToast(`Erreur: ${e.message}`, 'error');
-        }
+window.closeModal = (modalId) => {
+    const modalsToClose = modalId ? [document.getElementById(modalId)] : document.querySelectorAll('.modal--show');
+    modalsToClose.forEach(modal => {
+        if (modal) modal.classList.remove('modal--show');
+    });
+    if (document.querySelectorAll('.modal--show').length === 0) {
+        document.body.classList.remove('modal-open');
     }
+};
 
-    async function handleImportValidations(projectId) {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.csv';
+function selectAllArticles() {
+	const checkboxes = document.querySelectorAll('.article-checkbox');
+	const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+	
+	checkboxes.forEach(cb => {
+		cb.checked = !allChecked; // Inverse la sélection
+        toggleArticleSelection(cb.dataset.articleId, !allChecked);
+	});
+}
+
+async function handlePullOllamaModel() {
+    const input = document.getElementById('ollamaModelInput');
+    const modelName = (input && input.value) ? input.value.trim() : null;
+    
+    if (!modelName) {
+        showToast('Saisissez le nom du modèle', 'warning');
+        return;
+    }
+    
+    try {
+        showLoadingOverlay(true, `Téléchargement du modèle ${modelName}...`);
+        await fetchAPI('/ollama/pull', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: modelName })
+        });
+        showToast(`Téléchargement de ${modelName} lancé`, 'success');
+        if (input) input.value = '';
         
-        input.onchange = async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const formData = new FormData();
-            formData.append('file', file);
-            
+        setTimeout(async () => {
             try {
-                showLoadingOverlay(true, 'Import des validations...');
-                
-                const result = await fetchAPI(`/projects/${projectId}/import-validations`, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                showToast(result.message, 'success');
-                await loadValidationSection();
-                
+                appState.ollamaModels = await fetchAPI('/ollama/models');
+                if (appState.currentSection === 'settings') {
+                    loadSettings();
+                }
             } catch (e) {
-                console.error('Erreur import validations:', e);
-                showToast(`Erreur: ${e.message}`, 'error');
-            } finally {
-                showLoadingOverlay(false);
+                console.error('Erreur rechargement modèles:', e);
             }
-        };
-        
-        input.click();
+        }, 2000);
+    } catch (e) {
+        console.error('Erreur téléchargement modèle:', e);
+        showToast(`Erreur: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
     }
+}
 
-    async function handleCalculateKappa(projectId) {
-        try {
-            showLoadingOverlay(true, 'Calcul du Kappa...');
-            
-            await fetchAPI(`/projects/${projectId}/calculate-kappa`, {
-                method: 'POST'
-            });
-            
-            showToast('Calcul du Kappa lancé', 'success');
-            
-        } catch (e) {
-            console.error('Erreur calcul Kappa:', e);
-            showToast(`Erreur: ${e.message}`, 'error');
-        } finally {
-            showLoadingOverlay(false);
+// ============================ 
+// FONCTIONS MANQUANTES À AJOUTER
+// ============================ 
+
+// Gestion des uploads PDF manuels
+async function handleManualPDFUpload(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    
+    if (!appState.currentProject?.id) {
+        showToast('Sélectionnez un projet avant d\'uploader', 'warning');
+        return;
+    }
+    
+    const formData = new FormData();
+    Array.from(files).forEach(file => formData.append('files', file));
+    
+    try {
+        showLoadingOverlay(true, `Upload de ${files.length} PDF(s)...`);
+        const result = await fetchAPI(`/projects/${appState.currentProject.id}/upload-pdfs-bulk`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        showToast(`${result.successful.length} PDF(s) importés avec succès`, 'success');
+        if (result.failed.length > 0) {
+            console.warn('Échecs upload:', result.failed);
+        }
+    } catch (e) {
+        showToast(`Erreur upload: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+        event.target.value = ''; // Reset input
+    }
+}
+
+// Gestion des modales pour grilles d'extraction
+function openGridModal(action = 'create', gridId = null) {
+    const modal = document.getElementById('gridModal');
+    if (!modal) return;
+    
+    const form = modal.querySelector('#gridForm');
+    const titleElement = modal.querySelector('.modal__title');
+    
+    if (action === 'create') {
+        titleElement.textContent = 'Nouvelle grille d\'extraction';
+        form.reset();
+        form.dataset.action = 'create';
+    } else if (action === 'edit' && gridId) {
+        titleElement.textContent = 'Modifier la grille';
+        form.dataset.action = 'edit';
+        form.dataset.gridId = gridId;
+        
+        // Charger les données de la grille
+        const grid = appState.currentProjectGrids.find(g => g.id === gridId);
+        if (grid) {
+            form.querySelector('#gridName').value = grid.name;
+            const fieldsData = JSON.parse(grid.fields || '[]');
+            renderGridFields(fieldsData);
         }
     }
+    
+    openModal('gridModal');
+}
 
-    // ============================ 
-    // Fonctions de chat
-    // ============================
-
-    async function loadChatMessages() {
-        if (!appState.currentProject?.id || !elements.chatContainer) return;
-        
-        try {
-            const messages = await fetchAPI(`/projects/${appState.currentProject.id}/chat`);
-            appState.chatMessages = Array.isArray(messages) ? messages : [];
-            renderChatInterface(appState.chatMessages);
-            
-        } catch (e) {
-            console.error('Erreur chargement chat:', e);
-            elements.chatContainer.innerHTML = '<p>Erreur lors du chargement du chat.</p>';
-        }
+// CORRECTION : Fonctions de gestion des modales unifiées
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('modal--show');
+        document.body.classList.add('modal-open');
     }
+}
 
-    async function handleSendChatMessage() {
-        const textarea = document.getElementById('chatInput');
-        const question = textarea?.value.trim();
-        
-        if (!question || !appState.currentProject?.id) {
-            showToast('Saisissez une question', 'warning');
-            return;
-        }
-        
-        // Ajouter le message utilisateur immédiatement
-        const userMessage = {
-            id: Date.now(),
-            role: 'user',
-            content: question,
-            timestamp: new Date().toISOString()
-        };
-        
-        appState.chatMessages.push(userMessage);
-        renderChatInterface(appState.chatMessages);
-        textarea.value = '';
-        
-        try {
-            await fetchAPI(`/projects/${appState.currentProject.id}/chat`, {
-                method: 'POST',
-                body: { question: question }
-            });
-            
-            showToast('Question envoyée', 'success');
-            
-            // Recharger les messages après un délai
-            setTimeout(() => loadChatMessages(), 2000);
-            
-        } catch (e) {
-            console.error('Erreur envoi message:', e);
-            showToast(`Erreur: ${e.message}`, 'error');
-            
-            // Retirer le message utilisateur en cas d'erreur
-            appState.chatMessages.pop();
-            renderChatInterface(appState.chatMessages);
-        }
-    }
-
-    // ============================ 
-    // Fonctions de paramètres
-    // ============================
-
-    async function loadSettings() {
-        if (!elements.settingsContainer) return;
-        
-        try {
-            showLoadingOverlay(true, 'Chargement des paramètres...');
-            
-            const [queues, zoteroSettings] = await Promise.all([
-                fetchAPI('/queues/info'),
-                fetchAPI('/settings/zotero')
-            ]);
-            
-            appState.queuesInfo = Array.isArray(queues) ? queues : [];
-            renderSettingsSection(zoteroSettings);
-            
-        } catch (e) {
-            console.error('Erreur chargement paramètres:', e);
-            elements.settingsContainer.innerHTML = '<p>Erreur lors du chargement des paramètres.</p>';
-        } finally {
-            showLoadingOverlay(false);
-        }
-    }
-
-    async function handleSaveZoteroSettings() {
-        const form = document.getElementById('zoteroSettingsForm');
-        if (!form) return;
-        
-        const formData = new FormData(form);
-        
-        try {
-            await fetchAPI('/settings/zotero', {
-                method: 'POST',
-                body: {
-                    userId: formData.get('userId'),
-                    apiKey: formData.get('apiKey')
-                }
-            });
-            
-            showToast('Paramètres Zotero sauvegardés', 'success');
-            
-        } catch (e) {
-            console.error('Erreur sauvegarde Zotero:', e);
-            showToast(`Erreur: ${e.message}`, 'error');
-        }
-    }
-
-    async function handlePullOllamaModel() {
-        const input = document.getElementById('ollamaModelInput');
-        const modelName = input?.value.trim();
-        
-        if (!modelName) {
-            showToast('Saisissez le nom du modèle', 'warning');
-            return;
-        }
-        
-        try {
-            showLoadingOverlay(true, `Téléchargement du modèle ${modelName}...`);
-            
-            await fetchAPI('/ollama/pull', {
-                method: 'POST',
-                body: { model: modelName }
-            });
-            
-            showToast(`Téléchargement de ${modelName} lancé`, 'success');
-            input.value = '';
-            
-            // Recharger la liste des modèles après un délai
-            setTimeout(async () => {
-                try {
-                    appState.ollamaModels = await fetchAPI('/ollama/models');
-                    renderSettingsSection();
-                } catch (e) {
-                    console.error('Erreur rechargement modèles:', e);
-                }
-            }, 2000);
-            
-        } catch (e) {
-            console.error('Erreur téléchargement modèle:', e);
-            showToast(`Erreur: ${e.message}`, 'error');
-        } finally {
-            showLoadingOverlay(false);
-        }
-    }
-
-    async function handleClearQueue(queueName) {
-        try {
-            await fetchAPI(`/queues/${queueName}/clear`, {
-                method: 'POST'
-            });
-            
-            showToast(`File ${queueName} vidée`, 'success');
-            await loadSettings();
-            
-        } catch (e) {
-            console.error(`Erreur vidage file ${queueName}:`, e);
-            showToast(`Erreur: ${e.message}`, 'error');
-        }
-    }
-
-    // ============================ 
-    // Utilitaires UI
-    // ============================
-
-    function showLoadingOverlay(show, message = 'Chargement...') {
-        if (!elements.loadingOverlay) return;
-        
-        elements.loadingOverlay.classList.toggle('loading-overlay--show', show);
-        
-        if (show && message) {
-            const messageEl = elements.loadingOverlay.querySelector('.loading-overlay__message');
-            if (messageEl) {
-                messageEl.textContent = message;
-            }
-        }
-    }
-
-    function showToast(message, type = 'info', duration = 5000) {
-        if (!elements.toastContainer) return;
-        
-        const toast = document.createElement('div');
-        toast.className = `toast toast--${type}`;
-        
-        const iconMap = {
-            success: '✅',
-            error: '❌', 
-            warning: '⚠️',
-            info: 'ℹ️'
-        };
-        
-        toast.innerHTML = `
-            <span class="toast__icon">${iconMap[type] || iconMap.info}</span>
-            <span class="toast__message">${escapeHtml(message)}</span>
-            <button class="toast__close" onclick="this.parentElement.remove()">&times;</button>
-        `;
-        
-        elements.toastContainer.appendChild(toast);
-        
-        // Auto-suppression
-        setTimeout(() => {
-            if (toast.parentElement) {
-                toast.remove();
-            }
-        }, duration);
-    }
-
-    function closeModal() {
-        const modals = document.querySelectorAll('.modal--show');
-        modals.forEach(modal => {
+function closeModal(modalId) {
+    if (modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.classList.remove('modal--show');
+    } else {
+        document.querySelectorAll('.modal--show').forEach(modal => {
             modal.classList.remove('modal--show');
         });
     }
+}
 
-    function getStatusClass(status) {
-        const statusMap = {
-            'pending': 'status--info',
-            'searching': 'status--warning',
-            'search_completed': 'status--success',
-            'processing': 'status--warning',
-            'synthesizing': 'status--warning',
-            'completed': 'status--success',
-            'failed': 'status--error',
-            'search_failed': 'status--error'
-        };
-        
-        return statusMap[status] || 'status--info';
+async function renderQueuesStatus() {
+    try {
+        const data = await fetchAPI('/admin/queues-status');
+        const queues = (data && data.queues) || [];
+        if (queues.length === 0) return `<p>Aucune file d\'attente active.</p>`;
+
+        return `
+          <div class="queues-grid">
+            ${queues.map(q => `
+              <div class="queue-card">
+                <div class="queue-header">
+                  <h5>${escapeHtml(q.display)}</h5>
+                  <span class="queue-workers-badge">${q.workers} worker${q.workers !== 1 ? 's' : ''}</span>
+                </div>
+                <div class="queue-stats">
+                  <div class="stat-item"><span class="stat-value">${q.pending}</span><span class="stat-label">En attente</span></div>
+                  <div class="stat-item"><span class="stat-value">${q.started}</span><span class="stat-label">En cours</span></div>
+                  <div class="stat-item"><span class="stat-value">${q.failed}</span><span class="stat-label">Échecs</span></div>
+                  <div class="stat-item"><span class="stat-value">${q.finished}</span><span class="stat-label">Terminées</span></div>
+                </div>
+                <div class="queue-footer"><small>${escapeHtml(q.rq_name)}</small></div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+    } catch (e) {
+        return `<div class="alert alert--error">Impossible de charger le statut des files.</div>`;
     }
+}
 
-    // ============================ 
-    // Event handlers globaux
-    // ============================
+// Fonctions utilitaires pour les files
+function getQueueStatusClass(queue) {
+    if (queue.worker_count === 0) return 'queue-card--inactive';
+    if (queue.failed_job_registry > 5) return 'queue-card--error';
+    if (queue.count > 10) return 'queue-card--busy';
+    return 'queue-card--active';
+}
 
-    // Gestion de la sélection d'articles
-    function toggleArticleSelection(articleId, checked) {
-        if (checked) {
-            appState.selectedSearchResults.add(articleId);
-        } else {
-            appState.selectedSearchResults.delete(articleId);
-        }
-        
-        // Mettre à jour l'affichage du compteur
-        updateSelectionCounter();
+async function refreshQueuesStatus() {
+    if (appState.currentSection === 'settings') {
+        await renderSettings(); // Recharge toute la section paramètres
     }
+}
 
-    function selectAllArticles() {
-        const checkboxes = document.querySelectorAll('.article-select-checkbox');
-        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+async function handleRunIndexing() {
+    if (!appState.currentProject?.id) {
+        showToast('Aucun projet sélectionné pour l\'indexation', 'warning');
+        return;
+    }
+    
+    try {
+        showLoadingOverlay(true, 'Lancement de l\'indexation...');
         
-        checkboxes.forEach(cb => {
-            cb.checked = !allChecked;
-            toggleArticleSelection(cb.value, !allChecked);
+        await fetchAPI(`/projects/${appState.currentProject.id}/index`, {
+            method: 'POST'
         });
+        
+        showToast('Indexation des PDFs lancée', 'success');
+        
+        // Rafraîchir le statut du projet
+        await refreshCurrentProjectData();
+        
+    } catch (e) {
+        showToast(`Erreur indexation: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
     }
+}
 
-    function updateSelectionCounter() {
-        const counter = document.querySelector('.selection-counter');
-        if (counter) {
-            const count = appState.selectedSearchResults.size;
-            counter.textContent = `${count} article(s) sélectionné(s)`;
-        }
-    }
-
-    // Gestion des détails d'articles
-    function toggleAbstractRow(articleId) {
-        const abstractRow = document.getElementById(`abstract-${articleId}`);
-        if (abstractRow) {
-            abstractRow.classList.toggle('hidden');
-        }
-    }
-
-    function showExtractionDetails(extractionId) {
-        const extraction = appState.currentProjectExtractions.find(e => e.id === extractionId);
-        if (!extraction) return;
-        
-        const modal = document.getElementById('extractionDetailsModal');
-        if (!modal) return;
-        
-        const modalContent = modal.querySelector('.modal__body');
-        if (!modalContent) return;
-        
-        let extractedDataHtml = '';
-        if (extraction.extracted_data) {
-            try {
-                const data = JSON.parse(extraction.extracted_data);
-                extractedDataHtml = Object.entries(data)
-                    .map(([key, value]) => `
-                        <div class="detail-section">
-                            <label>${escapeHtml(key)}:</label>
-                            <div class="detail-text">${escapeHtml(String(value))}</div>
-                        </div>
-                    `).join('');
-            } catch (e) {
-                extractedDataHtml = `
-                    <div class="detail-section">
-                        <label>Données extraites (JSON):</label>
-                        <div class="detail-json">${escapeHtml(extraction.extracted_data)}</div>
-                    </div>
-                `;
-            }
-        }
-        
-        modalContent.innerHTML = `
-            <div class="extraction-details">
-                <div class="extraction-header">
-                    <h4>${escapeHtml(extraction.title || 'Article sans titre')}</h4>
-                    <div class="article-id-display">ID: ${escapeHtml(extraction.pmid)}</div>
-                </div>
-                
-                <div class="extraction-details-grid">
-                    <div class="detail-item">
-                        <label>Score de pertinence</label>
-                        <div class="detail-value score-value">${extraction.relevance_score || 'N/A'}/10</div>
-                    </div>
-                    
-                    <div class="detail-item">
-                        <label>Source d'analyse</label>
-                        <div class="detail-value">${escapeHtml(extraction.analysis_source || 'N/A')}</div>
-                    </div>
-                    
-                    <div class="detail-item">
-                        <label>Date de création</label>
-                        <div class="detail-value">${extraction.created_at ? new Date(extraction.created_at).toLocaleDateString() : 'N/A'}</div>
-                    </div>
-                </div>
-                
-                ${extraction.relevance_justification ? `
-                    <div class="detail-section">
-                        <label>Justification</label>
-                        <div class="detail-text">${escapeHtml(extraction.relevance_justification)}</div>
-                    </div>
-                ` : ''}
-                
-                ${extractedDataHtml}
+// Fonction pour rendre les champs de grille d'extraction dynamiques
+function renderGridFields(fields = []) {
+    const container = document.getElementById('gridFieldsContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    fields.forEach((field, index) => {
+        const fieldDiv = document.createElement('div');
+        fieldDiv.className = 'grid-field-item';
+        fieldDiv.innerHTML = `
+            <div class="field-inputs">
+                <input type="text" placeholder="Nom du champ" value="${escapeHtml(field.name || '')}" 
+                       onchange="updateFieldName(${index}, this.value)">
+                <textarea placeholder="Description (optionnelle)" 
+                         onchange="updateFieldDescription(${index}, this.value)">${escapeHtml(field.description || '')}</textarea>
+                <button type="button" class="btn btn--secondary btn--sm" onclick="removeGridField(${index})">
+                    Supprimer
+                </button>
             </div>
         `;
+        container.appendChild(fieldDiv);
+    });
+    
+    // Bouton d'ajout de champ
+    const addButton = document.createElement('button');
+    addButton.type = 'button';
+    addButton.className = 'btn btn--primary btn--sm';
+    addButton.textContent = 'Ajouter un champ';
+    addButton.onclick = addGridField;
+    container.appendChild(addButton);
+}
+
+// Fonctions utilitaires pour la gestion des grilles
+function addGridField() {
+    const fields = getCurrentGridFields();
+    fields.push({ name: '', description: '' });
+    renderGridFields(fields);
+}
+
+function removeGridField(index) {
+    const fields = getCurrentGridFields();
+    fields.splice(index, 1);
+    renderGridFields(fields);
+}
+
+function updateFieldName(index, value) {
+    const fields = getCurrentGridFields();
+    if (fields[index]) {
+        fields[index].name = value;
+    }
+}
+
+function updateFieldDescription(index, value) {
+    const fields = getCurrentGridFields();
+    if (fields[index]) {
+        fields[index].description = value;
+    }
+}
+
+function getCurrentGridFields() {
+    const container = document.getElementById('gridFieldsContainer');
+    if (!container) return [];
+    
+    const inputs = container.querySelectorAll('.field-inputs');
+    return Array.from(inputs).map(input => ({
+        name: input.querySelector('input[type="text"]')?.value || '',
+        description: input.querySelector('textarea')?.value || ''
+    }));
+}
+
+async function handleGridFormSubmit(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const action = form.dataset.action;
+    const formData = new FormData(form);
+    const gridData = {
+        name: formData.get('name'),
+        fields: getCurrentGridFields()
+    };
+    
+    try {
+        showLoadingOverlay(true, 'Sauvegarde de la grille...');
         
-        modal.classList.add('modal--show');
+        if (action === 'create') {
+            await fetchAPI(`/projects/${appState.currentProject.id}/grids`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(gridData)
+            });
+            showToast('Grille créée avec succès', 'success');
+        } else if (action === 'edit') {
+            const gridId = form.dataset.gridId;
+            await fetchAPI(`/projects/${appState.currentProject.id}/grids/${gridId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(gridData)
+            });
+            showToast('Grille mise à jour', 'success');
+        }
+        
+        closeModal('gridModal');
+        await loadProjectGrids(); // Recharger les grilles
+        
+    } catch (e) {
+        showToast(`Erreur: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+// ================================================================
+// === INITIALISATION FINALE
+// ================================================================
+
+function showAddManualArticlesModal() {
+    openModal('addManualArticlesModal');
+}
+
+window.showAddManualArticlesModal = showAddManualArticlesModal;
+
+// Exposer certaines fonctions globalement pour les événements inline HTML
+
+// Exposition contrôlée des handlers au scope global (évite ReferenceError)
+window.handleZoteroFileUpload = typeof handleZoteroFileUpload === 'function' ? handleZoteroFileUpload : () => {};
+window.handleImportValidations = typeof handleImportValidations === 'function' ? handleImportValidations : (e) => { e.preventDefault(); console.warn("handleImportValidations non implémenté ou mal référencé."); };
+window.handleBulkPDFUpload = typeof handleBulkPDFUpload === 'function' ? handleBulkPDFUpload : () => {};
+window.showSearchModal = typeof showSearchModal === 'function' ? showSearchModal : () => {};
+window.deleteProject = typeof deleteProject === 'function' ? deleteProject : () => {};
+window.selectProject = typeof selectProject === 'function' ? selectProject : () => {};
+
+window.exportValidations = typeof exportValidations === 'function' ? exportValidations : () => {};
+window.calculateKappa = typeof calculateKappa === 'function' ? calculateKappa : () => {};
+
+window.handleRunIndexing = typeof handleRunIndexing === 'function' ? handleRunIndexing : () => {};
+window.handleFetchOnlinePDFs = typeof handleFetchOnlinePDFs === 'function' ? handleFetchOnlinePDFs : () => {};
+window.handleManualPDFUpload = typeof handleManualPDFUpload === 'function' ? handleManualPDFUpload : (e) => { e.preventDefault(); console.warn("handleManualPDFUpload non implémenté ou mal référencé."); };
+window.handleImportZotero = typeof handleImportZotero === 'function' ? handleImportZotero : () => {};
+window.handlePullModel = typeof handlePullModel === 'function' ? handlePullModel : () => {};
+window.handleSaveZoteroSettings = typeof handleSaveZoteroSettings === 'function' ? handleSaveZoteroSettings : () => {};
+window.handleSendChatMessage = typeof handleSendChatMessage === 'function' ? handleSendChatMessage : () => {};
+window.handleAddManualArticles = typeof handleAddManualArticles === 'function' ? handleAddManualArticles : () => {};
+
+window.openGridModal = typeof openGridModal === 'function' ? openGridModal : () => {};
+window.handleDeleteGrid = typeof handleDeleteGrid === 'function' ? handleDeleteGrid : () => {};
+window.openPromptModal = typeof openPromptModal === 'function' ? openPromptModal : () => {};
+window.editPrompt = typeof editPrompt === 'function' ? editPrompt : () => {};
+window.openProfileModal = typeof openProfileModal === 'function' ? openProfileModal : () => {};
+window.fetchAndDisplayRob = typeof fetchAndDisplayRob === 'function' ? fetchAndDisplayRob : () => {};
+window.deleteProfile = typeof deleteProfile === 'function' ? deleteProfile : () => {};
+window.selectAnalysisType = typeof selectAnalysisType === 'function' ? selectAnalysisType : () => {};
+
+window.showPRISMAModal = showPRISMAModal;
+window.togglePRISMAItem = togglePRISMAItem;
+window.savePRISMAProgress = savePRISMAProgress;
+window.exportPRISMAReport = exportPRISMAReport;
+
+window.runAdvancedAnalysis = typeof runAdvancedAnalysis === 'function' ? runAdvancedAnalysis : () => {};
+window.viewAnalysisPlot = typeof viewAnalysisPlot === 'function' ? viewAnalysisPlot : () => {};
+
+window.exportAnalyses = exportAnalyses;
+// Log de fin de chargement
+window.handleRunRobAnalysis = handleRunRobAnalysis;
+window.exportForThesis = exportForThesis;
+window.showStakeholderManagement = showStakeholderManagement;
+window.addStakeholderGroup = addStakeholderGroup;
+
+console.log('✅ AnalyLit V4.1 Frontend - Chargement complet terminé');
+
+function showBatchProcessModal() {
+    const selectedCount = appState.selectedSearchResults.size;
+    if (selectedCount === 0) {
+        showToast('Veuillez sélectionner au moins un article.', 'warning');
+        return;
     }
 
-    // Initialisation finale
-// ============================
-// INITIALISATION FINALE
-// ============================
+    const content = `
+        <p>Vous êtes sur le point de lancer un traitement par lot sur ${selectedCount} article(s).</p>
+        <p>Veuillez choisir un profil d'analyse:</p>
+        <select id="batch-analysis-profile" class="form-control">
+            ${appState.analysisProfiles.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+        </select>
+        <div class="modal__actions">
+            <button type="button" class="btn btn--secondary" onclick="closeModal('genericModal')">Annuler</button>
+            <button type="button" class="btn btn--primary" onclick="startBatchProcessing()">Lancer</button>
+        </div>
+    `;
+    showModal('Traitement par lot', content);
+}
 
-    // Exposer certaines fonctions globalement pour les événements inline HTML
-    window.openModal = openModal;
-    window.closeModal = closeModal;
-    window.showSection = showSection;
-    window.loadProjectSearchResults = loadProjectSearchResults;
-
-    // Exposition contrôlée des handlers au scope global (évite ReferenceError)
-    window.handleZoteroFileUpload = typeof handleZoteroFileUpload === 'function' ? handleZoteroFileUpload : () => {};
-    window.handleImportValidations = typeof handleImportValidations === 'function' ? handleImportValidations : () => {};
-    window.handleExportValidations = typeof handleExportValidations === 'function' ? handleExportValidations : () => {};
-    window.handleCalculateKappa = typeof handleCalculateKappa === 'function' ? handleCalculateKappa : () => {};
-
-    window.handleRunIndexing = typeof handleRunIndexing === 'function' ? handleRunIndexing : () => {};
-    window.handleFetchOnlinePdfs = typeof handleFetchOnlinePdfs === 'function' ? handleFetchOnlinePdfs : () => {};
-    window.handleManualPDFUpload = typeof handleManualPDFUpload === 'function' ? handleManualPDFUpload : () => {};
-    window.handleImportZotero = typeof handleImportZotero === 'function' ? handleImportZotero : () => {};
-    window.handlePullModel = typeof handlePullModel === 'function' ? handlePullModel : () => {};
-    window.handleSaveZoteroSettings = typeof handleSaveZoteroSettings === 'function' ? handleSaveZoteroSettings : () => {};
-    window.handleClearQueue = typeof handleClearQueue === 'function' ? handleClearQueue : () => {};
-    window.sendChatMessage = typeof sendChatMessage === 'function' ? sendChatMessage : () => {};
-    window.clearChatHistory = typeof clearChatHistory === 'function' ? clearChatHistory : () => {};
-
-    window.openGridModal = typeof openGridModal === 'function' ? openGridModal : () => {};
-    window.handleDeleteGrid = typeof handleDeleteGrid === 'function' ? handleDeleteGrid : () => {};
-    window.openPromptModal = typeof openPromptModal === 'function' ? openPromptModal : () => {};
-    window.openProfileModal = typeof openProfileModal === 'function' ? openProfileModal : () => {};
-    window.handleDeleteProfile = typeof handleDeleteProfile === 'function' ? handleDeleteProfile : () => {};
-
-    window.runAdvancedAnalysis = typeof runAdvancedAnalysis === 'function' ? runAdvancedAnalysis : () => {};
-    window.viewAnalysisPlot = typeof viewAnalysisPlot === 'function' ? viewAnalysisPlot : () => {};
+function startBatchProcessing() {
+    const selectedIds = Array.from(appState.selectedSearchResults);
+    const profileId = document.getElementById('batch-analysis-profile').value;
     
-    // Log de fin de chargement
-    console.log('✅ AnalyLit V4.1 Frontend - Chargement complet terminé');
-})();
+    try {
+        showLoadingOverlay(true, 'Lancement du traitement par lot...');
+        closeModal('genericModal');
+        
+        fetchAPI(`/projects/${appState.currentProject.id}/run`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                articles: selectedIds,
+                profile: profileId,
+                analysis_mode: 'screening'
+            })
+        });
+        
+        showToast('Traitement par lot lancé.', 'success');
+    } catch (e) {
+        showToast(`Erreur: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+window.showBatchProcessModal = showBatchProcessModal;
+window.startBatchProcessing = startBatchProcessing;
