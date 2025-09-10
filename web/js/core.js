@@ -4,7 +4,7 @@ import { loadInitialData, initializeWebSocket, showSection } from '../app.js';
 import { selectProject, deleteProject } from './projects.js';
 import { viewArticleDetails, toggleArticleSelection, sortResults, selectAllArticles, showBatchProcessModal, handleDeleteSelectedArticles, showRunExtractionModal } from './articles.js';
 import { handleRunIndexing, handleFetchOnlinePdfs, showAddManualArticlesModal, handleImportZoteroPdfs, handleZoteroFileUpload, handleBulkPDFUpload } from './import.js';
-import { editProfile, deleteProfile, showCreateProfileModal, editPrompt, showPullModelModal, handleSaveZoteroSettings } from './settings.js';
+import { editProfile, deleteProfile, showCreateProfileModal, editPrompt, showPullModelModal, handleSaveZoteroSettings, loadAnalysisProfiles, loadPrompts, loadOllamaModels, renderSettings } from './settings.js';
 import { runProjectAnalysis, exportAnalyses } from './analyses.js';
 
 
@@ -109,6 +109,22 @@ export async function initializeApplication() {
     } catch (e) {
         console.error('Erreur lors de l'initialisation de l'application:', e);
         showToast(`Erreur critique: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+export async function loadSettingsData() {
+    showLoadingOverlay(true, 'Chargement des paramètres...');
+    try {
+        await Promise.all([
+            loadAnalysisProfiles(),
+            loadPrompts(),
+            loadOllamaModels()
+        ]);
+    } catch (e) {
+        showToast("Erreur lors du chargement des données de paramètres.", "error");
+        console.error("Erreur loadSettingsData:", e);
     } finally {
         showLoadingOverlay(false);
     }

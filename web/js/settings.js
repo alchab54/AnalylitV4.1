@@ -1,22 +1,15 @@
 // ============================ 
 // Settings Section 
 // ============================ 
+import { appState, elements } from '../app.js';
+import { fetchAPI } from './api.js';
+import { showToast, showLoadingOverlay, escapeHtml, openModal, closeModal } from './ui.js';
 
-async function renderSettings() { 
+export async function renderSettings() { 
     if (!elements.settingsContainer) return; 
     
-    showLoadingOverlay(true, 'Chargement des paramètres...'); 
-    try { 
-        // Fetch data required for settings page 
-        await Promise.all([ 
-            loadAnalysisProfiles(), 
-            loadPrompts(), 
-            loadOllamaModels() 
-        ]); 
-
-        const queuesHtml = await renderQueuesStatus(); 
-        
-        elements.settingsContainer.innerHTML = ` 
+    const queuesHtml = await renderQueuesStatus(); 
+    elements.settingsContainer.innerHTML = ` 
             <div class="settings-grid"> 
                 <div class="settings-card"> 
                     <div class="settings-card__header"><h4>⚙️ Profils d'analyse</h4></div> 
@@ -46,7 +39,7 @@ async function renderSettings() {
                     <div class="settings-card__header"><h4>Zotero</h4></div> 
                     <div class="settings-card__content"> 
                         <p>Configurez votre connexion à Zotero.</p> 
-                        <form onsubmit="handleSaveZoteroSettings(event)"> 
+                        <form id="zoteroSettingsForm"> 
                             <div class="form-group"> 
                                 <label class="form-label">ID de la bibliothèque</label> 
                                 <input type="text" name="zotero_library_id" class="form-control" placeholder="Votre ID de bibliothèque Zotero"> 
@@ -69,15 +62,10 @@ async function renderSettings() {
                 </div> 
             </div> 
         `; 
-    } catch (e) { 
-        elements.settingsContainer.innerHTML = `<div class="alert alert--error">Erreur de chargement des paramètres.</div>`; 
-        console.error(e); 
-    } finally { 
-        showLoadingOverlay(false); 
-    } 
+    document.getElementById('zoteroSettingsForm')?.addEventListener('submit', handleSaveZoteroSettings);
 } 
 
-function renderAnalysisProfiles() { 
+export function renderAnalysisProfiles() { 
     const profiles = appState.analysisProfiles || []; 
     return ` 
         <div class="profiles-list"> 
@@ -102,7 +90,7 @@ function renderAnalysisProfiles() {
     `; 
 } 
 
-function renderPrompts() { 
+export function renderPrompts() { 
     const prompts = appState.prompts || []; 
     if (prompts.length === 0) return '<p>Aucun prompt disponible.</p>'; 
 
@@ -121,7 +109,7 @@ function renderPrompts() {
     `; 
 } 
 
-function renderOllamaModels() { 
+export function renderOllamaModels() { 
     const models = appState.ollamaModels || []; 
     return ` 
         <div class="models-list"> 
@@ -136,7 +124,7 @@ function renderOllamaModels() {
     `; 
 } 
 
-function formatBytes(bytes, decimals = 2) { 
+export function formatBytes(bytes, decimals = 2) { 
     if (bytes === 0) return '0 Bytes'; 
     const k = 1024; 
     const dm = decimals < 0 ? 0 : decimals; 
@@ -145,13 +133,13 @@ function formatBytes(bytes, decimals = 2) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]; 
 } 
 
-function showCreateProfileModal() { 
+export function showCreateProfileModal() { 
     const modelOptions = appState.ollamaModels.map(model => 
         `<option value="${escapeHtml(model.name)}">${escapeHtml(model.name)}</option>` 
     ).join(''); 
 
     const content = ` 
-        <form onsubmit="handleCreateProfile(event)"> 
+        <form id="createProfileForm"> 
             <div class="form-group"> 
                 <label class="form-label">Nom du profil</label> 
                 <input type="text" name="name" class="form-control" required> 
@@ -169,15 +157,16 @@ function showCreateProfileModal() {
                 <select name="synthesis_model" class="form-control" required>${modelOptions}</select> 
             </div> 
             <div class="modal__actions"> 
-                <button type="button" class="btn btn--secondary" onclick="closeModal('genericModal')">Annuler</button> 
+                <button type="button" class="btn btn--secondary" data-action="close-modal">Annuler</button> 
                 <button type="submit" class="btn btn--primary">Créer</button> 
             </div> 
         </form> 
     `; 
     showModal('Créer un profil d\'analyse', content); 
+    document.getElementById('createProfileForm')?.addEventListener('submit', handleCreateProfile);
 } 
 
-async function handleCreateProfile(event) { 
+export async function handleCreateProfile(event) { 
     event.preventDefault(); 
     const formData = new FormData(event.target); 
     const profile = { 
@@ -187,10 +176,8 @@ async function handleCreateProfile(event) {
         synthesis_model: formData.get('synthesis_model') 
     }; 
 
+    showLoadingOverlay(true, 'Création du profil...'); 
     try { 
-        closeModal('genericModal'); 
-        showLoadingOverlay(true, 'Création du profil...'); 
-        
         await fetchAPI('/profiles', { 
             method: 'POST', 
             body: profile 
@@ -198,6 +185,7 @@ async function handleCreateProfile(event) {
 
         await loadAnalysisProfiles(); 
         renderSettings(); 
+        closeModal('genericModal'); 
         showToast('Profil créé avec succès', 'success'); 
     } catch (e) { 
         showToast(`Erreur: ${e.message}`, 'error'); 
@@ -206,36 +194,36 @@ async function handleCreateProfile(event) {
     } 
 } 
 
-function showPullModelModal() { 
+export function showPullModelModal() { 
     const content = ` 
-        <form onsubmit="handlePullModel(event)"> 
+        <form id="pullModelForm"> 
             <div class="form-group"> 
                 <label class="form-label">Nom du modèle</label> 
                 <input type="text" name="model" class="form-control" placeholder="ex: llama3.1:8b" required> 
                 <div class="form-text">Le téléchargement peut prendre du temps.</div> 
             </div> 
             <div class="modal__actions"> 
-                <button type="button" class="btn btn--secondary" onclick="closeModal('genericModal')">Annuler</button> 
+                <button type="button" class="btn btn--secondary" data-action="close-modal">Annuler</button> 
                 <button type="submit" class="btn btn--primary">Télécharger</button> 
             </div> 
         </form> 
     `; 
     showModal('Télécharger un modèle Ollama', content); 
+    document.getElementById('pullModelForm')?.addEventListener('submit', handlePullModel);
 } 
 
-async function handlePullModel(event) { 
+export async function handlePullModel(event) { 
     event.preventDefault(); 
     const model = new FormData(event.target).get('model'); 
 
+    showLoadingOverlay(true, `Téléchargement de ${model}...`); 
     try { 
-        closeModal('genericModal'); 
-        showLoadingOverlay(true, `Téléchargement de ${model}...`); 
-        
         await fetchAPI('/ollama/pull', { 
             method: 'POST', 
             body: { model } 
         }); 
 
+        closeModal('genericModal'); 
         showToast('Téléchargement du modèle lancé en arrière-plan.', 'info'); 
         // Refresh model list after a delay 
         setTimeout(async () => { 
@@ -243,18 +231,19 @@ async function handlePullModel(event) {
             renderSettings(); 
         }, 10000); 
     } catch (e) { 
+        // Ne pas fermer la modale en cas d'erreur
         showToast(`Erreur: ${e.message}`, 'error'); 
     } finally { 
         showLoadingOverlay(false); 
     } 
 } 
 
-function editPrompt(promptName) { 
+export function editPrompt(promptName) { 
     const prompt = appState.prompts.find(p => p.name === promptName); 
     if (!prompt) return; 
 
     const content = ` 
-        <form onsubmit="handleEditPrompt(event, '${promptName}')"> 
+        <form id="editPromptForm" data-prompt-name="${promptName}"> 
             <div class="form-group"> 
                 <label class="form-label">Nom</label> 
                 <input type="text" name="name" value="${escapeHtml(prompt.name)}" class="form-control" readonly> 
@@ -268,15 +257,16 @@ function editPrompt(promptName) {
                 <textarea name="template" class="form-control" rows="10">${escapeHtml(prompt.template)}</textarea> 
             </div> 
             <div class="modal__actions"> 
-                <button type="button" class="btn btn--secondary" onclick="closeModal('genericModal')">Annuler</button> 
+                <button type="button" class="btn btn--secondary" data-action="close-modal">Annuler</button> 
                 <button type="submit" class="btn btn--primary">Sauvegarder</button> 
             </div> 
         </form> 
     `; 
     showModal('Modifier le prompt', content, 'modal__content--large'); 
+    document.getElementById('editPromptForm')?.addEventListener('submit', handleEditPrompt);
 } 
 
-async function handleEditPrompt(event, promptName) { 
+export async function handleEditPrompt(event) { 
     event.preventDefault(); 
     const formData = new FormData(event.target); 
     const promptData = { 
@@ -285,10 +275,8 @@ async function handleEditPrompt(event, promptName) {
         template: formData.get('template') 
     }; 
 
+    showLoadingOverlay(true, 'Sauvegarde du prompt...'); 
     try { 
-        closeModal('genericModal'); 
-        showLoadingOverlay(true, 'Sauvegarde du prompt...'); 
-        
         await fetchAPI('/prompts', { 
             method: 'POST', 
             body: promptData 
@@ -296,6 +284,7 @@ async function handleEditPrompt(event, promptName) {
 
         await loadPrompts(); 
         renderSettings(); 
+        closeModal('genericModal'); 
         showToast('Prompt sauvegardé', 'success'); 
     } catch (e) { 
         showToast(`Erreur: ${e.message}`, 'error'); 
@@ -304,12 +293,12 @@ async function handleEditPrompt(event, promptName) {
     } 
 } 
 
-async function handleSaveZoteroSettings(event) { 
+export async function handleSaveZoteroSettings(event) { 
     event.preventDefault(); 
     showToast('Fonctionnalité non implémentée.', 'info'); 
 } 
 
-async function renderQueuesStatus() {
+export async function renderQueuesStatus() {
     try {
         const data = await fetchAPI('/admin/queues-status');
         const queues = (data && data.queues) || [];
@@ -340,20 +329,20 @@ async function renderQueuesStatus() {
 }
 
 // Fonctions utilitaires pour les files
-function getQueueStatusClass(queue) {
+export function getQueueStatusClass(queue) {
     if (queue.worker_count === 0) return 'queue-card--inactive';
     if (queue.failed_job_registry > 5) return 'queue-card--error';
     if (queue.count > 10) return 'queue-card--busy';
     return 'queue-card--active';
 }
 
-async function refreshQueuesStatus() {
+export async function refreshQueuesStatus() {
     if (appState.currentSection === 'settings') {
         await renderSettings(); // Recharge toute la section paramètres
     }
 }
 
-async function deleteProfile(profileId) { 
+export async function deleteProfile(profileId) { 
     if (!confirm('Êtes-vous sûr de vouloir supprimer ce profil ?')) return; 
 
     showLoadingOverlay(true, 'Suppression du profil...'); 
@@ -369,10 +358,22 @@ async function deleteProfile(profileId) {
     } 
 } 
 
-function editProfile(profileId) { 
+export function editProfile(profileId) { 
     showToast('La modification de profil n\'est pas encore implémentée.', 'info'); 
 } 
 
-window.showCreateProfileModal = showCreateProfileModal;
-window.handleCreateProfile = handleCreateProfile;
-window.handlePullModel = handlePullModel;
+export async function loadAnalysisProfiles() {
+    appState.analysisProfiles = await fetchAPI('/profiles');
+}
+
+export async function loadPrompts() {
+    appState.prompts = await fetchAPI('/prompts');
+}
+
+export async function loadOllamaModels() {
+    appState.ollamaModels = await fetchAPI('/ollama/models');
+}
+
+// Exposition globale n'est plus nécessaire pour les handlers de formulaire
+// window.handleCreateProfile = handleCreateProfile;
+// window.handlePullModel = handlePullModel;

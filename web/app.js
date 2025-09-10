@@ -160,7 +160,7 @@ function refreshCurrentSection() {
             loadChatMessages();
             break;
         case 'settings':
-            renderSettings();
+            loadSettingsData().then(renderSettings);
             break;
         case 'reporting':
             renderReportingSection(appState.currentProject?.id);
