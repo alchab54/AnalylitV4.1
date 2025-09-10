@@ -2401,33 +2401,23 @@ def delete_project_articles(project_id):
     """Supprime une liste d'articles d'un projet."""
     data = request.get_json(force=True)
     article_ids = data.get('article_ids', [])
-
     if not article_ids:
         return jsonify({'error': 'Aucun ID d\'article fourni'}), 400
 
     session = Session()
     try:
-        # Supprimer les articles de search_results
-        session.execute(text("""
-            DELETE FROM search_results 
-            WHERE project_id = :pid AND article_id = ANY(:aids)
-        """), {"pid": project_id, "aids": article_ids})
-
-        # Supprimer les extractions associées
-        session.execute(text("""
-            DELETE FROM extractions 
-            WHERE project_id = :pid AND pmid = ANY(:aids)
-        """), {"pid": project_id, "aids": article_ids})
+        session.execute(text("DELETE FROM extractions WHERE project_id = :pid AND pmid = ANY(:aids)"), 
+                        {"pid": project_id, "aids": article_ids})
+        session.execute(text("DELETE FROM search_results WHERE project_id = :pid AND article_id = ANY(:aids)"), 
+                        {"pid": project_id, "aids": article_ids})
         
-        # Mettre à jour le compteur du projet
-        total_articles = session.execute(text(
-            "SELECT COUNT(*) FROM search_results WHERE project_id = :pid"
-        ), {"pid": project_id}).scalar_one()
-        session.execute(text(
-            "UPDATE projects SET pmids_count = :count WHERE id = :pid"
-        ), {"count": total_articles, "pid": project_id})
+        total_articles = session.execute(text("SELECT COUNT(*) FROM search_results WHERE project_id = :pid"), 
+                                        {"pid": project_id}).scalar_one()
+        session.execute(text("UPDATE projects SET pmids_count = :count WHERE id = :pid"), 
+                        {"count": total_articles, "pid": project_id})
 
         session.commit()
+        send_project_notification(project_id, 'articles_updated', f'{len(article_ids)} article(s) ont été supprimés.')
         return jsonify({'message': f'{len(article_ids)} article(s) supprimé(s) avec succès'}), 200
     except Exception as e:
         session.rollback()
@@ -2435,7 +2425,7 @@ def delete_project_articles(project_id):
         return jsonify({'error': 'Erreur interne du serveur'}), 500
     finally:
         session.close()
-
+        
 @api_bp.route('/projects/<project_id>/run-rob-analysis', methods=['POST'])
 def run_rob_analysis(project_id):
     """Lance l'analyse du risque de biais pour les articles sélectionnés."""

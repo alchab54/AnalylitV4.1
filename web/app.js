@@ -1019,12 +1019,40 @@ function clearNotifications() {
     if (list) list.innerHTML = '';
   }
 }
-// Fonctions d'interface manquantes
+
 function updateSelectionCounter() {
-    const counter = document.querySelector('.selection-counter');
+    const counter = document.getElementById('selection-counter');
     if (counter) {
-        const count = appState.selectedSearchResults.size;
-        counter.textContent = `${count} article(s) sélectionné(s)`;
+        counter.textContent = `${appState.selectedSearchResults.size} article(s) sélectionné(s)`;
+    }
+}
+
+async function handleDeleteSelectedArticles() {
+    const selectedIds = Array.from(appState.selectedSearchResults);
+    if (selectedIds.length === 0) {
+        showToast('Aucun article sélectionné.', 'warning');
+        return;
+    }
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer définitivement ${selectedIds.length} article(s) ?`)) {
+        return;
+    }
+    showLoadingOverlay(true, 'Suppression en cours...');
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/articles`, {
+            method: 'DELETE',
+            body: { article_ids: selectedIds }
+        });
+        
+        appState.searchResults = appState.searchResults.filter(a => !selectedIds.includes(a.article_id));
+        appState.currentProjectExtractions = appState.currentProjectExtractions.filter(e => !selectedIds.includes(e.pmid));
+        appState.selectedSearchResults.clear();
+        
+        showToast('Articles supprimés avec succès.', 'success');
+        renderSearchResultsTable();
+    } catch (error) {
+        showToast(`Erreur : ${error.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
     }
 }
 
@@ -3115,3 +3143,5 @@ window.showRunExtractionModal = showRunExtractionModal;
 window.startFullExtraction = startFullExtraction;
 window.handleFetchOnlinePdfs = handleFetchOnlinePdfs;
 window.handleRunRobAnalysis = handleRunRobAnalysis;
+window.toggleSelectAll = toggleSelectAll;
+window.handleDeleteSelectedArticles = handleDeleteSelectedArticles;

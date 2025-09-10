@@ -1,5 +1,4 @@
 // web/js/validation.js
-
 async function renderValidationSection(project) {
     const container = document.getElementById('validationContainer');
     if (!container || !project) return;
@@ -10,7 +9,7 @@ async function renderValidationSection(project) {
             loadProjectExtractions(project.id),
             loadProjectGrids(project.id)
         ]);
-
+        
         const extractions = appState.currentValidations || [];
         const included = extractions.filter(e => e.user_validation_status === 'include');
         const excluded = extractions.filter(e => e.user_validation_status === 'exclude');
@@ -27,9 +26,7 @@ async function renderValidationSection(project) {
             </div>
 
             <div class="card mt-24">
-                <div class="card__header">
-                    <h4>Articles en attente de validation</h4>
-                </div>
+                <div class="card__header"><h4>Articles en attente de validation (${pending.length})</h4></div>
                 <div class="card__body validation-list">
                     ${pending.length > 0 ? pending.map(renderValidationItem).join('') : '<p class="text-muted">Aucun article en attente.</p>'}
                 </div>
@@ -39,12 +36,11 @@ async function renderValidationSection(project) {
                 <div class="card__header">
                     <h4>Articles Validés</h4>
                     <div class="button-group">
-                        <button class="btn btn--sm" onclick="filterValidationList('include')">Voir Inclus</button>
-                        <button class="btn btn--sm" onclick="filterValidationList('exclude')">Voir Exclus</button>
+                        <button class="btn btn--sm" onclick="filterValidationList('include')">Voir Inclus (${included.length})</button>
+                        <button class="btn btn--sm" onclick="filterValidationList('exclude')">Voir Exclus (${excluded.length})</button>
                     </div>
                 </div>
-                <div class="card__body validation-list" id="validatedListContainer">
-                    </div>
+                <div class="card__body validation-list" id="validatedListContainer"></div>
             </div>
 
             <div class="card mt-24">
@@ -55,8 +51,8 @@ async function renderValidationSection(project) {
                  </div>
             </div>
         `;
-
-        filterValidationList('include'); // Afficher les inclus par défaut
+        
+        filterValidationList('include');
 
     } catch (e) {
         console.error('Erreur renderValidationSection:', e);
@@ -115,7 +111,7 @@ async function handleValidateExtraction(extractionId, decision) {
             method: 'PUT',
             body: { decision: decision, evaluator: 'evaluator1' }
         });
-        await renderValidationSection(appState.currentProject); // Re-render la section complète
+        await renderValidationSection(appState.currentProject);
         showToast('Décision mise à jour.', 'success');
     } catch (error) {
         showToast(`Erreur de validation : ${error.message}`, 'error');
