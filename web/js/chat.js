@@ -42,8 +42,15 @@ function renderChatSection(messages, error = false) {
     const messagesHtml = (messages || []).map(msg => `
         <div class="chat-message chat-message--${msg.role}">
             <div class="chat-message-content">
+                const urlRegex = /(https?:\[\/\/\S+)/g;
+                const formattedContent = escapeHtml(msg.content).replace(urlRegex, '<a href="<div class="chat-message-content">
                 ${escapeHtml(msg.content).replace(/
 /g, '<br>')}
+            </div>" target="_blank"><div class="chat-message-content">
+                ${escapeHtml(msg.content).replace(/
+/g, '<br>')}
+            </div></a>').replace(/\n/g, '<br>');
+                formattedContent
             </div>
             <div class="chat-message-meta">
                 <span>${new Date(msg.timestamp).toLocaleString()}</span>

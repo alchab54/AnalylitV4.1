@@ -111,24 +111,41 @@ async function handleValidateExtraction(extractionId, decision) {
         showToast('Erreur : projet ou ID d\'extraction manquant.', 'error');
         return;
     }
+    const buttonGroup = document.querySelector(`.validation-item[data-extraction-id="${extractionId}"] .validation-item__actions`);
+    if (buttonGroup) buttonGroup.innerHTML = `<div class="loading-spinner"></div>`;
 
     try {
-        // La route correcte attend une méthode PUT et l'ID dans l'URL
         await fetchAPI(`/projects/${appState.currentProject.id}/extractions/${extractionId}/decision`, {
             method: 'PUT',
             body: {
                 decision: decision,
-                evaluator: 'evaluator1' // ou un autre identifiant si nécessaire
+                evaluator: 'evaluator1'
             }
         });
-        showToast('Validation enregistrée avec succès.', 'success');
-        
-        // Rafraîchir les données pour voir le changement
-        await loadValidationSection();
-        
+
+        // Mettre à jour l'état local
+        const extraction = appState.currentValidations.find(e => e.id === extractionId);
+        if (extraction) {
+            extraction.user_validation_status = decision;
+        }
+
+        // Mettre à jour l'affichage
+        const validatedItem = document.querySelector(`.validation-item[data-extraction-id="${extractionId}"]`);
+        if (validatedItem) {
+            const statusBadge = document.createElement('div');
+            statusBadge.className = `status status--${decision === 'include' ? 'success' : 'error'}`;
+            statusBadge.textContent = decision === 'include' ? 'Inclus' : 'Exclus';
+            buttonGroup.innerHTML = '';
+            buttonGroup.appendChild(statusBadge);
+        }
+        showToast('Validation enregistrée.', 'success');
     } catch (error) {
         console.error('Erreur validation extraction:', error);
         showToast(`Erreur lors de la validation : ${error.message}`, 'error');
+        // Restaurer les boutons en cas d'erreur
+        if (buttonGroup) {
+             buttonGroup.innerHTML = `<button class="btn btn--success btn--sm" onclick="handleValidateExtraction('${extractionId}', 'include')">✓ Inclure</button> <button class="btn btn--error btn--sm" onclick="handleValidateExtraction('${extractionId}', 'exclude')">✗ Exclure</button>`;
+        }
     }
 }
 
