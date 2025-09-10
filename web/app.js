@@ -116,6 +116,12 @@ function setupEventListeners() {
     }
   });
   
+  document.body.addEventListener('click', event => {
+        if (event.target.id === 'runFullExtractionBtn') {
+            showRunExtractionModal();
+        }
+    });
+
   // Centralisation de la gestion des clics pour les actions dynamiques (délégation)
   document.body.addEventListener('click', (e) => {
     // Clic sur "Voir détails" d'un article
@@ -1004,6 +1010,70 @@ function updateSelectionCounter() {
     if (counter) {
         const count = appState.selectedSearchResults.size;
         counter.textContent = `${count} article(s) sélectionné(s)`;
+    }
+}
+
+// Fonctions pour le workflow d'extraction complète
+function showRunExtractionModal() {
+    const includedArticles = appState.currentValidations.filter(e => e.user_validation_status === 'include');
+    if (includedArticles.length === 0) {
+        showToast("Aucun article n'a été validé comme 'Inclus'.", 'warning');
+        return;
+    }
+
+    if (appState.currentProjectGrids.length === 0) {
+        showToast("Aucune grille d'extraction n'a été créée ou importée pour ce projet.", 'error');
+        showSection('grids'); // Redirige l'utilisateur pour créer une grille
+        return;
+    }
+
+    const modalContent = `
+        <p>Vous êtes sur le point de lancer une extraction complète sur les <strong>${includedArticles.length} article(s)</strong> que vous avez inclus.</p>
+        <div class="form-group">
+            <label for="extractionGridSelect" class="form-label">Choisir une grille d'extraction :</label>
+            <select id="extractionGridSelect" class="form-control">
+                ${appState.currentProjectGrids.map(grid => `<option value="${grid.id}">${escapeHtml(grid.name)}</option>`).join('')}
+            </select>
+        </div>
+         <div class="form-group">
+            <label for="extractionProfileSelect" class="form-label">Choisir un profil d'analyse :</label>
+            <select id="extractionProfileSelect" class="form-control">
+                ${appState.analysisProfiles.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}
+            </select>
+        </div>
+    `;
+    showModal('Lancer l\'extraction complète', modalContent, 'startFullExtraction()');
+}
+
+async function startFullExtraction() {
+    const gridId = document.getElementById('extractionGridSelect').value;
+    const profileId = document.getElementById('extractionProfileSelect').value;
+    const includedArticlesIds = appState.currentValidations
+        .filter(e => e.user_validation_status === 'include')
+        .map(e => e.pmid);
+
+    if (!gridId) {
+        showToast("Veuillez sélectionner une grille.", "warning");
+        return;
+    }
+
+    closeModal();
+    showLoadingOverlay(true, 'Lancement de l\'extraction...');
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
+            method: 'POST',
+            body: {
+                articles: includedArticlesIds,
+                profile: profileId,
+                analysis_mode: 'full_extraction',
+                custom_grid_id: gridId
+            }
+        });
+        showToast('Tâche d\'extraction lancée avec succès.', 'success');
+    } catch (error) {
+        showToast(`Erreur lors du lancement de l'extraction: ${error.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
     }
 }
 
@@ -3018,3 +3088,5 @@ function startBatchProcessing() {
 
 window.showBatchProcessModal = showBatchProcessModal;
 window.startBatchProcessing = startBatchProcessing;
+window.showRunExtractionModal = showRunExtractionModal;
+window.startFullExtraction = startFullExtraction;

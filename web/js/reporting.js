@@ -105,37 +105,53 @@ async function handleGenerateBibliography(projectId) {
     }
 }
 
-async function loadPrismaChecklist(projectId) {
-    const container = document.getElementById('prismaChecklistContainer');
-    container.innerHTML = 'Chargement de la checklist...';
-
+async function loadPrismaChecklist() {
+    if (!appState.currentProject) return;
     try {
-        const response = await fetch(`/api/projects/${projectId}/prisma-checklist`);
-        if (!response.ok) throw new Error('Erreur réseau ou serveur.');
+        const prismaData = await fetchAPI(`/projects/${appState.currentProject.id}/prisma-checklist`);
+        
+        // Initialisation de l'état global pour la checklist
+        window.currentPrismaState = {
+            checklist: prismaData.checklist || {}, // Utiliser un objet vide par défaut
+            projectId: appState.currentProject.id,
+            completionRate: prismaData.completion_rate || 0
+        };
+        
+        const checklist = window.currentPrismaState.checklist;
+        const container = document.getElementById('prismaChecklistContainer');
+        if (!container) return;
 
-        const { checklist, completion_rate } = await response.json();
-        
-        let html = '<ul>';
-        for (const section of checklist) {
-            html += `<li><strong>${section.section}</strong><ul>`;
-            for (const item of section.items) {
-                html += `
-                    <li>
-                        <input type="checkbox" id="prisma-${item.id}" ${item.checked ? 'checked' : ''}>
-                        <label for="prisma-${item.id}">${item.id}: ${item.description}</label>
-                    </li>
-                `;
-            }
-            html += '</ul></li>';
+        let html = '';
+        // CORRECTION : Utiliser Object.entries pour itérer sur l'objet checklist
+        for (const [section, items] of Object.entries(checklist)) {
+            if (!Array.isArray(items)) continue; // Sécurité pour s'assurer que les items sont une liste
+            
+            const sectionTitle = section.charAt(0).toUpperCase() + section.slice(1);
+            html += `
+                <div class="prisma-section">
+                    <h5 class="prisma-section-title">${sectionTitle}</h5>
+                    <div class="prisma-items">
+                        ${items.map(item => `
+                            <div class="prisma-item">
+                                <label class="prisma-checkbox">
+                                    <input type="checkbox" 
+                                           ${item.completed ? 'checked' : ''} 
+                                           onchange="togglePRISMAItem('${item.id}')" />
+                                    <span class="prisma-item-text">${escapeHtml(item.item)}</span>
+                                </label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
         }
-        html += '</ul>';
-        
         container.innerHTML = html;
-        document.getElementById('prismaCompletionRate').textContent = `Complétion : ${completion_rate}%`;
+        updatePRISMAProgress();
 
     } catch (error) {
         console.error('Erreur chargement PRISMA:', error);
-        container.innerHTML = '<p>Erreur de chargement de la checklist.</p>';
+        const container = document.getElementById('prismaChecklistContainer');
+        if(container) container.innerHTML = `<p class="text-error">Erreur lors du chargement de la checklist.</p>`;
     }
 }
 
