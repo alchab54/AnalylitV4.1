@@ -297,7 +297,7 @@ def run_discussion_generation_task(session, project_id: str):
     df = pd.DataFrame(rows)
     profile = session.execute(text("SELECT profile_used FROM projects WHERE id = :pid"), {"pid": project_id}).scalar_one_or_none() or 'standard'
     model_name = config.DEFAULT_MODELS.get(profile, {}).get('synthesis', 'llama3.1:8b')
-    draft = generate_discussion_draft(df, call_ollama_api, model_name)
+    draft = generate_discussion_draft(df, lambda p, m: call_ollama_api(p, m, temperature=0.7), model_name)
 
     update_project_status(session, project_id, 'completed', discussion=draft)
     send_project_notification(project_id, 'analysis_completed', 'Le brouillon de discussion a été généré.', {'discussion_draft': draft})

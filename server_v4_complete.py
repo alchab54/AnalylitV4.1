@@ -2710,6 +2710,24 @@ app.register_blueprint(api_bp)
 def serve_frontend():
     return app.send_static_file('index.html')
 
+def listen_for_notifications():
+    """Tâche de fond pour écouter les notifications Redis et les relayer via Socket.IO."""
+    pubsub = redis_conn.pubsub()
+    pubsub.subscribe("analylit_notifications")
+    logger.info("📢 L'écouteur de notifications Redis est démarré.")
+    for message in pubsub.listen():
+        if message['type'] == 'message':
+            try:
+                data = json.loads(message['data'])
+                if data.get('is_global'):
+                    socketio.emit('notification', data, broadcast=True, namespace='/')
+                elif data.get('project_id'):
+                    socketio.emit('notification', data, room=data['project_id'], namespace='/')
+            except Exception as e:
+                logger.error(f"Erreur lors du relais de la notification: {e}")
+
 if __name__ == '__main__':
     init_db()
+    # Démarrer l'écouteur dans un thread séparé pour ne pas bloquer le serveur
+    socketio.start_background_task(target=listen_for_notifications)
     socketio.run(app, host='0.0.0.0', port=5001, debug=True)
