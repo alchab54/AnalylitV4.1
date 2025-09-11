@@ -1,59 +1,37 @@
-# AnalyLit V4.1 - Dockerfile pour les workers (hérite de l'image de base)
+# STAGE 1: Builder - Installe les dépendances
+FROM python:3.11-slim as builder
 
-# --- Étape 1: Builder ---
-# Installe toutes les dépendances système et Python.
-FROM nvidia/cuda:12.3.1-runtime-ubuntu22.04 as builder
-
-ENV DEBIAN_FRONTEND=noninteractive
-ENV TZ=Europe/Paris
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONPATH=/app
-
-# Installation des dépendances système et Python 3.11
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    software-properties-common \
-    tzdata \
-    && add-apt-repository ppa:deadsnakes/ppa -y \
-    && apt-get update && apt-get install -y --no-install-recommends \
-    python3.11 python3.11-dev python3.11-venv python3-pip \
-    gcc g++ curl build-essential git libgl1-mesa-glx libglib2.0-0 libpq-dev \
-    && update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1 \
-    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Création d'un environnement virtuel
-RUN python -m venv /opt/venv
-# Active le venv pour les commandes suivantes
-ENV PATH="/opt/venv/bin:$PATH"
-RUN python -m pip install --upgrade pip setuptools wheel
-
-WORKDIR /app
-
-# Installation des dépendances Python dans le venv
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-
-# --- Étape 2: Production - Création de l'image finale ---
-FROM nvidia/cuda:12.3.1-runtime-ubuntu22.04
-
-ENV DEBIAN_FRONTEND=noninteractive
-ENV TZ=Europe/Paris
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONPATH=/app
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.11-venv \
+    build-essential \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
+RUN python -m pip install --upgrade pip setuptools wheel
+
+WORKDIR /app
+# Installation des dépendances Python dans le venv
+# ÉTAPE CLÉ : Copie et installe les dépendances EN PREMIER
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+
+# STAGE 2: Final - Image d'exécution
+FROM python:3.11-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copie l'environnement virtuel pré-construit
 COPY --from=builder /opt/venv /opt/venv
+
 ENV PATH="/opt/venv/bin:$PATH"
 
 WORKDIR /app
+# ÉTAPE CLÉ : Copie le reste du code de l'application
+COPY . .
 
-ENV NVIDIA_VISIBLE_DEVICES=all
-ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
-ENV CUDA_VISIBLE_DEVICES=0
-ENV USE_GPU=true
+CMD ["python", "-m", "rq", "worker", "-c", "config_v4", "high", "default", "low", "--with-scheduler"]
