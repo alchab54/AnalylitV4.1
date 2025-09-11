@@ -45,7 +45,8 @@ lxml==5.2.2
 PyMuPDF==1.24.1
 pdfplumber==0.11.1
 blinker==1.7.0
-pydantic-settings
+pydantic-settings==2.3.4
+pytesseract==0.3.10
 
 #--- Outils de Build ---
 setuptools>=65.0.0

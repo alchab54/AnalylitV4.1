@@ -1087,6 +1087,7 @@ def get_project_files(project_id):
     except Exception as e:
         logger.exception(f"Erreur lors de la récupération des fichiers pour le projet {project_id}: {e}")
         return jsonify({'error': 'Erreur interne du serveur lors de la récupération des fichiers.'}), 500
+    # Pas de bloc finally nécessaire ici, la gestion des erreurs est complète.
 
 @api_bp.route('/projects/<project_id>/index-pdfs', methods=['POST'])
 def run_index_pdfs(project_id):
@@ -2494,9 +2495,8 @@ def export_project(project_id):
     except Exception as e:
         logger.exception(f"Erreur export projet: {e}")
         return jsonify({'error': 'Erreur lors de l\'export'}), 500
-    finally:
-        # La session est gérée par le teardown context
-        pass
+    # Pas de bloc finally nécessaire ici, la gestion des erreurs est complète.
+
 
 # Route pour les statistiques de validation (récupérée de la v4.0 et adaptée)
 @api_bp.route('/projects/<project_id>/validation-stats', methods=['GET'])
@@ -2572,6 +2572,7 @@ def get_validation_stats(project_id):
     except Exception as e:
         logger.exception(f"Erreur get_validation_stats: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
+    # Pas de bloc finally nécessaire ici, la gestion des erreurs est complète.
 
 @api_bp.route('/projects/<project_id>/stakeholders', methods=['GET', 'POST'])
 def handle_stakeholders(project_id):

@@ -859,11 +859,11 @@ def run_risk_of_bias_task(session, project_id: str, article_id: str):
             domain_2_bias = EXCLUDED.domain_2_bias, domain_2_justification = EXCLUDED.domain_2_justification,
             overall_bias = EXCLUDED.overall_bias, overall_justification = EXCLUDED.overall_justification;
     """), rob_data)
-
-    except Exception as e:
-        logger.error(f"Erreur dans run_risk_of_bias_task pour {article_id}: {e}", exc_info=True)
-        send_project_notification(project_id, 'rob_failed', f"Erreur d'analyse RoB pour {article_id}: {e}")
-
+    
+    # Le bloc except a été déplacé dans le décorateur @with_db_session
+    # pour une gestion centralisée des erreurs.
+    # La tâche échouera et sera gérée par RQ si une exception se produit.
+    
     send_project_notification(project_id, 'rob_completed', f"Analyse RoB terminée pour {article_id}.")
 
 # ================================================================
