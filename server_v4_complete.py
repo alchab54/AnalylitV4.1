@@ -858,6 +858,30 @@ def handle_analysis_profiles_alias(db_session):
     if request.method == 'GET':
         profiles = db_session.query(Profile).order_by(Profile.name).all()
         return jsonify([p.to_dict() for p in profiles])
+
+@api_bp.route('/prompts/<uuid:prompt_id>', methods=['PUT'])
+@with_db_session
+def update_prompt(db_session, prompt_id):
+    prompt = db_session.get(Prompt, prompt_id)
+    if not prompt:
+        return jsonify({"error": "Prompt non trouvé"}), 404
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Données manquantes"}), 400
+        
+    prompt.name = data.get('name', prompt.name)
+    prompt.content = data.get('content', prompt.content)
+    prompt.is_default = data.get('is_default', prompt.is_default)
+    prompt.analysis_type = data.get('analysis_type', prompt.analysis_type)
+
+    try:
+        db_session.commit()
+    except Exception as e:
+        db_session.rollback()
+        logger.exception("Erreur lors de la mise à jour du prompt.")
+        return jsonify({"error": "Erreur interne"}), 500
+        
+    return jsonify(prompt.to_dict())
 @api_bp.route('/prompts', methods=['GET', 'POST'])
 def handle_prompts():
     session = Session()
@@ -932,41 +956,37 @@ def handle_extraction_grids(project_id):
         logger.exception(f"Erreur grids_collection: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
 
-@api_bp.route('/projects/<uuid:project_id>/grids/<uuid:grid_id>', methods=['PUT'])
+@api_bp.route('/grids/<uuid:grid_id>', methods=['PUT'])
 @with_db_session
-def update_grid(db_session, project_id, grid_id):
+def update_grid(db_session, grid_id):
     grid = db_session.get(Grid, grid_id)
-    if not grid or str(grid.project_id) != str(project_id):
+    if not grid:
         return jsonify({"error": "Grille non trouvée"}), 404
-        
     data = request.get_json()
     if not data:
         return jsonify({"error": "Données manquantes"}), 400
-        
+    
     grid.name = data.get('name', grid.name)
     grid.description = data.get('description', grid.description)
     
-    # Mise à jour des champs
-    if 'fields' in data and isinstance(data['fields'], list):
-        # Supprimer les anciens champs
-        for field in grid.fields:
-            db_session.delete(field)
-        
-        # Ajouter les nouveaux champs
-        for field_data in data['fields']:
-            new_field = GridField(
-                name=field_data.get('name'),
-                description=field_data.get('description'),
-                grid_id=grid.id
-            )
-            db_session.add(new_field)
+    # Mise à jour des champs (suppression puis recréation)
+    db_session.query(GridField).filter(GridField.grid_id == grid_id).delete()
+    
+    new_fields = data.get('fields', [])
+    for field_data in new_fields:
+        field = GridField(
+            grid_id=grid.id,
+            name=field_data.get('name'),
+            description=field_data.get('description')
+        )
+        db_session.add(field)
     
     try:
         db_session.commit()
     except Exception as e:
         db_session.rollback()
         logger.exception(f"Erreur lors de la mise à jour de la grille {grid_id}")
-        return jsonify({"error": "Erreur interne"}), 500
+        return jsonify({"error": "Erreur interne du serveur"}), 500
         
     return jsonify(grid.to_dict())
         
