@@ -1,4 +1,12 @@
+version: '3.8'
+
 services:
+  # NOUVEAU SERVICE : construit l'image de base partagée
+  base:
+    image: analylit-base:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.base
   db:
     image: postgres:15-alpine
     container_name: analylit-db-v4
@@ -39,6 +47,8 @@ services:
       echo 'Lancement du serveur Gunicorn...' &&
       gunicorn server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"
     depends_on:
+      base:
+        condition: service_completed_successfully
       db:
         condition: service_healthy
       redis: { condition: service_healthy }
@@ -71,6 +81,8 @@ services:
       analylit_processing_v4 analylit_synthesis_v4
       analylit_analysis_v4 analylit_background_v4
     depends_on:
+      base:
+        condition: service_completed_successfully
       db:
         condition: service_healthy
       redis: { condition: service_healthy }

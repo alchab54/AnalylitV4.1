@@ -1,36 +1,7 @@
-# STAGE 1: Builder - Installe les dépendances
-FROM python:3.11-slim as builder
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-
-RUN python -m pip install --upgrade pip setuptools wheel
+# Utilise l'image de base où tout est déjà installé
+FROM analylit-base:latest
 
 WORKDIR /app
-# ÉTAPE CLÉ : Copie et installe les dépendances EN PREMIER
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
 
-
-# STAGE 2: Final - Image d'exécution
-FROM python:3.11-slim
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copie l'environnement virtuel pré-construit
-COPY --from=builder /opt/venv /opt/venv
-
-ENV PATH="/opt/venv/bin:$PATH"
-
-WORKDIR /app
-# ÉTAPE CLÉ : Copie le reste du code de l'application
-COPY . .
-
-CMD ["python", "-m", "rq", "worker", "-c", "config_v4", "high", "default", "low", "--with-scheduler"]
+# La commande CMD est conservée pour spécifier le point d'entrée du conteneur worker
+CMD ["python", "-m", "rq.cli", "worker", "-u", "redis://redis:6379/0", "--with-scheduler", "analylit_processing_v4", "analylit_synthesis_v4", "analylit_analysis_v4", "analylit_background_v4"]

@@ -1,48 +1,12 @@
-# STAGE 1: Builder - Installe les dépendances dans un environnement virtuel
-FROM python:3.11-slim as builder
-
-# Installe les paquets système nécessaires pour la compilation
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Crée un environnement virtuel
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-
-# Met à jour pip
-RUN python -m pip install --upgrade pip setuptools wheel
+# Utilise l'image de base où tout est déjà installé
+FROM analylit-base:latest
 
 WORKDIR /app
-# ÉTAPE CLÉ : Copie et installe les dépendances EN PREMIER
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-
-
-# STAGE 2: Final - Construit l'image finale légère
-FROM python:3.11-slim
-
-# Installe uniquement les dépendances d'exécution nécessaires
-# MODIFICATION ICI : Remplacer libgl1-mesa-glx par libgl1
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq-dev \
-    libgl1 \
-    libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copie l'environnement virtuel avec les paquets déjà installés depuis le builder
-COPY --from=builder /opt/venv /opt/venv
-
-# Définit le chemin pour utiliser l'environnement virtuel
-ENV PATH="/opt/venv/bin:$PATH"
-
-WORKDIR /app
-# ÉTAPE CLÉ : Copie le reste du code de l'application SEULEMENT MAINTENANT
-COPY . .
 
 # Crée les répertoires nécessaires
 RUN mkdir -p /app/projects /app/model_cache
 
 EXPOSE 5000
+
+# La commande CMD est conservée pour spécifier le point d'entrée du conteneur web
 CMD ["/bin/bash", "-c", "python -c 'from utils.database import init_db; init_db()' && gunicorn --workers 4 --bind 0.0.0.0:5000 'server_v4_complete:create_app()'"]

@@ -1,0 +1,31 @@
+# Dockerfile.base
+# Cette image sert de socle commun pour les services web et worker.
+# Elle contient l'installation de toutes les dépendances lourdes.
+
+# Utilise une image Python de base légère
+FROM python:3.11-slim
+
+# Met à jour les paquets système et installe les dépendances de compilation et d'exécution
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Crée et active un environnement virtuel
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Met à jour pip
+RUN python -m pip install --upgrade pip setuptools wheel
+
+# Définit le répertoire de travail
+WORKDIR /app
+
+# Copie et installe les dépendances Python. C'est la seule étape longue.
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copie le reste du code de l'application dans l'image de base
+COPY . .
