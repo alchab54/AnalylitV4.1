@@ -20,9 +20,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine, text
 from functools import wraps
 from sqlalchemy.orm import sessionmaker, scoped_session
-from models import Project
-from config_v4 import Config
-from database import get_db_session
+from .models import (Project, Article, SearchResult, Grid, GridField,
+                         Extraction, AnalysisProfile, Prompt, Analysis,
+                         Validation, PRISMAChecklistItem, StakeholderGroup)
+from .database import db_session
 from config_v4 import get_config
 from tasks_v4_complete import (
     multi_database_search_task,
@@ -655,27 +656,21 @@ def handle_prisma_checklist(project_id):
         finally:
             session.close()
 
-@app.route('/api/projects/create-from-files', methods=['POST'])
-def create_project_from_files():
-    with get_db_session() as db_session:
-        name = request.form.get('name')
-        if not name:
-            return jsonify({"error": "Le nom du projet est requis"}), 400
-        
-        new_project = Project(name=name, status="pending")
-        db_session.add(new_project)
-        db_session.commit()
-        
-        files = request.files.getlist('files')
-        
-        # Lancer la tâche de fond
-        job = q_processing.enqueue('tasks.process_uploaded_files', new_project.id, files)
-        
-        return jsonify({
-            "message": "Projet créé et traitement des fichiers lancé.",
-            "project_id": new_project.id,
-            "job_id": job.id
-        }), 201
+@app.route('/api/projects/<uuid:project_id>/files-set', methods=['GET'])
+def get_project_files_set(project_id):
+    """
+    Retourne un ensemble des noms de fichiers PDF présents dans le dossier d'un projet.
+    """
+    project_path = os.path.join(Config.PROJECTS_DIR, str(project_id))
+    if not os.path.exists(project_path):
+        return jsonify({"error": "Projet non trouvé"}), 404
+    
+    try:
+        pdf_files = {f for f in os.listdir(project_path) if f.lower().endswith('.pdf')}
+        return jsonify(list(pdf_files))
+    except Exception as e:
+        logger.exception(f"Erreur lors de la lecture des fichiers du projet {project_id}")
+        return jsonify({"error": "Erreur interne du serveur"}), 500
 
 
 @api_bp.route('/health', methods=['GET'])
@@ -1947,7 +1942,10 @@ def get_summary_table_data(project_id):
         
         try:
             db_session.commit()
-            return jsonify({"message": "Progression PRISMA sauvegardée"}), 200
+        except Exception as e:
+            db_session.rollback()
+            logger.exception(f"Erreur lors de la mise à jour du profil {profile_id}")
+            return jsonify({"error": "Erreur interne du serveur"}), 500
         except SQLAlchemyError as e:
             db_session.rollback()
             logger.exception(f"Erreur DB lors de la sauvegarde PRISMA pour le projet {project_id}: {e}")
