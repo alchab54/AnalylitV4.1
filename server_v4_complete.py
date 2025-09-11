@@ -628,41 +628,29 @@ def handle_prisma_checklist(project_id):
         elif request.method == 'POST':
             data = request.get_json(force=True)
             
-            session.execute(text("""
-                UPDATE projects 
-                SET prisma_checklist = :checklist, updated_at = :ts 
-                WHERE id = :pid
-            """), {
-                "checklist": json.dumps(data.get('checklist', {})),
-                "ts": datetime.now().isoformat(),
-                "pid": project_id
-            })
-            session.commit()
+            try:
+                session.execute(text("""
+                    UPDATE projects 
+                    SET prisma_checklist = :checklist, updated_at = :ts 
+                    WHERE id = :pid
+                """), {
+                    "checklist": json.dumps(data.get('checklist', {})),
+                    "ts": datetime.now().isoformat(),
+                    "pid": project_id
+                })
+                session.commit()
+            except SQLAlchemyError as e:
+                session.rollback()
+                logger.exception(f"Erreur DB lors de la sauvegarde PRISMA : {e}")
+                return jsonify({"error": "Erreur base de données"}), 500
             
             return jsonify({"message": "Checklist PRISMA-ScR sauvegardée"}), 200
             
     except Exception as e:
         logger.exception(f"Erreur handle_prisma_checklist: {e}")
         return jsonify({'error': 'Erreur interne'}), 500
-
-@api_bp.route('/projects/<project_id>/atn-analysis', methods=['POST'])
-def run_atn_analysis(project_id):
-    """Lance l'analyse ATN multipartie prenante."""
-    try:
-        uuid.UUID(project_id, version=4)
-    except ValueError:
-        return jsonify({'error': 'ID de projet invalide'}), 400
-
-    job = analysis_queue.enqueue(
-        run_atn_stakeholder_analysis_task,
-        project_id=project_id,
-        job_timeout='30m'
-    )
-    
-    return jsonify({
-        "message": "Analyse ATN multipartie prenante lancée.",
-        "job_id": job.id
-    }), 202
+        finally:
+            session.close()
 
 @api_bp.route('/projects/<project_id>/atn-metrics', methods=['GET'])
 def get_atn_metrics(project_id):
@@ -2485,8 +2473,6 @@ def handle_stakeholders(project_id):
 
     session = Session()
     try:
-        # Validation de l'UUID déjà faite
-
         if request.method == 'GET':
             rows = session.execute(text("""
                 SELECT * FROM stakeholder_groups 
@@ -2496,6 +2482,7 @@ def handle_stakeholders(project_id):
             
             stakeholders = [dict(r) for r in rows]
             
+            # Si aucun groupe défini, retourner les groupes par défaut
             # Si aucun groupe défini, retourner les groupes par défaut
             if not stakeholders:
                 default_groups = [
@@ -2527,7 +2514,6 @@ def handle_stakeholders(project_id):
             session.commit()
             
             return jsonify(stakeholder), 201
-            
     except Exception as e:
         logger.exception(f"Erreur handle_stakeholders: {e}")
         return jsonify({'error': 'Erreur interne'}), 500

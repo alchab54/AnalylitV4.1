@@ -47,9 +47,11 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 WORKDIR /app
 
-# Copier uniquement les fichiers et dossiers nécessaires à l'exécution des tâches
-COPY tasks_v4_complete.py ./
-COPY utils ./utils/
+# Installation des dépendances Python dans le venv
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
 
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility

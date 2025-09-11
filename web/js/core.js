@@ -62,8 +62,8 @@ const clickActions = {
         const articleId = target.dataset.articleId;
         if (articleId) {
             fetchAndDisplayRob(articleId);
-        },
-    },
+        }
+    }
 };
 
 function setupDelegatedEventListeners() {

@@ -51,8 +51,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 # Configuration de l'application
 WORKDIR /app
+COPY requirements.txt ./
+RUN python -m pip install --no-cache-dir -r requirements.txt
 COPY . .
-
 RUN mkdir -p /app/projects /app/model_cache
 ENV SENTENCE_TRANSFORMERS_HOME=/app/model_cache
 ENV NVIDIA_VISIBLE_DEVICES=all
