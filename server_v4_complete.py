@@ -18,6 +18,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine, text
 from functools import wraps
 from sqlalchemy.orm import sessionmaker, scoped_session
+import shutil
 from models import (Project, Article, SearchResult, Extraction, Grid, GridField,
                     Validation, Analysis, ChatMessage, AnalysisProfile as Profile, Prompt,
                     Stakeholder, StakeholderGroup, AnalysisProfile)
@@ -430,38 +431,35 @@ def handle_projects():
         logger.exception(f"Erreur handle_projects: {e}")
         return jsonify({'error': 'Erreur interne'}), 500
 
-@api_bp.route('/projects/<project_id>', methods=['GET', 'DELETE'])
-def handle_single_project(project_id, db_session=None):
+@api_bp.route('/projects/<uuid:project_id>', methods=['DELETE'])
+@with_db_session
+def delete_project(db_session, project_id):
+    """Supprime un projet et ses données associées."""
     try:
-        uuid.UUID(project_id, version=4)
-    except ValueError:
-        return jsonify({'error': 'ID de projet invalide'}), 400
+        project = db_session.get(Project, project_id)
+        if not project:
+            return jsonify({"error": "Projet non trouvé"}), 404
 
-    session = Session()
-    # Validation de l'UUID déjà faite
+        # Supprimer le dossier du projet sur le disque
+        project_path = Path(app.config['PROJECTS_DIR']) / str(project_id)
+        if project_path.exists() and project_path.is_dir():
+            shutil.rmtree(project_path)
 
-    if request.method == 'GET':
-        try:
-            row = session.execute(text("SELECT * FROM projects WHERE id = :id"), {"id": project_id}).mappings().fetchone()
-            return (jsonify(dict(row)) if row else (jsonify({'error': 'Projet non trouvé'}), 404))
-        finally:
-            session.close()
-    if request.method == 'DELETE':
-        try:
-            session.execute(text("DELETE FROM search_results WHERE project_id = :pid"), {"pid": project_id})
-            session.execute(text("DELETE FROM extractions WHERE project_id = :pid"), {"pid": project_id})
-            session.execute(text("DELETE FROM processing_log WHERE project_id = :pid"), {"pid": project_id})
-            session.execute(text("DELETE FROM extraction_grids WHERE project_id = :pid"), {"pid": project_id})
-            session.execute(text("DELETE FROM chat_messages WHERE project_id = :pid"), {"pid": project_id})
-            session.execute(text("DELETE FROM projects WHERE id = :pid"), {"pid": project_id})
-            session.commit()
-            return jsonify({'message': 'Projet supprimé'})
-        except SQLAlchemyError as e:
-            logger.error(f"Erreur DB dans handle_single_project: {e}", exc_info=True)
-            return jsonify({'error': 'Erreur de base de données'}), 500
-        except Exception as e:
-            logger.exception(f"Erreur inattendue dans handle_single_project: {e}")
-            return jsonify({'error': 'Erreur interne'}), 500
+        # Supprimer le projet de la base de données (les cascades devraient gérer le reste)
+        db_session.delete(project)
+        db_session.commit()
+        
+        logger.info(f"Projet {project_id} supprimé avec succès.")
+        return jsonify({"message": "Projet supprimé"})
+
+    except SQLAlchemyError as e:
+        db_session.rollback()
+        logger.exception(f"Erreur DB lors de la suppression du projet {project_id}: {e}")
+        return jsonify({"error": "Erreur base de données"}), 500
+    except Exception as e:
+        db_session.rollback()
+        logger.exception(f"Erreur inattendue lors de la suppression du projet {project_id}: {e}")
+        return jsonify({"error": "Erreur interne du serveur"}), 500
 
 @api_bp.route('/projects/<project_id>/articles', methods=['DELETE'])
 def delete_project_articles(project_id):
