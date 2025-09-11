@@ -769,12 +769,12 @@ def update_profile(db_session, profile_id):
     profile.context_length = data.get('context_length', profile.context_length)
 
     try:
-        db_session.commit()
+        db_session.commit() # type: ignore
     except Exception as e:
         db_session.rollback()
         logger.exception("Erreur lors de la mise à jour du profil.")
         return jsonify({'error': 'Erreur interne'}), 500
-
+ 
     return jsonify(profile.to_dict())
 
 @api_bp.route('/projects/<project_id>/analysis-profile', methods=['PUT'])
@@ -2261,6 +2261,12 @@ def handle_stakeholder_groups(db_session, project_id):
         )
 
         db_session.add(new_group)
+        try:
+            db_session.commit()
+        except SQLAlchemyError as e:
+            db_session.rollback()
+            logger.exception(f"Erreur DB lors de la création du groupe de parties prenantes pour le projet {project_id}: {e}")
+            return jsonify({"error": "Erreur base de données"}), 500
         return jsonify(new_group.to_dict()), 201
 
 @api_bp.route('/admin/fix-profiles', methods=['POST'])
@@ -2314,11 +2320,11 @@ def handle_join_room(data):
     room = data.get('room')
     if room:
         from flask_socketio import join_room, emit
-        join_room(room)
-        emit('room_joined', {'project_id': room})
+        join_room(room) # type: ignore
+        emit('room_joined', {'project_id': room}) # type: ignore
         logger.info(f"Client {request.sid} a rejoint la room {room}")
 
-@api_bp.route('/projects/<project_id>/run-rob-analysis', methods=['POST'])
+@api_bp.route('/projects/<project_id>/run-rob-analysis', methods=['POST']) # type: ignore
 def run_rob_analysis(project_id):
     """Lance l'analyse du risque de biais pour les articles sélectionnés."""
     try:
