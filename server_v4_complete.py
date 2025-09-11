@@ -853,12 +853,11 @@ def update_analysis_profile(db_session, project_id):
 
 # ALIAS pour compatibilité frontend: /analysis-profiles
 @api_bp.route('/analysis-profiles', methods=['GET', 'POST'])
-def handle_analysis_profiles_alias():
+@with_db_session
+def handle_analysis_profiles_alias(db_session):
     if request.method == 'GET':
-        return handle_analysis_profiles()
-    if request.method == 'POST':
-        return handle_analysis_profiles()
-
+        profiles = db_session.query(Profile).order_by(Profile.name).all()
+        return jsonify([p.to_dict() for p in profiles])
 @api_bp.route('/prompts', methods=['GET', 'POST'])
 def handle_prompts():
     session = Session()
@@ -933,47 +932,43 @@ def handle_extraction_grids(project_id):
         logger.exception(f"Erreur grids_collection: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
 
-@api_bp.route('/projects/<project_id>/grids/<grid_id>', methods=['PUT', 'DELETE'])
-def handle_single_grid(project_id, grid_id):
+@api_bp.route('/projects/<uuid:project_id>/grids/<uuid:grid_id>', methods=['PUT'])
+@with_db_session
+def update_grid(db_session, project_id, grid_id):
+    grid = db_session.get(Grid, grid_id)
+    if not grid or str(grid.project_id) != str(project_id):
+        return jsonify({"error": "Grille non trouvée"}), 404
+        
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Données manquantes"}), 400
+        
+    grid.name = data.get('name', grid.name)
+    grid.description = data.get('description', grid.description)
+    
+    # Mise à jour des champs
+    if 'fields' in data and isinstance(data['fields'], list):
+        # Supprimer les anciens champs
+        for field in grid.fields:
+            db_session.delete(field)
+        
+        # Ajouter les nouveaux champs
+        for field_data in data['fields']:
+            new_field = GridField(
+                name=field_data.get('name'),
+                description=field_data.get('description'),
+                grid_id=grid.id
+            )
+            db_session.add(new_field)
+    
     try:
-        uuid.UUID(project_id, version=4)
-        uuid.UUID(grid_id, version=4)
-    except ValueError:
-        return jsonify({'error': 'ID de projet ou de grille invalide'}), 400
-
-    session = Session()
-    try:
-        # Validation des UUIDs déjà faite
-        if request.method == 'PUT':
-            data = request.get_json(force=True)
-            name, fields = data.get('name'), data.get('fields')
-            if not name or not isinstance(fields, list) or not fields:
-                return jsonify({'error': 'Le nom et une liste de champs sont requis.'}), 400
-
-            res = session.execute(text("""
-            UPDATE extraction_grids SET name = :n, fields = :f
-            WHERE id = :id AND project_id = :pid
-            """), {"n": name, "f": json.dumps(fields), "id": grid_id, "pid": project_id})
-            
-            if res.rowcount == 0:
-                return jsonify({'error': "Grille non trouvée ou n'appartient pas à ce projet."}), 404
-            
-            session.commit()
-            return jsonify({'message': 'Grille mise à jour avec succès.'})
-
-        if request.method == 'DELETE':
-            res = session.execute(text("""
-            DELETE FROM extraction_grids WHERE id = :id AND project_id = :pid
-            """), {"id": grid_id, "pid": project_id})
-            
-            if res.rowcount == 0:
-                return jsonify({'error': "Grille non trouvée ou n'appartient pas à ce projet."}), 404
-            
-            session.commit()
-            return jsonify({'message': 'Grille supprimée avec succès.'})
+        db_session.commit()
     except Exception as e:
-        logger.exception(f"Erreur grid_resource: {e}")
-        return jsonify({'error': 'Erreur interne du serveur'}), 500
+        db_session.rollback()
+        logger.exception(f"Erreur lors de la mise à jour de la grille {grid_id}")
+        return jsonify({"error": "Erreur interne"}), 500
+        
+    return jsonify(grid.to_dict())
         
 @api_bp.route('/projects/<project_id>/grids/import', methods=['POST'])
 def import_grid_from_file(project_id):
@@ -2210,6 +2205,39 @@ def handle_stakeholders(project_id):
     except Exception as e:
         logger.exception(f"Erreur handle_stakeholders: {e}")
         return jsonify({'error': 'Erreur interne'}), 500
+
+@api_bp.route('/admin/fix-profiles', methods=['POST'])
+@with_db_session
+def fix_analysis_profiles(db_session):
+    """Charge ou met à jour les profils d'analyse depuis un fichier profiles.json."""
+    try:
+        with open('profiles.json', 'r', encoding='utf-8') as f:
+            profiles_data = json.load(f)
+        
+        count = 0
+        for profile_data in profiles_data:
+            profile_id = profile_data.get("id")
+            profile = db_session.get(Profile, profile_id)
+            if not profile:
+                profile = Profile(id=profile_id)
+                db_session.add(profile)
+            
+            profile.name = profile_data.get("name")
+            profile.description = profile_data.get("description")
+            profile.model_name = profile_data.get("model_name")
+            profile.temperature = profile_data.get("temperature")
+            profile.context_length = profile_data.get("context_length")
+            count += 1
+
+        db_session.commit()
+        return jsonify({"message": f"{count} profils ont été chargés/mis à jour avec succès."}), 200
+        
+    except FileNotFoundError:
+        return jsonify({"error": "Le fichier profiles.json est introuvable."}), 404
+    except Exception as e:
+        db_session.rollback()
+        logger.exception("Erreur lors de la correction des profils d'analyse.")
+        return jsonify({"error": "Erreur interne du serveur"}), 500
 
 # ================================================================
 # 3) WebSocket Events
