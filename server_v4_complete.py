@@ -28,7 +28,7 @@ from utils.models import (
     Validation, Analysis, ChatMessage, AnalysisProfile as Profile, Prompt,
     Stakeholder, StakeholderGroup, AnalysisProfile)
 from utils.database import db_session, init_db, seed_default_data
-from config_v4 import get_config, Config
+from config_v4 import get_config
 from tasks_v4_complete import (
     multi_database_search_task,
     process_single_article_task,

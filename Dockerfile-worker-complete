@@ -12,7 +12,6 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN python -m pip install --upgrade pip setuptools wheel
 
 WORKDIR /app
-# Installation des dépendances Python dans le venv
 # ÉTAPE CLÉ : Copie et installe les dépendances EN PREMIER
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt

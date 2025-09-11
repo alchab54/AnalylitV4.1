@@ -7,16 +7,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Création d'un environnement virtuel
+# Crée un environnement virtuel
 RUN python -m venv /opt/venv
-# Active le venv pour les commandes suivantes
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Met à jour pip
 RUN python -m pip install --upgrade pip setuptools wheel
 
 WORKDIR /app
-# Installation des dépendances Python dans le venv
 # ÉTAPE CLÉ : Copie et installe les dépendances EN PREMIER
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
@@ -25,21 +23,19 @@ RUN pip install --no-cache-dir -r requirements.txt
 # STAGE 2: Final - Construit l'image finale légère
 FROM python:3.11-slim
 
-# Installation des dépendances d'exécution uniquement (plus léger)
+# Installe uniquement les dépendances d'exécution nécessaires
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
-    libgl1 \
+    libgl1-mesa-glx \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copie de l'environnement virtuel avec les dépendances déjà installées depuis le builder
+# Copie l'environnement virtuel avec les paquets déjà installés depuis le builder
 COPY --from=builder /opt/venv /opt/venv
 
-# Activation du venv pour l'image finale
 # Définit le chemin pour utiliser l'environnement virtuel
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Configuration de l'application
 WORKDIR /app
 # ÉTAPE CLÉ : Copie le reste du code de l'application SEULEMENT MAINTENANT
 COPY . .
