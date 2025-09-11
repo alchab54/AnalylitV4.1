@@ -1905,6 +1905,25 @@ def handle_project_chat(project_id):
             # Capture toute autre erreur (ex: JSON mal formé, échec de la mise en file d'attente)
             logger.error(f"Erreur lors de la soumission de la question au chat: {e}")
             return jsonify({'error': 'Erreur interne du serveur lors de la soumission de la question.'}), 500
+
+@api_bp.route('/projects/<project_id>/run-atn-analysis', methods=['POST'])
+@with_db_session
+def run_atn_analysis(db_session, project_id):
+    """Lance l'analyse multipartite prenante spécialisée pour l'ATN."""
+    project = db_session.get(Project, project_id)
+    if not project:
+        return jsonify({"error": "Projet non trouvé"}), 404
+
+    try:
+        job = analysis_queue.enqueue(
+            run_atn_stakeholder_analysis_task,
+            project_id=project_id,
+            job_timeout='30m'
+        )
+        return jsonify({'message': "Analyse ATN multipartite lancée.", 'job_id': job.id}), 202
+    except Exception as e:
+        logger.exception(f"Erreur lors du lancement de l'analyse ATN pour le projet {project_id}: {e}")
+        return jsonify({"error": "Erreur interne du serveur"}), 500
         
 @api_bp.route('/projects/<project_id>/chat-messages', methods=['GET'])
 def get_chat_messages(project_id):

@@ -6,7 +6,7 @@ import time
 import requests
 from typing import Any
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+from urllib3.util.retry import Retry
 
 # Import de la configuration de manière sécurisée
 try:

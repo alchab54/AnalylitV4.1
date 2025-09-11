@@ -17,6 +17,15 @@ async function renderValidationSection(project) {
         const excluded = extractions.filter(e => e.user_validation_status === 'exclude');
         const pending = extractions.filter(e => !e.user_validation_status);
 
+        const conflicts = extractions.filter(e => {
+            try {
+                const validations = JSON.parse(e.validations || '{}');
+                return validations.evaluator1 && validations.evaluator2 && validations.evaluator1 !== validations.evaluator2;
+            } catch {
+                return false;
+            }
+        });
+
         container.innerHTML = `
             <div class="card">
                 <div class="card__header"><h4>Statut de la Validation</h4></div>
@@ -62,6 +71,30 @@ async function renderValidationSection(project) {
     } finally {
         showLoadingOverlay(false);
     }
+}
+
+function renderConflictItem(extraction) {
+    const article = appState.searchResults.find(art => art.article_id === extraction.pmid);
+    const title = article?.title || extraction.title || 'Titre non disponible';
+    const validations = JSON.parse(extraction.validations || '{}');
+
+    return `
+        <div class="validation-item validation-item--conflict">
+            <div class="validation-item__info">
+                <h4>${escapeHtml(title)}</h4>
+                <div class="conflict-details">
+                    <span class="decision-badge decision--${validations.evaluator1}">Éval 1: ${validations.evaluator1}</span>
+                    <span class="decision-badge decision--${validations.evaluator2}">Éval 2: ${validations.evaluator2}</span>
+                </div>
+                <p><strong>Score IA:</strong> ${extraction.relevance_score != null ? extraction.relevance_score.toFixed(1) : 'N/A'}/10</p>
+            </div>
+            <div class="validation-item__actions">
+                <p>Résoudre en choisissant :</p>
+                <button class="btn btn--success btn--sm" onclick="handleValidateExtraction('${extraction.id}', 'include')">✓ Inclure</button>
+                <button class="btn btn--error btn--sm" onclick="handleValidateExtraction('${extraction.id}', 'exclude')">✗ Exclure</button>
+            </div>
+        </div>
+    `;
 }
 
 function renderValidationItem(extraction) {

@@ -33,49 +33,121 @@ export function exportAnalyses() {
 
 export function renderAnalysesSection() {
     if (!elements.analysisContainer) return;
-    const analysis = appState.analysisResults || null;
     const project = appState.currentProject;
-    const plotPath = project && project.analysis_plot_path || null;
-    const knowledgeGraphData = project && project.knowledge_graph ? JSON.parse(project.knowledge_graph) : null;
+
+    if (!project) {
+        elements.analysisContainer.innerHTML = `<div class="empty-state"><p>Sélectionnez un projet pour voir les analyses.</p></div>`;
+        return;
+    }
+
+    const analysis = appState.analysisResults || {};
+    const plotPath = analysis.plot_path || null;
+    const knowledgeGraphData = analysis.knowledge_graph ? JSON.parse(analysis.knowledge_graph) : null;
 
     elements.analysisContainer.innerHTML = `
-        <div class="card">
-            <div class="card__header"><h4>📊 Analyses du projet</h4></div>
-            <div class="card__body">
-                <div id="knowledgeGraphContainer" style="width: 100%; height: 600px; border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: 24px;">
-                    ${!knowledgeGraphData ? '<div class="empty-state"><p>Générez le graphe de connaissances pour le visualiser ici.</p></div>' : ''}
+        <div class="analysis-grid">
+            <div class="analysis-card">
+                <div class="analysis-card__header">
+                    <span class="analysis-card__icon">🤝</span>
+                    <h4>Analyse ATN Multipartite</h4>
                 </div>
-                ${analysis ? `<pre class="code-block">${escapeHtml(JSON.stringify(analysis, null, 2))}</pre>` : `
-                    <div class="empty-state">
-                        <p>Aucune analyse disponible pour le moment.</p>
-                    </div>`
-                }
-                ${plotPath ? `<img src="/api/projects/${appState.currentProject.id}/files/${plotPath.split('/').pop()}" alt="Graphique d'analyse" style="max-width:100%;height:auto;margin-top:16px;">` : ''}
+                <p class="analysis-card__description">Analyse spécialisée pour l'alliance thérapeutique numérique, incluant les scores d'empathie, types d'IA, et conformité réglementaire.</p>
+                <button class="btn btn--primary" data-action="run-atn-analysis">Lancer l'Analyse ATN</button>
+            </div>
+            
+            <div class="analysis-card">
+                <div class="analysis-card__header">
+                     <span class="analysis-card__icon">📝</span>
+                    <h4>Discussion académique</h4>
+                </div>
+                <p class="analysis-card__description">Génère une section Discussion basée sur la synthèse.</p>
+                <button class="btn btn--primary" data-action="run-discussion-draft">Générer la Discussion</button>
+            </div>
+             <div class="analysis-card">
+                <div class="analysis-card__header">
+                    <span class="analysis-card__icon">🌐</span>
+                    <h4>Graphe de connaissances</h4>
+                </div>
+                <p class="analysis-card__description">Visualise les relations entre les concepts et les articles.</p>
+                <button class="btn btn--primary" data-action="run-knowledge-graph">Générer le Graphe</button>
+            </div>
+        </div>
+
+        <div id="analysisResultContainer" class="mt-24">
+            </div>
+    `;
+
+    // AFFICHER LES RÉSULTATS ATN S'ILS EXISTENT DÉJÀ
+    if (analysis.atn_metrics) {
+        renderATNResults(analysis);
+    }
+}
+
+
+// NOUVELLE FONCTION : pour afficher les résultats de l'analyse ATN
+function renderATNResults(analysisData) {
+    const container = document.getElementById('analysisResultContainer');
+    if (!container) return;
+
+    const metrics = analysisData.atn_metrics || {};
+    const tech = analysisData.technology_analysis || {};
+    const ethical = analysisData.ethical_regulatory || {};
+
+    const empathyMetrics = metrics.empathy_analysis || {};
+    const allianceMetrics = metrics.alliance_metrics || {};
+
+    container.innerHTML = `
+        <div class="card">
+            <div class="card__header"><h4>Résultats de l'Analyse ATN</h4></div>
+            <div class="card__body">
+                <div class="atn-results">
+                    <div class="metrics-section">
+                        <h5>📊 Métriques d'Empathie & Alliance</h5>
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <h6>Empathie IA (Moy)</h6>
+                                <div class="metric-value">${empathyMetrics.mean_ai_empathy?.toFixed(2) || 'N/A'}</div>
+                            </div>
+                            <div class="metric-card">
+                                <h6>Empathie Humaine (Moy)</h6>
+                                <div class="metric-value">${empathyMetrics.mean_human_empathy?.toFixed(2) || 'N/A'}</div>
+                            </div>
+                             <div class="metric-card">
+                                <h6>Score WAI-SR (Moy)</h6>
+                                <div class="metric-value">${allianceMetrics.mean_wai_sr?.toFixed(2) || 'N/A'}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="metrics-section">
+                        <h5>🤖 Technologie Utilisée</h5>
+                        <p><strong>Type d'IA le plus courant :</strong> ${tech.most_common_ai_type || 'N/A'}</p>
+                        </div>
+                     <div class="metrics-section">
+                        <h5>⚖️ Conformité Réglementaire</h5>
+                         <p><strong>Mentions RGPD :</strong> ${ethical.gdpr_mentions || 0} études (${ethical.regulatory_compliance_rate?.toFixed(1) || 0}%)</p>
+                    </div>
+                </div>
             </div>
         </div>
     `;
+}
 
-    if (knowledgeGraphData && window.vis) {
-        const container = document.getElementById('knowledgeGraphContainer');
-        const options = {
-            nodes: {
-                shape: 'dot',
-                size: 16,
-                font: { size: 14, color: 'var(--color-text)' }
-            },
-            edges: {
-                width: 2,
-                color: { inherit: 'from' },
-                arrows: { to: { enabled: true, scaleFactor: 0.5 } }
-            },
-            physics: {
-                forceAtlas2Based: { gravitationalConstant: -26, centralGravity: 0.005, springLength: 230, springConstant: 0.18 },
-                maxVelocity: 146,
-                solver: 'forceAtlas2Based',
-                timestep: 0.35,
-            },
-        };
-        new vis.Network(container, knowledgeGraphData, options);
+// NOUVELLE FONCTION : pour lancer l'analyse ATN
+export async function handleRunATNAnalysis() {
+    if (!appState.currentProject?.id) {
+        showToast('Veuillez sélectionner un projet.', 'warning');
+        return;
+    }
+    showLoadingOverlay(true, "Lancement de l'analyse ATN...");
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/run-atn-analysis`, {
+            method: 'POST'
+        });
+        showToast('Analyse ATN lancée. Les résultats apparaîtront une fois le calcul terminé.', 'success');
+    } catch (e) {
+        showToast(`Erreur : ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
     }
 }
 
@@ -163,7 +235,6 @@ export function showRunAnalysisModal() {
     `;
     openModal('Lancer une Analyse Avancée', content);
 }
-
 
 export function renderDiscussionDraft(draft) {
     if (!draft) return '';
@@ -329,3 +400,4 @@ export async function handleRunDescriptiveStats() {
         showLoadingOverlay(false);
     }
 }
+

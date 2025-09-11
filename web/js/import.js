@@ -2,6 +2,7 @@ import { appState, elements } from '../app.js';
 import { fetchAPI } from './api.js';
 import { showToast, showLoadingOverlay, escapeHtml, openModal, closeModal } from './ui.js';
 import { loadSearchResults } from './articles.js';
+import { showModal, closeModal } from './ui.js';
 
 export function renderImportSection(project) {
     const container = document.getElementById('importContainer');
@@ -185,38 +186,65 @@ export function showAddManualArticlesModal() {
     openModal('addManualArticlesModal');
 }
 
-export async function handleAddManualArticles(event) {
-    event.preventDefault();
+export function showAddManualArticlesModal() {
+    if (!appState.currentProject) {
+        showToast('Veuillez sélectionner un projet.', 'warning');
+        return;
+    }
+    const modalContent = `
+        <form id="manualArticleForm">
+            <div class="form-group">
+                <label for="manualArticlesTextarea" class="form-label">Identifiants des articles</label>
+                <textarea id="manualArticlesTextarea" name="identifiers" class="form-control" rows="10" 
+                          placeholder="Collez ici une liste d'identifiants (un par ligne) :&#10;10.1038/nphys1170&#10;PMID:12345678&#10;arXiv:2101.00001"></textarea>
+                <p class="form-text">Les identifiants PMID, DOI et arXiv sont supportés.</p>
+            </div>
+            <div class="modal__actions">
+                <button type="button" class="btn btn--secondary" onclick="closeModal('genericModal')">Annuler</button>
+                <button type="submit" class="btn btn--primary">Ajouter les articles</button>
+            </div>
+        </form>
+    `;
+    showModal('Ajouter des Articles Manuellement', modalContent);
 
+    // Attacher le listener au formulaire de la modale
+    document.getElementById('manualArticleForm').addEventListener('submit', handleAddManualArticles);
+}
+
+// MODIFICATION : Mettez à jour la fonction handleAddManualArticles pour qu'elle gère l'événement
+export async function handleAddManualArticles(event) {
+    event.preventDefault(); // Empêche le rechargement de la page
+    
     if (!appState.currentProject?.id) {
         showToast('Sélectionnez d’abord un projet.', 'warning');
         return;
     }
 
     const form = event.target;
-    const textarea = form.querySelector('textarea[name="manual_ids"]') || form.querySelector('textarea');
-    const raw = textarea ? textarea.value.trim() : '';
+    const textarea = form.querySelector('textarea[name="identifiers"]');
+    const rawIdentifiers = textarea ? textarea.value.trim() : '';
 
-    // CORRECTION : on accepte un champ texte multi-lignes et on l’envoie sous "identifiers"
-    if (!raw) {
-        showToast('Ajoutez au moins un identifiant (PMID, DOI, arXiv).', 'warning');
+    if (!rawIdentifiers) {
+        showToast('Veuillez saisir au moins un identifiant.', 'warning');
         return;
     }
 
+    closeModal('genericModal');
+    showLoadingOverlay(true, 'Ajout des articles en cours...');
+
     try {
-        showLoadingOverlay(true, 'Ajout manuel en cours...');
-        const res = await fetchAPI(`/projects/${appState.currentProject.id}/add-manual-articles`, {
+        const response = await fetchAPI(`/projects/${appState.currentProject.id}/add-manual-articles`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ identifiers: raw })
+            body: { identifiers: rawIdentifiers }
         });
 
-        await loadSearchResults();
-        showToast(`${res.added || 0} article(s) ajouté(s).`, 'success');
-        // Optionnel : vider le champ
-        if (textarea) textarea.value = '';
+        showToast(response.message, 'success');
+        // Rafraîchir la liste des articles dans la section "Recherche"
+        if (typeof loadSearchResults === 'function') {
+            loadSearchResults();
+        }
     } catch (e) {
-        showToast(`Erreur: ${e.message}`, 'error');
+        showToast(`Erreur : ${e.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }

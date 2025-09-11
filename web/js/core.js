@@ -71,7 +71,8 @@ export async function initializeApplication() {
         setupDirectEventListeners();
         setupDelegatedEventListeners();
     } catch (e) {
-        console.error('Erreur lors de l'initialisation de l'application:', e);
+        // CORRECTION : Concaténer l'objet erreur au message.
+        console.error('Erreur lors de l\'initialisation de l\'application:', e);
         showToast(`Erreur critique: ${e.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
