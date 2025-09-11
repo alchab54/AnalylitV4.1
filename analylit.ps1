@@ -30,8 +30,7 @@ function Install-AnalyLit {
     }
     
     # Construction et démarrage
-    docker-compose -f $COMPOSE_FILE build
-    docker-compose -f $COMPOSE_FILE up -d --scale worker=3
+    docker-compose -f $COMPOSE_FILE up -d --build --scale worker=3
     
     Write-Host "✅ Installation terminée!" -ForegroundColor Green
     Write-Host "🌐 Interface web: http://localhost:8080" -ForegroundColor Blue
@@ -59,7 +58,7 @@ function Show-Logs {
     docker-compose -f $COMPOSE_FILE logs --tail=50
 }
 
-function Download-Models {
+function Invoke-ModelDownload {
     Write-Host "🤖 Téléchargement des modèles essentiels..." -ForegroundColor Blue
     
     # Attendre Ollama
@@ -84,6 +83,6 @@ switch ($action) {
     "stop" { Stop-Services }
     "status" { Show-Status }
     "logs" { Show-Logs }
-    "models" { Download-Models }
+    "models" { Invoke-ModelDownload }
     default { Show-Help }
 }

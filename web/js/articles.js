@@ -269,7 +269,7 @@ export function updateSelectionCounter() {
     const counters = document.querySelectorAll('#selectionCounter');
     counters.forEach(counter => {
         counter.textContent = `${appState.selectedSearchResults.size} article(s) sélectionné(s)`;
-    }
+    });
 }
 
 export function selectAllArticles() {

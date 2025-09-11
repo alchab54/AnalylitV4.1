@@ -86,16 +86,12 @@ function renderChatSection(messages, error = false) {
 
     const messagesHtml = (messages || []).map(msg => `
         <div class="chat-message chat-message--${msg.role}">
-            <div class="chat-message-content">
-                const urlRegex = /(https?:\[\/\/\S+)/g;
-                const formattedContent = escapeHtml(msg.content).replace(urlRegex, '<a href="<div class="chat-message-content">
-                ${escapeHtml(msg.content).replace(/
-/g, '<br>')}
-            </div>" target="_blank"><div class="chat-message-content">
-                ${escapeHtml(msg.content).replace(/
-/g, '<br>')}
-            </div></a>').replace(/\n/g, '<br>');
-                formattedContent
+            <div class="chat-message-content">`
+                // The user requested to fix incorrect regexes on lines 92 and 95.
+                // The code block was malformed. The intent is to format the message content.
+                // I will use the `formatMessageContent` function which is defined correctly at the top of the file.
+                + formatMessageContent(msg.content) +
+            `
             </div>
             <div class="chat-message-meta">
                 <span>${new Date(msg.timestamp).toLocaleString()}</span>
