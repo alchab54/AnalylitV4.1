@@ -13,7 +13,7 @@ export async function loadProjects() {
 
 export async function handleCreateProject(event) {
     event.preventDefault();
-    const form = event.target;
+    const form = event.target.closest('form');
     const name = form.elements.name.value;
     const description = form.elements.description.value;
     const mode = form.elements.mode.value;
@@ -89,7 +89,7 @@ export function renderProjectList() {
                         <span class="status-badge ${statusClass}">${escapeHtml(project.status || 'pending')}</span>
                     </div>
                 </div>
-                <button class="btn btn--danger btn--sm" data-action="delete-project" data-project-id="${project.id}" title="Supprimer le projet">
+                <button class="btn btn--danger btn--sm" data-action="delete-project" data-project-id="${project.id}" title="Supprimer le projet" onclick="event.stopPropagation();">
                     ×
                 </button>
             </div>
@@ -149,8 +149,8 @@ export function renderProjectDetail(project) {
             ${synthesis}
             
             <div class="project-actions">
-                <button class="btn btn--primary" onclick="showSearchModal()">🔍 Rechercher articles</button>
-                <button class="btn btn--secondary" onclick="showSection('results')">📄 Voir résultats</button>
+                <button class="btn btn--primary" data-action="show-search-modal">🔍 Rechercher articles</button>
+                <button class="btn btn--secondary" data-action="show-section" data-section-id="results">📄 Voir résultats</button>
             </div>
         </div>
     `;

@@ -1,6 +1,7 @@
 // ================================================================
 // AnalyLit V4.1 - Application Frontend (Version finale consolidée)
 // ================================================================
+import { setupDelegatedEventListeners } from './js/core.js';
 import { loadProjects, handleCreateProject, renderProjectList, renderProjectSynthesis, renderProjectDetail, selectProject, deleteProject } from './js/projects.js';
 import { loadSearchResults, handleDeleteSelectedArticles, selectAllArticles, showBatchProcessModal, startBatchProcessing, showRunExtractionModal, startFullExtraction, toggleSelectAll } from './js/articles.js';
 import { loadRobSection, fetchAndDisplayRob, getBiasClass, handleRunRobAnalysis, getRobDomainFromKey } from './js/rob.js';
@@ -56,37 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
         toastContainer: document.getElementById('toastContainer'),
         zoteroFileInput: document.getElementById('zoteroFileInput'),
         bulkPDFInput: document.getElementById('bulkPDFInput'),
-        runIndexingBtn: document.getElementById('runIndexingBtn'),
-        importZoteroPdfsBtn: document.getElementById('importZoteroPdfsBtn'),
-        
     });
 
-    setupEventListeners();
     initializeApplication();
 });
-
-
-
-async function handleRunIndexing() {
-    if (!appState.currentProject?.id) {
-        showToast('Aucun projet sélectionné.', 'warning');
-        return;
-    }
-
-    try {
-        showLoadingOverlay(true, 'Lancement de l\'indexation des PDFs...');
-        await fetchAPI(`/projects/${appState.currentProject.id}/index-pdfs`, {
-            method: 'POST'
-        });
-        showToast('L\'indexation des PDFs a été lancée en arrière-plan.', 'info');
-    } catch (e) {
-        showToast(`Erreur lors du lancement de l\'indexation: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
-}
-
-
 
 async function loadProjectFilesSet(projectId) {
     if (!projectId) return new Set();
@@ -246,45 +220,6 @@ function handleWebSocketNotification(data) {
     }
 }
 
-
-async function refreshCurrentProjectData() {
-    if (!appState.currentProject?.id) return; 
-    
-    try {
-        const updatedProject = await fetchAPI(`/projects/${appState.currentProject.id}`);
-        Object.assign(appState.currentProject, updatedProject);
-        
-        // Rafraîchir selon la section courante
-        switch (appState.currentSection) {
-            case 'projects':
-                await loadProjects();
-                renderProjectList();
-                renderProjectDetail(appState.currentProject);
-                break;
-            case 'results':
-                await loadSearchResults();
-                break;
-            case 'analyses':
-                await loadProjectAnalyses();
-                break;
-            case 'chat':
-                await loadChatMessages();
-                break;
-            case 'validation':
-                await loadValidationSection();
-                break;
-            case 'grids':
-                renderGridsSection(appState.currentProject);
-                break;
-            case 'rob':
-                await loadRobSection();
-                break;
-        }
-    } catch (e) {
-        console.error('Erreur refresh project data:', e);
-    }
-}
-
 // ============================ 
 // UI rendering
 // ============================ 
@@ -344,74 +279,6 @@ async function validateArticle(articleId, decision) {
     } finally {
         showLoadingOverlay(false);
     }
-}
-
-
-
-// ============================ 
-// Import Section
-// ============================ 
-function renderImportSection() {
-    if (!elements.importContainer) return; 
-    
-    if (!appState.currentProject) {
-        elements.importContainer.innerHTML = `
-            <div class="empty-state">
-                <p>Sélectionnez un projet pour importer des fichiers.</p>
-            </div>
-        `;
-        return;
-    }
-
-    elements.importContainer.innerHTML = `
-        <div class="import-section">
-            <h2>Import & Fichiers</h2>
-            
-            <div class="import-sources">
-                <div class="import-card">
-                    <h3>📚 Importer un export Zotero (.json)</h3>
-                    <p>Chargez un fichier d\'export Zotero pour ajouter des références.</p>
-                    <input type="file" id="zoteroFileInput" accept=".json" style="display: none;">
-                    <button class="btn btn--primary" onclick="document.getElementById('zoteroFileInput').click()">
-                        Choisir fichier JSON
-                    </button>
-                </div>
-                
-                <div class="import-card">
-                    <h3>📄 Uploader des PDFs (jusqu\'à 20)</h3>
-                    <p>Ces PDFs seront liés au projet courant.</p>
-                    <input type="file" id="bulkPDFInput" accept=".pdf" multiple style="display: none;">
-                    <button class="btn btn--primary" onclick="document.getElementById('bulkPDFInput').click()">
-                        Choisir PDFs
-                    </button>
-                </div>
-                
-                <div class="import-card">
-                    <h3>🔍 Indexer les PDFs pour le Chat RAG</h3>
-                    <p>Permettra de poser des questions au corpus.</p>
-                    <button class="btn btn--primary" id="runIndexingBtn">
-                        Indexer maintenant
-                    </button>
-                </div>
-                
-                <div class="import-card">
-                    <h3>🌐 Récupération automatique de PDFs</h3>
-                    <p>Recherche automatique via Unpaywall pour les articles avec DOI.</p>
-                    <button class="btn btn--secondary" onclick="handleFetchOnlinePDFs()">
-                        Lancer recherche
-                    </button>
-                </div>
-                
-                <div class="import-card">
-                    <h3>📝 Ajouter des articles manuellement</h3>
-                    <p>Saisissez des identifiants d\'articles (PMID, DOI, ArXiv ID) séparés par des retours à la ligne.</p>
-                    <button class="btn btn--secondary" onclick="showAddManualArticlesModal()">
-                        Ajouter articles
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
 }
 
 // ============================ 
@@ -498,15 +365,15 @@ function renderValidationSection(kappaData) {
         return `
             <div class="validation-item" data-extraction-id="${extraction.id}">
                 <div class="validation-item__info">
-                    <h4>${escapeHtml(title)}</h4>
+                    <h4>${title}</h4>
                     <p><strong>Score IA:</strong> ${extraction.relevance_score || 'N/A'}/10</p>
-                    <p><strong>Justification:</strong> ${escapeHtml(extraction.relevance_justification || 'Aucune')}</p>
+                    <p><strong>Justification:</strong> ${extraction.relevance_justification || 'Aucune'}</p>
                 </div>
                 <div class="validation-item__actions">
-                    <button class="btn btn--success btn--sm" onclick="validateExtraction('${extraction.id}', 'include')">
+                    <button class="btn btn--success btn--sm" data-action="validate-extraction" data-id="${extraction.id}" data-decision="include">
                         Ã¢Å“â€œ Inclure
                     </button>
-                    <button class="btn btn--error btn--sm" onclick="validateExtraction('${extraction.id}', 'exclude')">
+                    <button class="btn btn--error btn--sm" data-action="validate-extraction" data-id="${extraction.id}" data-decision="exclude">
                         Ã¢Å“â€” Exclure
                     </button>
                 </div>
@@ -540,9 +407,9 @@ function renderValidationSection(kappaData) {
             <div class="validation-actions">
                 <h4>Actions de validation</h4>
                 <div class="button-group">
-                    <button class="btn btn--primary" onclick="exportValidations()">Exporter validations (CSV)</button>
-                    <button class="btn btn--secondary" onclick="showImportValidationsModal()">Importer validations</button>
-                    <button class="btn btn--secondary" onclick="calculateKappa()">Calculer Kappa</button>
+                    <button class="btn btn--primary" data-action="export-validations">Exporter validations (CSV)</button>
+                    <button class="btn btn--secondary" data-action="import-validations-modal">Importer validations</button>
+                    <button class="btn btn--secondary" data-action="calculate-kappa">Calculer Kappa</button>
                 </div>
             </div>
 
@@ -565,8 +432,8 @@ function showImportValidationsModal() {
                 </div>
             </div>
             <div class="modal__actions">
-                <button type="button" class="btn btn--secondary" onclick="closeModal()">Annuler</button>
-                <button type="submit" class="btn btn--primary">Importer</button>
+                <button type="button" class="btn btn--secondary" data-action="close-modal">Annuler</button>
+                <button type="submit" class="btn btn--primary" data-action="import-validations">Importer</button>
             </div>
         </form>
     `;
@@ -734,14 +601,14 @@ function renderAnalysisProfiles() {
                     </div>
                     ${profile.is_custom ? `
                         <div class="profile-actions">
-                            <button class="btn btn--sm btn--outline" onclick="editProfile('${profile.id}')">Modifier</button>
-                            <button class="btn btn--sm btn--danger" onclick="deleteProfile('${profile.id}')">Supprimer</button>
+                            <button class="btn btn--sm btn--outline" data-action="edit-profile" data-profile-id="${profile.id}">Modifier</button>
+                            <button class="btn btn--sm btn--danger" data-action="delete-profile" data-profile-id="${profile.id}">Supprimer</button>
                         </div>
                     ` : ''}
                 </div>
             `).join('')}
         </div>
-        <button class="btn btn--primary btn--sm" onclick="showCreateProfileModal()">Créer un profil</button>
+        <button class="btn btn--primary btn--sm" data-action="create-profile-modal">Créer un profil</button>
     `;
 }
 
@@ -759,7 +626,7 @@ function renderPrompts() {
                         <h5>${escapeHtml(prompt.name)}</h5>
                         <p>${escapeHtml(prompt.description || 'Aucune description')}</p>
                     </div>
-                    <button class="btn btn--sm btn--outline" onclick="editPrompt('${prompt.name}')">Modifier</button>
+                    <button class="btn btn--sm btn--outline" data-action="edit-prompt" data-prompt-name="${prompt.name}">Modifier</button>
                 </div>
             `).join('')}
         </div>
@@ -783,7 +650,7 @@ function renderOllamaModels() {
                 </div>
             `).join('')}
         </div>
-        <button class="btn btn--primary btn--sm" onclick="showPullModelModal()">Télécharger un modèle</button>
+        <button class="btn btn--primary btn--sm" data-action="pull-model-modal">Télécharger un modèle</button>
     `;
 }
 
@@ -826,8 +693,8 @@ function showCreateProfileModals() {
                 </select>
             </div>
             <div class="modal__actions">
-                <button type="button" class="btn btn--secondary" onclick="closeModal()">Annuler</button>
-                <button type="submit" class="btn btn--primary">Créer</button>
+                <button type="button" class="btn btn--secondary" data-action="close-modal">Annuler</button>
+                <button type="submit" class="btn btn--primary" data-action="create-profile">Créer</button>
             </div>
         </form>
     `;
@@ -875,8 +742,8 @@ function showPullModelModal() {
                 </div>
             </div>
             <div class="modal__actions">
-                <button type="button" class="btn btn--secondary" onclick="closeModal()">Annuler</button>
-                <button type="submit" class="btn btn--primary">Télécharger</button>
+                <button type="button" class="btn btn--secondary" data-action="close-modal">Annuler</button>
+                <button type="submit" class="btn btn--primary" data-action="pull-model">Télécharger</button>
             </div>
         </form>
     `;
@@ -925,8 +792,8 @@ function editPrompt(promptName) {
                 <textarea name="template" class="form-control" rows="10">${escapeHtml(prompt.template)}</textarea>
             </div>
             <div class="modal__actions">
-                <button type="button" class="btn btn--secondary" onclick="closeModal()">Annuler</button>
-                <button type="submit" class="btn btn--primary">Sauvegarder</button>
+                <button type="button" class="btn btn--secondary" data-action="close-modal">Annuler</button>
+                <button type="submit" class="btn btn--primary" data-action="edit-prompt-save">Sauvegarder</button>
             </div>
         </form>
     `;
@@ -1104,9 +971,7 @@ function renderPRISMAChecklist(prismaState) {
             html += `
                 <div class="prisma-item">
                     <label class="prisma-checkbox">
-                        <input type="checkbox" 
-                               ${item.completed ? 'checked' : ''} 
-                               onchange="togglePRISMAItem(this, '${item.id}')" />
+                        <input type="checkbox" ${item.completed ? 'checked' : ''} data-action="toggle-prisma-item" data-item-id="${item.id}" />
                         <span class="prisma-item-text">${escapeHtml(item.item)}</span>
                     </label>
                 </div>
@@ -1288,43 +1153,6 @@ function renderStakeholderGroups(stakeholders) {
     `).join('');
     
     container.innerHTML = groupsHtml;
-}
-
-async function addStakeholderGroup() {
-    const name = document.getElementById('newStakeholderName')?.value?.trim();
-    const color = document.getElementById('newStakeholderColor')?.value;
-    const description = document.getElementById('newStakeholderDesc')?.value?.trim();
-    
-    if (!name) {
-        showToast('Le nom du groupe est requis', 'warning');
-        return;
-    }
-    
-    try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/stakeholders`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: name,
-                color: color,
-                description: description
-            })
-        });
-        
-        showToast('Groupe ajouté avec succès', 'success');
-        
-        // Reset form
-        document.getElementById('newStakeholderName').value = '';
-        document.getElementById('newStakeholderColor').value = '#4CAF50';
-        document.getElementById('newStakeholderDesc').value = '';
-        
-        // Refresh list
-        showStakeholderManagement();
-        
-    } catch (e) {
-        console.error('Erreur ajout stakeholder:', e);
-        showToast(`Erreur: ${e.message}`, 'error');
-    }
 }
 
 async function selectProject(projectId) {
@@ -1622,37 +1450,3 @@ async function handleGridFormSubmit(event) {
         showLoadingOverlay(false);
     }
 }
-
-// ================================================================
-// === INITIALISATION FINALE
-// ================================================================
-// Exposition contrôlée des handlers au scope global (évite ReferenceError)
-
-window.handleImportValidations = typeof handleImportValidations === 'function' ? handleImportValidations : (e) => { e.preventDefault(); console.warn("handleImportValidations non implémenté ou mal référencé."); };
-window.deleteProject = typeof deleteProject === 'function' ? deleteProject : () => {};
-window.handlePullModel = typeof handlePullModel === 'function' ? handlePullModel : () => {};
-window.handleSaveZoteroSettings = typeof handleSaveZoteroSettings === 'function' ? handleSaveZoteroSettings : () => {};
-window.openGridModal = typeof openGridModal === 'function' ? openGridModal : () => {};
-window.handleDeleteGrid = typeof handleDeleteGrid === 'function' ? handleDeleteGrid : () => {};
-window.openPromptModal = typeof openPromptModal === 'function' ? openPromptModal : () => {};
-window.editPrompt = typeof editPrompt === 'function' ? editPrompt : () => {};
-window.openProfileModal = typeof openProfileModal === 'function' ? openProfileModal : () => {};
-window.fetchAndDisplayRob = typeof fetchAndDisplayRob === 'function' ? fetchAndDisplayRob : () => {};
-window.deleteProfile = typeof deleteProfile === 'function' ? deleteProfile : () => {};
-window.showPRISMAModal = showPRISMAModal;
-window.togglePRISMAItem = togglePRISMAItem;
-window.savePRISMAProgress = savePRISMAProgress;
-window.exportPRISMAReport = exportPRISMAReport;
-window.runAdvancedAnalysis = typeof runAdvancedAnalysis === 'function' ? runAdvancedAnalysis : () => {};
-window.exportForThesis = exportForThesis;
-window.showStakeholderManagement = showStakeholderManagement;
-window.addStakeholderGroup = addStakeholderGroup;
-
-console.log('✅ AnalyLit V4.1 Frontend - Chargement complet terminé');
-
-// Log de fin de chargement
-window.showBatchProcessModal = showBatchProcessModal;
-window.startBatchProcessing = startBatchProcessing;
-window.showRunExtractionModal = showRunExtractionModal;
-window.startFullExtraction = startFullExtraction;
-window.handleDeleteSelectedArticles = handleDeleteSelectedArticles;

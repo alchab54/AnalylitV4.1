@@ -6,6 +6,14 @@ import { showSearchModal } from './search.js';
 import { setSearchResults, clearSelectedArticles, toggleSelectedArticle } from './state.js';
 import { showSection } from './core.js';
 
+function debounce(func, delay) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
 // Functions related to search results and articles will be moved here
 
 export async function loadSearchResults() {
@@ -89,7 +97,7 @@ function renderArticleRow(article, extraction, pdfExists, isSelected) {
         ${justification ? `<div class="score-justification" title="${escapeHtml(justification)}">${escapeHtml(justification.length > 50 ? justification.substring(0, 50) + '...' : justification)}</div>` : ''}
       </td>
       <td class="actions-cell">
-        <button class="btn btn--sm btn--outline" data-action="view-details" data-article-id="${escapeHtml(article.article_id)}" title="Voir détails">👁️</button>
+        <button class="btn btn--sm btn--outline" data-action="view-details" data-article-id="${escapeHtml(article.article_id)}" title="Voir détails"><i class="fas fa-eye"></i></button>
         ${article.url ? `<a href="${article.url}" target="_blank" class="btn btn--sm btn--outline">🔗</a>` : ''}
       </td>
     </tr>`;
@@ -147,7 +155,7 @@ export function renderSearchResultsTable() {
           <table class="table table--compact">
             <thead>
               <tr>
-                <th class="col-select"><input type="checkbox" data-action="select-all-articles" title="Tout sélectionner/désélectionner"></th>
+                <th class="col-select"><input type="checkbox" data-action="select-all-articles" title="Tout sélectionner/désélectionner" class="select-all-checkbox"></th>
                 <th class="col-main sortable" data-action="sort-results" data-sort-key="title">Article & Métadonnées</th>
                 <th class="col-source sortable" data-action="sort-results" data-sort-key="database_source">Source</th>
                 <th class="col-pdf">PDF</th>
@@ -198,6 +206,13 @@ export function viewArticleDetails(articleId) {
         </div>
       ` : ''}
 
+      <div class="form-group mt-16">
+          <label for="articleNotes" class="form-label">Mes notes de recherche</label>
+          <textarea id="articleNotes" class="form-control" rows="5" 
+                    placeholder="Ajoutez vos critiques, idées, ou liens avec d'autres études ici..."
+                    data-extraction-id="${extraction.id}">${escapeHtml(extraction.user_notes || '')}</textarea>
+      </div>
+
       ${extraction ? `
         <div class="article-extraction">
           <h4>Évaluation IA</h4>
@@ -224,7 +239,7 @@ export function viewArticleDetails(articleId) {
     <div class="modal__content modal__content--large">
       <div class="modal__header">
         <h3>Détails de l'article</h3>
-        <button type="button" class="modal__close" onclick="closeModal()">×</button>
+        <button type="button" class="modal__close" data-action="close-modal" data-modal-id="detailsModal">×</button>
       </div>
       <div class="modal__body">
         ${modalContent}
@@ -234,13 +249,7 @@ export function viewArticleDetails(articleId) {
 
   // Ajouter la modale au DOM
   document.body.appendChild(modal);
-
-  // Gestion de fermeture par clic sur le fond
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal || e.target.classList.contains('modal__close')) {
-      document.body.removeChild(modal);
-    }
-  });
+  modal.id = 'detailsModal'; // Pour que closeModal puisse le trouver
 }
 
 export function toggleAbstractRow(articleId) {
@@ -262,7 +271,7 @@ export function sanitizeForFilename(name) {
 }
 
 export function toggleArticleSelection(articleId, checked) {
-    toggleSelectedArticle(articleId);
+    toggleSelectedArticle(articleId, checked);
 }
 
 export function updateSelectionCounter() {
@@ -273,15 +282,17 @@ export function updateSelectionCounter() {
 }
 
 export function selectAllArticles() {
-  const allIds = (appState.searchResults || []).map(a => a.article_id);
-  const allCurrentlySelected = allIds.length > 0 && allIds.every(id => appState.selectedSearchResults.has(id));
+    const allCheckboxes = document.querySelectorAll('.article-checkbox');
+    const selectAllCheckbox = document.querySelector('.select-all-checkbox');
+    const shouldSelect = selectAllCheckbox ? selectAllCheckbox.checked : false;
 
-  if (allCurrentlySelected) {
-    clearSelectedArticles();
-  } else {
-    allIds.forEach(id => toggleSelectedArticle(id, true));
-    renderSearchResultsTable(); // Re-render to update checkboxes
-  }
+    allCheckboxes.forEach(checkbox => {
+        const articleId = checkbox.dataset.articleId;
+        checkbox.checked = shouldSelect;
+        toggleSelectedArticle(articleId, shouldSelect);
+    });
+
+    updateSelectionCounter();
 }
 
 export function toggleSelectAll(checked, source) {
@@ -341,8 +352,8 @@ export function showBatchProcessModal() {
             ${appState.analysisProfiles.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
         </select>
         <div class="modal__actions">
-            <button type="button" class="btn btn--secondary" onclick="closeModal('genericModal')">Annuler</button>
-            <button type="button" class="btn btn--primary" onclick="startBatchProcessing()">Lancer</button>
+            <button type="button" class="btn btn--secondary" data-action="close-modal" data-modal-id="genericModal">Annuler</button>
+            <button type="button" class="btn btn--primary" data-action="start-batch-process">Lancer</button>
         </div>
     `;
     showModal('Traitement par lot', content);
@@ -400,7 +411,7 @@ export function showRunExtractionModal() {
             </select>
         </div>
     `;
-    showModal('Lancer l\'extraction complète', modalContent, 'startFullExtraction()');
+    showModal('Lancer l\'extraction complète', modalContent, 'start-full-extraction');
 }
 
 export async function startFullExtraction() {
@@ -434,3 +445,22 @@ export async function startFullExtraction() {
         showLoadingOverlay(false);
     }
 }
+
+document.addEventListener('input', debounce(async (event) => {
+    if (event.target.id === 'articleNotes') {
+        const textarea = event.target;
+        const extractionId = textarea.dataset.extractionId;
+        const notes = textarea.value;
+        const projectId = appState.currentProject.id;
+
+        try {
+            await fetchAPI(`/projects/${projectId}/extractions/${extractionId}/notes`, {
+                method: 'PUT',
+                body: { notes }
+            });
+        } catch (error) {
+            console.error("Erreur de sauvegarde des notes:", error);
+            showToast("Erreur lors de la sauvegarde des notes.", 'error');
+        }
+    }
+}, 750)); // Sauvegarde 750ms après la dernière frappe

@@ -76,6 +76,7 @@ class Extraction(Base):
     user_validation_status = Column(String)
     analysis_source = Column(String)
     validations = Column(Text)
+    user_notes = Column(Text, nullable=True)
 
 class Grid(Base):
     __tablename__ = 'extraction_grids'

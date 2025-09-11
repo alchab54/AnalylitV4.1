@@ -1,71 +1,76 @@
 import { appState } from '../app.js';
 import {
-    toggleArticleSelection,
-    selectAllArticles,
     handleDeleteSelectedArticles,
     showBatchProcessModal,
+    handleSelectAll,
     startBatchProcessing,
     showRunExtractionModal,
     startFullExtraction,
-    toggleAbstractRow,
+    toggleArticleSelection,
     viewArticleDetails,
+    selectAllArticles
 } from './articles.js';
 import {
     handleRunDiscussionDraft,
     handleRunKnowledgeGraph,
-    handleRunPrismaFlow,
     handleRunMetaAnalysis,
+    handleRunPrismaFlow,
     handleRunDescriptiveStats,
     exportAnalyses,
+    handleRunATNAnalysis
 } from './analyses.js';
-import { handleRunRobAnalysis } from './rob.js';
 import { handleSendChatMessage } from './chat.js';
 import {
     handleCreateProject,
+    handleDeleteProject,
     selectProject,
-    deleteProject,
-    handleUpdateProjectSettings,
-    exportProjectData,
+    handleExportProject
 } from './projects.js';
-import { handleMultiDatabaseSearch } from './search.js';
+import { handleRunRobAnalysis } from './rob.js';
+import { showSearchModal, handleMultiDatabaseSearch } from './search.js';
 import {
-    handleValidateExtraction,
     handleDeleteGrid,
-    handleSaveGrid,
-    handleRunGridExtraction,
-    handleExportGrid,
+    handleValidateExtraction,
+    resetValidationStatus,
+    filterValidationList
 } from './validation.js';
-import { clearNotifications, showSection, refreshCurrentSection } from './ui.js';
+import {
+    closeModal,
+    toggleSidebar,
+    showCreateProjectModal
+} from './ui.js';
+import { clearNotifications, updateNotificationIndicator } from './notifications.js';
 
 /**
  * Mappe les valeurs de data-action aux fonctions de traitement correspondantes.
- * Chaque fonction reçoit l'élément cible (target) comme argument.
+ * C'est le cœur du système de délégation d'événements.
  */
 const clickActions = {
-    // --- Core UI Actions ---
-    'show-section': (target) => showSection(target.dataset.section),
-    'refresh-section': () => refreshCurrentSection(),
+    // Core & UI
+    'toggle-sidebar': toggleSidebar,
+    'close-modal': (target) => closeModal(target.dataset.modalId),
     'clear-notifications': clearNotifications,
+    'toggle-notifications': updateNotificationIndicator,
+    'create-project-modal': showCreateProjectModal,
 
-    // --- Project Actions ---
+    // Projects
     'create-project': handleCreateProject,
-    'select-project': selectProject,
-    'delete-project': deleteProject,
-    'update-project-settings': handleUpdateProjectSettings,
-    'export-project-data': exportProjectData,
+    'select-project': (target) => selectProject(target.dataset.projectId),
+    'delete-project': (target) => deleteProject(target.dataset.projectId),
+    'export-project': (target) => handleExportProject(target.dataset.projectId),
 
-    // --- Article/Search Actions ---
-    'toggle-article-selection': toggleArticleSelection,
-    'select-all-articles': selectAllArticles,
+    // Articles
+    'view-details': (target) => viewArticleDetails(target.dataset.articleId),
+    'toggle-article-selection': (target) => toggleArticleSelection(target.dataset.articleId, target.checked),
+    'select-all-articles': handleSelectAll,
     'delete-selected-articles': handleDeleteSelectedArticles,
-    'show-batch-process-modal': showBatchProcessModal,
-    'start-batch-processing': startBatchProcessing,
-    'show-run-extraction-modal': showRunExtractionModal,
+    'batch-process-modal': showBatchProcessModal,
+    'start-batch-process': startBatchProcessing,
+    'run-extraction-modal': showRunExtractionModal,
     'start-full-extraction': startFullExtraction,
-    'toggle-abstract': toggleAbstractRow,
-    'view-article-details': viewArticleDetails,
 
-    // --- Analysis Actions ---
+    // Analyses
+    'run-atn-analysis': handleRunATNAnalysis,
     'run-discussion-draft': handleRunDiscussionDraft,
     'run-knowledge-graph': handleRunKnowledgeGraph,
     'run-prisma-flow': handleRunPrismaFlow,
@@ -73,41 +78,39 @@ const clickActions = {
     'run-descriptive-stats': handleRunDescriptiveStats,
     'export-analyses': exportAnalyses,
 
-    // --- Risk of Bias (RoB) Actions ---
+    // Risk of Bias (RoB)
     'run-rob-analysis': handleRunRobAnalysis,
+    'show-rob-details': (target) => fetchAndDisplayRob(target.dataset.articleId),
 
-    // --- Chat Actions ---
-    'send-chat-message': handleSendChatMessage,
-
-    // --- New Search Actions ---
-    'multi-database-search': handleMultiDatabaseSearch,
-
-    // --- Validation/Grid Actions ---
-    'validate-extraction': handleValidateExtraction,
+    // Validation
+    'validate-extraction': (target) => handleValidateExtraction(target.dataset.id, target.dataset.decision),
+    'reset-validation': (target) => resetValidationStatus(target.dataset.id),
+    'filter-validations': (target) => filterValidationList(target.dataset.status),
     'delete-grid': handleDeleteGrid,
-    'save-grid': handleSaveGrid,
-    'run-grid-extraction': handleRunGridExtraction,
-    'export-grid': handleExportGrid,
+
+    // Search
+    'show-search-modal': showSearchModal,
+    'run-multi-search': handleMultiDatabaseSearch,
+
+    // Chat
+    'send-chat-message': handleSendChatMessage,
 };
 
 /**
- * Met en place un gestionnaire d'événements délégué sur `document.body`
- * pour gérer toutes les actions de clic via l'attribut `data-action`.
+ * Configure un écouteur d'événements global sur document.body pour gérer tous les clics
+ * sur les éléments ayant un attribut `data-action`.
  */
 export function setupDelegatedEventListeners() {
     document.body.addEventListener('click', (event) => {
         const target = event.target.closest('[data-action]');
+        if (!target) return;
 
-        if (target && target.dataset.action) {
-            const action = target.dataset.action;
-            const handler = clickActions[action];
+        const actionName = target.dataset.action;
+        const action = clickActions[actionName];
 
-            if (handler) {
-                event.preventDefault(); // Empêche le comportement par défaut (ex: soumission de formulaire)
-                handler(target); // Appelle la fonction correspondante avec l'élément cliqué
-            } else {
-                console.warn(`No click handler found for action: ${action}`);
-            }
+        if (action) {
+            event.preventDefault(); // Empêche le comportement par défaut (ex: soumission de formulaire, navigation)
+            action(target, event); // Appelle la fonction de traitement avec la cible et l'événement original
         }
     });
 }

@@ -105,6 +105,24 @@ async function handleGenerateBibliography(projectId) {
     }
 }
 
+function renderPrismaItem(item, projectId) {
+    const isChecked = item.checked ? 'checked' : '';
+    let statusIcon = '';
+    if (item.status === 'auto-completed') {
+        statusIcon = `<span class="status-icon" title="Cet élément est automatiquement rempli par les données du projet.">🔗</span>`;
+    }
+
+    return `
+        <div class="prisma-item">
+            <label>
+                <input type="checkbox" data-action="update-prisma-item" data-item-id="${item.id}" ${isChecked}>
+                ${escapeHtml(item.text)}
+            </label>
+            ${statusIcon}
+        </div>
+    `;
+}
+
 async function loadPrismaChecklist() {
     if (!appState.currentProject) return;
     try {
@@ -130,18 +148,7 @@ async function loadPrismaChecklist() {
             html += `
                 <div class="prisma-section">
                     <h5 class="prisma-section-title">${sectionTitle}</h5>
-                    <div class="prisma-items">
-                        ${items.map(item => `
-                            <div class="prisma-item">
-                                <label class="prisma-checkbox">
-                                    <input type="checkbox" 
-                                           ${item.completed ? 'checked' : ''} 
-                                           onchange="togglePRISMAItem('${item.id}')" />
-                                    <span class="prisma-item-text">${escapeHtml(item.item)}</span>
-                                </label>
-                            </div>
-                        `).join('')}
-                    </div>
+                    <div class="prisma-items">${items.map(item => renderPrismaItem(item, window.currentPrismaState.projectId)).join('')}</div>
                 </div>
             `;
         }

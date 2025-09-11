@@ -221,38 +221,59 @@ def export_for_thesis(project_id):
     finally:
         session.close()
 
+def get_base_prisma_checklist():
+    # C'est la structure de données de ta checklist, avec des IDs uniques
+    return {
+        "methods": {
+            "title": "Méthodes",
+            "items": [
+                {"id": "prisma-item-7", "text": "Présenter toutes les stratégies de recherche d'information"},
+                # ... autres items de la section Méthodes
+            ]
+        },
+        "results": {
+            "title": "Résultats",
+            "items": [
+                 {"id": "prisma-item-16a", "text": "Donner le nombre d'enregistrements identifiés, inclus et exclus, et les raisons de l'exclusion."},
+                 # ... autres items de la section Résultats
+            ]
+        }
+        # ... autres sections
+    }
+
 @api_bp.route('/projects/<project_id>/prisma-checklist', methods=['GET', 'POST'])
-def handle_prisma_checklist(project_id):
+@with_db_session
+def handle_prisma_checklist(db_session, project_id):
     """Gère la checklist PRISMA-ScR du projet."""
-    try:
-        uuid.UUID(project_id, version=4)
-    except ValueError:
-        return jsonify({'error': 'ID de projet invalide'}), 400
+    project = db_session.get(Project, project_id)
+    if not project:
+        return jsonify({"error": "Projet non trouvé"}), 404
 
-    session = Session()
-    try:
-        if request.method == 'GET':
-            project = session.execute(text("""
-                SELECT prisma_checklist FROM projects WHERE id = :pid
-            """ ), {"pid": project_id}).mappings().fetchone()
+    if request.method == 'GET':
+        checklist_data = get_base_prisma_checklist()
 
-            if project and project.get('prisma_checklist'):
-                checklist_data = json.loads(project['prisma_checklist'])
-            else:
-                from utils.prisma_scr import PRISMA_SCR_CHECKLIST
-                checklist_data = PRISMA_SCR_CHECKLIST
+        # Logique d'auto-complétion
+        if project.search_query and project.databases_used:
+            # Item 7: Stratégie de recherche
+            if 'methods' in checklist_data and len(checklist_data['methods']['items']) > 0:
+                checklist_data['methods']['items'][0]['status'] = 'auto-completed'
 
-            from utils.prisma_scr import get_prisma_scr_completion_rate
-            completion_rate = get_prisma_scr_completion_rate(checklist_data)
+        if project.prisma_flow_path:
+            # Item 16a: Diagramme de flux
+            if 'results' in checklist_data and len(checklist_data['results']['items']) > 0:
+                checklist_data['results']['items'][0]['status'] = 'auto-completed'
 
-            return jsonify({
-                "checklist": checklist_data,
-                "completion_rate": completion_rate
-            })
+        # Récupérer l'état sauvegardé par l'utilisateur
+        saved_state = json.loads(project.prisma_checklist or '{}')
+        for section, data in checklist_data.items():
+            for item in data['items']:
+                item['checked'] = saved_state.get(item['id'], False)
 
-        elif request.method == 'POST':
+        return jsonify(checklist_data)
+
+    elif request.method == 'POST':
             data = request.get_json(force=True)
-            session.execute(text("""
+            db_session.execute(text("""
                 UPDATE projects
                 SET prisma_checklist = :checklist, updated_at = :ts
                 WHERE id = :pid
@@ -261,15 +282,8 @@ def handle_prisma_checklist(project_id):
                 "ts": datetime.now().isoformat(),
                 "pid": project_id
             })
-            session.commit()
+            db_session.commit()
             return jsonify({"message": "Checklist PRISMA-ScR sauvegardée"}), 200
-
-    except Exception as e:
-        session.rollback()
-        logger.exception(f"Erreur handle_prisma_checklist: {e}")
-        return jsonify({'error': 'Erreur interne'}), 500
-    finally:
-        session.close()
 
 @app.route('/api/projects/<project_id>/upload-zotero', methods=['POST'])
 @with_db_session

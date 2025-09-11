@@ -42,12 +42,12 @@ function renderSearchSection(project) {
         <div id="resultsContainer" class="mt-24"></div>
     `;
     
-    document.getElementById('multiSearchForm').addEventListener('submit', handleMultiSearch);
+    document.getElementById('multiSearchForm').addEventListener('submit', handleMultiDatabaseSearch);
     // Afficher les résultats existants
     renderSearchResultsTable();
 } 
 
-async function handleMultiSearch(event) {
+export async function handleMultiDatabaseSearch(event) {
     event.preventDefault();
     if (!appState.currentProject) return;
 
@@ -89,14 +89,14 @@ export function showSearchModal() {
     `).join('');
 
     const content = `
-        <form id="modalSearchForm" onsubmit="handleModalSearch(event)">
+        <form id="modalSearchForm">
             <div class="form-group">
                 <label for="modalSearchQuery" class="form-label">Requête de recherche</label>
                 <input type="text" id="modalSearchQuery" name="query" class="form-control" placeholder="Ex: therapeutic alliance AND digital..." required>
             </div>
             <div class="form-group"><label class="form-label">Bases de données</label><div class="checkbox-group">${dbOptions}</div></div>
             <div class="form-group"><label for="modalMaxResults" class="form-label">Résultats max par base</label><input type="number" id="modalMaxResults" name="max_results" class="form-control" value="50" min="10" max="200"></div>
-            <button type="submit" class="btn btn--primary">Lancer la recherche</button>
+            <button type="submit" class="btn btn--primary" data-action="run-multi-search">Lancer la recherche</button>
         </form>
     `;
     openModal('Nouvelle Recherche', content);
@@ -113,7 +113,7 @@ function renderSearchResultsTable() {
         <div class="results-actions-header">
             <div id="selection-counter">0 article(s) sélectionné(s)</div>
             <div class="button-group">
-                <button class="btn btn--danger btn--sm" onclick="handleDeleteSelectedArticles()">Supprimer la sélection</button>
+                <button class="btn btn--danger btn--sm" data-action="delete-selected-articles">Supprimer la sélection</button>
             </div>
         </div>
     `;
@@ -139,10 +139,10 @@ function renderSearchResultsTable() {
                 <table class="table">
                     <thead>
                         <tr>
-                            <th style="width: 5%;"><input type="checkbox" onchange="toggleSelectAll(this.checked, '${source}')"></th>
-                            <th class="sortable" onclick="sortResults('relevance_score')">Score</th>
-                            <th class="sortable" onclick="sortResults('title')">Titre</th>
-                            <th class="sortable" onclick="sortResults('publication_date')">Année</th>
+                            <th style="width: 5%;"><input type="checkbox" data-action="select-all-articles" data-source="${source}"></th>
+                            <th class="sortable" data-action="sort-results" data-sort-key="relevance_score">Score</th>
+                            <th class="sortable" data-action="sort-results" data-sort-key="title">Titre</th>
+                            <th class="sortable" data-action="sort-results" data-sort-key="publication_date">Année</th>
                             <th>Auteurs</th>
                             <th>PDF</th>
                         </tr>
@@ -154,7 +154,7 @@ function renderSearchResultsTable() {
                             const isSelected = appState.selectedSearchResults.has(article.article_id);
                             return `
                                 <tr class="${extraction.user_validation_status === 'include' ? 'row-included' : ''}">
-                                    <td><input type="checkbox" class="article-checkbox" data-source="${source}" data-id="${article.article_id}" ${isSelected ? 'checked' : ''}></td>
+                                    <td><input type="checkbox" class="article-checkbox" data-action="toggle-article-selection" data-source="${source}" data-article-id="${article.article_id}" ${isSelected ? 'checked' : ''}></td>
                                     <td>${(extraction.relevance_score != null ? extraction.relevance_score.toFixed(1) : 'N/A')}</td>
                                     <td>${escapeHtml(article.title)}</td>
                                     <td>${escapeHtml(article.publication_date)}</td>
@@ -181,18 +181,6 @@ function renderSearchResultsTable() {
         </div>
     `;
 
-    // Attacher les listeners pour les checkboxes
-    document.querySelectorAll('.article-checkbox').forEach(cb => {
-        cb.addEventListener('change', (e) => {
-            const id = e.target.dataset.id;
-            if (e.target.checked) {
-                appState.selectedSearchResults.add(id);
-            } else {
-                appState.selectedSearchResults.delete(id);
-            }
-            updateSelectionCounter();
-        });
-    });
     updateSelectionCounter(); // Mettre à jour le compteur au premier affichage
 }
 
@@ -288,9 +276,3 @@ function hasPdfForArticle(articleId) {
 function sanitizeForFilename(name) {
     return String(name || '').replace(/[<>:"/\\|?*]/g, '_').trim();
 }
-
-
-// Assurez-vous d'exposer les nouvelles fonctions si elles sont appelées par onclick
-window.toggleSelectAll = toggleSelectAll;
-window.handleDeleteSelectedArticles = handleDeleteSelectedArticles;
-window.showSearchModal = showSearchModal;

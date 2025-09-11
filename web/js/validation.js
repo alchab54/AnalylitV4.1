@@ -47,8 +47,8 @@ async function renderValidationSection(project) {
                 <div class="card__header">
                     <h4>Articles Validés</h4>
                     <div class="button-group">
-                        <button class="btn btn--sm" onclick="filterValidationList('include')">Voir Inclus (${included.length})</button>
-                        <button class="btn btn--sm" onclick="filterValidationList('exclude')">Voir Exclus (${excluded.length})</button>
+                        <button class="btn btn--sm" data-action="filter-validations" data-status="include">Voir Inclus (${included.length})</button>
+                        <button class="btn btn--sm" data-action="filter-validations" data-status="exclude">Voir Exclus (${excluded.length})</button>
                     </div>
                 </div>
                 <div class="card__body validation-list" id="validatedListContainer"></div>
@@ -58,7 +58,7 @@ async function renderValidationSection(project) {
                  <div class="card__header"><h4>Étape suivante : Extraction complète</h4></div>
                  <div class="card__body">
                      <p>Lancez une extraction détaillée sur les <strong>${included.length} article(s)</strong> que vous avez inclus.</p>
-                     <button class="btn btn--primary" id="runFullExtractionBtn">Lancer l'extraction</button>
+                     <button class="btn btn--primary" data-action="run-extraction-modal">Lancer l'extraction</button>
                  </div>
             </div>
         `;
@@ -90,8 +90,8 @@ function renderConflictItem(extraction) {
             </div>
             <div class="validation-item__actions">
                 <p>Résoudre en choisissant :</p>
-                <button class="btn btn--success btn--sm" onclick="handleValidateExtraction('${extraction.id}', 'include')">✓ Inclure</button>
-                <button class="btn btn--error btn--sm" onclick="handleValidateExtraction('${extraction.id}', 'exclude')">✗ Exclure</button>
+                <button class="btn btn--success btn--sm" data-action="validate-extraction" data-id="${extraction.id}" data-decision="include">✓ Inclure</button>
+                <button class="btn btn--error btn--sm" data-action="validate-extraction" data-id="${extraction.id}" data-decision="exclude">✗ Exclure</button>
             </div>
         </div>
     `;
@@ -103,13 +103,13 @@ function renderValidationItem(extraction) {
     let actionHtml;
 
     if (extraction.user_validation_status === 'include') {
-        actionHtml = `<div class="status status--success">Inclus</div><button class="btn btn--sm" onclick="resetValidationStatus('${extraction.id}')">Annuler</button>`;
+        actionHtml = `<div class="status status--success">Inclus</div><button class="btn btn--sm" data-action="reset-validation" data-id="${extraction.id}">Annuler</button>`;
     } else if (extraction.user_validation_status === 'exclude') {
-        actionHtml = `<div class="status status--error">Exclus</div><button class="btn btn--sm" onclick="resetValidationStatus('${extraction.id}')">Annuler</button>`;
+        actionHtml = `<div class="status status--error">Exclus</div><button class="btn btn--sm" data-action="reset-validation" data-id="${extraction.id}">Annuler</button>`;
     } else {
         actionHtml = `
-            <button class="btn btn--success btn--sm" onclick="handleValidateExtraction('${extraction.id}', 'include')">✓ Inclure</button>
-            <button class="btn btn--error btn--sm" onclick="handleValidateExtraction('${extraction.id}', 'exclude')">✗ Exclure</button>
+            <button class="btn btn--success btn--sm" data-action="validate-extraction" data-id="${extraction.id}" data-decision="include">✓ Inclure</button>
+            <button class="btn btn--error btn--sm" data-action="validate-extraction" data-id="${extraction.id}" data-decision="exclude">✗ Exclure</button>
         `;
     }
 
@@ -124,7 +124,7 @@ function renderValidationItem(extraction) {
     `;
 }
 
-function filterValidationList(status) {
+export function filterValidationList(status) {
     const container = document.getElementById('validatedListContainer');
     if (!container) return;
     const filtered = appState.currentValidations.filter(e => e.user_validation_status === status);
@@ -135,11 +135,11 @@ function filterValidationList(status) {
     container.innerHTML = filtered.map(renderValidationItem).join('');
 }
 
-async function resetValidationStatus(extractionId) {
+export async function resetValidationStatus(extractionId) {
     await handleValidateExtraction(extractionId, ''); 
 }
 
-async function handleValidateExtraction(extractionId, decision) {
+export async function handleValidateExtraction(extractionId, decision) {
     if (!appState.currentProject?.id || !extractionId) return;
     try {
         await fetchAPI(`/projects/${appState.currentProject.id}/extractions/${extractionId}/decision`, {
@@ -163,8 +163,3 @@ async function loadValidationSection() {
     const extractions = await fetchAPI(`/projects/${appState.currentProject.id}/extractions`);
     setCurrentValidations(extractions);
 }
-
-
-window.validateExtraction = handleValidateExtraction;
-window.filterValidationList = filterValidationList;
-window.resetValidationStatus = resetValidationStatus;

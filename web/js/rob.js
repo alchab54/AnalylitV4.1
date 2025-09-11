@@ -20,7 +20,7 @@ export async function loadRobSection() {
     const articlesHtml = articles.map(article => `
         <div class="rob-article-card" id="rob-card-${article.article_id}">
             <div class="rob-article-header">
-                <input type="checkbox" class="article-select-checkbox" value="${escapeHtml(article.article_id)}" onchange="toggleArticleSelection('${escapeHtml(article.article_id)}', this.checked)">
+                <input type="checkbox" class="article-select-checkbox" data-action="toggle-article-selection" data-article-id="${escapeHtml(article.article_id)}">
                 <h4 class="rob-article-title">${escapeHtml(article.title)}</h4>
                 <button class="btn btn--secondary btn--sm" data-action="show-rob-details" data-article-id="${article.article_id}">Voir/Éditer</button>
             </div>
