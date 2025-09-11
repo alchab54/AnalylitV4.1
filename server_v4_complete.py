@@ -14,10 +14,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine, text
 from functools import wraps
 from sqlalchemy.orm import sessionmaker, scoped_session
-from models import (Project, Article, SearchResult, Grid, GridField,
-                         Extraction, AnalysisProfile, Prompt, Analysis,
-                         Validation, PRISMAChecklistItem, StakeholderGroup)
-from database import get_db_session, init_db
+from models import (Project, Article, SearchResult, Extraction, Grid, GridField,
+                    Validation, Analysis, ChatMessage, AnalysisProfile, Prompt,
+                    Stakeholder, StakeholderGroup)
+from database import db_session, init_db
 from config_v4 import get_config, Config
 from tasks_v4_complete import (
     multi_database_search_task,
@@ -978,20 +978,20 @@ def list_project_files(project_id):
     pdf_files = [{"filename": f.name} for f in project_dir.glob("*.pdf")]
     return jsonify(pdf_files)
 
-@api_bp.route('/projects/<project_id>/files/<filename>', methods=['GET'])
-def get_project_file(project_id, filename):
+@app.route('/projects/<uuid:project_id>/files/<path:filename>')
+def serve_project_file(project_id, filename):
+    """Sert un fichier statique depuis le dossier d'un projet spécifique."""
+    project = db_session.get(Project, str(project_id))
+    if not project:
+        return jsonify({"error": "Projet non trouvé"}), 404
+    
+    # Sécurisation du chemin
+    project_path = os.path.join(Config.PROJECTS_DIR, str(project.id))
+    
     try:
-        uuid.UUID(project_id, version=4)
-    except ValueError:
-        return jsonify({'error': 'ID de projet invalide'}), 400
-
-    safe_filename = secure_filename(filename)
-    project_dir = (PROJECTS_DIR / project_id).resolve()
-    file_path = (project_dir / safe_filename).resolve()
-
-    if not str(file_path).startswith(str(project_dir)):
-        return jsonify({"error": "Accès non autorisé"}), 403
-    return send_from_directory(str(project_dir), safe_filename)
+        return send_from_directory(project_path, filename)
+    except FileNotFoundError:
+        return jsonify({"error": "Fichier non trouvé"}), 404
 
 @api_bp.route('/projects/<project_id>/index', methods=['POST'])
 def run_indexing(project_id):
@@ -2006,9 +2006,9 @@ def handle_risk_of_bias(project_id):
             # Le code ci-dessous est un placeholder basé sur la structure de la fonction
             try:
                 # ... logique de sauvegarde ...
-                db_session.commit() # type: ignore
+                db_session.commit()
             except Exception as e:
-                db_session.rollback() # type: ignore
+                db_session.rollback()
                 logger.exception("Erreur lors de la mise à jour du profil.")
                 return jsonify({"error": "Erreur interne"}), 500
             return jsonify({"message": "Évaluation RoB sauvegardée"}), 200
