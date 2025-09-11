@@ -17,53 +17,11 @@ export function getStatusClass(status) {
     return 'status--secondary';
 }
 
-const clickActions = {
-    // Projects
-    'select-project': (target) => selectProject(target.dataset.projectId),
-    'delete-project': (target, event) => {
-        event.stopPropagation();
-        deleteProject(target.dataset.projectId);
-    },
-    'create-project-modal': () => showModal('newProjectModal'),
-
-    // Articles / Results
-    'view-details': (target) => viewArticleDetails(target.dataset.articleId),
-    'sort-results': (target) => sortResults(target.dataset.sortKey),
-    'select-all-articles': () => selectAllArticles(),
-    'batch-process-modal': () => showBatchProcessModal(),
-    'delete-selected-articles': () => handleDeleteSelectedArticles(),
-    'run-extraction-modal': () => showRunExtractionModal(),
-
-    // Import
-    'trigger-zotero-upload': () => document.getElementById('zoteroFileInput')?.click(),
-    'trigger-pdf-upload': () => document.getElementById('bulkPDFInput')?.click(),
-    'run-indexing': () => handleRunIndexing(),
-    'fetch-online-pdfs': () => handleFetchOnlinePdfs(),
-    'show-manual-add': () => showAddManualArticlesModal(),
-    'import-zotero-pdfs': () => handleImportZoteroPdfs(),
-
-    // Settings
-    'edit-profile': (target) => editProfile(target.dataset.id),
-    'delete-profile': (target) => deleteProfile(target.dataset.id),
-    'create-profile-modal': () => showCreateProfileModal(),
-    'edit-prompt': (target) => editPrompt(target.dataset.id),
-    'pull-model-modal': () => showPullModelModal(),
-
-    // Analyses (from modal)
-    'run-analysis': (target) => runProjectAnalysis(target.dataset.analysisType),
-
-    // Navigation
-    'show-section': (target) => showSection(target.dataset.section),
-    
-    // Other static buttons from index.html
-    'show-search-modal': () => window.showSearchModal(), // Assumes showSearchModal is on window
-    'show-run-analysis-modal': () => window.showRunAnalysisModal(), // Assumes showRunAnalysisModal is on window
-    'show-rob-details': (target) => {
-        const articleId = target.dataset.articleId;
-        if (articleId) {
-            fetchAndDisplayRob(articleId);
-        }
-    }
+const handlers = {
+    'show-section': (el) => showSection(el.dataset.section),
+    'create-project': () => handleCreateProject(),
+    'select-project': (el) => selectProject(el.closest('[data-project-id]').dataset.projectId),
+    'delete-project': (el) => deleteProject(el.closest('[data-project-id]').dataset.projectId)
 };
 
 function setupDelegatedEventListeners() {

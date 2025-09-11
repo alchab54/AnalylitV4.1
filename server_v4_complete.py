@@ -2045,47 +2045,28 @@ def get_bibliography(project_id):
 @api_bp.route('/projects/<project_id>/risk-of-bias', methods=['GET', 'POST'])
 def handle_risk_of_bias(project_id):
     """Gère la récupération et la sauvegarde des évaluations de risque de biais."""
-    try:
-        uuid.UUID(project_id, version=4)
-    except ValueError:
-        return jsonify({'error': 'ID de projet invalide'}), 400
+    with get_db_session() as db_session:
+        project = db_session.query(Project).get(project_id)
+        if not project:
+            return jsonify({"error": "Projet non trouvé"}), 404
 
-    session = Session()
-    try:
-        if request.method == 'GET':
-            article_id = request.args.get('article_id')
-            if not article_id:
-                return jsonify({'error': 'article_id est requis'}), 400
-            
-            rob = session.execute(text("""
-                SELECT * FROM risk_of_bias WHERE project_id = :pid AND article_id = :aid
-            """), {"pid": project_id, "aid": article_id}).mappings().fetchone()
-            
-            return jsonify(dict(rob) if rob else {})
+        if 'file' not in request.files:
+            return jsonify({"error": "Aucun fichier fourni"}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({"error": "Nom de fichier vide"}), 400
 
-        if request.method == 'POST':
-            data = request.get_json(force=True)
-            rob_id = data.get('id') or str(uuid.uuid4())
+        try:
+            project_path = os.path.join(Config.PROJECTS_DIR, str(project_id))
+            os.makedirs(project_path, exist_ok=True)
+            file_path = os.path.join(project_path, secure_filename(file.filename))
+            file.save(file_path)
             
-            # Logique de sauvegarde ou de mise à jour
-            session.execute(text("""
-                INSERT INTO risk_of_bias (id, project_id, article_id, domain_1_bias, domain_1_justification, domain_2_bias, domain_2_justification, overall_bias, overall_justification, created_at)
-                VALUES (:id, :pid, :aid, :d1b, :d1j, :d2b, :d2j, :ob, :oj, :ts)
-                ON CONFLICT (id) DO UPDATE SET
-                    domain_1_bias = EXCLUDED.domain_1_bias,
-                    domain_1_justification = EXCLUDED.domain_1_justification,
-                    domain_2_bias = EXCLUDED.domain_2_bias,
-                    domain_2_justification = EXCLUDED.domain_2_justification,
-                    overall_bias = EXCLUDED.overall_bias,
-                    overall_justification = EXCLUDED.overall_justification
-            """), {**data, "id": rob_id, "pid": project_id, "ts": datetime.now().isoformat()})
-            
-            session.commit()
-            send_project_notification(project_id, 'rob_updated', f"Évaluation RoB mise à jour pour {data.get('article_id')}")
-            return jsonify({'message': 'Évaluation sauvegardée'}), 200
-    except Exception as e:
-        logger.exception(f"Erreur handle_risk_of_bias: {e}")
-        return jsonify({'error': 'Erreur interne du serveur'}), 500
+            return jsonify({"message": "Fichier uploadé avec succès"}), 200
+        except Exception as e:
+            logger.exception(f"Erreur lors de l'upload du fichier pour le projet {project_id}: {e}")
+            return jsonify({"error": "Impossible de sauvegarder le fichier"}), 500
 
 # ================================================================
 # 8) Analyses
