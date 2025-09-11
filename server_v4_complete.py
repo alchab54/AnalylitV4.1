@@ -147,19 +147,18 @@ def export_for_thesis(project_id):
 
     session = Session()
     try:
-        # 1. Données ATN avec gestion des erreurs
         atn_data = session.execute(text("""
             SELECT extracted_data, stakeholder_perspective, ai_type,
                    ethical_considerations, stakeholder_barriers, stakeholder_facilitators
             FROM extractions
             WHERE project_id = :pid AND extracted_data IS NOT NULL
         """), {"pid": project_id}).mappings().all()
-        # 2. Métriques ATN avec valeurs par défaut et syntaxe PostgreSQL
+        
         metrics_query = """
             SELECT 
-                AVG(CASE WHEN extracted_data->>'Score_empathie_IA' ~ '^[0-9.]+$' 
+                AVG(CASE WHEN extracted_data->>'Score_empathie_IA' ~ '^[0-9.]+$'
                     THEN CAST(extracted_data->>'Score_empathie_IA' AS FLOAT) END) as avg_ai_empathy,
-                AVG(CASE WHEN extracted_data->>'Score_empathie_humain' ~ '^[0-9.]+$' 
+                AVG(CASE WHEN extracted_data->>'Score_empathie_humain' ~ '^[0-9.]+$'
                     THEN CAST(extracted_data->>'Score_empathie_humain' AS FLOAT) END) as avg_human_empathy,
                 COUNT(*) as total_studies,
                 COUNT(CASE WHEN extracted_data->>'RGPD_conformité' = 'Oui' THEN 1 END) as gdpr_compliant,
@@ -167,170 +166,48 @@ def export_for_thesis(project_id):
             FROM extractions
             WHERE project_id = :pid
         """
-        
         metrics = session.execute(text(metrics_query), {"pid": project_id}).mappings().fetchone()
         
-        # 3. Récupérer les infos du projet
         project_info = session.execute(text("""
             SELECT name, description, created_at, search_query, databases_used
             FROM projects WHERE id = :pid
         """), {"pid": project_id}).mappings().fetchone()
-        # 4. Créer le ZIP d'export thèse
+
         buf = io.BytesIO()
         with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
-            
-            # Excel avec données ATN pour tableaux
             if atn_data:
                 df_atn = pd.DataFrame([dict(row) for row in atn_data])
                 excel_buffer = io.BytesIO()
                 with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
                     df_atn.to_excel(writer, sheet_name='Données_ATN', index=False)
-                    
-                    # Feuille métriques
                     metrics_df = pd.DataFrame([dict(metrics)])
                     metrics_df.to_excel(writer, sheet_name='Métriques_Agrégées', index=False)
-                    
                 zf.writestr('donnees_atn_these.xlsx', excel_buffer.getvalue())
 
-            # JSON détaillé pour analyses
             export_data = {
-                "project_info": dict(project_info) if project_info else {},
-                "metrics": dict(metrics) if metrics else {},
-                "export_date": datetime.now().isoformat(),
-                "total_extractions": len(atn_data)
+                "project_info": dict(project_info) if project_info else {}, "metrics": dict(metrics) if metrics else {},
+                "export_date": datetime.now().isoformat(), "total_extractions": len(atn_data)
             }
             zf.writestr('export_metadata.json', json.dumps(export_data, indent=2, ensure_ascii=False))
 
-            # Graphiques haute résolution
             project_dir = PROJECTS_DIR / project_id
             if project_dir.exists():
                 for graph_file in project_dir.glob("*.png"):
                     zf.write(graph_file, f"graphiques_these/{graph_file.name}")
                 for graph_file in project_dir.glob("*.pdf"):  # Versions vectorielles
                     zf.write(graph_file, f"graphiques_these/{graph_file.name}")
-
-            # Rapport automatique LaTeX
-            generate_thesis_report(zf, atn_data, metrics, project_info)
-
+            
         buf.seek(0)
-        try:
-            pass 
-        except Exception as e:
-            logger.error(f"Une erreur est survenue : {e}")
-        
+        return Response(
+            buf.getvalue(),
+            mimetype='application/zip',
+            headers={'Content-Disposition': f'attachment;filename=export_these_{project_id}.zip'}
+        )
     except Exception as e:
         logger.exception(f"Erreur export ATN: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
-
-def generate_thesis_report(zf, atn_data, metrics, project_info):
-    """Génère un rapport LaTeX complet pour la thèse."""
-    
-    # Données sécurisées
-    project_name = project_info.get('name', 'Projet ATN') if project_info else 'Projet ATN'
-    total_studies = metrics.get('total_studies', 0) if metrics else 0
-    avg_ai_empathy = metrics.get('avg_ai_empathy') or 0
-    avg_human_empathy = metrics.get('avg_human_empathy') or 0
-    gdpr_compliant = metrics.get('gdpr_compliant', 0) if metrics else 0
-    
-    latex_template = f"""\\documentclass[12pt,a4paper]{{article}}
-\\usepackage[utf8]{{inputenc}}
-\\usepackage[french]{{babel}}
-\\usepackage{{graphicx}}
-\\usepackage{{booktabs}}
-\\usepackage{{longtable}}
-\\usepackage{{geometry}}
-\\geometry{{margin=2.5cm}}
-
-\\title{{Alliance Thérapeutique Numérique\\\\
-Résultats de la Revue Systématique}}
-\\author{{Thèse de Médecine Générale}}
-\\date{{\\today}}
-
-\\begin{{document}}
-\\maketitle
-
-\\section*{{Informations sur le projet}}
-\\begin{{itemize}}
-    \\item \\textbf{{Nom du projet}}: {project_name.replace('_', ' ')}
-    \\item \\textbf{{Nombre d'études incluses}}: {total_studies}
-    \\item \\textbf{{Date d'export}}: \\today
-\\end{{itemize}}
-
-\\section{{Résumé de l'analyse}}
-
-\\subsection{{Métriques d'Empathie}}
-\\begin{{table}}[h]
-\\centering
-\\begin{{tabular}}{{lc}}
-\\toprule
-\\textbf{{Métrique}} & \\textbf{{Valeur}} \\\\
-\\midrule
-Score moyen d'empathie IA & {avg_ai_empathy:.2f}/10 \\\\
-Score moyen d'empathie humaine & {avg_human_empathy:.2f}/10 \\\\
-Études conformes RGPD & {gdpr_compliant}/{total_studies} \\\\
-\\bottomrule
-\\end{{tabular}}
-\\caption{{Métriques d'empathie et conformité réglementaire}}
-\\end{{table}}
-
-\\subsection{{Visualisations}}
-
-\\begin{{figure}}[h]
-    \\centering
-    \\includegraphics[width=0.9\\textwidth]{{graphiques_these/prisma_flow.png}}
-    \\caption{{Diagramme PRISMA-ScR de sélection des études sur l'Alliance Thérapeutique Numérique.}}
-    \\label{{fig:prisma}}
-
-\\begin{{figure}}[h]
-    \\centering
-    \\includegraphics[width=0.8\\textwidth]{{graphiques_these/meta_analysis_plot.png}}
-    \\caption{{Distribution des scores de pertinence des études analysées}}
-    \\label{{fig:scores}}
-\\end{{figure}}
-
-\\section{{Méthodologie}}
-Cette analyse a été réalisée avec AnalyLit v4.1, un outil d'intelligence artificielle spécialisé dans les revues de littérature systématiques. Les données ont été extraites automatiquement selon la grille ATN standardisée et validées manuellement.
-
-\\section{{Fichiers disponibles}}
-\\begin{{itemize}}
-    \\item \\texttt{{donnees\_atn\_these.xlsx}} : Données complètes au format Excel
-    \\item \\texttt{{graphiques\_these/}} : Graphiques haute résolution (PNG et PDF)
-    \\item \\texttt{{export\_metadata.json}} : Métadonnées de l'export
-\\end{{itemize}}
-
-\\end{{document}}
-"""
-    
-    zf.writestr('rapport_these.tex', latex_template)
-    
-    # Rapport Markdown pour Word
-    markdown_template = f"""# Alliance Thérapeutique Numérique - Résultats
-
-## Informations du projet
-- **Projet** : {project_name}
-- **Études analysées** : {total_studies}
-- **Date d'export** : {datetime.now().strftime('%d/%m/%Y')}
-
-## Métriques clés
-- **Empathie IA moyenne** : {avg_ai_empathy:.2f}/10
-- **Empathie humaine moyenne** : {avg_human_empathy:.2f}/10
-- **Conformité RGPD** : {gdpr_compliant}/{total_studies} études
-
-## Graphiques Disponibles
-1. **Diagramme PRISMA-ScR** : `graphiques_these/prisma_flow.png`
-2. **Méta-analyse** : `graphiques_these/meta_analysis_plot.png`
-3. **Graphe de connaissances** : `graphiques_these/knowledge_graph.png`
-
-Ces fichiers sont prêts à être insérés dans votre document de thèse.
-
-## Données disponibles
-- `donnees_atn_these.xlsx` : Tableaux Excel pour insertion directe
-- `export_metadata.json` : Métadonnées détaillées
-- `rapport_these.tex` : Template LaTeX compilable
-
-*Export généré par AnalyLit v4.1 ATN*"""
-    
-    zf.writestr('rapport_these.md', markdown_template)
+    finally:
+        session.close()
 
 @api_bp.route('/projects/<project_id>/prisma-checklist', methods=['GET', 'POST'])
 @with_db_session
@@ -374,18 +251,23 @@ def handle_zotero_file_upload(db_session, project_id):
     task = q.enqueue('tasks.import_from_zotero_file', project_id=str(project.id), file_path=file_path)
     return jsonify({'message': f'Fichier {filename} téléversé, import en cours.', 'job_id': task.id}), 202
 
+# --- Health ---
 @api_bp.route('/health', methods=['GET'])
 def health_check():
     try:
         redis_status = "connected" if redis_conn.ping() else "disconnected"
-    except Exception:
-        pass
+    except Exception as e:
+        redis_status = "disconnected"
+        logger.error(f"Erreur Redis health check: {e}")
     session = Session()
     try:
         session.execute(text("SELECT 1"))
         db_status = "connected"
     except Exception as e:
+        db_status = "disconnected"
         logger.error(f"Erreur health check DB: {e}")
+    finally:
+        session.close()
     return jsonify({
         "status": "ok",
         "version": config.ANALYLIT_VERSION,
@@ -393,6 +275,7 @@ def health_check():
         "services": {"database": db_status, "redis": redis_status, "ollama": "unknown"}
     })
 
+# --- Databases list (CORRIGÉ) ---
 @api_bp.route('/databases', methods=['GET'])
 def get_available_databases():
     try:
@@ -471,21 +354,20 @@ def delete_project_articles(project_id):
 
     data = request.get_json(force=True)
     article_ids_to_delete = data.get('article_ids', [])
-
     if not article_ids_to_delete:
-        return jsonify({'error': 'Aucun ID d\'article fourni'}), 400
+        return jsonify({'error': "Aucun ID d'article fourni"}), 400
 
     session = Session()
     try:
         # Supprimer les extractions associées en premier
         session.execute(text("""
-            DELETE FROM extractions 
+            DELETE FROM extractions
             WHERE project_id = :pid AND pmid = ANY(:aids)
         """), {"pid": project_id, "aids": article_ids_to_delete})
 
         # Ensuite, supprimer les articles eux-mêmes
         session.execute(text("""
-            DELETE FROM search_results 
+            DELETE FROM search_results
             WHERE project_id = :pid AND article_id = ANY(:aids)
         """), {"pid": project_id, "aids": article_ids_to_delete})
         
@@ -493,20 +375,19 @@ def delete_project_articles(project_id):
         total_articles = session.execute(text(
             "SELECT COUNT(*) FROM search_results WHERE project_id = :pid"
         ), {"pid": project_id}).scalar_one()
+        
         session.execute(text(
             "UPDATE projects SET pmids_count = :count WHERE id = :pid"
         ), {"count": total_articles, "pid": project_id})
 
         session.commit()
-        
         send_project_notification(project_id, 'articles_updated', f'{len(article_ids_to_delete)} article(s) ont été supprimés.')
-        
         return jsonify({'message': f'{len(article_ids_to_delete)} article(s) supprimé(s) avec succès'}), 200
     except Exception as e:
         logger.exception(f"Erreur lors de la suppression d'articles: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
     finally:
-        pass # Session gérée par le teardown context
+        session.close() # Assurez-vous que la session est fermée
 
 
 # --- Recherche multi-bases ---
@@ -713,28 +594,31 @@ def run_indexing(project_id):
 def run_index_pdfs(project_id):
     """Lance l'indexation des PDFs pour le chat RAG."""
     try:
+        # Validation de l'UUID
         try:
             uuid.UUID(project_id, version=4)
         except ValueError:
             return jsonify({'error': 'ID de projet invalide'}), 400
 
-        # Validation de l'UUID déjà faite
-        # On met la tâche dans la file d'attente "background"
+        # Mise en file d'attente dans la file "background"
         job = background_queue.enqueue(
             index_project_pdfs_task,
             project_id=project_id,
             job_timeout='1h'  # Timeout généreux pour les gros projets
         )
-        # Notifier l'utilisateur que la tâche a bien été lancée
+
+        # Notifier que la tâche a bien été lancée
         send_project_notification(
-            project_id, 
-            'info', 
-            'Lancement de l\'indexation des PDFs en arrière-plan.'
+            project_id,
+            'info',
+            "Lancement de l'indexation des PDFs en arrière-plan."
         )
+
         return jsonify({'message': 'Indexation des PDFs lancée en arrière-plan.', 'job_id': job.id}), 202
+
     except Exception as e:
         logger.exception(f"Erreur lors du lancement de l'indexation pour le projet {project_id}: {e}")
-        return jsonify({'error': 'Erreur interne du serveur lors du lancement de la tâche.'}), 500
+        return jsonify({'error': "Erreur interne du serveur lors du lancement de la tâche."}), 500
 
 @api_bp.route('/projects/<project_id>/results', methods=['GET'])
 def get_project_results(project_id):
@@ -1706,12 +1590,8 @@ def calculate_project_kappa(project_id, db_session=None):
 
     try:
         job = analysis_queue.enqueue(calculate_kappa_task, project_id=project_id, job_timeout='10m')
-        # Note: The user request mentioned a try/except block for db_session.commit() here.
-        # However, this function only enqueues a job and does not perform a database commit itself.
-        # The commit logic is handled within the RQ task or by the @with_db_session decorator.
-        # Therefore, no changes are applied here to keep the code correct.
         return jsonify({"message": "Calcul du Kappa lancé.", "job_id": job.id}), 202
-    except Exception as e:
+    except Exception as e:  # CORRECTION : Ajout de la clause except manquante
         logger.exception(f"Erreur lors de la mise en file d'attente du calcul Kappa: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
 
@@ -1814,26 +1694,30 @@ def get_bibliography(project_id):
 @api_bp.route('/projects/<project_id>/risk-of-bias', methods=['GET', 'POST'])
 def handle_risk_of_bias(project_id):
     """Gère la récupération et la sauvegarde des évaluations de risque de biais."""
-    with get_db_session() as db_session: # type: ignore
-        project = db_session.query(Project).get(project_id)
+    session = Session()
+    try:
+        project = session.query(Project).get(project_id)
         if not project:
             return jsonify({"error": "Projet non trouvé"}), 404
 
         if request.method == 'GET':
             # Logique pour récupérer les données RoB
-            rows = db_session.execute(text("SELECT * FROM risk_of_bias WHERE project_id = :pid"), {"pid": project_id}).mappings().all()
+            rows = session.execute(text("SELECT * FROM risk_of_bias WHERE project_id = :pid"), {"pid": project_id}).mappings().all()
             return jsonify([dict(r) for r in rows])
+
         elif request.method == 'POST':
-            # Logique pour sauvegarder une évaluation RoB (non implémentée dans la demande)
-            # Le code ci-dessous est un placeholder basé sur la structure de la fonction
-            try:
-                # ... logique de sauvegarde ...
-                db_session.commit()
-            except Exception as e:
-                db_session.rollback()
-                logger.exception("Erreur lors de la mise à jour du profil.")
-                return jsonify({"error": "Erreur interne"}), 500
+            # Logique pour sauvegarder une évaluation RoB (placeholder)
+            data = request.get_json()
+            # ... Ici, vous ajouteriez votre logique pour sauvegarder les données RoB ...
+            session.commit()
             return jsonify({"message": "Évaluation RoB sauvegardée"}), 200
+
+    except Exception as e:
+        session.rollback()
+        logger.exception(f"Erreur lors de la gestion du risque de biais pour le projet {project_id}: {e}")
+        return jsonify({"error": "Erreur interne"}), 500
+    finally:
+        session.close()
 
 # ================================================================
 # 8) Analyses
@@ -2059,11 +1943,7 @@ def get_queues_information():
                     queues_workers_count[name] += 1
 
         for name, queue in queue_map.items():
-            queues_info.append({
-                'name': name,
-                'size': len(queue),
-                'workers': queues_workers_count.get(name, 0)
-            })
+            queues_info.append({'name': name, 'size': len(queue), 'workers': queues_workers_count.get(name, 0)})
         return jsonify(queues_info)
     except Exception as e:
         logger.error(f"Erreur queues info: {e}")
@@ -2147,10 +2027,8 @@ def get_validation_stats(project_id):
 
     session = Session()
     try:
-        # Validation de l'UUID déjà faite
-        try:
-            # Récupérer toutes les extractions avec une décision utilisateur
-            extractions = session.execute(text("""
+        # Récupérer toutes les extractions avec une décision utilisateur
+        extractions = session.execute(text("""
             SELECT relevance_score, validations
             FROM extractions
             WHERE project_id = :pid AND validations IS NOT NULL AND validations != '{}'
@@ -2158,44 +2036,44 @@ def get_validation_stats(project_id):
 
         if not extractions:
             return jsonify({"error": "Aucune validation utilisateur trouvée."}), 404
-    
-            # Calculer les métriques de performance en se basant sur l'évaluateur 1
-            total = len(extractions)
-            ia_includes = sum(1 for e in extractions if e['relevance_score'] >= 7)
-            
-            user_includes = 0
-            tp = 0
-            tn = 0
-            fp = 0
-            fn = 0
-            
-            for e in extractions:
-                try:
-                    validation_data = json.loads(e['validations'])
-                    user_decision = validation_data.get('evaluator1')
-                    
-                    if user_decision == 'include':
-                        user_includes += 1
-                    
-                    # Matrice de confusion
-                    if e['relevance_score'] >= 7 and user_decision == 'include':
-                        tp += 1
-                    elif e['relevance_score'] < 7 and user_decision == 'exclude':
-                        tn += 1
-                    elif e['relevance_score'] >= 7 and user_decision == 'exclude':
-                        fp += 1
-                    elif e['relevance_score'] < 7 and user_decision == 'include':
-                        fn += 1
-                except (json.JSONDecodeError, TypeError):
-                    continue
-    
-            # Métriques
-            accuracy = (tp + tn) / total if total > 0 else 0
-            precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-            recall = tp / (tp + fn) if (tp + fn) > 0 else 0
-            f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-            
-            return jsonify({
+
+        # Calculer les métriques de performance en se basant sur l'évaluateur 1
+        total = len(extractions)
+        ia_includes = sum(1 for e in extractions if e['relevance_score'] >= 7)
+
+        user_includes = 0
+        tp = 0
+        tn = 0
+        fp = 0
+        fn = 0
+
+        for e in extractions:
+            try:
+                validation_data = json.loads(e['validations'])
+                user_decision = validation_data.get('evaluator1')
+
+                if user_decision == 'include':
+                    user_includes += 1
+
+                # Matrice de confusion
+                if e['relevance_score'] >= 7 and user_decision == 'include':
+                    tp += 1
+                elif e['relevance_score'] < 7 and user_decision == 'exclude':
+                    tn += 1
+                elif e['relevance_score'] >= 7 and user_decision == 'exclude':
+                    fp += 1
+                elif e['relevance_score'] < 7 and user_decision == 'include':
+                    fn += 1
+            except (json.JSONDecodeError, TypeError):
+                continue
+
+        # Métriques
+        accuracy = (tp + tn) / total if total > 0 else 0
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+        f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+
+        return jsonify({
                 "total_articles": total,
                 "ia_includes": ia_includes,
                 "user_includes": user_includes,
@@ -2206,65 +2084,38 @@ def get_validation_stats(project_id):
                     "recall": round(recall, 3),
                     "f1_score": round(f1_score, 3)
                 }
-            })
-    except Exception as e:
+        })
+    except Exception as e:  # CORRECTION : Ajout de la clause except manquante
         logger.exception(f"Erreur get_validation_stats: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
-    # Pas de bloc finally nécessaire ici, la gestion des erreurs est complète.
+    finally:  # CORRECTION : Ajout du finally pour fermer la session
+        session.close()
 
 @api_bp.route('/projects/<project_id>/stakeholders', methods=['GET', 'POST'])
-def handle_stakeholders(project_id):
-    try:
-        uuid.UUID(project_id, version=4)
-    except ValueError:
-        return jsonify({'error': 'ID de projet invalide'}), 400
+@with_db_session
+def handle_stakeholder_groups(db_session, project_id):
+    project = db_session.get(Project, project_id)
+    if not project:
+        return jsonify({"error": "Projet non trouvé"}), 404
+        
+    if request.method == 'GET':
+        groups = db_session.query(StakeholderGroup).filter_by(project_id=project_id).all()
+        return jsonify([g.to_dict() for g in groups])
 
-    session = Session()
-    try:
-        if request.method == 'GET':
-            rows = session.execute(text("""
-                SELECT * FROM stakeholder_groups 
-                WHERE project_id = :pid 
-                ORDER BY created_at ASC
-            """), {"pid": project_id}).mappings().all()
+    if request.method == 'POST':
+        data = request.get_json()
+        if not data or not data.get('name'):
+            return jsonify({"error": "Le nom du groupe est requis"}), 400
             
-            stakeholders = [dict(r) for r in rows]
-            
-            # Si aucun groupe défini, retourner les groupes par défaut
-            # Si aucun groupe défini, retourner les groupes par défaut
-            if not stakeholders:
-                default_groups = [
-                    {"id": "patients", "name": "Patients/Soignés", "color": "#4CAF50", "description": "Utilisateurs finaux des solutions numériques"},
-                    {"id": "healthcare", "name": "Professionnels de santé", "color": "#2196F3", "description": "Médecins, infirmiers, autres soignants"},
-                    {"id": "developers", "name": "Développeurs/Tech", "color": "#FF9800", "description": "Concepteurs et développeurs de solutions"},
-                    {"id": "regulators", "name": "Régulateurs/Décideurs", "color": "#9C27B0", "description": "Autorités, décideurs politiques"},
-                    {"id": "payers", "name": "Payeurs/Assurances", "color": "#F44336", "description": "Organismes de financement"}
-                ]
-                return jsonify(default_groups)
-            
-            return jsonify(stakeholders)
-            
-        if request.method == 'POST':
-            data = request.get_json(force=True)
-            stakeholder = {
-                "id": str(uuid.uuid4()),
-                "project_id": project_id,
-                "name": data['name'],
-                "color": data.get('color', '#4CAF50'),
-                "description": data.get('description', ''),
-                "created_at": datetime.now().isoformat()
-            }
-            
-            session.execute(text("""
-                INSERT INTO stakeholder_groups (id, project_id, name, color, description, created_at)
-                VALUES (:id, :project_id, :name, :color, :description, :created_at)
-            """), stakeholder)
-            session.commit()
-            
-            return jsonify(stakeholder), 201
-    except Exception as e:
-        logger.exception(f"Erreur handle_stakeholders: {e}")
-        return jsonify({'error': 'Erreur interne'}), 500
+        new_group = StakeholderGroup(
+            id=str(uuid.uuid4()),
+            project_id=project_id,
+            name=data['name'],
+            color=data.get('color', '#4CAF50'),
+            description=data.get('description', '')
+        )
+        db_session.add(new_group)
+        return jsonify(new_group.to_dict()), 201
 
 @api_bp.route('/admin/fix-profiles', methods=['POST'])
 @with_db_session
