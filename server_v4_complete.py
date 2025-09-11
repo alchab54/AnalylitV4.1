@@ -911,47 +911,32 @@ def handle_prompts():
 
 # --- Grilles d'extraction ---
 @api_bp.route('/projects/<project_id>/grids', methods=['GET', 'POST'])
-def handle_extraction_grids(project_id):
+@with_db_session
+def handle_extraction_grids(db_session, project_id):
     try:
         uuid.UUID(project_id, version=4)
     except ValueError:
         return jsonify({'error': 'ID de projet invalide'}), 400
 
-    session = Session()
-    try:
-        # Validation de l'UUID déjà faite
-        if request.method == 'GET':
-            rows = session.execute(text("""
+    if request.method == 'GET':
+        rows = db_session.execute(text("""
             SELECT id, name, fields, created_at FROM extraction_grids
             WHERE project_id = :pid ORDER BY created_at DESC
-            """), {"pid": project_id}).mappings().all()
-            
-            grids = []
-            for r in rows:
-                g = dict(r)
-                try:
-                    g['fields'] = json.loads(g['fields'])
-                except Exception:
-                    g['fields'] = []
-                grids.append(g)
-            return jsonify(grids)
+        """), {"pid": project_id}).mappings().all()
+        
+        grids = []
+        for r in rows:
+            g = dict(r)
+            try:
+                g['fields'] = json.loads(g['fields'])
+            except Exception:
+                g['fields'] = []
+            grids.append(g)
+        return jsonify(grids)
 
-        if request.method == 'POST':
-            data = request.get_json(force=True)
-            name, fields = data.get('name'), data.get('fields')
-            if not name or not isinstance(fields, list) or not fields:
-                return jsonify({'error': 'Le nom et une liste de champs sont requis.'}), 400
+    # La méthode POST est maintenant gérée par la fonction create_grid ci-dessous
+    # pour une meilleure séparation des préoccupations.
 
-            grid_id = str(uuid.uuid4())
-            session.execute(text("""
-            INSERT INTO extraction_grids (id, project_id, name, fields, created_at)
-            VALUES (:id, :pid, :n, :f, :t)
-            """), {"id": grid_id, "pid": project_id, "n": name, "f": json.dumps(fields), 
-                   "t": datetime.now().isoformat()})
-            session.commit()
-            
-            return jsonify({"id": grid_id, "project_id": project_id, "name": name, "fields": fields,
-                            "created_at": datetime.now().isoformat()}), 201
     except Exception as e:
         logger.exception(f"Erreur grids_collection: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
@@ -989,6 +974,61 @@ def update_grid(db_session, grid_id):
         return jsonify({"error": "Erreur interne du serveur"}), 500
         
     return jsonify(grid.to_dict())
+
+@api_bp.route('/projects/<uuid:project_id>/grids', methods=['POST'])
+@with_db_session
+def create_grid(db_session, project_id):
+    project = db_session.get(Project, project_id)
+    if not project:
+        return jsonify({"error": "Projet non trouvé"}), 404
+    data = request.get_json()
+    if not data or not data.get('name'):
+        return jsonify({"error": "Le nom de la grille est requis"}), 400
+
+    new_grid = Grid(
+        id=uuid.uuid4(),
+        project_id=project_id,
+        name=data['name'],
+        description=data.get('description', '')
+    )
+    db_session.add(new_grid)
+    
+    try:
+        db_session.commit()
+    except SQLAlchemyError as e:
+        db_session.rollback()
+        logger.exception(f"Erreur DB lors de la création de la grille pour le projet {project_id}: {e}")
+        return jsonify({"error": "Erreur base de données"}), 500
+        
+    return jsonify(new_grid.to_dict()), 201
+
+@api_bp.route('/grids/<uuid:grid_id>/fields', methods=['POST'])
+@with_db_session
+def add_field_to_grid(db_session, grid_id):
+    grid = db_session.get(Grid, grid_id)
+    if not grid:
+        return jsonify({"error": "Grille non trouvée"}), 404
+    data = request.get_json()
+    if not data or not data.get('name') or 'type' not in data:
+        return jsonify({"error": "Le nom et le type du champ sont requis"}), 400
+
+    new_field = GridField(
+        id=uuid.uuid4(),
+        grid_id=grid_id,
+        name=data['name'],
+        field_type=data['type'],
+        description=data.get('description', '')
+    )
+    db_session.add(new_field)
+    
+    try:
+        db_session.commit()
+    except SQLAlchemyError as e:
+        db_session.rollback()
+        logger.exception(f"Erreur DB lors de l'ajout du champ à la grille {grid_id}: {e}")
+        return jsonify({"error": "Erreur base de données"}), 500
+        
+    return jsonify(new_field.to_dict()), 201
         
 @api_bp.route('/projects/<project_id>/grids/import', methods=['POST'])
 def import_grid_from_file(project_id):
