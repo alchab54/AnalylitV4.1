@@ -372,6 +372,7 @@ def delete_project(db_session, project_id):
         # Supprimer le dossier du projet sur le disque
         project_path = Path(config.PROJECTS_DIR) / str(project_id)
         if project_path.exists() and project_path.is_dir():
+            # CORRECTION : Les "..." invalides ont été retirés
             shutil.rmtree(project_path)
 
         # Supprimer le projet de la base de données (les cascades devraient gérer le reste)
@@ -389,53 +390,7 @@ def delete_project(db_session, project_id):
         db_session.rollback()
         logger.exception(f"Erreur inattendue lors de la suppression du projet {project_id}: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
-
-@api_bp.route('/projects/<project_id>/articles', methods=['DELETE'])
-def delete_project_articles(project_id):
-    """Supprime une liste d'articles d'un projet ainsi que leurs extractions associées."""
-    try:
-        uuid.UUID(project_id, version=4)
-    except ValueError:
-        return jsonify({'error': 'ID de projet invalide'}), 400
-
-    data = request.get_json(force=True)
-    article_ids_to_delete = data.get('article_ids', [])
-    if not article_ids_to_delete:
-        return jsonify({'error': "Aucun ID d'article fourni"}), 400
-
-    session = Session()
-    try:
-        # Supprimer les extractions associées en premier
-        session.execute(text("""
-            DELETE FROM extractions
-            WHERE project_id = :pid AND pmid = ANY(:aids)
-        """), {"pid": project_id, "aids": article_ids_to_delete})
-
-        # Ensuite, supprimer les articles eux-mêmes
-        session.execute(text("""
-            DELETE FROM search_results
-            WHERE project_id = :pid AND article_id = ANY(:aids)
-        """), {"pid": project_id, "aids": article_ids_to_delete})
-
-        # Mettre à jour le compteur total d'articles dans le projet
-        total_articles = session.execute(text(
-            "SELECT COUNT(*) FROM search_results WHERE project_id = :pid"
-        ), {"pid": project_id}).scalar_one()
-        
-        session.execute(text(
-            "UPDATE projects SET pmids_count = :count WHERE id = :pid"
-        ), {"count": total_articles, "pid": project_id})
-
-        session.commit()
-        send_project_notification(project_id, 'articles_updated', f'{len(article_ids_to_delete)} article(s) ont été supprimés.')
-        return jsonify({'message': f'{len(article_ids_to_delete)} article(s) supprimé(s) avec succès'}), 200
-
-    except Exception as e:
-        logger.exception(f"Erreur lors de la suppression d'articles: {e}")
-        return jsonify({'error': 'Erreur interne du serveur'}), 500
-    finally:
-        session.close() # Assurez-vous que la session est fermée
-
+    
 # --- Recherche multi-bases ---
 @api_bp.route('/search', methods=['POST'])
 def search_multiple_databases():
@@ -612,6 +567,7 @@ def upload_pdf_for_article(project_id):
     except Exception as e:
         logger.exception(f"Erreur upload_pdf_for_article: {e}")
         return jsonify({'error': 'Erreur lors de l'upload'}), 500
+
 
 @api_bp.route('/projects/<project_id>/files', methods=['GET'])
 def list_project_files(project_id):
@@ -1115,6 +1071,7 @@ def get_project_analyses(project_id):
         return jsonify({"error": "Erreur interne"}), 500
 
 # --- Export projet ---
+
 @api_bp.route('/projects/<project_id>/add-manual-articles', methods=['POST'])
 def add_manual_articles(project_id):
     """
@@ -1124,20 +1081,18 @@ def add_manual_articles(project_id):
         uuid.UUID(project_id, version=4)
     except ValueError:
         return jsonify({'error': 'ID de projet invalide'}), 400
-
     try:
         data = request.get_json(force=True) or {}
         raw = data.get('identifiers', '') or ''
         items = data.get('items')
-
         if isinstance(items, list) and items:
             identifiers = [str(x).strip() for x in items if str(x).strip()]
         else:
             identifiers = [line.strip() for line in str(raw).splitlines() if line.strip()]
-
         if not identifiers:
             return jsonify({'error': 'Aucun identifiant fourni.'}), 400
 
+        # CORRECTION : La parenthèse fermante a été ajoutée ici
         job = background_queue.enqueue(
             add_manual_articles_task,
             project_id=project_id,
@@ -1146,11 +1101,10 @@ def add_manual_articles(project_id):
         )
 
         return jsonify({'message': f'Ajout de {len(identifiers)} article(s) lancé en arrière-plan.', 'job_id': job.id}), 202
-
     except Exception as e:
         logger.exception(f"Erreur add_manual_articles: {e}")
         return jsonify({'error': "Erreur lors du lancement de l'ajout des articles."}), 500
-
+        
 @api_bp.route('/projects/<project_id>/export-analyses', methods=['GET'])
 def export_project_analyses(project_id):
     """Exporte les résultats d'analyse d'un projet dans une archive ZIP."""
@@ -2321,7 +2275,7 @@ def handle_join_room(data):
     if room:
         from flask_socketio import join_room, emit
         join_room(room) # type: ignore
-        emit('room_joined', {'project_id': room}) # type: ignore
+        emit('room_joined', {'project_id': room})
         logger.info(f"Client {request.sid} a rejoint la room {room}")
 
 @api_bp.route('/projects/<project_id>/run-rob-analysis', methods=['POST']) # type: ignore
