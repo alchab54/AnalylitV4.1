@@ -20,6 +20,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine, text
 from functools import wraps
 from sqlalchemy.orm import sessionmaker, scoped_session
+from models import Project
+from config_v4 import Config
+from database import get_db_session
 from config_v4 import get_config
 from tasks_v4_complete import (
     multi_database_search_task,
@@ -652,58 +655,27 @@ def handle_prisma_checklist(project_id):
         finally:
             session.close()
 
-@api_bp.route('/projects/<project_id>/atn-metrics', methods=['GET'])
-def get_atn_metrics(project_id):
-    """Récupère les métriques ATN agrégées."""
-    try:
-        uuid.UUID(project_id, version=4)
-    except ValueError:
-        return jsonify({'error': 'ID de projet invalide'}), 400
-
-    session = Session()
-    try:
-        # Métriques d'empathie
-        # CORRECTION: Remplacement de JSON_EXTRACT par la syntaxe PostgreSQL
-        empathy_metrics = session.execute(text("""
-            SELECT AVG((extracted_data->>'Score_empathie_IA')::FLOAT) as avg_ai_empathy,
-                   AVG((extracted_data->>'Score_empathie_humain')::FLOAT) as avg_human_empathy,
-                   COUNT(*) as total_with_empathy
-            FROM extractions 
-            WHERE project_id = :pid 
-            AND extracted_data->>'Score_empathie_IA' IS NOT NULL
-        """), {"pid": project_id}).mappings().fetchone()
+@app.route('/api/projects/create-from-files', methods=['POST'])
+def create_project_from_files():
+    with get_db_session() as db_session:
+        name = request.form.get('name')
+        if not name:
+            return jsonify({"error": "Le nom du projet est requis"}), 400
         
-        # Distribution des types d'IA
-        ai_types = session.execute(text("""
-            SELECT extracted_data->>'Type_IA' as ai_type, COUNT(*) as count
-            FROM extractions 
-            WHERE project_id = :pid 
-            AND extracted_data->>'Type_IA' IS NOT NULL
-            GROUP BY extracted_data->>'Type_IA'
-        """), {"pid": project_id}).mappings().all()
+        new_project = Project(name=name, status="pending")
+        db_session.add(new_project)
+        db_session.commit()
         
-        # Conformité réglementaire
-        regulatory_stats = session.execute(text("""
-            SELECT 
-                SUM(CASE WHEN extracted_data->>'RGPD_conformité' = 'Oui' THEN 1 ELSE 0 END) as gdpr_compliant,
-                COUNT(CASE WHEN extracted_data->>'RGPD_conformité' IS NOT NULL THEN 1 END) as total_gdpr_mentioned,
-                COUNT(CASE WHEN extracted_data->>'AI_Act_risque' IS NOT NULL THEN 1 END) as total_ai_act_mentioned
-            FROM extractions 
-            WHERE project_id = :pid
-        """), {"pid": project_id}).mappings().fetchone()
+        files = request.files.getlist('files')
+        
+        # Lancer la tâche de fond
+        job = q_processing.enqueue('tasks.process_uploaded_files', new_project.id, files)
         
         return jsonify({
-            "empathy_metrics": dict(empathy_metrics) if empathy_metrics else {},
-            "ai_types_distribution": [dict(r) for r in ai_types],
-            "regulatory_compliance": dict(regulatory_stats) if regulatory_stats else {}
-        })
-        
-    except Exception as e:
-        logger.exception(f"Erreur get_atn_metrics: {e}")
-        return jsonify({'error': 'Erreur lors du calcul des métriques ATN'}), 500
-    finally:
-        # La session est gérée par le teardown context
-        pass
+            "message": "Projet créé et traitement des fichiers lancé.",
+            "project_id": new_project.id,
+            "job_id": job.id
+        }), 201
 
 
 @api_bp.route('/health', methods=['GET'])
@@ -1965,36 +1937,21 @@ def get_inter_rater_stats(project_id):
 @api_bp.route('/projects/<project_id>/reports/summary-table', methods=['GET'])
 def get_summary_table_data(project_id):
     """Fournit les données extraites des articles inclus pour un tableau de synthèse."""
-    try:
-        uuid.UUID(project_id, version=4)
-    except ValueError:
-        return jsonify({'error': 'ID de projet invalide'}), 400
-
-    session = Session()
-    try:
-        rows = session.execute(text("""
-            SELECT pmid, title, extracted_data 
-            FROM extractions 
-            WHERE project_id = :pid AND user_validation_status = 'include'
-        """), {"pid": project_id}).mappings().all()
-
-        records = []
-        for row in rows:
-            try:
-                data = json.loads(row['extracted_data']) if row['extracted_data'] else {}
-                record = {
-                    'PMID': row['pmid'],
-                    'Titre': row['title'],
-                    **data
-                }
-                records.append(record)
-            except (json.JSONDecodeError, TypeError):
-                continue
+    with get_db_session() as db_session:
+        project = db_session.query(Project).get(project_id)
+        if not project:
+            return jsonify({"error": "Projet non trouvé"}), 404
         
-        return jsonify(records)
-    except Exception as e:
-        logger.exception(f"Erreur get_summary_table_data: {e}")
-        return jsonify({'error': 'Erreur interne du serveur'}), 500
+        data = request.get_json()
+        project.prisma_checklist = data.get('checklist', {})
+        
+        try:
+            db_session.commit()
+            return jsonify({"message": "Progression PRISMA sauvegardée"}), 200
+        except SQLAlchemyError as e:
+            db_session.rollback()
+            logger.exception(f"Erreur DB lors de la sauvegarde PRISMA pour le projet {project_id}: {e}")
+            return jsonify({"error": "Erreur base de données"}), 500
 
 def format_citation(article, style='apa'):
     """Formate une citation simple pour un article."""
