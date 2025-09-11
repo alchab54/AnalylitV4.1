@@ -23,10 +23,10 @@ from functools import wraps
 from sqlalchemy.orm import sessionmaker, scoped_session
 import shutil
 
-from models import (Project, Article, SearchResult, Extraction, Grid, GridField,
+from utils.models import (Project, Article, SearchResult, Extraction, Grid, GridField,
                    Validation, Analysis, ChatMessage, AnalysisProfile as Profile, Prompt,
                    Stakeholder, StakeholderGroup, AnalysisProfile)
-from database import db_session, init_db, seed_default_data
+from utils.database import db_session, init_db, seed_default_data
 from config_v4 import get_config, Config
 from tasks_v4_complete import (
     multi_database_search_task,
@@ -829,25 +829,26 @@ def handle_extraction_grids(db_session, project_id):
     except ValueError:
         return jsonify({'error': 'ID de projet invalide'}), 400
 
-    if request.method == 'GET':
-        rows = db_session.execute(text("""
-            SELECT id, name, fields, created_at FROM extraction_grids
-            WHERE project_id = :pid ORDER BY created_at DESC
-        """), {"pid": project_id}).mappings().all()
+    try:
+        if request.method == 'GET':
+            rows = db_session.execute(text("""
+                SELECT id, name, fields, created_at FROM extraction_grids
+                WHERE project_id = :pid ORDER BY created_at DESC
+            """), {"pid": project_id}).mappings().all()
 
-        grids = []
-        for r in rows:
-            g = dict(r)
-            try:
-                g['fields'] = json.loads(g['fields'])
-            except Exception:
-                g['fields'] = []
-            grids.append(g)
+            grids = []
+            for r in rows:
+                g = dict(r)
+                try:
+                    g['fields'] = json.loads(g['fields'])
+                except Exception:
+                    g['fields'] = []
+                grids.append(g)
 
-        return jsonify(grids)
+            return jsonify(grids)
 
-    # La méthode POST est maintenant gérée par la fonction create_grid ci-dessous
-    # pour une meilleure séparation des préoccupations.
+        # La méthode POST est maintenant gérée par la fonction create_grid ci-dessous
+        # pour une meilleure séparation des préoccupations.
 
     except Exception as e:
         logger.exception(f"Erreur grids_collection: {e}")
@@ -1652,7 +1653,7 @@ def calculate_project_kappa(project_id, db_session=None):
     try:
         job = analysis_queue.enqueue(calculate_kappa_task, project_id=project_id, job_timeout='10m')
         return jsonify({"message": "Calcul du Kappa lancé.", "job_id": job.id}), 202
-    except Exception as e:  # CORRECTION : Ajout de la clause except manquante
+    except Exception as e: 
         logger.exception(f"Erreur lors de la mise en file d'attente du calcul Kappa: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
 
