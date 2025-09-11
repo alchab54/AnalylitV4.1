@@ -790,6 +790,23 @@ def handle_analysis_profiles():
         logger.exception(f"Erreur handle_analysis_profiles: {e}")
         return jsonify({'error': 'Erreur interne'}), 500
 
+@api_bp.route('/profiles/<uuid:profile_id>', methods=['DELETE'])
+@with_db_session
+def delete_profile(db_session, profile_id):
+    profile = db_session.get(Profile, profile_id)
+    if not profile:
+        return jsonify({"error": "Profil non trouvé"}), 404
+    
+    try:
+        db_session.delete(profile)
+        db_session.commit()
+    except Exception as e:
+        db_session.rollback()
+        logger.exception(f"Erreur lors de la suppression du profil {profile_id}")
+        return jsonify({"error": "Erreur interne du serveur"}), 500
+        
+    return jsonify({"message": "Profil supprimé avec succès"})
+
 @api_bp.route('/profiles/<uuid:profile_id>', methods=['PUT'])
 @with_db_session
 def update_profile(db_session, profile_id):
@@ -812,6 +829,31 @@ def update_profile(db_session, profile_id):
         db_session.rollback()
         logger.exception("Erreur lors de la mise à jour du profil.")
         return jsonify({'error': 'Erreur interne'}), 500
+
+@api_bp.route('/projects/<uuid:project_id>/analysis-profile', methods=['PUT'])
+@with_db_session
+def update_analysis_profile(db_session, project_id):
+    project = db_session.get(Project, project_id)
+    if not project:
+        return jsonify({"error": "Projet non trouvé"}), 404
+    data = request.get_json()
+    profile_id = data.get('profile_id')
+    if not profile_id:
+        return jsonify({"error": "ID de profil manquant"}), 400
+    
+    profile = db_session.get(AnalysisProfile, profile_id)
+    if not profile:
+        return jsonify({"error": "Profil d'analyse non trouvé"}), 404
+            
+    project.analysis_profile_id = profile_id
+    try:
+        db_session.commit()
+    except Exception as e:
+        db_session.rollback()
+        logger.exception(f"Erreur lors de la mise à jour du profil pour le projet {project_id}")
+        return jsonify({"error": "Erreur interne"}), 500
+            
+    return jsonify({"message": "Profil d'analyse mis à jour"})
 
 # ALIAS pour compatibilité frontend: /analysis-profiles
 @api_bp.route('/analysis-profiles', methods=['GET', 'POST'])
