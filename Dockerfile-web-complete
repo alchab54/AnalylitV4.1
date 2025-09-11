@@ -51,8 +51,6 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 # Configuration de l'application
 WORKDIR /app
-COPY requirements.txt ./
-COPY . .
 RUN mkdir -p /app/projects /app/model_cache
 ENV SENTENCE_TRANSFORMERS_HOME=/app/model_cache
 ENV NVIDIA_VISIBLE_DEVICES=all
@@ -62,4 +60,7 @@ ENV USE_GPU=true
 ENV FLASK_APP=server_v4_complete.py
 
 EXPOSE 5001
+
+COPY . .
+
 # La commande de démarrage est dans docker-compose-local.yml
