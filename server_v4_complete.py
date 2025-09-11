@@ -21,7 +21,6 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from models import (Project, Article, SearchResult, Extraction, Grid, GridField,
                     Validation, Analysis, ChatMessage, AnalysisProfile as Profile, Prompt,
                     Stakeholder, StakeholderGroup, AnalysisProfile)
-from database import db_session, init_db
 from database import db_session, init_db, seed_default_data
 from config_v4 import get_config, Config
 from tasks_v4_complete import (
@@ -118,187 +117,8 @@ def with_db_session(f):
 # ================================================================
 # 1) Initialisation / Migrations
 # ================================================================
-def init_db():
-    """Initialise ou migre le schéma PostgreSQL."""
-    with engine.begin() as conn:
-        try:
-            conn.execute(text("""
-CREATE TABLE IF NOT EXISTS projects (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    description TEXT,
-    status TEXT DEFAULT 'pending',
-    profile_used TEXT,
-    job_id TEXT,
-    created_at TEXT,
-    updated_at TEXT,
-    synthesis_result TEXT,
-    discussion_draft TEXT,
-    knowledge_graph TEXT,
-    prisma_flow_path TEXT,
-    analysis_mode TEXT DEFAULT 'screening',
-    analysis_result TEXT,
-    analysis_plot_path TEXT,
-    pmids_count INTEGER DEFAULT 0,
-    processed_count INTEGER DEFAULT 0,
-    total_processing_time DOUBLE PRECISION DEFAULT 0,
-    indexed_at TEXT,
-    search_query TEXT,
-    databases_used TEXT,
-    inter_rater_reliability TEXT
-)
-"""))
-            conn.execute(text("""
-CREATE TABLE IF NOT EXISTS search_results (
-    id TEXT PRIMARY KEY,
-    project_id TEXT NOT NULL,
-    article_id TEXT NOT NULL,
-    title TEXT,
-    abstract TEXT,
-    authors TEXT,
-    publication_date TEXT,
-    journal TEXT,
-    doi TEXT,
-    url TEXT,
-    database_source TEXT NOT NULL,
-    created_at TEXT,
-    FOREIGN KEY (project_id) REFERENCES projects(id),
-    UNIQUE(project_id, article_id)
-)
-"""))
-            conn.execute(text("""
-CREATE TABLE IF NOT EXISTS extractions (
-    id TEXT PRIMARY KEY,
-    project_id TEXT,
-    pmid TEXT,
-    title TEXT,
-    validation_score DOUBLE PRECISION,
-    created_at TEXT,
-    extracted_data TEXT,
-    relevance_score DOUBLE PRECISION DEFAULT 0,
-    relevance_justification TEXT,
-    user_validation_status TEXT,
-    analysis_source TEXT,
-    validations TEXT,
-    FOREIGN KEY (project_id) REFERENCES projects(id)
-)
-"""))
-            conn.execute(text("""
-CREATE TABLE IF NOT EXISTS processing_log (
-    id SERIAL PRIMARY KEY,
-    project_id TEXT,
-    pmid TEXT,
-    status TEXT,
-    details TEXT,
-    "timestamp" TIMESTAMP,
-    FOREIGN KEY (project_id) REFERENCES projects(id)
-)
-"""))
-            conn.execute(text("""
-CREATE TABLE IF NOT EXISTS analysis_profiles (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE,
-    is_custom BOOLEAN DEFAULT TRUE,
-    preprocess_model TEXT NOT NULL,
-    extract_model TEXT NOT NULL,
-    synthesis_model TEXT NOT NULL
-)
-"""))
-            conn.execute(text("""
-CREATE TABLE IF NOT EXISTS prompts (
-    id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE,
-    description TEXT,
-    template TEXT NOT NULL
-)
-"""))
-            conn.execute(text("""
-CREATE TABLE IF NOT EXISTS extraction_grids (
-    id TEXT PRIMARY KEY,
-    project_id TEXT NOT NULL,
-    name TEXT NOT NULL,
-    fields TEXT NOT NULL,
-    created_at TEXT,
-    FOREIGN KEY (project_id) REFERENCES projects(id)
-)
-"""))
-            conn.execute(text("""
-CREATE TABLE IF NOT EXISTS chat_messages (
-    id TEXT PRIMARY KEY,
-    project_id TEXT NOT NULL,
-    role TEXT NOT NULL,
-    content TEXT NOT NULL,
-    sources TEXT,
-    timestamp TEXT,
-    FOREIGN KEY (project_id) REFERENCES projects(id)
-)
-"""))
 import click
 
-            conn.execute(text("""
-CREATE TABLE IF NOT EXISTS atn_metrics (
-    id TEXT PRIMARY KEY,
-    extraction_id TEXT NOT NULL,
-    empathy_score_ai FLOAT,
-    empathy_score_human FLOAT,
-    wai_sr_score FLOAT,
-    adherence_rate FLOAT,
-    algorithmic_trust FLOAT,
-    acceptability_score FLOAT,
-    stakeholder_group TEXT,
-    created_at TEXT,
-    FOREIGN KEY (extraction_id) REFERENCES extractions(id)
-)
-"""))
-
-            # Table pour les groupes de parties prenantes (manquait)
-            conn.execute(text("""
-CREATE TABLE IF NOT EXISTS stakeholder_groups (
-    id TEXT PRIMARY KEY,
-    project_id TEXT NOT NULL,
-    name TEXT NOT NULL,
-    color TEXT DEFAULT '#4CAF50',
-    description TEXT,
-    created_at TEXT,
-    FOREIGN KEY (project_id) REFERENCES projects(id)
-)
-"""))
-
-
-            # Colonnes spécialisées pour l'ATN
-            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS stakeholder_perspective TEXT"))
-            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS ai_type TEXT"))
-            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS platform_used TEXT"))
-            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS ethical_considerations TEXT"))
-
-# Table pour la conformité réglementaire
-# Ajout de la colonne PRISMA checklist
-            conn.execute(text("ALTER TABLE projects ADD COLUMN IF NOT EXISTS prisma_checklist TEXT"))
-
-            # Nouvelle table pour le Risque de Biais (RoB)
-            conn.execute(text("""
-CREATE TABLE IF NOT EXISTS risk_of_bias (
-    id TEXT PRIMARY KEY,
-    project_id TEXT NOT NULL,
-    article_id TEXT NOT NULL,
-    domain_1_bias TEXT,
-    domain_1_justification TEXT,
-    domain_2_bias TEXT,
-    domain_2_justification TEXT,
-    overall_bias TEXT,
-    overall_justification TEXT,
-    created_at TEXT,
-    FOREIGN KEY (project_id) REFERENCES projects(id)
-)
-"""))
-
-            # Ajout de colonnes pour la gestion multipartie prenante
-            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS stakeholder_perspective TEXT"))
-            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS stakeholder_barriers TEXT"))
-            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS stakeholder_facilitators TEXT"))
-            conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS stakeholder_outcomes TEXT"))
-
-            # Insertion des données par défaut (profils, prompts)
 @app.cli.command('init-db')
 def init_db_command():
     """Initialise la base de données et insère les données par défaut."""
@@ -309,13 +129,6 @@ def init_db_command():
     try:
         with engine.begin() as conn:
             seed_default_data(conn)
-
-            logger.info("✅ DB init/migrations OK.")
-        except Exception as e:
-            logger.error(f"❌ Erreur initialisation DB: {e}", exc_info=True)
-            raise
-        finally:
-            conn.commit() # S'assurer que la transaction est validée
         click.echo("Données par défaut insérées avec succès.")
     except Exception as e:
         click.echo(f"Erreur lors de l'insertion des données par défaut: {e}")
@@ -519,8 +332,6 @@ Ces fichiers sont prêts à être insérés dans votre document de thèse.
     zf.writestr('rapport_these.md', markdown_template)
 
 @api_bp.route('/projects/<project_id>/prisma-checklist', methods=['GET', 'POST'])
-def handle_prisma_checklist(project_id):
-    """Gère la checklist PRISMA-ScR du projet."""
 @with_db_session
 def save_prisma_progress(db_session, project_id):
     project = db_session.get(Project, project_id)
@@ -533,61 +344,12 @@ def save_prisma_progress(db_session, project_id):
     project.prisma_checklist = data.get('checklist', project.prisma_checklist)
     
     try:
-        uuid.UUID(project_id, version=4)
-    except ValueError:
-        return jsonify({'error': 'ID de projet invalide'}), 400
-
-    session = Session()
-    try:
-        if request.method == 'GET':
-            project = session.execute(text("""
-                SELECT prisma_checklist FROM projects WHERE id = :pid
-            """), {"pid": project_id}).mappings().fetchone()
-            
-            if project and project.get('prisma_checklist'):
-                checklist_data = json.loads(project['prisma_checklist'])
-            else:
-                from utils.prisma_scr import PRISMA_SCR_CHECKLIST
-                checklist_data = PRISMA_SCR_CHECKLIST
-            
-            from utils.prisma_scr import get_prisma_scr_completion_rate
-            completion_rate = get_prisma_scr_completion_rate(checklist_data)
-            
-            return jsonify({
-                "checklist": checklist_data,
-                "completion_rate": completion_rate
-            })
         db_session.commit()
     except SQLAlchemyError as e:
         db_session.rollback()
         logger.exception(f"Erreur DB lors de la sauvegarde de la progression PRISMA pour le projet {project_id}: {e}")
         return jsonify({"error": "Erreur base de données"}), 500
         
-        elif request.method == 'POST':
-            data = request.get_json(force=True)
-            
-            try:
-                session.execute(text("""
-                    UPDATE projects 
-                    SET prisma_checklist = :checklist, updated_at = :ts 
-                    WHERE id = :pid
-                """), {
-                    "checklist": json.dumps(data.get('checklist', {})),
-                    "ts": datetime.now().isoformat(),
-                    "pid": project_id
-                })
-            except SQLAlchemyError as e:
-                session.rollback()
-                logger.exception(f"Erreur DB lors de la sauvegarde de la progression PRISMA pour le projet {project_id}: {e}")
-                return jsonify({"error": "Erreur base de données"}), 500
-            
-            return jsonify({"message": "Checklist PRISMA-ScR sauvegardée"}), 200
-            
-    except Exception as e:
-        logger.exception(f"Erreur handle_prisma_checklist: {e}")
-        return jsonify({'error': 'Erreur interne'}), 500
-        finally:
-            session.close()
     return jsonify({"message": "Progression enregistrée"})
 
 @app.route('/api/projects/<uuid:project_id>/upload-zotero', methods=['POST'])
