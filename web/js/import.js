@@ -1,8 +1,7 @@
 import { appState, elements } from '../app.js';
 import { fetchAPI } from './api.js';
-import { showToast, showLoadingOverlay, escapeHtml, openModal, closeModal } from './ui.js';
+import { showToast, showLoadingOverlay, escapeHtml, openModal, closeModal, showModal } from './ui.js';
 import { loadSearchResults } from './articles.js';
-import { showModal, closeModal } from './ui.js';
 
 export function renderImportSection(project) {
     const container = document.getElementById('importContainer');
@@ -70,6 +69,25 @@ export function renderImportSection(project) {
     // Attacher les listeners pour les uploads de fichiers
     document.getElementById('zoteroFileInput').addEventListener('change', handleZoteroFileUpload);
     document.getElementById('bulkPDFInput').addEventListener('change', handleBulkPDFUpload);
+
+    // Utiliser la délégation d'événements pour les boutons d'action
+    container.addEventListener('click', (event) => {
+        const target = event.target.closest('button[data-action]');
+        if (!target) return;
+
+        const action = target.dataset.action;
+
+        switch (action) {
+            case 'trigger-zotero-upload': document.getElementById('zoteroFileInput').click(); break;
+            case 'trigger-pdf-upload': document.getElementById('bulkPDFInput').click(); break;
+            case 'run-indexing': handleRunIndexing(); break;
+            case 'fetch-online-pdfs': handleFetchOnlinePdfs(); break;
+            case 'show-manual-add': showAddManualArticlesModal(); break;
+            case 'import-zotero-pdfs': handleImportZoteroPdfs(); break;
+            default:
+                console.warn('Unknown import action:', action);
+        }
+    });
 }
 
 export async function handleZoteroFileUpload(event) {
@@ -113,37 +131,6 @@ export async function handleBulkPDFUpload(event) {
     }
 }
 
-export async function handleManualPDFUpload(event) {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
-    
-    if (!appState.currentProject?.id) {
-        showToast('Sélectionnez un projet avant d\'uploader', 'warning');
-        return;
-    }
-    
-    const formData = new FormData();
-    Array.from(files).forEach(file => formData.append('files', file));
-    
-    try {
-        showLoadingOverlay(true, `Upload de ${files.length} PDF(s)...`);
-        const result = await fetchAPI(`/projects/${appState.currentProject.id}/upload-pdfs-bulk`, {
-            method: 'POST',
-            body: formData
-        });
-        
-        showToast(`${result.successful.length} PDF(s) importés avec succès`, 'success');
-        if (result.failed.length > 0) {
-            console.warn('Échecs upload:', result.failed);
-        }
-    } catch (e) {
-        showToast(`Erreur upload: ${e.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-        event.target.value = ''; // Reset input
-    }
-}
-
 export async function handleRunIndexing() {
     if (!appState.currentProject) return;
     showLoadingOverlay(true, 'Lancement de l\'indexation des PDFs...');
@@ -156,12 +143,6 @@ export async function handleRunIndexing() {
         showLoadingOverlay(false);
     }
 }
-
-// Exposition globale pour les `onclick`
-window.handleRunIndexing = handleRunIndexing;
-window.handleFetchOnlinePdfs = handleFetchOnlinePdfs;
-window.showAddManualArticlesModal = showAddManualArticlesModal;
-window.handleImportZoteroPdfs = handleImportZoteroPdfs;
 
 export async function handleFetchOnlinePdfs() {
     if (!appState.currentProject) return;
@@ -180,10 +161,6 @@ export async function handleFetchOnlinePdfs() {
     } catch (error) {
         showToast(`Erreur : ${error.message}`, 'error');
     }
-}
-
-export function showAddManualArticlesModal() {
-    openModal('addManualArticlesModal');
 }
 
 export function showAddManualArticlesModal() {
