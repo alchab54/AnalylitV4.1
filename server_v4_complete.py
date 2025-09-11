@@ -19,9 +19,10 @@ from sqlalchemy import create_engine, text
 from functools import wraps
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models import (Project, Article, SearchResult, Extraction, Grid, GridField,
-                    Validation, Analysis, ChatMessage, AnalysisProfile, Prompt,
-                    Stakeholder, StakeholderGroup)
+                    Validation, Analysis, ChatMessage, AnalysisProfile as Profile, Prompt,
+                    Stakeholder, StakeholderGroup, AnalysisProfile)
 from database import db_session, init_db
+from database import db_session, init_db, seed_default_data
 from config_v4 import get_config, Config
 from tasks_v4_complete import (
     multi_database_search_task,
@@ -79,6 +80,7 @@ processing_queue = Queue('analylit_processing_v4', connection=redis_conn)
 synthesis_queue = Queue('analylit_synthesis_v4', connection=redis_conn)
 analysis_queue = Queue('analylit_analysis_v4', connection=redis_conn)
 background_queue = Queue('analylit_background_v4', connection=redis_conn)
+q = processing_queue # Alias pour la file de traitement principale
 
 # --- Projets: répertoire fichiers ---
 PROJECTS_DIR = Path(config.PROJECTS_DIR)
@@ -231,6 +233,7 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     FOREIGN KEY (project_id) REFERENCES projects(id)
 )
 """))
+import click
 
             conn.execute(text("""
 CREATE TABLE IF NOT EXISTS atn_metrics (
@@ -296,6 +299,15 @@ CREATE TABLE IF NOT EXISTS risk_of_bias (
             conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS stakeholder_outcomes TEXT"))
 
             # Insertion des données par défaut (profils, prompts)
+@app.cli.command('init-db')
+def init_db_command():
+    """Initialise la base de données et insère les données par défaut."""
+    click.echo("Initialisation de la base de données...")
+    init_db()
+    click.echo("Base de données initialisée.")
+    click.echo("Insertion des données par défaut (profils, prompts)...")
+    try:
+        with engine.begin() as conn:
             seed_default_data(conn)
 
             logger.info("✅ DB init/migrations OK.")
@@ -304,6 +316,9 @@ CREATE TABLE IF NOT EXISTS risk_of_bias (
             raise
         finally:
             conn.commit() # S'assurer que la transaction est validée
+        click.echo("Données par défaut insérées avec succès.")
+    except Exception as e:
+        click.echo(f"Erreur lors de l'insertion des données par défaut: {e}")
             
 # ================================================================
 # 2) API Routes
@@ -320,12 +335,11 @@ def export_for_thesis(project_id):
     try:
         # 1. Données ATN avec gestion des erreurs
         atn_data = session.execute(text("""
-            SELECT extracted_data, stakeholder_perspective, ai_type, 
+            SELECT extracted_data, stakeholder_perspective, ai_type,
                    ethical_considerations, stakeholder_barriers, stakeholder_facilitators
-            FROM extractions 
+            FROM extractions
             WHERE project_id = :pid AND extracted_data IS NOT NULL
         """), {"pid": project_id}).mappings().all()
-
         # 2. Métriques ATN avec valeurs par défaut et syntaxe PostgreSQL
         metrics_query = """
             SELECT 
@@ -336,7 +350,7 @@ def export_for_thesis(project_id):
                 COUNT(*) as total_studies,
                 COUNT(CASE WHEN extracted_data->>'RGPD_conformité' = 'Oui' THEN 1 END) as gdpr_compliant,
                 COUNT(CASE WHEN extracted_data->>'Type_IA' IS NOT NULL THEN 1 END) as ai_type_identified
-            FROM extractions 
+            FROM extractions
             WHERE project_id = :pid
         """
         
@@ -347,7 +361,6 @@ def export_for_thesis(project_id):
             SELECT name, description, created_at, search_query, databases_used
             FROM projects WHERE id = :pid
         """), {"pid": project_id}).mappings().fetchone()
-
         # 4. Créer le ZIP d'export thèse
         buf = io.BytesIO()
         with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
@@ -386,11 +399,10 @@ def export_for_thesis(project_id):
             generate_thesis_report(zf, atn_data, metrics, project_info)
 
         buf.seek(0)
-        return Response(
-            buf.getvalue(),
-            mimetype='application/zip',  # CORRECTION : Ajout d'une virgule ici
-            headers={'Content-Disposition': f'attachment; filename=these_atn_{project_id}.zip'}
-        )
+        try:
+            pass 
+        except Exception as e:
+            logger.error(f"Une erreur est survenue : {e}")
         
     except Exception as e:
         logger.exception(f"Erreur export ATN: {e}")
@@ -509,6 +521,17 @@ Ces fichiers sont prêts à être insérés dans votre document de thèse.
 @api_bp.route('/projects/<project_id>/prisma-checklist', methods=['GET', 'POST'])
 def handle_prisma_checklist(project_id):
     """Gère la checklist PRISMA-ScR du projet."""
+@with_db_session
+def save_prisma_progress(db_session, project_id):
+    project = db_session.get(Project, project_id)
+    if not project:
+        return jsonify({"error": "Projet non trouvé"}), 404
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Données manquantes"}), 400
+        
+    project.prisma_checklist = data.get('checklist', project.prisma_checklist)
+    
     try:
         uuid.UUID(project_id, version=4)
     except ValueError:
@@ -534,6 +557,11 @@ def handle_prisma_checklist(project_id):
                 "checklist": checklist_data,
                 "completion_rate": completion_rate
             })
+        db_session.commit()
+    except SQLAlchemyError as e:
+        db_session.rollback()
+        logger.exception(f"Erreur DB lors de la sauvegarde de la progression PRISMA pour le projet {project_id}: {e}")
+        return jsonify({"error": "Erreur base de données"}), 500
         
         elif request.method == 'POST':
             data = request.get_json(force=True)
@@ -560,6 +588,7 @@ def handle_prisma_checklist(project_id):
         return jsonify({'error': 'Erreur interne'}), 500
         finally:
             session.close()
+    return jsonify({"message": "Progression enregistrée"})
 
 @app.route('/api/projects/<uuid:project_id>/upload-zotero', methods=['POST'])
 @with_db_session
@@ -902,11 +931,10 @@ def serve_project_file(project_id, filename):
     project_path = os.path.join(config.PROJECTS_DIR, str(project_id))
     
     try:
-        return send_from_directory(project_path, filename)
+        return send_from_directory(project_path, filename) # type: ignore
     except FileNotFoundError:
         return jsonify({"error": "Fichier non trouvé"}), 404
 
-@api_bp.route('/projects/<project_id>/index', methods=['POST'])
 def run_indexing(project_id):
     job = background_queue.enqueue(index_project_pdfs_task, project_id=project_id, job_timeout='1h')
     session = Session()
@@ -1000,6 +1028,29 @@ def handle_analysis_profiles():
             return jsonify(profile), 201
     except Exception as e:
         logger.exception(f"Erreur handle_analysis_profiles: {e}")
+        return jsonify({'error': 'Erreur interne'}), 500
+
+@api_bp.route('/profiles/<uuid:profile_id>', methods=['PUT'])
+@with_db_session
+def update_profile(db_session, profile_id):
+    profile = db_session.get(Profile, profile_id)
+    if not profile:
+        return jsonify({"error": "Profil non trouvé"}), 404
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Données manquantes"}), 400
+    
+    profile.name = data.get('name', profile.name)
+    profile.description = data.get('description', profile.description)
+    profile.model_name = data.get('model_name', profile.model_name)
+    profile.temperature = data.get('temperature', profile.temperature)
+    profile.context_length = data.get('context_length', profile.context_length)
+    
+    try:
+        db_session.commit()
+    except Exception as e:
+        db_session.rollback()
+        logger.exception("Erreur lors de la mise à jour du profil.")
         return jsonify({'error': 'Erreur interne'}), 500
 
 # ALIAS pour compatibilité frontend: /analysis-profiles
@@ -1843,10 +1894,15 @@ def get_summary_table_data(project_id):
         project = session.query(Project).get(project_id)
         if not project:
             return jsonify({"error": "Projet non trouvé"}), 404
-        
+
+        # CORRECTION: Charger le profil pour obtenir prompt_id
+        profile = session.query(AnalysisProfile).filter_by(id=project.profile_used).first()
+        if not profile:
+            return jsonify({"error": "Profil d'analyse non trouvé pour ce projet"}), 404
+
         # Logique de récupération des données pour le tableau de synthèse
         rows = session.execute(text("""
-            SELECT pmid, title, extracted_data 
+            SELECT pmid, title, extracted_data
             FROM extractions 
             WHERE project_id = :pid AND user_validation_status = 'include'
         """), {"pid": project_id}).mappings().all()
@@ -1919,11 +1975,10 @@ def handle_risk_of_bias(project_id):
             # Le code ci-dessous est un placeholder basé sur la structure de la fonction
             try:
                 # ... logique de sauvegarde ...
-                db_session.delete(profile)
                 db_session.commit()
             except Exception as e:
                 db_session.rollback()
-                logger.exception("Erreur lors de la suppression du profil d'analyse.")
+                logger.exception("Erreur lors de la mise à jour du profil.")
                 return jsonify({"error": "Erreur interne"}), 500
             return jsonify({"message": "Évaluation RoB sauvegardée"}), 200
 
