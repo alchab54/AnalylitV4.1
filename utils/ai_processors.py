@@ -2,8 +2,11 @@
 
 import json
 import logging
+import time
 import requests
 from typing import Any
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 # Import de la configuration de manière sécurisée
 try:
@@ -21,7 +24,16 @@ logger = logging.getLogger(__name__)
 class AIResponseError(Exception):
     """Exception personnalisée pour les erreurs de réponse de l'IA."""
 
-def call_ollama_api(prompt: str, model: str = "llama3.1:8b", output_format: str = "text") -> Any:
+def requests_session_with_retries():
+    """Crée une session requests avec une stratégie de retry."""
+    session = requests.Session()
+    # Stratégie de retry: 3 essais, avec un délai qui augmente (0.5s, 1s, 2s)
+    # et on réessaie sur les erreurs serveur (5xx)
+    retries = Retry(total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
+    session.mount('http://', HTTPAdapter(max_retries=retries))
+    return session
+
+def call_ollama_api(prompt: str, model: str = "llama3.1:8b", output_format: str = "text", temperature: float = 0.2) -> Any:
     """
     Appelle l'API Ollama avec le prompt fourni.
     
@@ -29,6 +41,7 @@ def call_ollama_api(prompt: str, model: str = "llama3.1:8b", output_format: str 
         prompt: Le prompt à envoyer au modèle.
         model: Le nom du modèle Ollama à utiliser.
         output_format: "text" ou "json" selon le format de réponse attendu.
+        temperature: La température du modèle pour contrôler la créativité.
         
     Returns:
         La réponse du modèle (str si text, dict si json).
@@ -40,19 +53,20 @@ def call_ollama_api(prompt: str, model: str = "llama3.1:8b", output_format: str 
             "prompt": prompt,
             "stream": False,
             "options": {
-                "temperature": 0.2,  # CORRECTION: Température encore plus basse pour plus de déterminisme
+                "temperature": temperature,
                 "top_p": 0.9,
                 "num_predict": 1024, # CORRECTION: Augmentation pour les extractions complexes
                 "stop": ["\n\n\n", "```"]  # CORRECTION: Patterns d'arrêt plus robustes
             }
         }
         
+        session = requests_session_with_retries()
+
         if output_format == "json":
             payload["format"] = "json"
-            # CORRECTION: Instructions explicites pour le JSON
             payload["prompt"] = prompt + "\n\nRépondez UNIQUEMENT avec un JSON valide et complet:"
             
-        response = requests.post(url, json=payload, timeout=config.REQUEST_TIMEOUT)
+        response = session.post(url, json=payload, timeout=config.REQUEST_TIMEOUT)
         response.raise_for_status()
         result = response.json()
         raw_response = result.get("response", "").strip()
@@ -60,22 +74,21 @@ def call_ollama_api(prompt: str, model: str = "llama3.1:8b", output_format: str 
         if output_format == "json":
             try:
                 # CORRECTION: Nettoyage plus robuste de la réponse avant parsing
-                # Trouve le premier '{' et le dernier '}' pour extraire le JSON potentiel
                 start = raw_response.find('{')
                 end = raw_response.rfind('}')
                 if start != -1 and end != -1:
                     json_str = raw_response[start:end+1]
                     return json.loads(json_str)
                 raise json.JSONDecodeError("Marqueurs JSON non trouvés", raw_response, 0)
-            except json.JSONDecodeError as e:
+            except json.JSONDecodeError:
                 logger.warning(f"Réponse IA non-JSON valide: {raw_response[:200]}...")
-                # CORRECTION: Fallback plus robuste
-                return {
-                    "relevance_score": 5,
-                    "decision": "À exclure",
-                    "justification": "Erreur de parsing de la réponse IA - article écarté par sécurité"
-                }
-                logger.info("Utilisation de la réponse fallback pour éviter l'échec complet")
+                try:
+                    cleanup_prompt = f"Extrais UNIQUEMENT l'objet JSON valide du texte suivant. Ne fournis rien d'autre.\n\n{raw_response}"
+                    cleaned_response = call_ollama_api(cleanup_prompt, model="phi3:mini", output_format="text")
+                    return json.loads(cleaned_response)
+                except Exception as cleanup_error:
+                    logger.error(f"Échec de la tentative de nettoyage du JSON: {cleanup_error}")
+                    raise AIResponseError("La réponse de l'IA était un JSON invalide et n'a pas pu être nettoyée.")
         else:
             return raw_response
             

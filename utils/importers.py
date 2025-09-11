@@ -6,6 +6,7 @@ import hashlib
 import logging
 import pandas as pd
 from pathlib import Path
+from typing import Optional
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -28,6 +29,42 @@ class ZoteroAbstractExtractor:
         logger.info(f"{len(items)} références chargées depuis le fichier.")
         return items
 
+    def _get_best_identifier(self, item: dict) -> str:
+        """
+        Tente d'extraire le meilleur identifiant unique (PMID, DOI, puis Zotero Key).
+        """
+        # 1. Chercher un PMID
+        extra_field = str(item.get("extra", ""))
+        pmid_field = str(item.get("PMID", ""))
+        combined_text = extra_field + " " + pmid_field
+        pmid_match = re.search(r'\b(\d{7,9})\b', combined_text)
+        if pmid_match:
+            self.stats["with_pmid"] += 1
+            return pmid_match.group(1)
+
+        # 2. Chercher un DOI
+        doi = item.get("DOI")
+        if doi and isinstance(doi, str) and doi.strip():
+            return doi.strip()
+
+        # 3. En dernier recours, utiliser la clé Zotero
+        zotero_key = item.get("key")
+        if zotero_key:
+            return f"zotero:{zotero_key}"
+
+        # 4. Si vraiment rien, générer un ID basé sur un hash
+        title = item.get("title", "Sans titre") or "Sans titre"
+        return hashlib.md5(title[:50].encode()).hexdigest()[:16]
+
+    def _get_publication_year(self, item: dict) -> Optional[str]:
+        """Extrait l'année de publication de manière robuste."""
+        date_str = str(item.get("date", "")) or str(item.get("year", ""))
+        if date_str:
+            year_match = re.search(r'\b(19|20)\d{2}\b', date_str)
+            if year_match:
+                return year_match.group(0)
+        return None
+
     def extract_reference_data(self, item: dict) -> dict:
         try:
             pmid_text = item.get("extra", "") or ""
@@ -44,24 +81,22 @@ class ZoteroAbstractExtractor:
 
             authors_list = []
             for creator in item.get("creators", []):
-                if isinstance(creator, dict):
+                # Vérification de type plus robuste
+                if isinstance(creator, dict) and creator.get("lastName"):
                     authors_list.append(f"{creator.get('lastName', '')}, {creator.get('firstName', '')}")
             authors = "; ".join(authors_list)
 
-            date_str = item.get("date", "") or ""
-            year_match = re.search(r'\b(19|20)\d{2}\b', date_str)
-            year = int(year_match.group(0)) if year_match else None
+            year = self._get_publication_year(item)
 
             title = item.get("title", "Sans titre") or "Sans titre"
             hash_base = f"{title[:50]}_{(authors_list if authors_list else '')}_{year or ''}"
 
-            zotero_key = item.get("key")
             return {
-                "zotero_key": zotero_key,
-                "article_id": pmid or item.get("DOI", ""),
+                "zotero_key": item.get("key"),
+                "article_id": self._get_best_identifier(item),
                 "title": title,
                 "authors": authors,
-                "publication_date": str(year) if year else "",
+                "publication_date": year or "",
                 "journal": item.get("publicationTitle", "") or "",
                 "abstract": self.clean_html(abstract),
                 "doi": item.get("DOI", "") or "",

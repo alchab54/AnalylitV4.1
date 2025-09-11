@@ -1,80 +1,69 @@
-# AnalyLit V4.1 - Configuration centrale
-
+# config_v4.py
 import os
-from dataclasses import dataclass, field
+import json
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Dict, Any, Optional
 from pathlib import Path
 
-@dataclass
-class Config:
-    """Configuration pour AnalyLit V4.1"""
-    
-    # Version de l'application
+def load_default_models() -> Dict[str, Any]:
+    """Charge les profils de modèles depuis un fichier JSON externe."""
+    try:
+        # Le chemin est relatif à l'emplacement de ce fichier de configuration
+        config_path = Path(__file__).parent.parent / "profiles.json"
+        with open(config_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        # Fournit une configuration de secours si le fichier est manquant ou invalide
+        print("WARNING: profiles.json not found or invalid. Using fallback default models.")
+        return {
+            'fast': {'preprocess': 'phi3:mini', 'extract': 'phi3:mini', 'synthesis': 'llama3.1:8b'},
+            'standard': {'preprocess': 'phi3:mini', 'extract': 'llama3.1:8b', 'synthesis': 'llama3.1:8b'},
+            'deep': {'preprocess': 'llama3.1:8b', 'extract': 'mixtral:8x7b', 'synthesis': 'llama3.1:70b'}
+        }
+
+class Settings(BaseSettings):
+    """
+    Classe de configuration de l'application utilisant Pydantic pour la validation.
+    Charge les variables depuis un fichier .env et les variables d'environnement.
+    """
+    # Configuration pour Pydantic : lit le fichier .env, ignore les variables supplémentaires
+    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8', extra='ignore')
+
+    # --- Paramètres de l'application ---
     ANALYLIT_VERSION: str = "4.1.0"
+    SECRET_KEY: str
+    LOG_LEVEL: str = 'INFO'
     
-    # Configuration Redis
-    REDIS_URL: str = os.getenv('REDIS_URL', 'redis://redis:6379/0')
+    # --- Connexions aux services externes ---
+    REDIS_URL: str = 'redis://redis:6379/0'
+    OLLAMA_BASE_URL: str = 'http://ollama:11434'
+    DATABASE_URL: str = 'postgresql+psycopg2://analylit_user:strong_password@db:5432/analylit_db'
     
-    # Configuration Ollama
-    OLLAMA_BASE_URL: str = os.getenv('OLLAMA_BASE_URL', 'http://ollama:11434')
-    
-    # Configuration base de données (PostgreSQL)
-    DATABASE_URL: str = os.getenv('DATABASE_URL', 'postgresql+psycopg2://analylit_user:strong_password@db:5432/analylit_db')
+    # --- Chemins de fichiers ---
     PROJECTS_DIR: Path = Path("/app/projects")
     
-    # Configuration Flask
-    SECRET_KEY: str = os.getenv('SECRET_KEY')
+    # --- Paramètres de performance et de robustesse ---
+    REQUEST_TIMEOUT: int = 900
+    HTTP_MAX_RETRIES: int = 3
     
-    # Configuration des modèles par défaut
-    DEFAULT_MODELS: dict = field(default_factory=lambda: {
-        'fast': {
-            'preprocess': 'phi3:mini',  # CORRECTION: Changement de gemma:2b vers phi3:mini
-            'extract': 'phi3:mini',
-            'synthesis': 'llama3.1:8b'
-        },
-        'standard': {
-            'preprocess': 'phi3:mini',
-            'extract': 'llama3.1:8b',
-            'synthesis': 'llama3.1:8b'
-        },
-        'deep': {
-            'preprocess': 'llama3.1:8b',
-            'extract': 'mixtral:8x7b', 
-            'synthesis': 'llama3.1:70b'
-        }
-    })
-    
-    # Configuration timeouts
-    REQUEST_TIMEOUT: int = 900  # 15 minutes
-    JOB_TIMEOUT: int = 3600     # 1 heure
-    WEBSOCKET_PING_INTERVAL: int = 25
-    WEBSOCKET_PING_TIMEOUT: int = 60
-    
-    # Configuration logging
-    LOG_LEVEL: str = os.getenv('LOG_LEVEL', 'INFO')
-    
-    # Configuration sécurité
-    ALLOWED_EXTENSIONS: set = field(default_factory=lambda: {'pdf', 'json'})
-    MAX_CONTENT_LENGTH: int = 16 * 1024 * 1024  # 16MB
-    
-    # Configuration APIs externes
-    UNPAYWALL_EMAIL: str = os.getenv('UNPAYWALL_EMAIL', 'researcher@analylit.com')
-    MAX_RETRIES: int = int(os.getenv('HTTP_MAX_RETRIES', '3'))
-    
-    # Configuration Zotero
-    ZOTERO_USER_ID: str = os.getenv('ZOTERO_USER_ID', '')
-    ZOTERO_API_KEY: str = os.getenv('ZOTERO_API_KEY', '')
-    ZOTERO_GROUP_ID: str = os.getenv('ZOTERO_GROUP_ID', '')
-    
-    # Configuration embedding et indexation
-    EMBEDDING_MODEL: str = os.getenv('EMBEDDING_MODEL', 'all-MiniLM-L6-v2')
-    CHUNK_SIZE: int = int(os.getenv('CHUNK_SIZE', '1000'))
-    CHUNK_OVERLAP: int = int(os.getenv('CHUNK_OVERLAP', '200'))
-    
-    # Configuration bases de données externes
-    IEEE_API_KEY: str = os.getenv('IEEE_API_KEY', '')
-    CROSSREF_EMAIL: str = os.getenv('CROSSREF_EMAIL', 'researcher@analylit.com')
-    MAX_PDF_SIZE: int = 50 * 1024 * 1024  # Exemple: 50MB
+    # --- Configuration des Modèles IA ---
+    # Chargé depuis profiles.json via la fonction `load_default_models`
+    DEFAULT_MODELS: Dict[str, Any] = load_default_models()
 
-def get_config() -> Config:
-    """Retourne une instance de configuration"""
-    return Config()
+    # --- Paramètres divers ---
+    UNPAYWALL_EMAIL: str = 'researcher@analylit.com'
+
+# --- Singleton pour l'instance de configuration ---
+_config_instance: Optional[Settings] = None
+
+def get_config() -> Settings:
+    """
+    Retourne une instance unique (singleton) de la configuration.
+    Cela garantit que les paramètres sont chargés et validés une seule fois.
+    """
+    global _config_instance
+    if _config_instance is None:
+        _config_instance = Settings()
+        # Créer le répertoire des projets s'il n'existe pas
+        _config_instance.PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
+    return _config_instance

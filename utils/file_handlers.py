@@ -7,6 +7,12 @@ from typing import Optional
 import PyPDF2
 import pdfplumber
 
+try:
+    import pytesseract
+    from PIL import Image
+except ImportError:
+    pytesseract = None
+
 logger = logging.getLogger(__name__)
 
 def sanitize_filename(filename: str) -> str:
@@ -30,22 +36,34 @@ def extract_text_from_pdf(pdf_path: str) -> Optional[str]:
         logger.error(f"Fichier PDF non trouvé: {pdf_path}")
         return None
     
+    full_text = ""
     try:
         # Essaye d'abord avec pdfplumber (plus robuste)
         with pdfplumber.open(pdf_path) as pdf:
-            text_parts = []
-            for page in pdf.pages:
-                page_text = page.extract_text()
-                if page_text:
-                    text_parts.append(page_text)
-            
-            full_text = "\n".join(text_parts)
-            if full_text.strip():
-                return full_text
+            full_text = "\n".join(page.extract_text() or "" for page in pdf.pages)
                 
     except Exception as e:
         logger.warning(f"Erreur pdfplumber pour {pdf_path}: {e}")
     
+    if full_text.strip():
+        return full_text
+
+    # Si aucun texte n'est trouvé, essayer l'OCR comme solution de repli
+    if pytesseract:
+        logger.warning(f"Aucun texte extrait pour {pdf_path}. Tentative d'OCR...")
+        try:
+            with pdfplumber.open(pdf_path) as pdf:
+                ocr_text_parts = []
+                for i, page in enumerate(pdf.pages):
+                    pil_image = page.to_image(resolution=300).original
+                    ocr_text_parts.append(pytesseract.image_to_string(pil_image, lang='eng+fra'))
+                full_text = "\n".join(filter(None, ocr_text_parts))
+        except Exception as ocr_error:
+            logger.error(f"Erreur OCR pour {pdf_path}: {ocr_error}")
+
+    if full_text.strip():
+        return full_text
+
     try:
         # Fallback avec PyPDF2
         with open(pdf_path, 'rb') as file:
@@ -56,15 +74,14 @@ def extract_text_from_pdf(pdf_path: str) -> Optional[str]:
                 page_text = page.extract_text()
                 if page_text:
                     text_parts.append(page_text)
-            
-            full_text = "\n".join(text_parts)
-            if full_text.strip():
-                return full_text
+            full_text_pypdf = "\n".join(text_parts)
+            if full_text_pypdf.strip():
+                return full_text_pypdf
                 
     except Exception as e:
         logger.error(f"Erreur PyPDF2 pour {pdf_path}: {e}")
     
-    logger.error(f"Impossible d'extraire le texte de {pdf_path}")
+    logger.warning(f"Impossible d'extraire le texte de {pdf_path} après toutes les tentatives.")
     return None
 
 def ensure_directory_exists(directory_path: str) -> bool:
