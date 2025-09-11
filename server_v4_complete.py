@@ -3,6 +3,10 @@
 # ================================================================
 import os, uuid, json, logging, io, zipfile, pandas as pd
 from pathlib import Path
+import sys
+import os
+# Ajoute le répertoire courant au PYTHONPATH
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from datetime import datetime, timezone
 from flask import Flask, jsonify, request, Blueprint, send_from_directory, Response
 from flask_cors import CORS
@@ -291,100 +295,8 @@ CREATE TABLE IF NOT EXISTS risk_of_bias (
             conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS stakeholder_facilitators TEXT"))
             conn.execute(text("ALTER TABLE extractions ADD COLUMN IF NOT EXISTS stakeholder_outcomes TEXT"))
 
-            # --- Début du bloc à remplacer ---
-
-            # Vérifier si le projet par défaut existe, sinon le créer
-            default_project_exists = conn.execute(text("SELECT id FROM projects WHERE id = 'default'")).first()
-            if not default_project_exists:
-                conn.execute(text("""
-                    INSERT INTO projects (id, name, description, status, created_at, updated_at)
-                    VALUES ('default', 'Modèles par défaut', 'Projet système pour les grilles par défaut', 'completed', NOW(), NOW())
-                """))
-                logger.info("✅ Projet par défaut créé.")
-
-            # Vérifier si la grille ATN par défaut existe, sinon la créer
-            atn_grid_exists = conn.execute(text("SELECT id FROM extraction_grids WHERE name = 'Grille ATN Standardisée' AND project_id = 'default'")).first()
-            if not atn_grid_exists:
-                try:
-                    with open('grille-ATN.json', 'r', encoding='utf-8') as f:
-                        atn_data = json.load(f)
-                    
-                    atn_grid_params = {
-                        "id": str(uuid.uuid4()),
-                        "project_id": "default",  # Lier au projet par défaut maintenant existant
-                        "name": atn_data.get("name", "Grille ATN Standardisée"),
-                        "fields": json.dumps([
-                            {"name": field, "description": f"Extraction pour {field}"} for field in atn_data.get("fields", [])
-                        ]),
-                        "created_at": datetime.now(timezone.utc)
-                    }
-                    
-                    conn.execute(text("""
-                        INSERT INTO extraction_grids (id, project_id, name, fields, created_at)
-                        VALUES (:id, :project_id, :name, :fields, :created_at)
-                    """), atn_grid_params)
-                    logger.info("✅ Grille ATN standardisée créée et liée au projet par défaut.")
-                except FileNotFoundError:
-                    logger.warning("⚠️ Fichier grille-ATN.json non trouvé. La grille par défaut ne sera pas créée.")
-                except Exception as e:
-                    logger.error(f"❌ Erreur lors de la création de la grille ATN par défaut: {e}")
-
-            # Seeding profils
-            count_profiles = conn.execute(text("SELECT COUNT(*) FROM analysis_profiles")).scalar_one()
-            if count_profiles == 0:
-                default_profiles = [
-                    {"id": "fast", "name": "Rapide", "is_custom": False, "preprocess_model": "gemma:2b",
-                     "extract_model": "phi3:mini", "synthesis_model": "llama3.1:8b"},
-                    {"id": "standard", "name": "Standard", "is_custom": False, "preprocess_model": "phi3:mini",
-                     "extract_model": "llama3.1:8b", "synthesis_model": "llama3.1:8b"},
-                    {"id": "deep", "name": "Approfondi", "is_custom": False, "preprocess_model": "llama3.1:8b",
-                     "extract_model": "mixtral:8x7b", "synthesis_model": "llama3.1:70b"},
-                ]
-                stmt = text("""
-INSERT INTO analysis_profiles (id, name, is_custom, preprocess_model, extract_model, synthesis_model)
-VALUES (:id, :name, :is_custom, :preprocess_model, :extract_model, :synthesis_model)
-""")
-                for p in default_profiles:
-                    conn.execute(stmt, p)
-
-            # Seeding prompts (JSON échappé)
-            count_prompts = conn.execute(text("SELECT COUNT(*) FROM prompts")).scalar_one()
-            if count_prompts == 0:
-                default_prompts = [
-                    {
-                        "name": "screening_prompt",
-                        "description": "Prompt pour la pré-sélection des articles.",
-                        "template": (
-                            "En tant qu'assistant de recherche spécialisé, analysez cet article et déterminez sa pertinence.\n\n"
-                            "Titre: {title}\n\nRésumé: {abstract}\n\nSource: {database_source}\n\n"
-                            "Répondez UNIQUEMENT en JSON: "
-                            "{{\"relevance_score\": 0-10, \"decision\": \"À inclure\"|\"À exclure\", \"justification\": \"...\"}}"
-                        ),
-                    },
-                    {
-                        "name": "full_extraction_prompt",
-                        "description": "Prompt pour l'extraction détaillée (grille).",
-                        "template": (
-                            "ROLE: Assistant expert. Répondez UNIQUEMENT avec un JSON valide.\n"
-                            "TEXTE À ANALYSER:\n---\n{text}\n---\nSOURCE: {database_source}\n"
-                            "{{\n\"type_etude\":\"...\",\"population\":\"...\",\"intervention\":\"...\","
-                            "\"resultats_principaux\":\"...\",\"limites\":\"...\",\"methodologie\":\"...\"\n}}"
-                        ),
-                    },
-                    {
-                        "name": "synthesis_prompt",
-                        "description": "Prompt pour la synthèse.",
-                        "template": (
-                            "Contexte: {project_description}\n"
-                            "Résumés:\n---\n{data_for_prompt}\n---\n"
-                            "Réponds en JSON: {{\"relevance_evaluation\":[],\"main_themes\":[],\"key_findings\":[],"
-                            "\"methodologies_used\":[],\"synthesis_summary\":\"\",\"research_gaps\":[]}}"
-                        ),
-                    },
-                ]
-                stmt = text("INSERT INTO prompts (name, description, template) VALUES (:name, :description, :template)")
-                for pr in default_prompts:
-                    conn.execute(stmt, pr)
+            # Insertion des données par défaut (profils, prompts)
+            seed_default_data(conn)
 
             logger.info("✅ DB init/migrations OK.")
         except Exception as e:
@@ -636,7 +548,6 @@ def handle_prisma_checklist(project_id):
                     "ts": datetime.now().isoformat(),
                     "pid": project_id
                 })
-                session.commit()
             except SQLAlchemyError as e:
                 session.rollback()
                 logger.exception(f"Erreur DB lors de la sauvegarde de la progression PRISMA pour le projet {project_id}: {e}")
@@ -650,25 +561,29 @@ def handle_prisma_checklist(project_id):
         finally:
             session.close()
 
-@app.route('/api/projects/<uuid:project_id>/files-set', methods=['GET'])
-def get_project_files_set(project_id):
-    """
-    Retourne un ensemble des noms de fichiers PDF présents dans le dossier d'un projet.
-    """
-    if not os.path.exists(project_path):
+@app.route('/api/projects/<uuid:project_id>/upload-zotero', methods=['POST'])
+@with_db_session
+def handle_zotero_file_upload(db_session, project_id):
+    project = db_session.query(Project).filter(Project.id == project_id).first()
+    if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
+
+    file = request.files.get('file')
+    if not file:
+        return jsonify({"error": "Aucun fichier fourni"}), 400
+
+    project_path = os.path.join(app.config['PROJECTS_FOLDER'], str(project.id))
+    os.makedirs(project_path, exist_ok=True)
     
-    try:
-        pdf_files = {f for f in os.listdir(project_path) if f.lower().endswith('.pdf')}
-        return jsonify(list(pdf_files))
-    except Exception as e:
-        logger.exception(f"Erreur lors de la lecture des fichiers du projet {project_id}")
-        return jsonify({"error": "Erreur interne du serveur"}), 500
-    
-    # CORRECTION: Boucle incorrecte
-    for model_name in config.OLLAMA_MODELS_TO_PULL:
-        pull_model(model_name)
-    db_status, redis_status = "error", "error"
+    filename = secure_filename(file.filename)
+    file_path = os.path.join(project_path, filename)
+    file.save(file_path)
+
+    task = q.enqueue('tasks.import_from_zotero_file', project_id=str(project.id), file_path=file_path)
+    return jsonify({'message': f'Fichier {filename} téléversé, import en cours.', 'job_id': task.id}), 202
+
+@api_bp.route('/health', methods=['GET'])
+def health_check():
     try:
         redis_status = "connected" if redis_conn.ping() else "disconnected"
     except Exception:
@@ -980,13 +895,11 @@ def list_project_files(project_id):
 
 @app.route('/projects/<uuid:project_id>/files/<path:filename>')
 def serve_project_file(project_id, filename):
-    """Sert un fichier statique depuis le dossier d'un projet spécifique."""
-    project = db_session.get(Project, str(project_id))
-    if not project:
-        return jsonify({"error": "Projet non trouvé"}), 404
-    
+    """Sert un fichier statique depuis le dossier d'un projet spécifique."""    
     # Sécurisation du chemin
-    project_path = os.path.join(Config.PROJECTS_DIR, str(project.id))
+    # Il est plus sûr de ne pas interroger la DB ici pour un simple service de fichier.
+    # La validation de l'UUID est suffisante pour prévenir la plupart des abus.
+    project_path = os.path.join(config.PROJECTS_DIR, str(project_id))
     
     try:
         return send_from_directory(project_path, filename)
@@ -1925,23 +1838,23 @@ def get_inter_rater_stats(project_id):
 @api_bp.route('/projects/<project_id>/reports/summary-table', methods=['GET'])
 def get_summary_table_data(project_id):
     """Fournit les données extraites des articles inclus pour un tableau de synthèse."""
-    with get_db_session() as db_session: # type: ignore
-        project = db_session.query(Project).get(project_id)
+    session = Session()
+    try:
+        project = session.query(Project).get(project_id)
         if not project:
             return jsonify({"error": "Projet non trouvé"}), 404
         
-        # Ce bloc semble être une erreur de copier-coller et n'a pas de sens ici.
-        # La logique de récupération des données pour le tableau de synthèse doit être implémentée.
-        # Pour l'instant, nous allons corriger le bloc try/except qui suit.
-        data = request.get_json()
-        project.prisma_checklist = data.get('checklist', {})
+        # Logique de récupération des données pour le tableau de synthèse
+        rows = session.execute(text("""
+            SELECT pmid, title, extracted_data 
+            FROM extractions 
+            WHERE project_id = :pid AND user_validation_status = 'include'
+        """), {"pid": project_id}).mappings().all()
         
-        try:
-            db_session.commit()
-        except Exception as e:
-            db_session.rollback()
-            logger.exception(f"Erreur lors de la mise à jour du profil {prompt_id}") # CORRECTION: profile_id -> prompt_id
-            return jsonify({"error": "Erreur interne du serveur"}), 500
+        return jsonify([dict(r) for r in rows])
+    except Exception as e:
+        logger.exception(f"Erreur get_summary_table_data pour projet {project_id}: {e}")
+        return jsonify({"error": "Erreur interne du serveur"}), 500
 
 def format_citation(article, style='apa'):
     """Formate une citation simple pour un article."""
@@ -2006,10 +1919,11 @@ def handle_risk_of_bias(project_id):
             # Le code ci-dessous est un placeholder basé sur la structure de la fonction
             try:
                 # ... logique de sauvegarde ...
+                db_session.delete(profile)
                 db_session.commit()
             except Exception as e:
                 db_session.rollback()
-                logger.exception("Erreur lors de la mise à jour du profil.")
+                logger.exception("Erreur lors de la suppression du profil d'analyse.")
                 return jsonify({"error": "Erreur interne"}), 500
             return jsonify({"message": "Évaluation RoB sauvegardée"}), 200
 
