@@ -763,32 +763,29 @@ def get_project_results(project_id):
         
 # --- Profils et prompts ---
 @api_bp.route('/profiles', methods=['GET', 'POST'])
-def handle_analysis_profiles():
-    session = Session()
-    try:
-        if request.method == 'GET':
-            rows = session.execute(text("SELECT * FROM analysis_profiles ORDER BY name")).mappings().all()
-            return jsonify([dict(r) for r in rows])
+@with_db_session
+def create_profile(db_session):
+    data = request.get_json()
+    if not data or not data.get('name'):
+        return jsonify({"error": "Le nom du profil est requis"}), 400
 
-        if request.method == 'POST':
-            data = request.get_json(force=True)
-            profile = {
-                "id": str(uuid.uuid4()),
-                "name": data['name'],
-                "is_custom": True,
-                "preprocess_model": data['preprocess_model'],
-                "extract_model": data['extract_model'],
-                "synthesis_model": data['synthesis_model']
-            }
-            session.execute(text("""
-            INSERT INTO analysis_profiles (id, name, is_custom, preprocess_model, extract_model, synthesis_model)
-            VALUES (:id, :name, :is_custom, :preprocess_model, :extract_model, :synthesis_model)
-            """), profile)
-            session.commit()
-            return jsonify(profile), 201
+    new_profile = Profile(
+        name=data['name'],
+        description=data.get('description', ''),
+        model_name=data.get('model_name', 'default'),
+        temperature=data.get('temperature', 0.7),
+        context_length=data.get('context_length', 4096)
+    )
+    db_session.add(new_profile)
+    
+    try:
+        db_session.commit()
     except Exception as e:
-        logger.exception(f"Erreur handle_analysis_profiles: {e}")
-        return jsonify({'error': 'Erreur interne'}), 500
+        db_session.rollback()
+        logger.exception("Erreur lors de la création du profil.")
+        return jsonify({"error": "Erreur interne du serveur"}), 500
+        
+    return jsonify(new_profile.to_dict()), 201
 
 @api_bp.route('/profiles/<uuid:profile_id>', methods=['DELETE'])
 @with_db_session
@@ -798,14 +795,13 @@ def delete_profile(db_session, profile_id):
         return jsonify({"error": "Profil non trouvé"}), 404
     
     try:
-        db_session.delete(profile)
         db_session.commit()
     except Exception as e:
         db_session.rollback()
-        logger.exception(f"Erreur lors de la suppression du profil {profile_id}")
+        logger.exception("Erreur lors de la suppression du profil.")
         return jsonify({"error": "Erreur interne du serveur"}), 500
         
-    return jsonify({"message": "Profil supprimé avec succès"})
+    return jsonify({"message": "Profil supprimé"})
 
 @api_bp.route('/profiles/<uuid:profile_id>', methods=['PUT'])
 @with_db_session
