@@ -834,9 +834,7 @@ def delete_project_articles(project_id):
         logger.exception(f"Erreur lors de la suppression d'articles: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
     finally:
-        # La session est gérée par le teardown context
-        pass
-
+        pass # Session gérée par le teardown context
 
 
 # --- Recherche multi-bases ---
@@ -2041,7 +2039,9 @@ def import_validations(project_id):
         return jsonify({"error": "Erreur interne ou format invalide"}), 500
 
 @api_bp.route('/projects/<project_id>/calculate-kappa', methods=['POST'])
-def calculate_project_kappa(project_id):
+def calculate_project_kappa(project_id, db_session=None):
+    # The user's provided code for line 2167 is a generic commit block.
+    # It's not applicable here as this function only enqueues a job.
     try:
         uuid.UUID(project_id, version=4)
     except ValueError:
