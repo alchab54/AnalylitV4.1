@@ -1029,7 +1029,7 @@ def add_field_to_grid(db_session, grid_id):
         return jsonify({"error": "Erreur base de données"}), 500
         
     return jsonify(new_field.to_dict()), 201
-        
+
 @api_bp.route('/projects/<project_id>/grids/import', methods=['POST'])
 def import_grid_from_file(project_id):
     try:
