@@ -1107,91 +1107,7 @@ def add_manual_articles(project_id):
 @api_bp.route('/projects/<project_id>/export-analyses', methods=['GET'])
 def export_project_analyses(project_id):
     """Exporte les résultats d'analyse d'un projet dans une archive ZIP."""
-    # CORRECTION : Renommer la fonction pour refléter son contenu plus large
-    return export_project_data(project_id)
-
-def export_project_data(project_id):
-    """Exporte TOUTES les données d'un projet dans une archive ZIP."""
-    session = Session()
-    try:
-        uuid.UUID(project_id, version=4)
-    except ValueError:
-        return jsonify({'error': 'ID de projet invalide'}), 400
-
-    try:
-        project = session.execute(text("""
-            SELECT name, description, discussion_draft, knowledge_graph, prisma_flow_path, analysis_result, synthesis_result
-            FROM projects WHERE id = :pid
-        """ ), {"pid": project_id}).mappings().fetchone()
-
-        if not project:
-            return jsonify({'error': 'Projet non trouvé'}), 404
-
-        project_name_safe = sanitize_filename(project.get('name', 'projet_sans_nom'))
-
-        buf = io.BytesIO()
-        with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
-            # --- Fichiers d'analyse ---
-            # Exporter le brouillon de discussion
-            if project.get('discussion_draft'):
-                zf.writestr('brouillon_discussion.txt', project['discussion_draft'])
-
-            # Exporter le graphe de connaissances
-            if project.get('knowledge_graph'):
-                try:
-                    kg_data = json.loads(project['knowledge_graph'])
-                    zf.writestr('graphe_connaissances.json', json.dumps(kg_data, indent=2, ensure_ascii=False))
-                except (json.JSONDecodeError, TypeError):
-                    zf.writestr('graphe_connaissances.txt', str(project['knowledge_graph']))
-
-            # Exporter les autres résultats d'analyse
-            if project.get('analysis_result'):
-                try:
-                    analysis_data = json.loads(project['analysis_result'])
-                    zf.writestr('resultats_analyse_generale.json', json.dumps(analysis_data, indent=2, ensure_ascii=False))
-                except (json.JSONDecodeError, TypeError):
-                    zf.writestr('resultats_analyse_generale.txt', str(project['analysis_result']))
-
-            # Exporter la synthèse principale
-            if project.get('synthesis_result'):
-                try:
-                    synthesis_data = json.loads(project['synthesis_result'])
-                    zf.writestr('synthese_principale.json', json.dumps(synthesis_data, indent=2, ensure_ascii=False))
-                except (json.JSONDecodeError, TypeError):
-                    zf.writestr('synthese_principale.txt', str(project['synthesis_result']))
-
-            # Ajouter l'image PRISMA si elle existe
-            if project.get('prisma_flow_path'):
-                prisma_path = Path(project['prisma_flow_path'])
-                if prisma_path.exists():
-                    zf.write(prisma_path, prisma_path.name)
-
-            # --- Données brutes (CSV) ---
-            # Exporter les résultats de recherche
-            search_results = pd.read_sql(text("SELECT * FROM search_results WHERE project_id = :pid"), session.bind, params={"pid": project_id})
-            if not search_results.empty:
-                zf.writestr('articles_recherches.csv', search_results.to_csv(index=False))
-
-            # Exporter les extractions
-            extractions = pd.read_sql(text("SELECT * FROM extractions WHERE project_id = :pid"), session.bind, params={"pid": project_id})
-            if not extractions.empty:
-                zf.writestr('donnees_extraites_ia.csv', extractions.to_csv(index=False))
-
-            # Exporter les évaluations de risque de biais
-            risk_of_bias = pd.read_sql(text("SELECT * FROM risk_of_bias WHERE project_id = :pid"), session.bind, params={"pid": project_id})
-            if not risk_of_bias.empty:
-                zf.writestr('risques_de_biais.csv', risk_of_bias.to_csv(index=False))
-
-        buf.seek(0)
-        return Response(
-            buf.getvalue(),
-            mimetype='application/zip',
-            headers={'Content-Disposition': f'attachment; filename=export_complet_{project_name_safe}.zip'}
-        )
-
-    except Exception as e:
-        logger.exception(f"Erreur lors de l\'export des données pour le projet {project_id}: {e}")
-        return jsonify({'error': "Erreur lors de la création de l\'export."}), 500
+    return export_project_analyses(project_id)
 
 # --- Statut détaillé des files (remplace/complète les endpoints de queues) ---
 @api_bp.route('/admin/queues-status', methods=['GET'])
@@ -1435,7 +1351,7 @@ def run_synthesis_endpoint(project_id):
         logger.exception(f"Erreur inattendue dans run_synthesis_endpoint: {e}")
         return jsonify({'error': 'Erreur interne'}), 500
 
-    return jsonify({"status": "synthesizing", "message": "Synthèse lancée."}, 202
+    return jsonify({"status": "synthesizing", "message": "Synthèse lancée."}), 202
 
 # --- Ajout pour la validation ---
 @api_bp.route('/projects/<project_id>/extractions/<extraction_id>/decision', methods=['PUT'])
@@ -1580,6 +1496,10 @@ def export_validations(project_id):
 
 @api_bp.route('/projects/<project_id>/import-validations', methods=['POST'])
 def import_validations(project_id):
+    """
+    Importe les décisions de validation (inclure/exclure) depuis un fichier CSV
+    pour un deuxième évaluateur.
+    """
     try:
         uuid.UUID(project_id, version=4)
     except ValueError:
@@ -1589,58 +1509,67 @@ def import_validations(project_id):
         return jsonify({'error': 'Aucun fichier fourni'}), 400
 
     file = request.files['file']
-    session = Session()
+    if not file or file.filename == '':
+        return jsonify({'error': 'Fichier vide ou non sélectionné'}), 400
+
+    session = db_session()
     try:
         df = pd.read_csv(file.stream)
-        normalized = {str(c).strip().lower(): c for c in df.columns}
+        # Normalise les noms de colonnes (enlève les espaces, met en minuscules)
+        normalized_columns = {str(c).strip().lower(): c for c in df.columns}
 
-        if not {"articleid", "decision"}.issubset(set(normalized.keys())):
-            return jsonify({'error': "Le fichier CSV doit contenir les colonnes ['articleId','decision']"}), 400
+        # Vérifie la présence des colonnes requises
+        required_keys = {"articleid", "decision"}
+        if not required_keys.issubset(normalized_columns.keys()):
+            return jsonify({'error': "Le fichier CSV doit contenir les colonnes 'articleId' et 'decision'"}), 400
 
-        updated = 0
+        updated_count = 0
         for _, row in df.iterrows():
-            article_id = str(row[normalized["articleid"]]).strip()
-            decision = str(row[normalized["decision"]]).strip().lower()
+            article_id = str(row[normalized_columns["articleid"]]).strip()
+            decision = str(row[normalized_columns["decision"]]).strip().lower()
 
-            mapping = {
-                "inclure": "include", "inclu": "include", "include": "include",
-                "exclure": "exclude", "exclu": "exclude", "exclude": "exclude"
+            # Mappe les différentes variations de décision vers les valeurs standard
+            decision_mapping = {
+                "inclure": "include", "inclu": "include",
+                "exclure": "exclude", "exclu": "exclude"
             }
-            decision = mapping.get(decision, decision)
+            # Utilise la valeur mappée ou la valeur originale si elle est déjà correcte ("include" ou "exclude")
+            final_decision = decision_mapping.get(decision, decision)
 
-            if not article_id or decision not in ("include", "exclude"):
-                continue
+            if not article_id or final_decision not in ("include", "exclude"):
+                continue  # Ignore les lignes invalides
 
-            ext = session.execute(text("""
-                SELECT id, validations FROM extractions
-                WHERE project_id = :pid AND pmid = :pmid
-            """ ), {"pid": project_id, "pmid": article_id}).mappings().fetchone()
+            # Trouve l'extraction correspondante dans la base de données
+            extraction = session.query(Extraction).filter_by(project_id=project_id, pmid=article_id).first()
 
-            if not ext:
-                continue
+            if not extraction:
+                continue # Ignore si l'article n'est pas trouvé dans le projet
 
+            # Met à jour le champ de validations (JSON)
             try:
-                v = json.loads(ext["validations"]) if ext.get("validations") else {}
-            except Exception:
-                v = {}
+                validations = json.loads(extraction.validations) if extraction.validations else {}
+            except (json.JSONDecodeError, TypeError):
+                validations = {}
 
-            v["evaluator2"] = decision
-
-            session.execute(text("""
-                UPDATE extractions SET validations = :val WHERE id = :id
-            """ ), {"val": json.dumps(v, ensure_ascii=False), "id": ext["id"]})
-            updated += 1
+            validations["evaluator2"] = final_decision
+            extraction.validations = json.dumps(validations, ensure_ascii=False)
+            updated_count += 1
 
         session.commit()
-        return jsonify({'message': f"{updated} validations importées pour l\'évaluateur 2."}, 200
+        logger.info(f"{updated_count} validations importées avec succès pour le projet {project_id}.")
+        return jsonify({'message': f"{updated_count} validations ont été importées pour l'évaluateur 2."}), 200
 
-    except SQLAlchemyError as e:
-        logger.error(f"Erreur DB import validations: {e}", exc_info=True)
-        return jsonify({'error': 'Erreur de base de données'}), 500
+    except pd.errors.ParserError:
+        logger.warning(f"Échec de l'importation : le fichier pour le projet {project_id} n'est pas un CSV valide.")
+        return jsonify({'error': 'Le fichier fourni n\'est pas un CSV valide.'}), 400
     except Exception as e:
-        logger.exception(f"Erreur import validations: {e}")
-        return jsonify({'error': 'Erreur interne ou format invalide'}), 500
-
+        session.rollback()
+        logger.exception(f"Erreur inattendue lors de l'importation des validations pour le projet {project_id}: {e}")
+        return jsonify({'error': 'Une erreur interne est survenue.'}), 500
+    finally:
+        # S'assure que la session est fermée à la fin de la requête
+        db_session.remove()
+        
 @api_bp.route('/projects/<project_id>/calculate-kappa', methods=['POST'])
 def calculate_project_kappa(project_id, db_session=None):
     try:
@@ -1650,9 +1579,9 @@ def calculate_project_kappa(project_id, db_session=None):
 
     try:
         job = analysis_queue.enqueue(calculate_kappa_task, project_id=project_id, job_timeout='10m')
-        return jsonify({'message': "Calcul du Kappa lancé.", 'job_id': job.id}), 202
-    except Exception as e: 
-        logger.exception(f"Erreur lors de la mise en file d\'attente du calcul Kappa: {e}")
+        return jsonify({"message": "Calcul du Kappa lancé.", "job_id": job.id}), 202
+    except Exception as e:  # CORRECTION : Ajout de la clause except manquante
+        logger.exception(f"Erreur lors de la mise en file d'attente du calcul Kappa: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
 
 @api_bp.route('/projects/<project_id>/inter-rater-stats', methods=['GET'])
@@ -1915,37 +1844,68 @@ def run_knowledge_graph(project_id):
 # --- Chat RAG ---
 @api_bp.route('/projects/<project_id>/chat', methods=['POST', 'GET'])
 def handle_project_chat(project_id):
+    """
+    Gère la récupération et la soumission des messages de chat pour un projet.
+    - GET: Récupère l'historique des messages.
+    - POST: Soumet une nouvelle question à la tâche de fond RAG.
+    """
     try:
+        # Valide que l'ID du projet est un UUID valide
         uuid.UUID(project_id, version=4)
     except ValueError:
         return jsonify({'error': 'ID de projet invalide'}), 400
 
+    # --- GESTION DE LA RÉCUPÉRATION DES MESSAGES (GET) ---
     if request.method == 'GET':
-        session = Session()
+        session = db_session()
         try:
-            rows = session.execute(text("""
-                SELECT * FROM chat_messages
+            # Exécute la requête pour récupérer tous les messages du projet, ordonnés par date
+            rows = session.execute(text(
+                """
+                SELECT id, project_id, role, content, sources, timestamp 
+                FROM chat_messages
                 WHERE project_id = :pid
                 ORDER BY timestamp ASC
-            """ ), {"pid": project_id}).mappings().all()
-            return jsonify([dict(r) for r in rows])
+                """
+            ), {"pid": project_id}).mappings().all()
+            
+            # Convertit les résultats en une liste de dictionnaires pour la réponse JSON
+            messages = [dict(row) for row in rows]
+            return jsonify(messages)
 
+        except SQLAlchemyError as e:
+            # En cas d'erreur avec la base de données, on logue l'erreur et on retourne une erreur 500
+            logger.error(f"Erreur de base de données lors de la récupération du chat: {e}")
+            return jsonify({'error': 'Erreur interne du serveur lors de la lecture des messages.'}), 500
+        
+        finally:
+            # **CORRECTION CRUCIALE** : Quoi qu'il arrive (succès ou erreur),
+            # on s'assure que la session de la base de données est fermée.
+            db_session.remove()
+
+    # --- GESTION DE LA SOUMISSION D'UN NOUVEAU MESSAGE (POST) ---
     if request.method == 'POST':
-        data = request.get_json(force=True)
-        question = data.get('question', '').strip()
+        try:
+            data = request.get_json()
+            question = data.get('question', '').strip()
 
-        if not question:
-            return jsonify({'error': 'La question est requise.'}), 400
+            if not question:
+                return jsonify({'error': 'La question ne peut pas être vide.'}), 400
 
-        job = background_queue.enqueue(
-            answer_chat_question_task,
-            project_id=project_id,
-            question=question,
-            job_timeout='15m'
-        )
-
-        return jsonify({'message': 'Question envoyée au moteur RAG.', 'job_id': job.id}), 202
-
+            # Met en file d'attente la tâche de fond pour traiter la question
+            job = background_queue.enqueue(
+                answer_chat_question_task,
+                project_id=project_id,
+                question=question,
+                job_timeout='15m'
+            )
+            return jsonify({'message': 'Question envoyée au moteur RAG.', 'job_id': job.id}), 202
+            
+        except Exception as e:
+            # Capture toute autre erreur (ex: JSON mal formé, échec de la mise en file d'attente)
+            logger.error(f"Erreur lors de la soumission de la question au chat: {e}")
+            return jsonify({'error': 'Erreur interne du serveur lors de la soumission de la question.'}), 500
+        
 @api_bp.route('/projects/<project_id>/chat-messages', methods=['GET'])
 def get_chat_messages(project_id):
     """Récupère l'historique des messages pour le chat."""
