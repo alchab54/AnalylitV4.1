@@ -43,7 +43,7 @@ pytesseract==0.3.10
 werkzeug==3.0.1
 
 #--- Outils de Build ---
-setuptools>=65.0.0
+setuptools==65.5.0
 wheel>=0.38.0
 async_timeout==4.0.3
 feedparser==6.0.10
