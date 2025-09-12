@@ -3,7 +3,7 @@ import { appState, elements } from '../app.js';
 import { fetchAPI } from './api.js';
 import { showLoadingOverlay, showToast, escapeHtml, openModal, closeModal } from './ui.js';
 
-function renderSearchSection(project) {
+export function renderSearchSection(project) {
     const container = document.getElementById('searchContainer');
     if (!container) return;
 

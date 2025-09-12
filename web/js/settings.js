@@ -133,39 +133,6 @@ export function formatBytes(bytes, decimals = 2) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]; 
 } 
 
-export function showCreateProfileModal() { 
-    const modelOptions = appState.ollamaModels.map(model => 
-        `<option value="${escapeHtml(model.name)}">${escapeHtml(model.name)}</option>` 
-    ).join(''); 
-
-    const content = ` 
-        <form id="createProfileForm"> 
-            <div class="form-group"> 
-                <label class="form-label">Nom du profil</label> 
-                <input type="text" name="name" class="form-control" required> 
-            </div> 
-            <div class="form-group"> 
-                <label class="form-label">Modèle de preprocessing</label> 
-                <select name="preprocess_model" class="form-control" required>${modelOptions}</select> 
-            </div> 
-            <div class="form-group"> 
-                <label class="form-label">Modèle d'extraction</label> 
-                <select name="extract_model" class="form-control" required>${modelOptions}</select> 
-            </div> 
-            <div class="form-group"> 
-                <label class="form-label">Modèle de synthèse</label> 
-                <select name="synthesis_model" class="form-control" required>${modelOptions}</select> 
-            </div> 
-            <div class="modal__actions"> 
-                <button type="button" class="btn btn--secondary" data-action="close-modal">Annuler</button> 
-                <button type="submit" class="btn btn--primary">Créer</button> 
-            </div> 
-        </form> 
-    `; 
-    showModal('Créer un profil d\'analyse', content); 
-    document.getElementById('createProfileForm')?.addEventListener('submit', handleCreateProfile);
-} 
-
 export async function handleCreateProfile(event) { 
     event.preventDefault(); 
     const formData = new FormData(event.target); 
@@ -372,6 +339,15 @@ export async function loadPrompts() {
 
 export async function loadOllamaModels() {
     appState.ollamaModels = await fetchAPI('/ollama/models');
+}
+
+export async function loadSettingsData() {
+    // This function can be a wrapper if more settings data needs to be loaded in the future.
+    await Promise.all([
+        loadAnalysisProfiles(),
+        loadPrompts(),
+        loadOllamaModels()
+    ]);
 }
 
 // Exposition globale n'est plus nécessaire pour les handlers de formulaire

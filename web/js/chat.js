@@ -4,6 +4,7 @@
 import { appState, elements } from '../app.js';
 import { fetchAPI } from './api.js';
 import { escapeHtml } from './ui.js'; // Assure-toi que l'import est présent
+import { showToast } from './ui.js';
 
 function formatMessageContent(content) {
     if (!content) return '';
@@ -17,7 +18,7 @@ function formatMessageContent(content) {
     return safeContent;
 }
 
-async function loadChatMessages() {
+export async function loadChatMessages() {
     if (!elements.chatContainer) return; 
     
     if (!appState.currentProject?.id) {
@@ -27,7 +28,7 @@ async function loadChatMessages() {
 
     try {
         const messages = await fetchAPI(`/projects/${appState.currentProject.id}/chat-messages`);
-        setChatMessages(Array.isArray(messages) ? messages : []);
+        appState.chatMessages = Array.isArray(messages) ? messages : [];
         renderChatInterface(appState.chatMessages);
     } catch (e) {
         console.error('Erreur chargement chat:', e);
@@ -35,7 +36,7 @@ async function loadChatMessages() {
     }
 }
 
-function renderChatMessages(messages = []) {
+export function renderChatMessages(messages = []) {
     if (!messages || messages.length === 0) {
         return `<div class="empty-state"><p>Aucun message.</p></div>`;
     }
@@ -65,7 +66,7 @@ function renderChatMessages(messages = []) {
     }).join('');
 }
 
-function renderChatSection(messages, error = false) {
+export function renderChatInterface(messages, error = false) {
     if (!elements.chatContainer) return;
 
     if (!appState.currentProject?.id) {
@@ -122,7 +123,7 @@ function renderChatSection(messages, error = false) {
     }
 }
 
-async function sendChatMessage() {
+export async function sendChatMessage() {
     const input = document.getElementById('chatInput');
     if (!input) return;
     
@@ -138,7 +139,8 @@ async function sendChatMessage() {
     };
 
     // Add user message to UI immediately
-    addChatMessage(userMessage);
+    appState.chatMessages.push(userMessage);
+    renderChatInterface(appState.chatMessages);
     
     input.value = '';
     input.disabled = true;
@@ -146,14 +148,16 @@ async function sendChatMessage() {
     try {
         const response = await fetchAPI(`/projects/${appState.currentProject.id}/chat`, {
             method: 'POST',
-            body: { message }
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message })
         });
         
         await loadChatMessages();
 
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
-        setChatMessages(appState.chatMessages.filter(m => m.id !== tempId));
+        appState.chatMessages = appState.chatMessages.filter(m => m.id !== tempId);
+        renderChatInterface(appState.chatMessages);
         input.value = message;
     } finally {
         input.disabled = false;

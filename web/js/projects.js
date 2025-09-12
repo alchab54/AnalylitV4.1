@@ -4,6 +4,7 @@ import { showToast, showLoadingOverlay, closeModal } from './ui.js';
 import { escapeHtml } from './ui.js'; // Import escapeHtml
 import { getStatusClass } from './core.js'; // Import getStatusClass and showSection
 import { setProjects, setCurrentProject } from './state.js';
+import { refreshCurrentSection } from './core.js';
 
 export async function loadProjects() {
     // Assuming appState is globally available
@@ -58,6 +59,42 @@ export async function selectProject(projectId) {
         refreshCurrentSection();
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
+    }
+}
+
+export async function handleDeleteProject(projectId) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce projet et tous ses articles ? Cette action est irréversible.')) {
+        return;
+    }
+    try {
+        showLoadingOverlay(true, 'Suppression du projet...');
+        await fetchAPI(`/projects/${projectId}`, { method: 'DELETE' });
+        showToast('Projet supprimé.', 'success');
+        await loadProjects(); // Recharger la liste
+    } catch (e) {
+        showToast(`Erreur: ${e.message}`, 'error');
+    }
+}
+
+export async function handleExportProject(projectId) {
+    if (!projectId) {
+        showToast('ID du projet manquant pour l\'exportation.', 'warning');
+        return;
+    }
+    // This will open the download link in a new tab.
+    window.open(`/api/projects/${projectId}/export`, '_blank');
+    showToast('L\'exportation du projet a commencé...', 'info');
+}
+
+export async function loadProjectFilesSet(projectId) {
+    if (!projectId) return new Set();
+    try {
+        const files = await fetchAPI(`/projects/${projectId}/files`);
+        const filenames = (files || []).map(f => String(f.filename || '').replace(/\.pdf$/i, ''));
+        return new Set(filenames);
+    } catch (error) {
+        console.error('Erreur chargement des fichiers projet:', error);
+        return new Set();
     }
 }
 

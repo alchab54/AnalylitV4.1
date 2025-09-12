@@ -5,10 +5,6 @@
 import os, uuid, json, logging, io, zipfile, pandas as pd
 from pathlib import Path
 import sys
-import os
-
-# Ajoute le répertoire courant au PYTHONPATH
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from datetime import datetime, timezone
 from flask import Flask, jsonify, request, Blueprint, send_from_directory, Response
@@ -68,17 +64,18 @@ SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 Session = scoped_session(SessionFactory)
 
 # --- Application ---
-app = Flask(__name__, static_folder='web', static_url_path='/')
-api_bp = Blueprint('api', __name__, url_prefix='/api')
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+def create_app():
+    """Crée et configure l'instance de l'application Flask."""
+    app = Flask(__name__, static_folder='web', static_url_path='/')
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    
+    # Enregistrement du blueprint API
+    app.register_blueprint(api_bp)
 
-socketio = SocketIO(
-    app,
-    cors_allowed_origins="*",
-    message_queue=config.REDIS_URL,
-    async_mode='gevent',
-    path='/socket.io/'
-)
+    # Configuration de SocketIO
+    socketio.init_app(app, cors_allowed_origins="*", message_queue=config.REDIS_URL, async_mode='gevent', path='/socket.io/')
+
+    return app
 
 # --- Redis / Queues ---
 redis_conn = redis.from_url(config.REDIS_URL)
@@ -87,6 +84,15 @@ synthesis_queue = Queue('analylit_synthesis_v4', connection=redis_conn)
 analysis_queue = Queue('analylit_analysis_v4', connection=redis_conn)
 background_queue = Queue('analylit_background_v4', connection=redis_conn)
 q = processing_queue # Alias pour la file de traitement principale
+
+# --- Blueprint et SocketIO (définis globalement) ---
+api_bp = Blueprint('api', __name__, url_prefix='/api')
+socketio = SocketIO()
+
+# --- Création de l'instance de l'application ---
+# Gunicorn utilisera cette fonction pour obtenir l'application.
+app = create_app()
+
 
 # --- Projets: répertoire fichiers ---
 PROJECTS_DIR = Path(config.PROJECTS_DIR)
@@ -2294,8 +2300,6 @@ def run_rob_analysis(project_id):
 # ================================================================
 # 4) Enregistrement du blueprint et route front
 # ================================================================
-
-app.register_blueprint(api_bp)
 
 @app.route('/')
 def serve_frontend():

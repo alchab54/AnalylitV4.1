@@ -1,6 +1,6 @@
 // web/js/reporting.js
 
-function renderReportingSection(projectId) {
+export function renderReportingSection(projectId) {
     if (!projectId) {
         document.getElementById('reportingContainer').innerHTML = '<p>Veuillez d\'abord sélectionner un projet.</p>';
         return;

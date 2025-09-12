@@ -1,6 +1,6 @@
 // web/js/grids.js
 
-function renderGridsSection(project) {
+export function renderGridsSection(project) {
     const container = document.getElementById('gridsContainer');
     if (!container || !project) return;
 
@@ -129,7 +129,7 @@ async function handleSaveGrid(event, gridId) {
     }
 }
 
-async function handleDeleteGrid(gridId) {
+export async function handleDeleteGrid(gridId) {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette grille ?')) return;
 
     try {

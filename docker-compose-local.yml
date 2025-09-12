@@ -41,10 +41,8 @@ services:
       sh -c "echo 'En attente des services...' && sleep 5 &&
       echo 'Initialisation de la base de données...' && python -c 'from utils.database import init_db; init_db()' &&
       echo 'Lancement du serveur Gunicorn...' &&
-      gunicorn --workers 4 --bind 0.0.0.0:5000 'server_v4_complete:create_app()'"
+      gunicorn --worker-class gevent --workers 4 --bind 0.0.0.0:5000 'server_v4_complete:create_app()'"
     depends_on:
-      base:
-        condition: service_completed_successfully
       db:
         condition: service_healthy
       redis: { condition: service_healthy }
@@ -54,6 +52,10 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
+    volumes:
+      # Monte le fichier profiles.json local dans le conteneur
+      - ./profiles.json:/app/profiles.json:ro
+      - ./projects:/app/projects
     networks:
       - analylit-network
 
@@ -70,12 +72,8 @@ services:
       - PYTHONUNBUFFERED=1
       - ZOTERO_API_KEY=${ZOTERO_API_KEY}
     command: >-
-      python -m rq.cli worker -u redis://redis:6379/0 --with-scheduler
-      analylit_processing_v4 analylit_synthesis_v4
-      analylit_analysis_v4 analylit_background_v4
+      sh -c "python -m rq.cli worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4"
     depends_on:
-      base:
-        condition: service_completed_successfully
       db:
         condition: service_healthy
       redis: { condition: service_healthy }

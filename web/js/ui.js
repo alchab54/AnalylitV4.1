@@ -7,7 +7,7 @@
  * @param {string} unsafe - La chaîne de caractères à échapper.
  * @returns {string} - La chaîne échappée.
  */
-function escapeHtml(unsafe) {
+export function escapeHtml(unsafe) {
     if (unsafe === null || unsafe === undefined) {
         return '';
     }
@@ -25,8 +25,8 @@ function escapeHtml(unsafe) {
  * @param {string} message - Le message à afficher.
  * @param {'info'|'success'|'warning'|'error'} type - Le type de toast.
  */
-function showToast(message, type = 'info') {
-    if (!elements.toastContainer) return;
+export function showToast(message, type = 'info', elements) {
+    if (!elements?.toastContainer) return;
 
     const toast = document.createElement('div');
     toast.className = `toast toast--${type}`;
@@ -71,12 +71,12 @@ function showToast(message, type = 'info') {
  * @param {boolean} show - Afficher ou masquer.
  * @param {string} message - Le message à afficher pendant le chargement.
  */
-function showLoadingOverlay(show, message = '') {
-    const overlay = document.getElementById('loadingOverlay');
+export function showLoadingOverlay(show, message = '', elements) {
+    const overlay = elements?.loadingOverlay || document.getElementById('loadingOverlay');
     if (!overlay) return;
 
     const overlayMessage = overlay.querySelector('.loading-message');
-
+    
     if (show) {
         if (overlayMessage) {
             overlayMessage.textContent = message;
@@ -91,7 +91,7 @@ function showLoadingOverlay(show, message = '') {
  * Ouvre une modale spécifique par son ID.
  * @param {string} modalId - L'ID de l'élément de la modale.
  */
-function openModal(modalId) {
+export function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
         modal.classList.add('modal--show');
@@ -135,4 +135,32 @@ export function showModal(title, content, modalClass = '') {
     }
 
     modal.classList.add('modal--show');
+}
+
+export function showCreateProjectModal() {
+    const modal = document.getElementById('newProjectModal');
+    if (modal) {
+        modal.classList.add('modal--show');
+        const form = modal.querySelector('form');
+        if (form) {
+            form.reset(); // Reset form fields
+            form.elements.name.focus(); // Focus on the name input
+        }
+    } else {
+        // Fallback or create modal dynamically if it doesn't exist
+        const modalContent = `
+            <p>La modale de création de projet n'a pas pu être trouvée.</p>
+        `;
+        showModal('Erreur', modalContent);
+    }
+}
+
+/**
+ * Bascule la visibilité de la barre latérale.
+ */
+export function toggleSidebar() {
+    const sidebar = document.getElementById('appSidebar'); // Assurez-vous que votre sidebar a cet ID
+    if (sidebar) {
+        sidebar.classList.toggle('sidebar--collapsed');
+    }
 }

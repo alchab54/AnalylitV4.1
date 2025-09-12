@@ -1,7 +1,7 @@
 // web/js/validation.js
 import { setCurrentValidations } from './state.js';
 
-async function renderValidationSection(project) {
+export async function renderValidationSection(project) {
     const container = document.getElementById('validationContainer');
     if (!container || !project) return;
 
@@ -153,7 +153,7 @@ export async function handleValidateExtraction(extractionId, decision) {
     }
 }
 
-async function loadValidationSection() {
+export async function loadValidationSection() {
     if (!appState.currentProject) {
         if (elements.validationContainer) {
             elements.validationContainer.innerHTML = '<p>Sélectionnez un projet pour voir les données de validation.</p>';

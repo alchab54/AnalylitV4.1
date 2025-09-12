@@ -2,7 +2,7 @@
 import { appState } from '../app.js';
 import { renderProjectList, renderProjectDetail } from './projects.js';
 import { renderSearchResultsTable, updateSelectionCounter } from './articles.js';
-import { updateNotificationIndicator } from './core.js';
+import { updateNotificationIndicator } from './notifications.js';
 import { renderAnalysesSection } from './analyses.js';
 import { renderChatInterface } from './chat.js';
 import { renderValidationSection } from './validation.js';

@@ -2,7 +2,6 @@ import { appState } from '../app.js';
 import {
     handleDeleteSelectedArticles,
     showBatchProcessModal,
-    handleSelectAll,
     startBatchProcessing,
     showRunExtractionModal,
     startFullExtraction,
@@ -19,7 +18,7 @@ import {
     exportAnalyses,
     handleRunATNAnalysis
 } from './analyses.js';
-import { handleSendChatMessage } from './chat.js';
+import { sendChatMessage } from './chat.js';
 import {
     handleCreateProject,
     handleDeleteProject,
@@ -28,18 +27,14 @@ import {
 } from './projects.js';
 import { handleRunRobAnalysis } from './rob.js';
 import { showSearchModal, handleMultiDatabaseSearch } from './search.js';
-import {
-    handleDeleteGrid,
-    handleValidateExtraction,
-    resetValidationStatus,
-    filterValidationList
-} from './validation.js';
+import { handleValidateExtraction, resetValidationStatus, filterValidationList } from './validation.js';
 import {
     closeModal,
     toggleSidebar,
     showCreateProjectModal
 } from './ui.js';
 import { clearNotifications, updateNotificationIndicator } from './notifications.js';
+import { handleDeleteGrid } from './grids.js';
 
 /**
  * Mappe les valeurs de data-action aux fonctions de traitement correspondantes.
@@ -62,7 +57,7 @@ const clickActions = {
     // Articles
     'view-details': (target) => viewArticleDetails(target.dataset.articleId),
     'toggle-article-selection': (target) => toggleArticleSelection(target.dataset.articleId, target.checked),
-    'select-all-articles': handleSelectAll,
+    'select-all-articles': selectAllArticles,
     'delete-selected-articles': handleDeleteSelectedArticles,
     'batch-process-modal': showBatchProcessModal,
     'start-batch-process': startBatchProcessing,
@@ -93,7 +88,7 @@ const clickActions = {
     'run-multi-search': handleMultiDatabaseSearch,
 
     // Chat
-    'send-chat-message': handleSendChatMessage,
+    'send-chat-message': sendChatMessage,
 };
 
 /**
@@ -113,4 +108,87 @@ export function setupDelegatedEventListeners() {
             action(target, event); // Appelle la fonction de traitement avec la cible et l'événement original
         }
     });
+}
+
+export function initializeWebSocket() {
+    try {
+        if (typeof io !== 'function') {
+            console.warn('Client Socket.IO indisponible.');
+            if (elements.connectionStatus) elements.connectionStatus.textContent = '❌';
+            return;
+        }
+        
+        appState.socket = io({ path: '/socket.io/' });
+        
+        appState.socket.on('connect', () => {
+            console.log('✅ WebSocket connecté');
+            appState.socketConnected = true;
+            if (elements.connectionStatus) elements.connectionStatus.textContent = '✅';
+            if (appState.currentProject) {
+                appState.socket.emit('join_room', { room: appState.currentProject.id });
+            }
+        });
+        
+        appState.socket.on('disconnect', () => {
+            console.warn('🔌 WebSocket déconnecté.');
+            appState.socketConnected = false;
+            if (elements.connectionStatus) elements.connectionStatus.textContent = '⏳';
+        });
+        
+        appState.socket.on('notification', (data) => {
+            console.log('🔔 Notification reçue:', data);
+            // handleWebSocketNotification(data); // Cette fonction devra être importée ou déplacée ici
+        });
+    } catch (e) {
+        console.error('Erreur WebSocket:', e);
+        if (elements.connectionStatus) elements.connectionStatus.textContent = '❌';
+    }
+}
+
+export function showSection(sectionId) {
+    appState.currentSection = sectionId;
+
+    elements.sections.forEach(section => {
+        section.classList.toggle('section--active', section.dataset.section === sectionId);
+    });
+
+    elements.navButtons.forEach(btn => {
+        btn.classList.toggle('app-nav__button--active', btn.dataset.section === sectionId);
+    });
+
+    // Charger les données spécifiques à la section si nécessaire
+    refreshCurrentSection();
+}
+
+export function refreshCurrentSection() {
+    switch (appState.currentSection) {
+        case 'projects':
+            if (appState.currentProject) {
+                renderProjectDetail(appState.currentProject);
+            }
+            break;
+        case 'results':
+            loadSearchResults();
+            break;
+        case 'validation':
+            loadValidationSection();
+            break;
+        // ... ajouter les autres cas ici
+        default:
+            break;
+    }
+}
+
+/**
+ * Retourne une classe CSS en fonction du statut du projet.
+ * @param {string} status - Le statut du projet.
+ * @returns {string} La classe CSS correspondante.
+ */
+export function getStatusClass(status) {
+    switch (status) {
+        case 'completed': return 'status--success';
+        case 'in_progress': return 'status--warning';
+        case 'pending': return 'status--info';
+        default: return 'status--secondary';
+    }
 }
