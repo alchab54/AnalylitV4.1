@@ -2,10 +2,11 @@
 param([string]$action = "help")
 
 $COMPOSE_FILE = "docker-compose-local.yml"
+$WORKER_COUNT = 3
 
 function Show-Help {
     Write-Host ""
-    Write-Host "AnalyLit V4.1 - Commandes disponibles:" -ForegroundColor Blue
+    Write-Host "AnalyLit V4.1 - Gestionnaire de services" -ForegroundColor Blue
     Write-Host ""
     Write-Host "  install     " -ForegroundColor Green -NoNewline; Write-Host "Installation complète"
     Write-Host "  start       " -ForegroundColor Green -NoNewline; Write-Host "Démarrer les services"
@@ -13,6 +14,7 @@ function Show-Help {
     Write-Host "  status      " -ForegroundColor Green -NoNewline; Write-Host "État des services"
     Write-Host "  logs        " -ForegroundColor Green -NoNewline; Write-Host "Voir les logs"
     Write-Host "  models      " -ForegroundColor Green -NoNewline; Write-Host "Télécharger les modèles IA"
+    Write-Host "  clean       " -ForegroundColor Green -NoNewline; Write-Host "Arrête et supprime les conteneurs, réseaux et volumes."
     Write-Host ""
 }
 
@@ -30,15 +32,15 @@ function Install-AnalyLit {
     }
     
     # Construction et démarrage
-    docker-compose -f $COMPOSE_FILE up -d --build --scale worker=3
+    docker-compose -f $COMPOSE_FILE up -d --build --scale worker=$WORKER_COUNT
     
     Write-Host "✅ Installation terminée!" -ForegroundColor Green
     Write-Host "🌐 Interface web: http://localhost:8080" -ForegroundColor Blue
 }
 
 function Start-Services {
-    Write-Host "🚀 Démarrage des services..." -ForegroundColor Blue
-    docker-compose -f $COMPOSE_FILE up -d --scale worker=3
+    Write-Host "🚀 Démarrage des services (avec $WORKER_COUNT workers)..." -ForegroundColor Blue
+    docker-compose -f $COMPOSE_FILE up -d --scale worker=$WORKER_COUNT
     Write-Host "✅ Services démarrés" -ForegroundColor Green
 }
 
@@ -55,7 +57,7 @@ function Show-Status {
 
 function Show-Logs {
     Write-Host "📋 Logs des services:" -ForegroundColor Blue
-    docker-compose -f $COMPOSE_FILE logs --tail=50
+    docker-compose -f $COMPOSE_FILE logs -f --tail=100
 }
 
 function Invoke-ModelDownload {
@@ -76,6 +78,12 @@ function Invoke-ModelDownload {
     Write-Host "✅ Modèles téléchargés" -ForegroundColor Green
 }
 
+function Clean-Environment {
+    Write-Host "🧹 Nettoyage complet de l'environnement (conteneurs, réseaux, volumes)..." -ForegroundColor Yellow
+    docker-compose -f $COMPOSE_FILE down -v
+    Write-Host "✅ Environnement nettoyé." -ForegroundColor Green
+}
+
 # Dispatcher des actions
 switch ($action) {
     "install" { Install-AnalyLit }
@@ -84,5 +92,6 @@ switch ($action) {
     "status" { Show-Status }
     "logs" { Show-Logs }
     "models" { Invoke-ModelDownload }
+    "clean" { Clean-Environment }
     default { Show-Help }
 }

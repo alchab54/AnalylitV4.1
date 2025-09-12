@@ -11,7 +11,7 @@ db_session = scoped_session(SessionFactory)
 
 def init_db():
     # Import all models here to ensure they are registered with SQLAlchemy
-    import models
+    from . import models
     # This will create all tables
     models.Base.metadata.create_all(bind=engine)
 

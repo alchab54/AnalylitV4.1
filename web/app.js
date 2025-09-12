@@ -62,18 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeApplication();
 });
 
-async function loadProjectFilesSet(projectId) {
-    if (!projectId) return new Set();
-    try {
-        const files = await fetchAPI(`/projects/${projectId}/files`);
-        const filenames = (files || []).map(f => String(f.filename || '').replace(/\.pdf$/i, ''));
-        return new Set(filenames);
-    } catch (error) {
-        console.error('Erreur chargement des fichiers projet:', error);
-        return new Set();
-    }
-}
-
 async function loadAnalysisProfiles() {
     appState.analysisProfiles = await fetchAPI('/profiles');
 }

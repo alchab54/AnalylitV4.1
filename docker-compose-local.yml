@@ -27,13 +27,9 @@ services:
       - analylit-network
 
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile-web-complete
+    # L'image est déjà construite par le service 'base'
+    image: analylit-base:latest
     container_name: analylit-web-v4
-    volumes:
-      - ./projects:/app/projects
-      - .:/app
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=redis://redis:6379/0
@@ -42,10 +38,10 @@ services:
       - ANALYLIT_VERSION=${ANALYLIT_VERSION:-4.1.0}
       - PYTHONPATH=/app
     command: >
-      sh -c "echo 'En attente de la base de données...' && sleep 5 &&
-      echo 'Initialisation de la base de données...' && python -c 'from server_v4_complete import init_db; init_db()' &&
+      sh -c "echo 'En attente des services...' && sleep 5 &&
+      echo 'Initialisation de la base de données...' && python -c 'from utils.database import init_db; init_db()' &&
       echo 'Lancement du serveur Gunicorn...' &&
-      gunicorn server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"
+      gunicorn --workers 4 --bind 0.0.0.0:5000 'server_v4_complete:create_app()'"
     depends_on:
       base:
         condition: service_completed_successfully
@@ -53,7 +49,7 @@ services:
         condition: service_healthy
       redis: { condition: service_healthy }
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
       interval: 20s
       timeout: 10s
       retries: 5
@@ -65,9 +61,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-worker-complete
-    volumes:
-      - ./projects:/app/projects
-      - .:/app
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=redis://redis:6379/0
@@ -76,7 +69,7 @@ services:
       - PYTHONPATH=/app
       - PYTHONUNBUFFERED=1
       - ZOTERO_API_KEY=${ZOTERO_API_KEY}
-    command: >
+    command: >-
       python -m rq.cli worker -u redis://redis:6379/0 --with-scheduler
       analylit_processing_v4 analylit_synthesis_v4
       analylit_analysis_v4 analylit_background_v4
@@ -127,10 +120,7 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      web:
-        condition: service_healthy
-    volumes:
-      - ./web:/usr/share/nginx/html
+      - web
     networks:
       - analylit-network
 
