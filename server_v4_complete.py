@@ -2275,14 +2275,14 @@ def run_rob_analysis(project_id):
 # 4) Enregistrement du blueprint et route front
 # ================================================================
 
-app = create_app()
-import click
+app = create_app() # --- LIGNE DÉPLACÉE ICI ---
+import click # L'import de click doit être après la création de l'app si on utilise @app.cli
 
 @app.route('/') # type: ignore
 def serve_frontend():
     return app.send_static_file('index.html')
 
-@app.cli.command('init-db')
+@app.cli.command('init-db') # Cette commande peut maintenant être définie sur l'objet app
 def init_db_command():
     """Initialise la base de données et insère les données par défaut."""
     click.echo("Initialisation de la base de données...")
