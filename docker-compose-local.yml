@@ -1,7 +1,5 @@
-version: '3.8'
 
 services:
-  # NOUVEAU SERVICE : construit l'image de base partagée
   base:
     image: analylit-base:latest
     build:
@@ -27,9 +25,13 @@ services:
       - analylit-network
 
   web:
-    # L'image est déjà construite par le service 'base'
-    image: analylit-base:latest
+    build:
+      context: .
+      dockerfile: Dockerfile-web-complete
     container_name: analylit-web-v4
+    volumes:
+      - ./projects:/app/projects
+      - .:/app
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=redis://redis:6379/0
@@ -38,24 +40,21 @@ services:
       - ANALYLIT_VERSION=${ANALYLIT_VERSION:-4.1.0}
       - PYTHONPATH=/app
     command: >
-      sh -c "echo 'En attente des services...' && sleep 5 &&
-      echo 'Initialisation de la base de données...' && python -c 'from utils.database import init_db; init_db()' &&
-      echo 'Lancement du serveur Gunicorn...' &&
-      gunicorn --worker-class gevent --workers 4 --bind 0.0.0.0:5000 'server_v4_complete:create_app()'"
+      sh -c "echo 'Waiting for DB...' && sleep 5 &&
+      python -c 'from utils.database import init_db; init_db()' &&
+      echo 'Starting Gunicorn...' &&
+      gunicorn server_v4_complete:app 
+        -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker 
+        -w 1 
+        --timeout 300 
+        -b 0.0.0.0:5000 
+        --access-logfile - 
+        --error-logfile -"
     depends_on:
       db:
         condition: service_healthy
-      redis: { condition: service_healthy }
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
-      interval: 20s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    volumes:
-      # Monte le fichier profiles.json local dans le conteneur
-      - ./profiles.json:/app/profiles.json:ro
-      - ./projects:/app/projects
+      redis:
+        condition: service_healthy
     networks:
       - analylit-network
 
