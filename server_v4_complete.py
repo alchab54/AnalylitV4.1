@@ -75,28 +75,6 @@ q = processing_queue # Alias pour la file de traitement principale
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 socketio = SocketIO()
 
-# --- Application ---
-def create_app():
-    """Crée et configure l'instance de l'application Flask."""
-    app = Flask(__name__, static_folder='web', static_url_path='/')
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
-    
-    # Enregistrement du blueprint API
-    app.register_blueprint(api_bp)
-
-    # Configuration de SocketIO
-    socketio.init_app(app, cors_allowed_origins="*", message_queue=config.REDIS_URL, async_mode='gevent', path='/socket.io/')
-
-    @app.teardown_appcontext
-    def shutdown_session(exception=None):
-        """Ferme la session SQLAlchemy à la fin de la requête."""
-        session = Session()
-        if session:
-            if exception:
-                session.rollback()
-            session.remove()
-    return app
-
 # --- Projets: répertoire fichiers ---
 PROJECTS_DIR = Path(config.PROJECTS_DIR)
 PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -120,6 +98,23 @@ def with_db_session(f):
 # ================================================================
 # 1) Initialisation / Migrations
 # ================================================================
+
+# --- Application ---
+def create_app():
+    """Crée et configure l'instance de l'application Flask."""
+    app = Flask(__name__, static_folder='web', static_url_path='/')
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    
+    # Enregistrement du blueprint API
+
+    # Configuration de SocketIO
+    socketio.init_app(app, cors_allowed_origins="*", message_queue=config.REDIS_URL, async_mode='gevent', path='/socket.io/')
+
+    @app.teardown_appcontext
+    def shutdown_session(exception=None):
+        """Ferme la session SQLAlchemy à la fin de la requête."""
+        Session.remove()
+    return app
 
 # ================================================================
 # 2) API Routes
@@ -662,28 +657,33 @@ def get_project_results(project_id):
 # --- Profils et prompts ---
 @api_bp.route('/profiles', methods=['GET', 'POST'])
 @with_db_session
-def create_profile(db_session):
-    data = request.get_json()
-    if not data or not data.get('name'):
-        return jsonify({"error": "Le nom du profil est requis"}), 400
+def handle_profiles(db_session):
+    if request.method == 'GET':
+        profiles = db_session.query(Profile).order_by(Profile.name).all()
+        return jsonify([p.to_dict() for p in profiles])
 
-    new_profile = Profile(
-        name=data['name'],
-        description=data.get('description', ''),
-        model_name=data.get('model_name', 'default'),
-        temperature=data.get('temperature', 0.7),
-        context_length=data.get('context_length', 4096)
-    )
+    if request.method == 'POST':
+        data = request.get_json()
+        if not data or not data.get('name'):
+            return jsonify({"error": "Le nom du profil est requis"}), 400
 
-    db_session.add(new_profile)
-    try:
-        db_session.commit()
-    except Exception as e:
-        db_session.rollback()
-        logger.exception("Erreur lors de la création du profil.")
-        return jsonify({"error": "Erreur interne du serveur"}), 500
+        new_profile = Profile(
+            name=data['name'],
+            description=data.get('description', ''),
+            model_name=data.get('model_name', 'default'),
+            temperature=data.get('temperature', 0.7),
+            context_length=data.get('context_length', 4096)
+        )
 
-    return jsonify(new_profile.to_dict()), 201
+        db_session.add(new_profile)
+        try:
+            db_session.commit()
+        except Exception as e:
+            db_session.rollback()
+            logger.exception("Erreur lors de la création du profil.")
+            return jsonify({"error": "Erreur interne du serveur"}), 500
+
+        return jsonify(new_profile.to_dict()), 201
 
 @api_bp.route('/profiles/<profile_id>', methods=['DELETE'])
 @with_db_session
@@ -2275,7 +2275,8 @@ def run_rob_analysis(project_id):
 # 4) Enregistrement du blueprint et route front
 # ================================================================
 
-app = create_app() # --- LIGNE DÉPLACÉE ICI ---
+app = create_app()
+app.register_blueprint(api_bp)
 import click # L'import de click doit être après la création de l'app si on utilise @app.cli
 
 @app.route('/') # type: ignore

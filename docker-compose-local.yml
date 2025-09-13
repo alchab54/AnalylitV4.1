@@ -47,7 +47,7 @@ services:
         -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker \
         -w 1 \
         --timeout 300 \
-        -b 0.0.0.0:5000 \
+        -b 0.0.0.0:5001 \
         --access-logfile - \
         --error-logfile -"
     depends_on:

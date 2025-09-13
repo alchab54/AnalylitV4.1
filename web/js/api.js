@@ -7,15 +7,23 @@
  * @returns {Promise<any>} - The JSON response from the API.
  */
 export async function fetchAPI(url, options = {}) {
+    const apiUrl = url.startsWith('/') && !url.startsWith('/api') ? `/api${url}` : url;
     try {
-        const response = await fetch(url, options);
+        const response = await fetch(apiUrl, options);
         if (!response.ok) {
-            const errorData = await response.json();
+            let errorData;
+            try {
+                errorData = await response.json();
+            } catch (e) {
+                throw new Error(`API request failed with status ${response.status}: ${response.statusText}`);
+            }
             throw new Error(errorData.message || `API error: ${response.statusText}`);
         }
-        return await response.json();
+        const text = await response.text();
+        return text ? JSON.parse(text) : {};
     } catch (error) {
-        console.error('Fetch API Error:', error);
+        console.error(`Fetch API Error for URL ${apiUrl}:`, error);
         throw error;
     }
 }
+
