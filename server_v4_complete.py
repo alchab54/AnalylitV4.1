@@ -121,19 +121,6 @@ def with_db_session(f):
 # 1) Initialisation / Migrations
 # ================================================================
 
-def init_db_command():
-    """Initialise la base de données et insère les données par défaut."""
-    click.echo("Initialisation de la base de données...")
-    init_db()
-    click.echo("Base de données initialisée.")
-    click.echo("Insertion des données par défaut (profils, prompts)...")
-    try:
-        with engine.begin() as conn:
-            seed_default_data(conn)
-        click.echo("Données par défaut insérées avec succès.")
-    except Exception as e:
-        click.echo(f"Erreur lors de l'insertion des données par défaut: {e}")
-
 # ================================================================
 # 2) API Routes
 # ================================================================
@@ -2291,14 +2278,23 @@ def run_rob_analysis(project_id):
 app = create_app()
 import click
 
-@app.cli.command('init-db')
-def cli_init_db_command():
-    """Wrapper pour la commande CLI."""
-    init_db_command()
-
 @app.route('/') # type: ignore
 def serve_frontend():
     return app.send_static_file('index.html')
+
+@app.cli.command('init-db')
+def init_db_command():
+    """Initialise la base de données et insère les données par défaut."""
+    click.echo("Initialisation de la base de données...")
+    init_db()
+    click.echo("Base de données initialisée.")
+    click.echo("Insertion des données par défaut (profils, prompts)...")
+    try:
+        with engine.begin() as conn:
+            seed_default_data(conn)
+        click.echo("Données par défaut insérées avec succès.")
+    except Exception as e:
+        click.echo(f"Erreur lors de l'insertion des données par défaut: {e}")
 
 def listen_for_notifications():
     """Tâche de fond pour écouter les notifications Redis et les relayer via Socket.IO."""
