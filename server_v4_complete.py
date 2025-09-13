@@ -63,20 +63,6 @@ engine = create_engine(config.DATABASE_URL, pool_pre_ping=True)
 SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 Session = scoped_session(SessionFactory)
 
-# --- Application ---
-def create_app():
-    """Crée et configure l'instance de l'application Flask."""
-    app = Flask(__name__, static_folder='web', static_url_path='/')
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
-    
-    # Enregistrement du blueprint API
-    app.register_blueprint(api_bp)
-
-    # Configuration de SocketIO
-    socketio.init_app(app, cors_allowed_origins="*", message_queue=config.REDIS_URL, async_mode='gevent', path='/socket.io/')
-
-    return app
-
 # --- Redis / Queues ---
 redis_conn = redis.from_url(config.REDIS_URL)
 processing_queue = Queue('analylit_processing_v4', connection=redis_conn)
@@ -89,27 +75,31 @@ q = processing_queue # Alias pour la file de traitement principale
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 socketio = SocketIO()
 
-# --- Création de l'instance de l'application ---
-# Gunicorn utilisera cette fonction pour obtenir l'application.
-app = create_app()
+# --- Application ---
+def create_app():
+    """Crée et configure l'instance de l'application Flask."""
+    app = Flask(__name__, static_folder='web', static_url_path='/')
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    
+    # Enregistrement du blueprint API
+    app.register_blueprint(api_bp)
 
+    # Configuration de SocketIO
+    socketio.init_app(app, cors_allowed_origins="*", message_queue=config.REDIS_URL, async_mode='gevent', path='/socket.io/')
+
+    @app.teardown_appcontext
+    def shutdown_session(exception=None):
+        """Ferme la session SQLAlchemy à la fin de la requête."""
+        session = Session()
+        if session:
+            if exception:
+                session.rollback()
+            session.remove()
+    return app
 
 # --- Projets: répertoire fichiers ---
 PROJECTS_DIR = Path(config.PROJECTS_DIR)
 PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
-
-# ================================================================
-# 0) Gestion de la session SQLAlchemy
-# ================================================================
-
-@app.teardown_appcontext
-def shutdown_session(exception=None):
-    """Ferme la session SQLAlchemy à la fin de la requête."""
-    session = Session()
-    if session:
-        if exception:
-            session.rollback()
-        session.remove()
 
 def with_db_session(f):
     """Décorateur pour injecter et gérer une session de base de données."""
@@ -131,9 +121,6 @@ def with_db_session(f):
 # 1) Initialisation / Migrations
 # ================================================================
 
-import click
-
-@app.cli.command('init-db')
 def init_db_command():
     """Initialise la base de données et insère les données par défaut."""
     click.echo("Initialisation de la base de données...")
@@ -247,7 +234,7 @@ def get_base_prisma_checklist():
         # ... autres sections
     }
 
-@api_bp.route('/projects/<project_id>/prisma-checklist', methods=['GET', 'POST'])
+@api_bp.route('/projects/<project_id>/prisma-checklist', methods=['GET', 'POST']) # type: ignore
 @with_db_session
 def handle_prisma_checklist(db_session, project_id):
     """Gère la checklist PRISMA-ScR du projet."""
@@ -291,7 +278,7 @@ def handle_prisma_checklist(db_session, project_id):
             db_session.commit()
             return jsonify({"message": "Checklist PRISMA-ScR sauvegardée"}), 200
 
-@app.route('/api/projects/<project_id>/upload-zotero', methods=['POST'])
+@api_bp.route('/projects/<project_id>/upload-zotero', methods=['POST']) # type: ignore
 @with_db_session
 def handle_zotero_file_upload(db_session, project_id):
     project = db_session.query(Project).filter(Project.id == project_id).first()
@@ -302,7 +289,7 @@ def handle_zotero_file_upload(db_session, project_id):
     if not file:
         return jsonify({"error": "Aucun fichier fourni"}), 400
 
-    project_path = os.path.join(app.config['PROJECTS_FOLDER'], str(project.id))
+    project_path = os.path.join(config.PROJECTS_DIR, str(project.id))
     os.makedirs(project_path, exist_ok=True)
 
     filename = secure_filename(file.filename)
@@ -604,7 +591,7 @@ def list_project_files(project_id):
     pdf_files = [{"filename": f.name} for f in project_dir.glob("*.pdf")]
     return jsonify(pdf_files)
 
-@app.route('/projects/<project_id>/files/<filename>')
+@api_bp.route('/projects/<project_id>/files/<filename>') # type: ignore
 def serve_project_file(project_id, filename):
     """Sert un fichier statique depuis le dossier d'un projet spécifique."""
     # Sécurisation du chemin
@@ -2301,7 +2288,15 @@ def run_rob_analysis(project_id):
 # 4) Enregistrement du blueprint et route front
 # ================================================================
 
-@app.route('/')
+app = create_app()
+import click
+
+@app.cli.command('init-db')
+def cli_init_db_command():
+    """Wrapper pour la commande CLI."""
+    init_db_command()
+
+@app.route('/') # type: ignore
 def serve_frontend():
     return app.send_static_file('index.html')
 

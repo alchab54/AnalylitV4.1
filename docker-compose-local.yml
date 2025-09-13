@@ -40,15 +40,15 @@ services:
       - ANALYLIT_VERSION=${ANALYLIT_VERSION:-4.1.0}
       - PYTHONPATH=/app
     command: >
-      sh -c "echo 'Waiting for DB...' && sleep 5 &&
-      python -c 'from utils.database import init_db; init_db()' &&
-      echo 'Starting Gunicorn...' &&
-      gunicorn server_v4_complete:app 
-        -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker 
-        -w 1 
-        --timeout 300 
-        -b 0.0.0.0:5000 
-        --access-logfile - 
+      sh -c "echo 'Waiting for DB...' && sleep 5 && \
+      python -c 'from utils.database import init_db; init_db()' && \
+      echo 'Starting Gunicorn...' && \
+      gunicorn server_v4_complete:app \
+        -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker \
+        -w 1 \
+        --timeout 300 \
+        -b 0.0.0.0:5000 \
+        --access-logfile - \
         --error-logfile -"
     depends_on:
       db:
