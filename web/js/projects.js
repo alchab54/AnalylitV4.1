@@ -1,4 +1,4 @@
-// web/js/projects.js
+import { appState, elements } from '../app.js';
 import { fetchAPI } from './api.js';
 import { showToast, showLoadingOverlay, closeModal } from './ui.js';
 import { escapeHtml } from './ui.js'; // Import escapeHtml
@@ -7,9 +7,9 @@ import { setProjects, setCurrentProject } from './state.js';
 import { refreshCurrentSection } from './core.js';
 
 export async function loadProjects() {
-    // Assuming appState is globally available
     const projects = await fetchAPI('/projects');
     setProjects(projects);
+    renderProjectList();
 }
 
 export async function handleCreateProject(event) {

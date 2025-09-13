@@ -11,7 +11,6 @@ import { renderValidationSection } from './validation.js';
 
 export function setProjects(projects) {
     appState.projects = projects || [];
-    renderProjectList();
 }
 
 export function setCurrentProject(project) {

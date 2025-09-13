@@ -1,4 +1,4 @@
-import { appState } from '../app.js';
+import { appState, elements } from '../app.js';
 import {
     handleDeleteSelectedArticles,
     showBatchProcessModal,

@@ -6,10 +6,10 @@ WORKDIR /app
 # Crée les répertoires nécessaires
 RUN mkdir -p /app/projects /app/model_cache
 
-EXPOSE 5000
+EXPOSE 5001
 
 # La commande CMD est conservée pour spécifier le point d'entrée du conteneur web
 CMD ["/bin/bash", "-c", "echo 'Waiting for DB...' && sleep 5 && \
       python -c 'from utils.database import init_db; init_db()' && \
       echo 'Starting Gunicorn...' && \
-      gunicorn server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 -b 0.0.0.0:5000 --access-logfile - --error-logfile -"]
+      gunicorn server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 --timeout 300 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"]

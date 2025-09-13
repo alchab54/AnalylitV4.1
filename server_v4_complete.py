@@ -92,7 +92,7 @@ def with_db_session(f):
             session.rollback()
             raise e
         finally:
-            session.remove()
+            Session.remove()
     return decorated_function
 
 # ================================================================
