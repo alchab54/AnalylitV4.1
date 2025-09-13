@@ -13,7 +13,7 @@ rq==1.16.1
 SQLAlchemy==2.0.23
 psycopg2-binary==2.9.9
 
-#--- Stack Scientifique & Analyse de Données (Versions Compatibles) ---
+#--- Stack Scientifique & Analyse de Données ---
 numpy==1.26.4
 pandas==2.2.2
 scipy==1.13.0
@@ -35,15 +35,14 @@ Pillow==10.1.0
 beautifulsoup4==4.12.2
 lxml==5.2.2
 PyMuPDF==1.24.1
-click==8.1.7
 pdfplumber==0.11.1
 blinker==1.7.0
 pydantic-settings==2.1.0
 pytesseract==0.3.10
 werkzeug==3.0.1
 
-#--- Outils de Build ---
+#--- Outils de Build & Dépendances Correctives ---
 setuptools==65.5.0
 wheel>=0.38.0
-async_timeout==4.0.3
+async_timeout
 feedparser==6.0.10
