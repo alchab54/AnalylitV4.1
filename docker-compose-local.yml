@@ -48,11 +48,10 @@ services:
       - projects_data_v4:/home/appuser/app/projects
       - model_cache_v4:/home/appuser/app/model_cache
     env_file: .env
-    # === AJOUTEZ CECI ===
     environment:
       - PYTHONPATH=/home/appuser/app
     command: |
-      sh -c "echo 'Lancement du serveur Gunicorn...' && gunicorn --chdir /home/appuser/app server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 3 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"
+      sh -c "echo 'Lancement du serveur Gunicorn...' && gunicorn server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 3 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"
     depends_on:
       base:
         condition: service_completed_successfully
@@ -81,7 +80,6 @@ services:
       - projects_data_v4:/home/appuser/app/projects
       - model_cache_v4:/home/appuser/app/model_cache
     env_file: .env
-    # === CORRIGEZ CECI ===
     environment:
       - PYTHONPATH=/home/appuser/app
     command: python -m rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4

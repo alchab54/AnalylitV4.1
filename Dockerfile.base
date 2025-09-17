@@ -29,7 +29,6 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
-COPY . /app
 
 # =================================================
 # Étape 2: Final Stage - Image d'exécution légère
