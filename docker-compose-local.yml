@@ -1,0 +1,132 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: analylit-db-v4
+    volumes:
+      - postgres_data_v4:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-analylit_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-strong_password}
+      - POSTGRES_DB=${POSTGRES_DB:-analylit_db}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: analylit-redis-v4
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile-web-complete
+    container_name: analylit-web-v4
+    volumes:
+      - projects_data_v4:/home/appuser/app/projects
+      - model_cache_v4:/home/appuser/app/model_cache
+    env_file: .env
+    environment:
+      # This ensures Python can find your application modules.
+      - PYTHONPATH=/home/appuser/app
+    command: |
+      sh -c "echo 'Lancement du serveur Gunicorn...' && gunicorn --chdir /home/appuser/app server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 3 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      # DOIT VÉRIFIER LE PORT 5001 (le port Gunicorn)
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile-worker-complete
+    container_name: analylit-worker-v4
+    volumes:
+      # Les workers ont aussi besoin des volumes de données
+      - projects_data_v4:/home/appuser/app/projects
+      - model_cache_v4:/home/appuser/app/model_cache
+    env_file: .env
+    command: python -m rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: ["gpu"]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis: { condition: service_healthy }
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: analylit-ollama-v4
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: ["gpu"]
+    volumes:
+      - ollama_data_v4:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile-nginx
+    container_name: analylit-nginx-v4
+    ports:
+      - "8080:80"
+    depends_on:
+      web:
+        condition: service_healthy # Attend que le web soit 'healthy'
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data_v4:
+  ollama_data_v4:
+  projects_data_v4: # Doit correspondre aux volumes utilisés ci-dessus
+  model_cache_v4:
+
+networks:
+  analylit-network:
+    driver: bridge

@@ -1,0 +1,12 @@
+# Dockerfile-tests
+# This Dockerfile is specifically for running the test suite.
+
+# Use the base image which has all dependencies installed
+FROM analylit-base:latest
+
+# Le WORKDIR est déjà défini dans la base, mais le répéter est une bonne pratique
+WORKDIR /home/appuser/app
+
+# The default command to run when the container starts.
+# This will execute the pytest command defined in the docker-compose file.
+CMD ["pytest"]

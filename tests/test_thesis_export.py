@@ -1,0 +1,112 @@
+# -*- coding: utf-8 -*-
+"""
+Tests pour l'export spécialisé thèse et génération de rapports
+Tests critiques pour le livrable final Excel + graphiques + métadonnées
+"""
+
+import pytest
+import json
+import uuid
+from sqlalchemy import text
+from unittest.mock import patch, MagicMock
+import openpyxl
+
+class TestThesisExport:
+    """Tests complets export spécialisé thèse"""
+
+    @patch('api.export.format_bibliography')
+    @patch('api.export.pd.DataFrame.to_excel')
+    def test_thesis_excel_export_comprehensive(self, mock_to_excel, mock_format_bib, session):
+        """
+        Test export Excel complet format thèse via API.
+        Vérifie que to_excel et format_bibliography sont appelés.
+        """
+        
+        project_id = str(uuid.uuid4())
+        session.execute(text("INSERT INTO projects (id, name, description, created_at, updated_at, analysis_mode) VALUES (:id, :name, :desc, :created, :updated, :mode)"),
+                        {"id": project_id, "name": "Test Thesis Export", "desc": "Desc", "created": "2023-01-01", "updated": "2023-01-01", "mode": "screening"})
+        # Données pour l'export bibliographique
+        session.execute(text("INSERT INTO search_results (id, project_id, article_id, title, authors, publication_date, journal) VALUES (:id, :pid, :aid, :title, :authors, :pub_date, :journal)"),
+                        {"id": str(uuid.uuid4()), "pid": project_id, "aid": "PMID1", "title": "Article 1", "authors": "Doe J", "pub_date": "2023", "journal": "Journal A"})
+        # Marquer l'article comme inclus pour qu'il soit dans l'export
+        session.execute(text("INSERT INTO extractions (id, project_id, pmid, user_validation_status) VALUES (:id, :pid, :pmid, :status)"),
+                        {"id": str(uuid.uuid4()), "pid": project_id, "pmid": "PMID1", "status": "include"})
+        session.commit()
+
+        # Configurer les mocks
+        mock_to_excel.return_value = None
+        mock_format_bib.return_value = ["Doe, J. (2023). Article 1. Journal A."]
+
+        from server_v4_complete import create_app
+        app = create_app()
+        with app.test_client() as client:
+            response = client.get(f'/api/projects/{project_id}/export/thesis')
+
+        assert response.status_code == 200
+        assert response.content_type == 'application/zip'
+        assert 'attachment;filename=export_these_' in response.headers['Content-Disposition']
+        
+        # Vérifier que les fonctions de génération de contenu ont été appelées
+        mock_to_excel.assert_called()
+        mock_format_bib.assert_called_once()
+
+    def test_prisma_scr_checklist_generation(self, session):
+        """Test génération et sauvegarde checklist PRISMA-ScR complète via API"""
+        
+        project_id = str(uuid.uuid4())
+        session.execute(text("INSERT INTO projects (id, name, description, created_at, updated_at, analysis_mode) VALUES (:id, :name, :desc, :created, :updated, :mode)"),
+                        {"id": project_id, "name": "Test PRISMA Checklist", "desc": "Desc", "created": "2023-01-01", "updated": "2023-01-01", "mode": "screening"})
+        session.commit()
+
+        from server_v4_complete import create_app
+        app = create_app()
+        with app.test_client() as client:
+            response_get = client.get(f'/api/projects/{project_id}/prisma-checklist')
+            assert response_get.status_code == 200
+            
+            prisma_checklist = json.loads(response_get.data)
+            # CORRECTION: La clé pour un item complété est 'checked', pas 'completed'.
+            prisma_checklist['sections'][0]['items'][0]['checked'] = True
+            prisma_checklist['sections'][0]['items'][0]['notes'] = "Titre vérifié par le test"
+
+            response_post = client.post(
+                f'/api/projects/{project_id}/prisma-checklist',
+                data=json.dumps({"checklist": prisma_checklist}),
+                content_type='application/json'
+            )
+            assert response_post.status_code == 200
+            
+            response_get_again = client.get(f'/api/projects/{project_id}/prisma-checklist')
+            assert response_get_again.status_code == 200
+            result = json.loads(response_get_again.data)
+            assert result['sections'][0]['items'][0]['checked'] is True
+            assert result['sections'][0]['items'][0]['notes'] == "Titre vérifié par le test"
+
+    def test_prisma_flow_diagram_generation(self, session):
+        """Test génération diagramme de flux PRISMA via API (task enqueue)"""
+        
+        project_id = str(uuid.uuid4())
+        session.execute(text("INSERT INTO projects (id, name, description, created_at, updated_at, analysis_mode) VALUES (:id, :name, :desc, :created, :updated, :mode)"),
+                        {"id": project_id, "name": "Test PRISMA Flow", "desc": "Desc", "created": "2023-01-01", "updated": "2023-01-01", "mode": "screening"})
+        session.execute(text("INSERT INTO search_results (id, project_id, article_id, title) VALUES (:id, :pid, :aid, :title)"),
+                        {"id": str(uuid.uuid4()), "pid": project_id, "aid": "PMID1", "title": "Article 1"})
+        session.commit()
+
+        from server_v4_complete import create_app
+        app = create_app()
+        with app.test_client() as client:
+            with patch('server_v4_complete.analysis_queue.enqueue') as mock_enqueue:
+                # Utiliser MagicMock pour un mock plus robuste
+                mock_job = MagicMock()
+                mock_job.id = "fake_prisma_task_id"
+                mock_enqueue.return_value = mock_job
+                
+                # CORRECTION: Utiliser le bon endpoint /run-analysis avec le payload correct
+                response = client.post(
+                    f'/api/projects/{project_id}/run-analysis',
+                    data=json.dumps({"type": "prisma_flow"}),
+                    content_type='application/json'
+                )
+                assert response.status_code == 202
+                assert 'task_id' in json.loads(response.data)
+                mock_enqueue.assert_called_once()

@@ -1,0 +1,7 @@
+# Utilise l'image de base où tout est déjà installé
+FROM analylit-base:latest
+
+EXPOSE 5001
+
+# La commande CMD est conservée pour spécifier le point d'entrée du conteneur web
+CMD ["sh", "-c", "gunicorn server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 3 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"]

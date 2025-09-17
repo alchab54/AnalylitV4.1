@@ -1,0 +1,8 @@
+# Utilise l'image de base où tout est déjà installé
+FROM analylit-base:latest
+
+# Le WORKDIR est déjà défini dans la base, mais le répéter est une bonne pratique
+WORKDIR /home/appuser/app
+
+# La commande CMD est conservée pour spécifier le point d'entrée du conteneur worker
+CMD ["python", "-m", "rq.cli", "worker", "-u", "redis://redis:6379/0", "--with-scheduler", "analylit_processing_v4", "analylit_synthesis_v4", "analylit_analysis_v4", "analylit_background_v4"]

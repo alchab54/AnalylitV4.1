@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnalyLit v4.1 - Outil IA pour revues de littérature</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔬</text></svg>">
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <!-- CORRECTION : Ajout du script manquant pour Ace Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.33.0/ace.js"></script>
+</head>
+<body>
+    <!-- En-tête principal -->
+    <header class="app-header">
+        <div class="container">
+            <div class="app-header__content">
+                <div class="app-header__left">
+                    <h1 class="app-header__title">
+                        <span class="app-header__icon">🔬</span>
+                        AnalyLit v4.1
+                        <span class="app-header__subtitle">Revue de littérature IA</span>
+                    </h1>
+                </div>
+                <div class="app-header__right">
+                    <div class="connection-status">
+                        <span>Connexion:</span>
+                        <span data-connection-status>⏳</span>
+                    </div>
+                    <div class="notification-indicator">
+                        <span>📢</span>
+                        <span>Notifications</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="app-nav">
+        <div class="container">
+            <ul class="app-nav__list">
+				<li class="app-nav__item">
+					<button class="app-nav__button app-nav__button--active" data-action="show-section" data-section-id="projects">
+						📁 Projets
+					</button>
+				</li>
+				<li class="app-nav__item">
+                    <button class="app-nav__button" data-action="show-section" data-section-id="search">
+                        🔍 Recherche
+                    </button>
+                </li>
+				<li class="app-nav__item">
+					<button class="app-nav__button" data-action="show-section" data-section-id="results">
+						📄 Résultats
+					</button>
+				</li>
+				<li class="app-nav__item">
+					<button class="app-nav__button" data-action="show-section" data-section-id="validation">
+						⚖️ Validation
+					</button>
+				</li>
+                <li class="app-nav__item">
+                    <button class="app-nav__button" data-action="show-section" data-section-id="grids">
+                        Grilles
+                    </button>
+                </li>
+				<li class="app-nav__item">
+					<button class="app-nav__button" data-action="show-section" data-section-id="rob">
+						⚖️ Risque de Biais
+					</button>
+				</li>
+				<li class="app-nav__item">
+					<button class="app-nav__button" data-action="show-section" data-section-id="analyses">
+						📊 Analyses
+					</button>
+				</li>
+				<li class="app-nav__item">
+					<button class="app-nav__button" data-action="show-section" data-section-id="import">
+						📚 Import & Fichiers
+					</button>
+				</li>
+				<li class="app-nav__item">
+					<button class="app-nav__button" data-action="show-section" data-section-id="chat">
+						💬 Chat
+					</button>
+				</li>
+				<li class="app-nav__item">
+					<button class="app-nav__button" data-action="show-section" data-section-id="settings">
+						⚙️ Paramètres
+					</button>
+				</li>
+                <li class="app-nav__item">
+                    <button class="app-nav__button" data-action="show-section" data-section-id="tasks">
+                        ⏳ Tâches
+                    </button>
+                </li>
+                <li class="app-nav__item">
+                    <button class="app-nav__button" data-action="show-section" data-section-id="reporting">
+                        Rapports & Exports
+                    </button>
+                </li>
+			</ul>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="app-main">
+        <div class="container">
+            <!-- Section Projets -->
+            <section class="section section--active" data-section="projects">
+                <div class="section-header">
+                    <div class="section-header__content">
+                        <h2>Projets</h2>
+                        <p>Gérez et ouvrez un projet pour commencer.</p>
+                    </div>
+                    <div class="section-header__actions">
+                        <button class="btn btn--primary" id="createProjectBtn" data-action="create-project-modal">
+                            ➕ Nouveau projet
+                        </button>
+                    </div>
+                </div>
+
+                <div class="projects-container">
+                    <div class="projects-grid" id="projectsList">
+                        <!-- Liste des projets générée dynamiquement -->
+                    </div>
+                </div>
+
+                <!-- Détails du projet sélectionné -->
+                <div class="project-detail" id="projectDetail">
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>Détails du projet</h3>
+                        </div>
+                        <div class="card__body" id="projectDetailContent">
+                            <p>Sélectionnez un projet pour voir les détails.</p>
+                        </div>
+                    </div>
+                    <div id="projectPlaceholder" class="project-placeholder">
+                        <div class="project-placeholder__icon">📁</div>
+                        <h3>Aucun projet sélectionné</h3>
+                        <p>Sélectionnez un projet dans la liste ou créez-en un nouveau.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" data-section="rob">
+                <div class="section-header">
+                    <h2>Risque de Biais</h2>
+                    <p>Évaluez le risque de biais pour les articles inclus.</p>
+                </div>
+                <div id="robContainer">
+                    <!-- Contenu de la section RoB -->
+                </div>
+            </section>
+
+            <section class="section" data-section="search">
+                <div id="searchContainer">
+                </div>
+            </section>
+
+            <section class="section" data-section="reporting">
+                <div class="section-header">
+                    <h2>Rapports & Exports</h2>
+                    <p>Générez les éléments finaux pour votre manuscrit de thèse.</p>
+                </div>
+                <div id="reportingContainer" class="reporting-grid">
+                </div>
+            </section>
+
+			<!-- Modale pour la grille d'extraction -->
+			<input type="file" id="manualPDFInput" multiple accept=".pdf" style="display: none;">
+			<div id="gridFieldsContainer"></div>
+
+
+            <!-- Section Résultats -->
+            <section class="section" data-section="results">
+                <div class="section-header">
+                    <div class="section-header__content">
+                        <h2>Résultats</h2>
+                        <p>Affiche les résultats de recherche du projet sélectionné.</p>
+                    </div>
+                    <div class="section-header__actions">
+                        <button class="btn btn--primary" data-action="show-search-modal">
+                            🔍 Nouvelle recherche
+                        </button>                        
+                    </div>
+				</div>
+                <div class="results-container" id="resultsContainer">
+                    <div class="results-placeholder">
+                        <div class="results-placeholder__icon">📄</div>
+                        <h3>Aucun résultat</h3>
+                        <p>Sélectionner un projet et lancer une recherche.</p>
+                    </div>
+                </div>
+            </section>
+			
+			<section class="section" data-section="validation">
+				<div class="section-header">
+					<div class="section-header__content">
+						<h2>Validation Inter-Évaluateurs</h2>
+						<p>Comparez les décisions, importez/exportez les validations et calculez le Kappa.</p>
+					</div>
+                    <div class="section-header__actions">
+                        <div class="validation-actions">
+                            <h4>Lancer l'extraction complète</h4>
+                            <p>Lancez une extraction détaillée sur les articles que vous avez validés ("Inclus").</p> 
+                            <button class="btn btn--primary" data-action="run-extraction-modal">Lancer l'extraction</button>
+                        </div>
+                    </div>
+				</div>
+				<div id="validationContainer">
+					<div class="validation-placeholder">
+						<span class="validation-placeholder__icon">⚖️</span>
+						<h3>Aucun projet sélectionné</h3>
+						<p>Sélectionnez un projet pour voir les données de validation.</p>
+					</div>
+				</div>
+			</section>
+
+            <section class="section" data-section="grids">
+                <div class="section-header">
+                    <h2>Grilles d'Extraction</h2>
+                    <div class="section-header__content">
+                        <p>Gérez vos modèles d'extraction de données pour chaque projet.</p>
+                    </div>
+                    <div class="section-header__actions">
+                        <button class="btn btn--primary" data-action="showGridFormModal">
+                            <i class="fas fa-plus"></i> Nouvelle Grille
+                        </button>
+                        <button class="btn btn-secondary" data-action="triggerGridImport">
+                            <i class="fas fa-upload"></i> Importer une Grille
+                        </button>
+                        <input type="file" id="grid-import-input" accept=".json" style="display: none;" />
+                    </div>
+                </div>
+                <div id="gridsContainer">
+                </div>
+            </section>
+
+            <!-- Section Analyses -->
+            <section class="section" data-section="analyses">
+                <div class="section-header">
+                    <div class="section-header__content">
+                        <h2>Analyses</h2>
+                        <p>Lancez des analyses avancées et visualisez leurs sorties.</p>
+                    </div>
+                    <div class="section-header__actions">
+                        <button class="btn btn--primary" data-action="show-run-analysis-modal">Lancer une analyse avancée</button>
+                    </div>
+                </div>
+
+                <div class="analysis-grid" id="analysisContainer">
+                    <div id="knowledgeGraphContainer" style="width: 100%; height: 600px; border: 1px solid var(--color-border); border-radius: var(--radius-lg);"></div>
+                </div>
+            </section>
+
+            <!-- Section Import & Fichiers -->
+            <section class="section" data-section="import">
+                <div class="section-header">
+                    <div class="section-header__content">
+                        <h2>Import & Fichiers</h2>
+                        <p>Import Zotero (JSON), récupération PDFs, indexation.</p>
+                    </div>
+                </div>
+                <div class="import-sections" id="importContainer">
+                    <!-- Le contenu sera généré par renderImportSection dans import.js -->
+                </div>
+            </section>
+			
+            <!-- Section Chat -->
+            <section class="section" data-section="chat">
+                <div class="section-header">
+                    <div class="section-header__content">
+                        <h2>Chat</h2>
+                        <p>Posez des questions une fois les PDFs indexés.</p>
+                    </div>
+                </div>
+
+                <div class="chat-interface" id="chatContainer">
+                    <div class="chat-messages">
+                        <div class="chat-welcome">
+                            <div class="chat-welcome__icon">💬</div>
+                            <h3>Chat RAG</h3>
+                            <p>Indexez des PDFs puis posez une question.</p>
+                        </div>
+                    </div><div class="chat-input-container">
+                        <textarea id="chatInput" placeholder="Posez une question sur les documents du projet..." class="chat-input-field" data-action="submit-chat-on-enter"></textarea>
+                        <button class="btn btn--primary" data-action="send-chat-message">Envoyer</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Paramètres -->
+            <section class="section" data-section="settings">
+                <div class="section-header">
+                    <div class="section-header__content">
+                        <h2>Paramètres</h2>
+                        <p>Profils, prompts, modèles locaux, et files de tâches.</p>
+                    </div>
+                </div>
+                <div class="settings-grid" id="settingsContainer">
+                    <!-- CORRECTION: Ajout de la structure HTML manquante pour les paramètres -->
+                    <div class="card">
+                        <div class="card__header">
+                            <h4>Profils d'Analyse</h4>
+                            <button class="btn btn--sm" id="new-profile-btn" data-action="create-profile-modal">Nouveau Profil</button>
+                        </div>
+                        <div class="card__body" id="profile-list-container">
+                            <!-- La liste des profils sera rendue ici -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__header">
+                            <h4>Éditeur de Profil</h4>
+                        </div>
+                        <div class="card__body">
+                            <form id="profile-edit-form">
+                                <input type="hidden" id="profile-id">
+                                <div class="form-group">
+                                    <label for="profile-name" class="form-label">Nom du Profil</label>
+                                    <input type="text" id="profile-name" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-description" class="form-label">Description</label>
+                                    <textarea id="profile-description" class="form-control" rows="2"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="profile-is_default">
+                                        Définir comme profil par défaut
+                                    </label>
+                                </div>
+
+                                <!-- Sélecteurs de modèles -->
+                                <div class="form-group">
+                                    <label for="profile-preprocess-model" class="form-label">Modèle de Screening</label>
+                                    <select id="profile-preprocess-model" class="form-control model-select"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-extract-model" class="form-label">Modèle d'Extraction</label>
+                                    <select id="profile-extract-model" class="form-control model-select"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-synthesis-model" class="form-label">Modèle de Synthèse</label>
+                                    <select id="profile-synthesis-model" class="form-control model-select"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-discussion-model" class="form-label">Modèle de Discussion</label>
+                                    <select id="profile-discussion-model" class="form-control model-select"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-rob-model" class="form-label">Modèle RoB</label>
+                                    <select id="profile-rob-model" class="form-control model-select"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-graph-model" class="form-label">Modèle Graphe</label>
+                                    <select id="profile-graph-model" class="form-control model-select"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-stakeholder-model" class="form-label">Modèle Parties Prenantes</label>
+                                    <select id="profile-stakeholder-model" class="form-control model-select"></select>
+                                </div>
+                                
+                                <!-- CORRECTION : Ajout des boutons d'action manquants pour le formulaire -->
+                                <div class="modal__actions">
+                                    <button type="button" id="delete-profile-btn" class="btn btn--danger">Supprimer</button>
+                                    <button type="submit" class="btn btn--primary">Sauvegarder le Profil</button>
+                                </div>
+
+                                <!-- Éditeurs de prompts -->
+                                <div id="prompt-editors-container">
+                                    <!-- Les éditeurs Ace seront générés ici par JS -->
+                                    <div id="preprocess-prompt-system"></div><div id="preprocess-prompt-user"></div>
+                                    <div id="extract-prompt-system"></div><div id="extract-prompt-user"></div>
+                                    <div id="synthesis-prompt-system"></div><div id="synthesis-prompt-user"></div>
+                                    <div id="discussion-prompt-system"></div><div id="discussion-prompt-user"></div>
+                                    <div id="rob-prompt-system"></div><div id="rob-prompt-user"></div>
+                                    <div id="graph-prompt-system"></div><div id="graph-prompt-user"></div>
+                                    <div id="stakeholder-prompt-system"></div><div id="stakeholder-prompt-user"></div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Tâches de fond -->
+            <section class="section" data-section="tasks">
+                <div class="section-header">
+                    <div class="section-header__content">
+                        <h2>Tâches de fond</h2>
+                        <p>Suivez l'état des opérations asynchrones en temps réel.</p>
+                    </div>
+                </div>
+                <div id="tasksContainer"></div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Overlays et Modales -->
+    <div class="loading-overlay" id="loadingOverlay">
+		<div class="loading-overlay__content">
+			<div class="loading-spinner loading-spinner--lg"></div>
+			<p class="loading-overlay__message">Chargement...</p>
+            <div class="progress-bar-container" style="display: none;">
+                <div class="progress-bar"></div>
+            </div>
+            <button id="cancelTaskBtn" class="btn btn--secondary btn--sm mt-16" style="display: none;">Annuler</button>
+		</div>
+	</div>
+
+    <!-- Conteneur des notifications toast -->
+    <div class="toast-container" id="toastContainer">
+        <!-- Toasts générés dynamiquement -->
+    </div>
+	
+    <!-- Conteneur pour toutes les modales -->
+    <div id="modalsContainer">
+
+        <!-- Modale: Lancer une analyse avancée -->
+        <div id="runAnalysisModal" class="modal">
+            <div class="modal__content">
+                <div class="modal__header">
+                    <h3>Lancer une analyse avancée</h3>
+                    <button type="button" class="modal__close" data-action="close-modal">×</button>
+                </div>
+                <div class="modal__body">
+                    <div class="analysis-options">
+                        <div class="analysis-option" data-action="run-analysis" data-analysis-type="meta_analysis">
+                            <div class="analysis-icon">📊</div>
+                            <div class="analysis-details">
+                                <h4>Méta-analyse</h4>
+                                <p>Distribution des scores de pertinence avec intervalles de confiance.</p>
+                            </div>
+                        </div>
+                        <div class="analysis-option" data-action="show-prisma-modal">
+                            <div class="analysis-icon">📋</div>
+                            <div class="analysis-details">
+                                <h4>Checklist PRISMA-ScR</h4>
+                                <p>Suivez les recommandations PRISMA-ScR pour votre scoping review.</p>
+                            </div>
+                        </div>
+                        <div class="analysis-option" data-action="run-atn-analysis">
+                            <div class="analysis-icon">🤝</div>
+                            <div class="analysis-details">
+                                <h4>Analyse ATN Multipartie</h4>
+                                <p>Analyse spécialisée pour l'alliance thérapeutique numérique.</p>
+                            </div>
+                        </div>
+                        <div class="analysis-option" data-action="run-analysis" data-analysis-type="knowledge_graph">
+                            <div class="analysis-icon">🌐</div>
+                            <div class="analysis-details">
+                                <h4>Graphe de connaissances</h4>
+                                <p>Visualisation des relations entre articles.</p>
+                            </div>
+                        </div>
+                        <div class="analysis-option" data-action="run-analysis" data-analysis-type="discussion">
+                            <div class="analysis-icon">📝</div>
+                            <div class="analysis-details">
+                                <h4>Discussion</h4>
+                                <p>Génération automatique de la section Discussion.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+	<!-- Modal PRISMA-ScR -->
+	<div id="prismaModal" class="modal">
+            <div class="modal__content modal__content--large">
+                <div class="modal__header">
+                    <h3>📋 Checklist PRISMA-ScR</h3>
+                    <div class="prisma-progress">
+                        <span id="prismaProgress">0% complété</span>
+                    </div>
+                    <button type="button" class="modal__close" data-action="close-modal">&times;</button>
+                </div>
+                <div class="modal__body">
+                    <div id="prismaChecklistContent">
+                        <!-- Contenu généré dynamiquement -->
+                    </div>
+                    <div class="prisma-actions">
+                        <button class="btn btn--primary" data-action="save-prisma-progress">Sauvegarder</button>
+                        <button class="btn btn--secondary" data-action="export-prisma-report">Exporter rapport</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour les résultats ATN -->
+        <div id="atnResultsModal" class="modal">
+            <div class="modal__content">
+                <div class="modal__header">
+                    <h3>🤝 Résultats Analyse ATN</h3>
+                    <button type="button" class="modal__close" data-action="close-modal">&times;</button>
+                </div>
+                <div class="modal__body">
+                    <div id="atnResultsContent">
+                        <!-- Contenu généré dynamiquement -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour gérer les parties prenantes -->
+        <div id="stakeholderManagementModal" class="modal">
+            <div class="modal__content">
+                <div class="modal__header">
+                    <h3>🤝 Gestion des Parties Prenantes</h3>
+                    <button type="button" class="modal__close" data-action="close-modal">&times;</button>
+                </div>
+                <div class="modal__body">
+                    <div class="stakeholder-groups">
+                        <h4>Groupes définis pour votre projet :</h4>
+                        <div id="stakeholderGroupsList">
+                            <!-- Généré dynamiquement -->
+                        </div>
+                        
+                        <div class="add-stakeholder-group">
+                            <h4>Ajouter un groupe :</h4>
+                            <input type="text" id="newStakeholderName" placeholder="Nom du groupe (ex: Patients)" class="form-control">
+                            <input type="color" id="newStakeholderColor" value="#4CAF50" class="form-control" style="padding: 2px; height: 38px;">
+                            <textarea id="newStakeholderDesc" placeholder="Description du groupe..." class="form-control"></textarea>
+                            <button class="btn btn--primary" data-action="add-stakeholder-group">Ajouter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+	<!-- Modal: Recherche multi-bases -->
+	<div id="multiDatabaseSearchModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="multiDbSearchTitle">
+	  <div class="modal__content">
+		<div class="modal__header">
+		  <h3 id="multiDbSearchTitle">🔍 Recherche multi-bases</h3>
+		  <button type="button" class="modal__close" aria-label="Fermer" data-action="close-modal">×</button>
+		</div>
+		<div class="modal__body">
+		  <div class="form-group">
+			<label class="form-label" for="multiDbQuery">Requête</label>
+			<input id="multiDbQuery" class="form-control" type="text" placeholder="ex: "diabetes AND metformin"" />
+		  </div>
+		  <div class="form-group">
+			<label class="form-label">Bases</label>
+			<div id="multiDbList" class="flex gap-8"></div>
+		  </div>
+		  <div class="modal__actions">
+		  <button type="button" class="btn btn--secondary" data-action="close-modal">Annuler</button>
+		  <button class="btn btn--primary" id="multiDbSearchBtn">Rechercher</button>
+		</div>
+		</div>
+	  </div>
+	</div>
+
+	<!-- Modal: Ajouter des articles manuellement -->
+	<div id="addManualArticlesModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="addManualArticlesTitle">
+	  <div class="modal__content">
+		<div class="modal__header">
+		  <h3 id="addManualArticlesTitle">📝 Ajouter des articles manuellement</h3>
+		  <button type="button" class="modal__close" aria-label="Fermer" data-action="close-modal">×</button>
+		</div>
+        <form id="manualArticleForm">
+            <div class="modal__body">
+                <p>Saisir un identifiant par ligne (PMID, DOI, ArXiv ID).</p>
+                <div class="form-group">
+                    <textarea id="manualArticlesTextarea" name="articles" class="form-control" rows="10" placeholder="10.1038/nphys1170
+	PMID:12345678
+	arXiv:2101.00001"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="fetchMetadataCheckbox" name="fetch_metadata" checked>
+                        Récupérer automatiquement les métadonnées
+                    </label>
+                </div>
+            </div>
+            <div class="modal__actions">
+                <button type="button" class="btn btn--secondary" data-action="close-modal">Annuler</button>
+                <button type="submit" class="btn btn--primary">Importer</button>
+            </div>
+        </form>
+	  </div>
+	</div>
+
+    <!-- Modale Générique -->
+    <div id="genericModal" class="modal">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3 id="genericModalTitle"></h3>
+                <button type="button" class="modal__close" data-action="close-modal">&times;</button>
+            </div>
+            <div class="modal__body" id="genericModalBody"></div>
+            <div class="modal__actions" id="genericModalActions" style="display: none;"></div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Modale: Créer un nouveau projet -->
+    <div id="newProjectModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="newProjectTitle">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3 id="newProjectTitle">Créer un nouveau projet</h3>
+                <button type="button" class="modal__close" aria-label="Fermer" data-action="close-modal">×</button>
+            </div>
+            <form id="newProjectForm" data-action="create-project">
+                <div class="modal__body">
+                    <div class="form-group">
+                        <label for="newProjectName" class="form-label">Nom du projet</label>
+                        <input type="text" id="newProjectName" name="name" class="form-control" required placeholder="Ex: Revue sur l'IA en diabétologie">
+                    </div>
+                    <div class="form-group">
+                        <label for="newProjectDescription" class="form-label">Description (optionnel)</label>
+                        <textarea id="newProjectDescription" name="description" class="form-control" rows="4" placeholder="Décrivez brièvement l'objectif de votre revue de littérature..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mode d'analyse initial</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="mode" value="screening" checked> Pre-screening</label>
+                            <label><input type="radio" name="mode" value="full_extraction"> Extraction Complète</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal__actions">
+                    <button type="button" class="btn btn--secondary" data-action="close-modal">Annuler</button>
+                    <button type="submit" class="btn btn--primary">Créer le projet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modale: Créer/Modifier une grille d'extraction -->
+    <div id="gridFormModal" class="modal">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3 id="gridFormModalTitle"></h3>
+                <button type="button" class="modal__close" data-action="close-modal">&times;</button>
+            </div>
+            <form id="gridForm" data-action="save-grid">
+                <div class="modal__body">
+                    <input type="hidden" id="gridId" name="id">
+                    <div class="form-group">
+                        <label for="gridName" class="form-label">Nom de la grille</label>
+                        <input type="text" id="gridName" name="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gridDescription" class="form-label">Description</label>
+                        <textarea id="gridDescription" name="description" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div id="gridFields" class="grid-fields-editor"></div>
+                    <button type="button" class="btn btn--sm" data-action="add-grid-field">Ajouter un champ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <script type="module" src="app.js"></script>
+    
+</body>
+</html>

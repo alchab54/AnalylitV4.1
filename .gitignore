@@ -1,0 +1,53 @@
+# Fichier .gitignore pour le projet AnalyLit
+
+# --- Dépendances et environnements locaux ---
+# Ne jamais versionner les dépendances, elles sont réinstallées à partir des fichiers manifestes.
+node_modules/
+venv/
+.venv/
+env/
+
+# --- Fichiers de configuration locaux et secrets ---
+# Le fichier .env contient des secrets (clés API, mots de passe DB) et ne DOIT JAMAIS être sur GitHub.
+# Seul le fichier `env.example` (s'il existe) doit être versionné.
+.env
+.env.*
+!/.env.example
+
+# --- Fichiers de cache et artefacts de build ---
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info
+
+# Cache et rapports de tests
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+.coverage
+
+# --- Fichiers générés par l'application ---
+# Les données des projets (PDFs, images, etc.) ne doivent pas être dans le dépôt Git.
+# Ils sont gérés par des volumes Docker en production.
+projects/
+model_cache/
+reports/
+exports/
+
+# --- Logs ---
+# Les fichiers de log sont spécifiques à une exécution et ne doivent pas être versionnés.
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- Fichiers système et IDE ---
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~

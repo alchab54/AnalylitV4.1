@@ -1,0 +1,140 @@
+// ================================================================
+// AnalyLit V4.1 - Application Frontend (Version finale consolidée)
+// ================================================================
+import { setupDelegatedEventListeners, showSection, refreshCurrentSection, initializeWebSocket } from './js/core.js';
+import { handleCreateProject, loadProjects, renderProjectDetail, selectProject } from './js/projects.js';
+import { loadSearchResults } from './js/articles.js';
+import { loadRobSection } from './js/rob.js';
+import { loadChatMessages } from './js/chat.js';
+import { loadValidationSection, renderValidationSection } from './js/validation.js';
+import { renderGridsSection } from './js/grids.js';
+import { loadProjectAnalyses, renderAnalysesSection } from './js/analyses.js';
+import { renderImportSection } from './js/import.js';
+import { renderReportingSection } from './js/reporting.js';
+import { renderSearchSection } from './js/search.js';
+import { renderSettings, loadSettingsData } from './js/settings.js';
+import { loadTasksSection, setupTasksAutoRefresh } from './js/tasks.js';
+import { fetchAPI } from './js/api.js';
+import { showToast } from './js/ui-improved.js';
+
+export const appState = {
+    currentProject: null,
+    projects: [],
+    searchResults: [],
+    searchResultsMeta: {},
+    analysisProfiles: [],
+    ollamaModels: [],
+    prompts: [],
+    currentProjectGrids: [],
+    currentProjectExtractions: [],
+    currentProjectChatHistory: [],
+    socketConnected: false,
+    currentSection: 'projects',
+    socket: null,
+    availableDatabases: [],
+    notifications: [],
+    unreadNotifications: 0,
+    analysisResults: {},
+    chatMessages: [],
+    currentValidations: [],
+    queuesInfo: [],
+    selectedSearchResults: new Set(),
+    prismaChecklist: null,
+    renderedSections: new Set() // Pour suivre les sections déjà rendues
+};
+
+export let elements = {};
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Démarrage de AnalyLit V4.1 Frontend...');
+    
+    // Initialisation des éléments DOM
+    const elementQueries = {
+        sections: document.querySelectorAll('.section'),
+        navButtons: document.querySelectorAll('.app-nav__button'),
+        connectionStatus: document.querySelector('[data-connection-status]'),
+        projectsList: document.getElementById('projectsList'),
+        createProjectBtn: document.getElementById('createProjectBtn'),
+        projectDetail: document.getElementById('projectDetail'),
+        projectDetailContent: document.getElementById('projectDetailContent'),
+        projectPlaceholder: document.getElementById('projectPlaceholder'),
+        resultsContainer: document.getElementById('resultsContainer'),
+        validationContainer: document.getElementById('validationContainer'),
+        analysisContainer: document.getElementById('analysisContainer'),
+        importContainer: document.getElementById('importContainer'),
+        chatContainer: document.getElementById('chatContainer'),
+        settingsContainer: document.getElementById('settingsContainer'),
+        robContainer: document.getElementById('robContainer'),
+        modalsContainer: document.getElementById('modalsContainer'),
+        loadingOverlay: document.getElementById('loadingOverlay'),
+        toastContainer: document.getElementById('toastContainer'),
+        // Lazy-loaded elements, will be queried when needed
+        // zoteroFileInput: document.getElementById('zoteroFileInput'),
+        // bulkPDFInput: document.getElementById('bulkPDFInput'),
+        reportingContainer: document.getElementById('reportingContainer'), // New element
+        tasksContainer: document.getElementById('tasksContainer'),
+        newProjectForm: document.getElementById('newProjectForm'),
+    };
+
+    // Assign elements and check for missing ones
+    for (const key in elementQueries) {
+        elements[key] = elementQueries[key];
+        if (!elements[key] || (elements[key] instanceof NodeList && elements[key].length === 0)) {
+            // Ne pas afficher d'avertissement pour les éléments qui seront chargés plus tard
+            if (key !== 'zoteroFileInput' && key !== 'bulkPDFInput') {
+                console.warn(`UI element not found on initial load: ${key}`);
+            }
+        }
+    }
+
+    initializeApplication();
+});
+
+async function initializeApplication() {
+    setupDelegatedEventListeners();
+    initializeWebSocket();
+    setupTasksAutoRefresh();
+    try {
+        await loadInitialData();
+
+        // Récupérer la dernière section active ou utiliser 'projects' par défaut
+        const lastSection = localStorage.getItem('analylit_last_section') || 'projects';
+        showSection(lastSection);
+
+        // Automatically select the first project if available
+        if (appState.projects.length > 0 && !appState.currentProject) {
+            const firstProjectId = appState.projects[0].id;
+            console.log('Auto-selecting first project:', firstProjectId);
+            await selectProject(firstProjectId);
+            if (lastSection === 'projects') refreshCurrentSection(); // Rafraîchir si on est resté sur la page projets
+        }
+    } catch (error) {
+        console.error("Erreur d'initialisation:", error);
+        showToast("Impossible de charger les données initiales.", 'error');
+    }
+} // Removed finally block here
+
+
+async function loadAnalysisProfiles() {
+    appState.analysisProfiles = await fetchAPI('/profiles');
+}
+
+async function loadPrompts() {
+    appState.prompts = await fetchAPI('/prompts');
+}
+
+async function loadOllamaModels() {
+    appState.ollamaModels = await fetchAPI('/ollama/models');
+}
+
+async function loadAvailableDatabases() {
+    appState.availableDatabases = await fetchAPI('/databases');
+}
+
+async function loadInitialData() {
+    await Promise.all([
+        loadProjects(),
+        loadAvailableDatabases(), // Gardons celui-ci pour l'instant car il n'est pas dans loadSettingsData
+        loadSettingsData()
+    ]);
+}

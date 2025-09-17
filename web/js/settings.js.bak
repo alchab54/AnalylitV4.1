@@ -1,0 +1,591 @@
+// web/js/settings.js
+
+import { fetchAPI } from './api.js'; // Correction 1: getAPIEndpoint supprimé
+import { appState } from '../app.js'; // Correction 2: Importation de l'état central
+import { setAnalysisResults, setQueuesStatus } from './state.js';
+import { showToast } from './ui-improved.js';
+
+let editors = {}; // Stocke les instances d'Ace Editor
+
+// Types de prompts utilisés pour générer les éditeurs
+const promptTypes = ['preprocess', 'extract', 'synthesis', 'discussion', 'rob', 'graph', 'stakeholder'];
+
+/**
+ * Charge les données initiales pour la page des paramètres.
+ * Appelé par app.js lors de l'initialisation.
+ */
+export async function loadSettingsData() {
+    await Promise.all([
+        loadAnalysisProfiles(),
+        loadPrompts(),
+        loadOllamaModels(),
+        loadQueuesStatus()
+    ]);
+}
+
+/**
+ * Récupère les profils d'analyse depuis l'API et les stocke dans l'état.
+ */
+export async function loadAnalysisProfiles() {
+    console.log("Chargement des profils d'analyse...");
+    try {
+        // CORRECTION: Appel direct à l'endpoint relatif. fetchAPI gère le préfixe.
+        const profiles = await fetchAPI('/profiles');
+        appState.analysisProfiles = profiles; // Directly set state, no dedicated setter for profiles
+        console.log("Profils chargés:", profiles);
+    } catch (error) {
+        console.error("Erreur lors du chargement des profils d'analyse:", error);
+        showToast(error.message, 'error'); // CORRIGÉ: Appelle showToast
+    }
+}
+
+/**
+ * Récupère les modèles de prompts depuis l'API et les stocke dans l'état.
+ */
+export async function loadPrompts() {
+    // CORRECTION: Appel direct à l'endpoint relatif.
+    const prompts = await fetchAPI('/prompts');
+    appState.prompts = prompts; // Directly set state
+}
+
+/**
+ * Récupère les modèles Ollama locaux (via l'API backend).
+ */
+export async function loadOllamaModels() {
+    const models = await fetchAPI('/ollama/models');
+    appState.ollamaModels = models; // Directly set state
+}
+
+/**
+ * Récupère le statut actuel des files d'attente RQ.
+ */
+export async function loadQueuesStatus() {
+    // CORRECTION: Appel direct à l'endpoint relatif.
+    const status = await fetchAPI('/queues/info');
+    setQueuesStatus(status);
+}
+
+export function showEditPromptModal() {}
+/**
+ * Fonction principale pour afficher la page des paramètres.
+ */
+export function renderSettings() {
+    const profiles = appState.analysisProfiles;
+    const prompts = appState.prompts;
+    const models = appState.ollamaModels;
+    const queueStatus = appState.queuesInfo;
+
+    // CORRECTION : Vérification plus robuste pour éviter les erreurs si les données ne sont pas encore chargées.
+    // La logique de rechargement est maintenant gérée en amont.
+    if (!profiles || !prompts || !models || !queueStatus) {
+        console.warn("Les données des paramètres ne sont pas prêtes, le rendu est annulé.");
+        return; 
+    }
+
+    // Rendu de la liste des profils
+    const profileListContainer = document.getElementById('profile-list-container');
+    renderAnalysisProfilesList(profiles, profileListContainer);
+
+    // Rendu des modèles Ollama dans les sélecteurs
+    populateModelSelects(models);
+
+    // Rendu des modèles de prompts
+    const templatesContainer = document.getElementById('prompt-templates-list');
+    renderPromptTemplates(prompts, templatesContainer);
+    
+    // Rendu du statut des files d'attente
+    renderQueueStatus(queueStatus);
+
+    // Initialiser les éditeurs Ace
+    initializeAllEditors();
+
+    // Sélectionner le premier profil par défaut (ou le profil 'default' si existant)
+    const defaultProfile = profiles.find(p => p.is_default) || profiles[0];
+    if (defaultProfile) {
+        selectProfile(defaultProfile.id);
+    }
+
+    // Configurer les écouteurs d'événements pour la page des paramètres
+    setupSettingsEventListeners();
+}
+
+/**
+ * Renders the list of analysis profiles.
+ * @param {Array} profiles - The list of analysis profiles.
+ * @param {HTMLElement} container - The container element to render the list into.
+ */
+function renderAnalysisProfilesList(profiles, container) {
+    if (!container) return;
+    if (!profiles || profiles.length === 0) {
+        container.innerHTML = '<p>Aucun profil d\'analyse trouvé.</p>';
+        return;
+    }
+    const listHtml = profiles.map(profile => `
+        <div class="list-group-item" data-profile-id="${profile.id}" data-action="select-profile">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">${profile.name} ${profile.is_default ? '<span class="badge bg-secondary">Défaut</span>' : ''}</h5>
+            </div>
+            <p class="mb-1">${profile.description || 'Pas de description.'}</p>
+        </div>
+    `).join('');
+    container.innerHTML = `<div class="list-group">${listHtml}</div>`;
+    container.querySelectorAll('.list-group-item').forEach(item => {
+        item.addEventListener('click', () => selectProfile(item.dataset.profileId));
+    });
+}
+
+export function showEditProfileModal() {}
+export function deleteProfile() {}
+export function showPullModelModal() {}
+
+/**
+ * Configure tous les écouteurs d'événements pour la page des paramètres.
+ */
+function setupSettingsEventListeners() {
+    const newProfileBtn = document.getElementById('new-profile-btn');
+    const profileEditForm = document.getElementById('profile-edit-form');
+    const deleteProfileBtn = document.getElementById('delete-profile-btn');
+    const promptTemplateSelect = document.getElementById('prompt-template-select');
+    const applyTemplateBtn = document.getElementById('apply-template-btn');
+    const refreshQueuesBtn = document.getElementById('refresh-queues-btn');
+
+    if (newProfileBtn) {
+        newProfileBtn.addEventListener('click', handleNewProfile);
+    }
+    if (profileEditForm) {
+        // Empêcher les soumissions multiples
+        if (!profileEditForm.dataset.listenerAttached) {
+            profileEditForm.addEventListener('submit', handleSaveProfile);
+            profileEditForm.dataset.listenerAttached = 'true';
+        }
+    }
+    if (deleteProfileBtn) {
+        deleteProfileBtn.addEventListener('click', handleDeleteProfile);
+    }
+    if (applyTemplateBtn) {
+        applyTemplateBtn.addEventListener('click', () => {
+            const selectedTemplateId = promptTemplateSelect.value;
+            if (selectedTemplateId) {
+                applyPromptTemplate(selectedTemplateId);
+            }
+        });
+    }
+    if (refreshQueuesBtn) {
+        refreshQueuesBtn.addEventListener('click', async () => {
+            showToast("Rafraîchissement du statut des files...", 'info'); // CORRIGÉ: Appelle showToast
+            await loadQueuesStatus(); // This will re-render via state update
+            renderQueueStatus(appState.queuesInfo);
+        });
+    }
+}
+
+/**
+ * Affiche la liste des modèles de prompts.
+ * @param {Array} prompts - La liste des modèles de prompts.
+ * @param {HTMLElement} container - L'élément conteneur où afficher la liste.
+ */
+function renderPromptTemplates(prompts, container) {
+    if (!container) return;
+    if (!prompts || prompts.length === 0) {
+        container.innerHTML = '<p>Aucun modèle de prompt trouvé.</p>';
+        return;
+    }
+    const listHtml = prompts.map(prompt => `
+        <div class="list-group-item">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">${prompt.name}</h5>
+                <small>ID: ${prompt.id}</small>
+            </div>
+            <p class="mb-1">${prompt.description || 'Pas de description.'}</p>
+        </div>
+    `).join('');
+    container.innerHTML = `<div class="list-group">${listHtml}</div>`;
+}
+
+/**
+ * Remplit tous les <select> de modèles avec les modèles Ollama récupérés.
+ */
+function populateModelSelects(models) {
+    const modelSelects = document.querySelectorAll('.model-select');
+    const optionsHtml = models.map(model => `<option value="${model.name}">${model.name}</option>`).join('');
+    
+    modelSelects.forEach(select => {
+        select.innerHTML = optionsHtml;
+    });
+}
+
+/**
+ * Initialise tous les éditeurs de code Ace sur la page.
+ */
+function initializeAllEditors(retryCount = 0) {
+    // CORRECTION : S'assurer que la bibliothèque Ace est chargée avant de l'utiliser.
+    if (typeof ace === 'undefined') {
+        if (retryCount > 50) { // Limite de 5 secondes (50 * 100ms)
+            console.error("La bibliothèque Ace n'a pas pu être chargée. L'initialisation des éditeurs est abandonnée.");
+            return;
+        }
+        console.warn("La bibliothèque Ace n'est pas encore chargée. Nouvel essai dans 100ms.");
+        setTimeout(() => initializeAllEditors(retryCount + 1), 100);
+        return;
+    }
+
+    promptTypes.forEach(type => {
+        try {
+            editors[`${type}_system`] = ace.edit(`${type}-prompt-system`);
+            editors[`${type}_system`].setTheme("ace/theme/chrome");
+            editors[`${type}_system`].session.setMode("ace/mode/markdown");
+
+            editors[`${type}_user`] = ace.edit(`${type}-prompt-user`);
+            editors[`${type}_user`].setTheme("ace/theme/chrome");
+            editors[`${type}_user`].session.setMode("ace/mode/markdown");
+        } catch (e) {
+            console.warn(`Impossible d'initialiser l'éditeur Ace pour ${type}: ${e.message}. L'élément DOM existe-t-il ?`);
+        }
+    });
+}
+
+/**
+ * Sélectionne un profil et charge ses données dans le formulaire d'édition.
+ * @param {string} profileId - L'UUID du profil à charger.
+ */
+export function selectProfile(profileId) {
+    const profiles = appState.analysisProfiles;
+    const profile = profiles.find(p => p.id === profileId);
+
+    if (!profile) {
+        console.error(`Profil non trouvé: ${profileId}`);
+        return;
+    }
+
+    // Mettre à jour la liste pour afficher la sélection
+    document.querySelectorAll('#profile-list-container .list-group-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.profileId === profileId) {
+            item.classList.add('active');
+        }
+    });
+
+    // Charger les données dans le formulaire
+    renderProfileForm(profile);
+}
+
+/**
+ * Affiche les données d'un profil sélectionné dans les champs du formulaire et les éditeurs.
+ * @param {object} profile - L'objet profil.
+ */
+function renderProfileForm(profile) {
+    const form = document.getElementById('profile-edit-form');
+    if (!form) return;
+
+    form.querySelector('#profile-id').value = profile.id || '';
+    form.querySelector('#profile-name').value = profile.name || '';
+    form.querySelector('#profile-description').value = profile.description || '';
+    form.querySelector('#profile-is_default').checked = profile.is_default || false;
+
+    // Définir les valeurs des sélecteurs de modèles
+    form.querySelector('#profile-preprocess-model').value = profile.preprocess_model || '';
+    form.querySelector('#profile-extract-model').value = profile.extract_model || '';
+    form.querySelector('#profile-synthesis-model').value = profile.synthesis_model || '';
+    form.querySelector('#profile-discussion-model').value = profile.discussion_model || '';
+    form.querySelector('#profile-rob-model').value = profile.rob_model || '';
+    form.querySelector('#profile-graph-model').value = profile.graph_model || '';
+    form.querySelector('#profile-stakeholder-model').value = profile.stakeholder_model || '';
+
+    // Gérer le bouton de suppression (ne pas autoriser la suppression du profil par défaut)
+    const deleteBtn = document.getElementById('delete-profile-btn');
+    if (profile.is_default) {
+        deleteBtn.disabled = true;
+        deleteBtn.title = "Impossible de supprimer le profil par défaut.";
+    } else {
+        deleteBtn.disabled = false;
+        deleteBtn.title = "Supprimer ce profil";
+    }
+
+    // --- CORRECTION DE LA LOGIQUE DE CHARGEMENT DES PROMPTS ---
+    // Les prompts sont maintenant stockés sous forme de chaînes JSON dans le modèle AnalysisProfile.
+    // Nous devons les parser avant de les injecter dans les éditeurs Ace.
+
+    promptTypes.forEach(type => {
+        let promptKey;
+        // Mapper 'stakeholder' au nom de colonne correct de la DB
+        if (type === 'stakeholder') {
+            promptKey = 'stakeholder_analysis_prompt';
+        } else {
+            promptKey = `${type}_prompt`;
+        }
+
+        // Récupérer le contenu JSON stringifié de la DB (ou un objet vide par défaut)
+        const dbContent = profile[promptKey] || "{}";
+        let promptData = { system: "", user: "" };
+
+        try {
+            const parsedData = JSON.parse(dbContent);
+            // S'assurer que les clés existent, même si elles sont vides
+            promptData.system = parsedData.system || "";
+            promptData.user = parsedData.user || "";
+            
+        } catch (e) {
+            // Si ce n'est PAS du JSON (ancien format texte brut), assigner à 'system' par défaut
+            console.warn(`Le prompt ${promptKey} n'était pas du JSON. Traitement comme texte brut.`);
+            promptData.system = dbContent;
+            promptData.user = "";
+        }
+
+        // Définir les valeurs dans les éditeurs Ace correspondants
+        if (editors[`${type}_system`]) {
+            editors[`${type}_system`].setValue(promptData.system, -1); // -1 déplace le curseur au début
+        }
+        if (editors[`${type}_user`]) {
+            editors[`${type}_user`].setValue(promptData.user, -1);
+        }
+    });
+    // --- FIN DE LA CORRECTION ---
+}
+
+
+/**
+ * Applique un modèle de prompt (template) aux éditeurs de prompts actuellement actifs.
+ * @param {string} templateId 
+ */
+function applyPromptTemplate(templateId) {
+    const templates = appState.prompts;
+    const template = templates.find(t => t.id === templateId);
+    if (!template) return;
+
+    showToast(`Application du modèle: ${template.name}`, 'info'); // CORRIGÉ: Appelle showToast
+
+    // Déterminer à quel(s) éditeur(s) ce modèle s'applique
+    // Nous supposons que le nom du template correspond au type de prompt (ex: "extract", "synthesis")
+    
+    // Tentative de déduction du type à partir du nom du template
+    const matchingType = promptTypes.find(type => template.name.toLowerCase().includes(type));
+
+    if (matchingType) {
+        // Appliquer aux éditeurs système et utilisateur correspondants
+        if (editors[`${matchingType}_system`]) {
+            editors[`${matchingType}_system`].setValue(template.system_message || "", -1);
+        }
+        if (editors[`${matchingType}_user`]) {
+            editors[`${matchingType}_user`].setValue(template.user_message_template || "", -1);
+        }
+        showToast(`Modèle '${template.name}' appliqué aux éditeurs '${matchingType}'.`, 'success'); // CORRIGÉ
+    } else {
+        showToast(`Impossible de déterminer à quel éditeur ce modèle s'applique.`, 'warn'); // CORRIGÉ
+    }
+}
+
+/**
+ * Récupère les valeurs actuelles de tous les éditeurs Ace.
+ * @returns {Array} Un tableau d'objets { name, content }.
+ */
+function getPromptEditorValues() {
+    const values = [];
+    promptTypes.forEach(type => {
+        if (editors[`${type}_system`]) {
+            values.push({
+                name: `${type}_system`,
+                content: editors[`${type}_system`].getValue()
+            });
+        }
+        if (editors[`${type}_user`]) {
+            values.push({
+                name: `${type}_user`,
+                content: editors[`${type}_user`].getValue()
+            });
+        }
+    });
+    return values;
+}
+
+/**
+ * Collecte toutes les données du formulaire de profil dans un objet JSON propre.
+ * @returns {object} L'objet de données prêt pour l'API.
+ */
+function collectProfileData() {
+    const form = document.getElementById('profile-edit-form');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries()); // Récupère les champs de base (nom, description, modèles)
+
+    // --- CORRECTION DE LA LOGIQUE D'ENVOI DES PROMPTS ---
+    // Aplatir les prompts pour qu'ils correspondent au modèle plat AnalysisProfile (DB)
+    
+    const promptsList = getPromptEditorValues(); // Récupère tous les éditeurs
+
+    promptTypes.forEach(type => {
+        const sysPrompt = promptsList.find(p => p.name === `${type}_system`);
+        const userPrompt = promptsList.find(p => p.name === `${type}_user`);
+
+        // Nous devons combiner 'system' et 'user' dans une seule chaîne JSON
+        // que le backend stockera dans la colonne Text unique (ex: 'preprocess_prompt')
+        const combinedPromptData = {
+            system: sysPrompt ? sysPrompt.content : "",
+            user: userPrompt ? userPrompt.content : ""
+        };
+
+        // Mapper aux noms de colonnes attendus par Python/SQLAlchemy
+        if (type === 'stakeholder') {
+            data['stakeholder_analysis_prompt'] = JSON.stringify(combinedPromptData);
+        } else {
+            data[`${type}_prompt`] = JSON.stringify(combinedPromptData);
+        }
+    });
+
+    // Gérer explicitement le checkbox (FormData n'inclut que les cases cochées, envoyant "on")
+    // Nous devons envoyer un booléen JSON (true/false) que Python attend.
+    data.is_default = form.querySelector('#profile-is_default').checked;
+    
+    // (La clé 'data.prompts' imbriquée n'est jamais créée, ce qui est correct)
+
+    return data;
+    // --- FIN DE LA CORRECTION ---
+}
+
+
+/**
+ * Gestionnaire pour la création d'un nouveau profil.
+ */
+function handleNewProfile() {
+    const newProfile = {
+        id: `new_${Date.now()}`, // ID temporaire (le backend générera un UUID)
+        name: "Nouveau Profil",
+        description: "",
+        is_default: false,
+        //... autres champs vides
+    };
+    
+    // Vider le formulaire et définir les valeurs par défaut
+    renderProfileForm(newProfile);
+
+    // Mettre l'ID à "" pour indiquer à l'API qu'il s'agit d'un POST (Créer)
+    document.getElementById('profile-id').value = "";
+    
+    // Désélectionner dans la liste
+    document.querySelectorAll('#profile-list-container .list-group-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    document.getElementById('profile-name').focus();
+}
+
+/**
+ * Gestionnaire pour la sauvegarde (POST ou PUT) d'un profil.
+ * @param {Event} e - L'événement de soumission du formulaire.
+ */
+async function handleSaveProfile(e) {
+    e.preventDefault();
+    const form = e.target;
+    const saveBtn = form.querySelector('button[type="submit"]');
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Sauvegarde...";
+
+    try {
+        const profileData = collectProfileData();
+        const profileId = document.getElementById('profile-id').value;
+
+        // CORRECTION: Utilisation des endpoints relatifs
+        let url = '/api/profiles';
+        let method = 'POST';
+
+        if (profileId && !profileId.startsWith('new_')) {
+            // C'est une mise à jour (PUT)
+            url = `/api/profiles/${profileId}`;
+            method = 'PUT';
+        } else {
+            // C'est une création (POST), supprimer l'ID temporaire
+            delete profileData.id;
+        }
+
+        const updatedProfile = await fetchAPI(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(profileData)
+        });
+
+        showToast(`Profil '${updatedProfile.name}' sauvegardé avec succès.`, 'success'); // CORRIGÉ
+        
+        // Recharger les profils dans l'état et ré-afficher la page
+        await loadAnalysisProfiles();
+        renderSettings(); // Re-render complet pour mettre à jour la liste
+        
+        // Resélectionner le profil qui vient d'être sauvegardé/créé
+        selectProfile(updatedProfile.id);
+
+    } catch (error) {
+        console.error("Erreur lors de la sauvegarde du profil:", error);
+        showToast(error.message, 'error'); // CORRIGÉ
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Sauvegarder le Profil";
+    }
+}
+
+/**
+ * Gestionnaire pour la suppression d'un profil (après confirmation).
+ */
+async function handleDeleteProfile() {
+    const profileId = appState.selectedProfileId;
+    const profiles = appState.analysisProfiles;
+    const profile = profiles.find(p => p.id === profileId);
+
+    if (!profile || profile.is_default) {
+        showToast("Impossible de supprimer ce profil (c'est le profil par défaut ou il n'est pas sélectionné).", 'warn'); // CORRIGÉ
+        return;
+    }
+
+    if (confirm(`Êtes-vous sûr de vouloir supprimer définitivement le profil "${profile.name}" ?`)) {
+        try {
+            // CORRECTION: Utilisation de l'endpoint relatif et de la bonne méthode
+            await fetchAPI(`/api/profiles/${profileId}`, { method: 'DELETE' });
+            showToast(`Profil "${profile.name}" supprimé.`, 'success'); // CORRIGÉ
+            
+            // Recharger et ré-afficher
+            await loadAnalysisProfiles();
+            renderSettings(); // Re-render (sélectionnera le nouveau profil par défaut)
+
+        } catch (error) {
+            console.error("Erreur lors de la suppression du profil:", error);
+            showToast(error.message, 'error'); // CORRIGÉ
+        }
+    }
+}
+
+
+/**
+ * Affiche le statut des files d'attente RQ.
+ */
+function renderQueueStatus(status) {
+    const container = document.getElementById('queue-status-container');
+    if (!container || !status || !status.queues) return;
+
+    let html = '<ul class="list-group">';
+    Object.keys(status.queues).forEach(qName => {
+        const queue = status.queues[qName];
+        html += `
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                File: <strong>${queue.display}</strong>
+                <span class="badge bg-primary rounded-pill" title="Tâches en attente">${queue.pending}</span>
+            </li>
+        `;
+    });
+    html += '</ul>';
+
+    // html += '<h5 class="mt-4">Workers</h5>';
+    // if (status.workers.length > 0) {
+    //     html += '<ul class="list-group">';
+    //     status.workers.forEach(worker => {
+    //         const stateClass = worker.state === 'idle' ? 'text-success' : 'text-warning';
+    //         html += `
+    //             <li class="list-group-item">
+    //                 ID: ${worker.name} <br>
+    //                 État: <strong class="${stateClass}">${worker.state}</strong> <br>
+    //                 Files: ${worker.queues.join(', ')}
+    //             </li>
+    //         `;
+    //     });
+    //     html += '</ul>';
+    // } else {
+    //     html += '<p class="text-danger"><strong>Aucun worker actif détecté.</strong> Les tâches ne seront pas traitées.</p>';
+    // }
+    
+    container.innerHTML = html;
+}

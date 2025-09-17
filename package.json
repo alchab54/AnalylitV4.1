@@ -1,0 +1,14 @@
+{
+  "name": "analylit_frontend",
+  "version": "1.0.0",
+  "description": "Tests unitaires pour le frontend AnalyLit JS",
+  "private": true,
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "type": "module"
+}
