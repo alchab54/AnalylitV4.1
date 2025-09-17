@@ -3,7 +3,7 @@ version: '3.9'
 services:
   # --- Base de données ---
   db:
-    image: postgres:15-alpine
+    image: postgres:15 # CORRECTION: Utilisation de l'image standard avec support complet des locales
     container_name: analylit-db-v4
     volumes:
       - postgres_data_v4:/var/lib/postgresql/data/
@@ -11,8 +11,6 @@ services:
       - POSTGRES_USER=${POSTGRES_USER:-analylit_user}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-strong_password}
       - POSTGRES_DB=${POSTGRES_DB:-analylit_db}
-      # CORRECTION: Force a UTF-8 locale to prevent initialization errors on some systems.
-      - POSTGRES_INITDB_ARGS=--locale=C.UTF-8
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
@@ -69,8 +67,8 @@ services:
       - model_cache_data:/home/appuser/app/model_cache
     env_file: .env
     command: > # CORRECTION: Utilisation de la commande complète pour l'initialisation et le seeding
-      sh -c "echo 'Attente de la base de données...' && sleep 5 &&
-      echo 'Initialisation de la base de données et seeding...' && python -c 'from server_v4_complete import _init_db_command; _init_db_command()' &&
+      sh -c "echo 'Initialisation de la base de données et seeding...' &&
+      python -c 'from server_v4_complete import _init_db_command; _init_db_command()' &&
       echo 'Lancement du serveur Gunicorn...' &&
       gunicorn server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 3 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"
     depends_on:
