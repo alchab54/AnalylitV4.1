@@ -147,8 +147,6 @@ def listen_for_notifications():
             except Exception as e:
                 logger.error(f"Erreur lors du relais de la notification: {e}")
 
-# --- CORRECTION : Désindenter cette ligne ---
-# Créer l'application au niveau global pour que Gunicorn puisse la trouver
 app = create_app()
 
 # --- Bloc d'exécution principal ---
