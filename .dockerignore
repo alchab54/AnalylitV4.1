@@ -71,14 +71,7 @@ Makefile*
 **/*.crt
 secrets/
 
-# === FICHIERS DE TEST ===
-# Les fichiers de test ne sont pas nécessaires en production
-test/
-tests/
-**/test_*.py
-**/*_test.py
-**/conftest.py
-**/locustfile.py
+
 
 # === ARTEFACTS DE BUILD ===
 dist/

@@ -195,11 +195,11 @@ def test_api_prisma_checklist_workflow(client, session, setup_project):
 # CATEGORIE 4: ADMIN & INFRASTRUCTURE
 # ================================================================
 
-@patch('server_v4_complete.Worker') # Mocker là où c'est utilisé
-@patch('server_v4_complete.processing_queue')
-@patch('server_v4_complete.synthesis_queue')
-@patch('server_v4_complete.analysis_queue')
-@patch('server_v4_complete.background_queue')
+@patch('api.admin.Worker') # Mocker là où c'est utilisé
+@patch('api.admin.processing_queue')
+@patch('api.admin.synthesis_queue')
+@patch('api.admin.analysis_queue')
+@patch('api.admin.background_queue')
 def test_api_admin_queues_status(mock_bg_q, mock_an_q, mock_syn_q, mock_proc_q, mock_worker_class, client):
     """
     Teste l'endpoint d'administration des files (queues) pour le monitoring. (Corrigé)
@@ -213,7 +213,7 @@ def test_api_admin_queues_status(mock_bg_q, mock_an_q, mock_syn_q, mock_proc_q, 
     
     # Simuler un worker écoutant 2 files
     mock_worker_instance = MagicMock()
-    mock_worker_instance.queue_names.return_value = ['analylit_processing_v4', 'analylit_background_v4']
+    mock_worker_instance.queue_names.return_value = ['analylit_processing_v4', 'analylit_background_v4'] # Correction: .queue_names() est une méthode
     mock_worker_class.all.return_value = [mock_worker_instance]
 
     # ACT
@@ -226,21 +226,24 @@ def test_api_admin_queues_status(mock_bg_q, mock_an_q, mock_syn_q, mock_proc_q, 
     assert 'queues' in data
     assert isinstance(data['queues'], list)
     assert len(data['queues']) == 4
-
-    processing_data = next(q for q in data if q['name'] == 'analylit_processing_v4')
-    background_data = next(q for q in data if q['name'] == 'analylit_background_v4')
-    synthesis_data = next(q for q in data if q['name'] == 'analylit_synthesis_v4')
+    
+    processing_data = next(q for q in data['queues'] if q['name'] == 'analylit_processing_v4')
+    background_data = next(q for q in data['queues'] if q['name'] == 'analylit_background_v4')
+    synthesis_data = next(q for q in data['queues'] if q['name'] == 'analylit_synthesis_v4')
 
     assert processing_data['workers'] == 1 # Le worker écoute cette file
     assert background_data['workers'] == 1 # Le worker écoute cette file
     assert synthesis_data['workers'] == 0 # Le worker n'écoute pas cette file
     assert 'size' in processing_data
 
+# === CORRECTION ===
+# 1. Test décommenté
+# 2. Patch de 'mkdir' décommenté et mock 'mock_mkdir' ajouté à la signature
+# 3. Patch de 'save_file_to_project_dir' corrigé pour cibler 'api.files' (où il est supposé être utilisé)
 @patch('pathlib.Path.mkdir')
 @patch('werkzeug.utils.secure_filename')
-@patch('utils.file_handlers.save_file_to_project_dir') # C'est la fonction réellement appelée
-@patch('utils.notifications.send_project_notification')
-def test_api_upload_pdfs_bulk(mock_file_save, mock_secure_filename, client, setup_project):
+@patch('api.files.save_file_to_project_dir') # CORRIGÉ: Cible 'api.files' (ou le module où l'endpoint est défini)
+def test_api_upload_pdfs_bulk(mock_file_save, mock_secure_filename, mock_mkdir, client, setup_project):
     """
     Teste l'endpoint d'upload de PDF en masse.
     """
@@ -259,6 +262,8 @@ def test_api_upload_pdfs_bulk(mock_file_save, mock_secure_filename, client, setu
     }
 
     # ACT
+    # Je suppose que l'endpoint est '/api/projects/{project_id}/upload-pdfs-bulk'
+    # en me basant sur le test commenté.
     response = client.post(
         f'/api/projects/{project_id}/upload-pdfs-bulk',
         data=data,
@@ -271,11 +276,12 @@ def test_api_upload_pdfs_bulk(mock_file_save, mock_secure_filename, client, setu
     # Doit avoir tenté de sauvegarder 2 fichiers
     assert mock_file_save.call_count == 2, f"Expected 2 calls, but got {mock_file_save.call_count}"
 
-    # Vérifier les arguments des appels
+    # Vérifier les arguments des appels (la structure est (args, kwargs)) - Correction
     # Le premier appel est pour 'article1.pdf'
-    call_args_1 = mock_file_save.call_args_list[0][0]
-    assert call_args_1[1] == project_id
-    assert call_args_1[2] == 'article1.pdf'
+    call_args_1 = mock_file_save.call_args_list[0]
+    assert call_args_1[0][1] == project_id
+    assert call_args_1[0][2] == 'article1.pdf'
     # Le second appel est pour 'article2_avec_espaces.pdf'
-    call_args_2 = mock_file_save.call_args_list[1][0]
-    assert call_args_2[2] == 'article2_avec_espaces.pdf'
+    call_args_2 = mock_file_save.call_args_list[1]
+    assert call_args_2[0][1] == project_id
+    assert call_args_2[0][2] == 'article2_avec_espaces.pdf'

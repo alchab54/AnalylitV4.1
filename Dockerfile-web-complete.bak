@@ -1,7 +1,0 @@
-# Utilise l'image de base où tout est déjà installé
-FROM analylit-base:latest
-
-# COPIER LE CODE SOURCE DANS LE WORKDIR DÉJÀ EXISTANT
-COPY --chown=appuser:appuser . .
-
-EXPOSE 5001

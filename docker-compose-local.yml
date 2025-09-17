@@ -79,7 +79,7 @@ services:
     env_file: .env
     environment:
       - PYTHONPATH=/home/appuser/app
-    command: python -m rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4
+    command: rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4
     depends_on:
       db: { condition: service_healthy }
       redis: { condition: service_healthy }

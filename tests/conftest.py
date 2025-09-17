@@ -12,61 +12,37 @@ import utils.database as database_utils
 # Importe la Base depuis les modèles
 from utils.models import Base, SearchResult # Explicitly import SearchResult
 # Importe le serveur APRÈS que la DB soit initialisée
-# import server_v4_complete # Déplacé dans la fixture 'app' pour éviter le rechargement
+import server_v4_complete # Importé une seule fois
 
 # Configurer le logging pour les tests
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Crée une SessionFactory de test liée au MOTEUR MAINTENANT INITIALISÉ
-# Nous accédons à l'engine via le module pour garantir que nous avons la version post-init()
-# TestingSessionLocal est maintenant créé dans la fixture session pour s'assurer que l'engine est initialisé.
-
-import pytest
-import logging
-import importlib
-import time
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from sqlalchemy.orm import sessionmaker
-
-# Importe le module database et la fonction init
-import utils.database as database_utils
-
-# Importe la Base depuis les modèles
-from utils.models import Base, SearchResult # Explicitly import SearchResult
-# Importe le serveur APRÈS que la DB soit initialisée
-# import server_v4_complete # Déplacé dans la fixture 'app' pour éviter le rechargement
-
-# Configurer le logging pour les tests
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Crée une SessionFactory de test liée au MOTEUR MAINTENANT INITIALISÉ
-# Nous accédons à l'engine via le module pour garantir que nous avons la version post-init()
-# TestingSessionLocal est maintenant créé dans la fixture session pour s'assurer que l'engine est initialisé.
 
 @pytest.fixture(scope='session')
 def app():
     """Crée une instance de l'application Flask pour la session de test."""
-    # Importer et recharger le module ici garantit un état frais pour les tests
-    # sans causer de double enregistrement de blueprint.
-    import server_v4_complete
-    importlib.reload(server_v4_complete)
     
-    # IMPORTANT : Initialise la base de données APRES l'importation des modèles
+    # IMPORTANT : Initialise la base de données AVANT la création de l'app
     database_utils.init_db() 
 
-    app_instance = server_v4_complete.create_app()
-    app_instance.config.update({
+    # CORRECTION MAJEURE:
+    # 1. On n'utilise PAS importlib.reload()
+    # 2. On passe la configuration de test DIRECTEMENT dans la factory
+    app_instance = server_v4_complete.create_app({
         "TESTING": True,
     })
     
     # Créer toutes les tables (en utilisant l'engine via le module)
-    Base.metadata.create_all(bind=database_utils.engine)
+    # Nous utilisons app_context pour garantir que tout est lié correctement
+    with app_instance.app_context():
+        Base.metadata.create_all(bind=database_utils.engine)
+    
     yield app_instance
+    
     # Nettoyage après la session
-    Base.metadata.drop_all(bind=database_utils.engine)
+    with app_instance.app_context():
+        Base.metadata.drop_all(bind=database_utils.engine)
 
 @pytest.fixture()
 def client(app):
@@ -74,16 +50,12 @@ def client(app):
     return app.test_client()
 
 @pytest.fixture(scope='function')
-def session():
+def session(app):
     """
     Fixture de session DB par fonction :
-    1. Supprime TOUT le schéma (drop_all)
-    2. Recrée TOUT le schéma (create_all)
+    1. Crée une session propre.
+    (Le drop/create est maintenant géré par la fixture 'app' et 'clean_db')
     """
-    logger.info("--- SETUP TEST DB: DROPPING AND CREATING TABLES ---")
-    Base.metadata.drop_all(bind=database_utils.engine)
-    Base.metadata.create_all(bind=database_utils.engine)
-    
     # Crée une session locale de test liée à l'engine initialisé
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=database_utils.engine)
     db = TestingSessionLocal()
@@ -96,9 +68,20 @@ def session():
 
 @pytest.fixture(scope='function')
 def clean_db(session):
-    """Alias pour la fixture 'session'."""
+    """
+    Nettoie la base de données *entre chaque test* pour l'isolation.
+    C'est plus sûr que de tout recréer.
+    """
+    logger.info("--- SETUP TEST DB: CLEANING TABLES ---")
+    for table in reversed(Base.metadata.sorted_tables):
+        session.execute(table.delete())
+    session.commit()
+    
     yield session
     
+    # Le rollback dans la fixture 'session' gère le teardown
+    
+
 @pytest.fixture(scope="session")
 def remote_driver():
     """

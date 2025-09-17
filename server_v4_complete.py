@@ -3,6 +3,7 @@
 # ================================================================
 import json
 import logging
+import sys
 from flask import Flask, jsonify, request, Blueprint, send_from_directory, Response
 from flask_cors import CORS # type: ignore
 from rq import Queue
@@ -33,27 +34,24 @@ from api.projects import projects_bp
 from api.search import search_bp
 from api.admin import admin_bp
 from api.settings import settings_bp
-from api.files import files_bp
+from api.files import files_bp # Assurez-vous que ce fichier existe
 
 # ================================================================
 # 1) Création de l'application Flask (Factory Pattern)
 # ================================================================
 
-def create_app():
+def create_app(config_overrides=None): # <--- Accepte les overrides
     """Crée et configure l'instance de l'application Flask."""
     app = Flask(__name__, static_folder='web', static_url_path='/')
     app.config['JSON_AS_ASCII'] = False 
-    # (Dans create_app())
-    # REMPLACEZ :
-    # CORS(app, resources={r"/api/*": {"origins": "*"}})
     
-    # PAR :
+    if config_overrides: # <--- Applique les overrides (pour pytest)
+        app.config.update(config_overrides)
+    
     allowed_origins = [
         "http://localhost:8080",  # Pour votre frontend local
         "https://www.zotero.org", # Pour l'intégration de l'extension
         "chrome-extension://*",    # Autorise TOUTES les extensions chrome (pour le dev)
-        # Une fois l'ID de votre extension fixe, remplacez "*" par l'ID :
-        # "chrome-extension://ID-DE-VOTRE-EXTENSION-ICI" 
     ]
     CORS(app, resources={r"/api/*": {"origins": allowed_origins}}, supports_credentials=True)
     
@@ -72,11 +70,8 @@ def create_app():
     app.register_blueprint(settings_bp, url_prefix='/api')
     app.register_blueprint(files_bp, url_prefix='/api')
         
-    app.register_blueprint(api_bp)
-
-    # Initialise la base de données et les données par défaut au démarrage,
-    # sauf si l'application est en mode test (géré par les fixtures pytest).
-    logger.info(f"App is in TESTING mode: {app.config.get('TESTING')}") # Correction de l'indentation
+    
+    logger.info(f"App is in TESTING mode: {app.config.get('TESTING')}")
     if not app.config.get("TESTING"):
         # Configurer la journalisation au démarrage de l'application
         setup_logging()
@@ -88,9 +83,6 @@ def create_app():
             logger.info("Database initialization and seeding complete.")
 
     return app
-
-# Crée une instance de l'application pour que Gunicorn puisse l'importer.
-app = create_app()
 
 # ================================================================
 # 2) Événements WebSocket
@@ -116,6 +108,7 @@ def handle_join_room(data):
 # ================================================================
 # 3) Logique de démarrage et tâches de fond
 # ================================================================
+
 def _init_db_command():
     """
     Fonction interne pour initialiser la base de données.
@@ -152,13 +145,12 @@ def listen_for_notifications():
             except Exception as e:
                 logger.error(f"Erreur lors du relais de la notification: {e}")
 
-# --- Bloc d'exécution principal ---
-# Ce bloc ne s'exécute que lorsque le script est lancé directement (ex: python server_v4_complete.py)
-# Il n'est PAS exécuté lors d'une importation (par pytest ou gunicorn).
-if __name__ == '__main__':
-    # Démarrer l'écouteur dans un thread séparé pour ne pas bloquer le serveur
-    socketio.start_background_task(target=listen_for_notifications)
-    # The internal port should be 5000 to match the docker-compose/nginx setup.
-    # use_reloader=False is recommended when running with external tools like Docker.
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True, use_reloader=False, allow_unsafe_werkzeug=True)
+    
+    # Créer l'application au niveau global pour que Gunicorn puisse la trouver
+    app = create_app()
 
+    # --- Bloc d'exécution principal ---
+if __name__ == '__main__':
+    # NE PAS recréer l'app ici, juste la lancer
+    socketio.start_background_task(target=listen_for_notifications)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True, use_reloader=False, allow_unsafe_werkzeug=True)

@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional
 import PyPDF2
 import pdfplumber
+from utils.app_globals import PROJECTS_DIR
 
 try:
     import pytesseract
@@ -110,3 +111,13 @@ def is_valid_pdf(file_path: str) -> bool:
         return True
     except Exception:
         return False
+
+def save_file_to_project_dir(file_storage, project_id, filename, projects_dir):
+    """Sauvegarde un FileStorage dans le dossier du projet."""
+    project_dir = projects_dir / project_id
+    project_dir.mkdir(parents=True, exist_ok=True)
+    save_path = project_dir / filename
+    file_storage.save(str(save_path))
+    logger.info(f"Fichier sauvegardé : {save_path}")
+
+# --- CORRECTION: Suppression de la fonction dupliquée ---

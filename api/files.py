@@ -1,51 +1,32 @@
 # api/files.py
 
-import os
-import uuid
 import logging
-from pathlib import Path
-
-from flask import Blueprint, jsonify, request, send_from_directory
+from flask import Blueprint, jsonify, request
 from werkzeug.utils import secure_filename
 
-from utils.app_globals import config, q
-from utils.file_handlers import sanitize_filename
-from utils.notifications import send_project_notification
+from utils.file_handlers import save_file_to_project_dir
 
+from utils.app_globals import PROJECTS_DIR, with_db_session
+
+files_bp = Blueprint('files_bp', __name__)
 logger = logging.getLogger(__name__)
-files_bp = Blueprint('files_api', __name__)
 
-@files_bp.route('/projects/<project_id>/upload-zotero', methods=['POST'])
-def handle_zotero_file_upload(project_id):
-    try:
-        uuid.UUID(project_id, version=4)
-    except ValueError:
-        return jsonify({"error": "ID de projet invalide"}), 400
 
-    file = request.files.get('file')
-    if not file:
-        return jsonify({"error": "Aucun fichier fourni"}), 400
 
-    project_path = config.PROJECTS_DIR / project_id
-    project_path.mkdir(exist_ok=True)
+@files_bp.route('/projects/<project_id>/upload-pdfs-bulk', methods=['POST'])
+@with_db_session
+def upload_pdfs_bulk(session, project_id):
+    if 'files' not in request.files:
+        return jsonify({"error": "Aucun fichier (part 'files') fourni"}), 400
 
-    filename = secure_filename(file.filename)
-    file_path = project_path / filename
-    file.save(str(file_path))
+    files = request.files.getlist('files')
+    if not files or files[0].filename == '':
+        return jsonify({"error": "Aucun fichier sélectionné"}), 400
 
-    task = q.enqueue('tasks_v4_complete.import_from_zotero_file_task', project_id=str(project_id), json_file_path=str(file_path))
-    return jsonify({'message': f'Fichier {filename} téléversé, import en cours.', 'job_id': task.id}), 202
+    saved_files = []
+    for file in files:
+        filename = secure_filename(file.filename)
+        save_file_to_project_dir(file, project_id, filename, PROJECTS_DIR)
+        saved_files.append(filename)
 
-@files_bp.route('/projects/<project_id>/files/<filename>')
-def serve_project_file(project_id, filename):
-    """Sert un fichier statique depuis le dossier d'un projet spécifique."""
-    try:
-        uuid.UUID(project_id, version=4)
-    except ValueError:
-        return jsonify({"error": "ID de projet invalide"}), 400
-
-    project_path = config.PROJECTS_DIR / project_id
-    try:
-        return send_from_directory(str(project_path), filename)
-    except FileNotFoundError:
-        return jsonify({"error": "Fichier non trouvé"}), 404
+    return jsonify({"message": f"{len(saved_files)} fichiers uploadés avec succès.", "files": saved_files}), 200
