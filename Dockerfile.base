@@ -29,9 +29,38 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
-
-# Copy all application source code into the builder stage
 COPY . /app
+
+# =================================================
+# Étape 2: Final Stage - Image d'exécution légère
+# =================================================
+FROM python:3.11-slim-bookworm
+
+# Installer curl pour les healthchecks
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
+# Créer un utilisateur non-root pour la sécurité
+RUN useradd --create-home appuser
+WORKDIR /home/appuser/app
+
+# Copier l'environnement virtuel et les node_modules depuis le builder
+# Ces couches seront mises en cache tant que les dépendances ne changent pas.
+COPY --from=builder /opt/venv /opt/venv
+COPY --from=builder --chown=appuser:appuser /app/node_modules ./node_modules
+ 
+# === CORRECTION ICI ===
+# Créez les répertoires de données en tant que ROOT (pendant que nous le pouvons encore)
+RUN mkdir -p /home/appuser/app/projects /home/appuser/app/model_cache
+
+# Corrigez la propriété de TOUT, y compris le code source et les nouveaux dossiers
+COPY --from=builder --chown=appuser:appuser /app /home/appuser/app
+RUN chown -R appuser:appuser /home/appuser/app
+ 
+USER appuser
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Exposer le port sur lequel l'application s'exécute à l'intérieur du conteneur
+EXPOSE 5001
 
 # =================================================
 # Étape 2: Final Stage - Image d'exécution légère
