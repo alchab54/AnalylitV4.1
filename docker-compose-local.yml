@@ -1,3 +1,5 @@
+version: '3.9'
+
 services:
   # --- Base de données ---
   db:
@@ -10,7 +12,6 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-strong_password}
       - POSTGRES_DB=${POSTGRES_DB:-analylit_db}
     healthcheck:
-      # CORRECTION : Utiliser $$ pour l'évaluation de la variable par le shell du conteneur
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
       timeout: 5s
@@ -55,18 +56,16 @@ services:
 
   # --- Serveur Web Applicatif ---
   web:
-    image: analylit-web:latest 
+    image: analylit-web:latest
     build:
       context: .
       dockerfile: Dockerfile-web-complete
     container_name: analylit-web-v4
     volumes:
-      # CORRECTION: Les chemins doivent correspondre à l'arborescence de l'application (comme dans docker-compose-local.yml)
-      - projects_data:/home/appuser/app/projects
-      - model_cache_data:/home/appuser/app/model_cache
+      # CORRECTION : Harmonisation des noms de volumes et des chemins d'accès internes
+      - projects_data_v4:/home/appuser/app/projects
+      - model_cache_v4:/home/appuser/app/model_cache
     env_file: .env
-    # CORRECTION: Commande simplifiée. Gunicorn uniquement.
-    # L'initialisation de la DB est gérée par la logique de create_app()
     command: >
       sh -c "echo 'Lancement du serveur Gunicorn...' &&
       gunicorn server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 3 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"
@@ -91,9 +90,9 @@ services:
       dockerfile: Dockerfile-worker-complete
     container_name: analylit-worker-v4
     volumes:
-      # CORRECTION: Les chemins doivent correspondre à ceux du service web
-      - projects_data:/home/appuser/app/projects
-      - model_cache_data:/home/appuser/app/model_cache
+      # CORRECTION : Harmonisation des noms de volumes et des chemins d'accès internes
+      - projects_data_v4:/home/appuser/app/projects
+      - model_cache_v4:/home/appuser/app/model_cache
     env_file: .env
     command: >
       python -m rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4
@@ -126,8 +125,8 @@ services:
 volumes:
   postgres_data_v4:
   ollama_data_v4:
-  projects_data: 
-  model_cache_data: 
+  projects_data_v4: # CORRECTION : Nom harmonisé
+  model_cache_v4:   # CORRECTION : Nom harmonisé
 
 networks:
   analylit-network:
