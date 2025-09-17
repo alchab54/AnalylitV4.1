@@ -1,12 +1,7 @@
 version: '3.9'
 
 services:
-  base:
-    build:
-      context: .
-      dockerfile: Dockerfile.base
-    image: analylit-base:latest
-
+  # --- Base de données ---
   db:
     image: postgres:15-alpine
     container_name: analylit-db-v4
@@ -17,8 +12,6 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-strong_password}
       - POSTGRES_DB=${POSTGRES_DB:-analylit_db}
     healthcheck:
-      # --- CORRECTION ICI ---
-      # Utiliser $$ pour que Docker Compose interprète les variables
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
       timeout: 5s
@@ -27,6 +20,7 @@ services:
       - analylit-network
     restart: unless-stopped
 
+  # --- Cache et File d'attente ---
   redis:
     image: redis:7-alpine
     container_name: analylit-redis-v4
@@ -41,23 +35,43 @@ services:
       - analylit-network
     restart: unless-stopped
 
+  # --- Moteur IA ---
+  ollama:
+    image: ollama/ollama:latest
+    container_name: analylit-ollama-v4
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - ollama_data_v4:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  # --- Serveur Web Applicatif ---
   web:
+    image: analylit-web:latest # Nomme l'image construite
     build:
       context: .
       dockerfile: Dockerfile-web-complete
     container_name: analylit-web-v4
     volumes:
-      - projects_data_v4:/home/appuser/app/projects
-      - model_cache_v4:/home/appuser/app/model_cache
+      # CORRECTION: Les chemins doivent pointer vers /home/appuser/app/ où l'application s'exécute
+      - projects_data:/home/appuser/app/projects
+      - model_cache_data:/home/appuser/app/model_cache
     env_file: .env
-    environment:
-      - PYTHONPATH=/home/appuser/app
-    command: |
-      sh -c "echo 'Lancement du serveur Gunicorn...' && gunicorn --chdir /home/appuser/app server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 3 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"
+    command: >
+      sh -c "echo 'Lancement du serveur Gunicorn...' &&
+      gunicorn server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 3 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"
     depends_on:
       db: { condition: service_healthy }
-      redis:
-        condition: service_healthy
+      redis: { condition: service_healthy }
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
       interval: 20s
@@ -68,50 +82,33 @@ services:
       - analylit-network
     restart: unless-stopped
 
+  # --- Worker pour les tâches asynchrones ---
   worker:
+    image: analylit-worker:latest # Nomme l'image construite
     build:
       context: .
       dockerfile: Dockerfile-worker-complete
     container_name: analylit-worker-v4
     volumes:
-      - projects_data_v4:/home/appuser/app/projects
-      - model_cache_v4:/home/appuser/app/model_cache
+      # CORRECTION: Doit correspondre aux chemins du service web
+      - projects_data:/home/appuser/app/projects
+      - model_cache_data:/home/appuser/app/model_cache
     env_file: .env
-    environment:
-      - PYTHONPATH=/home/appuser/app
-    command: rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4
+    command: >
+      python -m rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4
     depends_on:
       db: { condition: service_healthy }
       redis: { condition: service_healthy }
     deploy:
+      replicas: 1
       resources:
         reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: ["gpu"]
+          devices: [{ driver: nvidia, count: all, capabilities: [gpu] }]
     networks:
       - analylit-network
     restart: unless-stopped
 
-  ollama:
-    image: ollama/ollama:latest
-    container_name: analylit-ollama-v4
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: ["gpu"]
-    volumes:
-      - ollama_data_v4:/root/.ollama
-    ports:
-      - "11434:11434"
-    networks:
-      - analylit-network
-    restart: unless-stopped
-
+  # --- Serveur Web Frontend (Nginx) ---
   nginx:
     build:
       context: .
@@ -120,8 +117,7 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      web:
-        condition: service_healthy 
+      web: { condition: service_healthy }
     networks:
       - analylit-network
     restart: unless-stopped
@@ -129,8 +125,8 @@ services:
 volumes:
   postgres_data_v4:
   ollama_data_v4:
-  projects_data_v4: 
-  model_cache_v4:
+  projects_data: # Volume pour les données des projets
+  model_cache_data: # Volume pour le cache des modèles ML
 
 networks:
   analylit-network:

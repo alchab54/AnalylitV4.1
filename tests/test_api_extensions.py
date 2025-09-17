@@ -27,6 +27,7 @@ def setup_project(client, clean_db):
 
 # ================================================================
 # CATEGORIE 1: GESTION DES ENTITÉS (GRILLES, PROMPTS)
+# ... (les tests précédents restent inchangés) ...
 # ================================================================
 
 def test_api_grid_management_workflow(client, setup_project):
@@ -87,6 +88,7 @@ def test_api_prompts_get_and_update(client, session):
 
 # ================================================================
 # CATEGORIE 2: WORKFLOW DE VALIDATION (DOUBLE AVEUGLE)
+# ... (test_api_full_validation_workflow reste inchangé) ...
 # ================================================================
 
 def test_api_full_validation_workflow(client, session, setup_project):
@@ -148,6 +150,7 @@ def test_api_full_validation_workflow(client, session, setup_project):
 
 # ================================================================
 # CATEGORIE 3: RAPPORTS & EXPORTS
+# ... (test_api_prisma_checklist_workflow reste inchangé) ...
 # ================================================================
 
 def test_api_prisma_checklist_workflow(client, session, setup_project):
@@ -239,10 +242,10 @@ def test_api_admin_queues_status(mock_bg_q, mock_an_q, mock_syn_q, mock_proc_q, 
 # === CORRECTION ===
 # 1. Test décommenté
 # 2. Patch de 'mkdir' décommenté et mock 'mock_mkdir' ajouté à la signature
-# 3. Patch de 'save_file_to_project_dir' corrigé pour cibler 'api.files'
+# 3. Patch de 'save_file_to_project_dir' corrigé pour cibler 'api.files' (où il est supposé être utilisé)
 @patch('pathlib.Path.mkdir')
 @patch('werkzeug.utils.secure_filename')
-@patch('api.files.save_file_to_project_dir') # CORRIGÉ: Cible 'api.files' (où l'endpoint est défini)
+@patch('api.files.save_file_to_project_dir') # CORRIGÉ: Cible 'api.files' (ou le module où l'endpoint est défini)
 def test_api_upload_pdfs_bulk(mock_file_save, mock_secure_filename, mock_mkdir, client, setup_project):
     """
     Teste l'endpoint d'upload de PDF en masse.
@@ -250,15 +253,20 @@ def test_api_upload_pdfs_bulk(mock_file_save, mock_secure_filename, mock_mkdir, 
     project_id = setup_project
 
     # ARRANGE
+    # Simuler deux fichiers PDF envoyés dans la même requête
+    # Mock secure_filename pour retourner le nom de fichier original pour la prévisibilité
     mock_secure_filename.side_effect = lambda x: x
+
     mock_pdf_1 = (io.BytesIO(b'mock pdf 1'), 'article1.pdf')
     mock_pdf_2 = (io.BytesIO(b'mock pdf 2'), 'article2_avec_espaces.pdf')
+
     data = {
         'files': [mock_pdf_1, mock_pdf_2]
     }
 
     # ACT
-    # L'endpoint est supposé être '/api/projects/{project_id}/upload-pdfs-bulk'
+    # Je suppose que l'endpoint est '/api/projects/{project_id}/upload-pdfs-bulk'
+    # en me basant sur le test commenté.
     response = client.post(
         f'/api/projects/{project_id}/upload-pdfs-bulk',
         data=data,
@@ -268,12 +276,15 @@ def test_api_upload_pdfs_bulk(mock_file_save, mock_secure_filename, mock_mkdir, 
     # ASSERT
     assert response.status_code == 200
     
+    # Doit avoir tenté de sauvegarder 2 fichiers
     assert mock_file_save.call_count == 2, f"Expected 2 calls, but got {mock_file_save.call_count}"
 
-    # Vérifier les arguments des appels
+    # Vérifier les arguments des appels (la structure est (args, kwargs)) - Correction
+    # Le premier appel est pour 'article1.pdf'
     call_args_1 = mock_file_save.call_args_list[0]
     assert call_args_1[0][1] == project_id
     assert call_args_1[0][2] == 'article1.pdf'
+    # Le second appel est pour 'article2_avec_espaces.pdf'
     call_args_2 = mock_file_save.call_args_list[1]
     assert call_args_2[0][1] == project_id
     assert call_args_2[0][2] == 'article2_avec_espaces.pdf'
