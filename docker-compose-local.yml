@@ -51,12 +51,9 @@ services:
     environment:
       - PYTHONPATH=/home/appuser/app
     command: |
-      sh -c "echo 'Lancement du serveur Gunicorn...' && gunicorn server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 3 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"
+      sh -c "echo 'Lancement du serveur Gunicorn...' && gunicorn --chdir /home/appuser/app server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 3 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"
     depends_on:
-      base:
-        condition: service_completed_successfully
-      db:
-        condition: service_healthy
+      db: { condition: service_healthy }
       redis:
         condition: service_healthy
     healthcheck:
@@ -84,10 +81,7 @@ services:
       - PYTHONPATH=/home/appuser/app
     command: python -m rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4
     depends_on:
-      base:
-        condition: service_completed_successfully
-      db:
-        condition: service_healthy
+      db: { condition: service_healthy }
       redis: { condition: service_healthy }
     deploy:
       resources:

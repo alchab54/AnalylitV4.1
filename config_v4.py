@@ -40,9 +40,13 @@ class Settings(BaseSettings):
     DATABASE_URL: str = 'postgresql+psycopg2://analylit_user:strong_password@db:5432/analylit_db'
     
     # --- Chemins de fichiers ---
-    PROJECTS_DIR: Path = Path("/app/projects")
-    # NOUVEAU: Configuration des logs
-    LOG_DIR: Path = Path("/app/logs")
+    
+    # 1. Définir le chemin de base de l'application D'ABORD
+    APP_BASE_DIR: Path = Path(__file__).parent 
+    
+    # 2. Définir tous les autres chemins EN UTILISANT cette variable
+    PROJECTS_DIR: Path = APP_BASE_DIR / "projects"
+    LOG_DIR: Path = APP_BASE_DIR / "logs"
     LOG_FILE: str = "analylit.log"
     
     # --- Paramètres de performance et de robustesse ---

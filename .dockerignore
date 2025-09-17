@@ -1,52 +1,130 @@
-# Ignorer Git
+# .dockerignore OPTIMISÉ pour des builds ultra-rapides
+
+# === FILES SYSTÈME ===
 .git
 .gitignore
+**/.DS_Store
+**/Thumbs.db
+**/.idea
+**/.vscode
 
-# Ignorer les environnements Python locaux
+# === ENVIRONNEMENTS PYTHON LOCAUX ===
+# Ces environnements ne doivent JAMAIS être copiés dans l'image
 venv/
 .venv/
 env/
-
-# Artefacts Python
+.env/
 **/__pycache__
-*.pyc
-*.pyo
-*.egg-info
+**/*.pyc
+**/*.pyo
+**/*.egg-info
+**/.pytest_cache
 
-# Dépendances Node.js (installées dans le conteneur)
+# === DÉPENDANCES NODE.JS ===
+# Ignore node_modules local - sera installé dans le conteneur
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Fichiers de projet et de cache (générés par l'application)
+# === DONNÉES ET CACHE DE L'APPLICATION ===
+# Ces dossiers sont générés par l'application et montés via volumes
 projects/
 model_cache/
-
-# Fichiers de documentation et logs
-*.md
-*.log
 logs/
-*.docx
-*.png
+reports/
+exports/
+**/*.log
 
-# --- IMPORTANT ---
-# Ignorer le code source pour que l'image BASE ne casse pas son cache
-# (Ces fichiers seront copiés dans l'image de base à la place)
-utils/
-api/
+# === FICHIERS DE DÉVELOPPEMENT ET DOCUMENTATION ===
+*.md
+README*
+CHANGELOG*
+LICENSE*
+**/*.docx
+**/*.pdf
+**/*.png
+**/*.jpg
+**/*.jpeg
+htmlcov/
+.coverage
+.pytest_cache/
+
+# === FICHIERS DE BUILD ET CI/CD ===
+.github/
+**/.circleci
+**/.travis.yml
+**/Jenkinsfile
+**/docker-compose*.yml
+**/Dockerfile*
+**/.dockerignore
+Makefile*
+**/*.sh
+
+# === FICHIERS DE CONFIGURATION SENSIBLES ===
+# Le .env contient des secrets et ne doit PAS être dans l'image
+.env
+.env.*
+!.env.example
+**/*.key
+**/*.pem
+**/*.crt
+secrets/
+
+# === FICHIERS DE TEST ===
+# Les fichiers de test ne sont pas nécessaires en production
+test/
 tests/
+**/test_*.py
+**/*_test.py
+**/conftest.py
+**/locustfile.py
 
-tasks_v4_complete.py
-config_v4.py
-# Ignorer les fichiers JSON de données, mais PAS package.json ou grille-ATN.json
+# === ARTEFACTS DE BUILD ===
+dist/
+build/
+*.egg-info/
+.tox/
+.nox/
+
+# === FICHIERS TEMPORAIRES ===
+tmp/
+temp/
+*.tmp
+*.temp
+*.swp
+*~
+.DS_Store
+
+# === SAUVEGARDES ET EXPORTS ===
+backup/
+backups/
+*.backup
+*.sql
+*.dump
+
+# === FICHIERS SPÉCIFIQUES AU PROJET ===
+# Ignorer les artefacts spécifiques à votre projet qui ne sont pas nécessaires
 grille-ATN.json
 profiles.json
 *.ini
-*.sh
+analyse*.json
+results*.json
 
-# Artefacts de test
-htmlcov/
-.pytest_cache/
+# === OPTIMISATION IMPORTANTE ===
+# Garder uniquement les fichiers essentiels :
+# - Code source Python (.py)
+# - Templates et configurations (.html, .css, .js, .json configs)
+# - Fichiers de dépendances (requirements.txt, package.json)
+# - Fichiers de configuration essentiels
 
-# Fichiers de l'OS
-.DS_Store
-Thumbs.db
-.idea
+# EXCEPTION : Garder les fichiers nécessaires au runtime
+!requirements.txt
+!package*.json
+!profiles.json
+!web/
+!utils/
+!api/
+!server_v4_complete.py
+!tasks_v4_complete.py
+!config_v4.py

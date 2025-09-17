@@ -83,8 +83,8 @@ def create_app():
 
         with app.app_context():
             logger.info("Initializing database and seeding default data...")
-            init_db()
-            seed_default_data(engine)
+            # init_db()
+            # seed_default_data(engine)
             logger.info("Database initialization and seeding complete.")
 
     return app
@@ -162,76 +162,3 @@ if __name__ == '__main__':
     # use_reloader=False is recommended when running with external tools like Docker.
     socketio.run(app, host='0.0.0.0', port=5000, debug=True, use_reloader=False, allow_unsafe_werkzeug=True)
 
-@api_bp.route('/projects/<project_id>/import-zotero-extension', methods=['POST'])
-@with_db_session
-def handle_zotero_extension_import(db_session, project_id):
-    """
-    Accepte les données JSON (format Zotero) envoyées par l'extension Chrome/Edge.
-    Lance la tâche d'importation en arrière-plan (la VRAIE implémentation).
-    """
-    project = db_session.get(Project, project_id)
-    if not project:
-        return jsonify({"error": "Projet non trouvé"}), 404
-
-    data = request.get_json()
-    items_to_import = data.get('items', [])
-
-    if not items_to_import:
-        return jsonify({"error": "Aucun élément à importer"}), 400
-
-    # Appel de la nouvelle tâche (Phase 2, Étape 1)
-    job = background_queue.enqueue(
-        import_from_zotero_json_task,  # <-- APPEL DE LA NOUVELLE TÂCHE
-        project_id=project_id,
-        items_list=items_to_import,
-        job_timeout='30m'
-    )
-
-    send_project_notification(project_id, 'import_started', 
-                              f"Import Zotero (Extension) lancé pour {len(items_to_import)} articles.", 
-                              {'job_id': job.id})
-                              
-    return jsonify({"message": f"Import lancé pour {len(items_to_import)} articles", "job_id": job.id}), 202
-
-
-@api_bp.route('/projects/<project_id>/export-validated-zotero', methods=['GET'])
-@with_db_session
-def export_validated_for_zotero(db_session, project_id):
-    """
-    Exporte les articles validés (inclus) dans un format JSON compatible avec l'import Zotero.
-    """
-    try:
-        # Récupère les articles validés (en joignant SearchResults et Extractions)
-        query = text("""
-            SELECT sr.* FROM search_results sr
-            JOIN extractions e ON sr.article_id = e.pmid AND sr.project_id = e.project_id
-            WHERE e.project_id = :pid AND e.user_validation_status = 'include'
-        """)
-        articles = db_session.execute(query, {"pid": project_id}).mappings().all()
-
-        zotero_items = []
-        for art in articles:
-            # Conversion de votre format SearchResult au format Zotero JSON (simplifié)
-            authors_list = []
-            if art.get("authors"):
-                 authors_list = [{"creatorType": "author", "name": author.strip()} for author in art.get("authors", "").split(',') if author.strip()]
-
-            zotero_item = {
-                "itemType": "journalArticle",
-                "title": art.get("title"),
-                "creators": authors_list,
-                "abstractNote": art.get("abstract"),
-                "publicationTitle": art.get("journal"),
-                "date": art.get("publication_date"),
-                "DOI": art.get("doi"),
-                "PMID": art.get("article_id") if "pmid" in str(art.get("article_id", "")).lower() else None,
-                "url": art.get("url"),
-                "tags": [{"tag": "AnalyLit_Export"}, {"tag": "Validated_Include"}]
-            }
-            zotero_items.append(zotero_item)
-
-        return jsonify(zotero_items)
-
-    except Exception as e:
-        logger.exception(f"Erreur lors de l'export Zotero pour le projet {project_id}: {e}")
-        return jsonify({"error": "Erreur interne du serveur"}), 500

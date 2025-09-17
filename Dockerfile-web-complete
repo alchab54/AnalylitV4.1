@@ -1,4 +1,13 @@
-# Utilise l'image de base où tout est déjà installé
+# Dockerfile-web-complete OPTIMISÉ
+# Utilise l'image de base où tout est déjà installé (dépendances + code source)
 FROM analylit-base:latest
+
+# PLUS BESOIN de copier le code source - il est déjà dans l'image de base !
+# L'ancienne ligne "COPY --chown=appuser:appuser . ." était redondante
+
+# Le code source et les dépendances sont déjà présents via analylit-base:latest
+# WORKDIR est déjà défini à /home/appuser/app
+# USER est déjà défini à appuser
+# PATH est déjà configuré pour l'environnement virtuel
 
 EXPOSE 5001

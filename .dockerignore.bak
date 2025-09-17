@@ -1,0 +1,52 @@
+# Ignorer Git
+.git
+.gitignore
+
+# Ignorer les environnements Python locaux
+venv/
+.venv/
+env/
+
+# Artefacts Python
+**/__pycache__
+*.pyc
+*.pyo
+*.egg-info
+
+# Dépendances Node.js (installées dans le conteneur)
+node_modules/
+
+# Fichiers de projet et de cache (générés par l'application)
+projects/
+model_cache/
+
+# Fichiers de documentation et logs
+*.md
+*.log
+logs/
+*.docx
+*.png
+
+# --- IMPORTANT ---
+# Ignorer le code source pour que l'image BASE ne casse pas son cache
+# (Ces fichiers seront copiés dans l'étage final de l'image de base)
+# utils/
+# api/
+# tests/
+# 
+# tasks_v4_complete.py
+# config_v4.py
+# Ignorer les fichiers JSON de données, mais PAS package.json ou grille-ATN.json
+grille-ATN.json
+profiles.json
+*.ini
+*.sh
+
+# Artefacts de test
+htmlcov/
+.pytest_cache/
+
+# Fichiers de l'OS
+.DS_Store
+Thumbs.db
+.idea
