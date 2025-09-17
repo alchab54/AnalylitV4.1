@@ -12,7 +12,7 @@ import utils.database as database_utils
 # Importe la Base depuis les modèles
 from utils.models import Base, SearchResult # Explicitly import SearchResult
 # Importe le serveur APRÈS que la DB soit initialisée
-import server_v4_complete # Importé une seule fois
+import server_v4_complete 
 
 # Configurer le logging pour les tests
 logging.basicConfig(level=logging.INFO)
@@ -34,7 +34,6 @@ def app():
     })
     
     # Créer toutes les tables (en utilisant l'engine via le module)
-    # Nous utilisons app_context pour garantir que tout est lié correctement
     with app_instance.app_context():
         Base.metadata.create_all(bind=database_utils.engine)
     
@@ -52,11 +51,8 @@ def client(app):
 @pytest.fixture(scope='function')
 def session(app):
     """
-    Fixture de session DB par fonction :
-    1. Crée une session propre.
-    (Le drop/create est maintenant géré par la fixture 'app' et 'clean_db')
+    Fixture de session DB par fonction.
     """
-    # Crée une session locale de test liée à l'engine initialisé
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=database_utils.engine)
     db = TestingSessionLocal()
     try:
@@ -70,7 +66,6 @@ def session(app):
 def clean_db(session):
     """
     Nettoie la base de données *entre chaque test* pour l'isolation.
-    C'est plus sûr que de tout recréer.
     """
     logger.info("--- SETUP TEST DB: CLEANING TABLES ---")
     for table in reversed(Base.metadata.sorted_tables):
@@ -79,25 +74,16 @@ def clean_db(session):
     
     yield session
     
-    # Le rollback dans la fixture 'session' gère le teardown
-    
-
 @pytest.fixture(scope="session")
 def remote_driver():
     """
     Fixture de session pour initialiser un remote driver Selenium.
-    Cette fixture s'exécute une seule fois par session de test E2E.
     """
     print("\n--- [E2E Setup] Initialisation du Remote Driver Selenium ---")
     
-    # Attend que le conteneur Selenium soit prêt
-    # (En production, on utiliserait une attente plus robuste)
     time.sleep(15) 
     
     chrome_options = Options()
-    # CORRECTION: Pour éviter un "capability mismatch", nous devons explicitement
-    # définir le nom du navigateur. Le conteneur selenium/standalone-chrome
-    # s'attend à recevoir une demande pour "chrome".
     chrome_options.set_capability("browserName", "chrome")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
@@ -105,9 +91,7 @@ def remote_driver():
     driver = None
     try:
         driver = webdriver.Remote(
-            # Le hub Selenium est accessible via son nom de service Docker
             command_executor='http://selenium:4444/wd/hub',
-            # CORRECTION: Le paramètre 'options' est maintenant obligatoire.
             options=chrome_options 
         )
         driver.set_window_size(1920, 1080)

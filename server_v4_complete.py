@@ -14,7 +14,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import text
 
 from utils.database import init_db, seed_default_data
-from utils.logging_config import setup_logging # <-- AJOUT : Import de la fonction centralisée
+from utils.logging_config import setup_logging 
 
 # --- Import des variables globales partagées ---
 from utils.app_globals import (
@@ -86,6 +86,7 @@ def create_app(config_overrides=None): # <--- Accepte les overrides
 
 # ================================================================
 # 2) Événements WebSocket
+# ... (Les fonctions WebSocket restent inchangées) ...
 # ================================================================
 
 @socketio.on('connect')
@@ -107,6 +108,7 @@ def handle_join_room(data):
 
 # ================================================================
 # 3) Logique de démarrage et tâches de fond
+# ... (Les fonctions _init_db_command et listen_for_notifications restent inchangées) ...
 # ================================================================
 
 def _init_db_command():
