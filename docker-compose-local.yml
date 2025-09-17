@@ -10,7 +10,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-strong_password}
       - POSTGRES_DB=${POSTGRES_DB:-analylit_db}
     healthcheck:
-      # $$ est correct pour échapper la variable pour le shell du conteneur
+      # CORRECTION : Utiliser $$ pour l'évaluation de la variable par le shell du conteneur
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
       timeout: 5s
