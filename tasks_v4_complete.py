@@ -46,6 +46,8 @@ from config_v4 import get_config
 from utils.models import (
     Project, SearchResult, Extraction, Grid, ChatMessage, AnalysisProfile, RiskOfBias
 )
+from sqlalchemy.orm import Session # Explicitly import Session for type hinting if needed, though Session is already defined below
+
 
 # --- Importer les helpers/utilitaires applicatifs ---
 from utils.fetchers import db_manager, fetch_unpaywall_pdf_url, fetch_article_details
@@ -1090,3 +1092,70 @@ def add_manual_articles_task(session, project_id: str, identifiers: list):
     session.execute(text("UPDATE projects SET pmids_count = (SELECT COUNT(*) FROM search_results WHERE project_id = :pid), updated_at = :ts WHERE id = :pid"), {"pid": project_id, "ts": datetime.now().isoformat()})
     send_project_notification(project_id, 'import_completed', f'Ajout manuel terminé: {len(records_to_insert)} article(s) ajouté(s).')
     logger.info(f"âœ… Ajout manuel terminé pour le projet {project_id}. {len(records_to_insert)} articles ajoutés.")
+
+def import_from_zotero_json_task(project_id: str, items_list: list):
+    """
+    Tâche asynchrone pour importer une LISTE d'objets JSON Zotero (envoyée par l'extension)
+    et les convertir en SearchResult dans la base de données.
+    """
+    logger.info(f"Importation JSON Zotero (Extension) démarrée pour {project_id} : {len(items_list)} articles.")
+    session = Session()
+    imported_count = 0
+    failed_count = 0
+    
+    try:
+        for item in items_list:
+            try:
+                # Extraire les données de l'objet Zotero. (Ceci doit correspondre au format Zotero)
+                # Nous supposons ici le format "item" standard.
+                data = item.get('data', {})
+                
+                # Trouver un identifiant unique (priorité au DOI, puis PMID, puis fallback)
+                article_id = data.get('DOI', data.get('PMID', data.get('key')))
+
+                # Extraction robuste des auteurs
+                authors = []
+                if data.get('creators'):
+                    authors = [
+                        f"{c.get('firstName', '')} {c.get('lastName', '')}".strip() 
+                        for c in data['creators'] 
+                        if c.get('creatorType') == 'author'
+                    ]
+                
+                # Vérifier si cet article existe déjà dans le projet
+                exists = session.query(SearchResult).filter_by(project_id=project_id, article_id=article_id).first()
+                if exists:
+                    logger.warning(f"Article {article_id} déjà présent dans le projet. Ignoré.")
+                    continue
+
+                new_article = SearchResult(
+                    id=str(uuid.uuid4()),
+                    project_id=project_id,
+                    article_id=article_id,
+                    title=data.get('title', 'Titre inconnu'),
+                    abstract=data.get('abstractNote', ''),
+                    authors=", ".join(authors),
+                    publication_date=data.get('date', ''),
+                    journal=data.get('publicationTitle', ''),
+                    doi=data.get('DOI'),
+                    url=data.get('url'),
+                    database_source='Zotero (Extension)',
+                    raw_data=json.dumps(item) # Stocker l'enregistrement Zotero original
+                )
+                session.add(new_article)
+                imported_count += 1
+                
+            except Exception as e_item:
+                logger.error(f"Échec de l'importation de l'article Zotero {data.get('key', 'inconnu')}: {e_item}")
+                failed_count += 1
+
+        session.commit()        
+    except Exception as e_task:
+        logger.exception(f"Échec majeur de la tâche d'importation Zotero JSON : {e_task}")
+        session.rollback()
+    finally:
+        session.close()
+
+    msg = f"Importation Zotero (Extension) terminée : {imported_count} articles ajoutés, {failed_count} échecs."
+    send_project_notification(project_id, 'import_completed', msg)
+    logger.info(msg)

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenue dans AnalyLit Connector</title>
+    <link rel="stylesheet" href="welcome-styles.css">
+</head>
+<body>
+    <div class="welcome-container">
+        <header class="welcome-header">
+            <div class="logo-large">
+                <img src="icons/icon128.png" alt="AnalyLit" class="logo-icon">
+                <h1 class="logo-text">AnalyLit Connector</h1>
+            </div>
+            <p class="welcome-subtitle">Connectez Zotero à votre plateforme AnalyLit</p>
+        </header>
+
+        <main class="welcome-main">
+            <section class="features-section">
+                <h2>Fonctionnalités principales</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📥</div>
+                        <h3>Import facile</h3>
+                        <p>Importez vos collections, éléments sélectionnés ou toute votre bibliothèque Zotero directement dans AnalyLit.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📤</div>
+                        <h3>Export automatique</h3>
+                        <p>Exportez vos résultats validés et bibliographies depuis AnalyLit vers Zotero en un clic.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔄</div>
+                        <h3>Synchronisation</h3>
+                        <p>Gardez vos données synchronisées entre Zotero et AnalyLit avec un historique complet.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Interface intégrée</h3>
+                        <p>Boutons et menus contextuels directement dans l'interface Zotero Web.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="setup-section">
+                <h2>Configuration initiale</h2>
+                <div class="setup-steps">
+                    <div class="setup-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Ouvrir l'extension</h3>
+                            <p>Cliquez sur l'icône AnalyLit <img src="icons/icon16.png" alt="AnalyLit" class="inline-icon"> dans votre barre d'outils Chrome.</p>
+                        </div>
+                    </div>
+                    <div class="setup-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Configurer le serveur</h3>
+                            <p>Entrez l'URL de votre serveur AnalyLit (ex: <code>http://localhost:5000</code> ou votre domaine).</p>
+                        </div>
+                    </div>
+                    <div class="setup-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Tester la connexion</h3>
+                            <p>Cliquez sur "Tester la connexion" pour vérifier que tout fonctionne correctement.</p>
+                        </div>
+                    </div>
+                    <div class="setup-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Commencer à synchroniser</h3>
+                            <p>Rendez-vous sur <a href="https://www.zotero.org" target="_blank">zotero.org</a> et profitez de l'intégration !</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="usage-section">
+                <h2>Comment utiliser l'extension</h2>
+                <div class="usage-tabs">
+                    <button class="tab-button active" data-tab="import">Import</button>
+                    <button class="tab-button" data-tab="export">Export</button>
+                    <button class="tab-button" data-tab="integration">Intégration</button>
+                </div>
+
+                <div class="tab-content active" id="import-tab">
+                    <div class="usage-content">
+                        <h3>Importer depuis Zotero</h3>
+                        <div class="usage-steps">
+                            <p><strong>1. Allez sur zotero.org</strong> et connectez-vous à votre bibliothèque</p>
+                            <p><strong>2. Sélectionnez les éléments</strong> que vous voulez importer</p>
+                            <p><strong>3. Cliquez sur l'icône AnalyLit</strong> dans votre barre d'outils</p>
+                            <p><strong>4. Choisissez votre projet</strong> AnalyLit de destination</p>
+                            <p><strong>5. Cliquez sur "Importer"</strong> - c'est fait !</p>
+                        </div>
+                        <div class="screenshot-placeholder">
+                            <div class="screenshot-content">
+                                <div class="mock-zotero">
+                                    <div class="mock-item selected">📄 Article sélectionné</div>
+                                    <div class="mock-item">📖 Autre article</div>
+                                    <div class="analylit-button-mock">🔬 AnalyLit</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="export-tab">
+                    <div class="usage-content">
+                        <h3>Exporter vers Zotero</h3>
+                        <div class="usage-steps">
+                            <p><strong>1. Ouvrez l'extension AnalyLit</strong> depuis n'importe quelle page</p>
+                            <p><strong>2. Sélectionnez votre projet</strong> avec des résultats validés</p>
+                            <p><strong>3. Cliquez sur "Exporter les résultats"</strong> ou "Exporter la bibliographie"</p>
+                            <p><strong>4. Le fichier JSON</strong> sera téléchargé automatiquement</p>
+                            <p><strong>5. Importez ce fichier</strong> dans Zotero via File > Import</p>
+                        </div>
+                        <div class="export-types">
+                            <div class="export-type">
+                                <div class="export-icon">✅</div>
+                                <div>
+                                    <h4>Résultats validés</h4>
+                                    <p>Articles que vous avez marqués comme "Inclus" dans la validation</p>
+                                </div>
+                            </div>
+                            <div class="export-type">
+                                <div class="export-icon">📚</div>
+                                <div>
+                                    <h4>Bibliographie complète</h4>
+                                    <p>Tous les articles de votre projet avec métadonnées enrichies</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="integration-tab">
+                    <div class="usage-content">
+                        <h3>Intégration dans Zotero</h3>
+                        <div class="integration-features">
+                            <div class="integration-feature">
+                                <div class="integration-icon">🔘</div>
+                                <div>
+                                    <h4>Bouton dans la barre d'outils</h4>
+                                    <p>Un bouton AnalyLit apparaît automatiquement dans l'interface Zotero Web</p>
+                                </div>
+                            </div>
+                            <div class="integration-feature">
+                                <div class="integration-icon">🖱️</div>
+                                <div>
+                                    <h4>Menu contextuel</h4>
+                                    <p>Clic droit sur un article pour l'exporter directement vers AnalyLit</p>
+                                </div>
+                            </div>
+                            <div class="integration-feature">
+                                <div class="integration-icon">🔔</div>
+                                <div>
+                                    <h4>Notifications en temps réel</h4>
+                                    <p>Suivez le progrès de vos imports/exports directement dans Zotero</p>
+                                </div>
+                            </div>
+                            <div class="integration-feature">
+                                <div class="integration-icon">📊</div>
+                                <div>
+                                    <h4>Indicateurs de synchronisation</h4>
+                                    <p>Voyez quels éléments sont déjà synchronisés avec AnalyLit</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tips-section">
+                <h2>Conseils et astuces</h2>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <div class="tip-icon">💡</div>
+                        <h4>Sélection multiple</h4>
+                        <p>Utilisez Ctrl+clic pour sélectionner plusieurs articles dans Zotero avant l'import.</p>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">🎯</div>
+                        <h4>Collections</h4>
+                        <p>L'import d'une collection entière est plus rapide que la sélection manuelle d'articles.</p>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">🔄</div>
+                        <h4>Synchronisation</h4>
+                        <p>L'historique de synchronisation est accessible dans l'extension pour suivre vos imports/exports.</p>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">🔧</div>
+                        <h4>Configuration</h4>
+                        <p>Vous pouvez changer l'URL du serveur AnalyLit à tout moment dans les paramètres de l'extension.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="welcome-footer">
+            <div class="footer-actions">
+                <button id="openExtension" class="btn btn-primary">Ouvrir l'extension</button>
+                <button id="goToZotero" class="btn btn-secondary">Aller sur Zotero</button>
+            </div>
+            <div class="footer-links">
+                <a href="https://github.com/analylit/extension" target="_blank">Documentation</a>
+                <a href="https://github.com/analylit/extension/issues" target="_blank">Support</a>
+                <a href="https://analylit.com" target="_blank">Site web</a>
+            </div>
+            <p class="version-info">AnalyLit Connector v1.0.0</p>
+        </footer>
+    </div>
+
+    <script src="welcome.js"></script>
+</body>
+</html>

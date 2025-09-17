@@ -30,6 +30,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
+# Copy all application source code into the builder stage
+COPY . /app
+
 # =================================================
 # Étape 2: Final Stage - Image d'exécution légère
 # =================================================

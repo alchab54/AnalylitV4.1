@@ -1,0 +1,58 @@
+{
+    "manifest_version": 3,
+    "name": "AnalyLit Connector",
+    "version": "1.0.0",
+    "description": "Extension pour connecter Zotero à AnalyLit - Import/Export de références bibliographiques",
+    
+    "permissions": [
+        "activeTab",
+        "storage",
+        "background",
+        "scripting",
+        "tabs"
+    ],
+    
+    "host_permissions": [
+        "http://localhost:*/*",
+        "https://*.analylit.com/*",
+        "https://www.zotero.org/*"
+    ],
+    
+    "background": {
+        "service_worker": "background.js"
+    },
+    
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.zotero.org/groups/*",
+                "https://www.zotero.org/*/library/*"
+            ],
+            "js": ["zotero-inject.js"],
+            "css": ["extension-styles.css"]
+        }
+    ],
+    
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "AnalyLit Connector",
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        }
+    },
+    
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
+    
+    "web_accessible_resources": [
+        {
+            "resources": ["zotero-bridge.js"],
+            "matches": ["https://www.zotero.org/*"]
+        }
+    ]
+}

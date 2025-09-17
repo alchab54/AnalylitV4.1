@@ -1,6 +1,12 @@
 version: '3.9'
 
 services:
+  base:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    image: analylit-base:latest
+
   db:
     image: postgres:15-alpine
     container_name: analylit-db-v4
@@ -11,7 +17,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-strong_password}
       - POSTGRES_DB=${POSTGRES_DB:-analylit_db}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -42,12 +48,14 @@ services:
       - projects_data_v4:/home/appuser/app/projects
       - model_cache_v4:/home/appuser/app/model_cache
     env_file: .env
+    # === AJOUTEZ CECI ===
     environment:
-      # This ensures Python can find your application modules.
       - PYTHONPATH=/home/appuser/app
     command: |
       sh -c "echo 'Lancement du serveur Gunicorn...' && gunicorn --chdir /home/appuser/app server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 3 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"
     depends_on:
+      base:
+        condition: service_completed_successfully
       db:
         condition: service_healthy
       redis:
@@ -73,7 +81,16 @@ services:
       - projects_data_v4:/home/appuser/app/projects
       - model_cache_v4:/home/appuser/app/model_cache
     env_file: .env
+    # === CORRIGEZ CECI ===
+    environment:
+      - PYTHONPATH=/home/appuser/app
     command: python -m rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4
+    depends_on:
+      base:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+      redis: { condition: service_healthy }
     deploy:
       resources:
         reservations:
@@ -81,10 +98,6 @@ services:
             - driver: nvidia
               count: all
               capabilities: ["gpu"]
-    depends_on:
-      db:
-        condition: service_healthy
-      redis: { condition: service_healthy }
     networks:
       - analylit-network
     restart: unless-stopped

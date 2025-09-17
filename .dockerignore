@@ -33,7 +33,7 @@ logs/
 utils/
 api/
 tests/
-server_v4_complete.py
+
 tasks_v4_complete.py
 config_v4.py
 # Ignorer les fichiers JSON de données, mais PAS package.json ou grille-ATN.json

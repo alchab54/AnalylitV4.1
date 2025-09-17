@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnalyLit Connector</title>
+    <link rel="stylesheet" href="popup-styles.css">
+</head>
+<body>
+    <div class="popup-container">
+        <header class="popup-header">
+            <div class="logo">
+                <img src="icons/icon48.png" alt="AnalyLit" class="logo-icon">
+                <h1 class="logo-text">AnalyLit</h1>
+            </div>
+            <div class="connection-status" id="connectionStatus">
+                <span class="status-indicator" id="statusIndicator">⏳</span>
+                <span class="status-text" id="statusText">Connexion...</span>
+            </div>
+        </header>
+
+        <main class="popup-main">
+            <!-- Section de configuration -->
+            <section class="config-section" id="configSection">
+                <h2>Configuration</h2>
+                <div class="form-group">
+                    <label for="serverUrl">URL du serveur AnalyLit</label>
+                    <input type="url" 
+                           id="serverUrl" 
+                           class="form-control" 
+                           placeholder="http://localhost:5000"
+                           value="">
+                </div>
+                <div class="form-group">
+                    <label for="apiKey">Clé API (optionnel)</label>
+                    <input type="password" 
+                           id="apiKey" 
+                           class="form-control" 
+                           placeholder="Votre clé API">
+                </div>
+                <div class="form-actions">
+                    <button id="testConnection" class="btn btn-secondary">Tester la connexion</button>
+                    <button id="saveConfig" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </section>
+
+            <!-- Section principale -->
+            <section class="main-section" id="mainSection" style="display: none;">
+                <!-- Sélection de projet -->
+                <div class="project-selector">
+                    <label for="projectSelect">Projet AnalyLit</label>
+                    <select id="projectSelect" class="form-control">
+                        <option value="">Chargement des projets...</option>
+                    </select>
+                    <button id="refreshProjects" class="btn btn-ghost btn-sm">↻</button>
+                </div>
+
+                <!-- Actions d'import -->
+                <div class="import-actions">
+                    <h3>Import depuis Zotero</h3>
+                    <div class="action-buttons">
+                        <button id="importCollection" class="btn btn-primary" disabled>
+                            📚 Importer la collection active
+                        </button>
+                        <button id="importSelected" class="btn btn-secondary" disabled>
+                            ✓ Importer les éléments sélectionnés
+                        </button>
+                        <button id="importAll" class="btn btn-outline">
+                            📁 Importer toute la bibliothèque
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Actions d'export -->
+                <div class="export-actions">
+                    <h3>Export vers Zotero</h3>
+                    <div class="action-buttons">
+                        <button id="exportResults" class="btn btn-primary">
+                            📤 Exporter les résultats validés
+                        </button>
+                        <button id="exportBibliography" class="btn btn-secondary">
+                            📝 Exporter la bibliographie
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Historique des synchronisations -->
+                <div class="sync-history">
+                    <h3>Dernières synchronisations</h3>
+                    <div id="syncHistoryList" class="history-list">
+                        <p class="empty-state">Aucune synchronisation récente</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Section de statut/progress -->
+        <div class="status-bar" id="statusBar" style="display: none;">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Préparation...</div>
+            </div>
+            <button id="cancelOperation" class="btn btn-ghost btn-sm">Annuler</button>
+        </div>
+
+        <footer class="popup-footer">
+            <div class="footer-links">
+                <a href="#" id="openAnalyLit" class="footer-link">Ouvrir AnalyLit</a>
+                <a href="#" id="showHelp" class="footer-link">Aide</a>
+            </div>
+            <div class="version">v1.0.0</div>
+        </footer>
+    </div>
+
+    <!-- Overlay pour les messages -->
+    <div class="overlay" id="overlay" style="display: none;">
+        <div class="overlay-content">
+            <div class="overlay-icon" id="overlayIcon">ℹ️</div>
+            <h3 class="overlay-title" id="overlayTitle">Information</h3>
+            <p class="overlay-message" id="overlayMessage">Message</p>
+            <div class="overlay-actions">
+                <button id="overlayCancel" class="btn btn-secondary">Annuler</button>
+                <button id="overlayConfirm" class="btn btn-primary">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
