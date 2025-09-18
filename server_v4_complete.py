@@ -410,7 +410,7 @@ def create_app():
                 prompt = Prompt(name=data["name"])
                 session.add(prompt)
             prompt.template = data.get("template")
-            # prompt.description = data.get("description") # Retiré car la colonne n'existe pas
+            prompt.description = data.get("description")
             session.commit()
             return jsonify(prompt.to_dict()), 201
         elif request.method == "PUT":

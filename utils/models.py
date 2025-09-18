@@ -276,7 +276,7 @@ class Prompt(Base):
     
     id = Column(String, primary_key=True, default=_uuid)
     name = Column(String, nullable=False, unique=True)
-    # description = Column(Text) # Colonne retirée pour correspondre au schéma de la DB de test
+    description = Column(Text) 
     template = Column(Text, nullable=False) # Renommé de 'content' à 'template'
     is_default = Column(Boolean, default=False)
     analysis_type = Column(String)
