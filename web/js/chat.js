@@ -97,7 +97,7 @@ export function renderChatInterface(messages = appState.chatMessages, error = fa
     }
 }
 
-export async function sendChatMessage() {
+async function sendChatMessage() {
     const input = document.getElementById('chatInput');
     const question = input?.value?.trim();
     
@@ -137,6 +137,8 @@ export async function sendChatMessage() {
         renderChatInterface(appState.chatMessages);
     }
 }
+
+export { sendChatMessage };
 
 function renderChatSection(project = null, error = false) {
     const chatContainer = document.getElementById('chatContainer');

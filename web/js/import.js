@@ -1,7 +1,7 @@
 // web/js/import.js
 import { appState, fetchAPI } from './app-improved.js';
 import { showToast, showLoadingOverlay, showModal, closeModal, updateLoadingProgress } from './ui-improved.js';
-import { loadSearchResults } from './results.js';
+import { loadSearchResults } from './articles.js';
 
 // Cette fonction est appelée par le routeur principal, elle doit être exportée.
 export function renderImportSection(project) {

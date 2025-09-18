@@ -11,7 +11,7 @@ import {
     toggleArticleSelection,
     viewArticleDetails,
     selectAllArticles, 
-    loadSearchResults // ← Déplacer vers articles.js
+    loadSearchResults // --- LA FONCTION EST IMPORTÉE DEPUIS articles.js
 } from './articles.js';
 import {
     handleRunDiscussionDraft,

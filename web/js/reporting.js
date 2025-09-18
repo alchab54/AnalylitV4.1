@@ -40,7 +40,7 @@ export async function renderReportingSection(elements) {
     // Initial load of PRISMA checklist
     await loadPrismaChecklist();
 }
-export async function generateBibliography() { // Already exported, but keeping for consistency with request
+export async function generateBibliography() {
     showLoadingOverlay(true, 'Génération de la bibliographie...', elements);
     try {
         const style = document.getElementById('bibliographyStyle').value;
@@ -56,7 +56,7 @@ export async function generateBibliography() { // Already exported, but keeping 
     }
 }
 
-export async function generateSummaryTable() { // Already exported, but keeping for consistency with request
+export async function generateSummaryTable() {
     showLoadingOverlay(true, 'Génération du tableau de synthèse...', elements);
     try {
         const data = await fetchAPI(`/projects/${appState.currentProject.id}/reports/summary-table`);
@@ -105,7 +105,7 @@ export async function generateSummaryTable() { // Already exported, but keeping 
     }
 }
 
-export async function exportSummaryTableExcel() { // Already exported, but keeping for consistency with request
+export async function exportSummaryTableExcel() {
     showLoadingOverlay(true, 'Exportation du tableau en Excel...', elements);
     try {
         const response = await fetchAPI(`/projects/${appState.currentProject.id}/reports/summary-table/export/excel`, { rawResponse: true });
@@ -193,7 +193,7 @@ export function updatePrismaChecklistItem(itemId, field, value) {
     });
 }
 
-export async function savePrismaChecklist() { // Already exported, but keeping for consistency with request
+export async function savePrismaChecklist() {
     showLoadingOverlay(true, 'Sauvegarde de la checklist PRISMA-ScR...', elements);
     try {
         const payload = { checklist: appState.prismaChecklist };

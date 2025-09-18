@@ -87,7 +87,7 @@ export function renderSearchSection(project) {
     }));
 }
 
-export async function handleMultiDatabaseSearch(event) { // Already exported, but keeping for consistency with request
+export async function handleMultiDatabaseSearch(event) {
     event.preventDefault();
     if (!appState.currentProject) return;
 
@@ -137,7 +137,7 @@ export async function handleMultiDatabaseSearch(event) { // Already exported, bu
     }
 }
 
-export function showSearchModal() { // Already exported, but keeping for consistency with request
+export function showSearchModal() {
     if (!appState.currentProject) {
         showToast('Veuillez sélectionner un projet pour lancer une recherche.', 'warning');
         return;

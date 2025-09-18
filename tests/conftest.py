@@ -1,7 +1,9 @@
 # tests/conftest.py
 
-import pytest
 import os
+os.environ['TESTING'] = 'true'
+
+import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 

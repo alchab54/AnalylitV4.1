@@ -1,3 +1,4 @@
+import os
 from sqlalchemy import (
     Column, String, Integer, Float, Boolean, Text,
     ForeignKey, DateTime, UniqueConstraint
@@ -7,15 +8,17 @@ from datetime import datetime
 import uuid
 import json
 
+# Définir le schéma, mais le rendre optionnel pour les tests SQLite
+SCHEMA = 'analylit_schema' if os.getenv('TESTING') != 'true' else None
+
 Base = declarative_base()
-SCHEMA = 'analylit_schema'
 
 def _uuid():
     return str(uuid.uuid4())
 
 class Project(Base):
     __tablename__ = 'projects'
-    __table_args__ = {'schema': SCHEMA}
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
 
     id = Column(String, primary_key=True, default=_uuid)
     name = Column(String, nullable=False)
@@ -50,7 +53,7 @@ class Project(Base):
 
 class Article(Base):
     __tablename__ = 'articles'
-    __table_args__ = {'schema': SCHEMA}
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
 
     id = Column(String, primary_key=True, default=_uuid)
     project_id = Column(String, ForeignKey(f'{SCHEMA}.projects.id'), nullable=False)
@@ -67,7 +70,7 @@ class SearchResult(Base):
     __tablename__ = 'search_results'
     __table_args__ = (
         UniqueConstraint('project_id', 'article_id', name='uq_project_article'),
-        {'schema': SCHEMA}
+        {'schema': SCHEMA} if SCHEMA else {}
     )
 
     id = Column(String, primary_key=True, default=_uuid)
@@ -85,7 +88,7 @@ class SearchResult(Base):
 
 class Extraction(Base):
     __tablename__ = 'extractions'
-    __table_args__ = {'schema': SCHEMA}
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
 
     id = Column(String, primary_key=True, default=_uuid)
     project_id = Column(String, ForeignKey(f'{SCHEMA}.projects.id'))
@@ -119,7 +122,7 @@ class Extraction(Base):
 
 class Grid(Base):
     __tablename__ = 'extraction_grids'
-    __table_args__ = {'schema': SCHEMA}
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
 
     id = Column(String, primary_key=True, default=_uuid)
     project_id = Column(String, ForeignKey(f'{SCHEMA}.projects.id'), nullable=False)
@@ -136,7 +139,7 @@ class Grid(Base):
 
 class GridField(Base):
     __tablename__ = 'grid_fields'
-    __table_args__ = {'schema': SCHEMA}
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
 
     id = Column(String, primary_key=True, default=_uuid)
     grid_id = Column(String, ForeignKey(f'{SCHEMA}.extraction_grids.id'), nullable=False)
@@ -146,7 +149,7 @@ class GridField(Base):
 
 class Validation(Base):
     __tablename__ = 'validations'
-    __table_args__ = {'schema': SCHEMA}
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
 
     id = Column(String, primary_key=True, default=_uuid)
     extraction_id = Column(String, ForeignKey(f'{SCHEMA}.extractions.id'), nullable=False)
@@ -163,7 +166,7 @@ class Validation(Base):
 
 class Analysis(Base):
     __tablename__ = 'analyses'
-    __table_args__ = {'schema': SCHEMA}
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
 
     id = Column(String, primary_key=True, default=_uuid)
     project_id = Column(String, ForeignKey(f'{SCHEMA}.projects.id'), nullable=False)
@@ -182,7 +185,7 @@ class Analysis(Base):
 
 class ChatMessage(Base):
     __tablename__ = 'chat_messages'
-    __table_args__ = {'schema': SCHEMA}
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
 
     id = Column(String, primary_key=True, default=_uuid)
     project_id = Column(String, ForeignKey(f'{SCHEMA}.projects.id'), nullable=False)
@@ -203,7 +206,7 @@ class ChatMessage(Base):
 
 class AnalysisProfile(Base):
     __tablename__ = 'analysis_profiles'
-    __table_args__ = {'schema': SCHEMA}
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
 
     id = Column(String, primary_key=True, default=_uuid)
     name = Column(String, nullable=False, unique=True)
@@ -224,7 +227,7 @@ class AnalysisProfile(Base):
 
 class PRISMARecord(Base):
     __tablename__ = 'prisma_records'
-    __table_args__ = {'schema': SCHEMA}
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
 
     id = Column(String, primary_key=True, default=_uuid)
     project_id = Column(String, ForeignKey(f'{SCHEMA}.projects.id'), nullable=False)
@@ -236,7 +239,7 @@ class ScreeningDecision(Base):
     __tablename__ = 'screening_decisions'
     __table_args__ = (
         UniqueConstraint('project_id', 'pmid', name='uq_project_pmid'),
-        {'schema': SCHEMA}
+        {'schema': SCHEMA} if SCHEMA else {}
     )
 
     id = Column(String, primary_key=True, default=_uuid)
@@ -250,7 +253,7 @@ class ScreeningDecision(Base):
 
 class RiskOfBias(Base):
     __tablename__ = 'risk_of_bias'
-    __table_args__ = {'schema': SCHEMA}
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
 
     id = Column(String, primary_key=True, default=_uuid)
     project_id = Column(String, ForeignKey(f'{SCHEMA}.projects.id'), nullable=False)
@@ -272,7 +275,7 @@ class RiskOfBias(Base):
 
 class Prompt(Base):
     __tablename__ = 'prompts'
-    __table_args__ = {'schema': SCHEMA}
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
     
     id = Column(String, primary_key=True, default=_uuid)
     name = Column(String, nullable=False, unique=True)
@@ -283,7 +286,7 @@ class Prompt(Base):
 
 class ProcessingLog(Base):
     __tablename__ = 'processing_log'
-    __table_args__ = {'schema': SCHEMA}
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
 
     id = Column(String, primary_key=True, default=_uuid)
     project_id = Column(String, ForeignKey(f'{SCHEMA}.projects.id'), nullable=False)

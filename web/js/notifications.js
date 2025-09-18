@@ -1,6 +1,6 @@
 // web/js/notifications.js
 import { appState } from './app-improved.js';
-import { showToast } from './ui-improved.js';
+import { showToast } from './ui-improved.js'; // Already correct
 
 export function updateNotificationIndicator() {
     const indicator = document.querySelector('.notification-indicator');

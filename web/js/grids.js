@@ -72,7 +72,7 @@ function renderGridItem(grid) {
     `;
 }
 
-export async function handleDeleteGrid(gridId) { // Already exported, but keeping for consistency with request
+export async function handleDeleteGrid(gridId) {
     if (!gridId) return;
     if (!confirm('Supprimer cette grille ?')) return;
 
@@ -89,7 +89,7 @@ export async function handleDeleteGrid(gridId) { // Already exported, but keepin
     }
 }
 
-export function showGridFormModal(gridId = null) { // Already exported, but keeping for consistency with request
+export function showGridFormModal(gridId = null) {
     const modal = document.getElementById('gridFormModal');
     const title = document.getElementById('gridFormModalTitle');
     const form = document.getElementById('gridForm');
@@ -117,7 +117,7 @@ export function showGridFormModal(gridId = null) { // Already exported, but keep
     modal.classList.add('modal--show');
 }
 
-export function addGridFieldInput() { // Already exported, but keeping for consistency with request
+export function addGridFieldInput() {
     const container = document.getElementById('gridFields');
     if (container) {
         addFieldInput(container);
@@ -177,11 +177,11 @@ export async function handleGridImportUpload(event) {
     event.target.value = null;
 }
 
-export function removeGridField(target) { // Already exported, but keeping for consistency with request
+export function removeGridField(target) {
     target.closest('.grid-field-item').remove();
 }
 
-export async function handleSaveGrid(event) { // Already exported, but keeping for consistency with request
+export async function handleSaveGrid(event) {
     event.preventDefault();
     const form = document.getElementById('gridForm');
     const gridId = form.elements.id.value;

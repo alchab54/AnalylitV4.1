@@ -90,7 +90,7 @@ function formatTaskDate(task) {
     });
 }
 
-export function setupTasksAutoRefresh() { // Already exported, but keeping for consistency with request
+export function setupTasksAutoRefresh() {
     // Rafraîchir toutes les 10 secondes si la section est visible
     setInterval(() => {
         if (appState.currentSection === 'tasks') {

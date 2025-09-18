@@ -21,16 +21,6 @@ export async function loadProjectAnalyses() {
     }
 }
 
-export async function handleRunATNAnalysis(event) {
-    if (!appState.currentProject?.id) {
-        showToast('Veuillez sélectionner un projet.', 'warning');
-        return;
-    }
-    // Ouvre l'URL de l'endpoint d'export dans un nouvel onglet, ce qui déclenche le téléchargement
-    window.open(`/api/projects/${appState.currentProject.id}/export-analyses`, '_blank');
-    showToast('Export des analyses en cours de téléchargement...', 'info');
-}
-
 export function renderAnalysesSection() {
     if (!elements.analysisContainer) return;
     const project = appState.currentProject;
@@ -171,7 +161,7 @@ function renderATNResults(analysisData) {
     `;
 }
 
-export function showPRISMAModal() { // Already exported, but keeping for consistency with request
+export function showPRISMAModal() {
     openModal('prismaModal');
     // La logique de rendu et de sauvegarde est déjà dans le HTML/core.js
 }
@@ -203,7 +193,7 @@ export async function savePRISMAProgress() {
     }
 }
 
-export function exportPRISMAReport() { // Already exported, but keeping for consistency with request
+export function exportPRISMAReport() {
     showToast('Export PRISMA non implémenté.', 'info');
 }
 
@@ -237,7 +227,7 @@ export async function handleRunATNAnalysis(event) {
 }
 
 // MODIFICATION : runProjectAnalysis est maintenant déclenché par les boutons sur les cartes
-export async function runProjectAnalysis(analysisType) { // Already exported, but keeping for consistency with request
+export async function runProjectAnalysis(analysisType) {
     if (!appState.currentProject?.id) {
         showToast('Veuillez d\'abord sélectionner un projet.', 'warning');
         return;
@@ -288,7 +278,7 @@ export async function runProjectAnalysis(analysisType) { // Already exported, bu
     }
 }
 
-export function showRunAnalysisModal() { // Already exported, but keeping for consistency with request
+export function showRunAnalysisModal() {
     const content = `
         <div class="analysis-options">
             <div class="analysis-option" data-action="run-analysis" data-analysis-type="discussion">
@@ -341,7 +331,7 @@ export function renderDiscussionDraft(draft) {
     `;
 }
 
-export function renderKnowledgeGraph(graphData) { // Already exported
+export function renderKnowledgeGraph(graphData) {
     if (!graphData || !graphData.nodes || graphData.nodes.length === 0) {
         return `
             <div class="card" id="knowledge-graph-card">
@@ -476,7 +466,7 @@ export async function handleRunPrismaFlow(event) {
     }
 }
 
-export async function handleRunMetaAnalysis(event) {
+export async function handleRunMetaAnalysis() {
     if (!appState.currentProject?.id) return;
     showLoadingOverlay(true, 'Lancement de la méta-analyse...');
     try {
@@ -489,7 +479,7 @@ export async function handleRunMetaAnalysis(event) {
 }
 
 
-export async function handleRunDescriptiveStats(event) {
+export async function handleRunDescriptiveStats() {
     if (!appState.currentProject?.id) return;
     showLoadingOverlay(true, 'Calcul des statistiques descriptives...');
     try {

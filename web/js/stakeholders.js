@@ -3,7 +3,7 @@ import { appState } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { showToast, openModal, escapeHtml } from './ui-improved.js';
 
-export async function showStakeholderManagementModal() { // Already exported, but keeping for consistency with request
+export async function showStakeholderManagementModal() {
     if (!appState.currentProject) {
         showToast('Veuillez sélectionner un projet.', 'warning');
         return;
@@ -11,7 +11,7 @@ export async function showStakeholderManagementModal() { // Already exported, bu
     openModal('stakeholderManagementModal');
     await renderStakeholderGroups();
 }
-export function runStakeholderAnalysis() {}
+export function runStakeholderAnalysis() { /* ... */ }
 async function renderStakeholderGroups() {
     const container = document.getElementById('stakeholderGroupsList');
     if (!container) return;
@@ -38,7 +38,7 @@ async function renderStakeholderGroups() {
     }
 }
 
-export async function addStakeholderGroup() { // Already exported, but keeping for consistency with request
+export async function addStakeholderGroup() {
     const nameInput = document.getElementById('newStakeholderName');
     const colorInput = document.getElementById('newStakeholderColor');
     const descInput = document.getElementById('newStakeholderDesc');
@@ -67,7 +67,7 @@ export async function addStakeholderGroup() { // Already exported, but keeping f
     }
 }
 
-export async function deleteStakeholderGroup(groupId) { // Already exported, but keeping for consistency with request
+export async function deleteStakeholderGroup(groupId) {
     if (!groupId) return;
     if (!confirm('Êtes-vous sûr de vouloir supprimer ce groupe ?')) return;
 

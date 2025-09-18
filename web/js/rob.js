@@ -41,7 +41,7 @@ export async function loadRobSection() {
     `;
 }
 
-export async function fetchAndDisplayRob(articleId, editMode = false) { // Already exported, but keeping for consistency with request
+export async function fetchAndDisplayRob(articleId, editMode = false) {
     const summaryContainer = document.getElementById(`rob-summary-${articleId}`);
     if (!summaryContainer) return;
 
@@ -120,7 +120,7 @@ function renderRobEditForm(articleId, robData) {
     `;
 }
 
-export async function handleSaveRobAssessment(event) { // Already exported, but keeping for consistency with request
+export async function handleSaveRobAssessment(event) {
     event.preventDefault();
     const form = event.target.closest('form');
     if (!form) return;
@@ -159,7 +159,7 @@ function getBiasClass(bias) {
     return 'info';
 }
 
-export async function handleRunRobAnalysis() { // Already exported, but keeping for consistency with request
+export async function handleRunRobAnalysis() {
     if (!appState.currentProject) return;
     const selectedIds = Array.from(appState.selectedSearchResults);
     if (selectedIds.length === 0) {
