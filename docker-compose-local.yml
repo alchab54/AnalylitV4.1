@@ -57,7 +57,7 @@ services:
 
   # --- Serveur Web Applicatif ---
   web:
-    image: analylit-web:latest # Nomme l'image construite
+    image: analylit-web:latest
     build:
       context: .
       dockerfile: Dockerfile-web-complete
@@ -66,14 +66,12 @@ services:
       # CORRECTION: Les chemins doivent pointer vers /home/appuser/app/ où l'application s'exécute
       - projects_data:/home/appuser/app/projects
       - model_cache_data:/home/appuser/app/model_cache
-    env_file: .env
-    command: >
-      sh -c "echo 'Waiting for database to be ready...' &&
-      while ! PGPASSWORD=$$POSTGRES_PASSWORD pg_isready -h db -p 5432 -q -U $$POSTGRES_USER -d $$POSTGRES_DB; do sleep 2; done;
-      echo 'Database is ready. Initializing schema and seeding data...' &&
-      python -c 'from server_v4_complete import _init_db_command; _init_db_command()' &&
-      echo 'Lancement du serveur Gunicorn...' &&
-      gunicorn server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 3 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+    env_file:
+      - .env
+    command: ["/home/appuser/app/entrypoint.sh"]
     depends_on:
       db: { condition: service_started }
       redis: { condition: service_healthy }
@@ -81,7 +79,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
       interval: 20s
       timeout: 10s
-      retries: 5
+      retries: 3
       start_period: 30s
     networks:
       - analylit-network
@@ -89,7 +87,7 @@ services:
 
   # --- Worker pour les tâches asynchrones ---
   worker:
-    image: analylit-worker:latest # Nomme l'image construite
+    image: analylit-worker:latest
     build:
       context: .
       dockerfile: Dockerfile-worker-complete

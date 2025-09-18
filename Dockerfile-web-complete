@@ -11,6 +11,10 @@ RUN apt-get update && apt-get install -y netcat-openbsd postgresql-client && \
 # On revient à l'utilisateur non-privilégié pour la sécurité.
 USER appuser
 
+# AJOUT: Copie du script d'entrée
+COPY --chown=appuser:appuser entrypoint.sh /home/appuser/app/entrypoint.sh
+RUN chmod +x /home/appuser/app/entrypoint.sh
+
 # PLUS BESOIN de copier le code source - il est déjà dans l'image de base !
 # L'ancienne ligne "COPY --chown=appuser:appuser . ." était redondante
 
