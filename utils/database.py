@@ -2,7 +2,7 @@ import os
 import logging
 from contextlib import contextmanager
 from functools import wraps
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, inspect
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.exc import ProgrammingError, OperationalError
 
@@ -23,6 +23,9 @@ engine = create_engine(
     future=True,
 )
 Base = declarative_base()
+
+# Compatibilité pour les tests
+inspect = inspect  # Rendre inspect disponible au niveau module
 
 # Session factory
 SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
@@ -59,27 +62,61 @@ def _create_schema_if_needed(session):
         session.rollback()
         raise
 
-def seed_default_data(session):
-    # Ignorer en test
+def seed_default_data(session_or_connection):
+    """
+    Seed des données par défaut dans la base de données.
+    Compatible avec les tests qui passent une connection ou une session.
+    """
+    # Ignorer en environnement de test
     if os.getenv("FLASK_ENV") == "testing" or os.getenv("TESTING") == "true":
         logger.info("Test env détecté: seed_default_data ignoré")
         return
-    logger.info("Début du seeding par défaut...")
-    _create_schema_if_needed(session)
-    # Exemple minimal: garantir la table profiles si mappée via Base (sinon DDL séparés)
-    Base.metadata.create_all(bind=engine)
-    # Insertion de profil d'analyse par défaut si la table existe
+    
+    # Si c'est une connection, créer une session
+    if hasattr(session_or_connection, 'execute') and not hasattr(session_or_connection, 'query'):
+        # C'est une connection, créer une session pour les tests
+        from sqlalchemy.orm import Session
+        session = Session(bind=session_or_connection)
+        should_close = True
+    else:
+        # C'est déjà une session
+        session = session_or_connection  
+        should_close = False
+    
     try:
-        session.execute(text("""
-            INSERT INTO analylit_schema.analysis_profiles (name, description, config_json)
-            VALUES ('Standard', 'Profil par défaut', '{}')
-            ON CONFLICT DO NOTHING
-        """))
+        logger.info("Début du seeding par défaut...")
+        _create_schema_if_needed(session)
+        
+        # Vérifier et créer le profil par défaut
+        from utils.models import AnalysisProfile, Project
+        
+        existing_profile = session.query(AnalysisProfile).filter_by(name='Standard').first()
+        if not existing_profile:
+            default_profile = AnalysisProfile(
+                name='Standard', 
+                description='Profil par défaut', 
+                is_custom=False
+            )
+            session.add(default_profile)
+        
+        # Vérifier et créer le projet par défaut
+        existing_project = session.query(Project).filter_by(name='Projet par défaut').first()
+        if not existing_project:
+            default_project = Project(
+                name='Projet par défaut',
+                description='Projet de démonstration'
+            )
+            session.add(default_project)
+        
         session.commit()
-        logger.info("Seeding terminé.")
+        logger.info("Seeding terminé avec succès.")
+        
     except Exception as e:
         session.rollback()
-        logger.warning("Seeding non appliqué (peut être normal si la table n'existe pas encore): %s", e)
+        logger.warning(f"Seeding non appliqué: {e}")
+    finally:
+        if should_close:
+            session.close()
 
 def init_database():
     """Initialise la base de données en créant toutes les tables et en appliquant le seeding."""
