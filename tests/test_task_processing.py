@@ -26,6 +26,7 @@ from sklearn.metrics import cohen_kappa_score # Ajout pour le test Kappa
 # --- Imports de Config (Corrigé pour importer la fonction) ---
 from config_v4 import get_config
 config = get_config()
+from unittest import mock  # ← AJOUTER CETTE LIGNE
 
 # --- Imports des modèles et tâches ---
 from utils.models import Project, SearchResult, Extraction, Grid, ChatMessage, AnalysisProfile, RiskOfBias
@@ -242,7 +243,7 @@ def test_process_single_article_task_screening_mode(mock_ollama_api, session):
     process_single_article_task.__wrapped__(session, project_id, article_id, {"preprocess_model": "screening-model"}, "screening")
 
     # ASSERT
-    mock_ollama_api.assert_called_once_with(mocker.ANY, "screening-model", output_format="json")
+    mock_ollama_api.assert_called_once_with(mock.ANY, "screening-model", output_format="json")
     extraction = session.query(Extraction).filter_by(project_id=project_id, pmid=article_id).one()
     assert extraction.relevance_score == 8.5
     assert extraction.relevance_justification == "Très pertinent."
@@ -517,7 +518,7 @@ def test_run_risk_of_bias_task(session, mocker):
     # ARRANGE
     project_id = str(uuid.uuid4())
     article_id = "rob_test_1"
-    project = Project(id=project_id, name="RoB Test", pmid=article_id)
+    project = Project(id=project_id, name="RoB Test")
     session.add(project)
     session.commit()
 
