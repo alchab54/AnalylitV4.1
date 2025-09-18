@@ -3,11 +3,11 @@ version: '3.9'
 services:
   # --- Base de données ---
   db:
-    image: postgres:15 # CORRECTION: Utilisation de l'image standard avec support complet des locales
+    image: postgres:15
     container_name: analylit-db-v4
     volumes:
       - postgres_data_v4:/var/lib/postgresql/data/
-      - ./init-user-db.sql:/docker-entrypoint-initdb.d/init-user-db.sql
+      - ./init-user-db.sql:/docker-entrypoint-initdb.d/init-user-db.sql # <-- AJOUTEZ CETTE LIGNE
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-analylit_user}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-strong_password}
@@ -72,10 +72,10 @@ services:
       db: { condition: service_started }
       redis: { condition: service_healthy }
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:5001/"] # <-- Correction ici
       interval: 20s
       timeout: 10s
-      retries: 3
+      retries: 5
       start_period: 30s
     networks:
       - analylit-network
