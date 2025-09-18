@@ -70,7 +70,10 @@ services:
       - PYTHONPATH=/home/appuser/app # Assure que le chemin est correct
     env_file:
       - .env
-    command: ["/home/appuser/app/entrypoint.sh"]
+    # CORRECTION: Exécuter l'initialisation de la DB avant de lancer les tests.
+    # Cela garantit que le schéma est à jour avec les modèles.
+    # Le `&& pytest` est supprimé car pytest est exécuté manuellement.
+    command: ["/bin/sh", "-c", "python -c 'from utils.database import init_database; init_database()' && /home/appuser/app/entrypoint.sh"]
     depends_on:
       db:
         condition: service_started

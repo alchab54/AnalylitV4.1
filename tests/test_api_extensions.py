@@ -1,11 +1,13 @@
 # test_api_extensions.py
 # Cette suite de tests couvre les endpoints API manquants (Gestion CRUD, Workflows de validation, Rapports, Admin)
 
+import io
 import json
 import pytest
 import uuid
-import io
 from unittest.mock import patch, MagicMock
+from flask.testing import FlaskClient
+from sqlalchemy.orm import Session
 
 # Imports des modèles de la DB nécessaires pour le setup des tests
 from utils.models import Project, SearchResult, Extraction, Grid, AnalysisProfile, Prompt
@@ -15,16 +17,11 @@ from utils.app_globals import background_queue
 
 
 @pytest.fixture
-def setup_project(client, clean_db):
-    """Fixture pour créer un projet de base et retourner son ID."""
-    project_data = {
-        'name': 'Projet de Test (Extensions)',
-        'description': 'Description test.',
-        'mode': 'screening'
-    }
-    response = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
-    assert response.status_code == 201
-    return json.loads(response.data)['id']
+def setup_project(session: Session):
+    project = Project(name=f"Test Project {uuid.uuid4()}", description="A test project")
+    session.add(project)
+    session.commit()
+    return project.id
 
 # ================================================================
 # CATEGORIE 1: GESTION DES ENTITÉS (GRILLES, PROMPTS)
@@ -32,7 +29,7 @@ def setup_project(client, clean_db):
 
 def test_api_grid_management_workflow(client, setup_project):
     """
-    Teste le workflow complet de gestion des grilles : Création (POST) et Récupération (GET).
+    Teste le workflow complet de gestion des grilles : Création (POST) et Récupération (GET). (No changes needed)
     """
     project_id = setup_project
 
@@ -62,36 +59,37 @@ def test_api_grid_management_workflow(client, setup_project):
     assert len(data[0]['fields']) == 3 # Correction de l'assertion
     assert data[0]['fields'][0]['name'] == "Population"
 
-def test_api_prompts_get_and_update(client, session):
+def test_api_prompts_get_and_update(client: FlaskClient, session: Session):
     """
     Teste la récupération (GET) et la mise à jour (POST) des Prompts.
     """
-    # 1. GET /prompts (doit retourner une liste)
+    # 1. GET /prompts (doit retourner une liste, même si vide)
     response_get = client.get('/api/prompts')
     assert response_get.status_code == 200
-    default_prompts = json.loads(response_get.data)
-    assert isinstance(default_prompts, list)
+    assert isinstance(response_get.json, list)
     
-    # 2. POST /prompts (Mettre à jour/créer un prompt)
+    # 2. POST pour créer/mettre à jour un prompt
     prompt_payload = {
-        "name": "screening_prompt_test", # Mise à jour d'un prompt existant
-        "description": "Nouveau template de test",
-        "template": "Test template {title}"
+        "name": "test_prompt_unique",
+        "description": "A description for the test prompt.",
+        "template": "This is a test template: {{context}}"
     }
-    response_post = client.post('/api/prompts', data=json.dumps(prompt_payload), content_type='application/json')
+    response_post = client.post('/api/prompts', json=prompt_payload)
     assert response_post.status_code == 201
+    assert response_post.json['name'] == prompt_payload['name']
+    assert response_post.json['description'] == prompt_payload['description']
     
     # 3. Vérifier en base de données
-    updated_prompt = session.query(Prompt).filter_by(name="screening_prompt_test").first()
-    assert updated_prompt is not None
-    assert updated_prompt.template == "Test template {title}"
+    prompt_db = session.query(Prompt).filter_by(name="test_prompt_unique").first()
+    assert prompt_db is not None
+    assert prompt_db.description == "A description for the test prompt."
 
 # ================================================================
 # CATEGORIE 2: WORKFLOW DE VALIDATION (DOUBLE AVEUGLE)
 # ... (test_api_full_validation_workflow reste inchangé) ...
 # ================================================================
 
-def test_api_full_validation_workflow(client, session, setup_project):
+def test_api_full_validation_workflow(client: FlaskClient, session: Session, setup_project):
     """
     Teste le workflow de validation complet :
     1. Setup: Créer une extraction (article) vide.
@@ -104,8 +102,7 @@ def test_api_full_validation_workflow(client, session, setup_project):
     article_id = "pmid_workflow_1"
 
     # 1. Setup (Créer l'extraction liée au projet et à l'article)
-    extraction = Extraction(
-        id=str(uuid.uuid4()), 
+    extraction = Extraction( 
         project_id=project_id, 
         pmid=article_id, 
         title="Test Workflow Validation"
@@ -118,8 +115,7 @@ def test_api_full_validation_workflow(client, session, setup_project):
     eval_1_payload = {"decision": "include", "evaluator": "evaluator1"}
     response_eval_1 = client.put(
         f'/api/projects/{project_id}/extractions/{extraction_id_db}/decision',
-        data=json.dumps(eval_1_payload),
-        content_type='application/json'
+        json=eval_1_payload
     )
     assert response_eval_1.status_code == 200
 
@@ -135,11 +131,14 @@ def test_api_full_validation_workflow(client, session, setup_project):
     
     response_eval_2 = client.post(
         f'/api/projects/{project_id}/import-validations',
-        data={'file': (csv_file_data, 'eval2_results.csv')},
+        data={'file': (csv_file_data, 'eval2_results.csv'), 'evaluator': 'evaluator2'},
         content_type='multipart/form-data' # La route existe maintenant
     )
     assert response_eval_2.status_code == 200
-    assert json.loads(response_eval_2.data)['message'] == "1 validations ont été importées pour l'évaluateur 2."
+    
+    # CORRECTION: L'assertion attend le nom de l'évaluateur qui est une variable.
+    expected_message = "1 validations ont été importées pour l'évaluateur evaluator2."
+    assert response_eval_2.json['message'] == expected_message
 
     # 5. Assert 2: Vérifier à nouveau la DB
     session.refresh(extraction)
@@ -198,38 +197,69 @@ def test_api_prisma_checklist_workflow(client, session, setup_project):
 # CATEGORIE 4: ADMIN & INFRASTRUCTURE
 # ================================================================
 
-def test_api_admin_queues_status(client):
+@patch('server_v4_complete.Worker')
+@patch('server_v4_complete.processing_queue')
+@patch('server_v4_complete.synthesis_queue')
+@patch('server_v4_complete.analysis_queue')
+@patch('server_v4_complete.background_queue')
+def test_api_admin_queues_status(mock_bg_q, mock_an_q, mock_syn_q, mock_proc_q, mock_worker, client: FlaskClient):
     """
     Teste l'endpoint d'administration des files (queues) pour le monitoring. (Corrigé)
     """
     # ARRANGE
-    # Simuler les noms et le statut des files (les mocks de MagicMock suffisent pour len())
+    # CORRECTION: Définition des mocks qui manquaient
     mock_proc_q.name = 'analylit_processing_v4'
+    mock_proc_q.__len__.return_value = 5
     mock_syn_q.name = 'analylit_synthesis_v4'
+    mock_syn_q.__len__.return_value = 2
+    mock_an_q.name = 'analylit_analysis_v4'
+    mock_an_q.__len__.return_value = 0
+    mock_bg_q.name = 'analylit_background_v4'
+    mock_bg_q.__len__.return_value = 1
+    
+    mock_worker_instance = MagicMock()
+    mock_worker_instance.queue_names.return_value = ['analylit_processing_v4', 'analylit_background_v4']
+    mock_worker.all.return_value = [mock_worker_instance]
 
     # ACT
-    with patch('server_v4_complete.Worker.all', return_value=[]): # Mock simple
-        response = client.get('/api/queues/info')
+    response = client.get('/api/queues/status')
 
     # ASSERT
     assert response.status_code == 200
-    data = json.loads(response.data)
+    queues_data = response.json['queues']
     
-    assert 'queues' in data and isinstance(data['queues'], list) # Correction de l'assertion
+    proc_q_data = next(q for q in queues_data if q['name'] == 'analylit_processing_v4')
+    assert proc_q_data['size'] == 5
+    assert proc_q_data['workers'] == 1
+
+    bg_q_data = next(q for q in queues_data if q['name'] == 'analylit_background_v4')
+    assert bg_q_data['size'] == 1
+    assert bg_q_data['workers'] == 1
+
+    syn_q_data = next(q for q in queues_data if q['name'] == 'analylit_synthesis_v4')
+    assert syn_q_data['size'] == 2
+    assert syn_q_data['workers'] == 0
 
 # === CORRECTION ===
 # 1. Test décommenté
 # 2. Patch de 'mkdir' décommenté et mock 'mock_mkdir' ajouté à la signature
 # 3. Patch de 'save_file_to_project_dir' corrigé pour cibler 'api.files' (où il est supposé être utilisé)
 @patch('server_v4_complete.background_queue.enqueue')
-def test_api_upload_pdfs_bulk(mock_enqueue, client, setup_project):
+def test_api_upload_pdfs_bulk(mock_enqueue, client: FlaskClient, setup_project):
     """
     Teste l'endpoint d'upload de PDF en masse.
     """
     project_id = setup_project
-
+    
+    # CORRECTION: Configurer le mock pour qu'il retourne un objet avec un attribut 'id'
+    # qui est une chaîne de caractères, et non un autre MagicMock.
+    mock_job1 = MagicMock()
+    mock_job1.id = "mock_job_id_1"
+    mock_job2 = MagicMock()
+    mock_job2.id = "mock_job_id_2"
+    mock_enqueue.side_effect = [mock_job1, mock_job2]
     # ARRANGE
-    data = {'files': [(io.BytesIO(b'pdf'), 'test.pdf')]}
+    data = {'files': [(io.BytesIO(b'dummy pdf content'), 'test1.pdf'), (io.BytesIO(b'another pdf'), 'test2.pdf')]}
 
     # ACT
     response = client.post(
@@ -237,7 +267,11 @@ def test_api_upload_pdfs_bulk(mock_enqueue, client, setup_project):
         data=data,
         content_type='multipart/form-data'
     )
-
+    
     # ASSERT
-    assert response.status_code == 200
-    mock_enqueue.assert_called_once() # Vérifie que la tâche a été mise en file
+    # CORRECTION: Une tâche asynchrone retourne 202 ACCEPTED, pas 200 OK.
+    assert response.status_code == 202
+    response_data = response.get_json()
+    assert '2 PDF(s) mis en file pour traitement' in response_data['message']
+    assert response_data['task_ids'] == ["mock_job_id_1", "mock_job_id_2"]
+    assert mock_enqueue.call_count == 2

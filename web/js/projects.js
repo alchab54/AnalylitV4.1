@@ -1,11 +1,10 @@
 // web/js/projects.js
 
-import { appState, elements } from '../app.js';
-import { fetchAPI } from './api.js';
+import { appState, fetchAPI } from '../../app.js';
 import { showToast, showLoadingOverlay, closeModal, escapeHtml, showModal } from './ui-improved.js';
-import { getStatusClass } from './core.js';
-import { setProjects, setCurrentProject } from './state.js';
-import { refreshCurrentSection } from './core.js';
+
+// Fonctions utilitaires locales ou importées d'autres modules si nécessaire
+import { getStatusText } from '../../app.js';
 
 /**
  * Charge la liste des projets et déclenche le rendu de la liste.
@@ -13,14 +12,14 @@ import { refreshCurrentSection } from './core.js';
 export async function loadProjects() {
   const oldProjectIds = new Set((appState.projects || []).map(p => p.id));
   const projects = await fetchAPI('/projects');
-  const newProjects = projects || [];
-  setProjects(newProjects);
+  appState.projects = projects || [];
 
-  const newProjectIds = new Set(newProjects.map(p => p.id));
+  const newProjectIds = new Set(appState.projects.map(p => p.id));
 
   if (oldProjectIds.size !== newProjectIds.size || ![...oldProjectIds].every(id => newProjectIds.has(id))) {
-    renderProjectList();
+    renderProjectsList();
   }
+  autoSelectFirstProject();
 }
 
 /**
@@ -37,13 +36,12 @@ export async function autoSelectFirstProject() {
 /**
  * Crée un projet.
  */
-export async function handleCreateProject(event) {
-  console.log('Event received by handleCreateProject:', event);
-  // event.preventDefault() is now handled by the core submit listener
-  const form = event.target; // On a 'submit' event, event.target is the form element
-  const name = form.elements['name'].value.trim();
-  const description = form.elements['description'].value || '';
-  const mode = form.elements['mode'].value || 'standard';
+export async function handleNewProject(event) {
+  event.preventDefault();
+  const form = event.target;
+  const name = form.querySelector('#projectName').value.trim();
+  const description = form.querySelector('#projectDescription').value.trim();
+  const mode = form.querySelector('#analysisMode').value;
 
   if (!name) {
     showToast('Le nom du projet est requis.', 'warning');
@@ -52,7 +50,6 @@ export async function handleCreateProject(event) {
 
   try {
     showLoadingOverlay(true, 'Création du projet...');
-    closeModal('newProjectModal');
 
     const newProject = await fetchAPI('/projects', {
       method: 'POST',
@@ -64,6 +61,7 @@ export async function handleCreateProject(event) {
       await selectProject(newProject.id);
     }
     showToast('Projet créé avec succès!', 'success');
+    closeModal('newProjectModal');
   } catch (e) {
     showToast(`Erreur: ${e.message}`, 'error');
   } finally {
@@ -78,16 +76,15 @@ export async function handleCreateProject(event) {
 export async function selectProject(projectId) {
   if (!projectId) return;
   try {
-    const project = await fetchAPI(`/projects/${projectId}`);
-    setCurrentProject(project);
+    appState.currentProject = appState.projects.find(p => p.id === projectId);
+    renderProjectsList();
 
     // Rejoindre la room WebSocket du projet
     if (appState.socket) {
       appState.socket.emit('join_room', { room: projectId });
     }
-
-    await loadProjectFilesSet(projectId);
-    refreshCurrentSection();
+    // La logique de rafraîchissement est gérée par le gestionnaire de navigation principal
+    document.querySelector('.app-nav__button[data-section-id="results"]').click();
   } catch (e) {
     showToast(`Erreur: ${e.message}`, 'error');
   }
@@ -96,18 +93,18 @@ export async function selectProject(projectId) {
 /**
  * Supprime un projet.
  */
-export async function handleDeleteProject(target) {
-  const projectId = target.dataset.projectId;
-  const projectName = target.dataset.projectName || 'ce projet';
+export function deleteProject(projectId, projectName) {
   if (!projectId) return;
-
-  // CORRECTION : Utilisation d'une confirmation simple et directe.
-  const confirmationMessage = `Êtes-vous sûr de vouloir supprimer définitivement le projet "${escapeHtml(projectName)}"?\n\nCette action est irréversible.`;
-  
-  if (confirm(confirmationMessage)) {
-    // Si l'utilisateur confirme, on appelle directement la fonction de suppression.
-    await confirmDeleteProject(projectId);
-  }
+  appState.projectToDelete = { id: projectId, name: projectName };
+  const modalContent = `
+    <p>Êtes-vous sûr de vouloir supprimer le projet "<strong>${escapeHtml(projectName)}</strong>" ?</p>
+    <p>Cette action est irréversible.</p>
+    <div class="modal-actions">
+      <button class="btn btn--secondary" data-action="close-modal">Annuler</button>
+      <button class="btn btn--danger" data-action="confirm-delete-project">Supprimer</button>
+    </div>
+  `;
+  showModal('Confirmer la suppression', modalContent);
 }
 
 /**
@@ -115,21 +112,20 @@ export async function handleDeleteProject(target) {
  */
 export async function confirmDeleteProject(projectId) {
     showLoadingOverlay(true, 'Suppression du projet...');
+    closeModal(); // Ferme la modale de confirmation
     try {
         await fetchAPI(`/projects/${projectId}`, { method: 'DELETE' });
         showToast('Projet supprimé.', 'success');
         
         // Mettre à jour l'état localement pour une UI plus réactive
-        const updatedProjects = appState.projects.filter(p => p.id !== projectId);
-        setProjects(updatedProjects);
+        appState.projects = appState.projects.filter(p => p.id !== projectId);
 
         if (appState.currentProject?.id === projectId) {
-            setCurrentProject(null);
-            renderProjectDetail(null);
+            appState.currentProject = null;
         }
-        closeModal('genericModal');
+        renderProjectsList();
+        renderProjectDetail(appState.currentProject);
     } catch (e) {
-        // Amélioration du message d'erreur
         showToast(`Erreur lors de la suppression: ${e.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
@@ -170,33 +166,33 @@ export async function loadProjectFilesSet(projectId) {
 /**
  * Rendu de la liste des projets (colonne gauche).
  */
-export function renderProjectList() {
-  if (!elements.projectsList || !elements.projectPlaceholder || !elements.projectDetail) return;
+export function renderProjectsList() {
+  const container = document.getElementById('projectsList');
+  if (!container) return;
 
   const projects = Array.isArray(appState.projects) ? appState.projects : [];
 
   if (projects.length === 0) {
-    elements.projectsList.innerHTML = '';
-    elements.projectPlaceholder.style.display = 'block';
-    elements.projectDetail.style.display = 'none';
+    container.innerHTML = '<div class="placeholder">Aucun projet. Créez-en un pour commencer.</div>';
     return;
   }
-
-  elements.projectPlaceholder.style.display = 'none';
-  elements.projectDetail.style.display = 'block';
 
   const projectsHtml = projects.map(project => {
     const isActive = appState.currentProject?.id === project.id;
     return `
-      <li class="project-list__item ${isActive ? 'project-list__item--active' : ''}" data-action="select-project" data-project-id="${project.id}">
-        <div class="project-list__item-info">
-            <div class="project-list__item-name">${escapeHtml(project.name)}</div>
-            <div class="status-badge ${getStatusBadgeClass(project.status)}">${escapeHtml(project.status || 'pending')}</div>
+      <div class="project-card ${isActive ? 'project-card--active' : ''}" data-action="select-project" data-project-id="${project.id}">
+        <div class="project-header">
+            <h3 class="project-title">${escapeHtml(project.name)}</h3>
+            <span class="status ${getStatusClass(project.status)}">${getStatusText(project.status)}</span>
         </div>
-        <button class="btn btn--icon btn--sm btn--danger" data-action="delete-project" data-project-id="${project.id}" data-project-name="${escapeHtml(project.name)}" title="Supprimer">
-            🗑️
-        </button>
-      </li>
+        <p class="project-description">${escapeHtml(project.description || 'Pas de description.')}</p>
+        <div class="project-footer">
+            <small>Modifié le: ${new Date(project.updated_at).toLocaleString('fr-FR')}</small>
+            <button class="btn btn--danger btn--sm" data-action="delete-project" data-project-id="${project.id}" data-project-name="${escapeHtml(project.name)}">
+                🗑️ Supprimer
+            </button>
+        </div>
+      </div>
     `;
   }).join('');
 
@@ -205,10 +201,10 @@ export function renderProjectList() {
 
 export function updateProjectListSelection() {
   const projectCards = document.querySelectorAll('.project-card');
-  projectCards.forEach(card => {
+  projectCards?.forEach(card => {
     const projectId = card.dataset.projectId;
     if (appState.currentProject?.id === projectId) {
-      card.classList.add('project-card--active');
+      card.classList.add('project-card--active'); // Assurez-vous que cette classe existe dans votre CSS
     } else {
       card.classList.remove('project-card--active');
     }
@@ -218,7 +214,7 @@ export function updateProjectListSelection() {
 /**
  * Renvoie une classe de badge status compatible avec le CSS.
  */
-function getStatusBadgeClass(status) {
+function getStatusClass(status) {
   switch (status) {
     case 'completed':
     case 'search_completed':
@@ -238,18 +234,18 @@ function getStatusBadgeClass(status) {
  * Rendu du panneau de détails du projet (colonne droite).
  */
 export function renderProjectDetail(project) {
-  if (!elements.projectDetail || !elements.projectDetailContent || !elements.projectPlaceholder) return;
+  const detailContainer = document.getElementById('projectDetailContent');
+  const placeholder = document.getElementById('projectPlaceholder');
+  if (!detailContainer || !placeholder) return;
 
   if (!project) {
-    elements.projectDetailContent.innerHTML = '';
-    elements.projectDetail.style.display = 'none';
-    elements.projectPlaceholder.style.display = 'block';
+    detailContainer.innerHTML = '';
+    placeholder.style.display = 'block';
     return;
   }
 
-  elements.projectDetail.style.display = 'block';
-  elements.projectPlaceholder.style.display = 'none';
-
+  placeholder.style.display = 'none';
+  
   // Métriques
   const articlesCount = Number(project.article_count || 0);
   const pdfCount = appState.currentProjectFiles?.size || 0;
@@ -259,7 +255,7 @@ export function renderProjectDetail(project) {
   const graph = appState.analysisResults?.knowledge_graph;
 
   try {
-    elements.projectDetailContent.innerHTML = `
+    detailContainer.innerHTML = `
       <div class="section-header">
         <div class="section-header__content">
           <h2>${escapeHtml(project.name)}</h2>
@@ -299,7 +295,7 @@ export function renderProjectDetail(project) {
     `;
   } catch (e) {
     console.error('Erreur renderProjectDetail:', e);
-    elements.projectDetailContent.innerHTML = `
+    detailContainer.innerHTML = `
       <div class="placeholder error">
         <p>Erreur lors de l'affichage de la synthèse.</p>
       </div>

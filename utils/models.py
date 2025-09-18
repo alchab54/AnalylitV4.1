@@ -278,9 +278,12 @@ class Prompt(Base):
     name = Column(String, nullable=False, unique=True)
     description = Column(Text)
     template = Column(Text, nullable=False) # Renommé de 'content' à 'template'
+    is_default = Column(Boolean, default=False)
+    analysis_type = Column(String)
     
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return {c.name: getattr(self, c.name, None) for c in self.__table__.columns}
 
 class ProcessingLog(Base):
     __tablename__ = 'processing_log'

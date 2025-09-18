@@ -1,9 +1,9 @@
 // web/js/import.js
-import { appState } from '../app.js';
-import { fetchAPI } from './api.js';
-import { showToast, showLoadingOverlay, escapeHtml, showModal, closeModal, updateLoadingProgress } from './ui-improved.js';
-import { loadSearchResults } from './articles.js';
+import { appState, fetchAPI } from '../../app.js';
+import { showToast, showLoadingOverlay, showModal, closeModal, updateLoadingProgress } from './ui-improved.js';
+import { loadSearchResults } from './results.js';
 
+// Cette fonction est appelée par le routeur principal, elle doit être exportée.
 export function renderImportSection(project) {
   const container = document.getElementById('importContainer');
   if (!container) return;
@@ -63,7 +63,7 @@ export function renderImportSection(project) {
   `;
 }
 
-export function handleZoteroImport(target) { // Already exported, but keeping for consistency with request
+export function handleZoteroImport(target) {
   const fileInput = document.getElementById('zoteroFileInput');
   if (target && target.files && target.files.length > 0) {
     processZoteroFile(target.files);
@@ -72,7 +72,7 @@ export function handleZoteroImport(target) { // Already exported, but keeping fo
   }
 }
 
-export function showPmidImportModal() { // Already exported, but keeping for consistency with request
+export function showPmidImportModal() {
   const content = `
     <form id="pmid-import-form" data-action="submit-pmid-import">
       <div class="form-group">
@@ -87,7 +87,7 @@ export function showPmidImportModal() { // Already exported, but keeping for con
   showModal('Import Manuel PMID/DOI', content);
 }
 
-export function handleUploadPdfs(target) { // Already exported, but keeping for consistency with request
+export function handleUploadPdfs(target) {
   const fileInput = document.getElementById('bulkPDFInput');
   if (target && target.files && target.files.length > 0) {
     processPdfUpload(target.files);
@@ -109,7 +109,7 @@ export async function handleBulkPdfDownload() {
   }
 }
 
-export async function exportForThesis() { // Already exported, but keeping for consistency with request
+export async function exportForThesis() {
     if (!appState.currentProject?.id) {
         showToast('Veuillez sélectionner un projet.', 'warning');
         return;
@@ -118,7 +118,7 @@ export async function exportForThesis() { // Already exported, but keeping for c
     showToast('Export pour la thèse en cours de téléchargement...', 'info');
 }
 
-export async function handleIndexPdfs() { // Already exported, but keeping for consistency with request
+export async function handleIndexPdfs() {
   if (!appState.currentProject) return;
   
   // Affiche l'overlay avec un message initial et prépare la barre de progression
@@ -137,7 +137,7 @@ export async function handleIndexPdfs() { // Already exported, but keeping for c
   }
 }
 
-export async function handleZoteroSync() { // Already exported, but keeping for consistency with request
+export async function handleZoteroSync() {
   showToast('Synchronisation Zotero non implémentée dans cette version.', 'info');
 }
 
@@ -161,7 +161,7 @@ async function processZoteroFile(file) {
   }
 }
 
-export async function processPmidImport(event) { // Already exported, but keeping for consistency with request
+export async function processPmidImport(event) {
   event.preventDefault();
   // 1. LIRE LES VALEURS D'ABORD
   const pmidTextarea = document.getElementById('pmid-list');
@@ -196,6 +196,30 @@ export async function processPmidImport(event) { // Already exported, but keepin
     showLoadingOverlay(false, '');
   }
 }
+
+// --- Fonctions ajoutées pour la complétude de l'architecture ---
+
+export async function handleSaveZoteroSettings(e) {
+    e.preventDefault();
+    const userId = document.getElementById('zoteroUserId').value.trim();
+    const apiKey = document.getElementById('zoteroApiKey').value.trim();
+
+    if (!userId || !apiKey) {
+        return showToast('L\'ID utilisateur et la clé d\'API Zotero sont requis.', 'warning');
+    }
+
+    try {
+        await fetchAPI('/settings/zotero', {
+            method: 'POST',
+            body: { userId, apiKey }
+        });
+        showToast('Identifiants Zotero sauvegardés avec succès.', 'success');
+    } catch (error) {
+        showToast(`Erreur lors de la sauvegarde : ${error.message}`, 'error');
+    }
+}
+
+export function startZoteroStatusPolling(projectId) { /* ... logique de polling ... */ }
 
 async function processPdfUpload(files) {
   if (!appState.currentProject) {

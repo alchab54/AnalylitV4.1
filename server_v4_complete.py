@@ -18,7 +18,7 @@ from utils.app_globals import (
 )
 from utils.models import Project, Grid, Extraction, Prompt, AnalysisProfile, SearchResult, ChatMessage, RiskOfBias
 from utils.file_handlers import save_file_to_project_dir
-from utils.app_globals import PROJECTS_DIR
+from utils.app_globals import PROJECTS_DIR as PROJECTS_DIR_STR
 from utils.prisma_scr import get_base_prisma_checklist
 
 # --- Imports des tâches asynchrones ---
@@ -30,6 +30,9 @@ from tasks_v4_complete import (
     index_project_pdfs_task, answer_chat_question_task, run_risk_of_bias_task,
     add_manual_articles_task, pull_ollama_model_task, calculate_kappa_task
 )
+
+# Convertir PROJECTS_DIR en objet Path pour assurer la compatibilité
+PROJECTS_DIR = Path(PROJECTS_DIR_STR)
 
 def create_app():
     app = Flask(__name__)
