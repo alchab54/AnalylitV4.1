@@ -39,10 +39,11 @@ def create_app():
     CORS(app, origins=["http://localhost:8080", "http://127.0.0.1:8080"],
          expose_headers=["Content-Disposition"],
          supports_credentials=True)
-
-    app.config["TESTING"] = os.getenv("TESTING", "false").lower() == "true"
-    app.config["ENV"] = os.getenv("FLASK_ENV", "production")
-    app.config["WTF_CSRF_ENABLED"] = False
+    
+    # app_globals.initialize_app(testing=testing)  # DÉSACTIVÉ : Géré par entrypoint.sh AVANT le démarrage.
+    # app.config["TESTING"] = os.getenv("TESTING", "false").lower() == "true"
+    # app.config["ENV"] = os.getenv("FLASK_ENV", "production")
+    # app.config["WTF_CSRF_ENABLED"] = False
 
     def first_or_404(query):
         result = query.first()
