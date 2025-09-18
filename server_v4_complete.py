@@ -72,14 +72,6 @@ def create_app():
     def get_all_projects(session):
         projects = session.query(Project).all()
         return jsonify([p.to_dict() for p in projects]), 200
-    
-    def format_bibliography(extractions):
-    """Formate une bibliographie simple pour les tests."""
-    bibliography = []
-    for ext in extractions:
-        title = ext.get('title', 'Sans titre')
-        bibliography.append(f"- {title}")
-    return "\n".join(bibliography)
 
     @app.route("/api/projects/<project_id>", methods=["GET"])
     @with_db_session
@@ -567,6 +559,14 @@ def create_app():
     return app
 
 app = create_app()
+
+def format_bibliography(extractions):
+    """Formate une bibliographie simple pour les tests."""
+    bibliography = []
+    for ext in extractions:
+        title = ext.get('title', 'Sans titre')
+        bibliography.append(f"- {title}")
+    return "\n".join(bibliography)
 
 if __name__ == "__main__":
     # Initialisation pour le développement local
