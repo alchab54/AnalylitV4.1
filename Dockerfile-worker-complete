@@ -2,6 +2,15 @@
 # Utilise l'image de base où tout est déjà installé (dépendances + code source)
 FROM analylit-base:latest
 
+# CORRECTION: Installe les outils réseau (netcat) par cohérence avec l'image web.
+# On repasse temporairement en root pour l'installation.
+USER root
+RUN apt-get update && apt-get install -y netcat-openbsd postgresql-client && \
+    rm -rf /var/lib/apt/lists/*
+
+# On revient à l'utilisateur non-privilégié pour la sécurité.
+USER appuser
+
 # PLUS BESOIN de copier le code source - il est déjà dans l'image de base !
 # L'ancienne ligne "COPY --chown=appuser:appuser . ." était redondante
 
