@@ -11,6 +11,12 @@ services:
       - POSTGRES_USER=${POSTGRES_USER:-analylit_user}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-strong_password}
       - POSTGRES_DB=${POSTGRES_DB:-analylit_db}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - analylit-network
     restart: unless-stopped
@@ -61,17 +67,13 @@ services:
       - projects_data:/home/appuser/app/projects
       - model_cache_data:/home/appuser/app/model_cache
     env_file: .env
-    command: >
-      sh -c "echo 'Waiting for database port to be open...' &&
-      while ! nc -z db 5432; do
-        sleep 2;
-      done;
-      echo 'Database is ready. Initializing schema and seeding data...' &&
+    command: > # CORRECTION: Utilisation de la commande complète pour l'initialisation et le seeding
+      sh -c "echo 'Initialisation de la base de données et seeding...' &&
       python -c 'from server_v4_complete import _init_db_command; _init_db_command()' &&
       echo 'Lancement du serveur Gunicorn...' &&
       gunicorn server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 3 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"
     depends_on:
-      db: { condition: service_started }
+      db: { condition: service_healthy }
       redis: { condition: service_healthy }
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
@@ -98,7 +100,7 @@ services:
     command: >
       rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4
     depends_on:
-      db: { condition: service_started }
+      db: { condition: service_healthy }
       redis: { condition: service_healthy }
     deploy:
       replicas: 1
