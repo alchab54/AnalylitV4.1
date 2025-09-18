@@ -772,3 +772,31 @@ export async function handlePullModel() {
         showLoadingOverlay(false);
     }
 }
+
+/**
+ * Gère la sauvegarde d'un modèle de prompt.
+ */
+export async function handleSavePrompt(event) {
+    event.preventDefault();
+    const form = event.target;
+    const promptId = form.elements.promptId.value;
+    const name = form.elements.promptName.value;
+    const description = form.elements.promptDescription.value;
+    const systemMessage = form.elements.promptSystem.value;
+    const userTemplate = form.elements.promptUser.value;
+
+    const payload = {
+        name,
+        description,
+        system_message: systemMessage,
+        user_message_template: userTemplate
+    };
+
+    const method = promptId ? 'PUT' : 'POST';
+    const endpoint = promptId ? `/prompts/${promptId}` : '/prompts';
+
+    await fetchAPI(endpoint, { method, body: payload });
+    showToast('Modèle de prompt sauvegardé.', 'success');
+    closeModal('promptEditorModal');
+    await loadPrompts();
+}

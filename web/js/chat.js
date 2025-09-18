@@ -162,3 +162,26 @@ function renderChatSection(project = null, error = false) {
         return;
     }
 }
+
+
+/**
+ * Gère le lancement de l'indexation des PDFs pour le chat RAG.
+ */
+export async function handleStartIndexing() {
+    if (!appState.currentProject) {
+        showToast('Veuillez sélectionner un projet pour lancer l\'indexation.', 'warning');
+        return;
+    }
+
+    showLoadingOverlay(true, 'Lancement de l\'indexation des PDFs...');
+    try {
+        const response = await fetchAPI(`/projects/${appState.currentProject.id}/index-pdfs`, { method: 'POST' });
+        showToast('Indexation des PDFs lancée en arrière-plan.', 'success');
+        // On peut utiliser le task_id pour suivre la progression si nécessaire
+        console.log('Task ID for indexing:', response.task_id);
+    } catch (error) {
+        showToast(`Erreur lors du lancement de l'indexation : ${error.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
