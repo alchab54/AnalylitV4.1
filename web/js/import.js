@@ -1,5 +1,5 @@
 // web/js/import.js
-import { appState, fetchAPI } from '../app.js';
+import { appState, fetchAPI } from './app-improved.js';
 import { showToast, showLoadingOverlay, showModal, closeModal, updateLoadingProgress } from './ui-improved.js';
 import { loadSearchResults } from './results.js';
 

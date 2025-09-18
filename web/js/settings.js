@@ -2,7 +2,7 @@
 // --- MODIFIÉ POUR LE RENDU DYNAMIQUE ---
 
 import { fetchAPI } from './api.js';
-import { appState } from '../app.js';
+import { appState } from './app-improved.js';
 import { setQueuesStatus } from './state.js';
 // MODIFIÉ: Utilisation du nouveau module UI amélioré
 import { showToast, showConfirmModal } from './ui-improved.js'; 

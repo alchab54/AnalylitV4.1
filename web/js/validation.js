@@ -1,5 +1,5 @@
 // web/js/validation.js
-import { appState, elements } from '../app.js';
+import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { showLoadingOverlay, showToast, escapeHtml } from './ui-improved.js';
 import { loadProjectGrids } from './grids.js';

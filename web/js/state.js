@@ -1,6 +1,6 @@
 // web/js/state.js
 
-import { appState } from '../app.js';
+import { appState } from './app-improved.js';
 import { renderProjectList, renderProjectDetail, updateProjectListSelection } from './projects.js';
 import { renderSearchResultsTable, updateSelectionCounter, updateAllRowSelections } from './articles.js';
 import { updateNotificationIndicator } from './notifications.js';

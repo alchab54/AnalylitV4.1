@@ -6,14 +6,13 @@
 import { showToast, showLoadingOverlay, closeModal, openModal } from './ui-improved.js';
 import { loadProjects, selectProject, handleNewProject, confirmDeleteProject, deleteProject } from './projects.js';
 import { loadAnalysisProfiles, openProfileEditor, handleDeleteProfile, handleSaveProfile, loadOllamaModels, renderSettings } from './settings.js';
-import { handleSaveZoteroSettings, handleZoteroImport, startZoteroStatusPolling, renderImportSection, showPmidImportModal, handleUploadPdfs, handleIndexPdfs, handleZoteroSync, processPmidImport, exportForThesis } from './import.js';
-import { handlePrepareAnalysis, handleRunPipeline, handleRunSynthesis, handlePdfUpload } from './pipeline.js';
-import { handleExportResults, handleExportAll } from './results.js';
+import { renderImportSection, handleZoteroImport, showPmidImportModal, handleUploadPdfs, handleIndexPdfs, handleZoteroSync, processPmidImport, exportForThesis } from './import.js';
+import { startBatchProcessing, showRunExtractionModal, startFullExtraction } from './articles.js'; // Corrected from pipeline.js and results.js
 import { handleRunDiscussionDraft, handleRunKnowledgeGraph, renderKnowledgeGraph, loadProjectAnalyses, exportAnalyses, handleRunATNAnalysis, runProjectAnalysis, showPRISMAModal, savePRISMAProgress, exportPRISMAReport } from './analyses.js';
 import { handleGeneratePrisma, renderReportingSection, generateBibliography, generateSummaryTable, exportSummaryTableExcel, savePrismaChecklist } from './reporting.js';
-import { handleRunMetaAnalysis, handleRunDescriptiveStats, handleRunAtnScore } from './stats.js';
-import { loadValidationSection, handleValidationDecision, resetValidationStatus, filterValidationList } from './validation.js';
-import { handleClearQueue, handlePullModel, showEditPromptModal, handleSavePrompt, renderQueueStatus, renderOllamaModels, renderPromptsList, renderSettingsPage } from './admin.js';
+import { handleRunMetaAnalysis } from './analyses.js'; // Corrected from stats.js
+import { loadValidationSection, handleValidateExtraction, resetValidationStatus, filterValidationList } from './validation.js';
+import { loadQueuesStatus, handleClearQueue, handlePullModel, showEditPromptModal, handleSavePrompt } from './settings.js'; // Corrected from admin.js
 import { showGridFormModal, addGridFieldInput, handleSaveGrid, loadProjectGrids, handleDeleteGrid, removeGridField, triggerGridImport, handleGridImportUpload } from './grids.js';
 import { handleStartIndexing, sendChatMessage, loadChatMessages, renderChatInterface } from './chat.js';
 import { ThemeManager } from './theme-manager.js';

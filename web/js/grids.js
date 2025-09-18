@@ -1,6 +1,6 @@
 // web/js/grids.js
 
-import { appState, elements } from '../app.js';
+import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { setCurrentProjectGrids } from './state.js'; // Assuming this is correct, no ui import here.
 import { showToast, escapeHtml } from './ui-improved.js';

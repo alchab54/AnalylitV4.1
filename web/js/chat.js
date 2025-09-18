@@ -1,6 +1,6 @@
 // web/js/chat.js
 import { escapeHtml, showToast } from './ui-improved.js';
-import { appState } from '../app.js';
+import { appState } from './app-improved.js';
 import { fetchAPI } from './api.js';
 
 function formatMessageContent(content) {
