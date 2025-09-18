@@ -32,18 +32,17 @@ def session(engine, tables):
     Fournit une session DB transactionnelle et 100% isolée pour CHAQUE test.
     Ceci est la solution finale aux problèmes d'isolation.
     """
-    connection = engine.connect()
-    transaction = connection.begin()
-    db_session = Session(bind=connection)
-    
-    # Injection de la session dans le contexte de l'application Flask
-    flask_app.extensions['db_session_factory'] = lambda: db_session
+    # TRUNCATE toutes les tables avant chaque test pour une isolation parfaite
+    with engine.connect() as connection:
+        transaction = connection.begin()
+        for table in reversed(Base.metadata.sorted_tables):
+            connection.execute(table.delete())
+        transaction.commit()
 
+    # Crée une nouvelle session pour le test
+    db_session = sessionmaker(bind=engine)()
     yield db_session
-    
     db_session.close()
-    transaction.rollback() # Annule TOUTES les modifications à la fin de chaque test
-    connection.close()
 
 @pytest.fixture(scope="function")
 def client(session):

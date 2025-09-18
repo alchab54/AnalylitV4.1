@@ -31,6 +31,14 @@ class TestThesisExport:
         # Marquer l'article comme inclus pour qu'il soit dans l'export
         session.execute(text("INSERT INTO extractions (id, project_id, pmid, user_validation_status) VALUES (:id, :pid, :pmid, :status)"),
                         {"id": str(uuid.uuid4()), "pid": project_id, "pmid": "PMID1", "status": "include"})
+        project = Project(name="Test Thesis Export", description="Desc", analysis_mode="screening")
+        session.add(project)
+        session.flush() # Pour obtenir l'ID auto-généré
+        project_id = project.id
+
+        search_result = SearchResult(project_id=project_id, article_id="PMID1", title="Article 1", authors="Doe J", publication_date="2023", journal="Journal A")
+        extraction = Extraction(project_id=project_id, pmid="PMID1", user_validation_status="include")
+        session.add_all([search_result, extraction])
         session.commit()
 
         # Configurer les mocks
@@ -56,6 +64,10 @@ class TestThesisExport:
         project_id = str(uuid.uuid4())
         session.execute(text("INSERT INTO projects (id, name, description, created_at, updated_at, analysis_mode) VALUES (:id, :name, :desc, :created, :updated, :mode)"),
                         {"id": project_id, "name": "Test PRISMA Checklist", "desc": "Desc", "created": "2023-01-01", "updated": "2023-01-01", "mode": "screening"})
+        project = Project(name="Test PRISMA Checklist", description="Desc", analysis_mode="screening")
+        session.add(project)
+        session.flush()
+        project_id = project.id
         session.commit()
 
         from server_v4_complete import create_app
@@ -90,6 +102,11 @@ class TestThesisExport:
                         {"id": project_id, "name": "Test PRISMA Flow", "desc": "Desc", "created": "2023-01-01", "updated": "2023-01-01", "mode": "screening"})
         session.execute(text("INSERT INTO search_results (id, project_id, article_id, title) VALUES (:id, :pid, :aid, :title)"),
                         {"id": str(uuid.uuid4()), "pid": project_id, "aid": "PMID1", "title": "Article 1"})
+        project = Project(name="Test PRISMA Flow", description="Desc", analysis_mode="screening")
+        session.add(project)
+        session.flush()
+        project_id = project.id
+        session.add(SearchResult(project_id=project_id, article_id="PMID1", title="Article 1"))
         session.commit()
 
         from server_v4_complete import create_app
