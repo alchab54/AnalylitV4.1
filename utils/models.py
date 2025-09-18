@@ -276,13 +276,12 @@ class Prompt(Base):
     
     id = Column(String, primary_key=True, default=_uuid)
     name = Column(String, nullable=False, unique=True)
-    description = Column(Text)
+    # description = Column(Text) # Colonne retirée pour correspondre au schéma de la DB de test
     template = Column(Text, nullable=False) # Renommé de 'content' à 'template'
     is_default = Column(Boolean, default=False)
     analysis_type = Column(String)
     
     def to_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
         return {c.name: getattr(self, c.name, None) for c in self.__table__.columns}
 
 class ProcessingLog(Base):
