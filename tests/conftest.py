@@ -1,73 +1,46 @@
-import os
+# tests/conftest.py
+
 import pytest
-import json
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-# Définir environnement de test avant tout import
-os.environ.setdefault("TESTING", "true")
-os.environ.setdefault("FLASK_ENV", "testing")
-os.environ.setdefault("DATABASE_URL", "postgresql://analylit:password@analylit-db-v4:5432/analylit_db")
+# Assurez-vous que Base est importé depuis vos modèles
+# Cela peut être utils.database ou utils.models selon votre structure
+try:
+    from utils.models import Base
+except ImportError:
+    from utils.database import Base
 
-from utils.database import engine, Base, get_session
+# Utiliser une base de données en mémoire pour des tests rapides et isolés
+TEST_DATABASE_URL = "sqlite:///:memory:"
 
-@pytest.fixture(scope="session", autouse=True)
-def init_test_db():
-    # Créer un schéma si mappé, pas de seed
-    Base.metadata.create_all(bind=engine)
-    yield
-    Base.metadata.drop_all(bind=engine)
+@pytest.fixture(scope="session")
+def engine():
+    """
+    Crée un moteur de base de données unique pour toute la session de tests.
+    Crée toutes les tables au début et les supprime à la fin.
+    """
+    db_engine = create_engine(TEST_DATABASE_URL)
+    Base.metadata.create_all(db_engine)
+    yield db_engine
+    Base.metadata.drop_all(db_engine)
 
 @pytest.fixture(scope="function")
-def db_session():
-    session = get_session()
-    try:
-        yield session
-        session.commit()
-    finally:
-        session.rollback()
-        session.close()
-
-@pytest.fixture(scope="function", autouse=False)
-def clean_db(db_session):
-    # Vide les tables entre tests
-    for table in reversed(Base.metadata.sorted_tables):
-        db_session.execute(table.delete())
-        db_session.commit()
-    yield
-
-# Ajout des fixtures manquantes pour les tests API
-@pytest.fixture(scope="session")
-def app():
-    """Créer une instance de l'application Flask pour les tests."""
-    from server_v4_complete import create_app
+def db_session(engine):
+    """
+    Crée une nouvelle session et une transaction pour CHAQUE test.
+    À la fin du test, la transaction est annulée (rollback),
+    assurant qu'aucun test ne peut influencer le suivant.
+    """
+    connection = engine.connect()
+    transaction = connection.begin()
     
-    app_instance = create_app()
-    app_instance.config.update({
-        "TESTING": True,
-        "WTF_CSRF_ENABLED": False
-    })
+    Session = sessionmaker(bind=connection)
+    session = Session()
     
-    with app_instance.app_context():
-        yield app_instance
-
-@pytest.fixture
-def client(app):
-    """Client de test Flask."""
-    return app.test_client()
-
-@pytest.fixture
-def session(db_session):
-    """Alias pour la session de base de données."""
-    return db_session
-
-@pytest.fixture
-def setup_project(client, clean_db):
-    """Fixture pour créer un projet de base et retourner son ID."""
-    project_data = {
-        'name': 'Projet de Test (Extensions)',
-        'description': 'Description test.',
-        'mode': 'screening'
-    }
-    response = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
-    assert response.status_code == 201
-    project_id = json.loads(response.data)['id']
-    return {"project_id": project_id, "name": project_data['name']}
+    yield session
+    
+    session.close()
+    transaction.rollback()
+    connection.close()

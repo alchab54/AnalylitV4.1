@@ -1,71 +1,66 @@
+# tests/test_database.py
+
 import pytest
 from unittest.mock import patch, MagicMock
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
-# Importer les fonctions à tester
-from utils.database import init_database, seed_default_data, Base
+# Importer les fonctions à tester et les modèles pour vérification
+from utils.database import init_database, seed_default_data
 from utils.models import AnalysisProfile, Project
 
-@pytest.fixture(scope="function")
-def session():
-    """Crée une session de base de données en mémoire pour chaque test."""
-    engine = create_engine("sqlite:///:memory:")
-    Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
-    db_session = Session()
-    yield db_session
-    db_session.close()
-    Base.metadata.drop_all(engine)
+# La fixture `db_session` est automatiquement fournie par conftest.py
 
-def test_database_initialization():
+def test_init_database_logic():
     """
-    Teste si init_database configure correctement le moteur et les tables.
+    Teste la logique d'initialisation en simulant les appels externes.
     """
-    with patch('utils.database.create_engine') as mock_create_engine:
+    with patch('utils.database.create_engine') as mock_create_engine, \
+         patch('utils.database.Base.metadata.create_all') as mock_create_all:
+        
         mock_engine = MagicMock()
         mock_create_engine.return_value = mock_engine
 
-        # Appeler la fonction d'initialisation
-        init_database("sqlite:///:memory:")
+        # Appeler la fonction avec une URL de test
+        initialized_engine = init_database("mock_db_url")
 
-        # Vérifier que create_engine a été appelé
-        mock_create_engine.assert_called_once_with("sqlite:///:memory:", pool_pre_ping=True, echo=False)
-        # Vérifier que les tables ont été créées
-        Base.metadata.create_all.assert_called_once_with(bind=mock_engine)
+        # Vérifier que les fonctions critiques ont été appelées
+        mock_create_engine.assert_called_once_with("mock_db_url", pool_pre_ping=True, echo=False)
+        mock_create_all.assert_called_once_with(bind=mock_engine)
+        assert initialized_engine == mock_engine
 
-def test_seed_default_data_when_empty(session):
+def test_seed_default_data_when_empty(db_session):
     """
-    Teste que les données par défaut sont créées si la base de données est vide.
+    Teste que les données par défaut sont créées si la DB est vide.
+    `db_session` est une session propre fournie par notre fixture.
     """
-    # La base de données est vide grâce à la fixture
-    seed_default_data(session)
+    seed_default_data(db_session)
 
-    # Vérifier que les objets ont été créés
-    profile = session.query(AnalysisProfile).filter_by(name='Standard').first()
-    project = session.query(Project).filter_by(name='Projet par défaut').first()
+    # Vérifier que les objets ont bien été ajoutés à la session
+    profile = db_session.query(AnalysisProfile).filter_by(name='Standard').first()
+    project = db_session.query(Project).filter_by(name='Projet par défaut').first()
 
     assert profile is not None
     assert profile.name == 'Standard'
     assert project is not None
     assert project.name == 'Projet par défaut'
 
-def test_seed_default_data_when_exists(session):
+def test_seed_default_data_when_exists(db_session):
     """
     Teste que rien n'est ajouté si les données par défaut existent déjà.
     """
-    # Ajouter manuellement les données par défaut
-    session.add(AnalysisProfile(name='Standard'))
-    session.add(Project(name='Projet par défaut', description='Existant'))
-    session.commit()
+    # Pré-remplir la base de données avec les données par défaut
+    db_session.add(AnalysisProfile(name='Standard'))
+    db_session.add(Project(name='Projet par défaut'))
+    db_session.commit()
 
-    # Compter les objets avant de seeder
-    profile_count_before = session.query(AnalysisProfile).count()
-    project_count_before = session.query(Project).count()
+    # Compter les objets
+    profile_count = db_session.query(AnalysisProfile).count()
+    project_count = db_session.query(Project).count()
+    assert profile_count == 1
+    assert project_count == 1
 
-    # Lancer le seeding
-    seed_default_data(session)
+    # Lancer la fonction de seeding une seconde fois
+    seed_default_data(db_session)
 
-    # Vérifier que le nombre d'objets n'a pas changé
-    assert session.query(AnalysisProfile).count() == profile_count_before
-    assert session.query(Project).count() == project_count_before
+    # Vérifier que le nombre d'objets n'a pas changé (pas de doublons)
+    assert db_session.query(AnalysisProfile).count() == profile_count
+    assert db_session.query(Project).count() == project_count

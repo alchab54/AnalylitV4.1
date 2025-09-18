@@ -74,36 +74,17 @@ def with_db_session(func):
 
 def seed_default_data(session):
     """
-    Seed la base de données avec des données par défaut (un projet et un profil).
-    Ne fait rien si les données existent déjà.
+    Seed la base de données avec des données par défaut.
     """
-    # Importer les modèles ici pour éviter les imports circulaires
     from utils.models import AnalysisProfile, Project
-
     try:
-        # Vérifier et créer le profil par défaut
-        existing_profile = session.query(AnalysisProfile).filter_by(name='Standard').first()
-        if not existing_profile:
-            default_profile = AnalysisProfile(
-                name='Standard',
-                description='Profil par défaut pour les analyses standards.',
-                is_custom=False
-            )
-            session.add(default_profile)
-            logger.info("Profil 'Standard' par défaut créé.")
+        if not session.query(AnalysisProfile).filter_by(name='Standard').first():
+            session.add(AnalysisProfile(name='Standard', description='Profil par défaut.'))
 
-        # Vérifier et créer le projet par défaut
-        existing_project = session.query(Project).filter_by(name='Projet par défaut').first()
-        if not existing_project:
-            default_project = Project(
-                name='Projet par défaut',
-                description='Projet de démonstration pour les nouveaux utilisateurs.'
-            )
-            session.add(default_project)
-            logger.info("Projet 'Projet par défaut' créé.")
-
+        if not session.query(Project).filter_by(name='Projet par défaut').first():
+            session.add(Project(name='Projet par défaut', description='Projet de démo.'))
+        
         session.commit()
-
     except Exception as e:
-        logger.error(f"Erreur pendant le seeding des données: {e}")
+        logger.error(f"Erreur pendant le seeding: {e}")
         session.rollback()
