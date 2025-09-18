@@ -17,3 +17,17 @@ Mon application Docker Compose pour AnalylitV4.1 est presque fonctionnelle.
 
 **Objectif :**
 Modifier `server_v4_complete.py` pour empêcher l'initialisation globale `app_globals.initialize_app()` de s'exécuter lors de l'importation par les workers de Gunicorn. L'initialisation doit être *uniquement* gérée par notre appel explicite dans `entrypoint.sh`.
+
+---
+
+## Résumé de la résolution
+
+**Problème : Conflit d'initialisation de Gunicorn et Flask**
+
+L'application subissait un conflit d'initialisation lors du démarrage avec Gunicorn. Le script `entrypoint.sh` réalisait une première initialisation de la base de données, mais la fonction `create_app()` dans `server_v4_complete.py` effectuait également une initialisation.
+
+Lorsque Gunicorn démarrait ses workers, chaque worker importait le module `server_v4_complete` et appelait `create_app()`, ce qui provoquait des ré-initialisations multiples. Ce conflit corrompait l'état de l'application Flask, entraînant des erreurs `404 Not Found` sur les routes de l'API et l'échec du healthcheck de Docker Compose.
+
+**Solution : Suppression de l'initialisation redondante**
+
+La solution a été de supprimer le bloc d'initialisation redondant dans la fonction `create_app()` du fichier `server_v4_complete.py`. L'initialisation est maintenant uniquement gérée par le script `entrypoint.sh` avant le lancement de Gunicorn, ce qui garantit qu'elle n'est effectuée qu'une seule fois.
