@@ -3,15 +3,13 @@ from sqlalchemy import (
     Column, String, Integer, Float, Boolean, Text,
     ForeignKey, DateTime, UniqueConstraint
 )
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import relationship, declarative_base
 from datetime import datetime
 import uuid
 import json
-
-# Définir le schéma, mais le rendre optionnel pour les tests SQLite
+from .db_base import Base  # Importer la Base partagée
+ 
 SCHEMA = 'analylit_schema' if os.getenv('TESTING') != 'true' else None
-
-Base = declarative_base()
 
 def _uuid():
     return str(uuid.uuid4())

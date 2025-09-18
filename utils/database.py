@@ -5,7 +5,9 @@ import logging
 from functools import wraps
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
-
+# ↓↓↓ MODIFIEZ CET IMPORT ↓↓↓
+from .db_base import Base  # Importer la Base partagée
+ 
 logger = logging.getLogger(__name__)
 
 # --- Variables globales (non initialisées) ---
@@ -14,8 +16,6 @@ SessionFactory = None
 
 # Définir le schéma, mais le rendre None si en mode test
 SCHEMA = 'analylit_schema' if os.getenv('TESTING') != 'true' else None
-
-Base = declarative_base()
 
 # ↓↓↓ AJOUTEZ CET IMPORT CI-DESSOUS ↓↓↓
 # Cela force l'enregistrement de tous les modèles auprès de la 'Base' déclarative
