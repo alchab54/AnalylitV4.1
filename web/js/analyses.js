@@ -490,3 +490,29 @@ export async function handleRunDescriptiveStats() {
         showLoadingOverlay(false);
     }
 }
+
+/**
+ * Exporte les résultats d'analyse (données brutes et graphiques).
+ */
+export async function exportAnalyses() {
+    if (!appState.currentProject?.id) {
+        showToast('Veuillez sélectionner un projet pour exporter les analyses.', 'warning');
+        return;
+    }
+
+    try {
+        showLoadingOverlay(true, 'Préparation de l\'exportation...');
+        // L'URL pointe vers l'endpoint backend qui génère le fichier ZIP
+        const exportUrl = `/api/projects/${appState.currentProject.id}/export/analyses`;
+        
+        // Ouvre une nouvelle fenêtre pour déclencher le téléchargement du fichier
+        window.open(exportUrl, '_blank');
+
+        showToast('L\'exportation des analyses a commencé.', 'info');
+    } catch (error) {
+        console.error("Erreur lors de l'exportation des analyses:", error);
+        showToast(`Erreur d'exportation : ${error.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}

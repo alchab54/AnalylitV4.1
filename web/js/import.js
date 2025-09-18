@@ -1,6 +1,6 @@
 // web/js/import.js
-import { appState } from './app-improved.js'; 
-import { fetchAPI } from './api.js'; 
+import { appState } from './app-improved.js'; // L'état global vient de l'entrypoint
+import { fetchAPI } from './api.js';         // La fonction API vient de son module dédié
 import { showToast, showLoadingOverlay, showModal, closeModal, updateLoadingProgress } from './ui-improved.js';
 import { loadSearchResults } from './articles.js';
 
