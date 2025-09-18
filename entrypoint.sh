@@ -7,8 +7,9 @@ echo "Entrypoint démarré. En attente de la base de données..."
 
 # Boucle d'attente pour Postgres
 # Utilise les variables d'environnement fournies par docker-compose
-# Note : $$POSTGRES_USER est correct pour pg_isready dans un script shell
-until pg_isready -h "db" -p 5432 -U "$POSTGRES_USER" -d "$POSTGRES_DB"; do
+# CORRECTION : Utiliser PGPASSWORD et tous les paramètres pour un test de connexion complet.
+# NOUVELLE CORRECTION : Utiliser psql pour tenter une vraie connexion, ce qui est plus fiable que pg_isready.
+until psql "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB" -c '\q'; do
   echo "La base de données n'est pas encore prête... en attente."
   sleep 2
 done

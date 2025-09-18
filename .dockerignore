@@ -121,3 +121,4 @@ results*.json
 !server_v4_complete.py
 !tasks_v4_complete.py
 !config_v4.py
+!entrypoint.sh
