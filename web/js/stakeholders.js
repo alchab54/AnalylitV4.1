@@ -1,5 +1,5 @@
 // web/js/stakeholders.js
-import { appState } from '../app.js';
+import { appState } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { showToast, openModal, escapeHtml } from './ui-improved.js';
 

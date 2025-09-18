@@ -1,5 +1,5 @@
 // web/js/notifications.js
-import { appState } from '../app.js';
+import { appState } from './app-improved.js';
 import { showToast } from './ui-improved.js';
 
 export function updateNotificationIndicator() {

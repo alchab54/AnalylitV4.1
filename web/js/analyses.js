@@ -21,7 +21,7 @@ export async function loadProjectAnalyses() {
     }
 }
 
-export function exportAnalyses() {
+export async function handleRunATNAnalysis(event) {
     if (!appState.currentProject?.id) {
         showToast('Veuillez sélectionner un projet.', 'warning');
         return;
