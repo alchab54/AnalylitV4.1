@@ -114,19 +114,16 @@ def _init_db_command():
     Fonction interne pour initialiser la base de données.
     Sera appelée par une commande Flask CLI.
     """
-    # Import click ici pour éviter les dépendances circulaires
-    import click
-
-    click.echo("Initialisation de la base de données...")
+    logger.info("Initialisation de la base de données...")
     init_db()
-    click.echo("Base de données initialisée.")
-    click.echo("Insertion des données par défaut (profils, prompts)...")
+    logger.info("Base de données initialisée.")
+    logger.info("Insertion des données par défaut (profils, prompts)...")
     try:
         with engine.begin() as conn:
             seed_default_data(conn)
-        click.echo("Données par défaut insérées avec succès.")
+        logger.info("Données par défaut insérées avec succès.")
     except Exception as e:
-        click.echo(f"Erreur lors de l'insertion des données par défaut: {e}")
+        logger.error(f"Erreur lors de l'insertion des données par défaut: {e}")
 
 def listen_for_notifications():
     """Tâche de fond pour écouter les notifications Redis et les relayer via Socket.IO."""
