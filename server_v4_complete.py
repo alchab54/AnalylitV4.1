@@ -534,13 +534,15 @@ def create_app():
         logging.error(f"Erreur interne: {error} pour {request.method} {request.path}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
 
-    with app.app_context():
-        init_database()
-
     return app
 
 app = create_app()
 
+# -- Initialisation de l'application --
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
+    init_database()  # Appeler l'initialisation ici
     app.run(host="0.0.0.0", port=5001, debug=True)
+else:
+    # Pour Gunicorn/production
+    init_database()
