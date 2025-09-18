@@ -1,26 +1,25 @@
-# Dockerfile-web-complete OPTIMISÉ
-# Utilise l'image de base où tout est déjà installé (dépendances + code source)
-FROM analylit-base:latest
+# Utilise l'image de base qui contient Python/venv/dépendances
+FROM analylit-base:latest AS base
 
-# CORRECTION: Installe les outils réseau (netcat) nécessaires pour le script d'attente.
-# On repasse temporairement en root pour l'installation.
+# Outils utiles (psql pour checks, netcat pour waits)
 USER root
-RUN apt-get update && apt-get install -y netcat-openbsd postgresql-client && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends netcat-openbsd postgresql-client \
+ && rm -rf /var/lib/apt/lists/*
 
-# On revient à l'utilisateur non-privilégié pour la sécurité.
+# Répertoire de travail
 USER appuser
+WORKDIR /home/appuser/app
 
-# AJOUT: Copie du script d'entrée
-COPY --chown=appuser:appuser entrypoint.sh /home/appuser/app/entrypoint.sh
+# Copie TOUT le code de l'application (Python + web + configs)
+# Assure-toi que .dockerignore n'exclut pas des répertoires nécessaires (utils/, api/, profiles.json, etc.)
+COPY --chown=appuser:appuser . /home/appuser/app/
+
+# Rendre l'entrypoint exécutable
 RUN chmod +x /home/appuser/app/entrypoint.sh
 
-# PLUS BESOIN de copier le code source - il est déjà dans l'image de base !
-# L'ancienne ligne "COPY --chown=appuser:appuser . ." était redondante
-
-# Le code source et les dépendances sont déjà présents via analylit-base:latest
-# WORKDIR est déjà défini à /home/appuser/app
-# USER est déjà défini à appuser
-# PATH est déjà configuré pour l'environnement virtuel
-
+# Le service écoute en 5001 (Gunicorn)
 EXPOSE 5001
+
+# L'entrypoint gère l'attente DB, l'init DB/seed unique, puis lance Gunicorn
+ENTRYPOINT ["/home/appuser/app/entrypoint.sh"]

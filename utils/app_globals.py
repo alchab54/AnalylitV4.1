@@ -2,13 +2,17 @@ import logging
 import redis
 from rq import Queue
 from flask_socketio import SocketIO
+
 from config_v4 import get_config
-from utils.database import engine, Session, SessionFactory, with_db_session, PROJECTS_DIR # Assurez-vous que ces imports sont corrects
+# 'engine' n'est plus importé directement pour éviter les dépendances circulaires.
+# Les modules doivent utiliser get_engine() de utils.database après l'initialisation.
+from utils.database import Session, SessionFactory, with_db_session, PROJECTS_DIR
+from utils.queues import set_background_queue
 
 logger = logging.getLogger("analylit")
 config = get_config()
 
-# Objets neutres à l’import
+# Objets neutres à l’import (pas de connexions actives ici)
 socketio = SocketIO(message_queue=None, async_mode='gevent', cors_allowed_origins="*")
 redis_conn = None
 processing_queue = None
@@ -25,16 +29,18 @@ def initialize_app_globals(app=None):
     if redis_conn is None:
         redis_conn = redis.from_url(config.REDIS_URL)
 
+    # CORRECTION: Utiliser les noms de file d'attente définis dans docker-compose
     if processing_queue is None:
-        processing_queue = Queue("processing", connection=redis_conn)
+        processing_queue = Queue("analylit_processing_v4", connection=redis_conn)
     if synthesis_queue is None:
-        synthesis_queue = Queue("synthesis", connection=redis_conn)
+        synthesis_queue = Queue("analylit_synthesis_v4", connection=redis_conn)
     if analysis_queue is None:
-        analysis_queue = Queue("analysis", connection=redis_conn)
+        analysis_queue = Queue("analylit_analysis_v4", connection=redis_conn)
     if discussion_draft_queue is None:
         discussion_draft_queue = Queue("discussion_draft", connection=redis_conn)
     if background_queue is None:
-        background_queue = Queue("background", connection=redis_conn)
+        background_queue = Queue("analylit_background_v4", connection=redis_conn)
+        set_background_queue(background_queue) # Initialise la queue partagée
     if q is None:
         q = Queue("default", connection=redis_conn)
 

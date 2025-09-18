@@ -4,8 +4,7 @@ import json
 import logging
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
-
-from utils.app_globals import Session, with_db_session
+from utils.app_globals import Session, with_db_session # with_db_session est déjà dans app_globals
 from utils.models import Project, Grid, Extraction
 
 projects_bp = Blueprint('projects_bp', __name__)

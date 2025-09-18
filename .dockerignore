@@ -1,5 +1,4 @@
 # .dockerignore OPTIMISÉ pour des builds ultra-rapides
-
 # === FILES SYSTÈME ===
 .git
 .gitignore
@@ -59,7 +58,8 @@ htmlcov/
 **/Dockerfile*
 **/.dockerignore
 Makefile*
-**/*.sh
+# IMPORTANT: NE PAS EXCLURE entrypoint.sh - nécessaire au runtime
+# **/*.sh <- RETIRÉ cette ligne problématique
 
 # === FICHIERS DE CONFIGURATION SENSIBLES ===
 # Le .env contient des secrets et ne doit PAS être dans l'image
@@ -70,8 +70,6 @@ Makefile*
 **/*.pem
 **/*.crt
 secrets/
-
-
 
 # === ARTEFACTS DE BUILD ===
 dist/
@@ -96,10 +94,11 @@ backups/
 *.sql
 *.dump
 
-# === FICHIERS SPÉCIFIQUES AU PROJET ===
-# Ignorer les artefacts spécifiques à votre projet qui ne sont pas nécessaires
+# === FICHIERS SPÉCIFIQUES AU PROJET - AJUSTÉS ===
+# Ignorer les artefacts spécifiques qui ne sont pas nécessaires au runtime
 grille-ATN.json
-profiles.json
+# IMPORTANT: NE PAS EXCLURE profiles.json - nécessaire au runtime
+# profiles.json <- RETIRÉ cette ligne problématique
 *.ini
 analyse*.json
 results*.json
@@ -115,10 +114,10 @@ results*.json
 !requirements.txt
 !package*.json
 !profiles.json
+!entrypoint.sh
 !web/
 !utils/
 !api/
 !server_v4_complete.py
 !tasks_v4_complete.py
 !config_v4.py
-!entrypoint.sh

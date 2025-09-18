@@ -1,131 +1,115 @@
+# utils/database.py
 import logging
-from config_v4 import get_config, Settings
-from sqlalchemy import create_engine, inspect, text
+import functools
+from config_v4 import get_config
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 logger = logging.getLogger(__name__)
-
-# --- CORRECTION ---
-# Nous devons instancier l'objet config au niveau du module
-# pour qu'il soit disponible lorsque init_db() est appelé depuis conftest.
 config = get_config()
-# ------------------
 
-# Declare these as global to be reconfigurable
+# Définir les variables globales au niveau du module, initialisées à None
 engine = None
 SessionFactory = None
-db_session = None
+Session = None
+db_session = None  # Alias pour Session
 
-def init_db(db_url=None, config_obj: Settings = None):
-    logger.info("Starting init_db...")
-    global engine, SessionFactory, db_session
+# Exporter les constantes nécessaires pour d'autres modules
+PROJECTS_DIR = config.PROJECTS_DIR
+
+def init_db(db_url=None):
+    """Initialise l'engine de la base de données et les sessions."""
+    global engine, SessionFactory, Session, db_session
     
-    # Utilisez config_obj s'il est passé (pour les tests), sinon utilisez le config global
-    active_config = config_obj if config_obj else config
+    if engine:
+        logger.debug("La base de données est déjà initialisée.")
+        return
 
-    if db_url is None:
-        db_url = active_config.DATABASE_URL # Modifié pour utiliser active_config
+    db_url = db_url or config.DATABASE_URL
+    logger.info("Initialisation de l'engine SQLAlchemy...")
 
-    # Always re-create engine and SessionFactory to ensure a clean state for tests
-    engine = create_engine(db_url, pool_pre_ping=True, connect_args={'options': '-c search_path=analylit_schema'})
-    SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
-    db_session = scoped_session(SessionFactory)
-
-    from . import models
     try:
-        with engine.connect() as connection:
-            connection.execute(text("SET search_path TO analylit_schema;"))
-            connection.commit()
-            print(f"Current search_path: {connection.execute(text("SHOW search_path;")).scalar()}")
-            models.Base.metadata.create_all(bind=connection, schema='analylit_schema')
-        logger.info("All tables created successfully.")
+        engine = create_engine(
+            db_url,
+            pool_pre_ping=True,
+            connect_args={'options': '-c search_path=analylit_schema'}
+        )
+        SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+        # scoped_session assure une session par thread, crucial pour une app web
+        db_session = scoped_session(SessionFactory)
+        Session = db_session  # Assigner l'alias
+        logger.info("Engine et sessions initialisés avec succès.")
     except Exception as e:
-        logger.exception(f"Error creating tables: {e}")
+        logger.exception(f"Erreur lors de l'initialisation de la base de données: {e}")
+        # Réinitialiser en cas d'erreur pour éviter un état instable
+        engine = SessionFactory = Session = db_session = None
         raise
 
-    # Manual migration to add missing columns to analysis_profiles
-    inspector = inspect(engine)
-    try:
-        columns = {col['name'] for col in inspector.get_columns('analysis_profiles')}
-    except Exception as e:
-        logger.warning(f"Could not inspect analysis_profiles table (might not exist yet): {e}")
-        columns = set() # Assume no columns if table doesn't exist
+def get_engine():
+    """Retourne l'instance globale de l'engine. Point d'accès unique."""
+    if engine is None:
+        logger.warning("get_engine() appelé avant la fin de init_db().")
+    return engine
 
-    with engine.connect() as connection:
-        if 'description' not in columns:
-            logger.info("MIGRATION: Adding 'description' column to 'analysis_profiles' table.")
-            connection.execute(text('ALTER TABLE analysis_profiles ADD COLUMN description TEXT'))
+@functools.lru_cache(maxsize=None)
+def with_db_session(func):
+    """Décorateur pour injecter une session de base de données."""
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        if 'session' in kwargs:
+            return func(*args, **kwargs)
         
-        if 'temperature' not in columns:
-            logger.info("MIGRATION: Adding 'temperature' column to 'analysis_profiles' table.")
-            connection.execute(text('ALTER TABLE analysis_profiles ADD COLUMN temperature FLOAT'))
-
-        if 'context_length' not in columns:
-            logger.info("MIGRATION: Adding 'context_length' column to 'analysis_profiles' table.")
-            connection.execute(text('ALTER TABLE analysis_profiles ADD COLUMN context_length INTEGER'))
-            
-        if 'preprocess_model' not in columns:
-            logger.info("MIGRATION: Adding 'preprocess_model' column to 'analysis_profiles' table.")
-            connection.execute(text('ALTER TABLE analysis_profiles ADD COLUMN preprocess_model VARCHAR'))
-            
-        if 'extract_model' not in columns:
-            logger.info("MIGRATION: Adding 'extract_model' column to 'analysis_profiles' table.")
-            connection.execute(text('ALTER TABLE analysis_profiles ADD COLUMN extract_model VARCHAR'))
-            
-        if 'synthesis_model' not in columns:
-            logger.info("MIGRATION: Adding 'synthesis_model' column to 'analysis_profiles' table.")
-            connection.execute(text('ALTER TABLE analysis_profiles ADD COLUMN synthesis_model VARCHAR'))
-
-        connection.commit()
-    logger.info("Finished init_db.")
+        session = Session()
+        try:
+            kwargs['session'] = session
+            result = func(*args, **kwargs)
+            # Le commit est de la responsabilité de l'appelant
+            return result
+        except Exception:
+            session.rollback()
+            logger.exception("Rollback de la session suite à une erreur.")
+            raise
+        finally:
+            # La session est gérée par le scoped_session, qui la ferme
+            # généralement à la fin de la requête (teardown_appcontext).
+            pass
+    return wrapper
 
 def seed_default_data(conn):
-    logger.info("Starting seed_default_data...")
-    from .models import AnalysisProfile, Project
-    from sqlalchemy.orm import Session
+    """Peuple la base de données avec les données initiales."""
+    logger.info("Début du peuplement de la base de données (seeding)...")
+    from utils.models import Base, AnalysisProfile, Project
+    from sqlalchemy.orm import Session as SASession
     import uuid
     from datetime import datetime
 
-    session = Session(bind=conn)
-
     try:
-        # Create a default analysis profile if it doesn't exist
-        default_profile = session.query(AnalysisProfile).filter_by(name="Standard Profile").first()
-        if not default_profile:
+        logger.info("Création du schéma 'analylit_schema' et des tables.")
+        conn.execute(text("CREATE SCHEMA IF NOT EXISTS analylit_schema"))
+        Base.metadata.create_all(bind=conn)
+        
+        session = SASession(bind=conn)
+        
+        if not session.query(AnalysisProfile).filter_by(name="Standard Profile").first():
             default_profile = AnalysisProfile(
-                id=str(uuid.uuid4()),
-                name="Standard Profile",
-                description="Default analysis profile",
-                temperature=0.7,
-                context_length=4096,
-                preprocess_model="default",
-                extract_model="default",
-                synthesis_model="default"
+                id=str(uuid.uuid4()), name="Standard Profile", description="Default analysis profile",
+                temperature=0.7, context_length=4096, preprocess_model="default",
+                extract_model="default", synthesis_model="default"
             )
             session.add(default_profile)
-            logger.info("Default AnalysisProfile created.")
-        
-        # Create a default project if it doesn't exist
-        default_project = session.query(Project).filter_by(name="Default Project").first()
-        if not default_project:
-            default_project = Project(
-                id=str(uuid.uuid4()),
-                name="Default Project",
-                description="A default project for testing and initial use.",
-                created_at=datetime.now(),
-                updated_at=datetime.now(),
-                analysis_mode="screening",
-                profile_used=default_profile.id
-            )
-            session.add(default_project)
-            logger.info("Default Project created.")
+            logger.info("Profil par défaut créé.")
+            session.flush()
 
-        session.commit()
-        logger.info("Default data seeded successfully.")
+            if not session.query(Project).filter_by(name="Default Project").first():
+                default_project = Project(
+                    id=str(uuid.uuid4()), name="Default Project", description="A default project.",
+                    created_at=datetime.now(), updated_at=datetime.now(),
+                    analysis_mode="screening", profile_used=default_profile.id
+                )
+                session.add(default_project)
+                logger.info("Projet par défaut créé.")
+        
+        logger.info("Peuplement des données terminé.")
     except Exception as e:
-        session.rollback()
-        logger.exception(f"Error seeding default data: {e}")
+        logger.exception(f"Erreur lors du peuplement de la base de données: {e}")
         raise
-    finally:
-        session.close()
-    logger.info("Finished seed_default_data.")
