@@ -55,7 +55,8 @@ import {
     showEditPromptModal,
     showEditProfileModal,
     deleteProfile,
-    showPullModelModal
+    showPullModelModal,
+    handleSaveProfile
 } from './settings.js';
 import { fetchAPI } from './api.js';
 
@@ -247,7 +248,8 @@ export function setupDelegatedEventListeners() {
             'submit-pmid-import': (event) => processPmidImport(event),
             'save-grid': handleSaveGrid,
             'save-rob-assessment': (event) => handleSaveRobAssessment(event),
-            'save-zotero-settings': (event) => import('./settings.js').then(settings => settings.handleSaveZoteroSettings(event)),
+            'save-profile-form': handleSaveProfile, // Assurez-vous que votre formulaire a data-action="save-profile-form"
+            'save-zotero-settings': (event) => import('./settings.js').then(settings => settings.handleSaveZoteroSettings(event)), // This dynamic import is fine
             'run-multi-search': (event) => handleMultiDatabaseSearch(event)
         };
         const action = submitActions[actionName]; // Correction: action est la fonction handler

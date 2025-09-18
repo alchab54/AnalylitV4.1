@@ -261,7 +261,10 @@ class ScreeningDecision(Base):
 
 class RiskOfBias(Base):
     __tablename__ = 'risk_of_bias'
-    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+    __table_args__ = (
+        UniqueConstraint('project_id', 'article_id', name='uq_rob_project_article'),
+        {'schema': SCHEMA} if SCHEMA else {}
+    )
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)

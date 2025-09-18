@@ -606,7 +606,7 @@ function handleNewProfile() {
 /**
  * Gestionnaire pour la sauvegarde (POST ou PUT) d'un profil.
  */
-async function handleSaveProfile(e) {
+export async function handleSaveProfile(e) {
     e.preventDefault();
     const form = e.target;
     const saveBtn = form.querySelector('button[type="submit"]');
@@ -746,4 +746,29 @@ export async function handleClearQueue(queueName) {
             }
         }
     );
+}
+
+/**
+ * Gère le téléchargement (pull) d'un nouveau modèle Ollama.
+ */
+export async function handlePullModel() {
+    const modelNameInput = document.getElementById('pullModelName');
+    const modelName = modelNameInput ? modelNameInput.value.trim() : null;
+
+    if (!modelName) {
+        showToast('Veuillez entrer un nom de modèle valide (ex: llama3:latest).', 'warning');
+        return;
+    }
+
+    closeModal('pullModelModal');
+    showLoadingOverlay(true, `Téléchargement du modèle "${modelName}"...`);
+
+    try {
+        await fetchAPI('/ollama/pull', { method: 'POST', body: { model_name: modelName } });
+        showToast(`Le téléchargement de "${modelName}" a commencé.`, 'info');
+    } catch (error) {
+        showToast(`Erreur lors du lancement du téléchargement : ${error.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
 }

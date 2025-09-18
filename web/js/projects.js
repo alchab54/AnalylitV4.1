@@ -9,7 +9,7 @@ import { showToast, showLoadingOverlay, closeModal, escapeHtml, showModal } from
 /**
  * Charge la liste des projets et déclenche le rendu de la liste.
  */
-export async function loadProjects() {
+async function loadProjects() {
   const oldProjectIds = new Set((appState.projects || []).map(p => p.id));
   const projects = await fetchAPI('/projects');
   appState.projects = projects || [];
@@ -233,7 +233,7 @@ function getStatusClass(status) {
 /**
  * Rendu du panneau de détails du projet (colonne droite).
  */
-export function renderProjectDetail(project) {
+function renderProjectDetail(project) {
   const detailContainer = elements.projectDetailContent;
   const placeholder = elements.projectPlaceholder;
   if (!detailContainer || !placeholder) return;
@@ -302,6 +302,8 @@ export function renderProjectDetail(project) {
     `;
   }
 }
+
+export { loadProjects, renderProjectDetail };
 
 export function getStatusText(status) {
     const statusTexts = {

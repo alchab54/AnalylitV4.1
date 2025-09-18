@@ -16,37 +16,37 @@ TEST_DATABASE_URL = "sqlite:///:memory:"
 
 @pytest.fixture(scope="session")
 def engine():
-    """Crée un moteur SQLite en mémoire pour toute la session de test."""
+    """Crée un moteur SQLite en mémoire une seule fois."""
     return create_engine(TEST_DATABASE_URL)
 
 @pytest.fixture(scope="session")
-def connection(engine):
-    """Crée les tables une seule fois au début des tests."""
+def tables(engine):
+    """Crée toutes les tables une seule fois au début des tests."""
     Base.metadata.create_all(engine)
-    connection = engine.connect()
-    yield connection
-    connection.close()
+    yield
     Base.metadata.drop_all(engine)
 
 @pytest.fixture(scope="function")
-def session(connection):
+def session(engine, tables):
     """
-    Fournit une session de DB transactionnelle et isolée pour CHAQUE test.
-    Ceci est la solution aux problèmes d'isolation.
+    Fournit une session DB transactionnelle et 100% isolée pour CHAQUE test.
+    Ceci est la solution finale aux problèmes d'isolation.
     """
+    connection = engine.connect()
     transaction = connection.begin()
     db_session = Session(bind=connection)
     
-    # Injection de la session dans le contexte de l'application Flask pour les tests
+    # Injection de la session dans le contexte de l'application Flask
     flask_app.extensions['db_session_factory'] = lambda: db_session
 
     yield db_session
     
     db_session.close()
-    transaction.rollback() # Annule toutes les modifications à la fin du test
+    transaction.rollback() # Annule TOUTES les modifications à la fin de chaque test
+    connection.close()
 
-@pytest.fixture(scope="module")
-def client():
-    """Fournit un client de test Flask pour un module de test."""
+@pytest.fixture(scope="function")
+def client(session):
+    """Fournit un client de test Flask pour chaque test."""
     with flask_app.test_client() as c:
         yield c
