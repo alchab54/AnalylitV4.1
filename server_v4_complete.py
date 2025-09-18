@@ -320,6 +320,20 @@ def create_app():
         job = analysis_queue.enqueue(task_function, project_id=project_id, job_timeout='30m')
         return jsonify({"message": f"Analyse '{analysis_type}' lancée", "task_id": job.id}), 202
 
+    @app.route("/api/projects/<project_id>/add-manual-articles", methods=["POST"])
+    @with_db_session
+    def add_manual_articles_route(session, project_id):
+        """Ajoute manuellement des articles à un projet via une tâche de fond."""
+        data = request.get_json()
+        if not data or not data.get("items"):
+            return jsonify({"error": "La liste 'items' d'identifiants est requise"}), 400
+        
+        items = data["items"]
+        # L'endpoint de test attend un message spécifique pour 2 articles.
+        message = f"Ajout de {len(items)} article(s) en cours..."
+        job = background_queue.enqueue(add_manual_articles_task, project_id=project_id, identifiers=items, job_timeout='10m')
+        return jsonify({"message": message, "task_id": str(job.id)}), 202
+
     # ==================== ROUTES API CHAT ====================
     @app.route("/api/projects/<project_id>/chat", methods=["POST"])
     def chat_with_project(project_id):
@@ -327,7 +341,7 @@ def create_app():
         question = data.get('question')
         if not question:
             return jsonify({"error": "Question requise"}), 400
-        job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout='5m')
+        job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout='15m')
         return jsonify({"message": "Question soumise", "task_id": job.id}), 202
 
     @app.route("/api/projects/<project_id>/chat-history", methods=["GET"])
@@ -405,16 +419,26 @@ def create_app():
     def handle_prompts(session):
         if request.method == "POST":
             data = request.get_json()
+            if not data or not data.get("name"):
+                return jsonify({"error": "name est requis"}), 400
+            
             prompt = session.query(Prompt).filter_by(name=data["name"]).first()
             if not prompt:
-                prompt = Prompt(name=data["name"])
+                # Créer avec une valeur par défaut pour content
+                content = data.get("template", data.get("content", "Template par défaut"))
+                prompt = Prompt(name=data["name"], content=content)
                 session.add(prompt)
-            prompt.template = data.get("template")
-            prompt.description = data.get("description")
+            else:
+                # Mettre à jour le contenu existant
+                content = data.get("template", data.get("content"))
+                if content:
+                    prompt.content = content
+            
             session.commit()
             return jsonify(prompt.to_dict()), 201
         elif request.method == "PUT":
             return jsonify({"message": "Prompts updated"}), 200
+        
         prompts = session.query(Prompt).all()
         return jsonify([p.to_dict() for p in prompts]), 200
 
@@ -437,6 +461,16 @@ def create_app():
             logging.error(f"Erreur lors de la récupération des modèles: {e}")
             return jsonify({"error": "Erreur serveur"}), 500
 
+    @app.route("/api/databases", methods=["GET"])
+    def get_available_databases():
+        """Retourne la liste des bases de données disponibles pour la recherche."""
+        databases = [
+            {"id": "pubmed", "name": "PubMed", "description": "MEDLINE/PubMed database"},
+            {"id": "arxiv", "name": "arXiv", "description": "arXiv preprint server"},
+            {"id": "crossref", "name": "CrossRef", "description": "DOI-based search"}
+        ]
+        return jsonify(databases), 200
+
     @app.route("/api/ollama/pull", methods=["POST"])
     def pull_model():
         data = request.get_json()
@@ -445,6 +479,17 @@ def create_app():
             return jsonify({"error": "model_name est requis"}), 400
         job = background_queue.enqueue(pull_ollama_model_task, model_name, job_timeout='2h')
         return jsonify({"message": f"Téléchargement du modèle {model_name} lancé", "task_id": job.id}), 202
+
+    @app.route("/api/tasks/<task_id>/cancel", methods=["POST"])
+    def cancel_task(task_id):
+        """Annule une tâche RQ en cours."""
+        try:
+            from rq.job import Job
+            job = Job.fetch(task_id, connection=redis_conn)
+            job.cancel()
+            return jsonify({"message": "Demande d'annulation envoyée."}), 200
+        except Exception as e:
+            return jsonify({"error": f"Impossible d'annuler la tâche: {e}"}), 400
 
     @app.route('/api/health', methods=['GET'])
     def health_check():

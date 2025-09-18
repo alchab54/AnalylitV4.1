@@ -68,21 +68,21 @@ def test_api_prompts_get_and_update(client: FlaskClient, session: Session):
     assert response_get.status_code == 200
     assert isinstance(response_get.json, list)
     
-    # 2. POST pour créer/mettre à jour un prompt
+    # 2. POST pour créer un prompt avec template (sera mappé vers content)
     prompt_payload = {
         "name": "test_prompt_unique",
-        "description": "A description for the test prompt.",
         "template": "This is a test template: {{context}}"
     }
     response_post = client.post('/api/prompts', json=prompt_payload)
     assert response_post.status_code == 201
     assert response_post.json['name'] == prompt_payload['name']
-    assert response_post.json['description'] == prompt_payload['description']
+    assert response_post.json['content'] == prompt_payload['template']
     
     # 3. Vérifier en base de données
     prompt_db = session.query(Prompt).filter_by(name="test_prompt_unique").first()
     assert prompt_db is not None
-    assert prompt_db.description == "A description for the test prompt."
+    assert prompt_db.name == "test_prompt_unique"
+    assert prompt_db.content == "This is a test template: {{context}}"
 
 # ================================================================
 # CATEGORIE 2: WORKFLOW DE VALIDATION (DOUBLE AVEUGLE)

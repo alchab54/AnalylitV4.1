@@ -8,7 +8,7 @@ from config_v4 import Settings # Import Settings for type hinting
 # from config_v4 import Settings # Import Settings for type hinting 
 
 # Import after patching config
-from utils.database import init_db, seed_default_data
+from utils.database import init_database, seed_default_data
 
 # Patch the global variables directly for testing purposes
 @pytest.fixture(autouse=True)
@@ -40,7 +40,7 @@ def test_init_db_basic_initialization(
     # Create a mock config object to pass to init_db
     mock_config_obj = MagicMock(spec=Settings, DATABASE_URL="sqlite:///:memory:")
 
-    init_db(config_obj=mock_config_obj)
+    init_database()
 
     mock_create_engine.assert_called_once_with("sqlite:///:memory:", pool_pre_ping=True)
     mock_sessionmaker.assert_called_once_with(bind=mock_engine_instance, autoflush=False, autocommit=False)
@@ -78,7 +78,7 @@ def test_init_db_migrations_column_missing(
         {'name': 'synthesis_model'},
     ]
 
-    init_db()
+    init_database()
 
     mock_inspect.assert_called_once_with(mock_engine_instance)
     mock_inspect.return_value.get_columns.assert_called_once_with('analysis_profiles')
@@ -117,7 +117,7 @@ def test_init_db_migrations_all_columns_present(
         {'name': 'synthesis_model'},
     ]
 
-    init_db()
+    init_database()
 
     mock_inspect.assert_called_once_with(mock_engine_instance)
     mock_inspect.return_value.get_columns.assert_called_once_with('analysis_profiles')

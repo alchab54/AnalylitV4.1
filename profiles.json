@@ -2,7 +2,7 @@
     {
         "id": "fast",
         "name": "Rapide",
-        "description": "Utilise les modèles les plus rapides, idéal pour des tests rapides.",
+        "description": "Traitement rapide avec qualité standard",
         "preprocess_model": "phi3:mini",
         "extract_model": "phi3:mini",
         "synthesis_model": "llama3.1:8b",
@@ -11,16 +11,16 @@
     {
         "id": "standard",
         "name": "Standard",
-        "description": "Bon équilibre entre vitesse et qualité des résultats.",
+        "description": "Équilibre entre vitesse et qualité",
         "preprocess_model": "phi3:mini",
         "extract_model": "llama3.1:8b",
         "synthesis_model": "llama3.1:8b",
         "is_custom": false
     },
     {
-        "id": "deep",
+        "id": "thorough",
         "name": "Approfondi",
-        "description": "Utilise des modèles plus puissants pour une meilleure qualité, mais plus lent.",
+        "description": "Analyse complète et précise",
         "preprocess_model": "llama3.1:8b",
         "extract_model": "mixtral:8x7b",
         "synthesis_model": "llama3.1:70b",

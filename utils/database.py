@@ -82,10 +82,16 @@ def seed_default_data(session):
         logger.warning("Seeding non appliqué (peut être normal si la table n'existe pas encore): %s", e)
 
 def init_database():
-    # Création DDL basique
-    with get_session() as session:
-        _create_schema_if_needed(session)
-    Base.metadata.create_all(bind=engine)
-    # Seed hors tests
-    with get_session() as session:
-        seed_default_data(session)
+    """Initialise la base de données en créant toutes les tables et en appliquant le seeding."""
+    logger.info("Initialisation de la base de données...")
+    try:
+        with get_session() as session:
+            _create_schema_if_needed(session)
+            Base.metadata.create_all(bind=engine)
+            seed_default_data(session)
+        logger.info("Initialisation de la base de données terminée.")
+    except Exception as e:
+        logger.error("Erreur lors de l'initialisation de la DB: %s", e, exc_info=True)
+        # Ne pas propager l'erreur en production pour permettre au serveur de démarrer
+        if os.getenv("FLASK_ENV") == "testing":
+            raise

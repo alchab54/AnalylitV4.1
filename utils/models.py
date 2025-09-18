@@ -276,9 +276,7 @@ class Prompt(Base):
     
     id = Column(String, primary_key=True, default=_uuid)
     name = Column(String, nullable=False, unique=True)
-    template = Column(Text, nullable=False)
-    is_default = Column(Boolean, default=False)
-    analysis_type = Column(String)
+    content = Column(Text, nullable=False, default="")  # Colonne obligatoire
     
     def to_dict(self):
         return {c.name: getattr(self, c.name, None) for c in self.__table__.columns}

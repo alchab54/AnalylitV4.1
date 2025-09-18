@@ -16,3 +16,6 @@ background_queue = Queue("analylit_background_v4", connection=redis_conn, defaul
 
 # Pour l’endpoint /api/extensions
 extension_queue = processing_queue
+
+# Alias pour compatibilité des tests et flexibilité
+discussion_draft_queue = analysis_queue
