@@ -1,6 +1,6 @@
 // web/js/core.js
 
-import { appState, elements } from '../../app.js';
+import { appState, elements } from './app-improved.js';
 import { setProjects, setCurrentProject } from './state.js';
 import {
     handleDeleteSelectedArticles,
@@ -42,7 +42,7 @@ import { handleValidateExtraction, resetValidationStatus, filterValidationList, 
 import {
     closeModal,
     toggleSidebar,
-    showCreateProjectModal
+    showCreateProjectModal,
 } from './ui.js';
 import { clearNotifications } from './notifications.js';
 import { handleDeleteGrid, loadProjectGrids, renderGridsSection, showGridFormModal, addGridFieldInput, removeGridField, handleSaveGrid, triggerGridImport, handleGridImportUpload } from './grids.js';

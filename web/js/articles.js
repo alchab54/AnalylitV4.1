@@ -1,8 +1,8 @@
 // web/js/articles.js
 import { fetchAPI } from './api.js';
-import { appState, elements } from '../app.js';
-import { showLoadingOverlay, showToast, showModal, closeModal, escapeHtml } from './ui.js';
-import { loadProjectFilesSet } from './projects.js'; // Assuming this is correct
+import { appState, elements } from './app-improved.js';
+import { showLoadingOverlay, showToast, showModal, closeModal, escapeHtml } from './ui-improved.js';
+import { loadProjectFilesSet } from './projects.js';
 import { showSearchModal } from './search.js'; // Assuming this is correct
 import { setSearchResults, clearSelectedArticles, toggleSelectedArticle, setCurrentProjectExtractions } from './state.js';
 import { showSection } from './core.js';

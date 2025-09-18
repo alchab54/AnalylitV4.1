@@ -1,10 +1,10 @@
 // web/js/projects.js
 
-import { appState, fetchAPI } from '../app.js';
-import { showToast, showLoadingOverlay, closeModal, escapeHtml, showModal } from './ui.js';
+import { appState, elements } from './app-improved.js';
+import { fetchAPI } from './api.js';
+import { showToast, showLoadingOverlay, closeModal, escapeHtml, showModal } from './ui-improved.js';
 
 // Fonctions utilitaires locales ou importées d'autres modules si nécessaire
-import { getStatusText } from '../app.js';
 
 /**
  * Charge la liste des projets et déclenche le rendu de la liste.
@@ -167,7 +167,7 @@ export async function loadProjectFilesSet(projectId) {
  * Rendu de la liste des projets (colonne gauche).
  */
 export function renderProjectsList() {
-  const container = document.getElementById('projectsList');
+  const container = elements.projectsList;
   if (!container) return;
 
   const projects = Array.isArray(appState.projects) ? appState.projects : [];
@@ -181,7 +181,7 @@ export function renderProjectsList() {
     const isActive = appState.currentProject?.id === project.id;
     return `
       <div class="project-card ${isActive ? 'project-card--active' : ''}" data-action="select-project" data-project-id="${project.id}">
-        <div class="project-header">
+        <div class="project-card__header">
             <h3 class="project-title">${escapeHtml(project.name)}</h3>
             <span class="status ${getStatusClass(project.status)}">${getStatusText(project.status)}</span>
         </div>
@@ -196,7 +196,7 @@ export function renderProjectsList() {
     `;
   }).join('');
 
-  elements.projectsList.innerHTML = projectsHtml;
+  container.innerHTML = projectsHtml;
 }
 
 export function updateProjectListSelection() {
@@ -234,8 +234,8 @@ function getStatusClass(status) {
  * Rendu du panneau de détails du projet (colonne droite).
  */
 export function renderProjectDetail(project) {
-  const detailContainer = document.getElementById('projectDetailContent');
-  const placeholder = document.getElementById('projectPlaceholder');
+  const detailContainer = elements.projectDetailContent;
+  const placeholder = elements.projectPlaceholder;
   if (!detailContainer || !placeholder) return;
 
   if (!project) {
@@ -301,4 +301,16 @@ export function renderProjectDetail(project) {
       </div>
     `;
   }
+}
+
+export function getStatusText(status) {
+    const statusTexts = {
+        'pending': 'En attente', 'processing': 'Traitement...', 'synthesizing': 'Synthèse...',
+        'completed': 'Terminé', 'failed': 'Échec', 'indexing': 'Indexation...',
+        'generating_discussion': 'Génération discussion...', 'generating_graph': 'Génération graphe...',
+        'generating_prisma': 'Génération PRISMA...', 'generating_analysis': 'Analyse statistique...',
+        'search_completed': 'Recherche terminée', 'in_progress': 'En cours', 'queued': 'En file',
+        'started': 'Démarré', 'finished': 'Fini'
+    };
+    return statusTexts[status] || status;
 }

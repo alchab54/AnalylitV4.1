@@ -16,8 +16,10 @@ import { loadValidationSection, handleValidationDecision, resetValidationStatus,
 import { handleClearQueue, handlePullModel, showEditPromptModal, handleSavePrompt, renderQueueStatus, renderOllamaModels, renderPromptsList, renderSettingsPage } from './admin.js';
 import { showGridFormModal, addGridFieldInput, handleSaveGrid, loadProjectGrids, handleDeleteGrid, removeGridField, triggerGridImport, handleGridImportUpload } from './grids.js';
 import { handleStartIndexing, sendChatMessage, loadChatMessages, renderChatInterface } from './chat.js';
+import { ThemeManager } from './theme-manager.js';
 
 export const API_BASE_URL = '/api';
+
 
 
 export const appState = {
