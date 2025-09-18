@@ -57,3 +57,6 @@ def with_db_session(f):
         finally:
             Session.remove()
     return decorated_function
+
+# Initialize the application state immediately when this module is imported
+# app_globals.initialize_app() # COMMENTÉE : L'initialisation est maintenant gérée par l'entrypoint.sh
