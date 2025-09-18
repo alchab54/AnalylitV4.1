@@ -11,9 +11,6 @@ RUN apt-get update && apt-get install -y netcat-openbsd postgresql-client && \
 # On revient à l'utilisateur non-privilégié pour la sécurité.
 USER appuser
 
-# PLUS BESOIN de copier le code source - il est déjà dans l'image de base !
-# L'ancienne ligne "COPY --chown=appuser:appuser . ." était redondante
-
 # Le WORKDIR est déjà défini dans la base à /home/appuser/app
 # Le USER est déjà défini à appuser
 # Le PATH est déjà configuré pour l'environnement virtuel

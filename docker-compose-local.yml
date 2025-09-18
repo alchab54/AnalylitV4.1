@@ -73,7 +73,7 @@ services:
       - .env
     command: ["/home/appuser/app/entrypoint.sh"]
     depends_on:
-      db: { condition: service_started }
+      db: { condition: service_healthy }
       redis: { condition: service_healthy }
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
@@ -100,7 +100,7 @@ services:
     command: >
       rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4
     depends_on:
-      # Le worker dépend principalement de Redis pour démarrer, la DB est utilisée par les tâches.
+      db: { condition: service_healthy }
       redis: { condition: service_healthy }
     deploy:
       replicas: 1
