@@ -2,11 +2,11 @@ import logging
 import redis
 from rq import Queue
 from flask_socketio import SocketIO
-from utils.config_v4 import Config
-from utils.database import engine, Session, SessionFactory, with_db_session, PROJECTS_DIR
+from config_v4 import get_config
+from utils.database import engine, Session, SessionFactory, with_db_session, PROJECTS_DIR # Assurez-vous que ces imports sont corrects
 
 logger = logging.getLogger("analylit")
-config = Config()
+config = get_config()
 
 # Objets neutres à l’import
 socketio = SocketIO(message_queue=None, async_mode='gevent', cors_allowed_origins="*")
