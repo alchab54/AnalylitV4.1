@@ -68,8 +68,7 @@ services:
       - model_cache_data:/home/appuser/app/model_cache
     env_file: .env
     command: >
-      sh -c "echo 'Waiting for database to be ready...' && 
-      # CORRECTION: Utiliser PGPASSWORD pour éviter les problèmes d'interprétation du shell avec les arguments.
+      sh -c "echo 'Waiting for database to be ready...' &&
       while ! PGPASSWORD=$$POSTGRES_PASSWORD pg_isready -h db -p 5432 -q -U $$POSTGRES_USER -d $$POSTGRES_DB; do sleep 2; done;
       echo 'Database is ready. Initializing schema and seeding data...' &&
       python -c 'from server_v4_complete import _init_db_command; _init_db_command()' &&
