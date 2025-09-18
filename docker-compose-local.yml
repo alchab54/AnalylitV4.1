@@ -130,6 +130,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-nginx
+    volumes:
+      - ./web:/usr/share/nginx/html:ro
+      # ↖ Ceci mappe ton dossier local `web` sur la racine statique vue par Nginx
     container_name: analylit-nginx-v4
     ports:
       - "8080:80"

@@ -13,6 +13,7 @@ import { handleGeneratePrisma, renderReportingSection, generateBibliography, gen
 import { handleRunMetaAnalysis } from './analyses.js'; // Corrected from stats.js
 import { loadValidationSection, handleValidateExtraction, resetValidationStatus, filterValidationList } from './validation.js';
 import { loadQueuesStatus, handleClearQueue, handlePullModel, showEditPromptModal, handleSavePrompt } from './settings.js'; // Corrected from admin.js
+import { setupDelegatedEventListeners, refreshCurrentSection, showSection } from './core.js';
 import { showGridFormModal, addGridFieldInput, handleSaveGrid, loadProjectGrids, handleDeleteGrid, removeGridField, triggerGridImport, handleGridImportUpload } from './grids.js';
 import { handleStartIndexing, sendChatMessage, loadChatMessages, renderChatInterface } from './chat.js';
 import { ThemeManager } from './theme-manager.js';

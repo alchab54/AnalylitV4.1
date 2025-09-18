@@ -563,6 +563,14 @@ def create_app():
 
 app = create_app()
 
+def format_bibliography(extractions):
+    """Formate une bibliographie simple pour les tests."""
+    bibliography = []
+    for ext in extractions:
+        title = ext.get('title', 'Sans titre')
+        bibliography.append(f"- {title}")
+    return "\n".join(bibliography)
+
 if __name__ == "__main__":
     # Initialisation pour le développement local
     init_database()

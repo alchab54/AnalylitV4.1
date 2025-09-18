@@ -1,11 +1,10 @@
-# tests/conftest.py
+# tests/conftest.py - VERSION FINALE BLINDÉE
 
 import pytest
 import os
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
-# FORCER le mode test AVANT tout autre import
 os.environ['TESTING'] = 'true'
 
 from server_v4_complete import create_app
@@ -26,25 +25,31 @@ def tables(engine):
 
 @pytest.fixture(scope='function')
 def session(engine, tables):
-    """Session 100% ISOLÉE avec TRUNCATE explicite de toutes les tables."""
+    """Session avec NETTOYAGE BRUTAL de toutes les tables."""
     connection = engine.connect()
     db_session = sessionmaker(bind=connection)()
     
     yield db_session
     
-    # NETTOYAGE BRUTAL : vider toutes les tables dans le bon ordre
-    for table in reversed(Base.metadata.sorted_tables):
-        db_session.execute(table.delete())
-    db_session.commit()
-    db_session.close()
-    connection.close()
+    # NETTOYAGE RADICAL : vider TOUTES les tables dans le bon ordre
+    try:
+        db_session.execute(text("PRAGMA foreign_keys = OFF"))  # Désactiver les contraintes
+        for table in reversed(Base.metadata.sorted_tables):
+            db_session.execute(table.delete())
+        db_session.execute(text("PRAGMA foreign_keys = ON"))   # Réactiver les contraintes
+        db_session.commit()
+    except Exception as e:
+        db_session.rollback()
+    finally:
+        db_session.close()
+        connection.close()
 
 @pytest.fixture(scope='function')
 def client(session):
     app = create_app()
     app.config.update({"TESTING": True})
     
-    # Injection de session : remplacer le décorateur temporairement
+    # Injection de session dans l'app
     from utils.database import with_db_session
     original_decorator = with_db_session
     
@@ -59,5 +64,4 @@ def client(session):
     with app.test_client() as c:
         yield c
     
-    # Restaurer le décorateur original
     utils.database.with_db_session = original_decorator

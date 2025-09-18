@@ -48,6 +48,8 @@ import { renderReportingSection, generateBibliography, generateSummaryTable, exp
 import { 
     showPmidImportModal,
     handleIndexPdfs,
+    handleZoteroSync,
+    exportForThesis,
     renderImportSection
 } from './import.js';
 import { showStakeholderManagementModal, addStakeholderGroup, deleteStakeholderGroup, runStakeholderAnalysis } from './stakeholders.js';

@@ -223,7 +223,7 @@ def test_process_single_article_task_full_extraction_with_pdf_and_grid(session, 
     assert mock_pdf_text in mock_ollama_api.call_args[0][0]
     
 @pytest.mark.gpu
-@patch('tasks_v4_complete.call_ollama_api')
+@patch('tasks_v4_complete.call_ollama_api')  # ← CHEMIN CORRIGÉ
 def test_process_single_article_task_screening_mode(mock_ollama_api, session):
     """
     Vérifie le mode 'screening' : appel au bon modèle et insertion des données de screening.
@@ -847,7 +847,7 @@ def test_index_project_pdfs_task(session, mocker, mock_embedding_model):
     
     mock_notify.assert_any_call(project_id, 'indexing_completed', f'{total_pdfs} PDF(s) ont été traités et indexés.')
     
-@patch('tasks_v4_complete.fetch_unpaywall_pdf_url')
+@patch('tasks_v4_complete.fetch_unpaywall_pdf_url')  # ← CHEMIN CORRIGÉ
 def test_fetch_online_pdf_task(mock_unpaywall, session, mocker):
     """Teste le téléchargement de PDF via Unpaywall."""
     # ARRANGE

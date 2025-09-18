@@ -1030,19 +1030,25 @@ def run_risk_of_bias_task(session, project_id: str, article_id: str):
     if not rob_data or not isinstance(rob_data, dict):
         raise ValueError("La réponse de l'IA pour l'analyse RoB est invalide.")
 
-    rob_data['id'] = str(uuid.uuid4())
-    rob_data['project_id'] = project_id
-    rob_data['article_id'] = article_id
-    rob_data['created_at'] = datetime.now().isoformat()
-
     session.execute(text("""
-        INSERT INTO risk_of_bias (id, project_id, article_id, domain_1_bias, domain_1_justification, domain_2_bias, domain_2_justification, overall_bias, overall_justification, created_at)
-        VALUES (:id, :project_id, :article_id, :domain_1_bias, :domain_1_justification, :domain_2_bias, :domain_2_justification, :overall_bias, :overall_justification, :created_at)
+        INSERT INTO risk_of_bias (id, project_id, pmid, article_id, domain_1_bias, domain_1_justification, domain_2_bias, domain_2_justification, overall_bias, overall_justification, created_at)
+        VALUES (:id, :project_id, :pmid, :article_id, :d1b, :d1j, :d2b, :d2j, :ob, :oj, :ts)
         ON CONFLICT (project_id, article_id) DO UPDATE SET
             domain_1_bias = EXCLUDED.domain_1_bias, domain_1_justification = EXCLUDED.domain_1_justification,
             domain_2_bias = EXCLUDED.domain_2_bias, domain_2_justification = EXCLUDED.domain_2_justification,
             overall_bias = EXCLUDED.overall_bias, overall_justification = EXCLUDED.overall_justification;
-    """), rob_data)
+    """), {
+        "id": str(uuid.uuid4()), "project_id": project_id,
+        "pmid": article_id,    # ← AJOUTER CETTE LIGNE
+        "article_id": article_id,
+        "d1b": rob_data.get("domain_1_bias", "N/A"),
+        "d1j": rob_data.get("domain_1_justification", ""),
+        "d2b": rob_data.get("domain_2_bias", "N/A"),
+        "d2j": rob_data.get("domain_2_justification", ""),
+        "ob": rob_data.get("overall_bias", "N/A"),
+        "oj": rob_data.get("overall_justification", ""),
+        "ts": datetime.now().isoformat()
+    })
     
     send_project_notification(project_id, 'rob_completed', f"Analyse RoB terminée pour {article_id}.")
 
