@@ -402,19 +402,19 @@
 
     <!-- Scripts JavaScript -->
     <!-- Main application entry point -->
-    <script type="module" src="app.js"></script>
+    <script type="module" src="app-improved.js"></script>
 
     <!-- Service Worker pour PWA (optionnel) -->
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js').then(function(registration) {
-                    console.log('SW registered: ', registration);
-                }).catch(function(registrationError) {
-                    console.log('SW registration failed: ', registrationError);
-                });
-            });
-        }
+        // if ('serviceWorker' in navigator) {
+        //     window.addEventListener('load', function() {
+        //         navigator.serviceWorker.register('/sw.js').then(function(registration) {
+        //             console.log('SW registered: ', registration);
+        //         }).catch(function(registrationError) {
+        //             console.log('SW registration failed: ', registrationError);
+        //         });
+        //     });
+        // }
     </script>
 
     <!-- Schema.org structured data pour SEO -->
