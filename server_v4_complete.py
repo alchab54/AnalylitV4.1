@@ -145,12 +145,8 @@ def listen_for_notifications():
             except Exception as e:
                 logger.error(f"Erreur lors du relais de la notification: {e}")
 
-# --- CORRECTION : Désindenter cette ligne ---
-# Créer l'application au niveau global pour que Gunicorn puisse la trouver
 app = create_app()
 
-# --- Bloc d'exécution principal ---
 if __name__ == '__main__':
-    # NE PAS recréer l'app ici, juste la lancer
     socketio.start_background_task(target=listen_for_notifications)
     socketio.run(app, host='0.0.0.0', port=5000, debug=True, use_reloader=False, allow_unsafe_werkzeug=True)
