@@ -70,7 +70,14 @@ def create_app(config_overrides=None): # <--- Accepte les overrides
     app.register_blueprint(settings_bp, url_prefix='/api')
     app.register_blueprint(files_bp, url_prefix='/api')
         
-    
+    @app.route('/api/health')
+    def health_check():
+        return jsonify({'status': 'ok', 'message': 'AnalyLit V4.1 is running'}), 200
+
+    @app.route('/healthz')
+    def healthz():
+        return jsonify({'status': 'ok', 'message': 'Healthz check passed'}), 200
+
     logger.info(f"App is in TESTING mode: {app.config.get('TESTING')}")
     if not app.config.get("TESTING"):
         # Configurer la journalisation au démarrage de l'application

@@ -68,11 +68,7 @@ services:
     # En production, il est préférable de gérer les secrets via des orchestrateurs (K8s Secrets, Docker Secrets)
     # ou des variables d'environnement injectées, plutôt qu'un fichier .env sur le serveur.
     env_file: .env
-    command: >
-      sh -c "echo 'Attente de la base de données...' && sleep 5 &&
-      echo 'Initialisation de la base de données...' && python -c 'from server_v4_complete import init_db; init_db()' &&
-      echo 'Lancement du serveur Gunicorn...' &&
-      gunicorn server_v4_complete:app -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 3 -b 0.0.0.0:5001 --access-logfile - --error-logfile -"
+    entrypoint: /app/entrypoint.sh
     depends_on:
       db: { condition: service_healthy }
       redis: { condition: service_healthy }

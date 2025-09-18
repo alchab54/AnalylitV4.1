@@ -11,13 +11,14 @@ echo "Entrypoint démarré. En attente de la base de données..."
 # NOUVELLE CORRECTION : Utiliser psql pour tenter une vraie connexion, ce qui est plus fiable que pg_isready.
 
 # Exporte le mot de passe pour que psql puisse l'utiliser automatiquement
+# Exporte le mot de passe pour que psql puisse l'utiliser automatiquement
 export PGPASSWORD=$POSTGRES_PASSWORD
 
 # Boucle d'attente avec un nombre maximum de tentatives
-max_retries=30
+max_retries=10
 retry_count=0
 
-until psql -h "db" -p "5432" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c '\q' > /dev/null 2>&1; do
+until PGPASSWORD=$POSTGRES_PASSWORD psql -h "db" -p "5432" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c '\q' > /dev/null 2>&1; do
   retry_count=$((retry_count+1))
   if [ $retry_count -ge $max_retries ]; then
     echo "Échec de la connexion à la base de données après $max_retries tentatives. Abandon."
