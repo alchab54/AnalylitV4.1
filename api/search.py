@@ -25,7 +25,7 @@ def get_available_databases():
 
 @search_bp.route('/search', methods=['POST'])
 @with_db_session
-def search_multiple_databases(db_session=None):
+def search_multiple_databases(session):
     data = request.get_json(force=True)
     project_id = data.get('project_id')
     databases = data.get('databases', ['pubmed'])
@@ -46,13 +46,15 @@ def search_multiple_databases(db_session=None):
     main_query_to_save = next(iter(expert_queries.values())) if is_expert_mode and expert_queries else simple_query
     
     try:
-        db_session.execute(text("""
+        session.execute(text("""
             UPDATE projects
             SET search_query = :q, databases_used = :dbs, status = 'searching', updated_at = :now
             WHERE id = :pid
         """), {"q": main_query_to_save, "dbs": json.dumps(databases), "now": datetime.now().isoformat(), "pid": project_id})
+        session.commit() # Commit the changes to the database
     except SQLAlchemyError as e:
         logger.error(f"Erreur DB saving search params: {e}", exc_info=True)
+        session.rollback() # Rollback in case of error
         return jsonify({'error': 'Erreur interne'}), 500
 
     background_queue = get_background_queue()
@@ -66,13 +68,13 @@ def search_multiple_databases(db_session=None):
 
 @search_bp.route('/projects/<project_id>/search-stats', methods=['GET'])
 @with_db_session
-def get_project_search_stats(db_session, project_id):
+def get_project_search_stats(session, project_id):
     try:
         uuid.UUID(project_id, version=4)
     except ValueError:
         return jsonify({'error': 'ID de projet invalide'}), 400
 
-    stats = db_session.execute(text("""
+    stats = session.execute(text("""
         SELECT database_source, COUNT(*) as count
         FROM search_results WHERE project_id = :pid
         GROUP BY database_source

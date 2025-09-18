@@ -50,12 +50,14 @@ def create_app(config_overrides=None):
     from api.admin import admin_bp
     from api.settings import settings_bp
     from api.files import files_bp
+    from api.extensions import extensions_bp # New import
 
     app.register_blueprint(projects_bp, url_prefix='/api')
     app.register_blueprint(search_bp, url_prefix='/api')
     app.register_blueprint(admin_bp, url_prefix='/api')
     app.register_blueprint(settings_bp, url_prefix='/api/settings')
     app.register_blueprint(files_bp, url_prefix='/api')
+    app.register_blueprint(extensions_bp) # New registration
 
     # Routes de health check pour le monitoring
     @app.route('/api/health')

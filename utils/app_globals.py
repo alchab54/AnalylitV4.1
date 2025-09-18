@@ -24,6 +24,7 @@ synthesis_queue = None
 analysis_queue = None
 discussion_draft_queue = None
 background_queue = None
+extension_queue = None # New: Declare extension_queue
 q = None
 
 def initialize_app_globals(app=None):
@@ -32,7 +33,7 @@ def initialize_app_globals(app=None):
     Cette fonction est appelée une fois que l'application Flask est créée.
     """
     global redis_conn, processing_queue, synthesis_queue, analysis_queue
-    global discussion_draft_queue, background_queue, q, socketio
+    global discussion_draft_queue, background_queue, extension_queue, q, socketio # New: Add extension_queue to global
 
     if redis_conn is None:
         redis_conn = redis.from_url(config.REDIS_URL)
@@ -49,6 +50,8 @@ def initialize_app_globals(app=None):
     if background_queue is None:
         background_queue = Queue("analylit_background_v4", connection=redis_conn)
         set_background_queue(background_queue) # Initialise la queue partagée
+    if extension_queue is None: # New: Initialize extension_queue
+        extension_queue = Queue("analylit_extension_v4", connection=redis_conn)
     if q is None:
         q = Queue("default", connection=redis_conn)
 

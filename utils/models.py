@@ -98,6 +98,12 @@ class Extraction(Base):
     stakeholder_perspective = Column(String)
     ai_type = Column(String)
     platform_used = Column(String)
+    def to_dict(self):
+        data = {}
+        for c in self.__table__.columns:
+            v = getattr(self, c.name)
+            data[c.name] = v.isoformat() if isinstance(v, datetime) else v
+        return data
 
 class Grid(Base):
     __tablename__ = 'extraction_grids'
@@ -168,6 +174,12 @@ class AnalysisProfile(Base):
     description = Column(Text)
     temperature = Column(Float, default=0.7)
     context_length = Column(Integer, default=4096)
+    def to_dict(self):
+        data = {}
+        for c in self.__table__.columns:
+            v = getattr(self, c.name)
+            data[c.name] = v.isoformat() if isinstance(v, datetime) else v
+        return data
 
 class PRISMARecord(Base):
     __tablename__ = 'prisma_records'
@@ -215,3 +227,21 @@ class Prompt(Base):
     language = Column(String, default='fr')
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    def to_dict(self):
+        data = {}
+        for c in self.__table__.columns:
+            v = getattr(self, c.name)
+            data[c.name] = v.isoformat() if isinstance(v, datetime) else v
+        return data
+
+class ProcessingLog(Base):
+    __tablename__ = 'processing_log'
+    __table_args__ = {'schema': SCHEMA}
+    id = Column(String, primary_key=True, default=_uuid)
+    project_id = Column(String, ForeignKey(f'{SCHEMA}.projects.id'), nullable=False)
+    article_id = Column(String, nullable=True) # Can be null for project-level tasks
+    task_name = Column(String, nullable=False)
+    status = Column(String, nullable=False)
+    message = Column(Text)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    details = Column(Text) # Store JSON string for structured details
