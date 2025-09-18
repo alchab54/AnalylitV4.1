@@ -27,12 +27,12 @@ def setup_project(db_session: Session):
 # CATEGORIE 1: GESTION DES ENTITÉS (GRILLES, PROMPTS)
 # ================================================================
 
-def test_api_grid_management_workflow(client, setup_project):
+def test_api_grid_management_workflow(client: FlaskClient, db_session: Session, setup_project):
     """
     Teste le workflow complet de gestion des grilles : Création (POST) et Récupération (GET). (No changes needed)
     """
     project_id = setup_project
-
+    
     # 1. Tester l'import d'une grille (POST /projects/<id>/grids/import)
     # (Nous testons l'import car l'endpoint POST simple est moins critique que le flux d'import)
     grid_json_data = {
@@ -269,7 +269,6 @@ def test_api_upload_pdfs_bulk(mock_enqueue, client: FlaskClient, setup_project):
     )
     
     # ASSERT
-    # CORRECTION: Une tâche asynchrone retourne 202 ACCEPTED, pas 200 OK.
     assert response.status_code == 202
     response_data = response.get_json()
     assert '2 PDF(s) mis en file pour traitement' in response_data['message']

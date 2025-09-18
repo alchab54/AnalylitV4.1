@@ -40,6 +40,7 @@ def create_app():
          expose_headers=["Content-Disposition"],
          supports_credentials=True)
     # app_globals.initialize_app(testing=testing) # DÉSACTIVÉ : Géré par entrypoint.sh AVANT le démarrage.
+    # app_globals.initialize_app(testing=testing)  # DÉSACTIVÉ : Géré par entrypoint.sh AVANT le démarrage.
 
     def first_or_404(query):
         result = query.first()
@@ -318,6 +319,14 @@ def create_app():
         return jsonify({"message": f"Analyse '{analysis_type}' lancée", "task_id": job.id}), 202
 
     @app.route("/api/projects/<project_id>/add-manual-articles", methods=["POST"])
+    def add_manual_articles(project_id):
+        data = request.get_json()
+        items = data.get("items", [])
+        if not items:
+            return jsonify({"error": "La liste 'items' d'identifiants est requise"}), 400
+        job = background_queue.enqueue(add_manual_articles_task, project_id=project_id, identifiers=items, job_timeout='10m')
+        return jsonify({"message": f"Ajout de {len(items)} article(s) en cours...", "task_id": job.id}), 202
+
     @with_db_session
     def add_manual_articles_route(session, project_id):
         """Ajoute manuellement des articles à un projet via une tâche de fond."""
@@ -331,23 +340,13 @@ def create_app():
         job = background_queue.enqueue(add_manual_articles_task, project_id=project_id, identifiers=items, job_timeout='10m')
         return jsonify({"message": message, "task_id": str(job.id)}), 202
 
-    # --- Routes ajoutées pour la couverture des tests ---
-    @app.route('/api/projects/<project_id>/import-zotero', methods=['POST'])
-    @with_db_session
-    def import_zotero(session, project_id):
-        # Logique d'import Zotero simplifiée pour les tests
-        job = background_queue.enqueue(import_pdfs_from_zotero_task, project_id=project_id, pmids=["pmid1"], zotero_user_id="test", zotero_api_key="test")
-        return jsonify({"message": "Zotero import initiated", "task_id": job.id}), 202
-
     @app.route('/api/projects/<project_id>/run-rob-analysis', methods=['POST'])
     @with_db_session
-    def run_rob_analysis(session, project_id):
-        # Logique d'analyse RoB simplifiée pour les tests
+    def run_rob_analysis_route(session, project_id):
         data = request.get_json()
         article_ids = data.get('article_ids', [])
-        task_ids = [background_queue.enqueue(run_risk_of_bias_task, project_id, article_id).id for article_id in article_ids]
+        task_ids = [background_queue.enqueue(run_risk_of_bias_task, project_id, article_id, job_timeout='20m').id for article_id in article_ids]
         return jsonify({"message": "RoB analysis initiated", "task_ids": task_ids}), 202
-    # --- Fin des routes ajoutées ---
 
     # ==================== ROUTES API CHAT ====================
     @app.route("/api/projects/<project_id>/chat", methods=["POST"])

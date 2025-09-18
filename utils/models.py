@@ -75,10 +75,6 @@ class SearchResult(Base):
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
     project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
-    query = Column(String(500), nullable=False)
-    database_name = Column(String(50), nullable=False)
-    total_results = Column(Integer, default=0)
-    results_data = Column(Text)
     article_id = Column(String, nullable=False)
     title = Column(Text)
     abstract = Column(Text)
@@ -89,18 +85,7 @@ class SearchResult(Base):
     url = Column(String)
     database_source = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
-
-    def to_dict(self):
-        data = {}
-        for c in self.__table__.columns:
-            v = getattr(self, c.name)
-            if isinstance(v, datetime):
-                data[c.name] = v.isoformat()
-            elif c.name == "results_data" and v:
-                data[c.name] = json.loads(v)
-            else:
-                data[c.name] = v
-        return data
+    query = Column(String, nullable=True)
 
 class Extraction(Base):
     __tablename__ = 'extractions'
@@ -301,7 +286,6 @@ class RiskOfBias(Base):
     def to_dict(self):
         return {
             "id": self.id,
-            "article_id": self.article_id,
             "project_id": self.project_id,
             "pmid": self.pmid,
             "domain": self.domain,
@@ -326,20 +310,22 @@ class ProcessingLog(Base):
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
+    pmid = Column(String, nullable=True)
     project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
-    article_id = Column(String, nullable=True)
-    step = Column(String(50), nullable=False)
-    status = Column(String(20), nullable=False)
+    article_id = Column(String, nullable=True) 
+    task_name = Column(String, nullable=False)
+    status = Column(String, nullable=False)
+    message = Column(Text)
+    timestamp = Column(DateTime, default=datetime.utcnow)
     details = Column(Text)
-    created_at = Column(DateTime, default=datetime.utcnow)
 
     def to_dict(self):
         return {
             "id": self.id,
             "project_id": self.project_id,
             "article_id": self.article_id,
-            "step": self.step,
+            "task_name": self.task_name,
             "status": self.status,
-            "details": self.details,
-            "created_at": self.created_at.isoformat(),
+            "message": self.message,
+            "timestamp": self.timestamp.isoformat(),
         }

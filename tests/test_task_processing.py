@@ -170,7 +170,7 @@ def test_process_single_article_task_insufficient_content(db_session, mocker):
     mock_log_status.assert_called_once_with(
         db_session,
         project_id,
-        article_id,
+        article_id, # Correction: 'article_id' is the correct variable name
         "écarté", 
         "Contenu textuel insuffisant."
     )
@@ -643,8 +643,8 @@ def test_run_meta_analysis_task(db_session, mocker):
     ext1 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid1", relevance_score=8.0)
     ext2 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid2", relevance_score=9.0)
     ext3 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid3", relevance_score=7.0)
-    session.add_all([ext1, ext2, ext3])
-    session.commit()
+    db_session.add_all([ext1, ext2, ext3])
+    db_session.commit()
 
     mock_savefig = mocker.patch('matplotlib.pyplot.savefig')
     mocker.patch('matplotlib.pyplot.close')
@@ -708,12 +708,10 @@ def test_run_atn_score_task(db_session, mocker):
     # Score: alliance (3) + numérique (3) + patient (2) + empathie (2) = 10
     ext1_data = json.dumps({"description": "Analyse de l'alliance thérapeutique numérique et de l'empathie du patient."})
     ext1 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid1", title="Full ATN", extracted_data=ext1_data)
-    
-    # CORRECTION LOGIQUE: Le mot "rapport" contient "app", déclenchant la règle +3.
-    # Score: app (3) = 3
-    ext2_data = json.dumps({"description": "Un article sans rapport."})
+
+    # Score: app (3) = 3. Le mot "rapport" contient "app".
+    ext2_data = json.dumps({"description": "Un article sans grand rapport."}) # "rapport" contains "app"
     ext2 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid2", title="Non ATN", extracted_data=ext2_data)
-    
     db_session.add_all([ext1, ext2])
     db_session.commit()
 
@@ -731,10 +729,8 @@ def test_run_atn_score_task(db_session, mocker):
     result = json.loads(updated_project.analysis_result)
 
     assert result['total_articles_scored'] == 2
-    # CORRECTION ASSERTION: Attend la moyenne réelle (10 + 3) / 2 = 6.5. Le mot "rapport" contient "app".
-    assert result['mean_atn'] == pytest.approx(6.5)
+    assert result['mean_atn'] == pytest.approx((10 + 3) / 2)
     assert result['atn_scores'][0]['atn_score'] == 10
-    # CORRECTION ASSERTION: Attend le score réel de 3 car "rapport" contient "app".
     assert result['atn_scores'][1]['atn_score'] == 3
     mock_notify.assert_called_once()
 

@@ -5,22 +5,22 @@ import uuid
 from sqlalchemy import text
 from tasks_v4_complete import run_atn_score_task
 
-def test_run_atn_score_task_no_extractions(session):
+def test_run_atn_score_task_no_extractions(db_session):
     """Test that the task handles projects with no extractions."""
     project_id = str(uuid.uuid4())
-    session.execute(text("INSERT INTO projects (id, name) VALUES (:id, :name)"), {'id': project_id, 'name': 'Test Project'})
-    session.commit()
+    db_session.execute(text("INSERT INTO projects (id, name) VALUES (:id, :name)"), {'id': project_id, 'name': 'Test Project'})
+    db_session.commit()
     
-    run_atn_score_task.__wrapped__(session, project_id)
+    run_atn_score_task.__wrapped__(db_session, project_id)
     
-    project = session.execute(text("SELECT analysis_result, status FROM projects WHERE id = :id"), {'id': project_id}).mappings().fetchone()
+    project = db_session.execute(text("SELECT analysis_result, status FROM projects WHERE id = :id"), {'id': project_id}).mappings().fetchone()
     assert project['analysis_result'] is None
     assert project['status'] == 'failed'
 
-def test_run_atn_score_task_scoring_logic(session):
+def test_run_atn_score_task_scoring_logic(db_session):
     """Test the keyword-based scoring logic of run_atn_score_task."""
     project_id = str(uuid.uuid4())
-    session.execute(text("INSERT INTO projects (id, name) VALUES (:id, :name)"), {'id': project_id, 'name': 'Test Project'})
+    db_session.execute(text("INSERT INTO projects (id, name) VALUES (:id, :name)"), {'id': project_id, 'name': 'Test Project'})
     
     # Create mock extractions with different keywords
     extractions_data = [
@@ -31,17 +31,17 @@ def test_run_atn_score_task_scoring_logic(session):
     ]
 
     for ext in extractions_data:
-        session.execute(
+        db_session.execute(
             text("INSERT INTO extractions (id, project_id, pmid, title, extracted_data) VALUES (:id, :pid, :pmid, :title, :data)"),
             {'id': str(uuid.uuid4()), 'pid': project_id, 'pmid': ext['pmid'], 'title': ext['title'], 'data': ext['extracted_data']}
         )
-    session.commit()
+    db_session.commit()
 
     # Run the task
-    run_atn_score_task.__wrapped__(session, project_id)
+    run_atn_score_task.__wrapped__(db_session, project_id)
 
     # Check the results stored in the project
-    project = session.execute(text("SELECT analysis_result FROM projects WHERE id = :id"), {'id': project_id}).mappings().fetchone()
+    project = db_session.execute(text("SELECT analysis_result FROM projects WHERE id = :id"), {'id': project_id}).mappings().fetchone()
     analysis_result = json.loads(project['analysis_result'])
     
     assert analysis_result['total_articles_scored'] == 4
