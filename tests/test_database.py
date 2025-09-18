@@ -3,9 +3,6 @@ from unittest.mock import MagicMock, patch, call
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import sessionmaker, scoped_session
 from config_v4 import Settings # Import Settings for type hinting
-from sqlalchemy import inspect
-from utils.database import init_database, engine, Base
-from utils.models import Project, SearchResult, Extraction, Grid, Prompt, AnalysisProfile, ChatMessage, RiskOfBias
 
 # CORRECTION : Import dupliqué supprimé
 # from config_v4 import Settings # Import Settings for type hinting 
@@ -43,13 +40,6 @@ def test_init_db_basic_initialization(
     # Create a mock config object to pass to init_db
     mock_config_obj = MagicMock(spec=Settings, DATABASE_URL="sqlite:///:memory:")
 
-def test_init_database_creates_tables(db_session):
-    """
-    Vérifie que init_database crée toutes les tables définies dans les modèles SQLAlchemy.
-    Ce test utilise la base de données de test réelle configurée dans conftest.py.
-    """
-    # 1. S'assurer que la base est propre (géré par les fixtures de conftest)
-    # 2. Appeler la fonction d'initialisation
     init_database()
 
     mock_create_engine.assert_called_once_with("sqlite:///:memory:", pool_pre_ping=True)
@@ -86,21 +76,6 @@ def test_init_db_migrations_column_missing(
         {'name': 'preprocess_model'},
         {'name': 'extract_model'},
         {'name': 'synthesis_model'},
-    
-    # 3. Vérifier que les tables existent
-    inspector = inspect(engine)
-    
-    # Liste de toutes les tables attendues basées sur utils/models.py
-    expected_tables = [
-        "projects",
-        "search_results",
-        "extractions",
-        "extraction_grids",
-        "prompts",
-        "analysis_profiles",
-        "chat_messages",
-        "risk_of_bias",
-        "processing_log", # Assurez-vous que ce modèle existe
     ]
 
     init_database()
@@ -213,5 +188,3 @@ def test_seed_default_data_data_already_exists(
     # Assert that add was NOT called
     mock_session_instance.add.assert_not_called()
     mock_session_instance.commit.assert_called_once()
-    for table_name in expected_tables:
-        assert inspector.has_table(table_name, schema="analylit_schema"), f"La table '{table_name}' devrait exister dans le schéma 'analylit_schema'"

@@ -95,3 +95,34 @@ def init_database():
         # Ne pas propager l'erreur en production pour permettre au serveur de démarrer
         if os.getenv("FLASK_ENV") == "testing":
             raise
+
+# Variable globale pour la compatibilité des tests
+db_session = None
+
+def init_db():
+    """
+    Initialise la base de données en créant toutes les tables.
+    Fonction utilitaire pour les tests.
+    """
+    from utils.models import Base
+    
+    try:
+        # Créer le schéma s'il n'existe pas
+        with get_session() as session:
+            session.execute(text("CREATE SCHEMA IF NOT EXISTS analylit_schema"))
+            session.commit()
+        
+        # Créer toutes les tables
+        Base.metadata.create_all(engine)
+        print("✅ Tables créées avec succès")
+        return engine
+    except Exception as e:
+        print(f"❌ Erreur lors de l'initialisation de la DB: {e}")
+        raise
+
+def get_db_session():
+    """Retourne la session de base de données pour les tests"""
+    global db_session
+    if db_session is None:
+        db_session = get_session()
+    return db_session
