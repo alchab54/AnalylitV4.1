@@ -32,6 +32,7 @@ done
 unset PGPASSWORD
 
 echo "Base de données prête !"
+sleep 10 # Give the database a moment to apply all init scripts
 
 # Exécute les commandes d'initialisation de l'application
 echo "Initialisation de la base de données et seeding..."

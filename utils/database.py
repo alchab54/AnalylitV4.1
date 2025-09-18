@@ -27,13 +27,17 @@ def init_db(db_url=None, config_obj: Settings = None):
         db_url = active_config.DATABASE_URL # Modifié pour utiliser active_config
 
     # Always re-create engine and SessionFactory to ensure a clean state for tests
-    engine = create_engine(db_url, pool_pre_ping=True)
+    engine = create_engine(db_url, pool_pre_ping=True, connect_args={'options': '-c search_path=analylit_schema'})
     SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
     db_session = scoped_session(SessionFactory)
 
     from . import models
     try:
-        models.Base.metadata.create_all(bind=engine)
+        with engine.connect() as connection:
+            connection.execute(text("SET search_path TO analylit_schema;"))
+            connection.commit()
+            print(f"Current search_path: {connection.execute(text("SHOW search_path;")).scalar()}")
+            models.Base.metadata.create_all(bind=connection, schema='analylit_schema')
         logger.info("All tables created successfully.")
     except Exception as e:
         logger.exception(f"Error creating tables: {e}")

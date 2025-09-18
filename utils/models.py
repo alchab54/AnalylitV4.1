@@ -4,10 +4,13 @@ from sqlalchemy.orm import relationship, declarative_base
 from datetime import datetime
 import uuid
 
+print("Models loaded, schema set to analylit_schema")
+
 Base = declarative_base()
 
 class Project(Base):
     __tablename__ = 'projects'
+    __table_args__ = {'schema': 'analylit_schema'}
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String, nullable=False)
     description = Column(Text)
@@ -45,6 +48,7 @@ class Project(Base):
 
 class Article(Base):
     __tablename__ = 'articles'
+    __table_args__ = {'schema': 'analylit_schema'}
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     project_id = Column(String, ForeignKey('projects.id'), nullable=False)
     title = Column(Text)
@@ -64,6 +68,9 @@ from sqlalchemy import UniqueConstraint
 
 class SearchResult(Base):
     __tablename__ = 'search_results'
+    __table_args__ = ({'schema': 'analylit_schema'},
+        UniqueConstraint('project_id', 'article_id', name='uq_project_article'),
+    )
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     project_id = Column(String, ForeignKey('projects.id'), nullable=False)
     article_id = Column(String, nullable=False)
@@ -76,14 +83,11 @@ class SearchResult(Base):
     url = Column(String)
     database_source = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
-    
-    __table_args__ = (
-        UniqueConstraint('project_id', 'article_id', name='uq_project_article'),
-    )
 
 
 class Extraction(Base):
     __tablename__ = 'extractions'
+    __table_args__ = {'schema': 'analylit_schema'}
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     project_id = Column(String, ForeignKey('projects.id'))
     pmid = Column(String)
@@ -103,10 +107,11 @@ class Extraction(Base):
 
 class Grid(Base):
     __tablename__ = 'extraction_grids'
+    __table_args__ = {'schema': 'analylit_schema'}
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     project_id = Column(String, ForeignKey('projects.id'), nullable=False)
     name = Column(String, nullable=False)
-    fields = Column(Text) # Storing as JSON string
+    fields = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     def to_dict(self):
@@ -121,6 +126,7 @@ class Grid(Base):
 
 class GridField(Base):
     __tablename__ = 'grid_fields'
+    __table_args__ = {'schema': 'analylit_schema'}
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     grid_id = Column(String, ForeignKey('extraction_grids.id'), nullable=False)
     name = Column(String, nullable=False)
@@ -139,6 +145,7 @@ class GridField(Base):
 
 class Validation(Base):
     __tablename__ = 'validations'
+    __table_args__ = {'schema': 'analylit_schema'}
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     extraction_id = Column(String, ForeignKey('extractions.id'), nullable=False)
     user_id = Column(String, nullable=False)
@@ -146,6 +153,7 @@ class Validation(Base):
 
 class Analysis(Base):
     __tablename__ = 'analyses'
+    __table_args__ = {'schema': 'analylit_schema'}
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     project_id = Column(String, ForeignKey('projects.id'), nullable=False)
     analysis_type = Column(String)
@@ -154,6 +162,7 @@ class Analysis(Base):
 
 class ChatMessage(Base):
     __tablename__ = 'chat_messages'
+    __table_args__ = {'schema': 'analylit_schema'}
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     project_id = Column(String, ForeignKey('projects.id'), nullable=False)
     role = Column(String, nullable=False) # 'user' or 'assistant'
@@ -163,6 +172,7 @@ class ChatMessage(Base):
 
 class AnalysisProfile(Base):
     __tablename__ = 'analysis_profiles'
+    __table_args__ = {'schema': 'analylit_schema'}
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String, nullable=False, unique=True)
     is_custom = Column(Boolean, default=True)
@@ -186,6 +196,7 @@ class AnalysisProfile(Base):
 
 class Prompt(Base):
     __tablename__ = 'prompts'
+    __table_args__ = {'schema': 'analylit_schema'}
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False, unique=True)
     description = Column(Text)
@@ -206,12 +217,14 @@ class Prompt(Base):
 
 class Stakeholder(Base):
     __tablename__ = 'stakeholders'
+    __table_args__ = {'schema': 'analylit_schema'}
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     extraction_id = Column(String, ForeignKey('extractions.id'), nullable=False)
     group_id = Column(String, ForeignKey('stakeholder_groups.id'), nullable=False)
 
 class StakeholderGroup(Base):
     __tablename__ = 'stakeholder_groups'
+    __table_args__ = {'schema': 'analylit_schema'}
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     project_id = Column(String, ForeignKey('projects.id'), nullable=False)
     name = Column(String, nullable=False)
@@ -230,27 +243,24 @@ class StakeholderGroup(Base):
 
 class RiskOfBias(Base):
     __tablename__ = 'risk_of_bias'
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    project_id = Column(String, ForeignKey('projects.id'), nullable=False)
-    article_id = Column(String, nullable=False)
-    
-    domain_1_bias = Column(String) # Ex: 'Low risk'
-    domain_1_justification = Column(Text)
-    domain_2_bias = Column(String)
-    domain_2_justification = Column(Text)
-    overall_bias = Column(String)
-    overall_justification = Column(Text)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    
-    __table_args__ = (
+    __table_args__ = ({'schema': 'analylit_schema'},
         UniqueConstraint('project_id', 'article_id', name='uq_project_article_rob'),
     )
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    project_id = Column(String, ForeignKey('projects.id'), nullable=False)
+    article_id = Column(String, ForeignKey('articles.id'), nullable=False)
+    rob_tool = Column(String) # 'RoB 2', 'ROBINS-I'
+    domain = Column(String)
+    assessment = Column(String) # 'low', 'some concerns', 'high'
+    justification = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 class ProcessingLog(Base):
     __tablename__ = 'processing_log'
+    __table_args__ = {'schema': 'analylit_schema'}
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     project_id = Column(String, ForeignKey('projects.id'), nullable=False)
     pmid = Column(String, nullable=False)
     timestamp = Column(DateTime, default=datetime.utcnow)
-    status = Column(String, nullable=False) # e.g., 'success', 'failed', 'skipped', 'écarté'
+    status = Column(String, nullable=False) # 'success', 'failed', 'skipped', 'écarté'
     details = Column(Text)

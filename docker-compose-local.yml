@@ -7,10 +7,12 @@ services:
     container_name: analylit-db-v4
     volumes:
       - postgres_data_v4:/var/lib/postgresql/data/
+      - ./init-user-db.sql:/docker-entrypoint-initdb.d/init-user-db.sql
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-analylit_user}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-strong_password}
       - POSTGRES_DB=${POSTGRES_DB:-analylit_db}
+      - PGDATA=/var/lib/postgresql/data/pgdata
     networks:
       - analylit-network
     restart: unless-stopped
