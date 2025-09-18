@@ -36,7 +36,7 @@ export async function autoSelectFirstProject() {
 /**
  * Crée un projet.
  */
-export async function handleNewProject(event) {
+export async function handleCreateProject(event) {
   event.preventDefault();
   const form = event.target;
   const name = form.querySelector('#projectName').value.trim();
