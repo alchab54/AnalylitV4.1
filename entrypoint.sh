@@ -9,12 +9,26 @@ echo "Entrypoint démarré. En attente de la base de données..."
 # Utilise les variables d'environnement fournies par docker-compose
 # CORRECTION : Utiliser PGPASSWORD et tous les paramètres pour un test de connexion complet.
 # NOUVELLE CORRECTION : Utiliser psql pour tenter une vraie connexion, ce qui est plus fiable que pg_isready.
-until psql "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/$POSTGRES_DB" -c '\q' > /dev/null 2>&1; do
+
+# Exporte le mot de passe pour que psql puisse l'utiliser automatiquement
 export PGPASSWORD=$POSTGRES_PASSWORD
+
+# Boucle d'attente avec un nombre maximum de tentatives
+max_retries=30
+retry_count=0
+
 until psql -h "db" -p "5432" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c '\q' > /dev/null 2>&1; do
-  echo "La base de données n'est pas encore prête... en attente."
-  sleep 2
+  retry_count=$((retry_count+1))
+  if [ $retry_count -ge $max_retries ]; then
+    echo "Échec de la connexion à la base de données après $max_retries tentatives. Abandon."
+    exit 1
+  fi
+  echo "La base de données n'est pas encore prête... en attente (tentative $retry_count/$max_retries)."
+  sleep 5 # Augmentation du temps d'attente entre les tentatives
 done
+
+# (Optionnel mais propre) Supprime la variable de l'environnement
+unset PGPASSWORD
 
 echo "Base de données prête !"
 
