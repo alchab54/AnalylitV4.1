@@ -655,7 +655,7 @@ async function handleSaveProfile(e) {
  * Gestionnaire pour la suppression d'un profil (après confirmation).
  * --- REFACTORISÉ AVEC showConfirmModal ---
  */
-async function handleDeleteProfile() {
+export async function handleDeleteProfile() {
     const profileId = appState.selectedProfileId;
     const profiles = appState.analysisProfiles;
     const profile = profiles.find(p => p.id === profileId);
@@ -724,28 +724,6 @@ function renderQueueStatus(status, container) {
     html += '</ul>';
     
     container.innerHTML = html;
-}
-
-/**
- * Gère le vidage d'une file d'attente spécifique.
- * @param {string} queueName - Le nom de la file à vider.
- */
-export async function handleClearQueue(queueName) {
-    if (!queueName) return;
-
-    showConfirmModal(
-        'Vider la file d\'attente',
-        `Êtes-vous sûr de vouloir vider la file "${queueName}" ? Toutes les tâches en attente seront perdues.`,
-        {
-            confirmText: 'Vider',
-            confirmClass: 'btn--danger',
-            onConfirm: async () => {
-                await fetchAPI('/queues/clear', { method: 'POST', body: { queue_name: queueName } });
-                showToast(`La file "${queueName}" a été vidée.`, 'success');
-                await loadQueuesStatus(); // Recharger le statut
-            }
-        }
-    );
 }
 
 /**

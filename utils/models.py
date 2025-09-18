@@ -265,6 +265,7 @@ class RiskOfBias(Base):
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
+    article_id = Column(String, nullable=True)
     project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
     pmid = Column(String, nullable=False)
     domain = Column(String)
@@ -299,6 +300,7 @@ class ProcessingLog(Base):
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
+    pmid = Column(String, nullable=True)
     project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
     article_id = Column(String, nullable=True) 
     task_name = Column(String, nullable=False)
