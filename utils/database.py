@@ -68,6 +68,15 @@ def with_db_session(func):
             session.close()
     return wrapper
 
+def _create_schema_if_needed(session):
+    """Crée le schéma si il n'existe pas."""
+    try:
+        session.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        logger.warning(f"Impossible de créer le schéma: {e}")
+
 def seed_default_data(session_or_connection):
     """
     Seed des données par défaut dans la base de données.
