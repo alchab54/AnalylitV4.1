@@ -1,57 +1,88 @@
-# tests/conftest.py
-
+# conftest.py
 import pytest
-import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import event
+from sqlalchemy.orm import sessionmaker, scoped_session
+from utils.database import db, init_db
+from server_v4_complete import create_app
+from datetime import datetime
+import uuid
 
-# FORCER le mode test AVANT tout autre import
-os.environ['TESTING'] = 'true'
+@pytest.fixture(scope="session")
+def app():
+    """Crée l'application Flask pour les tests."""
+    app = create_app('testing')
+    with app.app_context():
+        yield app
 
-# Imports retardés pour éviter les dépendances circulaires au démarrage
-from utils.db_base import Base 
-from utils import models
-
-@pytest.fixture(scope='function')
-def session():
+@pytest.fixture(scope="function", autouse=True)
+def db_session(app):
     """
-    Session ULTRA-ISOLÉE : Crée une base de données en mémoire
-    totalement neuve pour CHAQUE test individuel.
+    Fixture transactionnelle qui assure l'isolation entre les tests.
+    Utilise des transactions imbriquées avec rollback automatique.
     """
-    engine = create_engine("sqlite:///:memory:")
-    Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
-    db_session = Session()
+    # Création d'une connexion dédiée aux tests
+    connection = db.engine.connect()
+    transaction = connection.begin()
     
+    # Configuration d'une session avec transaction imbriquée
+    session = scoped_session(
+        sessionmaker(bind=connection, expire_on_commit=False)
+    )
+    
+    # Remplace la session globale par notre session de test
+    db.session = session
+    
+    # Démarre une transaction imbriquée (savepoint)
+    session.begin_nested()
+    
+    # Configure l'écoute pour redémarrer automatiquement les savepoints
+    @event.listens_for(session, "after_transaction_end")
+    def restart_savepoint(session, transaction):
+        if transaction.nested and not transaction._parent.nested:
+            session.begin_nested()
+    
+    yield session
+    
+    # Nettoyage : supprime l'écouteur et effectue le rollback
+    event.remove(session, "after_transaction_end", restart_savepoint)
+    session.close()
+    transaction.rollback()
+    connection.close()
+
+@pytest.fixture(scope="function")
+def clean_db(db_session):
+    """Assure une base de données vide pour les tests qui en ont besoin."""
+    # Supprime toutes les données des tables dans l'ordre inverse des dépendances
+    for table in reversed(db.metadata.sorted_tables):
+        db_session.execute(table.delete())
+    db_session.commit()
     yield db_session
-    
-    db_session.close()
-    engine.dispose() # Détruit complètement la DB et ses données après le test
 
-@pytest.fixture(scope='function')
-def client(session):
-    """
-    Fournit un client de test Flask 100% isolé pour CHAQUE test,
-    en injectant la session de base de données dédiée.
-    """
-    from server_v4_complete import create_app
-    app = create_app()
-    app.config.update({"TESTING": True})
+@pytest.fixture
+def setup_project(db_session):
+    """Crée un projet de test avec toutes les dépendances nécessaires."""
+    from utils.models import Project
     
-    # Injection de session via un "monkeypatch" du décorateur
-    from utils.database import with_db_session
-    original_decorator = with_db_session
+    project = Project(
+        id=str(uuid.uuid4()),
+        name="Test Project",
+        description="Projet de test",
+        analysis_mode="screening",
+        created_at=datetime.utcnow()
+    )
     
-    def test_decorator(func):
-        def wrapper(*args, **kwargs):
-            return func(session, *args, **kwargs)
-        return wrapper
+    db_session.add(project)
+    db_session.commit()
     
-    import utils.database
-    utils.database.with_db_session = test_decorator
+    yield project.id
     
-    with app.test_client() as c:
-        yield c
-    
-    # Restaurer le décorateur original pour ne pas affecter d'autres contextes
-    utils.database.with_db_session = original_decorator
+    # Le nettoyage est automatique grâce au rollback transactionnel
+
+@pytest.fixture
+def mock_queue():
+    """Mock de la queue pour les tests."""
+    from unittest.mock import MagicMock
+    mock_q = MagicMock()
+    mock_q.enqueue = MagicMock()
+    return mock_q
+

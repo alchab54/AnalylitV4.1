@@ -4,15 +4,20 @@ import os
 import logging
 from functools import wraps
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import sessionmaker, scoped_session
 # ↓↓↓ MODIFIEZ CET IMPORT ↓↓↓
 from .db_base import Base  # Importer la Base partagée
  
 logger = logging.getLogger(__name__)
 
-# --- Variables globales (non initialisées) ---
-engine = None
-SessionFactory = None
+# Global db object
+class _DB:
+    def __init__(self):
+        self.engine = None
+        self.SessionFactory = None
+        self.session = None # This will be the scoped_session for application use
+
+db = _DB()
 
 # Définir le schéma, mais le rendre None si en mode test
 SCHEMA = 'analylit_schema' if os.getenv('TESTING') != 'true' else None
@@ -23,39 +28,39 @@ from utils import models # noqa
 
 def init_database(database_url=None):
     """Initialise le moteur et la factory de session. Ne fait rien si déjà initialisé."""
-    global engine, SessionFactory
-    if engine:
-        return engine
+    if db.engine:
+        return db.engine
 
     if not database_url:
         database_url = os.getenv("DATABASE_URL", "postgresql://user:pass@db/test") # URL générique
 
     try:
-        engine = create_engine(database_url, pool_pre_ping=True)
+        db.engine = create_engine(database_url, pool_pre_ping=True)
         if SCHEMA: # Si on utilise PostgreSQL, on crée le schéma
-            with engine.connect() as connection:
+            with db.engine.connect() as connection:
                 connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
                 connection.commit()
         
-        Base.metadata.create_all(bind=engine)
-        SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+        Base.metadata.create_all(bind=db.engine)
+        db.SessionFactory = sessionmaker(bind=db.engine, autoflush=False, autocommit=False)
+        db.session = scoped_session(db.SessionFactory) # Initialize the scoped_session here
         logger.info("✅ Base de données initialisée avec succès.")
     except Exception as e:
         logger.critical(f"❌ ERREUR D'INITIALISATION DB : {e}", exc_info=True)
-        engine = None
+        db.engine = None
         raise
-    return engine
+    return db.engine
 
 def get_session():
     """Récupère une session de la factory."""
-    if not SessionFactory:
+    if not db.session: # Use db.session
         raise RuntimeError("La base de données n'est pas initialisée. Appelez init_database().")
-    return SessionFactory()
+    return db.session() # Call the scoped_session to get a session
 
 def with_db_session(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        session = get_session()
+        session = db.session() # Get a session from the scoped_session
         try:
             result = func(session, *args, **kwargs)
             session.commit()
@@ -65,7 +70,7 @@ def with_db_session(func):
             logger.exception(f"Erreur DB dans {func.__name__}: {e}")
             raise
         finally:
-            session.close()
+            session.remove() # Remove the session from the registry for scoped_session
     return wrapper
 
 def seed_default_data(session):
