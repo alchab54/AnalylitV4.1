@@ -9,7 +9,12 @@ from sqlalchemy.orm import sessionmaker
 os.environ['TESTING'] = 'true'
 
 from server_v4_complete import app as flask_app
-from utils.database import Base # Importer la Base déclarative
+from utils.database import Base
+
+# ↓↓↓ CET IMPORT EST LA CLÉ DE LA VICTOIRE ↓↓↓
+# Il force Python à lire le fichier models.py et à enregistrer
+# toutes les tables (Project, AnalysisProfile, etc.) auprès de la Base.
+from utils import models # noqa
 
 # URL pour la base de données de test en mémoire
 TEST_DATABASE_URL = "sqlite:///:memory:"
@@ -28,6 +33,7 @@ def engine():
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_database(engine):
     """Crée toutes les tables une seule fois au début des tests."""
+    # Maintenant que les modèles sont importés, create_all connaît toutes les tables.
     Base.metadata.create_all(engine)
     yield
     Base.metadata.drop_all(engine)
@@ -44,11 +50,7 @@ def session(engine):
     transaction.rollback()
     connection.close()
 
-@pytest.fixture(scope="function")
-def client(app, session):
-    """Fournit un client de test Flask et mock la session DB."""
-    def get_test_session():
-        return session
-    # Remplace la fonction get_session de l'app par notre session de test
-    flask_app.extensions['db_session'] = get_test_session 
+@pytest.fixture(scope="module")
+def client(app):
+    """Fournit un client de test Flask."""
     return app.test_client()

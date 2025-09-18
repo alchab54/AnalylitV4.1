@@ -1,7 +1,6 @@
 // web/js/state.js
 
 import { appState } from './app-improved.js';
-
 export function setProjects(projects) {
     appState.projects = projects;
     // This function should only update the state.
@@ -43,4 +42,8 @@ export function toggleSelectedArticle(articleId) {
 
 export function clearSelectedArticles() {
     appState.selectedSearchResults.clear();
+}
+
+export function setQueuesStatus(status) {
+    appState.queuesInfo = status;
 }

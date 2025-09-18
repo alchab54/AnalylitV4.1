@@ -17,6 +17,10 @@ SCHEMA = 'analylit_schema' if os.getenv('TESTING') != 'true' else None
 
 Base = declarative_base()
 
+# ↓↓↓ AJOUTEZ CET IMPORT CI-DESSOUS ↓↓↓
+# Cela force l'enregistrement de tous les modèles auprès de la 'Base' déclarative
+from utils import models # noqa
+
 def init_database(database_url=None):
     """Initialise le moteur et la factory de session. Ne fait rien si déjà initialisé."""
     global engine, SessionFactory
