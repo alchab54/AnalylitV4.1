@@ -1,3 +1,5 @@
+# version: '3.8'
+
 services:
   # --- Base de données ---
   db:
@@ -5,7 +7,7 @@ services:
     container_name: analylit-db-v4
     volumes:
       - postgres_data_v4:/var/lib/postgresql/data/
-      - ./init-user-db.sql:/docker-entrypoint-initdb.d/init-user-db.sql # <-- AJOUTEZ CETTE LIGNE
+      - ./init-user-db.sql:/docker-entrypoint-initdb.d/init-user-db.sql
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-analylit_user}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-strong_password}
@@ -57,12 +59,13 @@ services:
       dockerfile: Dockerfile-web-complete
     container_name: analylit-web-v4
     volumes:
-      # CORRECTION: Les chemins doivent pointer vers /home/appuser/app/ où l'application s'exécute
-      - projects_data:/home/appuser/app/projects
-      - model_cache_data:/home/appuser/app/model_cache
+      - ./projects:/home/appuser/app/projects
+      - ./model_cache:/home/appuser/app/model_cache
+      - .:/home/appuser/app  # Monte le code source pour le développement
     environment:
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
+      - PYTHONPATH=/home/appuser/app # Assure que le chemin est correct
     env_file:
       - .env
     command: ["/home/appuser/app/entrypoint.sh"]
@@ -72,7 +75,7 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001/api/settings/profiles"] # <-- Correction finale
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/settings/profiles"]
       interval: 20s
       timeout: 10s
       retries: 5
@@ -89,10 +92,13 @@ services:
       dockerfile: Dockerfile-worker-complete
     container_name: analylit-worker-v4
     volumes:
-      # CORRECTION: Doit correspondre aux chemins du service web
-      - projects_data:/home/appuser/app/projects
-      - model_cache_data:/home/appuser/app/model_cache
+      - ./projects:/home/appuser/app/projects
+      - ./model_cache:/home/appuser/app/model_cache
+      - .:/home/appuser/app # Monte le code source pour le développement
     env_file: .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/home/appuser/app # CORRECTION DÉFINITIVE
     command: >
       rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4
     depends_on:
@@ -130,8 +136,8 @@ services:
 volumes:
   postgres_data_v4:
   ollama_data_v4:
-  projects_data: # Volume pour les données des projets
-  model_cache_data: # Volume pour le cache des modèles ML
+  projects_data:
+  model_cache_data:
 
 networks:
   analylit-network:

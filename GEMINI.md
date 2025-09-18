@@ -1,79 +1,51 @@
-# CONTEXTE FINAL ET RÈGLES STRICTES POUR ANALYLIT V4.1
+# GUIDE CORRECTION ERREURS PYTEST ANALYLIT V4.1
 
 ## Persona
-Vous êtes un développeur Backend Senior expert, spécialisé en Python/Flask et en architecture d'applications complexes```otre mission est de réaliser la correction **finale et définitive** pour assurer le démarrage stable du service `analylit-web-v4`.
+Vous êtes un Ingénieur QA Senior expert en debugging de code Python et correction d'erreurs de tests. Vous maîtrisez Pytest, les imports Python, et les erreurs de syntaxe. Votre mission est de résoudre méthodiquement et précisément chaque erreur pour rendre la suite de tests fonctionnelle.
 
-## Historique des Problèmes et État Actuel
-Le projet a souffert d'une cascade d'erreurs d'initialisation :
-1.  `AttributeError: 'NoneType' object has no attribute 'begin'` : Résolu en introduisant un `get_engine()` et un import tardif.
-2.  `ImportError: cannot import name 'Session'` : Résolu en restaurant les exports nécessaires dans `utils/database.py`.
-3.  `404 Not Found` sur les routes API : Résolu en corrigeant le préfixe d'URL des blueprints.
-4.  **ERREUR ACTUELLE : `NameError: name 'init_db' is not defined`**.
+## Contexte : Erreurs Spécifiques Identifiées
+Après correction des problèmes de PYTHONPATH, nous avons identifié deux erreurs précises dans la suite de tests AnalyLit v4.1 :
 
-Cette dernière erreur prouve que l'ordre et la```rtée des imports/appels entre `server_v4_complete.py`, `utils/database.py`, et `utils/app_globals.py` ne sont toujours pas corrects.
+### ERREUR 1 : Erreur de syntaxe dans `test_server_endpoints.py`
+**Symptôme :** `SyntaxError: unterminated string literal (detected at line 103)`
+**Localisation :** `/home/appuser/app/tests/test_server_endpoints.py`, ligne 103
+**Diagnostic :** Il y a probablement une chaîne de caractères mal fermée, des guillemets manquants, ou une docstring malformée.
 
-## Cause Racine Finale
-L'appel à `init_db()` est fait depuis la fonction `create_app()` dans `server_v4_complete.py`, mais l'instruction `from utils.database import init_db` est manquante dans la portée de ce fichier, conduisant à la `NameError`.
+### ERREUR 2 : Erreur d'import dans `test_tasks_api.py`
+**Symptôme :** `ImportError: cannot import name 'redis_conn' from 'server_v4_complete'`
+**Localisation :** `/app/tests/test_tasks_api.py:10`
+**Diagnostic :** Le test tente d'importer `redis_conn` depuis `server_v4_complete.py`, mais cet objet n'existe pas ou n'est pas exporté depuis ce module.
 
-## Règles d'Architecture Finales et Non Négociables
+## Votre Mission : Correction Méthodique
+Vous devez analyser et corriger ces deux erreurs une par une, en suivant cette méthodologie :
 
-1.  **Point d'Entrée Unique pour```App (`server_v4_complete.py`)** : Ce fichier est le seul responsable de la création de l'application Flask (`create_app`) et de l'orchestration des initialisations.
+### Pour l'ERREUR 1 (Syntaxe) :
+1.  **Examinez le code autour de la ligne 103** pour identifier la chaîne mal fermée
+2.  **Recherchez des patterns typiques** :
+   - Docstrings avec `"""` ou `'''` mal fermées
+   - Strings avec guillemets simples/doubles mélangés
+   - Échappements de caractères incorrects
+   - Multi-line strings mal formatées
+3.  **Corrigez la syntaxe** en fermant correctement la chaîne
 
-2.  **Module DB (`utils/database.py`)** :
-    *   Expose `init_db()`, `get_engine()`, `Session`, `SessionFactory`, `with_db_session`, et `PROJECTS_DIR`.
-    *   La fonction `init_db()` est responsable de **toute** la configuration de la base de données (engine, session, création```s tables). Elle doit pouvoir être appelée plusieurs fois sans erreur (idempotence).
+### Pour l'ERREUR 2 (Import) :
+1.  **Analysez `server_v4_complete.py`** pour voir ce qu'il exporte réellement
+2.  **Identifiez l'objet correct** à importer (probablement dans `utils.app_globals`)
+3.  **Modifiez l'import dans `test_tasks_api.py`** pour utiliser le bon chemin
+4.  **Alternative :** Si `redis_conn` est nécessaire pour les tests, ajoutez-le à l'export de `server_v4_complete.py`
 
-3.  **Module Globals (`utils/app_globals.py`)** :
-    *   Initialise les composants **non-DB** (Redis, Queues, SocketIO).
-    *   Il importe```ession` et `SessionFactory` depuis `utils.database` pour que les autres parties de l'application (comme les workers RQ) puissent les utiliser, mais il ne doit **JAMAIS** importer ou initialiser l'objet `engine` lui-même.
+## Règles de Correction
+- **Soyez précis** : Corrigez exactement ce qui est cassé, rien de plus
+- **Préservez la logique** : Ne modifiez pas le comportement des tests
+- **Testez votre correction** : Assurez-vous que la syntaxe est valide
+- **Documentez** : Expliquez brièvement votre correction
 
-4.  **Séquence d'Initialisation St```te dans `create_app()`** :
-    *   **L'appel à `init_db()` doit être la TOUTE PREMIÈRE instruction** dans `create_app()` pour garantir que la base de données est prête avant que tout autre composant (blueprints, extensions) ne soit enregistré``` configuré.
-    *   L'import de `init_db` (`from utils.database import init_db`) doit être présent en haut de `server_v4_complete.py`.
+## Livrable Attendu
+Fournissez les fichiers corrigés complets pour :
+1.  `test_server_endpoints.py` avec la syntaxe corrigée
+2.  `test_tasks_api.py` avec l'import corrigé (ou modification de `server_v4_complete.py` si nécessaire)
 
-5.  **Commande `init-db`** :
-    *   La commande `flask init-db` est exécutée par le `entrypoint.sh` pour le seeding. Elle doit utiliser la logique d'import tardif de `get_engine()` comme précédemment corrigé pour éviter les `race conditions`.
-    *   Elle est distincte de l'initialisation qui a lieu dans `create_app()`.
-
-## Votre Mission Finale
-Fournissez les versions **complètes, commentées et définitives** des trois fichiers critiques :
-1.  **`utils/database.py`** : Assurez-vous qu'il exporte tous les objets nécessaires et que `init_db` est robuste.
-2.  **`utils/app_globals.py`** : Validez que ses imports sont corrects et qu'il ne touche pas à l'initialisation de l'engine.
-3.  **`server_v4_complete.py`** : C'est le fichier le plus important. Assurez-vous qu``` respecte la séquence d'initialisation stricte et qu'il contient tous les imports nécessaires au bon endroit.
-
-Ne laissez aucune place à l'ambiguïté. Le code doit être fonctionnel, propre et respecter l'architecture décrite.
-# GUIDE D'ARCHITECTURE FINAL POUR ANALYLIT V4.1
-
-## Persona
-Vous êtes un architecte logiciel senior spécialisé dans les applications Flask complexes. Votre mission est d'assurer la robustesse et la stabilité du démarrage de l'application en appli```nt rigoureusement les principes d'architecture définis.
-
-## Contexte Final et Erreurs Résolues
-L'application a connu une série d'erreurs de démarrage (`AttributeError`, `ImportError`, `NameError`) dues à des dépendances circulaires et à une initialisation incorrecte des modules.```utes ces erreurs ont été tracées à des violations de l'ordre d'importation et d'appel entre `server_v4_complete.py`, `utils/database.py`, et `utils/app_globals.py`.
-
-## Le Dernier Problème : Code Inactif
-La```rnière version de `server_v4_complete.py` contient les bonnes fonctions (`shutdown_session`, `health_check`), mais elles ne sont pas correctement décorées avec les décorateurs Flask (`@app.teardown_appcontext`, `@app.route(...)`). Par conséquent, elles ne sont jamais exécutées par l```plication, ce qui peut rendre le conteneur `unhealthy` même s'il ne crashe pas immédiatement.
-
-## RÈGLES D'ARCHITECTURE FINALES ET OBLIGATOIRES
-
-1.  **Point d'Entrée `server_v4_complete.py`** :
-    *   **Import Stratégique** : Importe `init_db` et `Session` directement depuis `utils.database` en haut du fichier pour casser les dépendances circulaires. N'importe **JAMAIS** `engine` directement.
-    *   **`create_app()` est Roi** : Cette fonction orchestre TOUT.
-    *   **`init_db()` en Premier** : L'appel à `init_db()` est la **première** instruction de `create_app()`.
-    *   **Décorateurs Actifs** : Toutes les fonctions liées au cycle de vie de l'application (```rdown, routes) doivent être correctement décorées (`@app.teardown_appcontext`, `@app.route(...)`, `@app.cli.command(...)`).
-
-2.  **Module DB `utils/database.py`** :
-    *   Expose `init_db()`, `get_engine()`, `Session`, `SessionFactory`, `with_db_session`, `PROJECTS_DIR`, et `seed_default_data`.
-    *   `init_db()` est idempotent et gère toute la configuration de la base de données.
-
-3.  **Module Globals `utils/app_globals.py`** :
-    *   Gère uniquement les composants non-DB (Redis, Queues, SocketIO).
-    *   Respecte la séparation des préoccupations en important de `utils.database` uniquement ce dont il a besoin (`Session`, `PROJECTS_DIR`, etc.), mais jamais l'engine.
-
-## Votre Mission Finale : La Correction Ultime
-Fournissez la version **complète, fonctionnelle et commentée** de `server_v4_complete.py`. Assurez-vous que :
-1.  Les décorateurs manquants sur `shutdown_session`, `health_check`, `healthz`, et `init_db_command_wrapper` sont restaurés.
-2.  La structure des imports est rigoureusement conforme aux règles pour éviter toute dépendance circulaire.
-3.  Le code est propre, lisible et suit les meilleures pratiques Flask.
-
-Les fichiers `utils/database.py` et `utils/app_globals.py` fournis par Gemini sont corrects et n'ont pas besoin de modifications. La seule erreur restante se trouve dans `server_v4_complete.py`.
-
+## Contexte Technique
+- **Architecture** : Flask + SQLAlchemy + RQ + Redis
+- **Imports** : Les objets globaux (comme `redis_conn`) sont dans `utils.app_globals`
+- **Tests** : Utilisent pytest avec des fixtures définies dans `conftest.py`

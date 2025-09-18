@@ -45,6 +45,7 @@ RUN useradd --create-home appuser
 RUN mkdir -p /home/appuser/app/projects /home/appuser/app/model_cache && chown -R appuser:appuser /home/appuser
 
 WORKDIR /home/appuser/app
+ENV PYTHONPATH="/home/appuser/app:$PYTHONPATH"
 
 # Copier l'environnement virtuel et les node_modules depuis le builder
 # Ces couches seront mises en cache tant que les dépendances ne changent pas.

@@ -1,9 +1,13 @@
+# utils/app_globals.py
+
 import logging
 import redis
 from rq import Queue
 from flask_socketio import SocketIO
 
-from config_v4 import get_config
+# CORRECTION : L'import doit pointer vers 'config_v4' à la racine du projet.
+from config_v4 import get_config 
+
 # 'engine' n'est plus importé directement pour éviter les dépendances circulaires.
 # Les modules doivent utiliser get_engine() de utils.database après l'initialisation.
 from utils.database import Session, SessionFactory, with_db_session, PROJECTS_DIR
@@ -23,13 +27,17 @@ background_queue = None
 q = None
 
 def initialize_app_globals(app=None):
+    """
+    Initialise les objets globaux de l'application (Redis, Queues, SocketIO).
+    Cette fonction est appelée une fois que l'application Flask est créée.
+    """
     global redis_conn, processing_queue, synthesis_queue, analysis_queue
     global discussion_draft_queue, background_queue, q, socketio
 
     if redis_conn is None:
         redis_conn = redis.from_url(config.REDIS_URL)
 
-    # CORRECTION: Utiliser les noms de file d'attente définis dans docker-compose
+    # Utiliser les noms de file d'attente définis
     if processing_queue is None:
         processing_queue = Queue("analylit_processing_v4", connection=redis_conn)
     if synthesis_queue is None:
