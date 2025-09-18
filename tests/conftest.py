@@ -1,55 +1,44 @@
-# tests/conftest.py - VERSION FINALE BLINDÉE
+# tests/conftest.py
 
 import pytest
 import os
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+# FORCER le mode test AVANT tout autre import
 os.environ['TESTING'] = 'true'
 
-from server_v4_complete import create_app
-from utils.db_base import Base
+# Imports retardés pour éviter les dépendances circulaires au démarrage
+from utils.db_base import Base 
 from utils import models
 
-TEST_DATABASE_URL = "sqlite:///:memory:"
-
-@pytest.fixture(scope='session')
-def engine():
-    return create_engine(TEST_DATABASE_URL)
-
-@pytest.fixture(scope='session')  
-def tables(engine):
-    Base.metadata.create_all(engine)
-    yield
-    Base.metadata.drop_all(engine)
-
 @pytest.fixture(scope='function')
-def session(engine, tables):
-    """Session avec NETTOYAGE BRUTAL de toutes les tables."""
-    connection = engine.connect()
-    db_session = sessionmaker(bind=connection)()
+def session():
+    """
+    Session ULTRA-ISOLÉE : Crée une base de données en mémoire
+    totalement neuve pour CHAQUE test individuel.
+    """
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    db_session = Session()
     
     yield db_session
     
-    # NETTOYAGE RADICAL : vider TOUTES les tables dans le bon ordre
-    try:
-        db_session.execute(text("PRAGMA foreign_keys = OFF"))  # Désactiver les contraintes
-        for table in reversed(Base.metadata.sorted_tables):
-            db_session.execute(table.delete())
-        db_session.execute(text("PRAGMA foreign_keys = ON"))   # Réactiver les contraintes
-        db_session.commit()
-    except Exception as e:
-        db_session.rollback()
-    finally:
-        db_session.close()
-        connection.close()
+    db_session.close()
+    engine.dispose() # Détruit complètement la DB et ses données après le test
 
 @pytest.fixture(scope='function')
 def client(session):
+    """
+    Fournit un client de test Flask 100% isolé pour CHAQUE test,
+    en injectant la session de base de données dédiée.
+    """
+    from server_v4_complete import create_app
     app = create_app()
     app.config.update({"TESTING": True})
     
-    # Injection de session dans l'app
+    # Injection de session via un "monkeypatch" du décorateur
     from utils.database import with_db_session
     original_decorator = with_db_session
     
@@ -64,4 +53,5 @@ def client(session):
     with app.test_client() as c:
         yield c
     
+    # Restaurer le décorateur original pour ne pas affecter d'autres contextes
     utils.database.with_db_session = original_decorator

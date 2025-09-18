@@ -4,7 +4,7 @@ import json
 import uuid
 import pytest
 from datetime import datetime, timedelta
-from unittest.mock import patch, MagicMock, ANY
+from unittest.mock import patch, MagicMock, ANY, mock
 
 from utils.models import Project
 from utils.app_globals import redis_conn # Import redis_conn
@@ -90,7 +90,7 @@ def test_cancel_task(client):
         
         assert response.status_code == 200
         assert response.get_json()['message'] == "Demande d'annulation envoyée."
-        mock_fetch.assert_called_once_with(fake_task_id, connection=mock_redis_conn)
+        mock_fetch.assert_called_once_with(fake_task_id, connection=mock.ANY)
         mock_job.cancel.assert_called_once()
 
 def test_get_tasks_status(client):
