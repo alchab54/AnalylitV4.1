@@ -12,8 +12,8 @@ echo "Base de données prête !"
 
 echo "Initialisation de la base de données et seeding..."
 
-# L'initialisation se fait maintenant automatiquement dans create_app()
-# Plus besoin de flask init-db
+# Exécute l'initialisation de la base de données de manière explicite
+python -c 'from utils.database import init_database; init_database()'
 
 echo "Démarrage de l'application Flask..."
 exec python server_v4_complete.py

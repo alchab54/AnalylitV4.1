@@ -70,12 +70,48 @@ services:
       - PYTHONPATH=/home/appuser/app # Assure que le chemin est correct
     env_file:
       - .env
-    # CORRECTION: Exécuter l'initialisation de la DB avant de lancer les tests.
-    # Cela garantit que le schéma est à jour avec les modèles.
-    # Le `&& pytest` est supprimé car pytest est exécuté manuellement.
-    command: ["/bin/sh", "-c", "python -c 'from utils.database import init_database; init_database()' && /home/appuser/app/entrypoint.sh"]
+    # CORRECTION: L'initialisation de la DB est déjà gérée par l'entrypoint.
+    # La commande doit simplement lancer l'entrypoint.
+    command: ["/home/appuser/app/entrypoint.sh"]
     depends_on:
       db:
+      
+      Gemini
+      Thinking
+      Bonjour ! Vous avez parfaitement identifié les deux problèmes : une erreur d'import en Python qui est simple à corriger, et un avertissement de permission Docker qui est un peu plus subtil mais tout aussi important pour un environnement de test propre.
+      
+      Je vais appliquer la correction pour l'erreur d'import dans votre fichier de test.
+      
+      Correction de l'erreur d'import (ImportError)
+      Je vais modifier la ligne d'import dans tests/test_tasks_api.py pour qu'elle soit correcte, ce qui résoudra l'ImportError.
+      
+      test_tasks_api.py
+      -1
+      +2
+      Concernant l'avertissement de permission (PytestCacheWarning)
+      Votre analyse est tout à fait correcte. L'avertissement Permission denied indique que l'utilisateur appuser à l'intérieur du conteneur Docker n'a pas les droits d'écriture sur le répertoire /home/appuser/app, qui est le répertoire où le code de votre projet est monté depuis votre machine hôte.
+      
+      La solution que vous proposez, qui consiste à s'assurer que appuser est propriétaire du répertoire de travail dans le Dockerfile, est la bonne pratique pour résoudre ce problème de manière durable.
+      
+      Voici à quoi ressemblerait la modification dans vos Dockerfile-web-complete et Dockerfile-worker-complete (je ne peux pas modifier ces fichiers car ils ne sont pas dans le contexte, mais voici l'exemple) :
+      
+      dockerfile
+      # Dans Dockerfile-web-complete et Dockerfile-worker-complete
+      
+      # ... (après la création de appuser et la définition de WORKDIR)
+      WORKDIR /home/appuser/app
+      
+      # Assurez-vous que l'utilisateur est propriétaire du répertoire de l'application
+      # Cette commande doit être exécutée avant de copier les fichiers
+      RUN chown -R appuser:appuser /home/appuser/app
+      
+      # Copiez les fichiers en tant que appuser
+      COPY --chown=appuser:appuser . .
+      
+      # ... (le reste du Dockerfile)
+      En appliquant la correction de l'import et en ajustant les permissions dans vos Dockerfiles, vous devriez avoir une suite de tests qui s'exécute sans erreur ni avertissement.
+      
+      Prompts to tr
         condition: service_started
       redis:
         condition: service_healthy

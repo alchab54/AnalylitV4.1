@@ -39,11 +39,7 @@ def create_app():
     CORS(app, origins=["http://localhost:8080", "http://127.0.0.1:8080"],
          expose_headers=["Content-Disposition"],
          supports_credentials=True)
-    
-    # app_globals.initialize_app(testing=testing)  # DÉSACTIVÉ : Géré par entrypoint.sh AVANT le démarrage.
-    # app.config["TESTING"] = os.getenv("TESTING", "false").lower() == "true"
-    # app.config["ENV"] = os.getenv("FLASK_ENV", "production")
-    # app.config["WTF_CSRF_ENABLED"] = False
+    # app_globals.initialize_app(testing=testing) # DÉSACTIVÉ : Géré par entrypoint.sh AVANT le démarrage.
 
     def first_or_404(query):
         result = query.first()
@@ -76,6 +72,14 @@ def create_app():
     def get_all_projects(session):
         projects = session.query(Project).all()
         return jsonify([p.to_dict() for p in projects]), 200
+    
+    def format_bibliography(extractions):
+    """Formate une bibliographie simple pour les tests."""
+    bibliography = []
+    for ext in extractions:
+        title = ext.get('title', 'Sans titre')
+        bibliography.append(f"- {title}")
+    return "\n".join(bibliography)
 
     @app.route("/api/projects/<project_id>", methods=["GET"])
     @with_db_session
@@ -563,14 +567,6 @@ def create_app():
     return app
 
 app = create_app()
-
-def format_bibliography(extractions):
-    """Formate une bibliographie simple pour les tests."""
-    bibliography = []
-    for ext in extractions:
-        title = ext.get('title', 'Sans titre')
-        bibliography.append(f"- {title}")
-    return "\n".join(bibliography)
 
 if __name__ == "__main__":
     # Initialisation pour le développement local
