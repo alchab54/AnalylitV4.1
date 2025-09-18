@@ -1,18 +1,32 @@
 # conftest.py
 import pytest
-from sqlalchemy import event
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker, scoped_session
-from utils.database import db, init_db
-from server_v4_complete import create_app
-from datetime import datetime
 import uuid
+from datetime import datetime
+
+# --- Imports corrigés ---
+from utils.database import init_database, Base # Importer Base pour la création des tables
+from server_v4_complete import create_app
+
+# Créer une instance de moteur unique pour la session de test
+engine = create_engine("sqlite:///:memory:")
 
 @pytest.fixture(scope="session")
 def app():
     """Crée l'application Flask pour les tests."""
-    app = create_app('testing')
+    app = create_app() # Le mode 'testing' est déjà géré dans create_app
+    app.config['TESTING'] = True
     with app.app_context():
         yield app
+
+@pytest.fixture(scope="function")
+def client(app):
+    """
+    Provides a Flask test client for each test.
+    """
+    with app.test_client() as c:
+        yield c
 
 @pytest.fixture(scope="function", autouse=True)
 def db_session(app):
@@ -20,26 +34,26 @@ def db_session(app):
     Fixture transactionnelle qui assure l'isolation entre les tests.
     Utilise des transactions imbriquées avec rollback automatique.
     """
+    # S'assurer que les tables sont créées une seule fois par session de test
+    Base.metadata.create_all(bind=engine)
+
     # Création d'une connexion dédiée aux tests
-    connection = db.engine.connect()
+    connection = engine.connect()
     transaction = connection.begin()
     
     # Configuration d'une session avec transaction imbriquée
     session = scoped_session(
         sessionmaker(bind=connection, expire_on_commit=False)
     )
-    
-    # Remplace la session globale par notre session de test
-    db.session = session
-    
+        
     # Démarre une transaction imbriquée (savepoint)
     session.begin_nested()
     
     # Configure l'écoute pour redémarrer automatiquement les savepoints
     @event.listens_for(session, "after_transaction_end")
-    def restart_savepoint(session, transaction):
-        if transaction.nested and not transaction._parent.nested:
-            session.begin_nested()
+    def restart_savepoint(current_session, previous_transaction):
+        if previous_transaction.nested and not previous_transaction._parent.nested:
+            current_session.begin_nested()
     
     yield session
     
@@ -48,18 +62,20 @@ def db_session(app):
     session.close()
     transaction.rollback()
     connection.close()
+    # Supprime toutes les données après chaque test pour une isolation complète
+    Base.metadata.drop_all(bind=engine)
 
 @pytest.fixture(scope="function")
 def clean_db(db_session):
     """Assure une base de données vide pour les tests qui en ont besoin."""
     # Supprime toutes les données des tables dans l'ordre inverse des dépendances
-    for table in reversed(db.metadata.sorted_tables):
+    for table in reversed(Base.metadata.sorted_tables):
         db_session.execute(table.delete())
     db_session.commit()
     yield db_session
 
 @pytest.fixture
-def setup_project(db_session):
+def setup_project(db_session): # Renommé de 'test_project' pour correspondre à l'usage
     """Crée un projet de test avec toutes les dépendances nécessaires."""
     from utils.models import Project
     
@@ -85,4 +101,3 @@ def mock_queue():
     mock_q = MagicMock()
     mock_q.enqueue = MagicMock()
     return mock_q
-

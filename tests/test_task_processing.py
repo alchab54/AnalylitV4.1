@@ -26,7 +26,7 @@ from sklearn.metrics import cohen_kappa_score # Ajout pour le test Kappa
 # --- Imports de Config (Corrigé pour importer la fonction) ---
 from config_v4 import get_config
 config = get_config()
-from unittest import mock  # ← AJOUTER CETTE LIGNE
+from unittest import mock
 
 # --- Imports des modèles et tâches ---
 from utils.models import Project, SearchResult, Extraction, Grid, ChatMessage, AnalysisProfile, RiskOfBias

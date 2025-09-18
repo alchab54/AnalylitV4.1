@@ -31,7 +31,7 @@ export async function loadSettingsData() {
 export async function loadAnalysisProfiles() {
     console.log("Chargement des profils d'analyse...");
     try {
-        const profiles = await fetchAPI('/profiles');
+        const profiles = await fetchAPI('/settings/profiles');
         appState.analysisProfiles = profiles; 
         console.log("Profils chargés:", profiles);
     } catch (error) {

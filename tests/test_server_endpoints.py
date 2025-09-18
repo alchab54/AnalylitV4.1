@@ -144,7 +144,7 @@ def test_delete_non_existent_project(client, session): # Utilise session
     error_data = json.loads(response.data)
     assert error_data['error'] == 'Projet non trouvé'
 
-def test_get_all_projects(client, session): # Utilise session
+def test_get_all_projects(client, db_session): # Utilise session
     """
     GIVEN a Flask test client and multiple projects
     WHEN the '/api/projects' route is called with GET
@@ -398,7 +398,7 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, session):
                 job_timeout='1h'
             )
 
-@patch('utils.app_globals.q.enqueue') # CORRECTION: L'endpoint est dans `files_bp`, on patche donc `api.files`
+@patch('utils.app_globals.background_queue.enqueue') # CORRECTION: L'endpoint utilise background_queue
 def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, session):
     """
     Teste POST /api/projects/<id>/upload-zotero (File import)
@@ -415,7 +415,7 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, session):
 
     # ACT
     with patch('werkzeug.datastructures.FileStorage.save') as mock_save:
-        response = client.post(f'/api/projects/{project_id}/upload-zotero', data=file_data, content_type='multipart/form-data')
+        response = client.post(f'/api/projects/{project_id}/upload-zotero', data=file_data, content_type='multipart/form-data') # L'endpoint est dans server_v4_complete
 
         # ASSERT
         assert response.status_code == 202

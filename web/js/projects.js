@@ -11,7 +11,7 @@ import { showToast, showLoadingOverlay, closeModal, escapeHtml, showModal } from
  */
 async function loadProjects() {
   const oldProjectIds = new Set((appState.projects || []).map(p => p.id));
-  const projects = await fetchAPI('/projects');
+  const projects = await fetchAPI('/projects/');
   appState.projects = projects || [];
 
   const newProjectIds = new Set(appState.projects.map(p => p.id));

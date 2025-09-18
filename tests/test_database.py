@@ -5,27 +5,27 @@ from utils.models import AnalysisProfile, Project
 
 # La fixture `session` est automatiquement injectée par conftest.py
 
-def test_seed_default_data_when_empty(session):
+def test_seed_default_data_when_empty(db_session):
     """Teste que le seeding fonctionne sur une base de données vide."""
     # Act
-    seed_default_data(session)
+    seed_default_data(db_session)
  
     # Assert
-    profile = session.query(AnalysisProfile).filter_by(name='Standard').first()
-    project = session.query(Project).filter_by(name='Projet par défaut').first()
+    profile = db_session.query(AnalysisProfile).filter_by(name='Standard').first()
+    project = db_session.query(Project).filter_by(name='Projet par défaut').first()
     assert profile is not None
     assert project is not None
  
-def test_seed_default_data_when_exists(session):
+def test_seed_default_data_when_exists(db_session):
     """Teste que le seeding ne crée pas de doublons."""
     # Arrange: insérer les données une première fois
-    session.add(AnalysisProfile(name='Standard'))
-    session.add(Project(name='Projet par défaut'))
-    session.commit()
-    count_before = session.query(Project).count()
+    db_session.add(AnalysisProfile(name='Standard'))
+    db_session.add(Project(name='Projet par défaut'))
+    db_session.commit()
+    count_before = db_session.query(Project).count()
  
     # Act: lancer le seeding une deuxième fois
-    seed_default_data(session)
+    seed_default_data(db_session)
  
     # Assert: vérifier que le nombre d'entrées n'a pas changé
-    assert session.query(Project).count() == count_before
+    assert db_session.query(Project).count() == count_before

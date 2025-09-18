@@ -7,9 +7,9 @@ from sqlalchemy import text
 from tasks_v4_complete import multi_database_search_task
 
 @pytest.fixture
-def mock_db_session(session):
+def mock_db_session(db_session):
     """Fixture qui utilise la session de test existante."""
-    return session
+    return db_session
 
 def test_multi_database_search_task_expert_mode(mock_db_session, mocker):
     """

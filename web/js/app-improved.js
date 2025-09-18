@@ -142,7 +142,7 @@ async function initializeApplication() {
 async function loadInitialData() {
     const t1 = performance.now();
     try {
-        await Promise.all([loadProjects(), loadAvailableDatabases(), loadSettingsData()]);
+        await Promise.all([loadProjects(), loadAvailableDatabases(), loadAnalysisProfiles()]);
         const loadMs = performance.now() - t1;
         appState.performance.loadTimes.initialData = loadMs;
         console.log(`📊 Données initiales chargées en ${loadMs.toFixed(2)}ms`);

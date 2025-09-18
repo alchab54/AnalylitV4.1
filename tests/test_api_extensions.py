@@ -152,7 +152,7 @@ def test_api_full_validation_workflow(client: FlaskClient, session: Session, set
 # ... (test_api_prisma_checklist_workflow reste inchangé) ...
 # ================================================================
 
-def test_api_prisma_checklist_workflow(client, session, setup_project):
+def test_api_prisma_checklist_workflow(client, db_session, setup_project):
     """
     Teste le GET (génération) et le POST (sauvegarde) de la checklist PRISMA-ScR.
     """
