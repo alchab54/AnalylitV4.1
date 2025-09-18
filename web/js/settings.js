@@ -725,3 +725,25 @@ function renderQueueStatus(status, container) {
     
     container.innerHTML = html;
 }
+
+/**
+ * Gère le vidage d'une file d'attente spécifique.
+ * @param {string} queueName - Le nom de la file à vider.
+ */
+export async function handleClearQueue(queueName) {
+    if (!queueName) return;
+
+    showConfirmModal(
+        'Vider la file d\'attente',
+        `Êtes-vous sûr de vouloir vider la file "${queueName}" ? Toutes les tâches en attente seront perdues.`,
+        {
+            confirmText: 'Vider',
+            confirmClass: 'btn--danger',
+            onConfirm: async () => {
+                await fetchAPI('/queues/clear', { method: 'POST', body: { queue_name: queueName } });
+                showToast(`La file "${queueName}" a été vidée.`, 'success');
+                await loadQueuesStatus(); // Recharger le statut
+            }
+        }
+    );
+}
