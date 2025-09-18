@@ -8,46 +8,49 @@ from sqlalchemy.exc import ProgrammingError, OperationalError
 
 logger = logging.getLogger(__name__)
 
-# Répertoire projets (utilisé par utils.app_globals et utils.file_handlers)
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-PROJECTS_DIR = os.getenv("PROJECTS_DIR", os.path.abspath(os.path.join(BASE_DIR, "..", "projects")))
-
-# URL DB
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://analylit:password@analylit-db-v4:5432/analylit_db")
-
-# Engine et Base
-engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True,
-    echo=False,
-    future=True,
-)
+# --- Variables globales (initialisées à None) ---
+engine = None
+SessionFactory = None
 Base = declarative_base()
+SCHEMA = 'analylit_schema'
+db_session = None # Pour compatibilité tests
 
-# Session factory
-SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
+# --- Fonctions d'initialisation ---
+def init_database(database_url=None):
+    """
+    Initialise le moteur et la factory de session.
+    Fonction principale appelée par l'application au démarrage.
+    """
+    global engine, SessionFactory, db_session
 
-# Variables globales pour compatibilité des tests
-db_session = None
-inspect = inspect  # Rendre inspect disponible au niveau module
+    if not database_url:
+        database_url = os.getenv("DATABASE_URL", "postgresql://analylit:password@analylit-db-v4:5432/analylit_db")
+
+    engine = create_engine(database_url, pool_pre_ping=True, echo=False, future=True)
+    SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
+    
+    # Création du schéma et des tables
+    with engine.connect() as connection:
+        connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
+        connection.commit()
+    Base.metadata.create_all(bind=engine)
+    
+    # Session pour compatibilité avec les tests
+    db_session = scoped_session(SessionFactory)
+    
+    logger.info("✅ Base de données initialisée")
+    return engine
 
 def get_session():
     """
     Retourne une nouvelle session SQLAlchemy.
-    Gère le cas où SessionFactory est mocké (None) pendant les tests.
+    S'assure que la DB est initialisée.
     """
     if SessionFactory is None:
-        # Pendant les tests, SessionFactory peut être mocké.
-        # Dans ce cas, on ne peut pas créer de session réelle.
-        # Retourner un MagicMock permet aux tests de continuer.
+        # Permet aux tests de mocker SessionFactory
         from unittest.mock import MagicMock
         return MagicMock()
     return SessionFactory()
-
-def scoped_session(session_factory):
-    """Fonction de compatibilité pour les tests"""
-    from sqlalchemy.orm import scoped_session as sqlalchemy_scoped_session
-    return sqlalchemy_scoped_session(session_factory)
 
 def with_db_session(func):
     @wraps(func)
@@ -65,16 +68,7 @@ def with_db_session(func):
             session.close()
     return wrapper
 
-def _create_schema_if_needed(session):
-    # Crée le schéma si absent
-    try:
-        session.execute(text("CREATE SCHEMA IF NOT EXISTS analylit_schema"))
-        session.commit()
-    except Exception:
-        session.rollback()
-        raise
-
-def seed_default_data(connection_or_session):
+def seed_default_data(session_or_connection):
     """
     Seed des données par défaut dans la base de données.
     Compatible avec les tests qui passent une connection.
