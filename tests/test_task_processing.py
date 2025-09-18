@@ -516,7 +516,7 @@ def test_run_risk_of_bias_task(session, mocker):
     # ARRANGE
     project_id = str(uuid.uuid4())
     article_id = "rob_test_1"
-    project = Project(id=project_id, name="RoB Test")
+    project = Project(id=project_id, name="RoB Test", pmid=article_id)
     session.add(project)
     session.commit()
 
@@ -845,7 +845,8 @@ def test_index_project_pdfs_task(session, mocker, mock_embedding_model):
     
     mock_notify.assert_any_call(project_id, 'indexing_completed', f'{total_pdfs} PDF(s) ont été traités et indexés.')
     
-def test_fetch_online_pdf_task(session, mocker):
+@patch('tasks_v4_complete.fetch_unpaywall_pdf_url')
+def test_fetch_online_pdf_task(mock_unpaywall, session, mocker):
     """Teste le téléchargement de PDF via Unpaywall."""
     # ARRANGE
     project_id = str(uuid.uuid4())
@@ -859,7 +860,7 @@ def test_fetch_online_pdf_task(session, mocker):
     mock_pdf_url = "http://example.com/mock.pdf"
     mock_pdf_content = b'%PDF-1.4...test content...'
 
-    mock_unpaywall = mocker.patch('tasks_v4_complete.fetch_unpaywall_pdf_url', return_value=mock_pdf_url)
+    mock_unpaywall.return_value = mock_pdf_url
     
     mock_http_response = MagicMock()
     mock_http_response.headers = {'content-type': 'application/pdf'}
