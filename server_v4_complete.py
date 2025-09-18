@@ -538,10 +538,9 @@ def create_app():
 
 app = create_app()
 
-# -- Initialisation de l'application --
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    init_database()  # Appeler l'initialisation ici
+    # Initialisation pour le développement local
+    init_database()
     app.run(host="0.0.0.0", port=5001, debug=True)
 else:
     # Pour Gunicorn/production
