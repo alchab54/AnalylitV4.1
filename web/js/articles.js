@@ -1,6 +1,6 @@
 // web/js/articles.js
 import { fetchAPI } from './api.js';
-import { appState, elements } from './app-improved.js';
+import { appState, elements } from './app-improved.js'; // Already correct
 import { showLoadingOverlay, showToast, showModal, closeModal, escapeHtml } from './ui-improved.js';
 import { loadProjectFilesSet } from './projects.js';
 import { showSearchModal } from './search.js'; // Assuming this is correct

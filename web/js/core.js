@@ -40,11 +40,8 @@ import { handleRunRobAnalysis, fetchAndDisplayRob, loadRobSection, handleSaveRob
 import { showSearchModal, handleMultiDatabaseSearch, renderSearchSection } from './search.js';
 import { handleValidateExtraction, resetValidationStatus, filterValidationList, loadValidationSection } from './validation.js';
 import {
-    closeModal,
-    toggleSidebar,
-    showCreateProjectModal,
-} from './ui.js';
-import { clearNotifications } from './notifications.js';
+    closeModal, toggleSidebar, showCreateProjectModal, showToast, showLoadingOverlay } from './ui-improved.js';
+import { clearNotifications } from './notifications.js'; // Already correct
 import { handleDeleteGrid, loadProjectGrids, renderGridsSection, showGridFormModal, addGridFieldInput, removeGridField, handleSaveGrid, triggerGridImport, handleGridImportUpload } from './grids.js';
 import { renderReportingSection, generateBibliography, generateSummaryTable, exportSummaryTableExcel, savePrismaChecklist } from './reporting.js';
 // CORRIGÉ: Ajout des imports pour les fonctions d'import et la gestion des modales
@@ -61,7 +58,6 @@ import {
     showPullModelModal
 } from './settings.js';
 import { fetchAPI } from './api.js';
-import { showToast, showLoadingOverlay } from './ui-improved.js';
 
 async function handleCancelTask(target) {
     const taskId = target.dataset.taskId;
