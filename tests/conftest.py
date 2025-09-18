@@ -43,12 +43,17 @@ def session(engine):
     """Fournit une session de DB isolée pour chaque test."""
     connection = engine.connect()
     transaction = connection.begin()
+    
+    # Utiliser un savepoint pour une isolation encore plus forte
+    nested = connection.begin_nested()
+    
+    @pytest.fixture(autouse=True)
+    def _teardown_nested_transaction():
+        yield
+        nested.rollback()
+
     Session = sessionmaker(bind=connection)
-    db_session = Session()
-    yield db_session
-    db_session.close()
-    transaction.rollback()
-    connection.close()
+    yield Session()
 
 @pytest.fixture(scope="module")
 def client(app):

@@ -269,8 +269,13 @@ class RiskOfBias(Base):
     project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
     pmid = Column(String, nullable=False)
     domain = Column(String)
+    domain_1_bias = Column(String)
+    domain_1_justification = Column(Text)
+    domain_2_bias = Column(String)
+    domain_2_justification = Column(Text)
     judgement = Column(String)
-    support_for_judgement = Column(Text)
+    overall_bias = Column(String)
+    overall_justification = Column(Text)
     assessed_at = Column(DateTime, default=datetime.utcnow)
 
     def to_dict(self):

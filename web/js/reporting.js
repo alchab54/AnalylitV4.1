@@ -210,3 +210,22 @@ export async function savePrismaChecklist() {
         showLoadingOverlay(false, '', elements);
     }
 }
+
+/**
+ * Gère la génération du diagramme PRISMA.
+ */
+export async function handleGeneratePrisma() {
+    if (!appState.currentProject?.id) {
+        showToast('Veuillez sélectionner un projet.', 'warning');
+        return;
+    }
+    showLoadingOverlay(true, 'Génération du diagramme PRISMA...');
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, { method: 'POST', body: { type: 'prisma_flow' } });
+        showToast('Génération du diagramme PRISMA lancée en arrière-plan.', 'success');
+    } catch (error) {
+        showToast(`Erreur lors de la génération du diagramme PRISMA : ${error.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
+}

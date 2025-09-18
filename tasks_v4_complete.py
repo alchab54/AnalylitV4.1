@@ -159,12 +159,13 @@ def log_processing_status(session, project_id: str, article_id: str, status: str
     log_id = str(uuid.uuid4()) 
     
     session.execute(text("""
-        INSERT INTO processing_log (id, project_id, pmid, status, details, "timestamp")
-        VALUES (:id, :project_id, :pmid, :status, :details, :ts)
+        INSERT INTO processing_log (id, project_id, pmid, task_name, status, details, "timestamp")
+        VALUES (:id, :project_id, :pmid, :task_name, :status, :details, :ts)
     """), {
         "id": log_id, # <-- AJOUTÉ
         "project_id": project_id, 
         "pmid": article_id, 
+        "task_name": "process_article",
         "status": status, 
         "details": details, 
         "ts": datetime.now()
