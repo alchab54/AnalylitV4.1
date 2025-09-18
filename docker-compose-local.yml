@@ -63,6 +63,8 @@ services:
       - ./model_cache:/home/appuser/app/model_cache
       - .:/home/appuser/app  # Monte le code source pour le développement
     environment:
+      - TESTING=true
+      - FLASK_ENV=testing
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
       - PYTHONPATH=/home/appuser/app # Assure que le chemin est correct
@@ -99,6 +101,8 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - PYTHONPATH=/home/appuser/app # CORRECTION DÉFINITIVE
+      - TESTING=true
+      - FLASK_ENV=testing
     command: >
       rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4
     depends_on:

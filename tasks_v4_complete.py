@@ -1,6 +1,6 @@
-# ================================================================
-# AnalyLit V4.1 - Tâches RQ (100% PostgreSQL/SQLAlchemy) - CORRIGÉ
-# ================================================================
+# ================================================================ 
+# AnalyLit V4.1 - Tâches RQ (100% PostgreSQL/SQLAlchemy) - CORRIGÉ 
+# ================================================================ 
 import os
 import io
 import time
@@ -95,9 +95,9 @@ except Exception as e:
     logger.error(f"Erreur chargement du modèle d'embedding '{EMBEDDING_MODEL_NAME}': {e}")
     embedding_model = None
 
-# ================================================================
+# ================================================================ 
 # === DÉCORATEUR DE GESTION DE SESSION DB
-# ================================================================
+# ================================================================ 
 
 def with_db_session(func):
     # Assurer que le logging est configuré au début de la tâche
@@ -118,9 +118,9 @@ def with_db_session(func):
             session.close()
     return wrapper
 
-# ================================================================
+# ================================================================ 
 # === FONCTIONS UTILITAIRES DB-SAFE (SQLAlchemy)
-# ================================================================
+# ================================================================ 
 def update_project_status(session, project_id: str, status: str, result: dict = None, discussion: str = None,
                           graph: dict = None, prisma_path: str = None, analysis_result: dict = None,
                           analysis_plot_path: str = None):
@@ -155,7 +155,7 @@ def update_project_status(session, project_id: str, status: str, result: dict = 
 def log_processing_status(session, project_id: str, article_id: str, status: str, details: str):
     """Enregistre un événement de traitement dans processing_log."""
     
-    # CORRECTION : Nous devons générer manuellement l'UUID car nous utilisons du SQL brut.
+    # CORRECTION : Nous devons générer manuellement l'UUID car nous utilisons du SQL brut. 
     log_id = str(uuid.uuid4()) 
     
     session.execute(text("""
@@ -178,9 +178,9 @@ def update_project_timing(session, project_id: str, duration: float):
     """Ajoute une durée au total_processing_time."""
     session.execute(text("UPDATE projects SET total_processing_time = total_processing_time + :d WHERE id = :id"), {"d": float(duration), "id": project_id})
 
-# ================================================================
-# === TâCHES RQ (100% SQLAlchemy)
-# ================================================================
+# ================================================================ 
+# === Tâches RQ (100% SQLAlchemy)
+# ================================================================ 
 
 # --- Mock function for E2E tests ---
 def _mock_multi_database_search_task(session, project_id: str, query: str, databases: list, max_results_per_db: int = 50, *args, **kwargs):
@@ -572,9 +572,9 @@ def run_descriptive_stats_task(session, project_id: str):
     update_project_status(session, project_id, 'completed', analysis_result=stats_result)
     send_project_notification(project_id, 'analysis_completed', 'Statistiques descriptives générées')
 
-# ================================================================
+# ================================================================ 
 # === CHAT RAG
-# ================================================================
+# ================================================================ 
 
 @with_db_session
 def answer_chat_question_task(session, project_id: str, question: str):
@@ -609,9 +609,9 @@ Réponds de façon concise et précise."""
     session.execute(text("INSERT INTO chat_messages (id, project_id, role, content, timestamp) VALUES (:id1, :pid, 'user', :q, :ts1), (:id2, :pid, 'assistant', :a, :ts2)"), {"id1": str(uuid.uuid4()), "id2": str(uuid.uuid4()), "pid": project_id, "q": question, "a": response, "ts1": datetime.now().isoformat(), "ts2": datetime.now().isoformat()})
     return response
 
-# ================================================================
+# ================================================================ 
 # === IMPORT/EXPORT
-# ================================================================
+# ================================================================ 
 
 @with_db_session
 def import_from_zotero_file_task(session, project_id: str, json_file_path: str):
@@ -819,9 +819,9 @@ def fetch_online_pdf_task(project_id: str, article_id: str):
     finally:
         session.close()
 
-# ================================================================
+# ================================================================ 
 # === OLLAMA
-# ================================================================
+# ================================================================ 
 
 def pull_ollama_model_task(model_name: str):
     """Télécharge un modèle Ollama."""
@@ -839,9 +839,9 @@ def pull_ollama_model_task(model_name: str):
         logger.error(f"â Œ Erreur téléchargement {model_name}: {e}")
         raise
 
-# ================================================================
+# ================================================================ 
 # === VALIDATION INTER-ÉVALUATEURS
-# ================================================================
+# ================================================================ 
 
 @with_db_session
 def calculate_kappa_task(session, project_id: str):
@@ -887,9 +887,9 @@ def calculate_kappa_task(session, project_id: str):
     message = f"Kappa = {kappa:.3f} ({interpretation}), n = {len(eval1_decisions)}"
     send_project_notification(project_id, 'kappa_calculated', message)
 
-# ================================================================
+# ================================================================ 
 # === SCORES ATN
-# ================================================================
+# ================================================================ 
 
 @with_db_session
 def run_atn_stakeholder_analysis_task(session, project_id: str):
@@ -935,7 +935,7 @@ def run_atn_stakeholder_analysis_task(session, project_id: str):
         bars = ax.bar(list(ai_types_dist.keys()), list(ai_types_dist.values()), color=['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336'][:len(ai_types_dist)])
         ax.set_xlabel('Types d\'IA'); ax.set_ylabel('Nombre d\'études'); ax.set_title('Distribution des Types d\'IA dans les Études ATN'); ax.tick_params(axis='x', rotation=45)
         for bar in bars: ax.text(bar.get_x() + bar.get_width()/2., bar.get_height(), f'{int(bar.get_height())}', ha='center', va='bottom')
-        plt.tight_layout(); plt.savefig(plot_path, bbox_inches='tight', dpi=300); plt.close(fig)
+        plt.tight_layout(); plt.savefig(plot_path, bbox_inches='tight'); plt.close(fig)
         analysis_result["plot_path"] = plot_path
     
     update_project_status(session, project_id, 'completed', analysis_result=analysis_result)
@@ -986,9 +986,9 @@ def run_atn_score_task(session, project_id: str):
     update_project_status(session, project_id, 'completed', analysis_result=analysis_result, analysis_plot_path=plot_path)
     send_project_notification(project_id, 'analysis_completed', f'Scores ATN calculés: {mean_atn:.2f} (moyenne)')
 
-# ================================================================
+# ================================================================ 
 # === ANALYSE DU RISQUE DE BIAIS (RoB)
-# ================================================================
+# ================================================================ 
 
 @with_db_session
 def run_risk_of_bias_task(session, project_id: str, article_id: str):
@@ -1044,9 +1044,9 @@ def run_risk_of_bias_task(session, project_id: str, article_id: str):
     
     send_project_notification(project_id, 'rob_completed', f"Analyse RoB terminée pour {article_id}.")
 
-# ================================================================
+# ================================================================ 
 # === TâCHE POUR AJOUT MANUEL D'ARTICLES (ASYNCHRONE)
-# ================================================================
+# ================================================================ 
 
 @with_db_session
 def add_manual_articles_task(session, project_id: str, identifiers: list):
@@ -1159,3 +1159,14 @@ def import_from_zotero_json_task(project_id: str, items_list: list):
     msg = f"Importation Zotero (Extension) terminée : {imported_count} articles ajoutés, {failed_count} échecs."
     send_project_notification(project_id, 'import_completed', msg)
     logger.info(msg)
+
+def run_extension_task(session, project_id: str, extension_name: str):
+    """
+    Placeholder task for running a specific extension.
+    """
+    logger.info(f"🚀 Exécution de l'extension '{extension_name}' pour le projet {project_id}")
+    # Here, you would add the actual logic for the extension
+    # For now, it just logs and sends a notification
+    send_project_notification(project_id, 'extension_completed', f"Extension '{extension_name}' exécutée avec succès.", {'extension_name': extension_name})
+
+print(f"DEBUG: tasks_v4_complete.py loaded. run_extension_task is defined: {'run_extension_task' in globals()}")

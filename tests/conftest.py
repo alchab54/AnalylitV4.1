@@ -1,124 +1,73 @@
+import os
 import pytest
-import logging
-import importlib
-import time
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from sqlalchemy.orm import sessionmaker
+import json
 
-# Importe le module database et la fonction init
-import utils.database as database_utils
+# Définir environnement de test avant tout import
+os.environ.setdefault("TESTING", "true")
+os.environ.setdefault("FLASK_ENV", "testing")
+os.environ.setdefault("DATABASE_URL", "postgresql://analylit:password@analylit-db-v4:5432/analylit_db")
 
-# Importe la Base depuis les modèles
-from utils.models import Base, SearchResult # Explicitly import SearchResult
-# Importe le serveur APRÈS que la DB soit initialisée
-import server_v4_complete # Importé une seule fois
+from utils.database import engine, Base, get_session
 
-# Configurer le logging pour les tests
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+@pytest.fixture(scope="session", autouse=True)
+def init_test_db():
+    # Créer un schéma si mappé, pas de seed
+    Base.metadata.create_all(bind=engine)
+    yield
+    Base.metadata.drop_all(bind=engine)
 
+@pytest.fixture(scope="function")
+def db_session():
+    session = get_session()
+    try:
+        yield session
+        session.commit()
+    finally:
+        session.rollback()
+        session.close()
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="function", autouse=False)
+def clean_db(db_session):
+    # Vide les tables entre tests
+    for table in reversed(Base.metadata.sorted_tables):
+        db_session.execute(table.delete())
+        db_session.commit()
+    yield
+
+# Ajout des fixtures manquantes pour les tests API
+@pytest.fixture(scope="session")
 def app():
-    """Crée une instance de l'application Flask pour la session de test."""
+    """Créer une instance de l'application Flask pour les tests."""
+    from server_v4_complete import create_app
     
-    # IMPORTANT : Initialise la base de données AVANT la création de l'app
-    database_utils.init_db() 
-
-    # CORRECTION MAJEURE:
-    # 1. On n'utilise PAS importlib.reload()
-    # 2. On passe la configuration de test DIRECTEMENT dans la factory
-    app_instance = server_v4_complete.create_app({
+    app_instance = create_app()
+    app_instance.config.update({
         "TESTING": True,
+        "WTF_CSRF_ENABLED": False
     })
     
-    # Créer toutes les tables (en utilisant l'engine via le module)
-    # Nous utilisons app_context pour garantir que tout est lié correctement
     with app_instance.app_context():
-        Base.metadata.create_all(bind=database_utils.engine)
-    
-    yield app_instance
-    
-    # Nettoyage après la session
-    with app_instance.app_context():
-        Base.metadata.drop_all(bind=database_utils.engine)
+        yield app_instance
 
-@pytest.fixture()
+@pytest.fixture
 def client(app):
-    """Un client de test Flask pour l'application."""
+    """Client de test Flask."""
     return app.test_client()
 
-@pytest.fixture(scope='function')
-def session(app):
-    """
-    Fixture de session DB par fonction :
-    1. Crée une session propre.
-    (Le drop/create est maintenant géré par la fixture 'app' et 'clean_db')
-    """
-    # Crée une session locale de test liée à l'engine initialisé
-    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=database_utils.engine)
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.rollback() 
-        db.close()
-        logger.info("--- TEARDOWN TEST DB: SESSION CLOSED ---")
+@pytest.fixture
+def session(db_session):
+    """Alias pour la session de base de données."""
+    return db_session
 
-@pytest.fixture(scope='function')
-def clean_db(session):
-    """
-    Nettoie la base de données *entre chaque test* pour l'isolation.
-    C'est plus sûr que de tout recréer.
-    """
-    logger.info("--- SETUP TEST DB: CLEANING TABLES ---")
-    for table in reversed(Base.metadata.sorted_tables):
-        session.execute(table.delete())
-    session.commit()
-    
-    yield session
-    
-    # Le rollback dans la fixture 'session' gère le teardown
-    
-
-@pytest.fixture(scope="session")
-def remote_driver():
-    """
-    Fixture de session pour initialiser un remote driver Selenium.
-    Cette fixture s'exécute une seule fois par session de test E2E.
-    """
-    print("\n--- [E2E Setup] Initialisation du Remote Driver Selenium ---")
-    
-    # Attend que le conteneur Selenium soit prêt
-    # (En production, on utiliserait une attente plus robuste)
-    time.sleep(15) 
-    
-    chrome_options = Options()
-    # CORRECTION: Pour éviter un "capability mismatch", nous devons explicitement
-    # définir le nom du navigateur. Le conteneur selenium/standalone-chrome
-    # s'attend à recevoir une demande pour "chrome".
-    chrome_options.set_capability("browserName", "chrome")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    
-    driver = None
-    try:
-        driver = webdriver.Remote(
-            # Le hub Selenium est accessible via son nom de service Docker
-            command_executor='http://selenium:4444/wd/hub',
-            # CORRECTION: Le paramètre 'options' est maintenant obligatoire.
-            options=chrome_options 
-        )
-        driver.set_window_size(1920, 1080)
-        print("--- [E2E Setup] Driver initialisé ---")
-        yield driver
-    
-    except Exception as e:
-        print(f"--- [E2E ERREUR] Impossible de connecter au hub Selenium: {e} ---")
-        pytest.fail(f"Impossible de se connecter au Selenium Hub (http://selenium:4444). Le conteneur est-il lancé ? Détails : {e}")
-        
-    finally:
-        if driver:
-            print("\n--- [E2E Teardown] Fermeture du Driver Selenium ---")
-            driver.quit()
+@pytest.fixture
+def setup_project(client, clean_db):
+    """Fixture pour créer un projet de base et retourner son ID."""
+    project_data = {
+        'name': 'Projet de Test (Extensions)',
+        'description': 'Description test.',
+        'mode': 'screening'
+    }
+    response = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
+    assert response.status_code == 201
+    project_id = json.loads(response.data)['id']
+    return {"project_id": project_id, "name": project_data['name']}

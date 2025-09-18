@@ -1,65 +1,18 @@
-# utils/app_globals.py
-
-import logging
-import redis
+import os
+from redis import Redis
 from rq import Queue
-from flask_socketio import SocketIO
+from utils.database import PROJECTS_DIR  # compat: attendu par file_handlers
 
-# CORRECTION : L'import doit pointer vers 'config_v4' à la racine du projet.
-from config_v4 import get_config 
+REDIS_HOST = os.getenv("REDIS_HOST", "analylit-redis-v4")
+REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 
-# 'engine' n'est plus importé directement pour éviter les dépendances circulaires.
-# Les modules doivent utiliser get_engine() de utils.database après l'initialisation.
-from utils.database import Session, SessionFactory, with_db_session, PROJECTS_DIR
-from utils.queues import set_background_queue
+redis_conn = Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)
 
-logger = logging.getLogger("analylit")
-config = get_config()
+# Queues RQ nommées selon convention v4
+processing_queue = Queue("analylit_processing_v4", connection=redis_conn, default_timeout=1800)
+synthesis_queue = Queue("analylit_synthesis_v4", connection=redis_conn, default_timeout=3600)
+analysis_queue = Queue("analylit_analysis_v4", connection=redis_conn, default_timeout=3600)
+background_queue = Queue("analylit_background_v4", connection=redis_conn, default_timeout=1800)
 
-# Objets neutres à l’import (pas de connexions actives ici)
-socketio = SocketIO(message_queue=None, async_mode='gevent', cors_allowed_origins="*")
-redis_conn = None
-processing_queue = None
-synthesis_queue = None
-analysis_queue = None
-discussion_draft_queue = None
-background_queue = None
-extension_queue = None # New: Declare extension_queue
-q = None
-
-def initialize_app_globals(app=None):
-    """
-    Initialise les objets globaux de l'application (Redis, Queues, SocketIO).
-    Cette fonction est appelée une fois que l'application Flask est créée.
-    """
-    global redis_conn, processing_queue, synthesis_queue, analysis_queue
-    global discussion_draft_queue, background_queue, extension_queue, q, socketio # New: Add extension_queue to global
-
-    if redis_conn is None:
-        redis_conn = redis.from_url(config.REDIS_URL)
-
-    # Utiliser les noms de file d'attente définis
-    if processing_queue is None:
-        processing_queue = Queue("analylit_processing_v4", connection=redis_conn)
-    if synthesis_queue is None:
-        synthesis_queue = Queue("analylit_synthesis_v4", connection=redis_conn)
-    if analysis_queue is None:
-        analysis_queue = Queue("analylit_analysis_v4", connection=redis_conn)
-    if discussion_draft_queue is None:
-        discussion_draft_queue = Queue("discussion_draft", connection=redis_conn)
-    if background_queue is None:
-        background_queue = Queue("analylit_background_v4", connection=redis_conn)
-        set_background_queue(background_queue) # Initialise la queue partagée
-    if extension_queue is None: # New: Initialize extension_queue
-        extension_queue = Queue("analylit_extension_v4", connection=redis_conn)
-    if q is None:
-        q = Queue("default", connection=redis_conn)
-
-    if app is not None:
-        socketio.init_app(
-            app,
-            cors_allowed_origins="*",
-            message_queue=config.REDIS_URL,
-            async_mode='gevent',
-            path='/socket.io/'
-        )
+# Pour l’endpoint /api/extensions
+extension_queue = processing_queue
