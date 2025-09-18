@@ -424,7 +424,7 @@ export function renderGenericAnalysisResult(title, analysis) {
     `;
 }
 
-async function handleRunDiscussionDraft(event) {
+export async function handleRunDiscussionDraft(event) {
     if (!appState.currentProject?.id) return;
     const card = event.target.closest('.analysis-card');
     if (card) card.classList.add('analysis-card--loading');
@@ -438,7 +438,7 @@ async function handleRunDiscussionDraft(event) {
     }
 }
 
-async function handleRunKnowledgeGraph(event) {
+export async function handleRunKnowledgeGraph(event) {
     if (!appState.currentProject?.id) return;
     const card = event.target.closest('.analysis-card');
     if (card) card.classList.add('analysis-card--loading');
@@ -452,7 +452,7 @@ async function handleRunKnowledgeGraph(event) {
     }
 }
 
-async function handleRunPrismaFlow(event) {
+export async function handleRunPrismaFlow(event) {
     if (!appState.currentProject?.id) return;
     const card = event.target.closest('.analysis-card');
     if (card) card.classList.add('analysis-card--loading');
@@ -466,7 +466,7 @@ async function handleRunPrismaFlow(event) {
     }
 }
 
-async function handleRunMetaAnalysis() {
+export async function handleRunMetaAnalysis() {
     if (!appState.currentProject?.id) return;
     showLoadingOverlay(true, 'Lancement de la méta-analyse...');
     try {
@@ -479,7 +479,7 @@ async function handleRunMetaAnalysis() {
 }
 
 
-async function handleRunDescriptiveStats() {
+export async function handleRunDescriptiveStats() {
     if (!appState.currentProject?.id) return;
     showLoadingOverlay(true, 'Calcul des statistiques descriptives...');
     try {
@@ -490,6 +490,10 @@ async function handleRunDescriptiveStats() {
         showLoadingOverlay(false);
     }
 }
+
+/**
+ * Exporte les résultats d'analyse (données brutes et graphiques).
+ */
 export async function exportAnalyses() {
     if (!appState.currentProject?.id) {
         showToast('Veuillez sélectionner un projet pour exporter les analyses.', 'warning');

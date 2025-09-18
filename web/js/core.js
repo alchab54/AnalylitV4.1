@@ -336,7 +336,7 @@ export function initializeWebSocket() {
     }
 }
 
-export function showSection(sectionId) {
+function showSection(sectionId) {
     if (!sectionId) return;
     appState.currentSection = sectionId;
 
@@ -410,6 +410,8 @@ export function refreshCurrentSection() {
             break;
     }
 }
+
+export { showSection };
 
 export function getStatusClass(status) {
     switch (status) {

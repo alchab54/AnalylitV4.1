@@ -1,6 +1,6 @@
 import { fetchAPI } from './api.js';
 import { showToast, escapeHtml } from './ui-improved.js';
-import { appState, elements } from './app-improved.js';
+import { appState, elements } from './app-improved.js'; // Already correct
 
 export async function loadTasksSection() {
     if (!elements.tasksContainer) return;

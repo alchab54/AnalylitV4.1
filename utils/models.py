@@ -276,6 +276,7 @@ class RiskOfBias(Base):
     judgement = Column(String)
     overall_bias = Column(String)
     overall_justification = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow) # ← AJOUTER CETTE LIGNE
     assessed_at = Column(DateTime, default=datetime.utcnow)
 
     def to_dict(self):
