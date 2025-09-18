@@ -222,7 +222,8 @@ def test_process_single_article_task_full_extraction_with_pdf_and_grid(session, 
     assert mock_pdf_text in mock_ollama_api.call_args[0][0]
     
 @pytest.mark.gpu
-def test_process_single_article_task_screening_mode(session, mocker):
+@patch('tasks_v4_complete.call_ollama_api')
+def test_process_single_article_task_screening_mode(mock_ollama_api, session):
     """
     Vérifie le mode 'screening' : appel au bon modèle et insertion des données de screening.
     """
@@ -235,7 +236,7 @@ def test_process_single_article_task_screening_mode(session, mocker):
     session.commit()
 
     mock_ai_response = {"relevance_score": 8.5, "justification": "Très pertinent."}
-    mock_ollama_api = mocker.patch('tasks_v4_complete.call_ollama_api', return_value=mock_ai_response)
+    mock_ollama_api.return_value = mock_ai_response
 
     # ACT
     process_single_article_task.__wrapped__(session, project_id, article_id, {"preprocess_model": "screening-model"}, "screening")

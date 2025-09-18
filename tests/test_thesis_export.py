@@ -11,6 +11,9 @@ from sqlalchemy import text
 from unittest.mock import patch, MagicMock
 import openpyxl
 
+# AJOUTER :
+from utils.models import Project, SearchResult, Extraction  # ← AJOUTER CETTE LIGNE
+
 class TestThesisExport:
     """Tests complets export spécialisé thèse"""
 

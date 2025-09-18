@@ -800,3 +800,21 @@ export async function handleSavePrompt(event) {
     closeModal('promptEditorModal');
     await loadPrompts();
 }
+
+/**
+ * Ouvre la modale d'édition de profil, soit pour un nouveau profil, soit pour un profil existant.
+ * @param {string|null} profileId - L'ID du profil à éditer, ou null pour un nouveau.
+ */
+export function openProfileEditor(profileId = null) {
+    if (profileId) {
+        const profile = appState.analysisProfiles.find(p => p.id === profileId);
+        if (profile) {
+            // Logique pour pré-remplir le formulaire avec les données du profil
+            console.log('Editing profile:', profile);
+        }
+    } else {
+        // Logique pour réinitialiser le formulaire pour un nouveau profil
+        console.log('Creating new profile');
+    }
+    openModal('profileEditorModal'); // Assurez-vous que ce modal existe dans votre HTML
+}
