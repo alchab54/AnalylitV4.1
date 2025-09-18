@@ -83,11 +83,11 @@ def create_app(config_overrides=None): # <--- Accepte les overrides
         # Configurer la journalisation au démarrage de l'application
         setup_logging()
 
-        with app.app_context():
-            logger.info("Initializing database and seeding default data...")
-            # init_db()
-            # seed_default_data(engine)
-            logger.info("Database initialization and seeding complete.")
+        # with app.app_context():
+        #     logger.info("Initializing database and seeding default data...")
+        #     # init_db()
+        #     # seed_default_data(engine)
+        #     logger.info("Database initialization and seeding complete.")
 
     return app
 
