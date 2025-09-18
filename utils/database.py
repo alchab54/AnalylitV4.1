@@ -174,11 +174,8 @@ def init_db():
         raise
 
 def init_database():
-    """Fonction principale d'initialisation"""
-    # Création DDL basique
+    """Fonction principale d'initialisation."""
     with get_session() as session:
         _create_schema_if_needed(session)
     Base.metadata.create_all(bind=engine)
-    
-    # Migrations et seeding
     return init_db()

@@ -10,8 +10,8 @@ import {
     startFullExtraction,
     toggleArticleSelection,
     viewArticleDetails,
-    selectAllArticles,
-    loadSearchResults
+    selectAllArticles, 
+    loadSearchResults // ← Déplacer vers articles.js
 } from './articles.js';
 import {
     handleRunDiscussionDraft,
@@ -49,13 +49,6 @@ import { handleDeleteGrid, loadProjectGrids, renderGridsSection, showGridFormMod
 import { renderReportingSection, generateBibliography, generateSummaryTable, exportSummaryTableExcel, savePrismaChecklist } from './reporting.js';
 // CORRIGÉ: Ajout des imports pour les fonctions d'import et la gestion des modales
 import {
-    handleZoteroImport, 
-    showPmidImportModal, 
-    handleUploadPdfs,
-    handleIndexPdfs,
-    handleZoteroSync,
-    processPmidImport,
-    exportForThesis,
     renderImportSection
 } from './import.js';
 import { showStakeholderManagementModal, addStakeholderGroup, deleteStakeholderGroup, runStakeholderAnalysis } from './stakeholders.js';

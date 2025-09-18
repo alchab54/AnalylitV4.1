@@ -32,7 +32,7 @@ export async function loadSearchResults(page = 1) {
     }
 
     try {
-        const results = await fetchAPI(`/projects/${appState.currentProject.id}/results?page=${page}`);
+        const results = await fetchAPI(`/projects/${appState.currentProject.id}/search-results?page=${page}`);
         setSearchResults(results.articles || [], results.meta || {});
         
         const extractions = await fetchAPI(`/projects/${appState.currentProject.id}/extractions`);

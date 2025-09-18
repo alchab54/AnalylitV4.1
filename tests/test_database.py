@@ -10,22 +10,13 @@ from config_v4 import Settings # Import Settings for type hinting
 # Import after patching config
 from utils.database import init_database, seed_default_data
 
-# Patch the global variables directly for testing purposes
-@pytest.fixture(autouse=True)
-def mock_global_db_objects():
-    with patch('utils.database.engine', new=None) as mock_engine_global:
-        with patch('utils.database.SessionFactory', new=None) as mock_session_factory_global:
-            with patch('utils.database.db_session', new=None) as mock_db_session_global:
-                yield mock_engine_global, mock_session_factory_global, mock_db_session_global
-
 @patch('utils.database.create_engine')
 @patch('utils.database.sessionmaker')
 @patch('utils.database.scoped_session')
 @patch('utils.models.Base.metadata.create_all')
 @patch('utils.database.inspect')
 def test_init_db_basic_initialization(
-    mock_inspect, mock_create_all, mock_scoped_session, mock_sessionmaker, mock_create_engine,
-    mock_global_db_objects # Use this fixture to ensure globals are patched
+    mock_inspect, mock_create_all, mock_scoped_session, mock_sessionmaker, mock_create_engine
 ):
     """Test basic initialization of the database."""
     mock_engine_instance = MagicMock()
@@ -57,8 +48,7 @@ def test_init_db_basic_initialization(
 @patch('utils.models.Base.metadata.create_all')
 @patch('utils.database.inspect')
 def test_init_db_migrations_column_missing(
-    mock_inspect, mock_create_all, mock_scoped_session, mock_sessionmaker, mock_create_engine,
-    mock_global_db_objects
+    mock_inspect, mock_create_all, mock_scoped_session, mock_sessionmaker, mock_create_engine
 ):
     """Test init_db when a column is missing, triggering a migration."""
     mock_engine_instance = MagicMock()
@@ -95,8 +85,7 @@ def test_init_db_migrations_column_missing(
 @patch('utils.models.Base.metadata.create_all')
 @patch('utils.database.inspect')
 def test_init_db_migrations_all_columns_present(
-    mock_inspect, mock_create_all, mock_scoped_session, mock_sessionmaker, mock_create_engine,
-    mock_global_db_objects
+    mock_inspect, mock_create_all, mock_scoped_session, mock_sessionmaker, mock_create_engine
 ):
     """Test init_db when all columns are present, so no migrations are run."""
     mock_engine_instance = MagicMock()
@@ -129,8 +118,7 @@ def test_init_db_migrations_all_columns_present(
 @patch('utils.models.Project') # Patch utils.models.Project
 @patch('sqlalchemy.orm.Session') # Patch sqlalchemy.orm.Session directly
 def test_seed_default_data_no_data_exists(
-    mock_orm_session, mock_project_class, mock_analysis_profile_class,
-    mock_global_db_objects
+    mock_orm_session, mock_project_class, mock_analysis_profile_class
 ):
     """Test seed_default_data when no default profile or project exists."""
     mock_conn = MagicMock()
@@ -158,8 +146,7 @@ def test_seed_default_data_no_data_exists(
 @patch('utils.models.Project') # Patch utils.models.Project
 @patch('sqlalchemy.orm.Session') # Patch sqlalchemy.orm.Session directly
 def test_seed_default_data_data_already_exists(
-    mock_orm_session, mock_project_class, mock_analysis_profile_class,
-    mock_global_db_objects
+    mock_orm_session, mock_project_class, mock_analysis_profile_class
 ):
     """Test seed_default_data when default profile and project already exist."""
     mock_conn = MagicMock()
