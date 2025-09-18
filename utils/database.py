@@ -3,7 +3,7 @@ import logging
 from contextlib import contextmanager
 from functools import wraps
 from sqlalchemy import create_engine, text, inspect
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import sessionmaker, declarative_base, scoped_session
 from sqlalchemy.exc import ProgrammingError, OperationalError
 
 logger = logging.getLogger(__name__)
@@ -24,11 +24,12 @@ engine = create_engine(
 )
 Base = declarative_base()
 
-# Compatibilité pour les tests
-inspect = inspect  # Rendre inspect disponible au niveau module
-
 # Session factory
 SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
+
+# Variables globales pour compatibilité des tests
+db_session = None
+inspect = inspect  # Rendre inspect disponible au niveau module
 
 # Compatibilité: certains modules importent `Session` directement
 def Session():
@@ -36,6 +37,11 @@ def Session():
 
 def get_session():
     return SessionFactory()
+
+def scoped_session(session_factory):
+    """Fonction de compatibilité pour les tests"""
+    from sqlalchemy.orm import scoped_session as sqlalchemy_scoped_session
+    return sqlalchemy_scoped_session(session_factory)
 
 def with_db_session(func):
     @wraps(func)
@@ -62,44 +68,45 @@ def _create_schema_if_needed(session):
         session.rollback()
         raise
 
-def seed_default_data(session_or_connection):
+def seed_default_data(connection_or_session):
     """
     Seed des données par défaut dans la base de données.
-    Compatible avec les tests qui passent une connection ou une session.
+    Compatible avec les tests qui passent une connection.
     """
     # Ignorer en environnement de test
     if os.getenv("FLASK_ENV") == "testing" or os.getenv("TESTING") == "true":
         logger.info("Test env détecté: seed_default_data ignoré")
         return
-    
-    # Si c'est une connection, créer une session
-    if hasattr(session_or_connection, 'execute') and not hasattr(session_or_connection, 'query'):
-        # C'est une connection, créer une session pour les tests
-        from sqlalchemy.orm import Session
-        session = Session(bind=session_or_connection)
+        
+    # Pour les tests, créer une session à partir de la connection
+    from sqlalchemy.orm import Session
+    if hasattr(connection_or_session, 'execute') and not hasattr(connection_or_session, 'query'):
+        # C'est une connection
+        session = Session(bind=connection_or_session)
         should_close = True
     else:
         # C'est déjà une session
-        session = session_or_connection  
+        session = connection_or_session
         should_close = False
     
     try:
         logger.info("Début du seeding par défaut...")
         _create_schema_if_needed(session)
         
-        # Vérifier et créer le profil par défaut
+        # Importer ici pour éviter les imports circulaires
         from utils.models import AnalysisProfile, Project
         
+        # Vérifier le profil par défaut
         existing_profile = session.query(AnalysisProfile).filter_by(name='Standard').first()
         if not existing_profile:
             default_profile = AnalysisProfile(
-                name='Standard', 
-                description='Profil par défaut', 
+                name='Standard',
+                description='Profil par défaut',
                 is_custom=False
             )
             session.add(default_profile)
         
-        # Vérifier et créer le projet par défaut
+        # Vérifier le projet par défaut
         existing_project = session.query(Project).filter_by(name='Projet par défaut').first()
         if not existing_project:
             default_project = Project(
@@ -109,32 +116,13 @@ def seed_default_data(session_or_connection):
             session.add(default_project)
         
         session.commit()
-        logger.info("Seeding terminé avec succès.")
-        
+        logger.info("Seeding terminé.")
     except Exception as e:
         session.rollback()
-        logger.warning(f"Seeding non appliqué: {e}")
+        logger.warning("Seeding non appliqué: %s", e)
     finally:
         if should_close:
             session.close()
-
-def init_database():
-    """Initialise la base de données en créant toutes les tables et en appliquant le seeding."""
-    logger.info("Initialisation de la base de données...")
-    try:
-        with get_session() as session:
-            _create_schema_if_needed(session)
-            Base.metadata.create_all(bind=engine)
-            seed_default_data(session)
-        logger.info("Initialisation de la base de données terminée.")
-    except Exception as e:
-        logger.error("Erreur lors de l'initialisation de la DB: %s", e, exc_info=True)
-        # Ne pas propager l'erreur en production pour permettre au serveur de démarrer
-        if os.getenv("FLASK_ENV") == "testing":
-            raise
-
-# Variable globale pour la compatibilité des tests
-db_session = None
 
 def init_db():
     """
@@ -145,21 +133,46 @@ def init_db():
     
     try:
         # Créer le schéma s'il n'existe pas
+        from sqlalchemy.orm import Session
         with get_session() as session:
             session.execute(text("CREATE SCHEMA IF NOT EXISTS analylit_schema"))
             session.commit()
         
         # Créer toutes les tables
         Base.metadata.create_all(engine)
-        print("✅ Tables créées avec succès")
+        
+        # Migrations pour les colonnes manquantes
+        inspector = inspect(engine)
+        
+        try:
+            # Vérifier si la table analysis_profiles existe
+            if inspector.has_table('analysis_profiles', schema='analylit_schema'):
+                existing_columns = [col['name'] for col in inspector.get_columns('analysis_profiles', schema='analylit_schema')]
+                
+                # Colonnes attendues
+                expected_columns = ['description']
+                
+                with engine.connect() as conn:
+                    for col in expected_columns:
+                        if col not in existing_columns:
+                            logger.info(f"Ajout de la colonne manquante: {col}")
+                            conn.execute(text(f"ALTER TABLE analylit_schema.analysis_profiles ADD COLUMN {col} TEXT"))
+                    conn.commit()
+        except Exception as e:
+            logger.warning(f"Migration des colonnes échouée: {e}")
+        
+        logger.info("✅ Initialisation DB terminée")
         return engine
     except Exception as e:
-        print(f"❌ Erreur lors de l'initialisation de la DB: {e}")
+        logger.error(f"❌ Erreur lors de l'initialisation de la DB: {e}")
         raise
 
-def get_db_session():
-    """Retourne la session de base de données pour les tests"""
-    global db_session
-    if db_session is None:
-        db_session = get_session()
-    return db_session
+def init_database():
+    """Fonction principale d'initialisation"""
+    # Création DDL basique
+    with get_session() as session:
+        _create_schema_if_needed(session)
+    Base.metadata.create_all(bind=engine)
+    
+    # Migrations et seeding
+    return init_db()
