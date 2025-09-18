@@ -9,7 +9,8 @@ echo "Entrypoint démarré. En attente de la base de données..."
 # Utilise les variables d'environnement fournies par docker-compose
 # CORRECTION : Utiliser PGPASSWORD et tous les paramètres pour un test de connexion complet.
 # NOUVELLE CORRECTION : Utiliser psql pour tenter une vraie connexion, ce qui est plus fiable que pg_isready.
-until psql "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB" -c '\q'; do
+export PGPASSWORD=$POSTGRES_PASSWORD
+until psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c '\q' > /dev/null 2>&1; do
   echo "La base de données n'est pas encore prête... en attente."
   sleep 2
 done
