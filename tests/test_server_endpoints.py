@@ -44,7 +44,7 @@ def test_health_check(client):
     data = json.loads(response.data)
     assert data.get('status') == 'ok'
 
-def test_create_project(client, clean_db): # Utilise clean_db pour l'isolation
+def test_create_project(client, session): # Utilise session pour l'isolation
     """
     GIVEN un client de test Flask
     WHEN la route '/api/projects' est appelée en POST avec des données valides
@@ -75,7 +75,7 @@ def test_get_available_databases(client):
     assert isinstance(data, list)
     assert any(d['id'] == 'pubmed' for d in data)
 
-def test_get_project_details(client, clean_db): # Utilise clean_db
+def test_get_project_details(client, session): # Utilise session
     """
     GIVEN a Flask test client and an existing project
     WHEN the '/api/projects/' route is called with GET
@@ -96,7 +96,7 @@ def test_get_project_details(client, clean_db): # Utilise clean_db
     assert data['id'] == project_id
     assert data['name'] == 'Project Details'
 
-def test_get_project_details_not_found(client, clean_db): # clean_db garantit que l'ID n'existe pas
+def test_get_project_details_not_found(client, session): # session garantit que l'ID n'existe pas
     """
     GIVEN a Flask test client
     WHEN the '/api/projects/' route is called with GET
@@ -108,7 +108,7 @@ def test_get_project_details_not_found(client, clean_db): # clean_db garantit qu
     error_data = json.loads(response.data)
     assert error_data['error'] == 'Projet non trouvé'
 
-def test_delete_project(client, clean_db): # Utilise clean_db
+def test_delete_project(client, session): # Utilise session
     """
     GIVEN a Flask test client and an existing project
     WHEN the '/api/projects/' route is called with DELETE
@@ -132,7 +132,7 @@ def test_delete_project(client, clean_db): # Utilise clean_db
     get_response = client.get(f'/api/projects/{project_id}')
     assert get_response.status_code == 404
 
-def test_delete_non_existent_project(client, clean_db): # Utilise clean_db
+def test_delete_non_existent_project(client, session): # Utilise session
     """
     GIVEN a Flask test client
     WHEN the '/api/projects/' route is called with DELETE
@@ -144,7 +144,7 @@ def test_delete_non_existent_project(client, clean_db): # Utilise clean_db
     error_data = json.loads(response.data)
     assert error_data['error'] == 'Projet non trouvé'
 
-def test_get_all_projects(client, clean_db): # Utilise clean_db
+def test_get_all_projects(client, session): # Utilise session
     """
     GIVEN a Flask test client and multiple projects
     WHEN the '/api/projects' route is called with GET
@@ -181,7 +181,7 @@ def test_get_all_projects(client, clean_db): # Utilise clean_db
     assert found_project1['name'] == project1_data['name']
     assert found_project1['analysis_mode'] == project1_data['mode']
 
-def test_get_all_projects_empty(client, clean_db): # Utilise clean_db
+def test_get_all_projects_empty(client, session): # Utilise session
     """
     GIVEN a Flask test client with no projects (guaranteed by clean_db)
     WHEN the '/api/projects' route is called with GET
@@ -194,7 +194,7 @@ def test_get_all_projects_empty(client, clean_db): # Utilise clean_db
     assert len(data) == 0
 
 @patch('utils.app_globals.discussion_draft_queue.enqueue')
-def test_api_run_discussion_draft_enqueues_task(mock_enqueue, client, clean_db):
+def test_api_run_discussion_draft_enqueues_task(mock_enqueue, client, session):
     """
     Teste d'intégration API : Vérifie que l'endpoint de discussion met bien en file (enqueue) la bonne tâche.
     """
@@ -221,7 +221,7 @@ def test_api_run_discussion_draft_enqueues_task(mock_enqueue, client, clean_db):
     assert response_data['task_id'] == "mocked_job_id_123"
 
 @patch('utils.app_globals.background_queue.enqueue')
-def test_api_post_chat_message_enqueues_task(mock_enqueue, client, clean_db):
+def test_api_post_chat_message_enqueues_task(mock_enqueue, client, session):
     """
     Teste d'intégration API : Vérifie que l'endpoint de chat met bien en file la tâche RAG.
     """
@@ -255,7 +255,7 @@ def test_api_post_chat_message_enqueues_task(mock_enqueue, client, clean_db):
 # =================================================================
 
 @patch('utils.app_globals.background_queue.enqueue')
-def test_api_search_enqueues_task(mock_enqueue, client, clean_db):
+def test_api_search_enqueues_task(mock_enqueue, client, session):
     """
     Teste POST /api/search et vérifie qu'il met en file la tâche de recherche.
     """
@@ -287,7 +287,7 @@ def test_api_search_enqueues_task(mock_enqueue, client, clean_db):
     )
 
 @patch('utils.app_globals.processing_queue.enqueue')
-def test_api_run_pipeline_enqueues_tasks(mock_enqueue, client, clean_db, session):
+def test_api_run_pipeline_enqueues_tasks(mock_enqueue, client, session):
     """
     Teste POST /api/projects/<id>/run et vérifie qu'il met en file plusieurs tâches (une par article).
     """
@@ -345,7 +345,7 @@ def test_api_run_pipeline_enqueues_tasks(mock_enqueue, client, clean_db, session
     ("prisma_flow", run_prisma_flow_task),
 ])
 @patch('utils.app_globals.analysis_queue.enqueue')
-def test_api_run_advanced_analysis_enqueues_tasks(mock_enqueue, analysis_type, expected_task, client, clean_db):
+def test_api_run_advanced_analysis_enqueues_tasks(mock_enqueue, analysis_type, expected_task, client, session):
     """
     Teste POST /api/projects/<id>/run-analysis pour tous les types d'analyse (paramétré).
     """
@@ -369,7 +369,7 @@ def test_api_run_advanced_analysis_enqueues_tasks(mock_enqueue, analysis_type, e
     )
 
 @patch('utils.app_globals.background_queue.enqueue')
-def test_api_import_zotero_enqueues_task(mock_enqueue, client, clean_db):
+def test_api_import_zotero_enqueues_task(mock_enqueue, client, session):
     """
     Teste POST /api/projects/<id>/import-zotero (PDF sync)
     """
@@ -399,7 +399,7 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, clean_db):
             )
 
 @patch('utils.app_globals.q.enqueue') # CORRECTION: L'endpoint est dans `files_bp`, on patche donc `api.files`
-def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, clean_db):
+def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, session):
     """
     Teste POST /api/projects/<id>/upload-zotero (File import)
     CORRIGÉ: Ce test patche 'q.enqueue' (processing_queue) et ne fait qu'un seul appel API.
@@ -435,7 +435,7 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, clean_db):
         assert json.loads(response.data)['job_id'] == "zotero_file_job_q"
 
 @patch('utils.app_globals.analysis_queue.enqueue')
-def test_api_run_rob_analysis_enqueues_task(mock_enqueue, client, clean_db):
+def test_api_run_rob_analysis_enqueues_task(mock_enqueue, client, session):
     """
     Teste POST /api/projects/<id>/run-rob-analysis et vérifie les appels multiples à enqueue.
     """

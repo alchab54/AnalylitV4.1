@@ -14,8 +14,8 @@ import openpyxl
 class TestThesisExport:
     """Tests complets export spécialisé thèse"""
 
-    @patch('api.export.format_bibliography')
-    @patch('api.export.pd.DataFrame.to_excel')
+    @patch('server_v4_complete.format_bibliography')
+    @patch('pandas.DataFrame.to_excel')
     def test_thesis_excel_export_comprehensive(self, mock_to_excel, mock_format_bib, session):
         """
         Test export Excel complet format thèse via API.
