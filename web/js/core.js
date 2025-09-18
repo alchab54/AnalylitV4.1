@@ -29,7 +29,7 @@ import {
 import { sendChatMessage, loadChatMessages, renderChatInterface } from './chat.js';
 import {
     handleCreateProject,
-    deleteProject,
+    deleteProject, // This was already correct, but I'm confirming it.
     selectProject,
     confirmDeleteProject,
     handleExportProject,
@@ -116,7 +116,7 @@ const uiActions = {
 
 const projectActions = {
     'select-project': (target) => selectProject(target.dataset.projectId),
-    'delete-project': (target) => deleteProject(target.dataset.projectId, target.dataset.projectName),
+    'delete-project': (target) => deleteProject(target.dataset.projectId, target.dataset.projectName), // This was already correct.
     'export-project': (target) => handleExportProject(target.dataset.projectId),
     'confirm-delete-project': (target) => confirmDeleteProject(target.dataset.projectId), // Nouvelle action
 };

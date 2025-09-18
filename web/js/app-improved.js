@@ -57,7 +57,7 @@ export const appState = {
 
 export let elements = {};
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Démarrage de AnalyLit V4.1 Frontend (Version améliorée)...');
 
     // Initialiser le gestionnaire de thème

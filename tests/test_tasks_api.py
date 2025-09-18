@@ -4,7 +4,7 @@ import json
 import uuid
 import pytest
 from datetime import datetime, timedelta
-from unittest.mock import patch, MagicMock, ANY, mock
+from unittest.mock import patch, MagicMock, ANY
 
 from utils.models import Project
 from utils.app_globals import redis_conn # Import redis_conn
