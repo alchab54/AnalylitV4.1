@@ -72,7 +72,7 @@ services:
       db: { condition: service_started }
       redis: { condition: service_healthy }
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001/"] # <-- Correction ici
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/settings/profiles"] # <-- Correction finale
       interval: 20s
       timeout: 10s
       retries: 5
