@@ -149,7 +149,8 @@ def listen_for_notifications():
             except Exception as e:
                 logger.error(f"Erreur lors du relais de la notification: {e}")
 
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
     socketio.start_background_task(target=listen_for_notifications)
     socketio.run(app, host='0.0.0.0', port=5000, debug=True, use_reloader=False, allow_unsafe_werkzeug=True)

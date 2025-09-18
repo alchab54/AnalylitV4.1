@@ -40,7 +40,7 @@ python -c 'from server_v4_complete import _init_db_command; _init_db_command()'
 
 # Lance le serveur Gunicorn
 echo "Lancement du serveur Gunicorn..."
-exec gunicorn "server_v4_complete:create_app()" \
+exec gunicorn server_v4_complete:app \
     -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker \
     -w 3 \
     -b 0.0.0.0:5001 \
