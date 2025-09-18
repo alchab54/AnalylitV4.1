@@ -3,22 +3,22 @@
 // AnalyLit V4.1 - Application Frontend (Version améliorée)
 // ================================================================
 
-import { showToast, showLoadingOverlay, closeModal, openModal } from './web/js/ui-improved.js';
-import { loadProjects, selectProject, handleNewProject, handleConfirmDelete, deleteProject } from './web/js/projects.js';
-import { loadAnalysisProfiles, openProfileEditor, handleDeleteProfile, handleSaveProfile } from './web/js/settings.js';
-import { loadOllamaModels } from './web/js/settings.js';
-import { handleSaveZoteroSettings, handleImportFromZotero, startZoteroStatusPolling } from './web/js/import.js';
-import { handlePrepareAnalysis, handleRunPipeline, handleRunSynthesis, handlePdfUpload } from './web/js/pipeline.js';
-import { handleExportResults, handleExportAll } from './web/js/results.js';
-import { handleGenerateDiscussion, handleGenerateGraph, renderKnowledgeGraph } from './web/js/analysis.js';
-import { handleGeneratePrisma } from './web/js/reports.js';
-import { handleRunMetaAnalysis, handleRunDescriptiveStats, handleRunAtnScore } from './web/js/stats.js';
-import { loadArticlesForValidation, handleValidationDecision } from './web/js/validation.js';
-import { handleClearQueue, handlePullModel, openPromptEditor, handleSavePrompt, renderQueueStatus, renderOllamaModels, renderPromptsList, renderSettingsPage } from './web/js/admin.js';
-import { openGridEditor, addGridFieldRow, handleSaveGrid, loadProjectGrids } from './web/js/grids.js';
-import { handleStartIndexing, handleSendChatMessage, renderChatHistory } from './web/js/chat.js';
+import { showToast, showLoadingOverlay, closeModal, openModal } from './ui-improved.js';
+import { loadProjects, selectProject, handleNewProject, confirmDeleteProject, deleteProject } from './projects.js';
+import { loadAnalysisProfiles, openProfileEditor, handleDeleteProfile, handleSaveProfile, loadOllamaModels, renderSettings } from './settings.js';
+import { handleSaveZoteroSettings, handleZoteroImport, startZoteroStatusPolling, renderImportSection, showPmidImportModal, handleUploadPdfs, handleIndexPdfs, handleZoteroSync, processPmidImport, exportForThesis } from './import.js';
+import { handlePrepareAnalysis, handleRunPipeline, handleRunSynthesis, handlePdfUpload } from './pipeline.js';
+import { handleExportResults, handleExportAll } from './results.js';
+import { handleRunDiscussionDraft, handleRunKnowledgeGraph, renderKnowledgeGraph, loadProjectAnalyses, exportAnalyses, handleRunATNAnalysis, runProjectAnalysis, showPRISMAModal, savePRISMAProgress, exportPRISMAReport } from './analyses.js';
+import { handleGeneratePrisma, renderReportingSection, generateBibliography, generateSummaryTable, exportSummaryTableExcel, savePrismaChecklist } from './reporting.js';
+import { handleRunMetaAnalysis, handleRunDescriptiveStats, handleRunAtnScore } from './stats.js';
+import { loadValidationSection, handleValidationDecision, resetValidationStatus, filterValidationList } from './validation.js';
+import { handleClearQueue, handlePullModel, showEditPromptModal, handleSavePrompt, renderQueueStatus, renderOllamaModels, renderPromptsList, renderSettingsPage } from './admin.js';
+import { showGridFormModal, addGridFieldInput, handleSaveGrid, loadProjectGrids, handleDeleteGrid, removeGridField, triggerGridImport, handleGridImportUpload } from './grids.js';
+import { handleStartIndexing, sendChatMessage, loadChatMessages, renderChatInterface } from './chat.js';
 
 export const API_BASE_URL = '/api';
+
 
 export const appState = {
     currentProject: null,

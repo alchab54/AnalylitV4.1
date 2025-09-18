@@ -1,7 +1,7 @@
 import { appState, elements } from '../app.js';
 import { fetchAPI } from './api.js'; // Already correct
 import { setAnalysisResults } from './state.js';
-import { showToast, showLoadingOverlay, escapeHtml, showModal, closeModal, openModal } from './ui.js';
+import { showToast, showLoadingOverlay, escapeHtml, showModal, closeModal, openModal } from './ui-improved.js';
 
 export async function loadProjectAnalyses() {
     if (!appState.currentProject) {

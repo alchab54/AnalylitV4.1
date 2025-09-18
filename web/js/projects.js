@@ -1,10 +1,10 @@
 // web/js/projects.js
 
-import { appState, fetchAPI } from '../../app.js';
-import { showToast, showLoadingOverlay, closeModal, escapeHtml, showModal } from './ui-improved.js';
+import { appState, fetchAPI } from '../app.js';
+import { showToast, showLoadingOverlay, closeModal, escapeHtml, showModal } from './ui.js';
 
 // Fonctions utilitaires locales ou importées d'autres modules si nécessaire
-import { getStatusText } from '../../app.js';
+import { getStatusText } from '../app.js';
 
 /**
  * Charge la liste des projets et déclenche le rendu de la liste.
