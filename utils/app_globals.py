@@ -1,7 +1,7 @@
 import os
 from redis import Redis
 from rq import Queue
-from utils.database import PROJECTS_DIR  # compat: attendu par file_handlers
+from config_v4 import get_config
 
 REDIS_HOST = os.getenv("REDIS_HOST", "analylit-redis-v4")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
@@ -19,3 +19,6 @@ extension_queue = processing_queue
 
 # Alias pour compatibilité des tests et flexibilité
 discussion_draft_queue = analysis_queue
+
+# Compatibilité pour file_handlers qui attend cette variable
+PROJECTS_DIR = get_config().PROJECTS_DIR
