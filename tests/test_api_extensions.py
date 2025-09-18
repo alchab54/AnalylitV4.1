@@ -17,10 +17,10 @@ from utils.app_globals import background_queue
 
 
 @pytest.fixture
-def setup_project(session: Session):
+def setup_project(db_session: Session):
     project = Project(name=f"Test Project {uuid.uuid4()}", description="A test project")
-    session.add(project)
-    session.commit()
+    db_session.add(project)
+    db_session.commit()
     return project.id
 
 # ================================================================
@@ -59,7 +59,7 @@ def test_api_grid_management_workflow(client, setup_project):
     assert len(data[0]['fields']) == 3 # Correction de l'assertion
     assert data[0]['fields'][0]['name'] == "Population"
 
-def test_api_prompts_get_and_update(client: FlaskClient, session: Session):
+def test_api_prompts_get_and_update(client: FlaskClient, db_session: Session):
     """
     Teste la récupération (GET) et la mise à jour (POST) des Prompts.
     """
@@ -79,7 +79,7 @@ def test_api_prompts_get_and_update(client: FlaskClient, session: Session):
     assert response_post.json['content'] == prompt_payload['template']
     
     # 3. Vérifier en base de données
-    prompt_db = session.query(Prompt).filter_by(name="test_prompt_unique").first()
+    prompt_db = db_session.query(Prompt).filter_by(name="test_prompt_unique").first()
     assert prompt_db is not None
     assert prompt_db.name == "test_prompt_unique"
     assert prompt_db.content == "This is a test template: {{context}}"
@@ -89,7 +89,7 @@ def test_api_prompts_get_and_update(client: FlaskClient, session: Session):
 # ... (test_api_full_validation_workflow reste inchangé) ...
 # ================================================================
 
-def test_api_full_validation_workflow(client: FlaskClient, session: Session, setup_project):
+def test_api_full_validation_workflow(client: FlaskClient, db_session: Session, setup_project):
     """
     Teste le workflow de validation complet :
     1. Setup: Créer une extraction (article) vide.
@@ -107,8 +107,8 @@ def test_api_full_validation_workflow(client: FlaskClient, session: Session, set
         pmid=article_id, 
         title="Test Workflow Validation"
     )
-    session.add(extraction)
-    session.commit()
+    db_session.add(extraction)
+    db_session.commit()
     extraction_id_db = extraction.id # Récupère l'ID DB
 
     # 2. Étape 1: Eval 1 prend une décision
@@ -120,7 +120,7 @@ def test_api_full_validation_workflow(client: FlaskClient, session: Session, set
     assert response_eval_1.status_code == 200
 
     # 3. Assert 1: Vérifier la DB
-    session.refresh(extraction)
+    db_session.refresh(extraction)
     assert extraction.user_validation_status == "include"
     expected_json_1 = {"evaluator1": "include"}
     assert json.loads(extraction.validations) == expected_json_1
@@ -141,7 +141,7 @@ def test_api_full_validation_workflow(client: FlaskClient, session: Session, set
     assert response_eval_2.json['message'] == expected_message
 
     # 5. Assert 2: Vérifier à nouveau la DB
-    session.refresh(extraction)
+    db_session.refresh(extraction)
     expected_json_final = {"evaluator1": "include", "evaluator2": "exclude"}
     assert json.loads(extraction.validations) == expected_json_final
     assert extraction.user_validation_status == "include"
@@ -152,7 +152,7 @@ def test_api_full_validation_workflow(client: FlaskClient, session: Session, set
 # ... (test_api_prisma_checklist_workflow reste inchangé) ...
 # ================================================================
 
-def test_api_prisma_checklist_workflow(client, db_session, setup_project):
+def test_api_prisma_checklist_workflow(client, db_session: Session, setup_project):
     """
     Teste le GET (génération) et le POST (sauvegarde) de la checklist PRISMA-ScR.
     """
@@ -184,7 +184,7 @@ def test_api_prisma_checklist_workflow(client, db_session, setup_project):
     assert response_post.status_code == 200
 
     # 4. Vérifier la sauvegarde en DB
-    project = session.get(Project, project_id)
+    project = db_session.get(Project, project_id)
     saved_data_json = project.prisma_checklist
     assert saved_data_json is not None
     saved_data = json.loads(saved_data_json)

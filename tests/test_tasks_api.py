@@ -4,17 +4,17 @@ import json
 import uuid
 import pytest
 from datetime import datetime, timedelta
-from unittest.mock import patch, MagicMock, ANY
+from unittest.mock import patch, MagicMock, ANY, mock
 
 from utils.models import Project
 from utils.app_globals import redis_conn # Import redis_conn
 
 @pytest.fixture
-def test_project(session):
+def test_project(db_session):
     """Fixture pour créer un projet de test réutilisable."""
     project = Project(id=str(uuid.uuid4()), name="Test Project for Tasks")
-    session.add(project)
-    session.commit()
+    db_session.add(project)
+    db_session.commit()
     return project
 
 def test_search_returns_task_id(client, test_project):

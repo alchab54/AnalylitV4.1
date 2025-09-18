@@ -4,20 +4,15 @@ import os
 import logging
 from functools import wraps
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm import sessionmaker, declarative_base
 # ↓↓↓ MODIFIEZ CET IMPORT ↓↓↓
 from .db_base import Base  # Importer la Base partagée
  
 logger = logging.getLogger(__name__)
 
-# Global db object
-class _DB:
-    def __init__(self):
-        self.engine = None
-        self.SessionFactory = None
-        self.session = None # This will be the scoped_session for application use
-
-db = _DB()
+# --- Variables globales (non initialisées) ---
+engine = None
+SessionFactory = None
 
 # Définir le schéma, mais le rendre None si en mode test
 SCHEMA = 'analylit_schema' if os.getenv('TESTING') != 'true' else None
@@ -28,39 +23,39 @@ from utils import models # noqa
 
 def init_database(database_url=None):
     """Initialise le moteur et la factory de session. Ne fait rien si déjà initialisé."""
-    if db.engine:
-        return db.engine
+    global engine, SessionFactory
+    if engine:
+        return engine
 
     if not database_url:
         database_url = os.getenv("DATABASE_URL", "postgresql://user:pass@db/test") # URL générique
 
     try:
-        db.engine = create_engine(database_url, pool_pre_ping=True)
+        engine = create_engine(database_url, pool_pre_ping=True)
         if SCHEMA: # Si on utilise PostgreSQL, on crée le schéma
-            with db.engine.connect() as connection:
+            with engine.connect() as connection:
                 connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
                 connection.commit()
         
-        Base.metadata.create_all(bind=db.engine)
-        db.SessionFactory = sessionmaker(bind=db.engine, autoflush=False, autocommit=False)
-        db.session = scoped_session(db.SessionFactory) # Initialize the scoped_session here
+        Base.metadata.create_all(bind=engine)
+        SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
         logger.info("✅ Base de données initialisée avec succès.")
     except Exception as e:
         logger.critical(f"❌ ERREUR D'INITIALISATION DB : {e}", exc_info=True)
-        db.engine = None
+        engine = None
         raise
-    return db.engine
+    return engine
 
 def get_session():
     """Récupère une session de la factory."""
-    if not db.session: # Use db.session
+    if not SessionFactory:
         raise RuntimeError("La base de données n'est pas initialisée. Appelez init_database().")
-    return db.session() # Call the scoped_session to get a session
+    return SessionFactory()
 
 def with_db_session(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        session = db.session() # Get a session from the scoped_session
+        session = get_session()
         try:
             result = func(session, *args, **kwargs)
             session.commit()
@@ -70,7 +65,10 @@ def with_db_session(func):
             logger.exception(f"Erreur DB dans {func.__name__}: {e}")
             raise
         finally:
-            session.remove() # Remove the session from the registry for scoped_session
+            # La fixture de test ou le contexte de l'application Flask gère le cycle de vie de la session.
+            # L'appel à session.close() est correct pour retourner la connexion au pool,
+            # mais session.remove() (qui n'existe pas sur l'instance de session) ne doit pas être appelé.
+            session.close()
     return wrapper
 
 def seed_default_data(session):
