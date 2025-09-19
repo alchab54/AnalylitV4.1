@@ -1,4 +1,4 @@
-# tests/conftest.py - Remplacez le contenu COMPLET par :
+# tests/conftest.py - Version simplifiée
 import pytest
 from server_v4_complete import create_app
 from utils.database import init_database, get_session
@@ -23,28 +23,15 @@ def client(app):
 
 @pytest.fixture
 def db_session(app):
-    """Session de base de données ISOLÉE pour chaque test."""
+    """Session de base de données pour chaque test."""
     with app.app_context():
         session = get_session()
-        
-        # NETTOYAGE AVANT chaque test
-        from utils.models import Project, AnalysisProfile, SearchResult, Extraction, Grid, ChatMessage, RiskOfBias, Prompt
-        session.query(ChatMessage).delete()
-        session.query(RiskOfBias).delete()
-        session.query(Extraction).delete()
-        session.query(SearchResult).delete()
-        session.query(Grid).delete()
-        session.query(Project).delete()
-        session.query(AnalysisProfile).delete()
-        session.query(Prompt).delete()
-        session.commit()
-        
         yield session
         session.close()
 
 @pytest.fixture
 def setup_project(app, db_session):
-    """Crée un projet de test UNIQUE."""
+    """Crée un projet de test."""
     import uuid
     from utils.models import Project
     from datetime import datetime
@@ -52,7 +39,7 @@ def setup_project(app, db_session):
     with app.app_context():
         project = Project(
             id=str(uuid.uuid4()),
-            name=f"Test Project {uuid.uuid4().hex[:8]}", # Nom unique
+            name=f"Test Project {uuid.uuid4().hex[:8]}", 
             description="Projet de test",
             analysis_mode="screening",
             created_at=datetime.utcnow()

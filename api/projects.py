@@ -5,7 +5,8 @@ import logging
 import uuid
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
-from utils.app_globals import Session, with_db_session, background_queue, processing_queue, analysis_queue, discussion_draft_queue, q
+from utils.app_globals import background_queue, processing_queue, analysis_queue, discussion_draft_queue, q
+from utils.database import get_session as Session, with_db_session
 from utils.models import Project, Grid, Extraction, AnalysisProfile
 from tasks_v4_complete import (
     run_discussion_generation_task,
