@@ -1,10 +1,8 @@
 # Changelog AnalyLit V4.1 Frontend
 
 ## Version 4.1.0 (Septembre 2025)
-## Version 4.1.0 (En cours de finalisation - Septembre 2025)
 
 ### Améliorations et Corrections
-### ✅ Fonctionnalités Réactivées (Backend Existant)
 
 - **Correction des appels API:**
     - Mise à jour des URLs `fetchAPI` pour correspondre aux routes backend existantes (ajout du préfixe `/api` manquant).

@@ -386,8 +386,9 @@ def create_app(config=None):
         
         try:
             # 1. Récupérer les données pertinentes (articles inclus)
-            articles_query = session.query(SearchResult).join(Extraction, SearchResult.article_id == Extraction.pmid)\
-                .filter(SearchResult.project_id == project_id, Extraction.project_id == project_id)\
+            articles_query = session.query(SearchResult)\
+                .join(Extraction, SearchResult.article_id == Extraction.pmid)\
+                .filter(SearchResult.project_id == project_id)\
                 .filter(Extraction.user_validation_status == 'include')
             
             articles = [
@@ -523,7 +524,7 @@ def create_app(config=None):
             # Assurez-vous de retourner l'ID du job
             task_id = str(job.id) if job and job.id else "unknown"
             logging.debug(f"Chat endpoint returning: {{'message': 'Question soumise', 'task_id': {task_id}}}")
-            return jsonify({"message": "Question soumise", "task_id": task_id}), 202 
+            return jsonify({"message": "Question soumise", "task_id": task_id}), 202
         except Exception as e:
             logging.error(f"Erreur lors de l'enqueue du chat: {e}")
             return jsonify({"error": "Erreur interne du serveur"}), 500

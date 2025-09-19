@@ -271,12 +271,10 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
     all_records_to_insert = []
     failed_databases = []
     for db_name in databases:
+        current_query = None  # Initialiser à None
         results = []
 
         # Déterminer la requête à utiliser pour cette base de données spécifique
-        if expert_queries and db_name in expert_queries and expert_queries[db_name].strip():
-            current_query = None  # Initialiser à None
-        
         if expert_queries:
             # Mode expert. On vérifie si une requête spécifique existe
             if db_name in expert_queries and expert_queries[db_name] and expert_queries[db_name].strip():

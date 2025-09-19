@@ -451,7 +451,7 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
     # ACT
     with patch('server_v4_complete.save_file_to_project_dir', return_value='/fake/path/to/test.json') as mock_save_file:
         response = client.post(
-            '/api/upload-zotero-file-static',  # Changed URL
+            f'/api/projects/{project_id}/upload-zotero-file',
             data=file_data, 
             content_type='multipart/form-data'
         )
@@ -459,7 +459,6 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
         # ASSERT
         
         # 1. Vérifier le statut 202
-        #    (Ceci échouera avec 404 si vous ne rebuildez pas votre image Docker)
         assert response.status_code == 202
 
         # 2. Vérifier que la sauvegarde a été appelée
@@ -468,7 +467,7 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
         # 3. Vérifier que la tâche a été mise en file
         mock_q_enqueue.assert_called_once_with(
             import_from_zotero_file_task, 
-            project_id="test_static_route", # Changed project_id to match hardcoded value
+            project_id=project_id,
             json_file_path='/fake/path/to/test.json'
         )
 
