@@ -52,7 +52,7 @@ export async function loadPrompts() {
  * Récupère les modèles Ollama locaux (via l'API backend).
  */
 export async function loadOllamaModels() {
-    const models = await fetchAPI('/ollama/models');
+    const models = await fetchAPI('/settings/models');
     appState.ollamaModels = models;
 }
 
@@ -618,11 +618,11 @@ export async function handleSaveProfile(e) {
         const profileData = collectProfileData();
         const profileId = document.getElementById('profile-id').value;
 
-        let url = '/api/profiles';
+        let url = '/api/analysis-profiles';
         let method = 'POST';
 
         if (profileId && !profileId.startsWith('new_')) {
-            url = `/api/profiles/${profileId}`;
+            url = `/api/analysis-profiles/${profileId}`;
             method = 'PUT';
         } else {
             delete profileData.id;
@@ -674,7 +674,7 @@ export async function handleDeleteProfile() {
             confirmClass: 'btn--danger',
             onConfirm: async () => {
                 try {
-                    await fetchAPI(`/api/profiles/${profileId}`, { method: 'DELETE' });
+                    await fetchAPI(`/api/analysis-profiles/${profileId}`, { method: 'DELETE' });
                     showToast(`Profil "${profile.name}" supprimé.`, 'success');
                     
                     await loadAnalysisProfiles();

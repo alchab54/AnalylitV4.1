@@ -294,20 +294,15 @@ def create_app(config=None):
     @app.route('/api/projects/<project_id>/import-zotero', methods=['POST'])
     @with_db_session
     def import_zotero_pdfs(session, project_id):
+        if not request.is_json:
+            return jsonify({"error": "Content-Type doit être application/json"}), 400
+        
+        data = request.get_json()
+        if not data or "articles" not in data:
+            return jsonify({"error": "Le payload JSON doit contenir la clé 'articles'"}), 400
+        
         try:
-            # CORRECTION : Gestion robuste du type de contenu
-            if request.is_json:
-                data = request.get_json()
-            else:
-                data = request.form.to_dict()
-            
-            if not data:
-                return jsonify({"error": "Données requises"}), 400
-
             pmids = data.get("articles", [])
-            zotero_user_id = data.get("zotero_user_id", "test_user")
-            zotero_api_key = data.get("zotero_api_key", "test_key")
-
             job = background_queue.enqueue(
                 import_pdfs_from_zotero_task,
                 project_id=project_id,
@@ -318,8 +313,9 @@ def create_app(config=None):
             )
             return jsonify({"message": "Zotero PDF import started", "task_id": str(job.id)}), 202
         except Exception as e:
-            return jsonify({"error": f"Erreur de traitement: {str(e)}"}), 400
-        
+            logging.error(f"Erreur d'enqueue pour import Zotero: {e}")
+            return jsonify({"error": f"Erreur de traitement: {str(e)}"}), 500   
+             
     @app.route("/api/projects/<project_id>/upload-zotero", methods=["POST"])
     @with_db_session
     def upload_zotero(session, project_id):
@@ -514,16 +510,16 @@ def create_app(config=None):
     @app.route("/api/projects/<project_id>/chat", methods=["POST"])
     def chat_with_project(project_id):
         data = request.get_json()
-        question = data.get('question')
-        if not question:
+        if not data or 'question' not in data:
             return jsonify({"error": "Question requise"}), 400
         try:
-            job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout='15m')
-            task_id = str(job.id) if job and job.id else "unknown"
-            # L'instruction RETURN est maintenant à sa place
+            job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=data['question'], job_timeout='15m')
+            # Assurez-vous de retourner l'ID du job
+            task_id = str(job.id) if job else "unknown"
             return jsonify({"message": "Question soumise", "task_id": task_id}), 202
         except Exception as e:
-            return jsonify({"error": f"Erreur lors de l'enqueue: {e}"}), 500
+            logging.error(f"Erreur lors de l'enqueue du chat: {e}")
+            return jsonify({"error": "Erreur interne du serveur"}), 500
     
     @app.route("/api/projects/<project_id>/chat-history", methods=["GET"])
     @with_db_session

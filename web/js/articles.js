@@ -250,6 +250,9 @@ export async function viewArticleDetails(articleId) {
 }
 
 export async function handleDeleteSelectedArticles() {
+    // TODO: Backend route for batch deletion is missing.
+    // The original code was:
+    /*
     const selectedIds = Array.from(appState.selectedSearchResults);
     const selectedCount = selectedIds.length;
     
@@ -278,6 +281,8 @@ export async function handleDeleteSelectedArticles() {
     } finally {
         showLoadingOverlay(false);
     }
+    */
+    showToast('La suppression d\'articles n\'est pas encore implémentée.', 'info');
 }
 
 export function showBatchProcessModal() {

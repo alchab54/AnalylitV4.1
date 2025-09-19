@@ -27,7 +27,7 @@ export async function loadChatMessages() {
     }
 
     try {
-        const messages = await fetchAPI(`/api/projects/${appState.currentProject.id}/chat-messages`);
+        const messages = await fetchAPI(`/api/projects/${appState.currentProject.id}/chat-history`);
         appState.chatMessages = Array.isArray(messages) ? messages : [];
         renderChatInterface(appState.chatMessages);
     } catch (error) {
@@ -168,6 +168,8 @@ function renderChatSection(project = null, error = false) {
  * Gère le lancement de l'indexation des PDFs pour le chat RAG.
  */
 export async function handleStartIndexing() {
+    // TODO: Backend route for indexing PDFs is missing.
+    /*
     if (!appState.currentProject) {
         showToast('Veuillez sélectionner un projet pour lancer l\'indexation.', 'warning');
         return;
@@ -180,8 +182,10 @@ export async function handleStartIndexing() {
         // On peut utiliser le task_id pour suivre la progression si nécessaire
         console.log('Task ID for indexing:', response.task_id);
     } catch (error) {
-        showToast(`Erreur lors du lancement de l'indexation : ${error.message}`, 'error');
+        showToast(`Erreur lors du lancement de l\'indexation : ${error.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }
+    */
+   showToast('L\'indexation des PDFs n\'est pas encore implémentée.', 'info');
 }

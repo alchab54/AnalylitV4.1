@@ -73,6 +73,9 @@ function renderGridItem(grid) {
 }
 
 export async function handleDeleteGrid(gridId) {
+    // TODO: Backend route for grid deletion is missing.
+    // The original code was:
+    /*
     if (!gridId) return;
     if (!confirm('Supprimer cette grille ?')) return;
 
@@ -87,6 +90,8 @@ export async function handleDeleteGrid(gridId) {
     } catch (error) {
         showToast(`Erreur: ${error.message}`, 'error');
     }
+    */
+    showToast('La suppression de grille n\'est pas encore implémentée.', 'info');
 }
 
 export function showGridFormModal(gridId = null) {

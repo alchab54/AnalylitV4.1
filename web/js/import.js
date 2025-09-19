@@ -98,6 +98,8 @@ export function handleUploadPdfs(target) {
 }
 
 export async function handleBulkPdfDownload() {
+    // TODO: Backend route for bulk PDF download is missing.
+    /*
   if (!appState.currentProject) return;
   showLoadingOverlay(true, 'Recherche des PDFs gratuits...');
   try {
@@ -108,6 +110,8 @@ export async function handleBulkPdfDownload() {
   } finally {
     showLoadingOverlay(false, '');
   }
+  */
+  showToast('La recherche de PDFs n\'est pas encore implémentée.', 'info');
 }
 
 export async function exportForThesis() {
@@ -120,6 +124,8 @@ export async function exportForThesis() {
 }
 
 export async function handleIndexPdfs() {
+    // TODO: Backend route for indexing PDFs is missing.
+    /*
   if (!appState.currentProject) return;
   
   // Affiche l'overlay avec un message initial et prépare la barre de progression
@@ -134,8 +140,10 @@ export async function handleIndexPdfs() {
     showToast('Indexation lancée en arrière-plan.', 'info');
   } catch (e) {
     showToast(`Erreur: ${e.message}`, 'error');
-    showLoadingOverlay(false); // Masquer en cas d'erreur de lancement
+    showLoadingOverlay(false); // Masquer en cas d\'erreur de lancement
   }
+  */
+  showToast('L\'indexation des PDFs n\'est pas encore implémentée.', 'info');
 }
 
 export async function handleZoteroSync() {
@@ -156,7 +164,7 @@ async function processZoteroFile(file) {
     showToast(`${result.imported || 0} références importées.`, 'success');
     await loadSearchResults(); // Refresh results to show new articles
   } catch (e) {
-    showToast(`Erreur lors de l'import Zotero: ${e.message}`, 'error');
+    showToast(`Erreur lors de l\'import Zotero: ${e.message}`, 'error');
   } finally {
     showLoadingOverlay(false, '');
   }
@@ -192,7 +200,7 @@ export async function processPmidImport(event) {
     showToast(`Import lancé pour ${ids.length} identifiant(s).`, 'success');
     await loadSearchResults();
   } catch (e) {
-    showToast(`Erreur lors de l'import: ${e.message}`, 'error');
+    showToast(`Erreur lors de l\'import: ${e.message}`, 'error');
   } finally {
     showLoadingOverlay(false, '');
   }
@@ -201,6 +209,8 @@ export async function processPmidImport(event) {
 // --- Fonctions ajoutées pour la complétude de l'architecture ---
 
 export async function handleSaveZoteroSettings(e) {
+    // TODO: Backend route for saving Zotero settings is missing.
+    /*
     e.preventDefault();
     const userId = document.getElementById('zoteroUserId').value.trim();
     const apiKey = document.getElementById('zoteroApiKey').value.trim();
@@ -218,6 +228,8 @@ export async function handleSaveZoteroSettings(e) {
     } catch (error) {
         showToast(`Erreur lors de la sauvegarde : ${error.message}`, 'error');
     }
+    */
+    showToast('La sauvegarde des paramètres Zotero n\'est pas encore implémentée.', 'info');
 }
 
 export function startZoteroStatusPolling(projectId) { /* ... logique de polling ... */ }
@@ -236,11 +248,13 @@ async function processPdfUpload(files) {
     const formData = new FormData();
     [...files].forEach(f => formData.append('files', f));
     // CORRECTION : Utilisation de fetchAPI pour gérer l'upload de FormData
-    const result = await fetchAPI(`/projects/${appState.currentProject.id}/upload-pdfs`, { method: 'POST', body: formData });
+    // CORRECTED ROUTE: /upload-pdfs-bulk instead of /upload-pdfs
+    const result = await fetchAPI(`/projects/${appState.currentProject.id}/upload-pdfs-bulk`, { method: 'POST', body: formData });
     showToast(`${result.uploaded || 0} PDF(s) uploadé(s).`, 'success');
   } catch (e) {
-    showToast(`Erreur lors de l'upload: ${e.message}`, 'error');
+    showToast(`Erreur lors de l\'upload: ${e.message}`, 'error');
   } finally {
     showLoadingOverlay(false, '');
   }
 }
+

@@ -12,8 +12,9 @@ export async function loadProjectAnalyses() {
     }
     
     try {
-        const analyses = await fetchAPI(`/projects/${appState.currentProject.id}/analyses`);
-        setAnalysisResults(analyses);
+        // TODO: Backend route for getting analyses is missing.
+        // const analyses = await fetchAPI(`/projects/${appState.currentProject.id}/analyses`);
+        // setAnalysisResults(analyses);
         renderAnalysesSection();
     } catch (e) {
         console.error('Erreur chargement analyses:', e);
@@ -212,8 +213,9 @@ export async function handleRunATNAnalysis(event) {
     }
 
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-atn-analysis`, {
-            method: 'POST'
+        await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, {
+            method: 'POST',
+            body: { type: 'atn_score' }
         });
         showToast('Analyse ATN lancée. Les résultats apparaîtront une fois le calcul terminé.', 'success');
     } catch (e) {

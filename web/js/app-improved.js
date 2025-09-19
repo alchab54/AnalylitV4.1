@@ -154,7 +154,7 @@ async function loadInitialData() {
 
 async function loadAvailableDatabases() {
     try {
-        appState.availableDatabases = await fetchAPI('databases');
+        appState.availableDatabases = await fetchAPI('/databases');
     } catch {
         appState.availableDatabases = [];
     }
