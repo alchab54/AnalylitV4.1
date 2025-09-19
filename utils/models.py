@@ -304,6 +304,13 @@ class Prompt(Base):
     def to_dict(self):
         return {c.name: getattr(self, c.name, None) for c in self.__table__.columns}
 
+# === FORCER L'ENREGISTREMENT DES MODÈLES ===
+# Cette ligne force SQLAlchemy à reconnaître tous les modèles
+__all__ = [
+    'Project', 'SearchResult', 'Extraction', 'AnalysisProfile', 
+    'Grid', 'Prompt', 'ChatMessage', 'RiskOfBias'
+]
+
 class ProcessingLog(Base):
     __tablename__ = 'processing_log'
     __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
