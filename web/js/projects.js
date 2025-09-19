@@ -2,7 +2,7 @@
 
 import { fetchAPI } from './api.js';
 import { setProjects } from './state.js';
-import { showToast } from './ui.js';
+import { showToast } from './ui-improved.js';
 
 /**
  * Charge la liste des projets depuis le backend et met à jour l'état global.
@@ -75,7 +75,6 @@ export async function handleCreateProject(event) {
   const projectData = {
     name: formData.get('projectName'),
     description: formData.get('projectDescription'),
-    // ajouter d'autres champs si nécessaire
   };
   try {
     await createProject(projectData);
@@ -95,7 +94,7 @@ export function handleDeleteProject(event) {
   confirmDeleteProject(projectId);
 }
 
-// Exports pour core.js
+// Exports finaux
 export {
   loadProjects,
   createProject,
