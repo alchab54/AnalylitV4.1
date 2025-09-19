@@ -232,7 +232,13 @@ def test_process_single_article_task_screening_mode(mock_ollama_api, db_session,
     project_id = str(uuid.uuid4()) # Déjà unique.
     article_id = f"pmid_screen_{uuid.uuid4().hex[:8]}"
     project = Project(id=project_id, name="Test Screening")
-    search_result = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id=article_id, title="Screening Title", abstract="Abstract for screening.")
+    search_result = SearchResult(
+    id=str(uuid.uuid4()), 
+    project_id=project_id, 
+    article_id=article_id, 
+    title="Ceci est un titre suffisamment long pour le test de screening", 
+    abstract="Et ceci est un résumé assez long pour que le test passe la vérification de longueur minimale."
+    )   
     db_session.add_all([project, search_result])
     db_session.commit()
 

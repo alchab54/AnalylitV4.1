@@ -275,9 +275,20 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
 
         # Déterminer la requête à utiliser pour cette base de données spécifique
         if expert_queries and db_name in expert_queries and expert_queries[db_name].strip():
-            current_query = expert_queries[db_name]
+            current_query = None  # Initialiser à None
+        
+        if expert_queries:
+            # Mode expert. On vérifie si une requête spécifique existe
+            if db_name in expert_queries and expert_queries[db_name] and expert_queries[db_name].strip():
+                # Oui, une requête experte valide existe
+                current_query = expert_queries[db_name]
+            else:
+                # Le mode expert est activé, mais pour cette DB, la requête est vide ou absente.
+                # On ne fait rien (current_query reste None), ce qui la fera skipper ci-dessous.
+                pass
         else:
-            current_query = query  # Fallback sur la requête simple
+            # Pas de mode expert, on utilise la requête simple
+            current_query = query
 
         if not current_query or not current_query.strip():
             logger.info(f"Requête vide pour {db_name}, base de données ignorée.")
