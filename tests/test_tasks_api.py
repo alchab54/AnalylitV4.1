@@ -132,14 +132,16 @@ def test_get_tasks_status(client):
         # Pour ce test, nous allons simuler les réponses pour la première queue seulement
         # et des listes vides pour les appels suivants pour les autres queues.
         mock_fetch_many.side_effect = [
-            [mock_started_job], # processing_queue.started_job_registry
-            [mock_queued_job],  # processing_queue.get_job_ids()
-            [],                 # processing_queue.finished_job_registry
-            [],                 # processing_queue.failed_job_registry
-            # Répéter des listes vides pour les appels des autres queues
+            [mock_started_job], # processing_queue.started
+            [mock_queued_job],  # processing_queue.queued
+            [],                 # processing_queue.finished
+            [],                 # processing_queue.failed
+
+            # Répéter des listes vides pour les autres queues
             [], [], [], [], # synthesis_queue
-            [], [], [], [],
-            [], [], [], []
+            [], [], [], [], # analysis_queue
+            [], [], [], [], # background_queue
+            [], [], [], []  # <-- AJOUTEZ CETTE LIGNE (pour extension_queue)
         ]
         
         # 2. Appeler la route

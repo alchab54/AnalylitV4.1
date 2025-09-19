@@ -354,8 +354,8 @@ def create_app(config=None):
         except Exception as e:
             return jsonify({"error": f"Erreur: {str(e)}"}), 400
     
-    @app.route("/api/upload-zotero-file-static", methods=["POST"])
-    def upload_zotero_file(): # Removed project_id parameter
+    @app.route("/api/projects/<project_id>/upload-zotero-file", methods=["POST"])
+    def upload_zotero_file(project_id): # <-- "project_id" est ici
         """Upload Zotero file."""
         try:
             if 'file' not in request.files:
@@ -366,17 +366,15 @@ def create_app(config=None):
                 return jsonify({"error": "Fichier vide"}), 400
 
             filename = secure_filename(file.filename)
-            # CORRECTION : Cette ligne doit être patchable par le test
-            # For now, we'll hardcode a project_id for testing the route itself
-            test_project_id = "test_static_route"
-            file_path = save_file_to_project_dir(file, test_project_id, filename, PROJECTS_DIR)
+            # La sauvegarde utilise maintenant le project_id de l'URL
+            file_path = save_file_to_project_dir(file, project_id, filename, PROJECTS_DIR)
 
-            job = background_queue.enqueue(import_from_zotero_file_task, project_id=test_project_id, json_file_path=str(file_path))
+            job = background_queue.enqueue(import_from_zotero_file_task, project_id=project_id, json_file_path=str(file_path))
             task_id = str(job.id) if job and job.id else "unknown"
             return jsonify({"message": "Importation Zotero lancée", "task_id": task_id}), 202
         except Exception as e:
             return jsonify({"error": f"Erreur: {str(e)}"}), 400
-    
+        
     @app.route('/api/projects/<project_id>/export/thesis', methods=['GET'])
     @with_db_session
     def export_thesis(session, project_id):
