@@ -71,8 +71,6 @@ services:
       - PYTHONPATH=/home/appuser/app # Assure que le chemin est correct
     env_file:
       - .env
-    # CORRECTION: L'initialisation de la DB est déjà gérée par l'entrypoint.
-    # La commande doit simplement lancer l'entrypoint.
     command: ["/home/appuser/app/entrypoint.sh"]
     depends_on:
       db:

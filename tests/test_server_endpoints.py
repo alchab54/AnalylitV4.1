@@ -21,7 +21,7 @@ from tasks_v4_complete import (
     multi_database_search_task,
     process_single_article_task,
     import_from_zotero_file_task,
-    import_pdfs_from_zotero_task,
+    import_pdfs_from_zotero_file_task,
     run_risk_of_bias_task,
     run_meta_analysis_task,
     run_atn_score_task,
@@ -31,6 +31,26 @@ from tasks_v4_complete import (
 
 # Importer les modèles nécessaires pour la configuration des tests
 from utils.models import AnalysisProfile
+
+# Import the create_app function from your Flask application
+from server_v4_complete import create_app
+
+@pytest.fixture
+def app():
+    """Create and configure a new app instance for each test."""
+    # create the app with common test config
+    app = create_app({'TESTING': True})
+    yield app
+
+@pytest.fixture
+def client(app):
+    """A test client for the app."""
+    return app.test_client()
+
+@pytest.fixture
+def runner(app):
+    """A test runner for the app's Click commands."""
+    return app.test_cli_runner()
 
 # ---
 def test_health_check(client):
