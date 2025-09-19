@@ -17,7 +17,9 @@ async function renderStakeholderGroups() {
     if (!container) return;
 
     try {
-        const groups = await fetchAPI(`/projects/${appState.currentProject.id}/stakeholders`);
+        // TODO: Backend route for getting stakeholders is missing.
+        // const groups = await fetchAPI(`/projects/${appState.currentProject.id}/stakeholders`);
+        const groups = []; // Mock data
         if (groups.length === 0) {
             container.innerHTML = '<p class="text-muted">Aucun groupe de parties prenantes défini.</p>';
             return;
@@ -50,15 +52,16 @@ export async function addStakeholderGroup() {
     }
 
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/stakeholders`, {
-            method: 'POST',
-            body: {
-                name: name,
-                color: colorInput.value,
-                description: descInput.value
-            }
-        });
-        showToast('Groupe ajouté.', 'success');
+        // TODO: Backend route for adding stakeholders is missing.
+        // await fetchAPI(`/projects/${appState.currentProject.id}/stakeholders`, {
+        //     method: 'POST',
+        //     body: {
+        //         name: name,
+        //         color: colorInput.value,
+        //         description: descInput.value
+        //     }
+        // });
+        showToast('Ajout de groupe de parties prenantes non implémenté.', 'info');
         nameInput.value = '';
         descInput.value = '';
         await renderStakeholderGroups();
@@ -72,8 +75,9 @@ export async function deleteStakeholderGroup(groupId) {
     if (!confirm('Êtes-vous sûr de vouloir supprimer ce groupe ?')) return;
 
     try {
-        await fetchAPI(`/stakeholder-groups/${groupId}`, { method: 'DELETE' }); // CORRIGÉ: La route backend est /api/stakeholder-groups/{id}
-        showToast('Groupe supprimé.', 'success');
+        // TODO: Backend route for deleting stakeholders is missing.
+        // await fetchAPI(`/stakeholder-groups/${groupId}`, { method: 'DELETE' }); // CORRIGÉ: La route backend est /api/stakeholder-groups/{id}
+        showToast('Suppression de groupe de parties prenantes non implémentée.', 'info');
         await renderStakeholderGroups();
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');

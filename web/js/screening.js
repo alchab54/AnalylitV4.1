@@ -12,7 +12,8 @@ async function loadScreeningDecisions() {
     if (!appState.currentProject?.id) return;
     showLoadingOverlay(true, 'Chargement du screening...');
     try {
-        const decisions = await fetchAPI(`/projects/${appState.currentProject.id}/screening-decisions`);
+        // TODO: Backend route for getting screening decisions is missing.
+    // const decisions = await fetchAPI(`/projects/${appState.currentProject.id}/screening-decisions`);
         setScreeningDecisions(decisions || []);
         renderScreeningView();
     } catch (error) {

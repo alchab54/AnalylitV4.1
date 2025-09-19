@@ -516,7 +516,7 @@ def create_app(config=None):
             job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=data['question'], job_timeout='15m')
             # Assurez-vous de retourner l'ID du job
             task_id = str(job.id) if job else "unknown"
-            return jsonify({"message": "Question soumise", "task_id": task_id}), 202
+            return jsonify({"message": "Question soumise", "job_id": job.id}), 202 
         except Exception as e:
             logging.error(f"Erreur lors de l'enqueue du chat: {e}")
             return jsonify({"error": "Erreur interne du serveur"}), 500

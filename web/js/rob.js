@@ -47,7 +47,9 @@ export async function fetchAndDisplayRob(articleId, editMode = false) {
 
     try {
         summaryContainer.innerHTML = `<div class="loading-spinner"></div>`;
-        const robData = await fetchAPI(`/projects/${appState.currentProject.id}/risk-of-bias/${articleId}`);
+        // TODO: Backend route for getting risk of bias data is missing.
+        // const robData = await fetchAPI(`/projects/${appState.currentProject.id}/risk-of-bias/${articleId}`);
+        const robData = {}; // Mock data
 
         if (!robData || Object.keys(robData).length === 0) {
             summaryContainer.innerHTML = `<p class="text-secondary">Aucune évaluation de biais pour cet article. Lancez l'analyse.</p>`;
@@ -137,11 +139,12 @@ export async function handleSaveRobAssessment(event) {
     button.textContent = 'Sauvegarde...';
 
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/risk-of-bias`, {
-            method: 'POST',
-            body: data
-        });
-        showToast('Évaluation sauvegardée.', 'success');
+        // TODO: Backend route for saving risk of bias data is missing.
+// await fetchAPI(`/projects/${appState.currentProject.id}/risk-of-bias`, {
+//     method: 'POST',
+//     body: data
+// });
+showToast('Sauvegarde de l\'évaluation RoB non implémentée.', 'info');
         loadRobSection(); // Recharger la section pour voir les changements
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');

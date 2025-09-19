@@ -153,7 +153,8 @@ async function loadProjectFilesSet(projectId) {
     return;
   }
   try {
-    const files = await fetchAPI(`/projects/${projectId}/files`);
+    // TODO: Backend route for getting project files is missing.
+    // const files = await fetchAPI(`/projects/${projectId}/files`);
     const filenames = (files || [])
       .map(f => String(f.filename || '').replace(/\.pdf$/i, '').toLowerCase());
     appState.currentProjectFiles = new Set(filenames);

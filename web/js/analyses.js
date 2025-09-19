@@ -254,6 +254,7 @@ export async function runProjectAnalysis(analysisType) {
         
         // Note: L'endpoint varie en fonction de l'analyse
         let endpoint = '';
+        let body = {};
         switch(analysisType) {
             case 'discussion':
                 endpoint = `/projects/${appState.currentProject.id}/run-discussion-draft`;
@@ -262,14 +263,23 @@ export async function runProjectAnalysis(analysisType) {
                  endpoint = `/projects/${appState.currentProject.id}/run-knowledge-graph`;
                  break;
             case 'prisma_flow':
-                endpoint = `/projects/${appState.currentProject.id}/run-prisma-flow`;
+                endpoint = `/projects/${appState.currentProject.id}/run-analysis`;
+                body = { type: 'prisma_flow' };
+                break;
+            case 'meta_analysis':
+                endpoint = `/projects/${appState.currentProject.id}/run-analysis`;
+                body = { type: 'meta_analysis' };
+                break;
+            case 'descriptive_stats':
+                endpoint = `/projects/${appState.currentProject.id}/run-analysis`;
+                body = { type: 'descriptive_stats' };
                 break;
             default:
                 showToast('Type d\'analyse inconnu.', 'error');
                 return;
         }
         
-        await fetchAPI(endpoint, { method: 'POST' });
+        await fetchAPI(endpoint, { method: 'POST', body });
         showToast(`La génération pour ${analysisNames[analysisType]} a été lancée.`, 'success');
     } catch (e) {
         showToast(`Erreur lors du lancement de l\'analyse: ${e.message}`, 'error');
@@ -460,7 +470,7 @@ export async function handleRunPrismaFlow(event) {
     if (card) card.classList.add('analysis-card--loading');
 
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-prisma-flow`, { method: 'POST' });
+        await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, { method: 'POST', body: { type: 'prisma_flow' } });
         showToast('Génération du diagramme PRISMA lancée.', 'success');
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
@@ -472,7 +482,7 @@ export async function handleRunMetaAnalysis() {
     if (!appState.currentProject?.id) return;
     showLoadingOverlay(true, 'Lancement de la méta-analyse...');
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-meta-analysis`, { method: 'POST' });
+        await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, { method: 'POST', body: { type: 'meta_analysis' } });
         showToast('Méta-analyse lancée avec succès.', 'success');
         closeModal();
     } finally {
@@ -485,7 +495,7 @@ export async function handleRunDescriptiveStats() {
     if (!appState.currentProject?.id) return;
     showLoadingOverlay(true, 'Calcul des statistiques descriptives...');
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-descriptive-stats`, { method: 'POST' });
+        await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, { method: 'POST', body: { type: 'descriptive_stats' } });
         showToast('Calcul des statistiques lancé.', 'success');
         closeModal();
     } finally {

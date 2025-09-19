@@ -330,12 +330,12 @@ export async function startBatchProcessing() {
     showLoadingOverlay(true, `Lancement du screening pour ${selectedIds.length} article(s)...`);
     
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/process-batch`, {
+        await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
             method: 'POST',
             body: {
-                article_ids: selectedIds,
+                articles: selectedIds,
                 analysis_mode: 'screening',
-                profile_id: profileId,
+                profile: profileId,
             }
         });
         
@@ -410,12 +410,12 @@ export async function startFullExtraction() {
     showLoadingOverlay(true, `Lancement de l'extraction pour ${articleIds.length} article(s)...`);
     
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/process-batch`, {
+        await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
             method: 'POST',
             body: {
-                article_ids: articleIds,
+                articles: articleIds,
                 analysis_mode: 'full_extraction',
-                grid_id: gridId,
+                custom_grid_id: gridId,
             }
         });
         

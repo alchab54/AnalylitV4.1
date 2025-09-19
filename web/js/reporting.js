@@ -44,10 +44,11 @@ export async function generateBibliography() {
     showLoadingOverlay(true, 'Génération de la bibliographie...', elements);
     try {
         const style = document.getElementById('bibliographyStyle').value;
-        const bibliography = await fetchAPI(`/projects/${appState.currentProject.id}/reports/bibliography?style=${style}`);
-        const outputDiv = document.getElementById('bibliographyOutput');
-        outputDiv.innerHTML = bibliography.map(item => `<p>${item}</p>`).join('');
-        showToast('Bibliographie générée avec succès.', 'success', elements);
+        // TODO: Backend route for generating bibliography is missing.
+        // const bibliography = await fetchAPI(`/projects/${appState.currentProject.id}/reports/bibliography?style=${style}`);
+        // const outputDiv = document.getElementById('bibliographyOutput');
+        // outputDiv.innerHTML = bibliography.map(item => `<p>${item}</p>`).join('');
+        showToast('Génération de la bibliographie non implémentée.', 'info');
     } catch (error) {
         console.error('Erreur lors de la génération de la bibliographie:', error);
         showToast('Erreur lors de la génération de la bibliographie.', 'error', elements);
@@ -59,44 +60,45 @@ export async function generateBibliography() {
 export async function generateSummaryTable() {
     showLoadingOverlay(true, 'Génération du tableau de synthèse...', elements);
     try {
-        const data = await fetchAPI(`/projects/${appState.currentProject.id}/reports/summary-table`);
-        const outputDiv = document.getElementById('summaryTableOutput');
-        if (data.length === 0) {
-            outputDiv.innerHTML = '<p>Aucune donnée disponible pour le tableau de synthèse.</p>';
-            return;
-        }
+        // TODO: Backend route for generating summary table is missing.
+        // const data = await fetchAPI(`/projects/${appState.currentProject.id}/reports/summary-table`);
+        // const outputDiv = document.getElementById('summaryTableOutput');
+        // if (data.length === 0) {
+        //     outputDiv.innerHTML = '<p>Aucune donnée disponible pour le tableau de synthèse.</p>';
+        //     return;
+        // }
 
-        // Create table header
-        let tableHtml = '<table class="table table-striped table-bordered"><thead><tr>';
-        const allKeys = new Set();
-        data.forEach(row => {
-            Object.keys(row).forEach(key => allKeys.add(key));
-        });
-        allKeys.forEach(key => {
-            tableHtml += `<th>${key}</th>`;
-        });
-        tableHtml += '</tr></thead><tbody>';
+        // // Create table header
+        // let tableHtml = '<table class="table table-striped table-bordered"><thead><tr>';
+        // const allKeys = new Set();
+        // data.forEach(row => {
+        //     Object.keys(row).forEach(key => allKeys.add(key));
+        // });
+        // allKeys.forEach(key => {
+        //     tableHtml += `<th>${key}</th>`;
+        // });
+        // tableHtml += '</tr></thead><tbody>';
 
-        // Create table rows
-        data.forEach(row => {
-            tableHtml += '<tr>';
-            allKeys.forEach(key => {
-                let cellValue = row[key];
-                if (key === 'extracted_data' && typeof cellValue === 'string') {
-                    try {
-                        const parsedData = JSON.parse(cellValue);
-                        cellValue = JSON.stringify(parsedData, null, 2); // Pretty print JSON
-                    } catch (e) {
-                        // Keep as is if not valid JSON
-                    }
-                }
-                tableHtml += `<td><pre>${cellValue !== undefined ? cellValue : ''}</pre></td>`;
-            });
-            tableHtml += '</tr>';
-        });
-        tableHtml += '</tbody></table>';
-        outputDiv.innerHTML = tableHtml;
-        showToast('Tableau de synthèse généré avec succès.', 'success', elements);
+        // // Create table rows
+        // data.forEach(row => {
+        //     tableHtml += '<tr>';
+        //     allKeys.forEach(key => {
+        //         let cellValue = row[key];
+        //         if (key === 'extracted_data' && typeof cellValue === 'string') {
+        //             try {
+        //                 const parsedData = JSON.parse(cellValue);
+        //                 cellValue = JSON.stringify(parsedData, null, 2); // Pretty print JSON
+        //             } catch (e) {
+        //                 // Keep as is if not valid JSON
+        //             }
+        //         }
+        //         tableHtml += `<td><pre>${cellValue !== undefined ? cellValue : ''}</pre></td>`;
+        //     });
+        //     tableHtml += '</tr>';
+        // });
+        // tableHtml += '</tbody></table>';
+        // outputDiv.innerHTML = tableHtml;
+        showToast('Génération du tableau de synthèse non implémentée.', 'info');
     } catch (error) {
         console.error('Erreur lors de la génération du tableau de synthèse:', error);
         showToast('Erreur lors de la génération du tableau de synthèse.', 'error', elements);
@@ -108,17 +110,18 @@ export async function generateSummaryTable() {
 export async function exportSummaryTableExcel() {
     showLoadingOverlay(true, 'Exportation du tableau en Excel...', elements);
     try {
-        const response = await fetchAPI(`/projects/${appState.currentProject.id}/reports/summary-table/export/excel`, { rawResponse: true });
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `tableau_synthese_${appState.currentProject.id}.xlsx`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
-        showToast('Tableau exporté en Excel avec succès.', 'success', elements);
+        // TODO: Backend route for exporting summary table is missing.
+        // const response = await fetchAPI(`/projects/${appState.currentProject.id}/reports/summary-table/export/excel`, { rawResponse: true });
+        // const blob = await response.blob();
+        // const url = window.URL.createObjectURL(blob);
+        // const a = document.createElement('a');
+        // a.href = url;
+        // a.download = `tableau_synthese_${appState.currentProject.id}.xlsx`;
+        // document.body.appendChild(a);
+        // a.click();
+        // a.remove();
+        // window.URL.revokeObjectURL(url);
+        showToast('Exportation du tableau non implémentée.', 'info');
     } catch (error) {
         console.error('Erreur lors de l\'exportation du tableau en Excel:', error);
         showToast('Erreur lors de l\'exportation du tableau en Excel.', 'error', elements);

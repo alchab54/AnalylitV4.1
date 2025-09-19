@@ -205,7 +205,7 @@ export async function handleSaveGrid(event) {
 
     const payload = { name, description, fields: JSON.stringify(fields) };
     const method = gridId ? 'PUT' : 'POST';
-    const endpoint = gridId ? `/grids/${gridId}` : `/projects/${appState.currentProject.id}/grids`;
+    const endpoint = gridId ? `/projects/${appState.currentProject.id}/grids/${gridId}` : `/projects/${appState.currentProject.id}/grids`;
 
     try {
         const savedGrid = await fetchAPI(endpoint, { method, body: payload });
