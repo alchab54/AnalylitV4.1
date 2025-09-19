@@ -13,7 +13,7 @@ from rq.worker import Worker
 from werkzeug.utils import secure_filename
 
 # --- Imports des utilitaires et de la configuration ---
-from utils.database import init_database, with_db_session
+from utils.database import with_db_session
 from utils.app_globals import (
     processing_queue, synthesis_queue, analysis_queue, background_queue,
     extension_queue, redis_conn
@@ -49,6 +49,10 @@ def create_app(config=None):
     app = Flask(__name__)
     if config:
         app.config.update(config)
+
+    # Import et initialisation forcés
+    from utils.database import init_database
+    init_database() 
 
     import utils.models  # Force l'enregistrement des modèles SQLAlchemy
 
