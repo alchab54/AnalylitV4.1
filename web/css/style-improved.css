@@ -2501,3 +2501,39 @@ select.form-control {
   margin-bottom: var(--space-12); /* Réduit de 16px à 12px */
   display: block;
 }
+
+/* ========================= */
+/* === COMPACT MODE STYLES === */
+/* ========================= */
+
+/* Réduction des paddings et gaps quand le mode compact est actif */
+.compact .card__header,
+.compact .card__body,
+.compact .card__footer {
+  padding: var(--space-8);
+}
+
+.compact .btn {
+  padding: var(--space-6) var(--space-10);
+  min-height: 2rem;
+  font-size: var(--font-size-xs);
+}
+
+.compact .table th,
+.compact .table td {
+  padding: var(--space-4) var(--space-8);
+}
+
+.compact .app-nav__button {
+  padding: var(--space-6) var(--space-10);
+}
+
+.compact .section-header {
+  margin-bottom: var(--space-16);
+  gap: var(--space-12);
+}
+
+.compact .projects-grid,
+.compact .analysis-grid {
+  gap: var(--space-12);
+}

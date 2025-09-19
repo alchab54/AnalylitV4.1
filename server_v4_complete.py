@@ -294,13 +294,32 @@ def create_app(config=None):
     @app.route('/api/projects/<project_id>/import-zotero', methods=['POST'])
     @with_db_session
     def import_zotero_pdfs(session, project_id):
-        # Placeholder logic for Zotero PDF import
-        data = request.get_json()
-        pmids = data.get("articles", [])
-        # In a real scenario, we'd fetch Zotero credentials here
-        job = background_queue.enqueue(import_pdfs_from_zotero_task, project_id=project_id, pmids=pmids, zotero_user_id="test_user", zotero_api_key="test_key", job_timeout='1h')
-        return jsonify({"message": "Zotero PDF import started", "task_id": job.id}), 202
+        try:
+            # CORRECTION : Gestion robuste du type de contenu
+            if request.is_json:
+                data = request.get_json()
+            else:
+                data = request.form.to_dict()
+            
+            if not data:
+                return jsonify({"error": "Données requises"}), 400
 
+            pmids = data.get("articles", [])
+            zotero_user_id = data.get("zotero_user_id", "test_user")
+            zotero_api_key = data.get("zotero_api_key", "test_key")
+
+            job = background_queue.enqueue(
+                import_pdfs_from_zotero_task,
+                project_id=project_id,
+                pmids=pmids,
+                zotero_user_id=zotero_user_id,
+                zotero_api_key=zotero_api_key,
+                job_timeout='1h'
+            )
+            return jsonify({"message": "Zotero PDF import started", "task_id": str(job.id)}), 202
+        except Exception as e:
+            return jsonify({"error": f"Erreur de traitement: {str(e)}"}), 400
+        
     @app.route("/api/projects/<project_id>/upload-zotero", methods=["POST"])
     @with_db_session
     def upload_zotero(session, project_id):
@@ -503,7 +522,7 @@ def create_app(config=None):
             job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout='15m')
             # CORRECTION : Vérifier que job.id existe
             task_id = str(job.id) if job and job.id else "unknown"
-            return jsonify({"message": "Question soumise", "task_id": task_id}), 202
+        return jsonify({"message": "Question soumise", "task_id": str(job.id)}), 202
         except Exception as e:
             return jsonify({"error": f"Erreur lors de l'enqueue: {e}"}), 500
 

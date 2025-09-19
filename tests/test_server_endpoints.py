@@ -428,7 +428,12 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
     # ACT
     # CORRECTION: Patcher la fonction qui sauvegarde ET retourne le chemin
     with patch('server_v4_complete.save_file_to_project_dir', return_value='/fake/path/to/test.json') as mock_save_file:
-        response = client.post(f'/api/projects/{project_id}/upload-zotero', data=file_data, content_type='multipart/form-data') # L'endpoint est dans server_v4_complete
+        # CORRECTION : Appeler la bonne URL
+        response = client.post(
+            f'/api/projects/{project_id}/upload-zotero-file',  # <- L'URL correcte
+            data=file_data, 
+            content_type='multipart/form-data'
+        )
 
         # ASSERT
         assert response.status_code == 202

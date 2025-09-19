@@ -1,122 +1,285 @@
-# GUIDE CORRECTION BACKEND ANALYLIT V4.1
+# INSTRUCTIONS DÉTAILLÉES GEMINI AGENT - ANALYLIT V4.1
 
-## Persona
-Vous êtes un **Architecte Backend Senior** expert en Flask/SQLAlchemy/RQ, spécialisé dans le debugging d'applications API complexes et la correction de schémas de base de données. Vous maîtrisez parfaitement l'intégration entre les couches API, ORM, et queues de tâches asynchrones.
+## MISSION PRINCIPALE
+Finaliser le frontend JavaScript d'AnalyLit v4.1 en mode agent pour obtenir une application 100% fonctionnelle.
 
-## Contexte : Diagnostic Pytest Complet
-Après résolution des erreurs de syntaxe et d'imports, nous avons maintenant un diagnostic précis des problèmes backend d'AnalyLit v4.1. **75/115 tests passent (65%)**, mais **40 tests échouent** à cause de problèmes structurels identifiés.
+## ÉTAPE 1 : DIAGNOSTIC ET ANALYSE
+### Actions à effectuer :
+1. **Analyser tous les fichiers frontend existants** dans le dossier `web/`
+2. **Identifier précisément** les 48 fonctions manquant d'exports dans les 12 fichiers JS
+3. **Cartographier** les appels `fetchAPI` et vérifier leur cohérence avec `server_v4_complete.py`
+4. **Évaluer** l'état actuel de `index.html` et `style.css`
 
-## Analyse des Erreurs Critiques
+### Commandes d'analyse suggérées :
+```bash
+# Scanner les fichiers JS pour les exports manquants
+grep -n "function.*(" web/js/*.js | grep -v "export"
 
-### 🔥 PRIORITÉ 1 : Endpoints API Manquants (28 échecs)
-**Symptôme :** `405 Method Not Allowed` au lieu de `202 Accepted`
-**Diagnostic :** Le fichier `server_v4_complete.py` semble être un "stub" incomplet. De nombreux endpoints critiques manquent :
+# Vérifier les imports dans core.js
+grep "import.*from" web/js/core.js
 
-**Endpoints manquants identifiés :**
-- `POST /api/projects/{id}/run-discussion-draft` → `test_api_run_discussion_draft_enqueues_task`
-- `POST /api/projects/{id}/chat` → `test_api_post_chat_message_enqueues_task`
-- `POST /api/projects/{id}/run` → `test_api_run_pipeline_enqueues_tasks`
-- `POST /api/projects/{id}/run-analysis` → `test_api_run_advanced_analysis_enqueues_tasks`
-- `POST /api/projects/{id}/import-zotero` → `test_api_import_zotero_enqueues_task`
-- `POST /api/projects/{id}/upload-zotero` → `test_api_import_zotero_file_enqueues_task`
-- `POST /api/projects/{id}/run-rob-analysis` → `test_api_run_rob_analysis_enqueues_task`
-- `POST /api/search` → `test_api_search_enqueues_task`
-
-### 🏗️ PRIORITÉ 2 : Schéma Base de Données Incomplet (8 échecs)
-**Symptôme :** `relation "X" does not exist` et `column "Y" does not exist`
-**Tables/Colonnes manquantes :**
-
-```sql
--- Tables manquantes
-CREATE TABLE processing_log (
-    id SERIAL PRIMARY KEY,
-    project_id VARCHAR(36) NOT NULL,
-    article_id VARCHAR(100) NOT NULL,
-    step VARCHAR(50) NOT NULL,
-    status VARCHAR(20) NOT NULL,
-    details TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (project_id) REFERENCES projects(id)
-);
-
-CREATE TABLE search_results (
-    id SERIAL PRIMARY KEY,
-    project_id VARCHAR(36) NOT NULL,
-    query VARCHAR(500) NOT NULL,
-    database_name VARCHAR(50) NOT NULL,
-    total_results INTEGER DEFAULT 0,
-    results_data TEXT, -- JSON
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (project_id) REFERENCES projects(id)
-);
-
--- Colonnes manquantes
-ALTER TABLE risk_of_bias ADD COLUMN article_id VARCHAR(100);
-ALTER TABLE extractions ADD COLUMN extraction_data TEXT; -- JSON field
+# Lister les routes API backend
+grep "@api_bp.route" server_v4_complete.py
 ```
 
-### 📊 PRIORITÉ 3 : Modèles ORM Incomplets (4 échecs)
-**Symptôme :** `'Extraction' object has no attribute 'to_dict'`
-**Diagnostic :** Certains modèles manquent la méthode `to_dict()` standardisée
+## ÉTAPE 2 : CORRECTION SYSTÉMATIQUE DES EXPORTS
 
-**Modèles à corriger :**
-- `Extraction` → Ajouter `to_dict()`
-- `RiskOfBias` → Ajouter `to_dict()`
-- `ProcessingLog` → Créer le modèle complet
-- `SearchResult` → Créer le modèle complet
+### Liste EXACTE des fonctions à exporter par fichier :
 
-### ⚙️ PRIORITÉ 4 : Signatures de Fonctions Incohérentes
-**Symptôme :** `got an unexpected keyword argument 'session'`
-**Diagnostic :** Incohérences dans l'utilisation du décorateur `@with_db_session`
-
-## Votre Mission : Correction Systématique
-
-### ÉTAPE 1 : Implémenter les Endpoints API Manquants
-Analysez le fichier `server_v4_complete.py` actuel et implémentez tous les endpoints manquants en respectant le pattern existant :
-
-```python
-@api_bp.route('/projects/<project_id>/run-discussion-draft', methods=['POST'])
-def run_discussion_draft(project_id):
-    # Validation + Enqueue + Return 202
-    job = discussion_draft_queue.enqueue(
-        run_discussion_generation_task,
-        project_id=project_id,
-        job_timeout='1h'
-    )
-    return jsonify({'task_id': job.id, 'message': 'Génération du brouillon de discussion lancée'}), 202
+#### web/js/articles.js (8 exports à ajouter)
+```javascript
+export function handleDeleteSelectedArticles() { /* existing code */ }
+export function showBatchProcessModal() { /* existing code */ }
+export function startBatchProcessing() { /* existing code */ }
+export function showRunExtractionModal() { /* existing code */ }
+export function startFullExtraction() { /* existing code */ }
+export function toggleArticleSelection() { /* existing code */ }
+export function viewArticleDetails() { /* existing code */ }
+export function selectAllArticles() { /* existing code */ }
 ```
 
-### ÉTAPE 2 : Créer les Modèles ORM Manquants
-Ajoutez les modèles `ProcessingLog` et `SearchResult` dans le fichier des modèles, avec leurs méthodes `to_dict()`.
+#### web/js/analyses.js (9 exports à ajouter)
+```javascript
+export function handleRunDiscussionDraft() { /* existing code */ }
+export function handleRunKnowledgeGraph() { /* existing code */ }
+export function handleRunMetaAnalysis() { /* existing code */ }
+export function handleRunATNAnalysis() { /* existing code */ }
+export function showRunAnalysisModal() { /* existing code */ }
+export function runProjectAnalysis() { /* existing code */ }
+export function showPRISMAModal() { /* existing code */ }
+export function savePRISMAProgress() { /* existing code */ }
+export function exportPRISMAReport() { /* existing code */ }
+```
 
-### ÉTAPE 3 : Compléter les Modèles Existants
-Ajoutez les méthodes `to_dict()` manquantes aux modèles existants.
+#### web/js/validation.js (3 exports à ajouter)
+```javascript
+export function handleValidateExtraction() { /* existing code */ }
+export function resetValidationStatus() { /* existing code */ }
+export function filterValidationList() { /* existing code */ }
+```
 
-### ÉTAPE 4 : Corriger les Signatures de Fonctions
-Harmonisez l'utilisation du décorateur `@with_db_session` dans les fonctions de tâches.
+#### web/js/grids.js (5 exports à ajouter)
+```javascript
+export function handleDeleteGrid() { /* existing code */ }
+export function showGridFormModal() { /* existing code */ }
+export function addGridFieldInput() { /* existing code */ }
+export function removeGridField() { /* existing code */ }
+export function handleSaveGrid() { /* existing code */ }
+```
 
-## Contraintes Techniques
+#### web/js/import.js (7 exports à ajouter)
+```javascript
+export function handleZoteroImport() { /* existing code */ }
+export function showPmidImportModal() { /* existing code */ }
+export function handleUploadPdfs() { /* existing code */ }
+export function handleIndexPdfs() { /* existing code */ }
+export function handleZoteroSync() { /* existing code */ }
+export function processPmidImport() { /* existing code */ }
+export function exportForThesis() { /* existing code */ }
+```
 
-### Architecture Respectée
-- **Flask Blueprints** : Tous les endpoints dans `api_bp`
-- **RQ Queues** : Utilisez les bonnes queues (`processing_queue`, `analysis_queue`, etc.)
-- **Validation** : Toujours valider les données d'entrée
-- **Codes HTTP** : `202 Accepted` pour les tâches asynchrones, `201 Created` pour les créations
+#### web/js/chat.js (1 export à ajouter)
+```javascript
+export function sendChatMessage() { /* existing code */ }
+```
 
-### Patterns de Code
-- **Imports** : Importez les tâches depuis `tasks_v4_complete`
-- **Queue Usage** : `queue.enqueue(task_function, **kwargs, job_timeout='Xm')`
-- **Réponses JSON** : `{'task_id': job.id, 'message': 'Description'}` ou `{'error': 'Message'}`
-- **Gestion d'erreurs** : Blocs try/except avec codes d'erreur appropriés
+#### web/js/rob.js (3 exports à ajouter)
+```javascript
+export function handleRunRobAnalysis() { /* existing code */ }
+export function fetchAndDisplayRob() { /* existing code */ }
+export function handleSaveRobAssessment() { /* existing code */ }
+```
 
-## Fichiers à Analyser et Modifier
-1. **`server_v4_complete.py`** - Endpoints API principaux
-2. **`utils/models.py`** - Modèles ORM et méthodes to_dict()
-3. **`tasks_v4_complete.py`** - Signatures des fonctions de tâches
-4. **Scripts SQL** - Création des tables manquantes
+#### web/js/search.js (2 exports à ajouter)
+```javascript
+export function showSearchModal() { /* existing code */ }
+export function handleMultiDatabaseSearch() { /* existing code */ }
+```
 
-## Livrable Attendu
-Fournissez les fichiers complets corrigés qui résolvent systématiquement les 40 échecs de tests identifiés. Chaque correction doit être précise et respecter l'architecture existante.
+#### web/js/reporting.js (4 exports à ajouter)
+```javascript
+export function generateBibliography() { /* existing code */ }
+export function generateSummaryTable() { /* existing code */ }
+export function exportSummaryTableExcel() { /* existing code */ }
+export function savePrismaChecklist() { /* existing code */ }
+```
 
-## Validation
-Les corrections seront validées en relançant `pytest` - l'objectif est d'atteindre **95+ tests passants (82%+)** en résolvant les problèmes structurels identifiés.
+#### web/js/stakeholders.js (3 exports à ajouter)
+```javascript
+export function showStakeholderManagementModal() { /* existing code */ }
+export function addStakeholderGroup() { /* existing code */ }
+export function deleteStakeholderGroup() { /* existing code */ }
+```
+
+#### web/js/tasks.js (1 export à ajouter)
+```javascript
+export function setupTasksAutoRefresh() { /* existing code */ }
+```
+
+#### web/js/notifications.js (2 exports à ajouter)
+```javascript
+export function clearNotifications() { /* existing code */ }
+export function updateNotificationIndicator() { /* existing code */ }
+```
+
+## ÉTAPE 3 : VÉRIFICATION COHÉRENCE API
+
+### Routes critiques à vérifier dans server_v4_complete.py :
+1. `@api_bp.route('/projects', methods=['GET', 'POST'])`
+2. `@api_bp.route('/projects/<int:project_id>/export-thesis', methods=['GET'])`
+3. `@api_bp.route('/projects/<int:project_id>/run-analysis', methods=['POST'])`
+4. `@api_bp.route('/search', methods=['POST'])`
+5. `@api_bp.route('/projects/<int:project_id>/chat', methods=['POST'])`
+
+### Action requise :
+Pour chaque appel `fetchAPI` dans les fichiers JS, vérifier :
+- L'URL correspond à une route backend existante
+- Les données envoyées correspondent aux paramètres attendus
+- Le format de réponse est correctement traité
+
+## ÉTAPE 4 : MODERNISATION INTERFACE
+
+### web/index.html - Structure cible :
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnalyLit v4.1 - Alliance Thérapeutique Numérique</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation moderne et accessible -->
+    <nav class="main-nav" role="navigation">
+        <!-- Éléments de navigation avec data-action -->
+    </nav>
+    
+    <!-- Contenu principal -->
+    <main class="main-content" role="main">
+        <!-- Sections de l'application -->
+    </main>
+    
+    <!-- Modales et overlays -->
+    <div id="modal-container"></div>
+    
+    <!-- Scripts -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
+```
+
+### web/style.css - Design system moderne :
+```css
+:root {
+    /* Variables CSS pour cohérence */
+    --primary-color: #2dd4bf;
+    --secondary-color: #0d9488;
+    --accent-color: #14b8a6;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --background: #ffffff;
+    --surface: #f9fafb;
+    --border: #e5e7eb;
+    
+    /* Espacements */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    
+    /* Typographie */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+}
+
+/* Reset et base styles */
+* { box-sizing: border-box; }
+body { 
+    font-family: var(--font-family);
+    line-height: 1.6;
+    color: var(--text-primary);
+    background: var(--background);
+    margin: 0;
+}
+
+/* Components modernes */
+.btn { /* Styles boutons */ }
+.card { /* Styles cartes */ }
+.modal { /* Styles modales */ }
+.toast { /* Styles notifications */ }
+
+/* Layout responsive */
+@media (max-width: 768px) { /* Mobile styles */ }
+```
+
+## ÉTAPE 5 : TESTS ET VALIDATION
+
+### Checklist de validation :
+```bash
+# 1. Vérifier le chargement sans erreurs
+# Ouvrir http://localhost:8080 et inspecter la console (0 erreur)
+
+# 2. Tester navigation
+# Cliquer sur les éléments avec data-action="..."
+
+# 3. Vérifier WebSocket
+# Observer les notifications temps réel
+
+# 4. Tester fonctionnalités critiques
+# - Création projet
+# - Recherche multi-bases
+# - Screening IA
+# - Extraction ATN
+# - Export thèse
+```
+
+### Commandes de débogage :
+```javascript
+// Dans la console du navigateur
+console.log(window.appState); // Vérifier l'état global
+console.log(Object.keys(window)); // Voir les objets globaux
+```
+
+## ÉTAPE 6 : LIVRABLES FINAUX
+
+### Fichiers modifiés/créés :
+1. **web/js/*.js** - Tous les fichiers JS avec exports corrigés
+2. **web/index.html** - Structure moderne et accessible  
+3. **web/style.css** - Design system professionnel
+4. **web/app.js** - Améliorations si nécessaires
+
+### Documentation :
+1. **CHANGELOG.md** - Liste des corrections apportées
+2. **TESTS-FRONTEND.md** - Guide de tests de l'interface
+3. **README-FRONTEND.md** - Documentation frontend mise à jour
+
+## CONTRAINTES CRITIQUES
+
+### ❌ NE PAS MODIFIER :
+- `server_v4_complete.py` (backend intouchable)
+- `tasksv4_complete.py` (tâches backend)
+- Architecture existante (délégation d'événements via `core.js`)
+- Structure `appState` (source unique de vérité)
+
+### ✅ RESPECTER OBLIGATOIREMENT :
+- Sécurité : utiliser `escapeHtml` pour tout affichage DOM
+- Performance : lazy loading et optimisations
+- Accessibilité : attributs ARIA, navigation clavier
+- Responsive : design mobile-first
+
+## RÉSULTAT ATTENDU
+
+Une application AnalyLit v4.1 avec frontend **100% fonctionnel** permettant :
+- Navigation fluide entre toutes les sections
+- Utilisation complète des fonctionnalités ATN
+- Interface moderne et professionnelle
+- Aucune erreur console
+- Compatibilité mobile et desktop
+- Prête pour utilisation immédiate en recherche ATN
+
+**Priorité absolue : Rendre l'application immédiatement utilisable pour la finalisation d'une thèse sur l'Alliance Thérapeutique Numérique.**
