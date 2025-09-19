@@ -32,27 +32,6 @@ from tasks_v4_complete import (
 # Importer les modèles nécessaires pour la configuration des tests
 from utils.models import AnalysisProfile
 
-# Import the create_app function from your Flask application
-from server_v4_complete import create_app
-
-@pytest.fixture
-def app():
-    """Create and configure a new app instance for each test."""
-    # create the app with common test config
-    app = create_app({'TESTING': True})
-    yield app
-
-@pytest.fixture
-def client(app):
-    """A test client for the app."""
-    return app.test_client()
-
-@pytest.fixture
-def runner(app):
-    """A test runner for the app's Click commands."""
-    return app.test_cli_runner()
-
-# ---
 def test_health_check(client):
     """
     GIVEN un client de test Flask
