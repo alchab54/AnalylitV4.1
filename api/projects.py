@@ -5,9 +5,12 @@ import logging
 import uuid
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
-from utils.app_globals import background_queue, processing_queue, analysis_queue, discussion_draft_queue, q
-from utils.database import get_session as Session, with_db_session
+
+# CORRECTION : Imports propres et cohérents
+from utils.app_globals import background_queue, processing_queue, analysis_queue, discussion_draft_queue
+from utils.database import with_db_session, get_session
 from utils.models import Project, Grid, Extraction, AnalysisProfile
+from utils.file_handlers import save_file_to_project_dir
 from tasks_v4_complete import (
     run_discussion_generation_task,
     answer_chat_question_task,
@@ -22,9 +25,7 @@ from tasks_v4_complete import (
     add_manual_articles_task
 )
 from werkzeug.utils import secure_filename
-from utils.file_handlers import save_file_to_project_dir
-from utils.database import Session  # <-- Importez Session depuis le bon fichier
-from utils.app_globals import with_db_session, background_queue, processing_queue, analysis_queue, discussion_draft_queue, q
+
 projects_bp = Blueprint('projects_bp', __name__)
 logger = logging.getLogger(__name__)
 
@@ -269,19 +270,21 @@ def upload_zotero_file(project_id):
         return jsonify({"error": "Aucun fichier sélectionné"}), 400
 
     try:
+        from utils.app_globals import PROJECTS_DIR  # Import local
+        
         filename = secure_filename(file.filename)
         file_path = save_file_to_project_dir(file, project_id, filename, PROJECTS_DIR)
         
-        job = q.enqueue(
+        job = background_queue.enqueue(  # Utilisez background_queue au lieu de q
             import_from_zotero_file_task,
             project_id=project_id,
-            json_file_path=file_path
+            json_file_path=str(file_path)  # Convertir en string
         )
         return jsonify({"message": "Importation de fichier Zotero lancée", "job_id": job.id}), 202
     except Exception as e:
         logger.error(f"Erreur lors de l'upload du fichier Zotero: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
-
+    
 @projects_bp.route('/projects/<project_id>/run-rob-analysis', methods=['POST'])
 def run_rob_analysis(project_id):
     data = request.get_json()
