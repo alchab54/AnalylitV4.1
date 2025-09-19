@@ -22,8 +22,8 @@ from tasks_v4_complete import (
 )
 from werkzeug.utils import secure_filename
 from utils.file_handlers import save_file_to_project_dir
-from utils.app_globals import PROJECTS_DIR # Import PROJECTS_DIR
-
+from utils.database import Session  # <-- Importez Session depuis le bon fichier
+from utils.app_globals import with_db_session, background_queue, processing_queue, analysis_queue, discussion_draft_queue, q
 projects_bp = Blueprint('projects_bp', __name__)
 logger = logging.getLogger(__name__)
 
