@@ -598,6 +598,16 @@ def create_app(config=None):
     # La factory DOIT retourner l'objet app
     return app
 
+# À ajouter dans server_v4_complete.py
+def format_bibliography(articles):
+    """Format bibliography for thesis export."""
+    bibliography = []
+    for article in articles:
+        # Format simple pour les tests
+        citation = f"{article.get('authors', 'Unknown')}. ({article.get('publication_date', 'n.d.')}). {article.get('title', 'No title')}. {article.get('journal', 'Unknown journal')}."
+        bibliography.append(citation)
+    return bibliography
+
 # --- Point d'entrée pour Gunicorn et développement local ---
 # Gunicorn va chercher cette variable 'app'
 app = create_app()
