@@ -5,9 +5,8 @@ import logging
 from functools import wraps
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
-# ↓↓↓ MODIFIEZ CET IMPORT ↓↓↓
-from .db_base import Base  # Importer la Base partagée
- 
+from flask_sqlalchemy import SQLAlchemy
+
 logger = logging.getLogger(__name__)
 
 # --- Variables globales (non initialisées) ---
@@ -17,9 +16,17 @@ SessionFactory = None
 # Définir le schéma, mais le rendre None si en mode test
 SCHEMA = 'analylit_schema' if os.getenv('TESTING') != 'true' else None
 
-# ↓↓↓ AJOUTEZ CET IMPORT CI-DESSOUS ↓↓↓
-# Cela force l'enregistrement de tous les modèles auprès de la 'Base' déclarative
-from utils import models # noqa
+# Base déclarative
+Base = declarative_base()
+
+# Instance Flask-SQLAlchemy pour les tests
+db = SQLAlchemy()
+
+# Importer les modèles pour qu'ils soient enregistrés
+try:
+    from utils import models  # noqa
+except ImportError:
+    pass
 
 def init_database(database_url=None):
     """Initialise le moteur et la factory de session. Ne fait rien si déjà initialisé."""
@@ -28,11 +35,11 @@ def init_database(database_url=None):
         return engine
 
     if not database_url:
-        database_url = os.getenv("DATABASE_URL", "postgresql://user:pass@db/test") # URL générique
+        database_url = os.getenv("DATABASE_URL", "postgresql://user:pass@db/analylit_db")
 
     try:
         engine = create_engine(database_url, pool_pre_ping=True)
-        if SCHEMA: # Si on utilise PostgreSQL, on crée le schéma
+        if SCHEMA:  # Si on utilise PostgreSQL, on crée le schéma
             with engine.connect() as connection:
                 connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
                 connection.commit()
@@ -62,7 +69,7 @@ def with_db_session(func):
             return result
         except Exception as e:
             session.rollback()
-            logger.exception(f"Erreur DB dans {func.__name__}: {e}") # Rollback explicite
+            logger.exception(f"Erreur DB dans {func.__name__}: {e}")
             raise
         finally:
             session.close()
