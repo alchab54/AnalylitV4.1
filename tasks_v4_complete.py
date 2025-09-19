@@ -391,7 +391,7 @@ def process_single_article_task(session, project_id: str, article_id: str, profi
         justification = resp.get("justification", "N/A") if isinstance(resp, dict) else "Réponse IA invalide."
         session.execute(text("INSERT INTO extractions (id, project_id, pmid, title, relevance_score, relevance_justification, analysis_source, created_at) VALUES (:id, :pid, :pmid, :title, :score, :just, :src, :ts)"), {"id": str(uuid.uuid4()), "pid": project_id, "pmid": article_id, "title": article.get("title", ""), "score": score, "just": justification, "src": analysis_source, "ts": datetime.now().isoformat()})
 
-    increment_processed_count(session, project_id) # Correction: this was missing in one branch
+    increment_processed_count(session, project_id)
     update_project_timing(session, project_id, time.time() - start_time)
     send_project_notification(project_id, 'article_processed', f'Article "{article.get("title","" )[:30]}..." traité.', {'article_id': article_id})
 

@@ -6,28 +6,27 @@ Tests critiques pour le livrable final Excel + graphiques + métadonnées
 
 import pytest
 import json
-import uuid
-from sqlalchemy import text
 from unittest.mock import patch, MagicMock
-import openpyxl
 
-# AJOUTER :
-from utils.models import Project, SearchResult, Extraction  # ← AJOUTER CETTE LIGNE
+# --- Imports des modèles ---
+from utils.models import Project, SearchResult, Extraction
 
 class TestThesisExport:
-    """Tests complets export spécialisé thèse"""
+    """Tests complets pour l'export spécialisé thèse"""
 
+    # La fixture 'client' est maintenant injectée directement
     @patch('server_v4_complete.format_bibliography')
     @patch('pandas.DataFrame.to_excel')
-    def test_thesis_excel_export_comprehensive(self, mock_to_excel, mock_format_bib, db_session):
+    def test_thesis_excel_export_comprehensive(self, mock_to_excel, mock_format_bib, client, db_session):
         """
-        Test export Excel complet format thèse via API.
+        Test de l'export Excel complet format thèse via API.
         Vérifie que to_excel et format_bibliography sont appelés.
         """
-        
+        # --- ARRANGE (Préparation) ---
+        # Création des données de test via la fixture de session
         project = Project(name="Test Thesis Export", description="Desc", analysis_mode="screening")
         db_session.add(project)
-        db_session.flush() # Pour obtenir l'ID auto-généré
+        db_session.flush()  # Pour obtenir l'ID auto-généré
         project_id = project.id
 
         search_result = SearchResult(project_id=project_id, article_id="PMID1", title="Article 1", authors="Doe J", publication_date="2023", journal="Journal A")
@@ -39,55 +38,56 @@ class TestThesisExport:
         mock_to_excel.return_value = None
         mock_format_bib.return_value = ["Doe, J. (2023). Article 1. Journal A."]
 
-        from server_v4_complete import create_app
-        app = create_app()
-        with app.test_client() as client:
-            response = client.get(f'/api/projects/{project_id}/export/thesis')
+        # --- ACT (Action) ---
+        # Utiliser le client de test fourni par la fixture
+        response = client.get(f'/api/projects/{project_id}/export/thesis')
 
-        assert response.status_code == 200
-        assert response.content_type == 'application/zip'
-        assert 'attachment;filename=export_these_' in response.headers['Content-Disposition']
+        # --- ASSERT (Vérification) ---
+        assert response.status_code == 200, "La requête devrait réussir"
+        assert response.content_type == 'application/zip', "Le contenu doit être un fichier zip"
+        assert 'attachment;filename=export_these_' in response.headers['Content-Disposition'], "Le nom du fichier doit être correct"
         
         # Vérifier que les fonctions de génération de contenu ont été appelées
         mock_to_excel.assert_called()
         mock_format_bib.assert_called_once()
 
-    def test_prisma_scr_checklist_generation(self, db_session):
-        """Test génération et sauvegarde checklist PRISMA-ScR complète via API"""
-        
+    def test_prisma_scr_checklist_generation(self, client, db_session):
+        """Test de la génération et sauvegarde de la checklist PRISMA-ScR complète via API"""
+        # --- ARRANGE ---
         project = Project(name="Test PRISMA Checklist", description="Desc", analysis_mode="screening")
         db_session.add(project)
         db_session.flush()
         project_id = project.id
         db_session.commit()
 
-        from server_v4_complete import create_app
-        app = create_app()
-        with app.test_client() as client:
-            response_get = client.get(f'/api/projects/{project_id}/prisma-checklist')
-            assert response_get.status_code == 200
-            
-            prisma_checklist = json.loads(response_get.data)
-            # CORRECTION: La clé pour un item complété est 'checked', pas 'completed'.
-            prisma_checklist['sections'][0]['items'][0]['checked'] = True
-            prisma_checklist['sections'][0]['items'][0]['notes'] = "Titre vérifié par le test"
-
-            response_post = client.post(
-                f'/api/projects/{project_id}/prisma-checklist',
-                data=json.dumps({"checklist": prisma_checklist}),
-                content_type='application/json'
-            )
-            assert response_post.status_code == 200
-            
-            response_get_again = client.get(f'/api/projects/{project_id}/prisma-checklist')
-            assert response_get_again.status_code == 200
-            result = json.loads(response_get_again.data)
-            assert result['sections'][0]['items'][0]['checked'] is True
-            assert result['sections'][0]['items'][0]['notes'] == "Titre vérifié par le test"
-
-    def test_prisma_flow_diagram_generation(self, db_session):
-        """Test génération diagramme de flux PRISMA via API (task enqueue)"""
+        # --- ACT & ASSERT ---
+        # 1. Récupérer la checklist de base
+        response_get = client.get(f'/api/projects/{project_id}/prisma-checklist')
+        assert response_get.status_code == 200
         
+        prisma_checklist = response_get.json
+        
+        # 2. Modifier la checklist
+        prisma_checklist['sections'][0]['items'][0]['checked'] = True
+        prisma_checklist['sections'][0]['items'][0]['notes'] = "Titre vérifié par le test"
+
+        # 3. Sauvegarder la checklist modifiée
+        response_post = client.post(
+            f'/api/projects/{project_id}/prisma-checklist',
+            json={"checklist": prisma_checklist} # Utiliser 'json=' pour envoyer du JSON
+        )
+        assert response_post.status_code == 200
+        
+        # 4. Revérifier que les données ont bien été sauvegardées
+        response_get_again = client.get(f'/api/projects/{project_id}/prisma-checklist')
+        assert response_get_again.status_code == 200
+        result = response_get_again.json
+        assert result['sections'][0]['items'][0]['checked'] is True
+        assert result['sections'][0]['items'][0]['notes'] == "Titre vérifié par le test"
+
+    def test_prisma_flow_diagram_generation(self, client, db_session):
+        """Test de la génération du diagramme de flux PRISMA via API (mise en file d'attente de la tâche)"""
+        # --- ARRANGE ---
         project = Project(name="Test PRISMA Flow", description="Desc", analysis_mode="screening")
         db_session.add(project)
         db_session.flush()
@@ -95,21 +95,19 @@ class TestThesisExport:
         db_session.add(SearchResult(project_id=project_id, article_id="PMID1", title="Article 1"))
         db_session.commit()
 
-        from server_v4_complete import create_app
-        app = create_app()
-        with app.test_client() as client:
-            with patch('server_v4_complete.analysis_queue.enqueue') as mock_enqueue:
-                # Utiliser MagicMock pour un mock plus robuste
-                mock_job = MagicMock()
-                mock_job.id = "fake_prisma_task_id"
-                mock_enqueue.return_value = mock_job
-                
-                # CORRECTION: Utiliser le bon endpoint /run-analysis avec le payload correct
-                response = client.post(
-                    f'/api/projects/{project_id}/run-analysis',
-                    data=json.dumps({"type": "prisma_flow"}),
-                    content_type='application/json'
-                )
-                assert response.status_code == 202
-                assert 'task_id' in json.loads(response.data)
-                mock_enqueue.assert_called_once()
+        # --- ACT & ASSERT ---
+        with patch('server_v4_complete.analysis_queue.enqueue') as mock_enqueue:
+            mock_job = MagicMock()
+            mock_job.id = "fake_prisma_task_id"
+            mock_enqueue.return_value = mock_job
+            
+            # Utiliser le bon endpoint /run-analysis avec le payload correct
+            response = client.post(
+                f'/api/projects/{project_id}/run-analysis',
+                json={"type": "prisma_flow"}
+            )
+            
+            assert response.status_code == 202
+            assert 'task_id' in response.json
+            mock_enqueue.assert_called_once()
+

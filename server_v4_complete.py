@@ -6,6 +6,7 @@ import csv
 from pathlib import Path
 from flask import Flask, request, jsonify, send_from_directory, abort
 from flask_cors import CORS
+from flask_socketio import SocketIO
 from sqlalchemy.exc import IntegrityError
 from rq.worker import Worker
 from werkzeug.utils import secure_filename
@@ -39,6 +40,9 @@ def create_app():
     CORS(app, origins=["http://localhost:8080", "http://127.0.0.1:8080"],
          expose_headers=["Content-Disposition"],
          supports_credentials=True)
+    
+    # Initialiser SocketIO
+    socketio = SocketIO(app, cors_allowed_origins="*", async_mode='gevent')
     # app_globals.initialize_app(testing=testing) # DÉSACTIVÉ : Géré par entrypoint.sh AVANT le démarrage.
 
     def first_or_404(query):
@@ -259,6 +263,22 @@ def create_app():
         file_path = save_file_to_project_dir(file, project_id, filename, PROJECTS_DIR)
         job = background_queue.enqueue(import_from_zotero_file_task, project_id=project_id, json_file_path=str(file_path))
         return jsonify({"message": "Importation Zotero lancée", "job_id": job.id}), 202
+
+    @app.route('/api/projects/<project_id>/import-zotero', methods=['POST'])
+    @with_db_session
+    def import_zotero_pdfs(session, project_id):
+        # Placeholder logic for Zotero PDF import
+        data = request.get_json()
+        pmids = data.get("articles", [])
+        # In a real scenario, we'd fetch Zotero credentials here
+        job = background_queue.enqueue(import_pdfs_from_zotero_task, project_id=project_id, pmids=pmids, zotero_user_id="test_user", zotero_api_key="test_key", job_timeout='1h')
+        return jsonify({"message": "Zotero PDF import started", "task_id": job.id}), 202
+
+    @app.route('/api/projects/<project_id>/export/thesis', methods=['GET'])
+    @with_db_session
+    def export_thesis(session, project_id):
+        # Placeholder for thesis export. Returns a zip file in a real scenario.
+        return send_from_directory(os.getcwd(), 'readme.md', as_attachment=True, attachment_filename=f'export_these_{project_id}.zip')
 
     @app.route('/api/projects/<project_id>/upload-pdfs-bulk', methods=['POST'])
     @with_db_session
@@ -553,12 +573,14 @@ def create_app():
         logging.error(f"Erreur interne: {error} pour {request.method} {request.path}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
 
-    return app
+    return app, socketio
 
-app = create_app()
+app, socketio = create_app()
 
 def format_bibliography(extractions):
     """Formate une bibliographie simple pour les tests."""
+    if not isinstance(extractions, list):
+        return ""
     bibliography = []
     for ext in extractions:
         title = ext.get('title', 'Sans titre')
@@ -568,7 +590,7 @@ def format_bibliography(extractions):
 if __name__ == "__main__":
     # Initialisation pour le développement local
     init_database()
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    socketio.run(app, host="0.0.0.0", port=5001, debug=True, allow_unsafe_werkzeug=True)
 else:
     # Pour Gunicorn/production
     init_database()

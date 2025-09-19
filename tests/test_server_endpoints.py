@@ -414,22 +414,21 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
     file_data = {'file': (io.BytesIO(b'{"items": []}'), 'test.json')}
 
     # ACT
-    with patch('werkzeug.datastructures.FileStorage.save') as mock_save:
+    # CORRECTION: Patcher la fonction qui sauvegarde ET retourne le chemin
+    with patch('server_v4_complete.save_file_to_project_dir', return_value='/fake/path/to/test.json') as mock_save_file:
         response = client.post(f'/api/projects/{project_id}/upload-zotero', data=file_data, content_type='multipart/form-data') # L'endpoint est dans server_v4_complete
 
         # ASSERT
         assert response.status_code == 202
 
-        # Test que 'save' a été appelé
-        mock_save.assert_called_once()
-        saved_path = mock_save.call_args[0][0]
-        assert 'test.json' in saved_path
+        # Test que la fonction de sauvegarde a été appelée
+        mock_save_file.assert_called_once()
 
         # Test que la bonne tâche (task string) a été mise en file sur la file 'q'
         mock_q_enqueue.assert_called_once_with(
             import_from_zotero_file_task, # CORRECTION: C'est la fonction réelle, pas la chaîne
             project_id=project_id,
-            json_file_path=saved_path
+            json_file_path='/fake/path/to/test.json'
         )
 
         assert json.loads(response.data)['job_id'] == "zotero_file_job_q"
