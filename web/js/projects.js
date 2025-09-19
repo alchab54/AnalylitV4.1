@@ -7,8 +7,9 @@ import { showToast } from './ui-improved.js';
 /**
  * Charge la liste des projets depuis le backend et met à jour l'état global.
  */
-export async function loadProjects() {
+async function loadProjects() {
   try {
+    // On s'assure que l'URL n'a pas de slash final
     const projects = await fetchAPI('/api/projects');
     setProjects(projects);
   } catch (error) {
@@ -19,9 +20,9 @@ export async function loadProjects() {
 
 /**
  * Crée un nouveau projet côté backend.
- * @param {Object} projectData { name: string, description: string, ... }
+ * @param {Object} projectData - Données du projet { name, description }.
  */
-export async function createProject(projectData) {
+async function createProject(projectData) {
   try {
     const newProject = await fetchAPI('/api/projects', {
       method: 'POST',
@@ -33,68 +34,77 @@ export async function createProject(projectData) {
   } catch (error) {
     console.error('Erreur lors de la création du projet :', error);
     showToast('Erreur : impossible de créer le projet.', 'error');
-    throw error;
+    throw error; // Permet de bloquer la suite (ex: reset du form) si la création échoue
   }
 }
 
 /**
  * Supprime un projet côté backend.
- * @param {number|string} projectId 
+ * @param {number|string} projectId - L'ID du projet à supprimer.
  */
-export async function deleteProject(projectId) {
+async function deleteProject(projectId) {
   try {
     await fetchAPI(`/api/projects/${projectId}`, { method: 'DELETE' });
     showToast('Projet supprimé avec succès.', 'success');
   } catch (error) {
     console.error('Erreur lors de la suppression du projet :', error);
     showToast('Erreur : impossible de supprimer le projet.', 'error');
-    throw error;
+    throw error; // Propage l'erreur pour la gestion dans la fonction appelante
   }
 }
 
 /**
- * Demande confirmation et supprime un projet, puis recharge la liste.
- * @param {number|string} projectId 
+ * Demande une confirmation à l'utilisateur avant de lancer la suppression.
+ * @param {number|string} projectId - L'ID du projet.
  */
-export async function confirmDeleteProject(projectId) {
+async function confirmDeleteProject(projectId) {
   /* eslint-disable no-alert */
   if (window.confirm('Voulez-vous vraiment supprimer ce projet ?')) {
-    await deleteProject(projectId);
-    await loadProjects();
+    try {
+      await deleteProject(projectId);
+      await loadProjects(); // Recharge la liste des projets pour refléter la suppression
+    } catch (error) {
+      // Les erreurs sont déjà affichées par deleteProject, donc pas besoin de les gérer ici.
+    }
   }
 }
 
 /**
- * Gère la création d'un projet depuis un formulaire UI.
- * @param {Event} event 
+ * Gère la soumission du formulaire de création de projet.
+ * @param {Event} event - L'événement de soumission du formulaire.
  */
-export async function handleCreateProject(event) {
+async function handleCreateProject(event) {
   event.preventDefault();
   const form = event.currentTarget.closest('form');
+  if (!form) return;
+
   const formData = new FormData(form);
   const projectData = {
     name: formData.get('projectName'),
     description: formData.get('projectDescription'),
   };
+
   try {
     await createProject(projectData);
     form.reset();
-    await loadProjects();
-  } catch {
-    // erreurs gérées dans createProject
+    await loadProjects(); // Met à jour la liste des projets avec le nouveau
+  } catch (error) {
+    // L'erreur est déjà notifiée par createProject, on ne fait rien de plus ici.
   }
 }
 
 /**
- * Gère la suppression déclenchée depuis l'UI (data-action="delete-project").
- * @param {Event} event 
+ * Gère le clic sur le bouton de suppression d'un projet.
+ * @param {Event} event - L'événement du clic.
  */
-export function handleDeleteProject(event) {
+function handleDeleteProject(event) {
   const projectId = event.currentTarget.dataset.projectId;
-  confirmDeleteProject(projectId);
+  if (projectId) {
+    confirmDeleteProject(projectId);
+  }
 }
 
-// Exports finaux
+// Exportation unique et groupée de toutes les fonctions nécessaires
 export {
   loadProjects,
   createProject,
