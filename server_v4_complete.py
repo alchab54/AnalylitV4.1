@@ -22,6 +22,9 @@ from utils.models import Project, Grid, Extraction, Prompt, AnalysisProfile, Sea
 from utils.file_handlers import save_file_to_project_dir
 from utils.app_globals import PROJECTS_DIR as PROJECTS_DIR_STR
 from utils.prisma_scr import get_base_prisma_checklist
+# Import explicite des modèles pour forcer leur enregistrement
+import utils.models  # noqa
+
 
 # --- Imports des tâches asynchrones ---
 from tasks_v4_complete import (
