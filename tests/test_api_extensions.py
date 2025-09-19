@@ -31,7 +31,7 @@ def test_api_grid_management_workflow(client: FlaskClient, db_session: Session, 
     """
     Teste le workflow complet de gestion des grilles : Création (POST) et Récupération (GET). (No changes needed)
     """
-    project_id = setup_project
+    project_id = setup_project # setup_project est déjà l'ID
     
     # 1. Tester l'import d'une grille (POST /projects/<id>/grids/import)
     # (Nous testons l'import car l'endpoint POST simple est moins critique que le flux d'import)

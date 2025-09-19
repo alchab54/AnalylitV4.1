@@ -1,68 +1,51 @@
 # conftest.py
 import pytest
-from sqlalchemy import create_engine, event
-from sqlalchemy.orm import sessionmaker, scoped_session
+import os
 import uuid
 from datetime import datetime
 
 # --- Imports corrigés ---
-from utils.database import init_database, Base # Importer Base pour la création des tables
+from utils.database import Base, get_session as get_db_session # Importer Base pour la création des tables
 from server_v4_complete import create_app
-
-# Créer une instance de moteur unique pour la session de test
-engine = create_engine("sqlite:///:memory:")
 
 @pytest.fixture(scope="session")
 def app():
-    """Crée l'application Flask pour les tests."""
-    app = create_app() # Le mode 'testing' est déjà géré dans create_app
-    app.config['TESTING'] = True
+    """Crée une instance de l'application Flask pour la session de test."""
+    # Configurer l'application pour utiliser la base de données de test PostgreSQL
+    test_db_url = os.getenv("TEST_DATABASE_URL", "postgresql://analylit_user:strong_password@db/analylit_db_test")
+    
+    # Forcer le mode test et l'URL de la DB
+    os.environ['TESTING'] = 'true'
+    os.environ['DATABASE_URL'] = test_db_url
+    
+    app = create_app()
+    
+    # Crée un contexte d'application pour que les sessions fonctionnent
     with app.app_context():
         yield app
 
 @pytest.fixture(scope="function")
 def client(app):
-    """
-    Provides a Flask test client for each test.
-    """
+    """Fournit un client de test Flask pour chaque test."""
     with app.test_client() as c:
         yield c
 
-@pytest.fixture(scope="function", autouse=True)
-def db_session(app):
+@pytest.fixture(scope="function")
+def db_session(app, request):
     """
-    Fixture transactionnelle qui assure l'isolation entre les tests.
-    Utilise des transactions imbriquées avec rollback automatique.
+    Fixture qui assure une base de données propre pour chaque test en utilisant la connexion de l'app.
     """
-    # S'assurer que les tables sont créées une seule fois par session de test
+    from utils.database import engine
+    
+    # Crée les tables au début de chaque test
     Base.metadata.create_all(bind=engine)
-
-    # Création d'une connexion dédiée aux tests
-    connection = engine.connect()
-    transaction = connection.begin()
     
-    # Configuration d'une session avec transaction imbriquée
-    session = scoped_session(
-        sessionmaker(bind=connection, expire_on_commit=False)
-    )
-        
-    # Démarre une transaction imbriquée (savepoint)
-    session.begin_nested()
-    
-    # Configure l'écoute pour redémarrer automatiquement les savepoints
-    @event.listens_for(session, "after_transaction_end")
-    def restart_savepoint(current_session, previous_transaction):
-        if previous_transaction.nested and not previous_transaction._parent.nested:
-            current_session.begin_nested()
+    session = get_db_session()
     
     yield session
     
-    # Nettoyage : supprime l'écouteur et effectue le rollback
-    event.remove(session, "after_transaction_end", restart_savepoint)
+    # Nettoyage après chaque test
     session.close()
-    transaction.rollback()
-    connection.close()
-    # Supprime toutes les données après chaque test pour une isolation complète
     Base.metadata.drop_all(bind=engine)
 
 @pytest.fixture(scope="function")
@@ -90,7 +73,7 @@ def setup_project(db_session): # Renommé de 'test_project' pour correspondre à
     db_session.add(project)
     db_session.commit()
     
-    yield project.id
+    yield project # Retourne l'objet projet complet, pas seulement l'ID
     
     # Le nettoyage est automatique grâce au rollback transactionnel
 

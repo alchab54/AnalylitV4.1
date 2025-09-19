@@ -40,7 +40,6 @@ def create_app():
          expose_headers=["Content-Disposition"],
          supports_credentials=True)
     # app_globals.initialize_app(testing=testing) # DÉSACTIVÉ : Géré par entrypoint.sh AVANT le démarrage.
-    # app_globals.initialize_app(testing=testing)  # DÉSACTIVÉ : Géré par entrypoint.sh AVANT le démarrage.
 
     def first_or_404(query):
         result = query.first()
@@ -251,7 +250,6 @@ def create_app():
         session.commit()
         return jsonify({"message": f"{count} validations ont été importées pour l'évaluateur {evaluator_name}."}), 200
 
-    # ==================== ROUTES API IMPORT/EXPORT & FILES ====================
     @app.route("/api/projects/<project_id>/upload-zotero", methods=["POST"])
     def upload_zotero_file(project_id):
         if 'file' not in request.files:
@@ -261,7 +259,7 @@ def create_app():
         file_path = save_file_to_project_dir(file, project_id, filename, PROJECTS_DIR)
         job = background_queue.enqueue(import_from_zotero_file_task, project_id=project_id, json_file_path=str(file_path))
         return jsonify({"message": "Importation Zotero lancée", "job_id": job.id}), 202
-        
+
     @app.route('/api/projects/<project_id>/upload-pdfs-bulk', methods=['POST'])
     @with_db_session
     def upload_pdfs_bulk(session, project_id):

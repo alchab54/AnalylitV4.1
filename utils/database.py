@@ -62,12 +62,9 @@ def with_db_session(func):
             return result
         except Exception as e:
             session.rollback()
-            logger.exception(f"Erreur DB dans {func.__name__}: {e}")
+            logger.exception(f"Erreur DB dans {func.__name__}: {e}") # Rollback explicite
             raise
         finally:
-            # La fixture de test ou le contexte de l'application Flask gère le cycle de vie de la session.
-            # L'appel à session.close() est correct pour retourner la connexion au pool,
-            # mais session.remove() (qui n'existe pas sur l'instance de session) ne doit pas être appelé.
             session.close()
     return wrapper
 

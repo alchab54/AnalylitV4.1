@@ -174,7 +174,7 @@ def test_process_single_article_task_insufficient_content(db_session, mocker):
         "écarté", 
         "Contenu textuel insuffisant."
     )
-    mock_increment_processed_count.assert_called_once_with(session, project_id)
+    mock_increment_processed_count.assert_called_once_with(db_session, project_id)
 
 
 @pytest.mark.gpu

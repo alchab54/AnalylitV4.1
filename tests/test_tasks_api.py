@@ -127,17 +127,17 @@ def test_get_tasks_status(client):
         # 1. started_job_registry
         # 2. get_job_ids() (pour les queued jobs)
         # 3. finished_job_registry
-        # 4. failed_job_registry
+        # 4. failed_job_registry 
         # Et cela pour chaque queue (processing_queue, synthesis_queue, analysis_queue, background_queue)
         # Pour ce test, nous allons simuler les réponses pour la première queue seulement
         # et des listes vides pour les appels suivants pour les autres queues.
         mock_fetch_many.side_effect = [
-            [mock_started_job], # Pour queue.started_job_registry.get_job_ids()
-            [mock_queued_job],  # Pour queue.get_job_ids()
-            [],                 # Pour queue.finished_job_registry.get_job_ids()
-            [],                 # Pour queue.failed_job_registry.get_job_ids()
+            [mock_started_job], # processing_queue.started_job_registry
+            [mock_queued_job],  # processing_queue.get_job_ids()
+            [],                 # processing_queue.finished_job_registry
+            [],                 # processing_queue.failed_job_registry
             # Répéter des listes vides pour les appels des autres queues
-            [], [], [], [],
+            [], [], [], [], # synthesis_queue
             [], [], [], [],
             [], [], [], []
         ]

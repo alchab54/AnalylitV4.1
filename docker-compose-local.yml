@@ -66,6 +66,7 @@ services:
       - TESTING=true
       - FLASK_ENV=testing
       - POSTGRES_HOST=db
+      - TEST_DATABASE_URL=postgresql://analylit_user:strong_password@db/analylit_db_test
       - POSTGRES_PORT=5432
       - PYTHONPATH=/home/appuser/app # Assure que le chemin est correct
     env_file:
@@ -104,6 +105,7 @@ services:
       - PYTHONUNBUFFERED=1
       - PYTHONPATH=/home/appuser/app # CORRECTION DÉFINITIVE
       - TESTING=true
+      - TEST_DATABASE_URL=postgresql://analylit_user:strong_password@db/analylit_db_test
       - FLASK_ENV=testing
     command: >
       rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4

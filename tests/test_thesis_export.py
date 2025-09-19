@@ -19,21 +19,21 @@ class TestThesisExport:
 
     @patch('server_v4_complete.format_bibliography')
     @patch('pandas.DataFrame.to_excel')
-    def test_thesis_excel_export_comprehensive(self, mock_to_excel, mock_format_bib, session):
+    def test_thesis_excel_export_comprehensive(self, mock_to_excel, mock_format_bib, db_session):
         """
         Test export Excel complet format thèse via API.
         Vérifie que to_excel et format_bibliography sont appelés.
         """
         
         project = Project(name="Test Thesis Export", description="Desc", analysis_mode="screening")
-        session.add(project)
-        session.flush() # Pour obtenir l'ID auto-généré
+        db_session.add(project)
+        db_session.flush() # Pour obtenir l'ID auto-généré
         project_id = project.id
 
         search_result = SearchResult(project_id=project_id, article_id="PMID1", title="Article 1", authors="Doe J", publication_date="2023", journal="Journal A")
         extraction = Extraction(project_id=project_id, pmid="PMID1", user_validation_status="include")
-        session.add_all([search_result, extraction])
-        session.commit()
+        db_session.add_all([search_result, extraction])
+        db_session.commit()
 
         # Configurer les mocks
         mock_to_excel.return_value = None
@@ -52,14 +52,14 @@ class TestThesisExport:
         mock_to_excel.assert_called()
         mock_format_bib.assert_called_once()
 
-    def test_prisma_scr_checklist_generation(self, session):
+    def test_prisma_scr_checklist_generation(self, db_session):
         """Test génération et sauvegarde checklist PRISMA-ScR complète via API"""
         
         project = Project(name="Test PRISMA Checklist", description="Desc", analysis_mode="screening")
-        session.add(project)
-        session.flush()
+        db_session.add(project)
+        db_session.flush()
         project_id = project.id
-        session.commit()
+        db_session.commit()
 
         from server_v4_complete import create_app
         app = create_app()
@@ -85,15 +85,15 @@ class TestThesisExport:
             assert result['sections'][0]['items'][0]['checked'] is True
             assert result['sections'][0]['items'][0]['notes'] == "Titre vérifié par le test"
 
-    def test_prisma_flow_diagram_generation(self, session):
+    def test_prisma_flow_diagram_generation(self, db_session):
         """Test génération diagramme de flux PRISMA via API (task enqueue)"""
         
         project = Project(name="Test PRISMA Flow", description="Desc", analysis_mode="screening")
-        session.add(project)
-        session.flush()
+        db_session.add(project)
+        db_session.flush()
         project_id = project.id
-        session.add(SearchResult(project_id=project_id, article_id="PMID1", title="Article 1"))
-        session.commit()
+        db_session.add(SearchResult(project_id=project_id, article_id="PMID1", title="Article 1"))
+        db_session.commit()
 
         from server_v4_complete import create_app
         app = create_app()
