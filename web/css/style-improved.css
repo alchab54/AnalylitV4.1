@@ -739,7 +739,6 @@ select.form-control {
 
 /* END PERPLEXITY DESIGN SYSTEM */
 :root {
-  /* ===== DESIGN SYSTEM TOKENS ===== */
   
   /* Use design system color tokens */
   --color-white: var(--color-white);
@@ -916,6 +915,17 @@ select.form-control {
   --container-xl: var(--container-xl);
   --container-2xl: var(--container-xl);
 }
+
+/* ============================ */
+/* === Global Reset & Setup === */
+/* ============================ */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+}
+
 
 /* ===== MODE SOMBRE ===== */
 [data-color-scheme="dark"] {
@@ -1307,13 +1317,13 @@ select.form-control {
 }
 
 .card__header {
-  padding: var(--space-24);
+  padding: var(--space-12);
   border-bottom: 1px solid var(--color-card-border-inner);
   background: var(--color-surface);
 }
 
 .card__body {
-  padding: var(--space-24);
+  padding: var(--space-16);
 }
 
 .card__footer {
@@ -1367,7 +1377,7 @@ select.form-control {
 
 /* ===== EN-TÊTE ===== */
 .app-header {
-  background: var(--color-surface);
+  background: var(--color-surface-elevated);
   border-bottom: 1px solid var(--color-border);
   padding: var(--space-16) 0;
   position: sticky;
@@ -1380,7 +1390,7 @@ select.form-control {
 .app-header__content {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: center; /* Keep vertical alignment */
   gap: var(--space-16);
 }
 
@@ -1416,7 +1426,7 @@ select.form-control {
 .app-header__right {
   display: flex;
   align-items: center;
-  gap: var(--space-16);
+  gap: var(--space-12);
 }
 
 .connection-status {
@@ -1446,7 +1456,7 @@ select.form-control {
 .app-nav {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
-  padding: var(--space-8) 0;
+  padding: var(--space-4) 0;
 }
 
 .app-nav__list {
@@ -1471,7 +1481,7 @@ select.form-control {
 .app-nav__button {
   background: none;
   border: none;
-  padding: var(--space-10) var(--space-16);
+  padding: var(--space-8) var(--space-12);
   border-radius: var(--radius-lg);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
@@ -1502,7 +1512,8 @@ select.form-control {
 /* ===== CONTENU PRINCIPAL ===== */
 .app-main {
   min-height: calc(100vh - 140px);
-  padding: var(--space-32) 0;
+  padding: 16px 0;
+  min-height: calc(100vh - 100px); /* Hauteur ajustée de façon compacte */
 }
 
 .section {
@@ -1528,7 +1539,7 @@ select.form-control {
 .section-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center; /* Changed to center for better alignment with reduced space */
   margin-bottom: var(--space-32);
   gap: var(--space-24);
 }
@@ -1543,7 +1554,7 @@ select.form-control {
 
 .section-header__actions {
   display: flex;
-  gap: var(--space-12);
+  gap: var(--space-8);
   flex-shrink: 0;
 }
 
@@ -1560,7 +1571,7 @@ select.form-control {
 
 .table th {
   background: var(--color-secondary);
-  padding: var(--space-16);
+  padding: var(--space-8) var(--space-12); /* Further reduction */
   text-align: left;
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
@@ -1569,7 +1580,7 @@ select.form-control {
 }
 
 .table td {
-  padding: var(--space-16);
+  padding: var(--space-8) var(--space-12); /* Further reduction */
   border-bottom: 1px solid var(--color-card-border-inner);
   font-size: var(--font-size-sm);
   vertical-align: top;
@@ -1643,7 +1654,7 @@ select.form-control {
 }
 
 .modal__header {
-  padding: var(--space-24);
+  padding: var(--space-16);
   border-bottom: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;
@@ -1678,13 +1689,13 @@ select.form-control {
 }
 
 .modal__body {
-  padding: var(--space-24);
+  padding: var(--space-16);
   overflow-y: auto;
   flex: 1;
 }
 
 .modal__actions {
-  display: flex;
+  display: flex; /* Keep as flex */
   gap: var(--space-12);
   justify-content: flex-end;
   margin-top: var(--space-24);
@@ -1892,7 +1903,7 @@ select.form-control {
 .gap-2 { gap: var(--space-8); }
 .gap-3 { gap: var(--space-12); }
 .gap-4 { gap: var(--space-16); }
-.gap-6 { gap: var(--space-24); }
+.gap-6 { gap: var(--space-16); } /* Reduced from 24px */
 .gap-8 { gap: var(--space-32); }
 
 .hidden { display: none; }
@@ -1900,6 +1911,21 @@ select.form-control {
 .inline-block { display: inline-block; }
 
 /* ===== RESPONSIVE ===== */
+
+/* Spacing utility classes for compact design */
+.no-margin {
+  margin: 0 !important;
+}
+.no-padding {
+  padding: 0 !important;
+}
+.compact-spacing > * + * {
+  margin-top: var(--space-8) !important; /* Compact spacing between children */
+}
+.tight-spacing > * + * {
+  margin-top: var(--space-4) !important; /* Tighter spacing between children */
+}
+
 @media (max-width: 768px) {
   .container {
     padding-left: var(--space-16);
@@ -2004,14 +2030,11 @@ select.form-control {
 
   .card__header,
   .card__body,
-  .card__footer {
-    padding: var(--space-16);
-  }
-
+  .card__footer,
   .modal__header,
   .modal__body,
   .modal__actions {
-    padding: var(--space-16);
+    padding: var(--space-12);
   }
 
   .toast-container {
@@ -2031,7 +2054,7 @@ select.form-control {
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--space-24);
+  gap: var(--space-16);
   margin-bottom: var(--space-32);
 }
 
@@ -2074,13 +2097,13 @@ select.form-control {
 .project-card__stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-16);
+  gap: var(--space-8);
   margin-bottom: var(--space-16);
 }
 
 .stat-item {
   text-align: center;
-  padding: var(--space-12);
+  padding: var(--space-8);
   background: var(--color-secondary);
   border-radius: var(--radius-lg);
 }
@@ -2112,7 +2135,7 @@ select.form-control {
 .analysis-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--space-24);
+  gap: var(--space-16);
 }
 
 .analysis-card {
@@ -2148,7 +2171,7 @@ select.form-control {
 .chat-messages {
   height: 400px;
   overflow-y: auto;
-  padding: var(--space-16);
+  padding: var(--space-12);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -2157,7 +2180,7 @@ select.form-control {
 
 .chat-message {
   margin-bottom: var(--space-16);
-  padding: var(--space-12) var(--space-16);
+  padding: var(--space-8) var(--space-12);
   border-radius: var(--radius-lg);
   max-width: 80%;
   animation: slideIn 0.3s var(--transition-base);
@@ -2204,7 +2227,7 @@ select.form-control {
 .results-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: center; /* Keep vertical alignment */
   margin-bottom: var(--space-24);
   padding: var(--space-20);
   background: var(--color-surface);
@@ -2214,7 +2237,7 @@ select.form-control {
 
 .results-stats {
   display: flex;
-  gap: var(--space-16);
+  gap: var(--space-12);
   align-items: center;
 }
 
@@ -2229,12 +2252,12 @@ select.form-control {
 .import-sections {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: var(--space-24);
+  gap: var(--space-16);
 }
 
 .import-card {
-  padding: var(--space-24);
-  display: flex;
+  padding: var(--space-16);
+  display: flex; /* Keep as flex */
   flex-direction: column;
   gap: var(--space-16);
 }
@@ -2247,13 +2270,13 @@ select.form-control {
 /* Validation */
 .validation-filters {
   display: flex;
-  gap: var(--space-8);
+  gap: var(--space-6);
   margin-bottom: var(--space-24);
   flex-wrap: wrap;
 }
 
 .filter-btn {
-  padding: var(--space-8) var(--space-16);
+  padding: var(--space-4) var(--space-10); /* Further reduction */
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text-secondary);
@@ -2278,13 +2301,13 @@ select.form-control {
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: var(--space-16);
+  gap: var(--space-12);
   margin-bottom: var(--space-32);
 }
 
 .metric-card {
   text-align: center;
-  padding: var(--space-20);
+  padding: var(--space-12);
   background: var(--color-surface);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
@@ -2394,6 +2417,11 @@ select.form-control {
 }
 
 @media (max-width: 480px) {
+  .app-main {
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-16);
+  }
+
   .projects-grid {
     grid-template-columns: 1fr;
     gap: var(--space-16);
@@ -2449,4 +2477,27 @@ select.form-control {
   .results-actions .btn {
     flex: 1;
   }
+}
+
+/* ===== PLACEHOLDERS ===== */
+.project-placeholder,
+.results-placeholder,
+.validation-placeholder,
+.chat-welcome {
+  padding: var(--space-20);
+  margin: var(--space-8) 0;
+  text-align: center;
+  color: var(--color-text-secondary);
+  background-color: var(--color-secondary);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.project-placeholder__icon,
+.results-placeholder__icon,
+.validation-placeholder__icon,
+.chat-welcome__icon {
+  font-size: var(--font-size-3xl); /* Réduit de 30px à 24px */
+  margin-bottom: var(--space-12); /* Réduit de 16px à 12px */
+  display: block;
 }

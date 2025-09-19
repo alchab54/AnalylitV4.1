@@ -271,19 +271,19 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
     all_records_to_insert = []
     failed_databases = []
     for db_name in databases:
-        logger.info(f"ðŸ“š Recherche dans {db_name}...")
         results = []
 
         # Déterminer la requête à utiliser pour cette base de données spécifique
         if expert_queries and db_name in expert_queries and expert_queries[db_name].strip():
             current_query = expert_queries[db_name]
         else:
-            current_query = query # Fallback sur la requête simple
+            current_query = query  # Fallback sur la requête simple
 
         if not current_query or not current_query.strip():
             logger.info(f"Requête vide pour {db_name}, base de données ignorée.")
             continue
 
+        logger.info(f"ðŸ“š Recherche dans {db_name}...")
         try:
             if db_name == 'pubmed':
                 results = db_manager.search_pubmed(current_query, max_results_per_db)
