@@ -1,4 +1,4 @@
-# tests/conftest.py
+# tests/conftest.py - Remplacez le contenu COMPLET par :
 import pytest
 from server_v4_complete import create_app
 from utils.database import init_database, get_session
@@ -11,7 +11,6 @@ def app():
         'WTF_CSRF_ENABLED': False
     })
     
-    # CRUCIAL : Initialiser la base de données dans le contexte de l'app
     with app.app_context():
         init_database()
     
@@ -24,23 +23,36 @@ def client(app):
 
 @pytest.fixture
 def db_session(app):
-    """Session de base de données pour chaque test."""
+    """Session de base de données ISOLÉE pour chaque test."""
     with app.app_context():
         session = get_session()
+        
+        # NETTOYAGE AVANT chaque test
+        from utils.models import Project, AnalysisProfile, SearchResult, Extraction, Grid, ChatMessage, RiskOfBias, Prompt
+        session.query(ChatMessage).delete()
+        session.query(RiskOfBias).delete()
+        session.query(Extraction).delete()
+        session.query(SearchResult).delete()
+        session.query(Grid).delete()
+        session.query(Project).delete()
+        session.query(AnalysisProfile).delete()
+        session.query(Prompt).delete()
+        session.commit()
+        
         yield session
         session.close()
 
 @pytest.fixture
 def setup_project(app, db_session):
-    """Crée un projet de test."""
-    from utils.models import Project
+    """Crée un projet de test UNIQUE."""
     import uuid
+    from utils.models import Project
     from datetime import datetime
     
     with app.app_context():
         project = Project(
             id=str(uuid.uuid4()),
-            name="Test Project", 
+            name=f"Test Project {uuid.uuid4().hex[:8]}", # Nom unique
             description="Projet de test",
             analysis_mode="screening",
             created_at=datetime.utcnow()
@@ -63,13 +75,3 @@ def mock_queue():
     mock_q = MagicMock()
     mock_q.enqueue = MagicMock()
     return mock_q
-
-@pytest.fixture(autouse=True)
-def clean_between_tests(db_session):
-    """Nettoie la base entre chaque test."""
-    yield
-    # Nettoyage après chaque test
-    try:
-        db_session.rollback()
-    except:
-        pass

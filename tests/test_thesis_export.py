@@ -23,6 +23,10 @@ class TestThesisExport:
         Vérifie que to_excel et format_bibliography sont appelés.
         """
         # --- ARRANGE (Préparation) ---
+        # Configurer les mocks
+        mock_to_excel.return_value = None
+        mock_format_bib.return_value = ["Doe, J. (2023). Article 1. Journal A."]
+
         # Création des données de test via la fixture de session
         project = Project(name="Test Thesis Export", description="Desc", analysis_mode="screening")
         db_session.add(project)
@@ -34,10 +38,6 @@ class TestThesisExport:
         db_session.add_all([search_result, extraction])
         db_session.commit()
 
-        # Configurer les mocks
-        mock_to_excel.return_value = None
-        mock_format_bib.return_value = ["Doe, J. (2023). Article 1. Journal A."]
-
         # --- ACT (Action) ---
         # Utiliser le client de test fourni par la fixture
         response = client.get(f'/api/projects/{project_id}/export/thesis')
@@ -45,10 +45,10 @@ class TestThesisExport:
         # --- ASSERT (Vérification) ---
         assert response.status_code == 200, "La requête devrait réussir"
         assert response.content_type == 'application/zip', "Le contenu doit être un fichier zip"
-        assert 'attachment; filename=export_these_' in response.headers['Content-Disposition'], "Le nom du fichier doit être correct" # Note l'espace après le point-virgule
+        assert 'attachment; filename=export_these_' in response.headers['Content-Disposition'], "Le nom du fichier doit être correct"
         
         # Vérifier que les fonctions de génération de contenu ont été appelées
-        mock_to_excel.assert_called()
+        mock_to_excel.assert_called_once()
         mock_format_bib.assert_called_once()
 
     def test_prisma_scr_checklist_generation(self, client, db_session):
