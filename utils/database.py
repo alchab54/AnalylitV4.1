@@ -16,13 +16,8 @@ SessionFactory = None
 # Définir le schéma, mais le rendre None si en mode test
 SCHEMA = 'analylit_schema' if os.getenv('TESTING') != 'true' else None
 
-# Base déclarative
+# Base déclarative partagée
 Base = declarative_base()
-# CORRECTION : Import forcé APRÈS la définition de Base
-from utils.models import (
-    Project, AnalysisProfile, SearchResult, Extraction, 
-    Grid, ChatMessage, RiskOfBias, Prompt
-)  # noqa
 
 # Instance Flask-SQLAlchemy pour les tests
 db = SQLAlchemy()

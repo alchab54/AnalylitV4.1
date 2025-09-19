@@ -1,4 +1,4 @@
-# tests/conftest.py - Version simplifiée
+# tests/conftest.py
 import pytest
 from server_v4_complete import create_app
 from utils.database import init_database, get_session
@@ -20,6 +20,28 @@ def app():
 def client(app):
     """Client de test Flask."""
     return app.test_client()
+
+@pytest.fixture(autouse=True)
+def clean_db_before_test(app):
+    """Nettoie la base avant CHAQUE test automatiquement."""
+    with app.app_context():
+        try:
+            from utils.models import Project, AnalysisProfile, SearchResult, Extraction, Grid, ChatMessage, RiskOfBias, Prompt
+            session = get_session()
+            
+            # Nettoyage dans l'ordre des dépendances
+            session.query(ChatMessage).delete()
+            session.query(RiskOfBias).delete()
+            session.query(Extraction).delete()
+            session.query(SearchResult).delete()
+            session.query(Grid).delete()
+            session.query(Project).delete()
+            session.query(AnalysisProfile).delete()
+            session.query(Prompt).delete()
+            session.commit()
+            session.close()
+        except Exception:
+            pass  # Ignore les erreurs de nettoyage
 
 @pytest.fixture
 def db_session(app):
