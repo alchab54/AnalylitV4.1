@@ -50,6 +50,8 @@ def create_app(config=None):
     if config:
         app.config.update(config)
 
+    import utils.models  # Force l'enregistrement des modèles SQLAlchemy
+
     # --- Configuration des extensions ---
     CORS(app, origins=["http://localhost:8080", "http://127.0.0.1:8080"],
          expose_headers=["Content-Disposition"],

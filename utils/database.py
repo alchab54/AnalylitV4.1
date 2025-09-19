@@ -18,26 +18,7 @@ SCHEMA = 'analylit_schema' if os.getenv('TESTING') != 'true' else None
 
 # Base déclarative partagée
 Base = declarative_base()
-
-# Dans utils/database.py, après "Base = declarative_base()", ajoutez :
-
-def ensure_models_loaded():
-    """S'assure que tous les modèles sont chargés."""
-    try:
-        from utils.models import register_models
-        register_models()
-        
-        # Import explicite de tous les modèles
-        from utils.models import (
-            Project, AnalysisProfile, SearchResult, Extraction, 
-            Grid, ChatMessage, RiskOfBias, Prompt
-        )
-        
-        # Ceci force l'enregistrement dans Base.metadata
-        return True
-    except Exception as e:
-        logger.error(f"Erreur lors du chargement des modèles: {e}")
-        return False
+# Note : les modèles seront importés par server_v4_complete.py
 
 # Instance Flask-SQLAlchemy pour les tests
 db = SQLAlchemy()
@@ -53,10 +34,6 @@ def init_database(database_url=None):
 
     try:
         engine = create_engine(database_url, pool_pre_ping=True)
-        
-        # NOUVELLE LIGNE : Charger les modèles avant de créer les tables
-        ensure_models_loaded()
-        
         if SCHEMA:
             with engine.connect() as connection:
                 connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
