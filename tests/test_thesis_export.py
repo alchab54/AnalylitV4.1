@@ -110,4 +110,3 @@ class TestThesisExport:
             assert response.status_code == 202
             assert 'task_id' in response.json
             mock_enqueue.assert_called_once()
-

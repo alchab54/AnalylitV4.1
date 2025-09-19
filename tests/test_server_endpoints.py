@@ -198,7 +198,9 @@ def test_api_run_discussion_draft_enqueues_task(mock_enqueue, client, db_session
     Teste d'intégration API : Vérifie que l'endpoint de discussion met bien en file (enqueue) la bonne tâche.
     """
     # ARRANGE
-    mock_enqueue.return_value.id = "mocked_job_id_123"
+    mock_job = MagicMock()
+    mock_job.id = "mocked_job_id_123"
+    mock_enqueue.return_value = mock_job
     project_data = {'name': 'API Test Discussion', 'mode': 'screening'}
     resp = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
     project_id = json.loads(resp.data)['id']
@@ -225,7 +227,9 @@ def test_api_post_chat_message_enqueues_task(mock_enqueue, client, db_session):
     Teste d'intégration API : Vérifie que l'endpoint de chat met bien en file la tâche RAG.
     """
     # ARRANGE
-    mock_enqueue.return_value.id = "mocked_chat_job_456"
+    mock_job = MagicMock()
+    mock_job.id = "mocked_chat_job_456"
+    mock_enqueue.return_value = mock_job
     project_data = {'name': 'API Test Chat', 'mode': 'screening'}
     resp = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
     project_id = json.loads(resp.data)['id']
@@ -259,7 +263,9 @@ def test_api_search_enqueues_task(mock_enqueue, client, db_session):
     Teste POST /api/search et vérifie qu'il met en file la tâche de recherche.
     """
     # ARRANGE
-    mock_enqueue.return_value.id = "mocked_search_job"
+    mock_job = MagicMock()
+    mock_job.id = "mocked_search_job"
+    mock_enqueue.return_value = mock_job
     project_data = {'name': 'API Test Search', 'mode': 'screening'}
     resp = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
     project_id = json.loads(resp.data)['id']
@@ -350,7 +356,9 @@ def test_api_run_advanced_analysis_enqueues_tasks(mock_enqueue, analysis_type, e
     Teste POST /api/projects/<id>/run-analysis pour tous les types d'analyse (paramétré).
     """
     # ARRANGE
-    mock_enqueue.return_value.id = f"job_for_{analysis_type}"
+    mock_job = MagicMock()
+    mock_job.id = f"job_for_{analysis_type}"
+    mock_enqueue.return_value = mock_job
     project_data = {'name': f'API Test {analysis_type}', 'mode': 'screening'}
     resp = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
     project_id = json.loads(resp.data)['id']
@@ -374,7 +382,9 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
     Teste POST /api/projects/<id>/import-zotero (PDF sync)
     """
     # ARRANGE
-    mock_enqueue.return_value.id = "zotero_pdf_job"
+    mock_job = MagicMock()
+    mock_job.id = "zotero_pdf_job"
+    mock_enqueue.return_value = mock_job
     project_data = {'name': 'API Test Zotero PDF', 'mode': 'screening'}
     resp = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
     project_id = json.loads(resp.data)['id']
@@ -405,7 +415,9 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
     CORRIGÉ: Ce test patche 'q.enqueue' (processing_queue) et ne fait qu'un seul appel API.
     """
     # ARRANGE
-    mock_q_enqueue.return_value.id = "zotero_file_job_q"
+    mock_job = MagicMock()
+    mock_job.id = "zotero_file_job_q"
+    mock_q_enqueue.return_value = mock_job
     project_data = {'name': 'API Test Zotero File', 'mode': 'screening'}
     resp = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
     project_id = json.loads(resp.data)['id']
@@ -431,7 +443,7 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
             json_file_path='/fake/path/to/test.json'
         )
 
-        assert json.loads(response.data)['job_id'] == "zotero_file_job_q"
+        assert json.loads(response.data)['job_id'] == mock_job.id
 
 @patch('utils.app_globals.analysis_queue.enqueue')
 def test_api_run_rob_analysis_enqueues_task(mock_enqueue, client, db_session):

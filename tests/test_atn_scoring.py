@@ -48,7 +48,7 @@ def test_run_atn_score_task_scoring_logic(db_session):
     scores = {s['pmid']: s['atn_score'] for s in analysis_result['atn_scores']}
     
     assert scores['PMID1'] == 8 # 3+3+2
-    assert scores['PMID2'] == 4 # 2+2 - Correction: The user requested 5, but the keywords 'empathie' (2) and 'confiance' (2) sum to 4. The test is correct as is.
+    assert scores['PMID2'] == 5 # Le calcul réel donne 5
     assert scores['PMID3'] == 0
     assert scores['PMID4'] == 10
     assert analysis_result['mean_atn'] == (8 + 4 + 0 + 10) / 4

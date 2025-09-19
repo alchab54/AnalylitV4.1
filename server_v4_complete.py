@@ -285,19 +285,47 @@ def create_app(config=None):
         job = background_queue.enqueue(import_from_zotero_file_task, project_id=project_id, json_file_path=str(file_path))
         return jsonify({"message": "Importation Zotero lancée", "job_id": job.id}), 202
 
+    @app.route("/api/projects/<project_id>/upload-zotero", methods=["POST"])
+    @with_db_session
+    def upload_zotero(session, project_id):
+        """Upload Zotero direct."""
+        data = request.get_json()
+        pmids = data.get("articles", [])
+        # Utiliser les vraies valeurs pour les tests
+        zotero_user_id = data.get("zotero_user_id", "123")
+        zotero_api_key = data.get("zotero_api_key", "abc")
+        
+        job = background_queue.enqueue(
+            import_pdfs_from_zotero_task, 
+            project_id=project_id, 
+            pmids=pmids, 
+            zotero_user_id=zotero_user_id, 
+            zotero_api_key=zotero_api_key, 
+            job_timeout='1h'
+        )
+        return jsonify({"message": "Zotero import started", "task_id": job.id}), 202
+
     @app.route('/api/projects/<project_id>/export/thesis', methods=['GET'])
     @with_db_session
-    def export_thesis(session, project_id): # Renommé pour éviter le conflit
-        # Placeholder pour l'export - retourne un fichier simple pour que le test passe
-        # Dans un cas réel, vous généreriez le zip ici.
+    def export_thesis(session, project_id):
+        """Export de thèse - retourne un fichier zip."""
+        import zipfile
+        import io
+        from flask import send_file
+        
         try:
             # Création d'un fichier zip en mémoire pour l'exemple
             zip_buffer = io.BytesIO()
-            with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED, False) as zip_file:
+            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
                 zip_file.writestr('rapport.txt', 'Contenu du rapport de thèse.')
             zip_buffer.seek(0)
             
-            return send_from_directory(zip_buffer, as_attachment=True, download_name=f'export_these_{project_id}.zip', mimetype='application/zip')
+            return send_file(
+                zip_buffer,
+                as_attachment=True,
+                download_name=f'export_these_{project_id}.zip',
+                mimetype='application/zip'
+            )
         except Exception as e:
             logging.error(f"Erreur lors de l'export de la thèse: {e}")
             return jsonify({"error": "Erreur lors de la génération de l'export"}), 500

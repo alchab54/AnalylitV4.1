@@ -22,11 +22,8 @@ Base = declarative_base()
 # Instance Flask-SQLAlchemy pour les tests
 db = SQLAlchemy()
 
-# Importer les modèles pour qu'ils soient enregistrés
-try:
-    from utils import models  # noqa
-except ImportError:
-    pass
+# Import explicite pour forcer l'enregistrement des modèles
+from utils.models import Project, AnalysisProfile, SearchResult, Extraction, Grid, ChatMessage, RiskOfBias, Prompt  # noqa
 
 def init_database(database_url=None):
     """Initialise le moteur et la factory de session. Ne fait rien si déjà initialisé."""

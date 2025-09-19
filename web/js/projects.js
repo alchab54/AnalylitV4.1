@@ -2,9 +2,9 @@
 
 import { fetchAPI } from './api.js';
 // CORRIGÉ: Ajout des imports pour l'état et les éléments UI
-import { setProjects, setCurrentProject, appState } from './state.js';
+import { setProjects, setCurrentProject } from './state.js'; // <-- 'appState' retiré d'ici
 import { showToast } from './ui-improved.js';
-import { elements } from './app-improved.js';
+import { elements, appState } from './app-improved.js'; // <-- 'appState' ajouté ici
 
 /**
  * Charge la liste des projets depuis le backend et met à jour l'état global.

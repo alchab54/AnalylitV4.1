@@ -213,6 +213,9 @@ def test_api_upload_pdfs_bulk(mock_enqueue, client: FlaskClient, setup_project: 
     Teste l'endpoint d'upload de PDF en masse.
     """
     # ARRANGE: Configurer le mock pour retourner un objet avec un attribut 'id'
+    mock_job = MagicMock()
+    mock_job.id = "mock_job_id_123"
+    mock_enqueue.return_value = mock_job
     mock_job1 = MagicMock(); mock_job1.id = "mock_job_id_1"
     mock_job2 = MagicMock(); mock_job2.id = "mock_job_id_2"
     mock_enqueue.side_effect = [mock_job1, mock_job2]
