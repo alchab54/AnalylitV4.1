@@ -22,9 +22,7 @@ from utils.models import Project, Grid, Extraction, Prompt, AnalysisProfile, Sea
 from utils.file_handlers import save_file_to_project_dir
 from utils.app_globals import PROJECTS_DIR as PROJECTS_DIR_STR
 from utils.prisma_scr import get_base_prisma_checklist
-# Import explicite des modèles pour forcer leur enregistrement
 import utils.models  # noqa
-
 
 # --- Imports des tâches asynchrones ---
 from tasks_v4_complete import (
@@ -50,11 +48,10 @@ def create_app(config=None):
     if config:
         app.config.update(config)
 
-    # Import et initialisation forcés
+    # Import et initialisation forcés - BON ORDRE :
+    # Les modèles sont déjà importés au top du fichier
     from utils.database import init_database
-    init_database() 
-
-    import utils.models  # Force l'enregistrement des modèles SQLAlchemy
+    init_database()  
 
     # --- Configuration des extensions ---
     CORS(app, origins=["http://localhost:8080", "http://127.0.0.1:8080"],
