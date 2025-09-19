@@ -517,15 +517,14 @@ def create_app(config=None):
         question = data.get('question')
         if not question:
             return jsonify({"error": "Question requise"}), 400
-        
         try:
             job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout='15m')
-            # CORRECTION : Vérifier que job.id existe
             task_id = str(job.id) if job and job.id else "unknown"
-        return jsonify({"message": "Question soumise", "task_id": str(job.id)}), 202
+            # L'instruction RETURN est maintenant à sa place
+            return jsonify({"message": "Question soumise", "task_id": task_id}), 202
         except Exception as e:
             return jsonify({"error": f"Erreur lors de l'enqueue: {e}"}), 500
-
+    
     @app.route("/api/projects/<project_id>/chat-history", methods=["GET"])
     @with_db_session
     def get_chat_history(session, project_id):
