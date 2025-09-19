@@ -73,25 +73,21 @@ function renderGridItem(grid) {
 }
 
 export async function handleDeleteGrid(gridId) {
-    // TODO: Backend route for grid deletion is missing.
-    // The original code was:
-    /*
     if (!gridId) return;
     if (!confirm('Supprimer cette grille ?')) return;
 
     try {
-        await fetchAPI(`/grids/${gridId}`, { method: 'DELETE' });
+        await fetchAPI(`/projects/${appState.currentProject.id}/grids/${gridId}`, { method: 'DELETE' });
         showToast('Grille supprimée.', 'success');
         
         // Mettre à jour l'état localement
         const updatedGrids = (appState.currentProjectGrids || []).filter(g => g.id !== gridId);
         setCurrentProjectGrids(updatedGrids);
+        await loadProjectGrids(appState.currentProject.id);
 
     } catch (error) {
         showToast(`Erreur: ${error.message}`, 'error');
     }
-    */
-    showToast('La suppression de grille n\'est pas encore implémentée.', 'info');
 }
 
 export function showGridFormModal(gridId = null) {

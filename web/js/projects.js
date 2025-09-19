@@ -148,10 +148,10 @@ async function handleExportProject(projectId) {
  * Charge la liste des fichiers PDF associés au projet et stocke uniquement les stems.
  */
 async function loadProjectFilesSet(projectId) {
-  if (!projectId) {
-    appState.currentProjectFiles = new Set();
-    return;
-  }
+    if (!projectId) {
+        appState.currentProjectFiles = new Set();
+        return;
+    }
   try {
     // TODO: Backend route for getting project files is missing.
     // const files = await fetchAPI(`/projects/${projectId}/files`);

@@ -167,9 +167,7 @@ function renderChatSection(project = null, error = false) {
 /**
  * Gère le lancement de l'indexation des PDFs pour le chat RAG.
  */
-export async function handleStartIndexing() {
-    // TODO: Backend route for indexing PDFs is missing.
-    /*
+export async function handleIndexPdfs() {
     if (!appState.currentProject) {
         showToast('Veuillez sélectionner un projet pour lancer l\'indexation.', 'warning');
         return;
@@ -177,6 +175,8 @@ export async function handleStartIndexing() {
 
     showLoadingOverlay(true, 'Lancement de l\'indexation des PDFs...');
     try {
+        // The route is defined in server_v4_complete.py but not with the /api prefix in the route definition itself.
+        // The fetchAPI helper adds the /api prefix. The route is `/projects/<project_id>/index-pdfs`
         const response = await fetchAPI(`/projects/${appState.currentProject.id}/index-pdfs`, { method: 'POST' });
         showToast('Indexation des PDFs lancée en arrière-plan.', 'success');
         // On peut utiliser le task_id pour suivre la progression si nécessaire
@@ -186,6 +186,4 @@ export async function handleStartIndexing() {
     } finally {
         showLoadingOverlay(false);
     }
-    */
-   showToast('L\'indexation des PDFs n\'est pas encore implémentée.', 'info');
 }

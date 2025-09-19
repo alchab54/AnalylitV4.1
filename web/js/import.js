@@ -98,34 +98,30 @@ export function handleUploadPdfs(target) {
 }
 
 export async function handleBulkPdfDownload() {
-    // TODO: Backend route for bulk PDF download is missing.
-    /*
-  if (!appState.currentProject) return;
-  showLoadingOverlay(true, 'Recherche des PDFs gratuits...');
-  try {
-    await fetchAPI(`/projects/${appState.currentProject.id}/bulk-pdf-download`, { method: 'POST' });
-    showToast('Recherche de PDFs lancée en arrière-plan.', 'info');
-  } catch (e) {
-    showToast(`Erreur: ${e.message}`, 'error');
-  } finally {
-    showLoadingOverlay(false, '');
-  }
-  */
-  showToast('La recherche de PDFs n\'est pas encore implémentée.', 'info');
+    if (!appState.currentProject) return;
+    showLoadingOverlay(true, 'Recherche des PDFs gratuits...');
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/bulk-pdf-download`, { method: 'POST' });
+        showToast('Recherche de PDFs lancée en arrière-plan.', 'info');
+    } catch (e) {
+        showToast(`Erreur: ${e.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false, '');
+    }
 }
 
 export async function exportForThesis() {
-    if (!appState.currentProject?.id) {
-        showToast('Veuillez sélectionner un projet.', 'warning');
+    if (!appState.currentProject) {
+        showToast('Aucun projet sélectionné', 'warning');
         return;
     }
-    window.open(`/api/projects/${appState.currentProject.id}/export/thesis`, '_blank');
-    showToast('Export pour la thèse en cours de téléchargement...', 'info');
+    showLoadingOverlay(true, 'Génération de l\'export thèse...');
+    const exportUrl = `/api/projects/${appState.currentProject.id}/export/thesis`;
+    window.location.href = exportUrl;
+    showLoadingOverlay(false);
 }
 
 export async function handleIndexPdfs() {
-    // TODO: Backend route for indexing PDFs is missing.
-    /*
   if (!appState.currentProject) return;
   
   // Affiche l'overlay avec un message initial et prépare la barre de progression
@@ -142,8 +138,6 @@ export async function handleIndexPdfs() {
     showToast(`Erreur: ${e.message}`, 'error');
     showLoadingOverlay(false); // Masquer en cas d\'erreur de lancement
   }
-  */
-  showToast('L\'indexation des PDFs n\'est pas encore implémentée.', 'info');
 }
 
 export async function handleZoteroSync() {
@@ -209,16 +203,14 @@ export async function processPmidImport(event) {
 // --- Fonctions ajoutées pour la complétude de l'architecture ---
 
 export async function handleSaveZoteroSettings(e) {
-    // TODO: Backend route for saving Zotero settings is missing.
-    /*
     e.preventDefault();
     const userId = document.getElementById('zoteroUserId').value.trim();
     const apiKey = document.getElementById('zoteroApiKey').value.trim();
-
+    
     if (!userId || !apiKey) {
         return showToast('L\'ID utilisateur et la clé d\'API Zotero sont requis.', 'warning');
     }
-
+    
     try {
         await fetchAPI('/settings/zotero', {
             method: 'POST',
@@ -228,8 +220,6 @@ export async function handleSaveZoteroSettings(e) {
     } catch (error) {
         showToast(`Erreur lors de la sauvegarde : ${error.message}`, 'error');
     }
-    */
-    showToast('La sauvegarde des paramètres Zotero n\'est pas encore implémentée.', 'info');
 }
 
 export function startZoteroStatusPolling(projectId) { /* ... logique de polling ... */ }
@@ -247,14 +237,12 @@ async function processPdfUpload(files) {
   try {
     const formData = new FormData();
     [...files].forEach(f => formData.append('files', f));
-    // CORRECTION : Utilisation de fetchAPI pour gérer l'upload de FormData
-    // CORRECTED ROUTE: /upload-pdfs-bulk instead of /upload-pdfs
     const result = await fetchAPI(`/projects/${appState.currentProject.id}/upload-pdfs-bulk`, { method: 'POST', body: formData });
-    showToast(`${result.uploaded || 0} PDF(s) uploadé(s).`, 'success');
+    showToast(`${result.successful_uploads?.length || 0} PDFs uploadés`, 'success');
+    document.getElementById('bulkPDFInput').value = ''; // Reset file input
   } catch (e) {
     showToast(`Erreur lors de l\'upload: ${e.message}`, 'error');
   } finally {
     showLoadingOverlay(false, '');
   }
 }
-

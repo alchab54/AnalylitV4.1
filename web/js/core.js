@@ -125,7 +125,7 @@ const compactModeAction = {
 
 const projectActions = {
     'select-project': (target) => selectProject(target.dataset.projectId),
-    'delete-project': (target) => deleteProject(target.dataset.projectId, target.dataset.projectName), // This was already correct.
+    'delete-project': (target) => deleteProject(target.dataset.projectId, target.dataset.projectName),
     'export-project': (target) => handleExportProject(target.dataset.projectId),
     'confirm-delete-project': (target) => confirmDeleteProject(target.dataset.projectId), // Nouvelle action
 };
