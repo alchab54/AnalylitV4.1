@@ -298,7 +298,7 @@ def test_api_run_pipeline_enqueues_tasks(mock_enqueue, client, db_session):
     """
     # ARRANGE
     # 1. Créer un profil d'analyse valide (nécessaire pour l'endpoint /run)
-    profile_id = str(uuid.uuid4())
+    profile_id = str(uuid.uuid4()) # Déjà unique, c'est bon.
     profile = AnalysisProfile(id=profile_id, name="Standard Profile", preprocess_model="model1", extract_model="model2", synthesis_model="model3")
     db_session.add(profile)
     db_session.commit()

@@ -18,12 +18,14 @@ SCHEMA = 'analylit_schema' if os.getenv('TESTING') != 'true' else None
 
 # Base déclarative
 Base = declarative_base()
+# CORRECTION : Import forcé APRÈS la définition de Base
+from utils.models import (
+    Project, AnalysisProfile, SearchResult, Extraction, 
+    Grid, ChatMessage, RiskOfBias, Prompt
+)  # noqa
 
 # Instance Flask-SQLAlchemy pour les tests
 db = SQLAlchemy()
-
-# Import explicite pour forcer l'enregistrement des modèles
-from utils.models import Project, AnalysisProfile, SearchResult, Extraction, Grid, ChatMessage, RiskOfBias, Prompt  # noqa
 
 def init_database(database_url=None):
     """Initialise le moteur et la factory de session. Ne fait rien si déjà initialisé."""

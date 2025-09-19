@@ -289,18 +289,26 @@ def create_app(config=None):
     @with_db_session
     def upload_zotero(session, project_id):
         """Upload Zotero direct."""
-        data = request.get_json()
+        # Gérer les deux types de requêtes : JSON et form data
+        if request.content_type and 'application/json' in request.content_type:
+            data = request.get_json()
+        else:
+            # Pour les tests qui envoient du form data
+            data = request.form.to_dict()
+            if 'articles' in data:
+                data['articles'] = data['articles'].split(',')
+        
         pmids = data.get("articles", [])
         # Utiliser les vraies valeurs pour les tests
         zotero_user_id = data.get("zotero_user_id", "123")
         zotero_api_key = data.get("zotero_api_key", "abc")
         
         job = background_queue.enqueue(
-            import_pdfs_from_zotero_task, 
-            project_id=project_id, 
-            pmids=pmids, 
-            zotero_user_id=zotero_user_id, 
-            zotero_api_key=zotero_api_key, 
+            import_pdfs_from_zotero_task,
+            project_id=project_id,
+            pmids=pmids,
+            zotero_user_id=zotero_user_id,
+            zotero_api_key=zotero_api_key,
             job_timeout='1h'
         )
         return jsonify({"message": "Zotero import started", "task_id": job.id}), 202

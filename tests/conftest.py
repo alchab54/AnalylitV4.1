@@ -63,3 +63,13 @@ def mock_queue():
     mock_q = MagicMock()
     mock_q.enqueue = MagicMock()
     return mock_q
+
+@pytest.fixture(autouse=True)
+def clean_between_tests(db_session):
+    """Nettoie la base entre chaque test."""
+    yield
+    # Nettoyage après chaque test
+    try:
+        db_session.rollback()
+    except:
+        pass

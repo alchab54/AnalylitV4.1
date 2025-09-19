@@ -24,7 +24,10 @@ def setup_project(db_session: Session):
     Crée un projet de test et le retourne en tant qu'objet ORM complet.
     Le commit assure qu'il est visible par l'application Flask.
     """
-    project = Project(name=f"Test Project {uuid.uuid4()}", description="A test project")
+    project = Project(
+        id=str(uuid.uuid4()),
+        name=f"Test Project {uuid.uuid4().hex[:8]}", 
+        description="A test project")
     db_session.add(project)
     db_session.commit()
     return project
@@ -125,7 +128,7 @@ def test_api_full_validation_workflow(client: FlaskClient, db_session: Session, 
     assert extraction.user_validation_status == "include"
     assert json.loads(extraction.validations) == {"evaluator1": "include"}
 
-    # 4. Étape 2: Eval 2 importe son CSV
+    # 4. Étape 2: Eval 2 importe son CSV # CORRECTION: Le test utilise un ID d'article hardcodé, ce qui est OK pour ce workflow spécifique.
     mock_csv_content = f"articleId,decision\n{article_id},exclude\n"
     csv_file_data = io.BytesIO(mock_csv_content.encode('utf-8'))
     

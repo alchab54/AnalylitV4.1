@@ -45,7 +45,7 @@ class TestThesisExport:
         # --- ASSERT (Vérification) ---
         assert response.status_code == 200, "La requête devrait réussir"
         assert response.content_type == 'application/zip', "Le contenu doit être un fichier zip"
-        assert 'attachment;filename=export_these_' in response.headers['Content-Disposition'], "Le nom du fichier doit être correct"
+        assert 'attachment; filename=export_these_' in response.headers['Content-Disposition'], "Le nom du fichier doit être correct" # Note l'espace après le point-virgule
         
         # Vérifier que les fonctions de génération de contenu ont été appelées
         mock_to_excel.assert_called()

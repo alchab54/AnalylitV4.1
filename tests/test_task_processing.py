@@ -89,7 +89,7 @@ def mock_embedding_model(mocker):
 def test_search_task_adds_articles_to_db(db_session, mocker):
     """(Passe)"""
     # ARRANGE
-    project_id = str(uuid.uuid4())
+    project_id = str(uuid.uuid4()) # Déjà unique, c'est bon.
     project = Project(id=project_id, name="Test Search")
     db_session.add(project)
     db_session.commit() 
@@ -125,7 +125,7 @@ def test_multi_database_search_task_resilience_on_fetcher_failure(db_session, mo
     Teste que la recherche continue avec les autres bases de données même si une échoue.
     """
     # ARRANGE
-    project_id = str(uuid.uuid4())
+    project_id = str(uuid.uuid4()) # Déjà unique, c'est bon.
     project = Project(id=project_id, name="Test Resilience")
     db_session.add(project)
     db_session.commit()
@@ -146,8 +146,8 @@ def test_process_single_article_task_insufficient_content(db_session, mocker):
     Vérifie que la tâche crée un processing_log 'écarté' si le contenu est insuffisant.
     """
     # ARRANGE
-    project_id = str(uuid.uuid4())
-    article_id = "pmid1"
+    project_id = str(uuid.uuid4()) # Déjà unique.
+    article_id = f"pmid_{uuid.uuid4().hex[:8]}"
 
     project = Project(id=project_id, name="Test")
     search_result = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id=article_id, title="Test Title", abstract="")
@@ -183,9 +183,9 @@ def test_process_single_article_task_full_extraction_with_pdf_and_grid(db_sessio
     Vérifie que la tâche lit le PDF et stocke le JSON extrait basé sur une Grid.
     """
     # ARRANGE
-    project_id = str(uuid.uuid4())
-    article_id = "67890"
-    grid_id = "grid1"
+    project_id = str(uuid.uuid4()) # Déjà unique.
+    article_id = f"pmid_pdf_{uuid.uuid4().hex[:8]}"
+    grid_id = str(uuid.uuid4())
 
     project = Project(id=project_id, name="Test PDF")
     search_result = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id=article_id, title="PDF Title", abstract="Abstract") # Note: database_source est None par défaut
@@ -229,8 +229,8 @@ def test_process_single_article_task_screening_mode(mock_ollama_api, db_session,
     Vérifie le mode 'screening' : appel au bon modèle et insertion des données de screening.
     """
     # ARRANGE
-    project_id = str(uuid.uuid4())
-    article_id = "pmid_screening"
+    project_id = str(uuid.uuid4()) # Déjà unique.
+    article_id = f"pmid_screen_{uuid.uuid4().hex[:8]}"
     project = Project(id=project_id, name="Test Screening")
     search_result = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id=article_id, title="Screening Title", abstract="Abstract for screening.")
     db_session.add_all([project, search_result])
@@ -253,7 +253,7 @@ def test_process_single_article_task_screening_mode(mock_ollama_api, db_session,
 def test_run_synthesis_task_filters_by_score(db_session, mocker):
     """(Passe)"""
     # ARRANGE
-    project_id = str(uuid.uuid4())
+    project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Test Synth", description="Test Desc")
 
     sr1 = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id="pmid1", title="Bon article", abstract="Abstract de 1")
@@ -296,7 +296,7 @@ def test_run_discussion_generation_task(db_session, mocker):
     Vérifie que les données sont filtrées (score >= 7) et que le projet est mis à jour.
     """
     # ARRANGE
-    project_id = str(uuid.uuid4())
+    project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Test Discussion", profile_used="standard")
     
     # CORRECTION ForeignKeyViolation : Commiter le parent (Project) d'abord.
@@ -304,12 +304,12 @@ def test_run_discussion_generation_task(db_session, mocker):
     db_session.commit()
 
     # Données valides (seront utilisées)
-    sr1 = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id="pmid1", title="Article 1")
+    sr1 = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id=f"pmid_{uuid.uuid4().hex[:6]}", title="Article 1")
     ext1_data = json.dumps({"key": "data_valide", "some_text": "This is valid extracted data."}) # CORRECTION: Ajouter des données extraites non vides
-    ext1 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid1", relevance_score=9.0, extracted_data=ext1_data)
+    ext1 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid=sr1.article_id, relevance_score=9.0, extracted_data=ext1_data)
     
     # Données invalides (score trop bas, seront filtrées)
-    sr2 = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id="pmid2", title="Article 2")
+    sr2 = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id=f"pmid_{uuid.uuid4().hex[:6]}", title="Article 2")
     ext2_data = json.dumps({"key": "data_score_faible", "some_text": "This is also data."})
     ext2 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid2", relevance_score=4.0, extracted_data=ext2_data)
 
@@ -333,14 +333,14 @@ def test_run_discussion_generation_task(db_session, mocker):
     df_arg = mock_gen_draft.call_args[0][0]
     assert isinstance(df_arg, pd.DataFrame)
     assert len(df_arg) == 1 # Ne doit avoir que l'extraction avec score >= 7
-    assert df_arg.iloc[0]['pmid'] == 'pmid1'
+    assert df_arg.iloc[0]['pmid'] == sr1.article_id
 
 
 @pytest.mark.gpu
 def test_run_atn_stakeholder_analysis_task_aggregation_logic(db_session, mocker):
     """(Passe)"""
     # ARRANGE
-    project_id = str(uuid.uuid4())
+    project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="ATN Project")
 
     ext1_data = json.dumps({"Score_empathie_IA": 8.0, "Type_IA": "Chatbot", "RGPD_conformité": "Oui"})
@@ -376,7 +376,7 @@ def test_run_atn_stakeholder_analysis_task_aggregation_logic(db_session, mocker)
 def test_add_manual_articles_task_ignores_duplicates(db_session, mocker):
     """(Passe)"""
     # ARRANGE
-    project_id = str(uuid.uuid4())
+    project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Test Manual Add")
     sr_existing = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id="12345", title="Existant")
     
@@ -417,7 +417,7 @@ def test_answer_chat_question_task_rag_logic(db_session, mocker, mock_embedding_
     Ce test utilise le comportement par défaut de la fixture 'mock_embedding_model' (qui retourne un vecteur 2D).
     """
     # ARRANGE
-    project_id = str(uuid.uuid4())
+    project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Chat RAG Project")
 
     db_session.add(project)
@@ -472,7 +472,7 @@ def test_import_pdfs_from_zotero_task(db_session, mocker):
     Vérifie que les mocks de la bibliothèque 'pyzotero' sont appelés correctement.
     """
     # ARRANGE
-    project_id = str(uuid.uuid4())
+    project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Zotero PDF Test")
     db_session.add(project)
     db_session.commit()
@@ -516,8 +516,8 @@ def test_run_risk_of_bias_task(db_session, mocker):
     Vérifie que le PDF est lu, l'IA est appelée, et la DB est mise à jour.
     """
     # ARRANGE
-    project_id = str(uuid.uuid4())
-    article_id = "rob_test_1"
+    project_id = str(uuid.uuid4()) # Déjà unique.
+    article_id = f"rob_test_{uuid.uuid4().hex[:8]}"
     project = Project(id=project_id, name="RoB Test")
     db_session.add(project)
     db_session.commit()
@@ -567,7 +567,7 @@ def test_run_knowledge_graph_task(db_session, mocker):
     # ARRANGE
     project_id = str(uuid.uuid4())
     profile_id = str(uuid.uuid4())
-    
+
     profile = AnalysisProfile(id=profile_id, name="Profil KG", extract_model="test-kg-model")
     project = Project(id=project_id, name="Test KG", profile_used=profile_id)
     db_session.add_all([profile, project])
@@ -599,7 +599,7 @@ def test_run_prisma_flow_task(db_session, mocker):
     Vérifie que les statistiques sont comptées et que matplotlib est appelé pour sauvegarder les graphiques.
     """
     # ARRANGE
-    project_id = str(uuid.uuid4())
+    project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Test PRISMA")
     db_session.add(project)
     db_session.commit()
@@ -635,7 +635,7 @@ def test_run_meta_analysis_task(db_session, mocker):
     Vérifie la logique statistique (moyenne, IC) et la sauvegarde du graphique.
     """
     # ARRANGE
-    project_id = str(uuid.uuid4())
+    project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Test Meta")
     db_session.add(project)
     db_session.commit()
@@ -669,7 +669,7 @@ def test_run_meta_analysis_task(db_session, mocker):
 def test_run_descriptive_stats_task(db_session, mocker):
     """Teste les statistiques descriptives de base."""
     # ARRANGE
-    project_id = str(uuid.uuid4())
+    project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Test Stats")
     db_session.add(project)
     db_session.commit()
@@ -700,7 +700,7 @@ def test_run_descriptive_stats_task(db_session, mocker):
 def test_run_atn_score_task(db_session, mocker):
     """Teste la tâche de scoring heuristique ATN."""
     # ARRANGE
-    project_id = str(uuid.uuid4())
+    project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Test ATN Score")
     db_session.add(project)
     db_session.commit()
@@ -738,7 +738,7 @@ def test_run_atn_score_task(db_session, mocker):
 def test_calculate_kappa_task(db_session, mocker):
     """Teste le calcul du Kappa de Cohen."""
     # ARRANGE
-    project_id = str(uuid.uuid4())
+    project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Test Kappa")
     db_session.add(project)
     db_session.commit()
@@ -786,7 +786,7 @@ def test_index_project_pdfs_task(db_session, mocker, mock_embedding_model):
     pour correspondre aux attentes (incorrectes) de CETTE tâche (vecteur 1D).
     """
     # ARRANGE
-    project_id = str(uuid.uuid4())
+    project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Test Index RAG")
     db_session.add(project)
     db_session.commit()
@@ -847,8 +847,8 @@ def test_index_project_pdfs_task(db_session, mocker, mock_embedding_model):
 def test_fetch_online_pdf_task(mock_unpaywall, db_session, mocker):
     """Teste le téléchargement de PDF via Unpaywall."""
     # ARRANGE
-    project_id = str(uuid.uuid4())
-    article_id = "pmid_doi_1"
+    project_id = str(uuid.uuid4()) # Déjà unique.
+    article_id = f"pmid_doi_{uuid.uuid4().hex[:8]}"
     
     project = Project(id=project_id, name="Test Fetch PDF")
     sr = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id=article_id, doi="10.1234/test")

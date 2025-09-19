@@ -1,5 +1,6 @@
 # tests/test_database.py
 
+import uuid
 from utils.database import seed_default_data
 from utils.models import AnalysisProfile, Project
 
@@ -19,8 +20,14 @@ def test_seed_default_data_when_empty(db_session):
 def test_seed_default_data_when_exists(db_session):
     """Teste que le seeding ne crée pas de doublons."""
     # Arrange: insérer les données une première fois
-    db_session.add(AnalysisProfile(name='Standard'))
-    db_session.add(Project(name='Projet par défaut'))
+    db_session.add(AnalysisProfile(
+        id=str(uuid.uuid4()),
+        name='Standard'
+    ))
+    db_session.add(Project(
+        id=str(uuid.uuid4()),
+        name='Projet par défaut'
+    ))
     db_session.commit()
     count_before = db_session.query(Project).count()
  

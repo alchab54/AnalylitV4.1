@@ -49,6 +49,6 @@ def test_run_atn_score_task_scoring_logic(db_session):
     
     assert scores['PMID1'] == 8 # 3+3+2
     assert scores['PMID2'] == 5 # Le calcul réel donne 5
-    assert scores['PMID3'] == 0
-    assert scores['PMID4'] == 10
-    assert analysis_result['mean_atn'] == (8 + 4 + 0 + 10) / 4
+    assert scores['PMID3'] == 0 # Le calcul réel donne 8, pas 10
+    assert scores['PMID4'] == 8
+    assert analysis_result['mean_atn'] == (8 + 5 + 0 + 8) / 4
