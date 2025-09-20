@@ -4,6 +4,7 @@ import re
 from pathlib import Path # Déjà importé plus bas, mais on garde pour la clarté
 from typing import Optional
 
+# --- NOUVELLES IMPORTATIONS POUR L'EXTRACTION ROBUSTE ---
 import fitz  # PyMuPDF
 import pdfplumber
 try:
@@ -14,13 +15,16 @@ except ImportError:
     pytesseract = None
     Image = None
     convert_from_path = None
+# --- FIN DES NOUVELLES IMPORTATIONS ---
 logger = logging.getLogger(__name__)
 
+# --- AJOUTEZ CETTE FONCTION MANQUANTE ---
 def ensure_directory_exists(path: str | Path):
     """Crée un répertoire s'il n'existe pas."""
     if isinstance(path, str):
         path = Path(path)
     path.mkdir(parents=True, exist_ok=True)
+# --- FIN DE L'AJOUT ---
 
 def sanitize_filename(filename: str) -> str:
     """Nettoie un nom de fichier pour le système de fichiers."""
