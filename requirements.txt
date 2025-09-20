@@ -33,12 +33,13 @@ torch
 #--- Utilitaires ---
 PyPDF2==3.0.1
 requests==2.31.0
-python-dotenv==1.0.0
-Pillow==10.1.0
+python-dotenv==1.0.0 # Pillow est mis à jour ci-dessous
 beautifulsoup4==4.12.2
 lxml==5.2.2
-PyMuPDF==1.24.1
-pdfplumber==0.11.1
+Pillow==10.3.0 # Requis par pdf2image
+PyMuPDF==1.24.1 # Pour fitz
+pdfplumber==0.11.0 # Pour l'analyse de layout
+pdf2image==1.17.0 # Pour l'OCR
 blinker==1.7.0
 pydantic-settings==2.1.0
 pytesseract==0.3.10
