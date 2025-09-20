@@ -963,7 +963,7 @@ def create_app(config=None):
         try:
             data = request.get_json()
             analysis_type = data.get('type')
-            
+
             # Validation du type d'analyse
             valid_types = ['meta_analysis', 'atn_scores', 'knowledge_graph', 'prisma_flow']
             if analysis_type not in valid_types:
