@@ -22,6 +22,14 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+# --- FONCTION MANQUANTE À AJOUTER ICI ---
+def ensure_directory_exists(path: str | Path):
+    """Crée un répertoire s'il n'existe pas."""
+    if isinstance(path, str):
+        path = Path(path)
+    path.mkdir(parents=True, exist_ok=True)
+# --- FIN DE L'AJOUT ---
+
 def sanitize_filename(filename: str) -> str:
     """Nettoie un nom de fichier pour le système de fichiers."""
     # Remplace les caractères interdits par des underscores
@@ -192,7 +200,8 @@ def extract_text_from_pdf(pdf_path: str) -> str:
 def save_file_to_project_dir(file_storage, project_id, filename, projects_dir):
     """Sauvegarde un FileStorage dans le dossier du projet."""
     project_dir = projects_dir / project_id
-    project_dir.mkdir(parents=True, exist_ok=True)
+    # Utiliser la fonction dédiée
+    ensure_directory_exists(project_dir) 
     save_path = project_dir / filename
     file_storage.save(str(save_path))
     logger.info(f"Fichier sauvegardé : {save_path}")

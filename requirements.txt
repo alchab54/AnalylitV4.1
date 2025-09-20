@@ -33,7 +33,7 @@ torch
 #--- Utilitaires ---
 PyPDF2==3.0.1
 requests==2.31.0
-python-dotenv==1.0.0 # Pillow est mis à jour ci-dessous
+python-dotenv==1.0.0
 beautifulsoup4==4.12.2
 lxml==5.2.2
 Pillow==10.3.0 # Requis par pdf2image
@@ -56,12 +56,6 @@ feedparser==6.0.11
 #--- Testing ---
 pytest==7.4.3
 pytest-mock==3.10.0
-
-# --- Internationalisation (i18n) ---
-Flask-Babel
-Babel
-pytz
-
 
 # === DÉPENDANCES AJOUTÉES POUR LES TESTS AVANCÉS ===
 selenium==4.21.0
