@@ -12,7 +12,7 @@ from utils.models import Project, AnalysisProfile, SearchResult, ChatMessage
 
 @pytest.fixture
 def setup_project(db_session)
-    Crée un projet simple et le stocke en BDD.
+    """Crée un projet simple et le stocke en BDD."""
     project = Project(
         id=str(uuid.uuid4()),
         name=Projet de Test pour Couverture
@@ -26,14 +26,14 @@ def setup_project(db_session)
 # =================================================================
 
 def test_api_analysis_profiles_crud_workflow(client, db_session)
-    
-    Teste le cycle de vie complet (CRUD) pour apianalysis-profiles.
+    """
+    Teste le cycle de vie complet (CRUD) pour /api/analysis-profiles.
     1. POST (Créer) un profil personnalisé.
     2. GET (Lire) tous les profils et retrouver le nouveau.
     3. PUT (Mettre à jour) le profil personnalisé.
     4. DELETE (Supprimer) le profil personnalisé.
     5. DELETE (Échec) la suppression d'un profil par défaut.
-    
+    """
     
     # --- 1. POST (Créer) ---
     profile_data = {

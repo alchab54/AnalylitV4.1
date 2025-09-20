@@ -17,8 +17,8 @@ from utils.models import Project, SearchResult
 # --- Fixture pour un projet de test (utilisée par plusieurs tests) ---
 
 @pytest.fixture
-def setup_project(db_session)
-    Crée un projet simple et le stocke en BDD.
+def setup_project(db_session):
+    """Crée un projet simple et le stocke en BDD."""
     project = Project(
         id=str(uuid.uuid4()),
         name=Projet de Test pour Logique
@@ -32,11 +32,11 @@ def setup_project(db_session)
 # =================================================================
 
 def test_generate_discussion_draft_logic()
-    
-    Teste la logique de la fonction generate_discussion_draft 
+    """
+    Teste la logique de la fonction generate_discussion_draft
     - Filtre par score de pertinence.
     - Construit correctement le prompt pour l'IA.
-    
+    """
     # --- Setup ---
     # Création d'un DataFrame pandas de test
     data = {

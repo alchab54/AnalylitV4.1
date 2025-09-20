@@ -14,8 +14,8 @@ from tasks_v4_complete import pull_ollama_model_task, run_extension_task
 # --- Fixture pour un projet de test ---
 
 @pytest.fixture
-def setup_project(db_session)
-    Crée un projet simple et le stocke en BDD.
+def setup_project(db_session):
+    """Crée un projet simple et le stocke en BDD."""
     project = Project(
         id=str(uuid.uuid4()),
         name=Projet de Test pour Couverture
@@ -73,9 +73,9 @@ def test_api_grids_create_and_update(client, db_session, setup_project)
     assert len(json.loads(grid_from_db.fields)) == 3
 
 def test_api_prompt_update(client, db_session)
-    
-    Teste la mise à jour d'un prompt spécifique via PUT apipromptsid.
-    
+    """
+    Teste la mise à jour d'un prompt spécifique via PUT /api/prompts/<id>.
+    """
     # --- Setup  Créer un prompt initial en BDD ---
     prompt = Prompt(
         id=str(uuid.uuid4()),
