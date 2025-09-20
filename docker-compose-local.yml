@@ -63,7 +63,7 @@ services:
     volumes:
       - ./projects:/home/appuser/app/projects # Persistance des données de projets
       - ./model_cache:/home/appuser/app/model_cache # Persistance du cache des modèles
-      # - .:/home/appuser/app # Commenté pour forcer l'utilisation du code de l'image Docker
+      - .:/home/appuser/app  # <--- DÉ-COMMENTEZ CETTE LIGNE
     environment:
       - TESTING=true
       - FLASK_ENV=production
