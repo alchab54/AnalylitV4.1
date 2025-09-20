@@ -286,7 +286,7 @@ def create_app(config=None):
     # --- FIN DES AJOUTS POUR L'EXTENSION ZOTERO ---
 
     # --- Enregistrement des routes (Blueprints ou routes directes) ---
-
+    
     # --- HEALTHCHECK ROUTE ---
     @app.route("/api/health", methods=["GET"])
     def health_check():
