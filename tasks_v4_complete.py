@@ -66,8 +66,8 @@ from utils.prompt_templates import (
     get_synthesis_prompt_template,
     get_rag_chat_prompt_template,
     get_effective_prompt_template,
-)
-from utils.logging_config import setup_logging # <-- AJOUT : Import de la fonction centralisée
+) # Import de la fonction centralisée
+from utils.logging_config import setup_logging
 
 # --- Configuration globale ---
 config = get_config()
@@ -156,14 +156,14 @@ def update_project_status(session, project_id: str, status: str, result: dict = 
 def log_processing_status(session, project_id: str, article_id: str, status: str, details: str):
     """Enregistre un événement de traitement dans processing_log."""
     
-    # CORRECTION : Nous devons générer manuellement l'UUID car nous utilisons du SQL brut. 
+    # Nous devons générer manuellement l'UUID car nous utilisons du SQL brut.
     log_id = str(uuid.uuid4()) 
     
     session.execute(text("""
         INSERT INTO processing_log (id, project_id, pmid, task_name, status, details, "timestamp")
         VALUES (:id, :project_id, :pmid, :task_name, :status, :details, :ts)
     """), {
-        "id": log_id, # <-- AJOUTÉ
+        "id": log_id,
         "project_id": project_id, 
         "pmid": article_id, 
         "task_name": "process_article",
@@ -247,7 +247,7 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
     # Il faut s'assurer que les tables existent avant que la tâche ne s'exécute.
     if os.environ.get('TESTING') == 'true':
         from utils.database import init_database
-        init_database()  # ← CORRECT
+        init_database()
 
     if os.environ.get("ANALYLIT_TEST_MODE") == "true":
         _mock_multi_database_search_task(session, project_id, query, databases, max_results_per_db)
@@ -382,10 +382,8 @@ def process_single_article_task(session, project_id: str, article_id: str, profi
         fields = [{"name": f, "description": f} for f in fields_list]
         tpl = get_effective_prompt_template("full_extraction_prompt", get_full_extraction_prompt_template(fields))
         
-        # ***** CORRECTION (pour le TypeError) *****
         # Assurer un fallback si database_source est None dans la DB
         prompt = tpl.replace("{text}", text_for_analysis).replace("{database_source}", article.get("database_source") or "unknown")
-        # ***** FIN CORRECTION *****
 
         extracted = call_ollama_api(prompt, profile["extract_model"], output_format="json")
 
@@ -441,8 +439,7 @@ def run_discussion_generation_task(session, project_id: str):
     """Génère le brouillon de la discussion."""
     update_project_status(session, project_id, 'generating_analysis')
     rows = session.execute(text("SELECT e.extracted_data, e.pmid, s.title, e.relevance_score FROM extractions e JOIN search_results s ON e.project_id = s.project_id AND e.pmid = s.article_id WHERE e.project_id = :pid AND e.relevance_score >= 7 AND e.extracted_data IS NOT NULL"), {"pid": project_id}).mappings().all()
-    if not rows:
-        # CORRECTION: Ne pas lever d'erreur, mais mettre à jour le statut et notifier.
+    if not rows: # Ne pas lever d'erreur, mais mettre à jour le statut et notifier.
         update_project_status(session, project_id, 'failed')
         send_project_notification(project_id, 'analysis_failed', "Aucune donnée d'extraction pertinente trouvée pour générer la discussion.")
         return
@@ -1044,7 +1041,6 @@ def run_risk_of_bias_task(session, project_id: str, article_id: str):
     if not rob_data or not isinstance(rob_data, dict):
         raise ValueError("La réponse de l'IA pour l'analyse RoB est invalide.")
 
-    # CORRECTION DANS tasks_v4_complete.py
     session.execute(text("""
         INSERT INTO risk_of_bias (id, project_id, pmid, article_id, domain_1_bias, domain_1_justification, domain_2_bias, domain_2_justification, overall_bias, overall_justification, created_at)
         VALUES (:id, :project_id, :pmid, :article_id, :d1b, :d1j, :d2b, :d2j, :ob, :oj, :ts)
@@ -1053,8 +1049,7 @@ def run_risk_of_bias_task(session, project_id: str, article_id: str):
             domain_2_bias = EXCLUDED.domain_2_bias, domain_2_justification = EXCLUDED.domain_2_justification,
             overall_bias = EXCLUDED.overall_bias, overall_justification = EXCLUDED.overall_justification;
         """), {
-        "id": str(uuid.uuid4()), "project_id": project_id,
-        "pmid": article_id,        # ← AJOUTER CETTE LIGNE CRITALE
+        "id": str(uuid.uuid4()), "project_id": project_id, "pmid": article_id,
         "article_id": article_id, "d1b": "Low risk", "d1j": "Randomisation claire.",
         "d2b": "Some concerns", "d2j": "Données manquantes notées.",
         "ob": "Some concerns", "oj": "Globalement OK.",

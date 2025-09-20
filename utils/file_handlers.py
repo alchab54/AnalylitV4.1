@@ -1,10 +1,9 @@
 # utils/file_handlers.py - Gestionnaires de fichiers
 import logging
 import re
-from pathlib import Path
+from pathlib import Path # Déjà importé plus bas, mais on garde pour la clarté
 from typing import Optional
 
-# --- NOUVELLES IMPORTATIONS POUR L'EXTRACTION ROBUSTE ---
 import fitz  # PyMuPDF
 import pdfplumber
 try:
@@ -15,20 +14,13 @@ except ImportError:
     pytesseract = None
     Image = None
     convert_from_path = None
-# --- FIN DES NOUVELLES IMPORTATIONS ---
-
-# (Supposons que vous avez vos autres importations ici, ex: get_upload_folder)
-# from config_v4 import Config 
-
 logger = logging.getLogger(__name__)
 
-# --- FONCTION MANQUANTE À AJOUTER ICI ---
 def ensure_directory_exists(path: str | Path):
     """Crée un répertoire s'il n'existe pas."""
     if isinstance(path, str):
         path = Path(path)
     path.mkdir(parents=True, exist_ok=True)
-# --- FIN DE L'AJOUT ---
 
 def sanitize_filename(filename: str) -> str:
     """Nettoie un nom de fichier pour le système de fichiers."""
@@ -200,10 +192,8 @@ def extract_text_from_pdf(pdf_path: str) -> str:
 def save_file_to_project_dir(file_storage, project_id, filename, projects_dir):
     """Sauvegarde un FileStorage dans le dossier du projet."""
     project_dir = projects_dir / project_id
-    # Utiliser la fonction dédiée
+    # Utiliser la fonction dédiée pour s'assurer que le répertoire existe
     ensure_directory_exists(project_dir) 
     save_path = project_dir / filename
     file_storage.save(str(save_path))
     logger.info(f"Fichier sauvegardé : {save_path}")
-
-# --- CORRECTION: Suppression de la fonction dupliquée ---
