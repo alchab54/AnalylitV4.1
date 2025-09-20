@@ -87,7 +87,6 @@ def create_app(config=None):
             abort(404, description="Resource not found")
         return result
 
-    # --- AJOUTEZ CE BLOC ---
     @app.route("/api/health", methods=["GET"])
     def health_check():
         """Route simple pour le healthcheck de Docker."""
@@ -96,44 +95,126 @@ def create_app(config=None):
 
     # --- NOUVEAUX ENDPOINTS POUR L'EXTENSION ZOTERO ---
 
-    # (Simulation - remplacez par vos vraies fonctions)
     @with_db_session
-    def get_validated_articles_data(session, project_id, status='included'):
-        logger.info(f"Simulation: Récupération des articles validés pour {project_id}")
-        # Logique fictive:
-        # Cette jointure est un exemple, adaptez-la à votre modèle si nécessaire
-        articles = session.query(SearchResult).join(Extraction, SearchResult.article_id == Extraction.pmid).filter(
-            SearchResult.project_id == project_id,
-            Extraction.user_validation_status == status
-        ).limit(10).all()
-        return [a.to_dict() for a in articles]
+    def get_validated_articles_data(session, project_id, status='include'):
+        """
+        Récupère tous les articles d'un projet ayant un statut de validation spécifique.
+        (Version non-simulée)
+        """
+        logger.info(f"Récupération des articles (statut: {status}) pour le projet {project_id}")
+        
+        try:
+            # Jointure entre SearchResult (infos de base) et Extraction (décision)
+            articles_query = session.query(SearchResult).join(
+                Extraction, SearchResult.article_id == Extraction.pmid
+            ).filter(
+                SearchResult.project_id == project_id,
+                Extraction.user_validation_status == status  # Utilise le statut fourni
+            )
+            
+            articles = articles_query.all()
+            logger.info(f"{len(articles)} articles récupérés pour l'export Zotero.")
+            
+            # Retourne une liste de dictionnaires complets des articles
+            return [a.to_dict() for a in articles]
+            
+        except Exception as e:
+            logger.error(f"Erreur lors de la récupération des articles validés pour {project_id}: {e}")
+            return []
 
-    def convert_to_zotero_format(articles_data: list) -> list:
-        logger.info(f"Simulation: Conversion de {len(articles_data)} articles au format Zotero")
-        # Logique fictive:
-        return [{"title": a.get('title', 'N/A'), "doi": a.get('doi', 'N/A')} for a in articles_data]
-    # (Fin de la simulation)
+    def convert_to_zotero_format(articles_data: list[dict]) -> list[dict]:
+        """
+        Convertit une liste de dictionnaires d'articles au format Zotero JSON standard.
+        (Version non-simulée)
+        """
+        logger.info(f"Conversion de {len(articles_data)} articles au format Zotero JSON.")
+        zotero_items = []
+        
+        for article in articles_data:
+            item = {
+                "itemType": "journalArticle",
+                "title": article.get('title', 'Titre inconnu'),
+                "creators": [],
+                "abstractNote": article.get('abstract', ''),
+                "publicationTitle": article.get('journal', ''),
+                "volume": article.get('volume', ''),
+                "issue": article.get('issue', ''),
+                "pages": article.get('pages', ''),
+                "date": article.get('publication_date', ''),
+                "DOI": article.get('doi', ''),
+                "url": article.get('url', ''),
+                "tags": article.get('keywords', []),
+                "libraryCatalog": article.get('database_source', 'Analylit') 
+            }
+            
+            # Gestion détaillée des auteurs
+            authors_str = article.get('authors', '')
+            if authors_str:
+                try:
+                    for author_name in authors_str.split(';'):
+                        author_name = author_name.strip()
+                        if not author_name:
+                            continue
+                        parts = author_name.split(',')
+                        if len(parts) >= 2:
+                            item["creators"].append({"creatorType": "author", "firstName": parts[1].strip(), "lastName": parts[0].strip()})
+                        elif len(parts) == 1 and parts[0]:
+                            name_parts = parts[0].split(' ', 1)
+                            if len(name_parts) == 2:
+                                item["creators"].append({"creatorType": "author", "firstName": name_parts[0], "lastName": name_parts[1]})
+                            else:
+                                item["creators"].append({"creatorType": "author", "name": parts[0].strip()})
+                except Exception as e:
+                    logger.warning(f"Erreur au formatage des auteurs '{authors_str}', utilisation du fallback: {e}")
+                    if not item["creators"]:
+                        item["creators"].append({"creatorType": "author", "name": authors_str})
+            zotero_items.append(item)
+        return zotero_items
 
-    def add_articles_to_project_bulk(session, project_id, articles_data):
-        """Fonction d'insertion en masse simulée. Adaptez-la à votre logique."""
+    def add_articles_to_project_bulk(session, project_id, articles_data: list[dict]) -> int:
+        """
+        Insère en masse des articles dans la table SearchResult pour un projet,
+        en ignorant les conflits (basés sur project_id et article_id).
+        (Version non-simulée)
+        """
         from sqlalchemy.dialects.postgresql import insert
         
         if not articles_data:
+            logger.warning(f"Tentative d'insertion en masse de 0 article pour le projet {project_id}.")
             return 0
 
-        # Préparer les données pour l'insertion
+        prepared_records = []
         for record in articles_data:
+            # S'assurer que les champs obligatoires ont des valeurs
             record['project_id'] = project_id
             if 'id' not in record:
                 record['id'] = str(uuid.uuid4())
+            
+            # Fournir des valeurs par défaut si manquant
+            record.setdefault('title', 'Titre non disponible')
+            # article_id est crucial pour la déduplication
+            record.setdefault('article_id', record.get('doi') or record.get('pmid') or f"manual:{record['id']}")
+            
+            prepared_records.append(record)
 
         # Utiliser l'instruction 'ON CONFLICT' de PostgreSQL
-        stmt = insert(SearchResult).values(articles_data)
+        # Assure l'existence de l'index UNIQUE (project_id, article_id) dans votre modèle
+        stmt = insert(SearchResult).values(prepared_records)
         stmt = stmt.on_conflict_do_nothing(
             index_elements=['project_id', 'article_id']
         )
-        result = session.execute(stmt)
-        return result.rowcount
+        
+        try:
+            result = session.execute(stmt)
+            return result.rowcount
+        except IntegrityError as e:
+            logger.error(f"Erreur d'intégrité lors de l'insertion en masse (l'index unique manque ?): {e}")
+            session.rollback()
+            return 0
+        except Exception as e:
+            logger.error(f"Erreur inattendue lors de l'insertion en masse: {e}")
+            session.rollback()
+            return 0
 
     @with_db_session
     def process_zotero_import(session, project_id: int, items: list[dict]) -> int:
