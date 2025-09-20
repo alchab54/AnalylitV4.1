@@ -699,6 +699,7 @@ def create_app(config=None):
             job = analysis_queue.enqueue(
                 task_function,
                 project_id=project_id,
+                job_timeout='30m',  # <-- AJOUTEZ CETTE LIGNE
                 **data.get('parameters', {})
             )
             

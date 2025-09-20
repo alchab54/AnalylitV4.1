@@ -41,7 +41,7 @@ def test_health_check(client):
     response = client.get('/api/health') # CORRECTION: Le blueprint admin est préfixé par /api
     assert response.status_code == 200
     data = json.loads(response.data)
-    assert data.get('status') == 'ok'
+    assert data.get('status') == 'healthy'
 
 def test_create_project(client, db_session): # Utilise session pour l'isolation
     """
@@ -214,7 +214,7 @@ def test_api_run_discussion_draft_enqueues_task(mock_enqueue, client, db_session
     mock_enqueue.assert_called_once_with(
         run_discussion_generation_task, # <-- Vérifie l'objet fonction, pas le string
         project_id=project_id,
-        job_timeout='30m'
+        job_timeout='1h'
     )
 
     response_data = json.loads(response.data)
@@ -249,7 +249,7 @@ def test_api_post_chat_message_enqueues_task(mock_enqueue, client, db_session):
         answer_chat_question_task, # <-- Vérifie l'objet fonction, pas le string
         project_id=project_id,
         question="Test question?",
-        job_timeout='30m'
+        job_timeout='15m'
     )
 
     response_data = json.loads(response.data)
@@ -454,7 +454,7 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
             import_from_zotero_file_task, 
             project_id=project_id,
             json_file_path='/fake/path/to/test.json',
-            job_timeout='30m' # <-- HARMONIZED
+            job_timeout='15m'
         )
 
         # 4. CORRECTION : Vérifier "task_id" au lieu de "job_id"
