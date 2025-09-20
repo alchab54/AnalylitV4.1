@@ -240,7 +240,7 @@ def run_advanced_analysis(project_id):
     job = analysis_queue.enqueue(task_function, project_id=project_id, job_timeout='30m')
     return jsonify({"message": f"Analyse '{analysis_type}' lancée", "task_id": job.id}), 202
 
-@projects_bp.route('/projects/<project_id>/import-zotero', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/import-zotero-pdfs', methods=['POST'])
 def import_zotero_pdfs(project_id):
     data = request.get_json()
     pmids = data.get('articles', [])
@@ -286,7 +286,7 @@ def upload_zotero_file(project_id):
         logger.error(f"Erreur lors de l'upload du fichier Zotero: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
     
-@projects_bp.route('/projects/<project_id>/import-zotero-json', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/import-zotero', methods=['POST'])
 def import_zotero_json(project_id):
     data = request.get_json()
     items_list = data.get('items', [])
