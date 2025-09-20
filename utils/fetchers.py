@@ -73,8 +73,8 @@ class DatabaseManager:
             root = ET.fromstring(xml_data)
             for entry in root.findall('atom:entry', ns):
                 arxiv_id_node = entry.find('atom:id', ns)
-                # Extrait l'ID, ex: 'http://arxiv.org/abs/2304.01234v1' -> '2304.01234'
-                arxiv_id = arxiv_id_node.text.split('/abs/')[-1].split('v')[0] if arxiv_id_node is not None else ''
+                # CORRECTION: Extrait l'ID correctement, ex: 'http://arxiv.org/abs/1234.5678v1' -> '1234.5678v1'
+                arxiv_id = arxiv_id_node.text.split('/abs/')[-1] if arxiv_id_node is not None else ''
 
                 title_node = entry.find('atom:title', ns)
                 title = title_node.text.strip() if title_node is not None else 'N/A'

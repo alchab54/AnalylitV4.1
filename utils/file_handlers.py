@@ -66,14 +66,14 @@ def extract_text_from_pdf(pdf_path: str) -> Optional[str]:
     if full_text.strip():
         return full_text
 
+    # Fallback avec PyPDF2
     try:
-        # Fallback avec PyPDF2
         with open(pdf_path, 'rb') as file:
             pdf_reader = PyPDF2.PdfReader(file)
             text_parts = []
             
             for page in pdf_reader.pages:
-                page_text = page.extract_text()
+                page_text = page.extract_text() or ""
                 if page_text:
                     text_parts.append(page_text)
             full_text_pypdf = "\n".join(text_parts)

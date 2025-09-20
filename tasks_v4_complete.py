@@ -1111,6 +1111,7 @@ def add_manual_articles_task(session, project_id: str, identifiers: list):
     send_project_notification(project_id, 'import_completed', f'Ajout manuel terminé: {len(records_to_insert)} article(s) ajouté(s).')
     logger.info(f"âœ… Ajout manuel terminé pour le projet {project_id}. {len(records_to_insert)} articles ajoutés.")
 
+@with_db_session
 def import_from_zotero_json_task(project_id: str, items_list: list):
     """
     Tâche asynchrone pour importer une LISTE d'objets JSON Zotero (envoyée par l'extension)

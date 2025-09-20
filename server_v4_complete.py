@@ -396,10 +396,10 @@ def create_app(config=None):
         
         try:
             # 1. Récupérer les données pertinentes (articles inclus)
-            articles_query = session.query(SearchResult)\
-                .join(Extraction, SearchResult.article_id == Extraction.pmid)\
-                .filter(SearchResult.project_id == project_id)\
-                .filter(Extraction.user_validation_status == 'include')
+            articles_query = (session.query(SearchResult)
+                              .join(Extraction, SearchResult.article_id == Extraction.pmid)
+                              .filter(SearchResult.project_id == project_id)
+                              .filter(Extraction.user_validation_status == 'include'))
             
             articles = [
                 {
