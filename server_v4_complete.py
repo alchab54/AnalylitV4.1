@@ -35,7 +35,8 @@ from tasks_v4_complete import (
     run_synthesis_task, run_discussion_generation_task, run_knowledge_graph_task,
     run_prisma_flow_task, run_meta_analysis_task, run_descriptive_stats_task,
     run_atn_score_task, import_from_zotero_file_task, import_pdfs_from_zotero_task,
-    index_project_pdfs_task, answer_chat_question_task, run_risk_of_bias_task,
+    index_project_pdfs_task, answer_chat_question_task, run_risk_of_bias_task, # NOUVELLE IMPORTATION
+    import_from_zotero_json_task,
     add_manual_articles_task, pull_ollama_model_task, calculate_kappa_task
 )
 
@@ -59,9 +60,15 @@ def create_app(config=None):
     # init_database()  # Removed to prevent duplicate initialization  
 
     # --- Configuration des extensions ---
-    CORS(app, origins=["http://localhost:8080", "http://127.0.0.1:8080"],
+    # --- AJOUTER LA CONFIGURATION CORS ---
+    CORS(app, origins=[
+        "chrome-extension://*", # Pour l'extension Chrome/Edge
+        "moz-extension://*",    # Pour un futur support Firefox
+        "http://localhost:8080", "http://127.0.0.1:8080", # Pour le développement local
+        "https://*.zotero.org"  # Pour l'injection de script
+        ],
          expose_headers=["Content-Disposition"],
-         supports_credentials=True)
+         supports_credentials=True) 
 
     socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent')
 
@@ -71,6 +78,41 @@ def create_app(config=None):
         if result is None:
             abort(404, description="Resource not found")
         return result
+
+    # --- NOUVEAUX ENDPOINTS POUR L'EXTENSION ZOTERO ---
+
+    @app.route('/api/health', methods=['GET'])
+    def health_check():
+        """Endpoint pour vérifier la connexion de l'extension"""
+        return jsonify({"status": "healthy", "version": "4.1"})
+
+    @app.route('/api/projects/<project_id>/import-zotero', methods=['POST'])
+    def import_from_zotero_extension(project_id):
+        """
+        Import des données Zotero via l'extension (payload JSON).
+        Ceci est DISTINCT de l'endpoint d'upload de fichier de l'app web.
+        """
+        try:
+            data = request.get_json()
+            if not data:
+                return jsonify({"success": False, "message": "Payload JSON manquant."}), 400
+                
+            items = data.get('items', [])
+            import_type = data.get('importType', 'manual') # 'selected', 'collection', 'library'
+            
+            logger.info(f"Import Zotero (extension) type '{import_type}' pour projet {project_id}")
+            
+            # Lancer la tâche asynchrone pour l'importation
+            job = background_queue.enqueue(import_from_zotero_json_task, project_id=project_id, items_list=items, job_timeout='15m')
+            
+            return jsonify({
+                "success": True,
+                "message": f"Tâche d'importation lancée pour {len(items)} article(s).",
+                "task_id": job.id
+            }), 202
+        except Exception as e:
+            logger.error(f"Erreur API /import-zotero: {e}", exc_info=True)
+            return jsonify({"success": False, "message": str(e)}), 500
 
     # --- Enregistrement des routes (Blueprints ou routes directes) ---
     # ==================== ROUTES API PROJECTS ====================
@@ -386,58 +428,6 @@ def create_app(config=None):
         except Exception as e:
             logging.error(f"Erreur upload-zotero-file: {e}")
             return jsonify({"error": f"Erreur: {str(e)}"}), 400
-        
-    @app.route('/api/projects/<project_id>/export/thesis', methods=['GET'])
-    @with_db_session
-    def export_thesis(session, project_id):
-        """Génère et retourne un export complet de thèse (Excel, Biblio) dans un fichier zip."""
-        import pandas as pd
-        from flask import send_file
-        
-        try:
-            # 1. Récupérer les données pertinentes (articles inclus)
-            articles_query = (
-                session.query(SearchResult)
-                .join(Extraction, SearchResult.article_id == Extraction.pmid)
-                .filter(SearchResult.project_id == project_id)
-                .filter(Extraction.user_validation_status == "include")
-            )
-            
-            articles = [
-                {
-                    'title': r.title, 'authors': r.authors, 'publication_date': r.publication_date,
-                    'journal': r.journal, 'abstract': r.abstract
-                } for r in articles_query.all()
-            ]
-
-            if not articles:
-                return jsonify({"error": "Aucun article inclus à exporter"}), 404
-
-            # 2. Créer le DataFrame et le fichier Excel en mémoire
-            df = pd.DataFrame(articles)
-            excel_buffer = io.BytesIO()
-            df.to_excel(excel_buffer, index=False, sheet_name='Articles Inclus')
-            excel_buffer.seek(0)
-
-            # 3. Formater la bibliographie
-            bibliography_text = "\n".join(format_bibliography(articles))
-
-            # 4. Créer le fichier zip en mémoire
-            zip_buffer = io.BytesIO()
-            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-                zip_file.writestr('export_articles.xlsx', excel_buffer.read())
-                zip_file.writestr('bibliographie.txt', bibliography_text.encode('utf-8'))
-            zip_buffer.seek(0)
-            
-            return send_file(
-                zip_buffer,
-                as_attachment=True,
-                download_name=f'export_these_{project_id}.zip',
-                mimetype='application/zip'
-            )
-        except Exception as e:
-            logging.error(f"Erreur lors de l'export de la thèse: {e}")
-            return jsonify({"error": "Erreur lors de la génération de l'export"}), 500
 
     @app.route('/api/projects/<project_id>/upload-pdfs-bulk', methods=['POST'])
     @with_db_session
@@ -1260,10 +1250,6 @@ def create_app(config=None):
             return jsonify({"message": "Demande d'annulation envoyée."} ), 200
         except Exception as e:
             return jsonify({"error": f"Impossible d'annuler la tâche: {e}"} ), 400
-
-    @app.route('/api/health', methods=['GET'])
-    def health_check():
-        return jsonify({"status": "ok", "version": "4.1.0"}), 200
 
     @app.route('/api/queues/status', methods=['GET'])
     def get_queues_status():
