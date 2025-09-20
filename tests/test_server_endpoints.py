@@ -415,7 +415,7 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
         pmids=["pmid1", "pmid2"],
         zotero_user_id="123",
         zotero_api_key="abc",
-        job_timeout='1h'
+        job_timeout='30m' # <-- HARMONIZED
     )
 
 @patch('utils.app_globals.background_queue.enqueue') 
@@ -453,7 +453,8 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
         mock_q_enqueue.assert_called_once_with(
             import_from_zotero_file_task, 
             project_id=project_id,
-            json_file_path='/fake/path/to/test.json'
+            json_file_path='/fake/path/to/test.json',
+            job_timeout='30m' # <-- HARMONIZED
         )
 
         # 4. CORRECTION : Vérifier "task_id" au lieu de "job_id"
