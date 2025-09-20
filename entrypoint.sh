@@ -16,4 +16,4 @@ echo "Initialisation de la base de données et seeding..."
 python -c 'from utils.database import init_database; init_database()'
 
 echo "Démarrage de l'application Flask..."
-exec python server_v4_complete.py
+exec "$@"

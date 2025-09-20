@@ -307,6 +307,9 @@ def create_app(config=None):
         
         try:
             pmids = data.get("articles", [])
+            # CORRECTION: Lire les identifiants depuis le payload
+            zotero_user_id = data.get("zotero_user_id")
+            zotero_api_key = data.get("zotero_api_key")
             job = background_queue.enqueue(
                 import_pdfs_from_zotero_task,
                 project_id=project_id,
@@ -354,8 +357,9 @@ def create_app(config=None):
         except Exception as e:
             return jsonify({"error": f"Erreur: {str(e)}"}), 400
     
-    @app.route("/api/projects/<project_id>/upload-zotero-file", methods=["POST"])
-    def upload_zotero_file(project_id): # <-- "project_id" est ici
+    @app.route('/api/projects/<project_id>/upload-zotero-file', methods=['POST'])
+    @with_db_session
+    def upload_zotero_file(session, project_id): # <-- "project_id" est ici
         """Upload Zotero file."""
         try:
             if 'file' not in request.files:
@@ -366,13 +370,19 @@ def create_app(config=None):
                 return jsonify({"error": "Fichier vide"}), 400
 
             filename = secure_filename(file.filename)
-            # La sauvegarde utilise maintenant le project_id de l'URL
+            # Conserver la signature utilisée par vos utilitaires
             file_path = save_file_to_project_dir(file, project_id, filename, PROJECTS_DIR)
 
-            job = background_queue.enqueue(import_from_zotero_file_task, project_id=project_id, json_file_path=str(file_path))
+            job = background_queue.enqueue(
+                import_from_zotero_file_task,
+                project_id=project_id,
+                json_file_path=str(file_path),
+                job_timeout='15m'
+            )
             task_id = str(job.id) if job and job.id else "unknown"
             return jsonify({"message": "Importation Zotero lancée", "task_id": task_id}), 202
         except Exception as e:
+            logging.error(f"Erreur upload-zotero-file: {e}")
             return jsonify({"error": f"Erreur: {str(e)}"}), 400
         
     @app.route('/api/projects/<project_id>/export/thesis', methods=['GET'])
@@ -518,7 +528,12 @@ def create_app(config=None):
         if not data or 'question' not in data:
             return jsonify({"error": "Question requise"}), 400
         try:
-            job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=data['question'], job_timeout='15m')
+            job = background_queue.enqueue(
+                answer_chat_question_task,
+                project_id=project_id,
+                question=data['question'],
+                job_timeout='15m'
+            )
             # Assurez-vous de retourner l'ID du job
             task_id = str(job.id) if job and job.id else "unknown"
             logging.debug(f"Chat endpoint returning: {{'message': 'Question soumise', 'task_id': {task_id}}}")

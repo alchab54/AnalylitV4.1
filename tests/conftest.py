@@ -1,11 +1,18 @@
 # tests/conftest.py
 import pytest
-from server_v4_complete import create_app
+# from server_v4_complete import create_app # Remove this line
 from utils.database import init_database, get_session
+import sys
+import importlib
 
 @pytest.fixture(scope='session')
 def app():
     """Crée une instance de l'application Flask pour les tests."""
+    # Force a fresh import of the module
+    if 'server_v4_complete' in sys.modules:
+        del sys.modules['server_v4_complete']
+    from server_v4_complete import create_app # Import after removal
+
     app = create_app({
         'TESTING': True,
         'WTF_CSRF_ENABLED': False
@@ -23,13 +30,12 @@ def client(app):
 
 @pytest.fixture(autouse=True)
 def clean_db_before_test(app):
-    """Nettoie la base avant CHAQUE test automatiquement."""
+    """Nettoyage de la base de données avant chaque test."""
     with app.app_context():
         try:
             from utils.models import Project, AnalysisProfile, SearchResult, Extraction, Grid, ChatMessage, RiskOfBias, Prompt
             session = get_session()
             
-            # Nettoyage dans l'ordre des dépendances
             session.query(ChatMessage).delete()
             session.query(RiskOfBias).delete()
             session.query(Extraction).delete()
@@ -41,7 +47,7 @@ def clean_db_before_test(app):
             session.commit()
             session.close()
         except Exception:
-            pass  # Ignore les erreurs de nettoyage
+            pass
 
 @pytest.fixture
 def db_session(app):

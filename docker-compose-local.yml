@@ -58,31 +58,38 @@ services:
       context: .
       dockerfile: Dockerfile-web-complete
     container_name: analylit-web-v4
+    ports:
+      - "5000:5000"
     volumes:
-      - ./projects:/home/appuser/app/projects
-      - ./model_cache:/home/appuser/app/model_cache
-      - .:/home/appuser/app  # Monte le code source pour le développement
+      - ./projects:/home/appuser/app/projects # Persistance des données de projets
+      - ./model_cache:/home/appuser/app/model_cache # Persistance du cache des modèles
+      # - .:/home/appuser/app # Commenté pour forcer l'utilisation du code de l'image Docker
     environment:
       - TESTING=true
-      - FLASK_ENV=testing
+      - FLASK_ENV=production
+      - FLASK_APP=server_v4_complete:create_app
+      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_RUN_PORT=5000
       - POSTGRES_HOST=db
       - TEST_DATABASE_URL=postgresql://analylit_user:strong_password@db/analylit_db_test
       - POSTGRES_PORT=5432
-      - PYTHONPATH=/home/appuser/app # Assure que le chemin est correct
+      - PYTHONPATH=/home/appuser/app
     env_file:
       - .env
-    command: ["/home/appuser/app/entrypoint.sh"]
+    command: ["flask", "run", "--no-debugger", "--no-reload"]
     depends_on:
       db:
         condition: service_started
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
-      interval: 5s     # <-- Vérifie toutes les 5 secondes
-      timeout: 3s      # <-- Considère l'échec après 3 secondes
-      retries: 5
-      start_period: 10s  # <-- Donne 10 secondes au serveur pour démarrer
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+
+
     networks:
       - analylit-network
     restart: unless-stopped
@@ -97,16 +104,16 @@ services:
     volumes:
       - ./projects:/home/appuser/app/projects
       - ./model_cache:/home/appuser/app/model_cache
-      - .:/home/appuser/app # Monte le code source pour le développement
+      - .:/home/appuser/app
     env_file: .env
     environment:
       - PYTHONUNBUFFERED=1
-      - PYTHONPATH=/home/appuser/app # CORRECTION DÉFINITIVE
+      - PYTHONPATH=/home/appuser/app
       - TESTING=true
       - TEST_DATABASE_URL=postgresql://analylit_user:strong_password@db/analylit_db_test
       - FLASK_ENV=testing
-    command: >
-      rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4
+    # ----- CORRECTION DE LA SYNTAXE YAML -----
+    command: rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4
     depends_on:
       db:
         condition: service_started
@@ -131,7 +138,6 @@ services:
       dockerfile: Dockerfile-nginx
     volumes:
       - ./web:/usr/share/nginx/html:ro
-      # ↖ Ceci mappe ton dossier local `web` sur la racine statique vue par Nginx
     container_name: analylit-nginx-v4
     ports:
       - "8080:80"
