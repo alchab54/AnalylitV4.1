@@ -1157,8 +1157,7 @@ def import_from_zotero_json_task(project_id: str, items_list: list):
                     journal=data.get('publicationTitle', ''),
                     doi=data.get('DOI'),
                     url=data.get('url'),
-                    database_source='Zotero (Extension)',
-                    raw_data=json.dumps(item) # Stocker l'enregistrement Zotero original
+                    database_source='Zotero (Extension)'
                 )
                 session.add(new_article)
                 imported_count += 1

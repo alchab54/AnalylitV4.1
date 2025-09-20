@@ -55,7 +55,7 @@ def test_create_project(client, db_session): # Utilise session pour l'isolation
         'mode': 'screening'
     }
 
-    response = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
+    response = client.post('/api/projects/', data=json.dumps(project_data), content_type='application/json')
     assert response.status_code == 201
     response_data = json.loads(response.data)
     assert 'id' in response_data
@@ -82,7 +82,7 @@ def test_get_project_details(client, db_session): # Utilise session
     """
     # 1. Create a project first
     project_data = {'name': 'Project Details', 'description': 'Desc', 'mode': 'screening'}
-    create_response = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
+    create_response = client.post('/api/projects/', data=json.dumps(project_data), content_type='application/json')
     created_project = json.loads(create_response.data)
     project_id = created_project['id']
 
@@ -115,7 +115,7 @@ def test_delete_project(client, db_session): # Utilise session
     """
     # 1. Create a project
     project_data = {'name': 'Project to Delete', 'description': 'Desc', 'mode': 'screening'}
-    create_response = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
+    create_response = client.post('/api/projects/', data=json.dumps(project_data), content_type='application/json')
     assert create_response.status_code == 201
     project_id = json.loads(create_response.data)['id']
 
@@ -153,16 +153,16 @@ def test_get_all_projects(client, db_session): # Utilise session
     project1_data = {'name': 'Project One', 'description': 'Desc 1', 'mode': 'screening'}
     project2_data = {'name': 'Project Two', 'description': 'Desc 2', 'mode': 'full_extraction'}
 
-    create_response1 = client.post('/api/projects', data=json.dumps(project1_data), content_type='application/json')
+    create_response1 = client.post('/api/projects/', data=json.dumps(project1_data), content_type='application/json')
     assert create_response1.status_code == 201
     created_project1 = json.loads(create_response1.data)
 
-    create_response2 = client.post('/api/projects', data=json.dumps(project2_data), content_type='application/json')
+    create_response2 = client.post('/api/projects/', data=json.dumps(project2_data), content_type='application/json')
     assert create_response2.status_code == 201
     created_project2 = json.loads(create_response2.data)
 
     # 2. Make a GET request
-    response = client.get('/api/projects')
+    response = client.get('/api/projects/')
     data = json.loads(response.data)
 
     # 3. Assertions
@@ -185,7 +185,7 @@ def test_get_all_projects_empty(client, db_session): # Utilise session
     WHEN the '/api/projects' route is called with GET
     THEN check that the response is 200 OK and contains an empty list.
     """
-    response = client.get('/api/projects')
+    response = client.get('/api/projects/')
     data = json.loads(response.data)
     assert response.status_code == 200
     assert isinstance(data, list)
@@ -201,7 +201,7 @@ def test_api_run_discussion_draft_enqueues_task(mock_enqueue, client, db_session
     mock_job.id = "mocked_job_id_123"
     mock_enqueue.return_value = mock_job
     project_data = {'name': 'API Test Discussion', 'mode': 'screening'}
-    resp = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
+    resp = client.post('/api/projects/', data=json.dumps(project_data), content_type='application/json')
     project_id = json.loads(resp.data)['id']
 
     # ACT
@@ -230,7 +230,7 @@ def test_api_post_chat_message_enqueues_task(mock_enqueue, client, db_session):
     mock_job.id = "mocked_chat_job_456"
     mock_enqueue.return_value = mock_job
     project_data = {'name': 'API Test Chat', 'mode': 'screening'}
-    resp = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
+    resp = client.post('/api/projects/', data=json.dumps(project_data), content_type='application/json')
     project_id = json.loads(resp.data)['id']
 
     chat_data = {"question": "Test question?"}
@@ -269,7 +269,7 @@ def test_api_search_enqueues_task(mock_enqueue, client, db_session):
     mock_job.id = "mocked_search_job"
     mock_enqueue.return_value = mock_job
     project_data = {'name': 'API Test Search', 'mode': 'screening'}
-    resp = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
+    resp = client.post('/api/projects/', data=json.dumps(project_data), content_type='application/json')
     project_id = json.loads(resp.data)['id']
 
     search_payload = {
@@ -307,7 +307,7 @@ def test_api_run_pipeline_enqueues_tasks(mock_enqueue, client, db_session):
 
     # 2. Créer le projet
     project_data = {'name': 'API Test Run', 'mode': 'screening'}
-    resp = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
+    resp = client.post('/api/projects/', data=json.dumps(project_data), content_type='application/json')
     project_id = json.loads(resp.data)['id']
 
     run_payload = {
@@ -362,7 +362,7 @@ def test_api_run_advanced_analysis_enqueues_tasks(mock_enqueue, analysis_type, e
     mock_job.id = f"job_for_{analysis_type}"
     mock_enqueue.return_value = mock_job
     project_data = {'name': f'API Test {analysis_type}', 'mode': 'screening'}
-    resp = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
+    resp = client.post('/api/projects/', data=json.dumps(project_data), content_type='application/json')
     project_id = json.loads(resp.data)['id']
 
     analysis_payload = {"type": analysis_type}
@@ -388,7 +388,7 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
     mock_job.id = "zotero_pdf_job"
     mock_enqueue.return_value = mock_job
     project_data = {'name': 'API Test Zotero PDF', 'mode': 'screening'}
-    resp = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
+    resp = client.post('/api/projects/', data=json.dumps(project_data), content_type='application/json')
     project_id = json.loads(resp.data)['id']
 
     # CORRECTION : Le payload doit contenir les clés Zotero
@@ -402,7 +402,7 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
     # ACT
     # Les patchs pour 'open' et 'json.load' ne sont pas nécessaires ici
     response = client.post(
-        f'/api/projects/{project_id}/import-zotero', 
+        f'/api/projects/{project_id}/import-zotero/', 
         data=json.dumps(import_payload), 
         content_type='application/json'
     )
@@ -422,7 +422,7 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
     mock_job.id = "zotero_file_job_q"
     mock_q_enqueue.return_value = mock_job
     project_data = {'name': 'API Test Zotero File', 'mode': 'screening'}
-    resp = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
+    resp = client.post('/api/projects/', data=json.dumps(project_data), content_type='application/json')
     project_id = json.loads(resp.data)['id']
 
     file_data = {'file': (io.BytesIO(b'{"items": []}'), 'test.json')}
@@ -468,7 +468,7 @@ def test_api_run_rob_analysis_enqueues_task(mock_enqueue, client, db_session):
     mock_job2.id = "mock_rob_job_2" # CORRECTION: Le mock doit retourner un objet avec un attribut 'id'
     mock_enqueue.side_effect = [mock_job1, mock_job2]
 
-    resp = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
+    resp = client.post('/api/projects/', data=json.dumps(project_data), content_type='application/json')
     project_id = json.loads(resp.data)['id']
 
     rob_payload = {"article_ids": ["pmid100", "pmid200"]}

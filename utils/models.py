@@ -87,6 +87,9 @@ class SearchResult(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     query = Column(String, nullable=True)
 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 class Extraction(Base):
     __tablename__ = 'extractions'
     __table_args__ = {'schema': SCHEMA} if SCHEMA else {}

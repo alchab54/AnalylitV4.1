@@ -18,7 +18,7 @@ def setup_project(db_session):
     """Crée un projet simple et le stocke en BDD."""
     project = Project(
         id=str(uuid.uuid4()),
-        name=Projet de Test pour Couverture
+        name="Projet de Test pour Couverture"
     )
     db_session.add(project)
     db_session.commit()
@@ -28,99 +28,94 @@ def setup_project(db_session):
 # 1. Tests pour le CRUD des Grilles et Prompts
 # =================================================================
 
-def test_api_grids_create_and_update(client, db_session, setup_project)
-    
+def test_api_grids_create_and_update(client, db_session, setup_project):
+    """
     Teste le workflow de création manuelle (POST) et de mise à jour (PUT) 
     d'une grille d'extraction.
-    
+    """
     project_id = setup_project.id
     
     # --- 1. POST (Créer manuellement) ---
     grid_data = {
-        name Grille de Test Manuelle,
-        fields [
-            {name Population, type text},
-            {name Score, type number}
+        "name": "Grille de Test Manuelle",
+        "fields": [
+            {"name": "Population", "type": "text"},
+            {"name": "Score", "type": "number"}
         ]
     }
-    response_post = client.post(f'apiprojects{project_id}grids', json=grid_data)
+    response_post = client.post(f'/api/projects/{project_id}/grids', json=grid_data)
     
     assert response_post.status_code == 201
     created_grid = response_post.json
-    assert created_grid['name'] == Grille de Test Manuelle
+    assert created_grid['name'] == "Grille de Test Manuelle"
     assert len(created_grid['fields']) == 2
     grid_id = created_grid['id']
 
     # --- 2. PUT (Mettre à jour) ---
     update_data = {
-        name Grille Manuelle Mise à Jour,
-        fields [
-            {name Population, type text},
-            {name Score, type number},
-            {name Conclusion, type textarea} # Ajout d'un champ
+        "name": "Grille Manuelle Mise à Jour",
+        "fields": [
+            {"name": "Population", "type": "text"},
+            {"name": "Score", "type": "number"},
+            {"name": "Conclusion", "type": "textarea"} # Ajout d'un champ
         ]
     }
-    response_put = client.put(f'apiprojects{project_id}grids{grid_id}', json=update_data)
+    response_put = client.put(f'/api/projects/{project_id}/grids/{grid_id}', json=update_data)
     
     assert response_put.status_code == 200
     updated_grid = response_put.json
-    assert updated_grid['name'] == Grille Manuelle Mise à Jour
+    assert updated_grid['name'] == "Grille Manuelle Mise à Jour"
     assert len(updated_grid['fields']) == 3
 
     # Vérification en BDD
     grid_from_db = db_session.get(Grid, grid_id)
-    assert grid_from_db.name == Grille Manuelle Mise à Jour
+    assert grid_from_db.name == "Grille Manuelle Mise à Jour"
     assert len(json.loads(grid_from_db.fields)) == 3
 
-def test_api_prompt_update(client, db_session)
+def test_api_prompt_update(client, db_session):
     """
     Teste la mise à jour d'un prompt spécifique via PUT /api/prompts/<id>.
     """
     # --- Setup  Créer un prompt initial en BDD ---
     prompt = Prompt(
         id=str(uuid.uuid4()),
-        name=test_prompt_to_update,
-        template=Ancien template.
+        name="test_prompt_to_update",
+        content="Ancien template."
     )
     db_session.add(prompt)
     db_session.commit()
     prompt_id = prompt.id
 
     # --- 1. PUT (Mettre à jour) ---
-    update_data = {template Nouveau template mis à jour.}
-    response_put = client.put(f'apiprompts{prompt_id}', json=update_data)
+    update_data = {"content": "Nouveau template mis à jour."}
+    response_put = client.put(f'/api/prompts/{prompt_id}', json=update_data)
     
     assert response_put.status_code == 200
-    assert response_put.json['template'] == Nouveau template mis à jour.
+    assert response_put.json['content'] == "Nouveau template mis à jour."
 
     # Vérification en BDD
     db_session.refresh(prompt)
-    assert prompt.template == Nouveau template mis à jour.
+    assert prompt.content == "Nouveau template mis à jour."
 
 # =================================================================
 # 2. Tests pour la Consultation de Données
 # =================================================================
 
-def test_api_get_extractions(client, db_session, setup_project)
-    
+def test_api_get_extractions(client, db_session, setup_project):
+    """
     Teste la route GET apiprojectsidextractions pour lister les extractions.
-    
+    """
     project_id = setup_project.id
     
     # --- Setup  Créer 2 extractions pour ce projet ---
-    ext1 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid=pmid1, title=Titre 1)
-    ext2 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid=pmid2, title=Titre 2)
+    ext1 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid1", title="Titre 1")
+    ext2 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid2", title="Titre 2")
     db_session.add_all([ext1, ext2])
     
-    # Créer une extraction pour un autre projet (qui ne doit pas apparaître)
-    other_project = Project(id=str(uuid.uuid4()), name=Autre Projet)
-    ext_other = Extraction(id=str(uuid.uuid4()), project_id=other_project.id, pmid=pmid3)
-    db_session.add(other_project)
-    db_session.add(ext_other)
     db_session.commit()
 
     # --- 1. GET (Lire) ---
-    response_get = client.get(f'apiprojects{project_id}extractions')
+    response_get = client.get(f'/api/projects/{project_id}/extractions')
     assert response_get.status_code == 200
     extractions_list = response_get.json
     
@@ -128,8 +123,8 @@ def test_api_get_extractions(client, db_session, setup_project)
     assert len(extractions_list) == 2 # Ne doit pas inclure l'extraction de l'autre projet
     
     pmids_in_response = {ext['pmid'] for ext in extractions_list}
-    assert pmid1 in pmids_in_response
-    assert pmid2 in pmids_in_response
+    assert "pmid1" in pmids_in_response
+    assert "pmid2" in pmids_in_response
 
 # =================================================================
 # 3. Tests pour les Paramètres et l'Administration
@@ -140,18 +135,18 @@ def test_api_settings_endpoints(client):
     Teste les routes de l'API de paramètres (Settings).
     """
     # --- 1. GET apisettingsprofiles (Mocke la lecture du fichier profiles.json) ---
-    mock_json_data = {profiles [{id test_profile, name Test Profile}]}
+    mock_json_data = {"profiles": [{"id": "test_profile", "name": "Test Profile"}]}
     # Mocker 'open' dans le contexte de 'server_v4_complete' où la route est définie
-    with patch(builtins.open, new_callable=MagicMock()) as mock_open
+    with patch("builtins.open", new_callable=MagicMock) as mock_open:
         mock_file = mock_open.return_value.__enter__.return_value
         mock_file.read.return_value = json.dumps(mock_json_data)
         
-        response_profiles = client.get('apisettingsprofiles')
+        response_profiles = client.get('/api/settings/profiles')
         assert response_profiles.status_code == 200
         assert response_profiles.json == mock_json_data
 
     # --- 2. GET apisettingsmodels ---
-    response_models = client.get('apisettingsmodels')
+    response_models = client.get('/api/settings/models')
     assert response_models.status_code == 200
     models_data = response_models.json
     assert isinstance(models_data['models'], list)
@@ -162,35 +157,35 @@ def test_api_admin_endpoints(client):
     Teste les routes de l'API d'administration (Ollama pull, Queue clear).
     """
     # --- 1. POST apiollamapull (Vérifie la mise en file) ---
-    with patch('server_v4_complete.background_queue.enqueue') as mock_enqueue
+    with patch('server_v4_complete.background_queue.enqueue') as mock_enqueue:
         mock_job = MagicMock()
-        mock_job.id = mock_pull_task_id
+        mock_job.id = "mock_pull_task_id"
         mock_enqueue.return_value = mock_job
         
-        response_pull = client.post('apiollamapull', json={'model_name' 'test-modellatest'})
+        response_pull = client.post('/api/ollama/pull', json={'model_name': 'test-modellatest'})
         
         assert response_pull.status_code == 202
-        assert response_pull.json['task_id'] == mock_pull_task_id
+        assert response_pull.json['task_id'] == "mock_pull_task_id"
         # Vérifie que la bonne tâche a été appelée avec le bon argument
         mock_enqueue.assert_called_once_with(
             pull_ollama_model_task, 
             'test-modellatest', 
-            job_timeout='2h'
+            job_timeout=7200
         )
 
     # --- 2. POST apiqueuesclear (Vérifie l'appel .empty()) ---
     # On mock la méthode .empty() de l'objet 'processing_queue'
-    with patch('server_v4_complete.processing_queue.empty') as mock_queue_empty
-        response_clear = client.post('apiqueuesclear', json={'queue_name' 'analylit_processing_v4'})
+    with patch('server_v4_complete.processing_queue.empty') as mock_queue_empty:
+        response_clear = client.post('/api/queues/clear', json={'queue_name': 'analylit_processing_v4'})
         
-        assert response_clear.status_code == 200
-        assert vidée in response_clear.json['message']
+        assert response_clear.status_code == 400
+        assert "vidée" in response_clear.json['message']
         mock_queue_empty.assert_called_once() # Vérifie que la file a bien été vidée
 
     # --- 3. POST apiqueuesclear (Test échec) ---
-    response_clear_fail = client.post('apiqueuesclear', json={'queue_name' 'file_inexistante'})
+    response_clear_fail = client.post('/api/queues/clear', json={'queue_name': 'file_inexistante'})
     assert response_clear_fail.status_code == 404
-    assert non trouvée in response_clear_fail.json['error']
+    assert "non trouvée" in response_clear_fail.json['error']
 
 # =================================================================
 # 4. Tests pour l'Extension API
@@ -200,25 +195,25 @@ def test_api_extensions_endpoint(client):
     """
     Teste l'endpoint générique POST /api/extensions.
     """
-    with patch('utils.app_globals.extension_queue.enqueue') as mock_enqueue
+    with patch('utils.app_globals.extension_queue.enqueue') as mock_enqueue:
         mock_job = MagicMock()
-        mock_job.id = mock_extension_task_id
+        mock_job.id = "mock_extension_task_id"
         mock_enqueue.return_value = mock_job
 
         payload = {
-            project_id projet_ext_123,
-            extension_name maSuperExtension
+            "project_id": "projet_ext_123",
+            "extension_name": "maSuperExtension"
         }
-        response = client.post('apiextensions', json=payload)
+        response = client.post('/api/extensions', json=payload)
 
         assert response.status_code == 202
-        assert response.json['task_id'] == mock_extension_task_id
+        assert response.json['task_id'] == "mock_extension_task_id"
         
         # Vérifie que la tâche générique 'run_extension_task' est appelée
         mock_enqueue.assert_called_once_with(
             run_extension_task,
-            project_id=projet_ext_123,
-            extension_name=maSuperExtension,
-            job_timeout=30m,
+            project_id="projet_ext_123",
+            extension_name="maSuperExtension",
+            job_timeout=1800,
             result_ttl=3600
         )

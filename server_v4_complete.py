@@ -73,7 +73,7 @@ def create_app(config=None):
 
     # --- Enregistrement des routes (Blueprints ou routes directes) ---
     # ==================== ROUTES API PROJECTS ====================
-    @app.route("/api/projects/", methods=["POST"])
+    @app.route("/api/projects", methods=["POST"])
     @with_db_session
     def create_project(session):
         data = request.get_json()
@@ -92,7 +92,7 @@ def create_app(config=None):
             session.rollback()
             return jsonify({"error": "Un projet avec ce nom existe déjà"}), 409
 
-    @app.route("/api/projects/", methods=["GET"])
+    @app.route("/api/projects", methods=["GET"])
     @with_db_session
     def get_all_projects(session):
         projects = session.query(Project).all()
@@ -247,7 +247,7 @@ def create_app(config=None):
         per_page = request.args.get('per_page', 20, type=int)
         
         # Utiliser la pagination de SQLAlchemy pour plus d'efficacité
-        query = session.query(SearchResult).filter_by(project_id=project_id)
+        query = session.query(SearchResult).filter_by(project_id=project_id).order_by(SearchResult.article_id)
         total = query.count()
         paginated_query = query.offset((page - 1) * per_page).limit(per_page)
         
@@ -559,7 +559,7 @@ def create_app(config=None):
             logging.warning("Payload invalide: %s", data)
             return jsonify({"error": "project_id et extension_name requis"}), 400
         logging.info("Enqueue extension: project_id=%s, extension=%s", project_id, extension_name)
-        job = extension_queue.enqueue(run_extension_task, project_id=project_id, extension_name=extension_name, job_timeout="30m", result_ttl=3600)
+        job = extension_queue.enqueue(run_extension_task, project_id=project_id, extension_name=extension_name, job_timeout=1800, result_ttl=3600)
         logging.info("Job enqueued: %s", job.id)
         return jsonify({"task_id": job.id, "message": "Extension lancée"}), 202
 
@@ -620,15 +620,15 @@ def create_app(config=None):
             if not data or not data.get("name"):
                 return jsonify({"error": "name est requis"}), 400
             
-            prompt = session.query(Prompt).filter_by(name=data["name"])
+            prompt = session.query(Prompt).filter_by(name=data["name"]).first()
             if not prompt:
                 # Créer avec une valeur par défaut pour content
-                content = data.get("template", data.get("content", "Template par défaut"))
+                content = data.get("content", "Template par défaut")
                 prompt = Prompt(name=data["name"], content=content)
                 session.add(prompt)
             else:
                 # Mettre à jour le contenu existant
-                content = data.get("template", data.get("content"))
+                content = data.get("content")
                 if content:
                     prompt.content = content
             
@@ -645,7 +645,7 @@ def create_app(config=None):
     def update_prompt(session, prompt_id):
         prompt = first_or_404(session.query(Prompt).filter_by(id=prompt_id))
         data = request.get_json()
-        prompt.template = data.get('template', prompt.template)
+        prompt.content = data.get('content', prompt.content)
         session.commit()
         return jsonify(prompt.to_dict()), 200
 
@@ -675,7 +675,7 @@ def create_app(config=None):
         model_name = data.get('model_name')
         if not model_name:
             return jsonify({"error": "model_name est requis"}), 400
-        job = background_queue.enqueue(pull_ollama_model_task, model_name, job_timeout='2h')
+        job = background_queue.enqueue(pull_ollama_model_task, model_name, job_timeout=7200)
         return jsonify({"message": f"Téléchargement du modèle {model_name} lancé", "task_id": job.id}), 202
 
     @app.route('/api/tasks/status', methods=['GET'])
