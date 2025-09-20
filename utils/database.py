@@ -82,3 +82,32 @@ def seed_default_data(session):
     except Exception as e:
         logger.error(f"Erreur pendant le seeding : {e}")
         session.rollback()
+
+def get_paginated_search_results(session, project_id: str, page: int, per_page: int, sort_by: str, sort_order: str) -> dict:
+    """
+    Récupère les résultats de recherche paginés et triés pour un projet.
+    Cette fonction centralise la logique de pagination qui était dans server_v4_complete.py.
+    """
+    from .models import SearchResult  # Import local pour éviter les imports circulaires
+
+    query = session.query(SearchResult).filter_by(project_id=project_id)
+
+    # Logique de tri
+    valid_sort_columns = ['article_id', 'title', 'authors', 'publication_date', 'journal', 'database_source']
+    if sort_by in valid_sort_columns:
+        column_to_sort = getattr(SearchResult, sort_by)
+        if sort_order.lower() == 'desc':
+            query = query.order_by(column_to_sort.desc())
+        else:
+            query = query.order_by(column_to_sort.asc())
+
+    # Compter le total avant la pagination
+    total = query.count()
+
+    # Appliquer la pagination
+    paginated_query = query.offset((page - 1) * per_page).limit(per_page)
+
+    return {
+        "results": [r.to_dict() for r in paginated_query.all()],
+        "total": total
+    }

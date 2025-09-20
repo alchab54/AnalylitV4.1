@@ -383,16 +383,30 @@ def create_app(config=None):
     @with_db_session
     def get_project_search_results(session, project_id):
         """Récupère les résultats de recherche pour un projet."""
-        page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 20, type=int)
+        args = request.args
+        page = args.get('page', 1, type=int)
+        per_page = args.get('per_page', 20, type=int)
+        sort_by = args.get('sort_by', 'article_id')
+        sort_order = args.get('sort_order', 'asc')
         
-        # Utiliser la pagination de SQLAlchemy pour plus d'efficacité
-        query = session.query(SearchResult).filter_by(project_id=project_id).order_by(SearchResult.article_id)
+        query = session.query(SearchResult).filter_by(project_id=project_id)
+
+        # --- CORRECTION DE LA LOGIQUE DE TRI ---
+        valid_sort_columns = ['article_id', 'title', 'authors', 'publication_date', 'journal', 'database_source']
+        if sort_by in valid_sort_columns:
+            column_to_sort = getattr(SearchResult, sort_by)
+            
+            # La logique a été corrigée pour mapper 'asc' -> 'ASC' et 'desc' -> 'DESC'
+            if sort_order.lower() == 'desc':
+                query = query.order_by(column_to_sort.desc())
+            else:
+                query = query.order_by(column_to_sort.asc())
+        
         total = query.count()
         paginated_query = query.offset((page - 1) * per_page).limit(per_page)
         
         return jsonify({
-            "results": [r.to_dict() for r in paginated_query.all()],
+            "results": [r.to_dict() for r in paginated_query],
             "total": total,
             "page": page,
             "per_page": per_page,
@@ -576,7 +590,7 @@ from rq.worker import Worker
 from werkzeug.utils import secure_filename
 
 # --- Imports des utilitaires et de la configuration ---
-from utils.database import with_db_session
+from utils.database import with_db_session, get_paginated_search_results
 from utils.app_globals import (
     processing_queue, synthesis_queue, analysis_queue, background_queue,
     extension_queue, redis_conn
@@ -807,20 +821,23 @@ def create_app(config=None):
     @with_db_session
     def get_project_search_results(session, project_id):
         """Récupère les résultats de recherche pour un projet."""
-        page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 20, type=int)
+        args = request.args
+        page = args.get('page', 1, type=int)
+        per_page = args.get('per_page', 20, type=int)
+        sort_by = args.get('sort_by', 'article_id')
+        sort_order = args.get('sort_order', 'asc')
         
-        # Utiliser la pagination de SQLAlchemy pour plus d'efficacité
-        query = session.query(SearchResult).filter_by(project_id=project_id).order_by(SearchResult.article_id)
-        total = query.count()
-        paginated_query = query.offset((page - 1) * per_page).limit(per_page)
+        # Appeler la fonction centralisée depuis utils/database.py
+        data = get_paginated_search_results(
+            session, project_id, page, per_page, sort_by, sort_order
+        )
         
         return jsonify({
-            "results": [r.to_dict() for r in paginated_query.all()],
-            "total": total,
+            "results": data["results"],
+            "total": data["total"],
             "page": page,
             "per_page": per_page,
-            "total_pages": (total + per_page - 1) // per_page
+            "total_pages": (data["total"] + per_page - 1) // per_page
         }), 200
 
     # ==================== ROUTES API PRISMA ====================
