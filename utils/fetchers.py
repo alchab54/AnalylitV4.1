@@ -117,7 +117,7 @@ class DatabaseManager:
         try:
             search_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
             search_params = {"db": "pubmed", "term": query, "retmax": max_results, "retmode": "json"}
-            response = self.session.get(search_url, params=search_params, timeout=30)
+            response = requests.get(search_url, params=search_params, timeout=30)
             response.raise_for_status()
             search_data = response.json()
             pmids = search_data.get("esearchresult", {}).get("idlist", [])
@@ -128,7 +128,7 @@ class DatabaseManager:
             fetch_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
             # On récupère en mode XML pour avoir tous les détails
             fetch_params = {"db": "pubmed", "id": ",".join(pmids), "retmode": "xml"}
-            fetch_response = self.session.post(fetch_url, data=fetch_params, timeout=60)
+            fetch_response = requests.post(fetch_url, data=fetch_params, timeout=60)
             fetch_response.raise_for_status()
             
             return self._parse_pubmed_xml(fetch_response.text)
@@ -142,7 +142,7 @@ class DatabaseManager:
         try:
             url = "http://export.arxiv.org/api/query"
             params = {"search_query": f'all:"{query}"', "start": 0, "max_results": max_results}
-            response = self.session.get(url, params=params, timeout=30)
+            response = requests.get(url, params=params, timeout=30)
             response.raise_for_status()
             return self._parse_arxiv_xml(response.text)
         except Exception as e:
@@ -154,7 +154,7 @@ class DatabaseManager:
         try:
             url = "https://api.crossref.org/works"
             params = {"query": query, "rows": max_results, "mailto": "contact@analylit.com"}
-            response = self.session.get(url, params=params, timeout=30)
+            response = requests.get(url, params=params, timeout=30)
             response.raise_for_status()
             data = response.json()
             results = []

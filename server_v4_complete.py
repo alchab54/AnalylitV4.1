@@ -7,7 +7,7 @@ import csv
 import zipfile
 from pathlib import Path
 import pandas as pd
-from flask import Flask, request, jsonify, send_from_directory, abort
+from flask import Flask, request, jsonify, send_from_directory, abort, send_file
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from sqlalchemy.exc import IntegrityError
@@ -470,7 +470,7 @@ def create_app(config=None):
         args = request.args
         page = args.get('page', 1, type=int)
         per_page = args.get('per_page', 20, type=int)
-        sort_by = args.get('sort_by', 'title') # <--- Changez 'article_id' en 'title'
+        sort_by = args.get('sort_by', 'title')
         sort_order = args.get('sort_order', 'asc')
         
         query = session.query(SearchResult).filter_by(project_id=project_id)
@@ -554,7 +554,7 @@ def create_app(config=None):
                 pmids=pmids,
                 zotero_user_id=zotero_user_id,
                 zotero_api_key=zotero_api_key,
-                job_timeout='1h'
+                job_timeout='30m'
             )
             return jsonify({"message": "Zotero PDF import started", "task_id": str(job.id)}), 202
         except Exception as e:
@@ -710,7 +710,7 @@ def create_app(config=None):
     # ==================== ROUTES API ADVANCED ANALYSIS ====================
     @app.route("/api/projects/<project_id>/run-discussion-draft", methods=["POST"])
     def run_discussion_draft(project_id): # noqa
-        job = analysis_queue.enqueue(run_discussion_generation_task, project_id=project_id, job_timeout='30m') # <--- Changez '1h' en '30m'
+        job = analysis_queue.enqueue(run_discussion_generation_task, project_id=project_id, job_timeout='1h')
         return jsonify({"message": "Génération du brouillon de discussion lancée", "task_id": job.id}), 202
 
     @app.route("/api/projects/<project_id>/run-knowledge-graph", methods=["POST"])
@@ -758,7 +758,7 @@ def create_app(config=None):
             
             return jsonify({
                 "message": f"Analyse {analysis_type} lancée",
-                "job_id": job_id,
+                "task_id": job_id,
                 "type": analysis_type
             }), 202
             
@@ -793,7 +793,7 @@ def create_app(config=None):
     def run_rob_analysis_route(session, project_id):
         data = request.get_json()
         article_ids = data.get('article_ids', [])
-        task_ids = [analysis_queue.enqueue(run_risk_of_bias_task, project_id, article_id, job_timeout='20m').id for article_id in article_ids]
+        task_ids = [analysis_queue.enqueue(run_risk_of_bias_task, project_id, article_id, job_timeout='30m').id for article_id in article_ids]
         return jsonify({"message": "RoB analysis initiated", "task_ids": task_ids}), 202
 
     # ==================== ROUTES API CHAT ====================
@@ -807,7 +807,7 @@ def create_app(config=None):
                 answer_chat_question_task,
                 project_id=project_id,
                 question=data['question'],
-            job_timeout='30m'  # <--- Changez '15m' en '30m'
+            job_timeout='15m'
             )
             # Assurez-vous de retourner l'ID du job
             task_id = str(job.id) if job and job.id else "unknown"

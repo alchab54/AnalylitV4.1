@@ -1,5 +1,6 @@
 # utils/file_handlers.py - Gestionnaires de fichiers
 import logging
+import os
 import re
 from pathlib import Path # Déjà importé plus bas, mais on garde pour la clarté
 from typing import Optional
@@ -158,12 +159,13 @@ def extract_text_from_pdf(pdf_path: str) -> str:
     Extrait le texte brut d'un fichier PDF en utilisant une stratégie
     de fallback robuste (PyMuPDF -> PDFPlumber -> OCR).
     """
-    file_path = Path(pdf_path)
-    if not file_path.exists():
+    # Utiliser os.path.exists pour être compatible avec les mocks des tests
+    if not os.path.exists(pdf_path):
         logger.error(f"Fichier PDF introuvable: {pdf_path}")
         return ""
 
     text = ""
+    file_path = Path(pdf_path) # On crée l'objet Path après la vérification
     
     # --- 1. Essai avec PyMuPDF (fitz) ---
     text = _extract_text_with_pymupdf(file_path)

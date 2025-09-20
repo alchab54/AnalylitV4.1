@@ -178,8 +178,11 @@ def _extract_reference_data_for_extension(item: dict) -> Optional[dict]:
     provenant du payload JSON de l'extension.
     """
     try:
+        # PRENEZ LE BLOC 'data'
+        data = item.get("data", item) # S'il n'y a pas de 'data', utilise l'item racine
+
         authors_list = []
-        for creator in item.get("creators", []):
+        for creator in data.get("creators", []): # <--- data.get
             if isinstance(creator, dict):
                 # Format de zotero-inject.js
                 if creator.get("lastName"):
@@ -189,23 +192,23 @@ def _extract_reference_data_for_extension(item: dict) -> Optional[dict]:
                      authors_list.append(creator.get("name"))
 
         authors = "; ".join(authors_list)
-        year = _get_publication_year_for_extension(item)
-        title = item.get("title", "Sans titre") or "Sans titre"
+        year = _get_publication_year_for_extension(data) # <--- data
+        title = data.get("title", "Sans titre") or "Sans titre" # <--- data.get
         
         # Créer un hash pour la déduplication
         hash_base = f"{title[:50]}_{(authors_list[0] if authors_list else '')}_{year or ''}"
         
-        doi = item.get("DOI", "") or item.get("doi", "")
-        url = item.get("url", f"https://doi.org/{doi}" if doi else "") or ""
+        doi = data.get("DOI", "") or data.get("doi", "") # <--- data.get
+        url = data.get("url", f"https://doi.org/{doi}" if doi else "") or "" # <--- data.get
 
         return {
-            "zotero_key": item.get("key"),
-            "article_id": _get_best_identifier_for_extension(item),
+            "zotero_key": data.get("key"), # <--- data.get
+            "article_id": _get_best_identifier_for_extension(data), # <--- data
             "title": title,
             "authors": authors,
             "publication_date": year or "",
-            "journal": item.get("publicationTitle", "") or item.get("journal", ""),
-            "abstract": _clean_html_for_extension(item.get("abstractNote", "")),
+            "journal": data.get("publicationTitle", "") or data.get("journal", ""), # <--- data.get
+            "abstract": _clean_html_for_extension(data.get("abstractNote", "")), # <--- data.get
             "doi": doi,
             "url": url,
             "database_source": "zotero_extension_import",
