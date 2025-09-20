@@ -40,6 +40,14 @@ from tasks_v4_complete import (
     add_manual_articles_task, pull_ollama_model_task, calculate_kappa_task
 )
 
+# --- Imports pour l'extension Zotero ---
+from utils.importers import process_zotero_item_list
+# Simulez ou remplacez par vos vraies fonctions de BDD et d'export
+# Assurez-vous que 'add_articles_to_project_bulk' existe dans vos utils
+from utils.database import with_db_session # Assurez-vous que cela est importé si vous l'utilisez dans les fonctions ci-dessous
+
+)
+
 # Convertir PROJECTS_DIR en objet Path pour assurer la compatibilité
 PROJECTS_DIR = Path(PROJECTS_DIR_STR)
 
@@ -60,13 +68,16 @@ def create_app(config=None):
     # init_database()  # Removed to prevent duplicate initialization  
 
     # --- Configuration des extensions ---
-    # --- AJOUTER LA CONFIGURATION CORS ---
-    CORS(app, origins=[
-        "chrome-extension://*", # Pour l'extension Chrome/Edge
-        "moz-extension://*",    # Pour un futur support Firefox
-        "http://localhost:8080", "http://127.0.0.1:8080", # Pour le développement local
-        "https://*.zotero.org"  # Pour l'injection de script
-        ],
+    # REMPLACEZ l'ancienne ligne CORS par celle-ci
+    CORS(app, 
+         origins=[
+             "http://localhost:8080", 
+             "http://127.0.0.1:8080",
+             "chrome-extension://*",  # Pour l'extension Chrome/Edge
+             "moz-extension://*",    # Pour un futur support Firefox
+             "http://localhost:*",   # Pour le développement local de l'extension
+             "https://*.zotero.org"  # Pour l'injection de script
+         ],
          expose_headers=["Content-Disposition"],
          supports_credentials=True) 
 
@@ -81,16 +92,82 @@ def create_app(config=None):
 
     # --- NOUVEAUX ENDPOINTS POUR L'EXTENSION ZOTERO ---
 
-    @app.route('/api/health', methods=['GET'])
-    def health_check():
-        """Endpoint pour vérifier la connexion de l'extension"""
-        return jsonify({"status": "healthy", "version": "4.1"})
+    # (Simulation - remplacez par vos vraies fonctions)
+    # Assurez-vous que ces fonctions existent ou créez-les.
+    @with_db_session
+    def get_validated_articles_data(session, project_id, status='included'):
+        logger.info(f"Simulation: Récupération des articles validés pour {project_id}")
+        # Logique fictive:
+        # Cette jointure est un exemple, adaptez-la à votre modèle si nécessaire
+        articles = session.query(SearchResult).join(Extraction, SearchResult.article_id == Extraction.pmid).filter(
+            SearchResult.project_id == project_id,
+            Extraction.user_validation_status == status
+        ).limit(10).all()
+        return [a.to_dict() for a in articles]
 
-    @app.route('/api/projects/<project_id>/import-zotero', methods=['POST'])
-    def import_from_zotero_extension(project_id):
+    def convert_to_zotero_format(articles_data: list) -> list:
+        logger.info(f"Simulation: Conversion de {len(articles_data)} articles au format Zotero")
+        # Logique fictive:
+        return [{"title": a.get('title', 'N/A'), "doi": a.get('doi', 'N/A')} for a in articles_data]
+    # (Fin de la simulation)
+
+    def add_articles_to_project_bulk(session, project_id, articles_data):
+        """Fonction d'insertion en masse simulée. Adaptez-la à votre logique."""
+        from sqlalchemy.dialects.postgresql import insert
+        
+        if not articles_data:
+            return 0
+
+        # Préparer les données pour l'insertion
+        for record in articles_data:
+            record['project_id'] = project_id
+            if 'id' not in record:
+                record['id'] = str(uuid.uuid4())
+
+        # Utiliser l'instruction 'ON CONFLICT' de PostgreSQL
+        stmt = insert(SearchResult).values(articles_data)
+        stmt = stmt.on_conflict_do_nothing(
+            index_elements=['project_id', 'article_id']
+        )
+        result = session.execute(stmt)
+        return result.rowcount
+
+    @with_db_session
+    def process_zotero_import(session, project_id: int, items: list[dict]) -> int:
+        """
+        Logique métier pour traiter et insérer les items Zotero dans la BDD.
+        """
+        logger.info(f"Début de l'import (extension) pour le projet {project_id}. {len(items)} items reçus.")
+        
+        # 1. Traiter et dédupliquer les items
+        processed_records = process_zotero_item_list(items)
+        
+        if not processed_records:
+            logger.warning("Aucun nouvel enregistrement unique à importer.")
+            return 0
+        
+        # 2. Insérer dans la base de données
+        try:
+            # REMPLACEZ 'add_articles_to_project_bulk' par votre vraie fonction d'insertion
+            # Cette fonction doit accepter (session, project_id, liste_articles)
+            # et gérer les conflits (ex: ON CONFLICT DO NOTHING)
+            inserted_count = add_articles_to_project_bulk(session, project_id, processed_records)
+            logger.info(f"{inserted_count} nouveaux articles insérés pour le projet {project_id}.")
+            return inserted_count
+        
+        except Exception as e:
+            logger.error(f"Erreur lors de l'insertion BDD pour l'import Zotero: {e}")
+            session.rollback()
+            return 0
+
+    # Note: /api/health existe déjà (ligne 690), pas besoin de le recréer.
+    
+    @app.route('/api/projects/<project_id>/import-from-extension', methods=['POST'])
+    @with_db_session
+    def import_from_extension(session, project_id):
         """
         Import des données Zotero via l'extension (payload JSON).
-        Ceci est DISTINCT de l'endpoint d'upload de fichier de l'app web.
+        Cette route est NOUVELLE et distincte de '/import-zotero'.
         """
         try:
             data = request.get_json()
@@ -102,17 +179,36 @@ def create_app(config=None):
             
             logger.info(f"Import Zotero (extension) type '{import_type}' pour projet {project_id}")
             
-            # Lancer la tâche asynchrone pour l'importation
-            job = background_queue.enqueue(import_from_zotero_json_task, project_id=project_id, items_list=items, job_timeout='15m')
+            # Utiliser votre logique d'import (nouvellement créée)
+            imported_count = process_zotero_import(session, project_id, items) # Passe la session
             
             return jsonify({
                 "success": True,
-                "message": f"Tâche d'importation lancée pour {len(items)} article(s).",
-                "task_id": job.id
-            }), 202
+                "imported": imported_count,
+                "message": f"{imported_count} éléments importés avec succès."
+            })
         except Exception as e:
-            logger.error(f"Erreur API /import-zotero: {e}", exc_info=True)
+            logger.error(f"Erreur API /import-from-extension: {e}")
             return jsonify({"success": False, "message": str(e)}), 500
+
+    @app.route('/api/projects/<project_id>/export-validated-results', methods=['GET'])
+    @with_db_session
+    def export_validated_results(session, project_id):
+        """Export des résultats validés pour l'extension"""
+        try:
+            # 1. Récupérer les articles validés
+            validated_articles = get_validated_articles_data(session, project_id, status='include')
+            
+            # 2. Convertir au format Zotero
+            zotero_format = convert_to_zotero_format(validated_articles)
+            
+            return jsonify(zotero_format)
+            
+        except Exception as e:
+            logger.error(f"Erreur API /export-validated-results: {e}")
+            return jsonify({"success": False, "message": str(e)}), 500
+
+    # --- FIN DES AJOUTS POUR L'EXTENSION ZOTERO ---
 
     # --- Enregistrement des routes (Blueprints ou routes directes) ---
     # ==================== ROUTES API PROJECTS ====================
@@ -764,7 +860,7 @@ def create_app(config=None):
         return jsonify({"message": f"{count} validations ont été importées pour l'évaluateur {evaluator_name}."}), 200
 
     @app.route('/api/projects/<project_id>/import-zotero', methods=['POST'])
-    @with_db_session
+    @with_db_session # Cette route est pour la synchro PDF, elle est conservée.
     def import_zotero_pdfs(session, project_id):
         if not request.is_json:
             return jsonify({"error": "Content-Type doit être application/json"}), 400

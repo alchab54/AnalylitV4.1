@@ -269,7 +269,7 @@ class AnalyLitConnector {
                 importData = items;
             }
 
-            const response = await this.makeRequest(`/api/projects/${projectId}/import-zotero`, {
+            const response = await this.makeRequest(`/api/projects/${projectId}/import-from-extension`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
