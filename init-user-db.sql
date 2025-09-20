@@ -1,5 +1,13 @@
-CREATE USER analylit_user WITH PASSWORD 'strong_password';
-CREATE DATABASE analylit_db OWNER analylit_user;
+DO
+$$
+BEGIN
+   IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'analylit_user') THEN
+      CREATE USER analylit_user WITH PASSWORD 'strong_password';
+   END IF;
+END
+$$;
+
+CREATE DATABASE analylit_db OWNER analylit_user IF NOT EXISTS;
 
 -- Drop public schema to prevent conflicts
 DROP SCHEMA public CASCADE;

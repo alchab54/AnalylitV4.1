@@ -76,7 +76,6 @@ services:
       - PYTHONPATH=/home/appuser/app
     env_file:
       - .env
-    command: ["flask", "run", "--no-debugger", "--no-reload"]
     depends_on:
       db:
         condition: service_started
@@ -113,7 +112,7 @@ services:
       - TEST_DATABASE_URL=postgresql://analylit_user:strong_password@db/analylit_db_test
       - FLASK_ENV=testing
     # ----- CORRECTION DE LA SYNTAXE YAML -----
-    command: rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4
+    command: "rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4"
     depends_on:
       db:
         condition: service_started

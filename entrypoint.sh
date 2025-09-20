@@ -15,5 +15,6 @@ echo "Initialisation de la base de données et seeding..."
 # Exécute l'initialisation de la base de données de manière explicite
 python -c 'from utils.database import init_database; init_database()'
 
-echo "Démarrage de l'application Flask..."
-exec "$@"
+echo "Démarrage de l'application Flask avec Gunicorn..."
+# Start Gunicorn
+exec gunicorn -w 4 -b 0.0.0.0:5000 "server_v4_complete:create_app()"

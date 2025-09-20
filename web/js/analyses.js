@@ -213,17 +213,22 @@ export async function handleRunATNAnalysis(event) {
     }
 
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, {
+        // CORRECTION: Utilisation du type d'analyse correct et gestion de la réponse.
+        const response = await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, {
             method: 'POST',
-            body: { type: 'atn_score' }
+            body: { type: 'atn_scores' } // CORRECTION : type spécifique selon GEMINI.md
         });
-        showToast('Analyse ATN lancée. Les résultats apparaîtront une fois le calcul terminé.', 'success');
+
+        // CORRECTION : Utilise job_id
+        if (response.job_id) {
+            showToast(`Analyse ATN lancée (Job ID: ${response.job_id})`, 'success');
+        } else {
+            showToast('Analyse ATN lancée. Les résultats apparaîtront une fois le calcul terminé.', 'success');
+        }
     } catch (e) {
         showToast(`Erreur : ${e.message}`, 'error');
         if (card) card.classList.remove('analysis-card--loading');
     } finally {
-        // On ne retire pas le loading ici, on attend la notif WebSocket.
-        // L'overlay global, s'il a été montré, doit être masqué.
         if (!card) showLoadingOverlay(false);
     }
 }
@@ -239,7 +244,8 @@ export async function runProjectAnalysis(analysisType) {
     const analysisNames = {
         discussion: 'le brouillon de discussion',
         knowledge_graph: 'le graphe de connaissances',
-        prisma_flow: 'le diagramme PRISMA'
+        prisma_flow: 'le diagramme PRISMA',
+        atn_scores: "l'analyse ATN"
     };
 
     // Trouver la carte correspondante pour afficher le spinner
@@ -252,40 +258,48 @@ export async function runProjectAnalysis(analysisType) {
 
     try {
         
-        // Note: L'endpoint varie en fonction de l'analyse
+        // CORRECTION: Centralisation des endpoints et des types de body
         let endpoint = '';
         let body = {};
+        const projectId = appState.currentProject.id;
+
         switch(analysisType) {
             case 'discussion':
-                endpoint = `/projects/${appState.currentProject.id}/run-discussion-draft`;
+                endpoint = `/projects/${projectId}/run-discussion-draft`;
                 break;
             case 'knowledge_graph':
-                 endpoint = `/projects/${appState.currentProject.id}/run-knowledge-graph`;
+                 endpoint = `/projects/${projectId}/run-knowledge-graph`;
                  break;
             case 'prisma_flow':
-                endpoint = `/projects/${appState.currentProject.id}/run-analysis`;
+                endpoint = `/projects/${projectId}/run-analysis`;
                 body = { type: 'prisma_flow' };
                 break;
             case 'meta_analysis':
-                endpoint = `/projects/${appState.currentProject.id}/run-analysis`;
+                endpoint = `/projects/${projectId}/run-analysis`;
                 body = { type: 'meta_analysis' };
                 break;
             case 'descriptive_stats':
-                endpoint = `/projects/${appState.currentProject.id}/run-analysis`;
+                endpoint = `/projects/${projectId}/run-analysis`;
                 body = { type: 'descriptive_stats' };
                 break;
             default:
-                showToast('Type d\'analyse inconnu.', 'error');
+                showToast("Type d'analyse inconnu.", 'error');
+                if (card) card.classList.remove('analysis-card--loading');
+                if (!card) showLoadingOverlay(false);
                 return;
         }
         
-        await fetchAPI(endpoint, { method: 'POST', body });
-        showToast(`La génération pour ${analysisNames[analysisType]} a été lancée.`, 'success');
+        const response = await fetchAPI(endpoint, { method: 'POST', body });
+        // CORRECTION: Utilisation de job_id pour la cohérence avec le backend.
+        const jobId = response.job_id;
+        if (jobId) {
+            showToast(`La génération pour ${analysisNames[analysisType]} a été lancée (Job: ${jobId}).`, 'success');
+        } else {
+            showToast(`La génération pour ${analysisNames[analysisType]} a été lancée.`, 'success');
+        }
     } catch (e) {
         showToast(`Erreur lors du lancement de l\'analyse: ${e.message}`, 'error');
         if (card) card.classList.remove('analysis-card--loading');
-    } finally {
-        // On ne retire pas le loading ici, on attend la notif WebSocket.
         if (!card) showLoadingOverlay(false);
     }
 }

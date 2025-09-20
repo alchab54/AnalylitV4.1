@@ -29,14 +29,14 @@ export async function loadSettingsData() {
  * Récupère les profils d'analyse depuis l'API et les stocke dans l'état.
  */
 export async function loadAnalysisProfiles() {
-    console.log("Chargement des profils d'analyse...");
     try {
-        const profiles = await fetchAPI('/settings/profiles');
-        appState.analysisProfiles = profiles; 
-        console.log("Profils chargés:", profiles);
+        // CORRECTION : endpoint correct
+        const profiles = await fetchAPI('/analysis-profiles');
+        appState.analysisProfiles = profiles || [];
     } catch (error) {
         console.error("Erreur lors du chargement des profils d'analyse:", error);
-        showToast(error.message, 'error');
+        showToast(`Erreur chargement profils: ${error.message}`, 'error');
+        appState.analysisProfiles = [];
     }
 }
 
@@ -44,24 +44,41 @@ export async function loadAnalysisProfiles() {
  * Récupère les modèles de prompts depuis l'API et les stocke dans l'état.
  */
 export async function loadPrompts() {
-    const prompts = await fetchAPI('/prompts');
-    appState.prompts = prompts;
+    try {
+        const prompts = await fetchAPI('/prompts');
+        appState.prompts = prompts || [];
+    } catch (error) {
+        console.error("Erreur lors du chargement des prompts:", error);
+        showToast(`Erreur chargement prompts: ${error.message}`, 'error');
+        appState.prompts = [];
+    }
 }
 
 /**
  * Récupère les modèles Ollama locaux (via l'API backend).
  */
 export async function loadOllamaModels() {
-    const models = await fetchAPI('/settings/models');
-    appState.ollamaModels = models;
+    try {
+        // CORRECTION : endpoint correct
+        const data = await fetchAPI('/settings/models');
+        appState.ollamaModels = data.models || [];
+    } catch (error) {
+        console.error('Erreur chargement modèles:', error);
+        appState.ollamaModels = [];
+    }
 }
 
 /**
  * Récupère le statut actuel des files d'attente RQ.
  */
 export async function loadQueuesStatus() {
-    const status = await fetchAPI('/queues/info');
-    setQueuesStatus(status);
+    try {
+        const status = await fetchAPI('/queues/info');
+        setQueuesStatus(status);
+    } catch (error) {
+        console.error("Erreur lors du chargement du statut des files:", error);
+        setQueuesStatus({ queues: [] }); // État par défaut en cas d'erreur
+    }
 }
 
 export function showEditPromptModal() {}
@@ -622,7 +639,7 @@ export async function handleSaveProfile(e) {
         let method = 'POST';
 
         if (profileId && !profileId.startsWith('new_')) {
-            url = `/api/analysis-profiles/${profileId}`;
+            url = `/analysis-profiles/${profileId}`;
             method = 'PUT';
         } else {
             delete profileData.id;
@@ -630,7 +647,6 @@ export async function handleSaveProfile(e) {
 
         const updatedProfile = await fetchAPI(url, {
             method: method,
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(profileData)
         });
 
@@ -674,7 +690,7 @@ export async function handleDeleteProfile() {
             confirmClass: 'btn--danger',
             onConfirm: async () => {
                 try {
-                    await fetchAPI(`/api/analysis-profiles/${profileId}`, { method: 'DELETE' });
+                    await fetchAPI(`/analysis-profiles/${profileId}`, { method: 'DELETE' });
                     showToast(`Profil "${profile.name}" supprimé.`, 'success');
                     
                     await loadAnalysisProfiles();

@@ -131,8 +131,10 @@ export async function handleIndexPdfs() {
   try {
     const data = await fetchAPI(`/projects/${appState.currentProject.id}/index-pdfs`, { method: 'POST' });
     // L'overlay est maintenant affiché avec une barre de progression.
-    // On peut associer l'ID de la tâche au bouton d'annulation.
-    showLoadingOverlay(true, 'Indexation en cours...', data.task_id);
+    // CORRECTION : Utilisation de job_id au lieu de task_id pour la cohérence avec le backend.
+    const jobId = data.job_id;
+    console.log('Job ID:', jobId);
+    showLoadingOverlay(true, 'Indexation en cours...', jobId);
     showToast('Indexation lancée en arrière-plan.', 'info');
   } catch (e) {
     showToast(`Erreur: ${e.message}`, 'error');

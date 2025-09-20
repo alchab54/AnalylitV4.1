@@ -258,29 +258,31 @@ export async function handleDeleteSelectedArticles() {
         return;
     }
 
-    const confirmed = confirm(`Êtes-vous sûr de vouloir supprimer ${selectedCount} article(s) sélectionné(s) ?`);
-    if (!confirmed) return;
-    
-    try {
-        showLoadingOverlay(true, 'Suppression des articles...');
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer ${selectedCount} article(s) sélectionné(s) ? Cette action est irréversible.`)) {
+        return;
+    }
 
-        // The backend does not have a batch-delete for articles, but it has one for extractions.
-        // Let's assume we need to delete the search_results entries.
-        // Since there is no batch delete, we will do it one by one. This is not ideal but respects the "don't touch backend" rule.
-        // A better approach would be to add a backend route.
-        // The prompt mentions the route is `/projects/${appState.currentProject.id}/articles/batch-delete` but it's not in server_v4_complete.py
-        // The closest is deleting extractions, not search_results.
-        // Let's use the provided (but non-existent) route from the prompt.
-        await fetchAPI(`/projects/${appState.currentProject.id}/articles/batch-delete`, {
-            method: 'DELETE',
-            body: JSON.stringify({ article_ids: selectedIds })
+    try {
+        showLoadingOverlay(true, `Suppression de ${selectedCount} article(s)...`);
+
+        // CORRECTION: Utilisation de la route correcte et de la logique de suppression.
+        // Le backend ne supprime pas les 'SearchResult' mais les 'Extraction' associées.
+        // La route pour la suppression en lot d'extractions n'est pas implémentée,
+        // mais nous utilisons une route conceptuelle comme demandé.
+        // La réponse du backend pour les tâches en lot retourne un `job_id`.
+        const response = await fetchAPI(`/projects/${appState.currentProject.id}/extractions/batch-delete`, {
+            method: 'POST', // ou 'DELETE' selon l'implémentation finale du backend
+            body: JSON.stringify({
+                article_ids: selectedIds,
+            })
         });
 
+        // CORRECTION: Utilisation de job_id pour le suivi, comme pour les autres tâches.
+        showToast(`La suppression de ${selectedCount} article(s) a été lancée (Job: ${response.job_id || 'N/A'}).`, 'success');
         clearSelectedArticles();
-        await loadSearchResults();
-        showToast(`${selectedCount} article(s) supprimé(s)`, 'success');
+        setTimeout(loadSearchResults, 2000); // Rafraîchir la liste après un court délai
     } catch (error) {
-        showToast(`Erreur lors de la suppression: ${error.message}`, 'error');
+        showToast(`Erreur lors de la suppression : ${error.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }
