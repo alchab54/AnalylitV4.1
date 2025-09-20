@@ -1,23 +1,12 @@
-DO
-$$
-BEGIN
-   IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'analylit_user') THEN
-      CREATE USER analylit_user WITH PASSWORD 'strong_password';
-   END IF;
-END
-$$;
+-- Ce script est exécuté après la création automatique de 'analylit_db' par l'image Postgres.
 
-CREATE DATABASE analylit_db OWNER analylit_user IF NOT EXISTS;
+-- Crée un utilisateur (si vous n'utilisez pas l'utilisateur par défaut)
+-- L'utilisateur par défaut 'analylit_user' est déjà créé par l'image.
 
--- Drop public schema to prevent conflicts
-DROP SCHEMA public CASCADE;
+-- Crée la base de données de TEST
+CREATE DATABASE analylit_db_test;
+GRANT ALL PRIVILEGES ON DATABASE analylit_db_test TO analylit_user;
 
--- Create a new schema owned by analylit_user
-CREATE SCHEMA analylit_schema AUTHORIZATION analylit_user;
-
-GRANT ALL PRIVILEGES ON DATABASE analylit_db TO analylit_user;
-GRANT CREATE ON DATABASE analylit_db TO analylit_user;
-GRANT ALL PRIVILEGES ON SCHEMA analylit_schema TO analylit_user;
-ALTER ROLE analylit_user SET search_path TO analylit_schema;
-ALTER DEFAULT PRIVILEGES IN SCHEMA analylit_schema GRANT ALL PRIVILEGES ON TABLES TO analylit_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA analylit_schema GRANT ALL PRIVILEGES ON SEQUENCES TO analylit_user;
+-- S'assure que l'utilisateur peut créer des extensions dans la BDD de test (utile pour pytest)
+\c analylit_db_test
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
