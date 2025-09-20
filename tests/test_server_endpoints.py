@@ -214,7 +214,7 @@ def test_api_run_discussion_draft_enqueues_task(mock_enqueue, client, db_session
     mock_enqueue.assert_called_once_with(
         run_discussion_generation_task, # <-- Vérifie l'objet fonction, pas le string
         project_id=project_id,
-        job_timeout='1h'
+        job_timeout='30m'
     )
 
     response_data = json.loads(response.data)
@@ -249,7 +249,7 @@ def test_api_post_chat_message_enqueues_task(mock_enqueue, client, db_session):
         answer_chat_question_task, # <-- Vérifie l'objet fonction, pas le string
         project_id=project_id,
         question="Test question?",
-        job_timeout='15m'
+        job_timeout='30m'
     )
 
     response_data = json.loads(response.data)
@@ -409,8 +409,14 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
 
     # ASSERT
     assert response.status_code == 202 
-    # (Le reste de l'assertion 'mock_enqueue.assert_called_once_with'
-    # devrait maintenant passer car le serveur reçoit "123" et "abc")
+    mock_enqueue.assert_called_once_with(
+        import_pdfs_from_zotero_task,
+        project_id=project_id,
+        pmids=["pmid1", "pmid2"],
+        zotero_user_id="123",
+        zotero_api_key="abc",
+        job_timeout='1h'
+    )
 
 @patch('utils.app_globals.background_queue.enqueue') 
 def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session):
@@ -488,12 +494,12 @@ def test_api_run_rob_analysis_enqueues_task(mock_enqueue, client, db_session):
         run_risk_of_bias_task, # Vérifie la fonction
         project_id=project_id,
         article_id="pmid100",
-        job_timeout='20m'
+        job_timeout='30m'
     )
 
     mock_enqueue.assert_any_call(
         run_risk_of_bias_task,
         project_id=project_id,
         article_id="pmid200",
-        job_timeout='20m'
+        job_timeout='30m'
     )

@@ -21,6 +21,7 @@ from tasks_v4_complete import (
     run_prisma_flow_task,
     import_from_zotero_file_task,
     import_pdfs_from_zotero_task,
+    import_from_zotero_json_task, # Added this import
     run_risk_of_bias_task,
     add_manual_articles_task
 )
@@ -285,6 +286,22 @@ def upload_zotero_file(project_id):
         logger.error(f"Erreur lors de l'upload du fichier Zotero: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
     
+@projects_bp.route('/projects/<project_id>/import-zotero-json', methods=['POST'])
+def import_zotero_json(project_id):
+    data = request.get_json()
+    items_list = data.get('items', [])
+
+    if not items_list:
+        return jsonify({"error": "Liste d'articles Zotero vide"}), 400
+
+    job = background_queue.enqueue(
+        import_from_zotero_json_task,
+        project_id=project_id,
+        items_list=items_list,
+        job_timeout='1h'
+    )
+    return jsonify({"message": "Importation Zotero JSON lancée", "job_id": job.id}), 202
+
 @projects_bp.route('/projects/<project_id>/run-rob-analysis', methods=['POST'])
 def run_rob_analysis(project_id):
     data = request.get_json()
