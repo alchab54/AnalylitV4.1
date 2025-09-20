@@ -121,7 +121,7 @@ def test_get_tasks_status(client):
     mock_queued_job.exc_info = None
     
     # 1. Simuler des tâches dans différentes files (en cours, terminée, etc.)
-    with patch('server_v4_complete.Job.fetch_many') as mock_fetch_many:
+    with patch('server_v4_complete.fetch_many') as mock_fetch_many:
         # Simuler la réponse de fetch_many pour chaque type de registre
         # La fonction get_all_tasks_status appelle fetch_many plusieurs fois par queue:
         # 1. started_job_registry

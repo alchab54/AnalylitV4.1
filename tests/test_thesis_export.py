@@ -33,8 +33,13 @@ class TestThesisExport:
         db_session.flush()  # Pour obtenir l'ID auto-généré
         project_id = project.id
 
-        search_result = SearchResult(project_id=project_id, article_id="PMID1", title="Article 1", authors="Doe J", publication_date="2023", journal="Journal A")
-        extraction = Extraction(project_id=project_id, pmid="PMID1", user_validation_status="include")
+        # CORRECTION : Assurer que SearchResult et Extraction sont liés par le même article_id/pmid
+        # pour que la jointure dans la requête de l'API fonctionne.
+        article_id_to_include = "PMID12345"
+        search_result = SearchResult(project_id=project_id, article_id=article_id_to_include, title="Article 1", authors="Doe J", publication_date="2023", journal="Journal A", abstract="Abstract de test.")
+        # L'extraction doit avoir le même pmid et le statut 'include'
+        extraction = Extraction(project_id=project_id, pmid=article_id_to_include, user_validation_status="include")
+
         db_session.add_all([search_result, extraction])
         db_session.commit()
 
