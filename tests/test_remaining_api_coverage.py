@@ -155,7 +155,7 @@ def test_api_settings_endpoints(client):
     assert response_models.status_code == 200
     models_data = response_models.json
     assert isinstance(models_data['models'], list)
-    assert llama3.18b in models_data['models'] # Vérifie une valeur par défaut
+    assert 'llama3.1:8b' in models_data['models'] # Vérifie une valeur par défaut
 
 def test_api_admin_endpoints(client):
     """

@@ -133,16 +133,16 @@ def test_fetchers_arxiv_and_crossref(mock_get):
     """
     # --- Cas 1 ArXiv ---
     # Simuler une réponse XML ArXiv
-    arxiv_xml = 
-    feed xmlns=httpwww.w3.org2005Atom
-      entry
-        idhttparxiv.orgabs1234.5678v1id
-        titleUn Titre ArXiv Simpletitle
-        summaryCeci est le résumé.summary
-        authornameA. Auteurnameauthor
-        published2023-01-01T000000Zpublished
-      entry
-    feed
+    arxiv_xml = """
+    <feed xmlns="http://www.w3.org/2005/Atom">
+      <entry>
+        <id>http://arxiv.org/abs/1234.5678v1</id>
+        <title>Un Titre ArXiv Simple</title>
+        <summary>Ceci est le résumé.</summary>
+        <author><name>A. Auteur</name></author>
+        <published>2023-01-01T00:00:00Z</published>
+      </entry>
+    </feed>"""
     
     mock_response_arxiv = MagicMock()
     mock_response_arxiv.status_code = 200

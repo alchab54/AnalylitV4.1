@@ -204,7 +204,7 @@ def test_api_get_chat_history(client, db_session, setup_project):
         id=str(uuid.uuid4()),
         project_id=other_project.id,
         role=user,
-        content=Message d'un autre projet
+        content="Message d'un autre projet"
     )
     db_session.add(other_project)
     db_session.add(msg_other)
