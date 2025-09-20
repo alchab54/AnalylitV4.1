@@ -6,6 +6,7 @@ import io
 import csv
 import zipfile
 from pathlib import Path
+import pandas as pd
 from flask import Flask, request, jsonify, send_from_directory, abort
 from flask_cors import CORS
 from flask_socketio import SocketIO
@@ -469,7 +470,7 @@ def create_app(config=None):
         args = request.args
         page = args.get('page', 1, type=int)
         per_page = args.get('per_page', 20, type=int)
-        sort_by = args.get('sort_by', 'article_id')
+        sort_by = args.get('sort_by', 'title') # <--- Changez 'article_id' en 'title'
         sort_order = args.get('sort_order', 'asc')
         
         query = session.query(SearchResult).filter_by(project_id=project_id)
@@ -532,7 +533,7 @@ def create_app(config=None):
         session.commit()
         return jsonify({"message": f"{count} validations ont été importées pour l'évaluateur {evaluator_name}."}), 200
 
-    @app.route('/api/projects/<project_id>/import-zotero', methods=['POST'])
+    @app.route('/api/projects/<project_id>/import-zotero', methods=['POST'], strict_slashes=False) # <-- Ajoutez strict_slashes
     @with_db_session
     def import_zotero_pdfs(session, project_id):
         if not request.is_json:
@@ -656,10 +657,60 @@ def create_app(config=None):
             response_message += f" {len(failed_uploads)} fichier(s) ignoré(s) (format invalide ou erreur)."
         return jsonify({"message": response_message, "task_ids": task_ids, "failed_files": failed_uploads}), 202
 
+    @app.route('/api/projects/<project_id>/export/thesis', methods=['GET'])
+    @with_db_session
+    def export_thesis(session, project_id):
+        """Génère et retourne un export complet de thèse (Excel, Biblio) dans un fichier zip."""
+
+        try:
+            # 1. Récupérer les données pertinentes (articles inclus)
+            articles_query = (
+                session.query(SearchResult)
+                .join(Extraction, SearchResult.article_id == Extraction.pmid)
+                .filter(SearchResult.project_id == project_id)
+                .filter(Extraction.user_validation_status == 'include')
+            )
+
+            articles = [
+                {
+                    'title': r.title, 'authors': r.authors, 'publication_date': r.publication_date,
+                    'journal': r.journal, 'abstract': r.abstract
+                } for r in articles_query.all()
+            ]
+
+            if not articles:
+                return jsonify({"error": "Aucun article inclus à exporter"}), 404
+
+            # 2. Créer le DataFrame et le fichier Excel en mémoire
+            df = pd.DataFrame(articles)
+            excel_buffer = io.BytesIO()
+            df.to_excel(excel_buffer, index=False, sheet_name='Articles Inclus')
+            excel_buffer.seek(0)
+
+            # 3. Formater la bibliographie
+            bibliography_text = "\n".join(format_bibliography(articles))
+
+            # 4. Créer le fichier zip en mémoire
+            zip_buffer = io.BytesIO()
+            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                zip_file.writestr('export_articles.xlsx', excel_buffer.read())
+                zip_file.writestr('bibliographie.txt', bibliography_text.encode('utf-8'))
+            zip_buffer.seek(0)
+
+            return send_file(
+                zip_buffer,
+                as_attachment=True,
+                download_name=f'export_these_{project_id}.zip',
+                mimetype='application/zip'
+            )
+        except Exception as e:
+            logging.error(f"Erreur lors de l'export de la thèse: {e}")
+            return jsonify({"error": "Erreur lors de la génération de l'export"}), 500
+
     # ==================== ROUTES API ADVANCED ANALYSIS ====================
     @app.route("/api/projects/<project_id>/run-discussion-draft", methods=["POST"])
     def run_discussion_draft(project_id): # noqa
-        job = analysis_queue.enqueue(run_discussion_generation_task, project_id=project_id, job_timeout='1h')
+        job = analysis_queue.enqueue(run_discussion_generation_task, project_id=project_id, job_timeout='30m') # <--- Changez '1h' en '30m'
         return jsonify({"message": "Génération du brouillon de discussion lancée", "task_id": job.id}), 202
 
     @app.route("/api/projects/<project_id>/run-knowledge-graph", methods=["POST"])
@@ -700,7 +751,7 @@ def create_app(config=None):
                 task_function,
                 project_id=project_id,
                 job_timeout='30m',  # <-- AJOUTEZ CETTE LIGNE
-                **data.get('parameters', {})
+                **data.get('parameters', {}) # type: ignore
             )
             
             job_id = str(job.id) if hasattr(job, 'id') else str(uuid.uuid4())
@@ -742,7 +793,7 @@ def create_app(config=None):
     def run_rob_analysis_route(session, project_id):
         data = request.get_json()
         article_ids = data.get('article_ids', [])
-        task_ids = [background_queue.enqueue(run_risk_of_bias_task, project_id, article_id, job_timeout='20m').id for article_id in article_ids]
+        task_ids = [analysis_queue.enqueue(run_risk_of_bias_task, project_id, article_id, job_timeout='20m').id for article_id in article_ids]
         return jsonify({"message": "RoB analysis initiated", "task_ids": task_ids}), 202
 
     # ==================== ROUTES API CHAT ====================
@@ -756,7 +807,7 @@ def create_app(config=None):
                 answer_chat_question_task,
                 project_id=project_id,
                 question=data['question'],
-                job_timeout='15m'
+            job_timeout='30m'  # <--- Changez '15m' en '30m'
             )
             # Assurez-vous de retourner l'ID du job
             task_id = str(job.id) if job and job.id else "unknown"
