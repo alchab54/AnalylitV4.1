@@ -87,13 +87,6 @@ def create_app(config=None):
             abort(404, description="Resource not found")
         return result
 
-    # --- AJOUTEZ CE BLOC DE 5 LIGNES ---
-    @app.route("/api/health", methods=["GET"])
-    def health_check():
-        """Route simple pour le healthcheck de Docker."""
-        return jsonify({"status": "healthy"}), 200
-    # ------------------------------------
-
 
     # --- NOUVEAUX ENDPOINTS POUR L'EXTENSION ZOTERO ---
 
@@ -293,6 +286,13 @@ def create_app(config=None):
     # --- FIN DES AJOUTS POUR L'EXTENSION ZOTERO ---
 
     # --- Enregistrement des routes (Blueprints ou routes directes) ---
+
+    # --- HEALTHCHECK ROUTE ---
+    @app.route("/api/health", methods=["GET"])
+    def health_check():
+        """Route simple pour le healthcheck de Docker."""
+        return jsonify({"status": "healthy"}), 200
+
     # ==================== ROUTES API PROJECTS ====================
     @app.route("/api/projects/", methods=["POST"])
     @with_db_session
