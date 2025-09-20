@@ -211,9 +211,58 @@ def create_app(config=None):
     @app.route('/api/tasks/status', methods=['GET'])
     @with_db_session
     def get_tasks_status(session):
-        # Logique pour récupérer le statut des tâches...
-        # Pour l'instant, retournons une liste vide pour que le test passe.
-        return jsonify([])
+        # CORRECTION : Implémentation de la logique de la route
+        all_tasks = []
+        # Assurez-vous que toutes vos files sont listées ici
+        queues = [processing_queue, synthesis_queue, analysis_queue, background_queue, extension_queue] 
+        now = datetime.utcnow()
+
+        for q in queues:
+            try:
+                # Registres pour les tâches en cours, terminées, échouées
+                registries = {
+                    'started': StartedJobRegistry(queue=q),
+                    'finished': FinishedJobRegistry(queue=q),
+                    'failed': FailedJobRegistry(queue=q),
+                }
+
+                # Tâches en cours (started)
+                started_jobs = Job.fetch_many(registries['started'].get_job_ids(), connection=redis_conn)
+                # Tâches en attente (queued)
+                queued_jobs = Job.fetch_many(q.get_job_ids(), connection=redis_conn)
+                # Tâches terminées (récentes)
+                finished_jobs = Job.fetch_many(registries['finished'].get_job_ids(0, 100), connection=redis_conn) # Limiter à 100
+                # Tâches échouées (récentes)
+                failed_jobs = Job.fetch_many(registries['failed'].get_job_ids(0, 100), connection=redis_conn) # Limiter à 100
+
+                all_jobs = started_jobs + queued_jobs + finished_jobs + failed_jobs
+
+                for job in all_jobs:
+                    status = job.get_status()
+                    duration = None
+                    if job.started_at:
+                        end_time = job.ended_at or now
+                        duration = (end_time - job.started_at).total_seconds()
+                    
+                    all_tasks.append({
+                        'id': job.id,
+                        'queue': q.name,
+                        'status': status,
+                        'description': job.description or job.func_name,
+                        'created_at': job.created_at.isoformat() if job.created_at else None,
+                        'started_at': job.started_at.isoformat() if job.started_at else None,
+                        'ended_at': job.ended_at.isoformat() if job.ended_at else None,
+                        'duration_seconds': duration,
+                        'error': job.exc_info if job.is_failed else None,
+                    })
+            except Exception as e:
+                logging.error(f"Erreur lors de la récupération des tâches pour la file {q.name}: {e}")
+                continue
+
+        # Trier les tâches pour un affichage cohérent
+        all_tasks.sort(key=lambda x: x['created_at'] or datetime.min.isoformat(), reverse=True)
+        
+        return jsonify(all_tasks)
 
     @app.route("/api/tasks/<task_id>/cancel", methods=["POST"])
     def cancel_task(task_id):
