@@ -86,14 +86,13 @@ def test_generate_discussion_draft_logic()
 @patch('utils.file_handlers.pdfplumber.open')
 @patch('PyPDF2.PdfReader')
 @patch('utils.file_handlers.pytesseract', None) # Simule l'absence d'OCR
-def test_extract_text_from_pdf_logic(mock_pypdf, mock_pdfplumber, mock_exists)
-    
-    Teste la logique de fallback de l'extraction PDF 
+def test_extract_text_from_pdf_logic(mock_pypdf, mock_pdfplumber, mock_exists):
+    """
+    Teste la logique de fallback de l'extraction PDF
     1. Tente pdfplumber
     2. Si échec, tente PyPDF2
     3. Si échec, retourne None
-    
-    
+    """
     # --- Cas 1 pdfplumber fonctionne ---
     mock_page = MagicMock()
     mock_page.extract_text.return_value = Texte de PdfPlumber.
@@ -128,11 +127,10 @@ def test_extract_text_from_pdf_logic(mock_pypdf, mock_pdfplumber, mock_exists)
 # =================================================================
 
 @patch('requests.get')
-def test_fetchers_arxiv_and_crossref(mock_get)
-    
+def test_fetchers_arxiv_and_crossref(mock_get):
+    """
     Teste la logique de parsing pour ArXiv et CrossRef dans db_manager.
-    
-    
+    """
     # --- Cas 1 ArXiv ---
     # Simuler une réponse XML ArXiv
     arxiv_xml = 
@@ -199,12 +197,12 @@ def test_fetchers_arxiv_and_crossref(mock_get)
 # Patch pour la session BDD interne de la tâche et la notification
 @patch('tasks_v4_complete.Session') 
 @patch('tasks_v4_complete.send_project_notification')
-def test_import_from_zotero_json_task_logic(mock_notify, mock_session, db_session, setup_project)
-    
-    Teste la logique de la tâche 'import_from_zotero_json_task' 
+def test_import_from_zotero_json_task_logic(mock_notify, mock_session, db_session, setup_project):
+    """
+    Teste la logique de la tâche 'import_from_zotero_json_task'
     - Ajoute de nouveaux articles.
     - Ignore les articles déjà existants (basé sur l'article_id).
-    
+    """
     # --- Setup ---
     project_id = setup_project.id
     

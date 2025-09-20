@@ -103,10 +103,10 @@ def test_api_analysis_profiles_crud_workflow(client, db_session)
 # =================================================================
 
 def test_api_get_search_results_pagination(client, db_session, setup_project)
-    
-    Teste la pagination de la route GET apiprojectsidsearch-results.
+    """
+    Teste la pagination de la route GET /api/projects/<id>/search-results.
     Crée 25 articles et les récupère par pages de 10.
-    
+    """
     project_id = setup_project.id
     
     # --- Setup  Créer 25 résultats de recherche ---
@@ -165,11 +165,11 @@ def test_api_get_search_results_pagination(client, db_session, setup_project)
 # 3. Tests pour l'Historique du Chat
 # =================================================================
 
-def test_api_get_chat_history(client, db_session, setup_project)
-    
+def test_api_get_chat_history(client, db_session, setup_project):
+    """
     Teste la récupération de l'historique du chat pour un projet.
     Vérifie que les messages sont retournés dans le bon ordre (chronologique).
-    
+    """
     project_id = setup_project.id
     now = datetime.utcnow()
 

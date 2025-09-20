@@ -135,10 +135,10 @@ def test_api_get_extractions(client, db_session, setup_project)
 # 3. Tests pour les Paramètres et l'Administration
 # =================================================================
 
-def test_api_settings_endpoints(client)
-    
+def test_api_settings_endpoints(client):
+    """
     Teste les routes de l'API de paramètres (Settings).
-    
+    """
     # --- 1. GET apisettingsprofiles (Mocke la lecture du fichier profiles.json) ---
     mock_json_data = {profiles [{id test_profile, name Test Profile}]}
     # Mocker 'open' dans le contexte de 'server_v4_complete' où la route est définie
@@ -157,10 +157,10 @@ def test_api_settings_endpoints(client)
     assert isinstance(models_data['models'], list)
     assert llama3.18b in models_data['models'] # Vérifie une valeur par défaut
 
-def test_api_admin_endpoints(client)
-    
+def test_api_admin_endpoints(client):
+    """
     Teste les routes de l'API d'administration (Ollama pull, Queue clear).
-    
+    """
     # --- 1. POST apiollamapull (Vérifie la mise en file) ---
     with patch('server_v4_complete.background_queue.enqueue') as mock_enqueue
         mock_job = MagicMock()
@@ -196,10 +196,10 @@ def test_api_admin_endpoints(client)
 # 4. Tests pour l'Extension API
 # =================================================================
 
-def test_api_extensions_endpoint(client)
-    
-    Teste l'endpoint générique POST apiextensions.
-    
+def test_api_extensions_endpoint(client):
+    """
+    Teste l'endpoint générique POST /api/extensions.
+    """
     with patch('utils.app_globals.extension_queue.enqueue') as mock_enqueue
         mock_job = MagicMock()
         mock_job.id = mock_extension_task_id
