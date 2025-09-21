@@ -1,66 +1,53 @@
-# tests/conftest.py
+# tests/conftest.py - VERSION CORRIGÉE
 import pytest
 import os
 from sqlalchemy import create_engine
-from utils.database import get_session # Assurez-vous que cette fonction existe
+
+# CORRECTION: Import depuis le fichier principal au lieu de utils inexistant
+from server_v4_complete import app, db, Project
 
 @pytest.fixture(scope='session')
 def app_config():
     """Fournit une configuration de test propre."""
-    # S'assure que l'URL de la base de données de test est utilisée
-    # La valeur par défaut 'sqlite:///:memory:' est une sécurité si on lance les tests hors de Docker
     test_db_url = os.environ.get('DATABASE_URL', 'sqlite:///:memory:')
     return {
         'TESTING': True,
         'WTF_CSRF_ENABLED': False,
         'DATABASE_URL': test_db_url,
-        'SERVER_NAME': 'localhost' # Essentiel pour url_for dans les tests
+        'SERVER_NAME': 'localhost'
     }
 
 @pytest.fixture(scope='session')
-def app(app_config):
-    """Crée une instance de l'application Flask pour la session de test."""
-    from server_v4_complete import create_app # Importation locale
-    app = create_app(app_config)
+def test_app(app_config):
+    """Crée une instance de l'application Flask pour les tests."""
+    app.config.update(app_config)
     
     with app.app_context():
-        from utils.models import Base # Assurez-vous d'importer votre Base déclarative
-        engine = create_engine(app_config['DATABASE_URL'])
-        Base.metadata.drop_all(engine) # Nettoie avant les tests
-        Base.metadata.create_all(engine) # Crée toutes les tables
-    
-    yield app
-
-    # Nettoyage après tous les tests
-    with app.app_context():
-        engine = create_engine(app_config['DATABASE_URL'])
-        Base.metadata.drop_all(engine)
+        # CORRECTION: Utilise db au lieu de Base
+        db.create_all()
+        yield app
+        db.drop_all()
 
 @pytest.fixture
-def client(app):
+def client(test_app):
     """Client de test Flask pour les requêtes HTTP."""
-    with app.test_client() as client:
+    with test_app.test_client() as client:
         yield client
 
 @pytest.fixture
-def db_session(app):
+def db_session(test_app):
     """Fournit une session de base de données par test."""
-    with app.app_context():
-        session = get_session()
-        yield session
-        # On annule les transactions pour isoler chaque test.
-        # C'est plus rapide que de tout supprimer/recréer.
-        session.rollback()
-        session.close()
+    with test_app.app_context():
+        yield db.session
+        db.session.rollback()
 
 @pytest.fixture
-def setup_project(app, db_session):
+def setup_project(test_app, db_session):
     """Crée un projet de test."""
     import uuid
-    from utils.models import Project # L'import est fait ici pour être dans le contexte de l'app
     from datetime import datetime
     
-    with app.app_context():
+    with test_app.app_context():
         project = Project(
             id=str(uuid.uuid4()),
             name=f"Test Project {uuid.uuid4().hex[:8]}",

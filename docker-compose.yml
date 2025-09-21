@@ -50,8 +50,8 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-    container_name: analylit_worker # Point RQ to the Flask app to load the context
-    command: rq worker --url redis://redis:6379
+    container_name: analylit_worker
+    command: rq worker --url redis://redis:6379/0 # Spécifie explicitement la base de données Redis
     working_dir: /home/appuser/app
     volumes:
       - .:/home/appuser/app
