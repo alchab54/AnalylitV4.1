@@ -1,5 +1,3 @@
-from gevent import monkey
-monkey.patch_all()
 import logging
 import feedparser
 
@@ -1125,6 +1123,8 @@ def register_models():
 app = create_app()
 
 if __name__ == "__main__":
+    import gevent.monkey
+    gevent.monkey.patch_all()
     # Ce bloc est pour le développement local UNIQUEMENT
     # Utilise le serveur de développement de SocketIO
     # NOTE FOR PRODUCTION WITH GUNICORN:

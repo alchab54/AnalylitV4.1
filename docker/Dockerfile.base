@@ -29,7 +29,10 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN useradd --create-home appuser
 WORKDIR /home/appuser/app
 COPY --from=builder /opt/venv /opt/venv
-COPY --from=builder /usr/bin/psql /usr/bin/psql
-COPY --from=builder /usr/bin/nc /usr/bin/nc
+# Install postgresql-client and netcat-openbsd directly in the final image
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    postgresql-client netcat-openbsd libdbd-pg-perl libpg-perl \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 USER appuser
