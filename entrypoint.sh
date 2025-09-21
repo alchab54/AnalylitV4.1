@@ -4,7 +4,7 @@ set -e
 echo "Entrypoint démarré. En attente de la base de données..."
 
 # Attendre que PostgreSQL soit prêt
-while ! nc -z $POSTGRES_HOST $POSTGRES_PORT; do
+while ! nc -z "$POSTGRES_HOST" "$POSTGRES_PORT"; do
     sleep 1
 done
 
@@ -17,4 +17,4 @@ python -c 'from utils.database import init_database; init_database()'
 
 echo "Démarrage de l'application Flask avec Gunicorn..."
 # Start Gunicorn
-exec gunicorn --worker-class gevent -w 4 -b 0.0.0.0:5000 "server_v4_complete:create_app()"
+exec "$@"

@@ -61,18 +61,15 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./projects:/home/appuser/app/projects # Persistance des données de projets
-      - ./model_cache:/home/appuser/app/model_cache # Persistance du cache des modèles
-      - .:/home/appuser/app  # <--- DÉ-COMMENTEZ CETTE LIGNE
+      - ./projects:/home/appuser/app/projects
+      - ./model_cache:/home/appuser/app/model_cache
+      - .:/home/appuser/app
     environment:
       - TESTING=true
       - FLASK_ENV=production
       - FLASK_APP=server_v4_complete:create_app
       - FLASK_RUN_HOST=0.0.0.0
       - FLASK_RUN_PORT=5000
-      - POSTGRES_HOST=db
-      - TEST_DATABASE_URL=postgresql://analylit_user:strong_password@db/analylit_db_test
-      - POSTGRES_PORT=5432
       - PYTHONPATH=/home/appuser/app
     env_file:
       - .env
@@ -87,8 +84,8 @@ services:
       timeout: 3s
       retries: 10
       start_period: 20s
-
-
+    # Spécifie la commande Gunicorn pour utiliser le worker WebSocket
+    command: /home/appuser/app/entrypoint.sh gunicorn --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker --bind 0.0.0.0:5000 server_v4_complete:app
     networks:
       - analylit-network
     restart: unless-stopped
@@ -109,7 +106,6 @@ services:
       - PYTHONUNBUFFERED=1
       - PYTHONPATH=/home/appuser/app
       - TESTING=true
-      - TEST_DATABASE_URL=postgresql://analylit_user:strong_password@db/analylit_db_test
       - FLASK_ENV=testing
     # ----- CORRECTION DE LA SYNTAXE YAML -----
     command: "rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4"

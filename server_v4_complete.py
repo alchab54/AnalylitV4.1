@@ -1127,6 +1127,11 @@ app = create_app()
 if __name__ == "__main__":
     # Ce bloc est pour le développement local UNIQUEMENT
     # Utilise le serveur de développement de SocketIO
+    # NOTE FOR PRODUCTION WITH GUNICORN:
+    # For WebSockets to work, Gunicorn must be launched with the gevent-websocket worker.
+    # 1. Ensure 'gevent-websocket' is in your requirements.txt.
+    # 2. Launch Gunicorn with the following command:
+    #    gunicorn --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker --bind 0.0.0.0:5000 server_v4_complete:app
     socketio.run(app, host="0.0.0.0", port=8080, debug=True, allow_unsafe_werkzeug=True)
 else:
     # Pour Gunicorn/production, Gunicorn appellera create_app()
