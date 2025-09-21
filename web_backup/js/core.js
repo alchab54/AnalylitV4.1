@@ -14,6 +14,8 @@ import {
     loadSearchResults // --- LA FONCTION EST IMPORTÉE DEPUIS articles.js
 } from './articles.js';
 import {
+    handleRunDiscussionDraft,
+    handleRunKnowledgeGraph,
     handleRunMetaAnalysis,
     exportAnalyses,
     handleRunATNAnalysis,

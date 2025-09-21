@@ -258,12 +258,10 @@ export async function runProjectAnalysis(analysisType) {
 
         switch(analysisType) {
             case 'discussion':
-                endpoint = `/projects/${projectId}/run-analysis`;
-                body = { type: 'discussion' };
+                endpoint = `/projects/${projectId}/run-discussion-draft`;
                 break;
             case 'knowledge_graph':
-                 endpoint = `/projects/${projectId}/run-analysis`;
-                 body = { type: 'knowledge_graph' };
+                 endpoint = `/projects/${projectId}/run-knowledge-graph`;
                  break;
             case 'prisma_flow':
                 endpoint = `/projects/${projectId}/run-analysis`;
@@ -445,7 +443,33 @@ export function renderGenericAnalysisResult(title, analysis) {
     `;
 }
 
+export async function handleRunDiscussionDraft(event) {
+    if (!appState.currentProject?.id) return;
+    const card = event.target.closest('.analysis-card');
+    if (card) card.classList.add('analysis-card--loading');
 
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/run-discussion-draft`, { method: 'POST' });
+        showToast('Tâche de génération lancée.', 'success');
+    } catch (e) {
+        showToast(`Erreur: ${e.message}`, 'error');
+        if (card) card.classList.remove('analysis-card--loading');
+    }
+}
+
+export async function handleRunKnowledgeGraph(event) {
+    if (!appState.currentProject?.id) return;
+    const card = event.target.closest('.analysis-card');
+    if (card) card.classList.add('analysis-card--loading');
+
+    try {
+        await fetchAPI(`/projects/${appState.currentProject.id}/run-knowledge-graph`, { method: 'POST' });
+        showToast('Génération du graphe de connaissances lancée.', 'success');
+    } catch (e) {
+        showToast(`Erreur: ${e.message}`, 'error');
+        if (card) card.classList.remove('analysis-card--loading');
+    }
+}
 
 export async function handleRunPrismaFlow(event) {
     if (!appState.currentProject?.id) return;

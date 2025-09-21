@@ -1,6 +1,6 @@
 // web/js/core.js
 
-import { appState, elements, WEBSOCKET_URL } from './app-improved.js';
+import { appState, elements } from './app-improved.js';
 import { setProjects, setCurrentProject } from './state.js';
 import {
     handleDeleteSelectedArticles,
@@ -14,6 +14,8 @@ import {
     loadSearchResults // --- LA FONCTION EST IMPORTÉE DEPUIS articles.js
 } from './articles.js';
 import {
+    handleRunDiscussionDraft,
+    handleRunKnowledgeGraph,
     handleRunMetaAnalysis,
     exportAnalyses,
     handleRunATNAnalysis,
@@ -44,7 +46,7 @@ import { handleDeleteGrid, loadProjectGrids, renderGridsSection, showGridFormMod
 import { renderReportingSection, generateBibliography, generateSummaryTable, exportSummaryTableExcel, savePrismaChecklist } from './reporting.js';
 // CORRIGÉ: Ajout des imports pour les fonctions d'import et la gestion des modales
 import { 
-    showPmidImportModal, // Corrected import
+    showPmidImportModal,
     handleIndexPdfs,
     handleZoteroSync,
     exportForThesis,
@@ -55,7 +57,7 @@ import {
     processPmidImport
 } from './import.js';
 import { showStakeholderManagementModal, addStakeholderGroup, deleteStakeholderGroup, runStakeholderAnalysis } from './stakeholders.js';
-import { fetchTasks } from './tasks.js';
+import { loadTasksSection } from './tasks.js';
 import {
     renderSettings,
     showEditPromptModal,
@@ -123,7 +125,7 @@ const compactModeAction = {
 
 const projectActions = {
     'select-project': (target) => selectProject(target.dataset.projectId),
-    'delete-project': (target) => deleteProject(target.dataset.projectId, target.dataset.projectName),
+    'delete-project': (target) => deleteProject(target.dataset.projectId, target.dataset.projectName), // This was already correct.
     'export-project': (target) => handleExportProject(target.dataset.projectId),
     'confirm-delete-project': (target) => confirmDeleteProject(target.dataset.projectId), // Nouvelle action
 };
@@ -190,7 +192,7 @@ const chatActions = {
 const importExportActions = {
     'trigger-zotero-import': (target) => document.getElementById('zoteroFileInput').click(),
     'show-pmid-import-modal': showPmidImportModal,
-    'trigger-upload-pdfs': (target) => document.getElementById('bulkPDFInput').click(), // Corrected action
+    'trigger-upload-pdfs': (target) => document.getElementById('bulkPDFInput').click(),
     'index-pdfs': handleIndexPdfs,
     'zotero-sync': handleZoteroSync,
     'export-for-thesis': exportForThesis,
@@ -292,17 +294,62 @@ export function setupDelegatedEventListeners() {
 }
 
 export function initializeWebSocket() {
-    // WebSocket désactivé - Mode API polling utilisé
-    console.log('🔄 Mode API polling activé (WebSocket désactivé)');
-    
-    // Fallback vers polling pour les updates
-    setInterval(() => {
-        if (window.currentProject) {
-            refreshCurrentSection();
+    try {
+        if (typeof io !== 'function') {
+            console.warn('Client Socket.IO indisponible.');
+            if (elements.connectionStatus) elements.connectionStatus.textContent = '❌';
+            return;
         }
-    }, 5000); // Refresh toutes les 5 secondes
-    
-    return;
+
+        appState.socket = io({ path: '/socket.io/' });
+
+        appState.socket.on('connect', () => {
+            console.log('✅ WebSocket connecté');
+            appState.socketConnected = true;
+            if (elements.connectionStatus) elements.connectionStatus.textContent = '✅';
+            if (appState.currentProject) {
+                appState.socket.emit('join_room', { room: appState.currentProject.id });
+            }
+        });
+
+        appState.socket.on('disconnect', () => {
+            console.warn('🔌 WebSocket déconnecté.');
+            appState.socketConnected = false;
+            if (elements.connectionStatus) elements.connectionStatus.textContent = '⏳';
+        });
+
+        appState.socket.on('notification', (data) => {
+            console.log('🔔 Notification reçue:', data);
+            showToast(data.message, data.type || 'info');
+            
+            // Logique de rafraîchissement basée sur le type de notification
+            if (data.type === 'task_progress') {
+                // updateLoadingProgress(data.current, data.total, data.message, data.task_id);
+            } else {
+                // handleTaskNotification(data);
+            }
+        });
+
+        appState.socket.on('ANALYSIS_COMPLETED', (data) => {
+            showToast(`Analyse "${data.analysis_type}" terminée.`, 'success');
+            if (appState.currentSection === 'analyses') {
+                console.log('Rafraîchissement de la section analyses...');
+                loadProjectAnalyses();
+            }
+        });
+
+        appState.socket.on('search_completed', (data) => {
+            showToast(`Recherche terminée: ${data.total_results} articles trouvés.`, 'success');
+            if (appState.currentSection === 'results') {
+                console.log('Rafraîchissement de la section résultats...');
+                loadSearchResults();
+            }
+        });
+
+    } catch (e) {
+        console.error('Erreur WebSocket:', e);
+        if (elements.connectionStatus) elements.connectionStatus.textContent = '❌';
+    }
 }
 
 // --- CORRECTION ICI ---
@@ -368,7 +415,7 @@ export function refreshCurrentSection() {
             renderSettings();
             break;
         case 'tasks':
-            fetchTasks();
+            loadTasksSection();
             break;
         case 'reporting':
             renderReportingSection(elements);

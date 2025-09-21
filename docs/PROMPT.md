@@ -1,355 +1,99 @@
-# PROMPT.md - Instructions Détaillées Gemini VSCode
+Tu agis comme un assistant de migration frontend. Objectif: synchroniser le frontend AnalyLit v4.1 avec l’API. Applique exactement les opérations suivantes, sans toucher au backend.
 
-## MISSION PRINCIPALE
+Règles générales
 
-Finaliser l'application AnalyLit v4.1 en réactivant intelligemment les fonctionnalités frontend désactivées par erreur, tout en respectant l'architecture existante.
+Ne change pas la logique métier, seulement les endpoints et identifiants de tâches.
 
-## DIAGNOSTIC INITIAL REQUIS
+Sauvegarde le dossier web/ avant modifications.
 
-### Étape 1 : Scanner le Frontend
-```bash
-# Identifier toutes les fonctions commentées avec TODO
-find web/js -name "*.js" -exec grep -l "// TODO:" {} \;
-grep -rn "// TODO:" web/js/
+Ajoute seulement les fichiers listés.
 
-# Lister les exports manquants
-grep -rn "export function" web/js/ | head -20
-```
+N’introduis aucune URL externe.
 
-### Étape 2 : Vérifier la Correspondance Backend
-Pour chaque fonction commentée, vérifier si le backend l'implémente :
+Étapes
 
-```bash
-# Exemple pour articles.js
-grep -n "batch.*delete\|delete.*batch" server_v4_complete.py
-grep -n "upload.*pdfs\|pdfs.*upload" server_v4_complete.py  
-grep -n "export.*thesis" server_v4_complete.py
-```
+Sauvegarde
 
-## PLAN D'ACTION SÉQUENTIEL
+Crée un dossier backup_frontend_YYYYMMDD_HHMMSS.
 
-### PHASE 1 : Réactivation Sélective
+Copie le dossier web/ dedans.
 
-#### 1.1 Articles (articles.js)
-**À RÉACTIVER** - Backend vérifié présent :
+Patches fichiers existants (frontend)
 
-```javascript
-// ✅ Suppression par lot - Route backend trouvée
-export function handleDeleteSelectedArticles() {
-    if (!appState.currentProject || !appState.selectedSearchResults.size) {
-        showToast('Aucun article sélectionné', 'warning');
-        return;
-    }
-    
-    const articleIds = Array.from(appState.selectedSearchResults);
-    
-    fetchAPI(`/projects/${appState.currentProject.id}/articles/batch-delete`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ article_ids: articleIds })
-    }).then(() => {
-        showToast(`${articleIds.length} articles supprimés`);
-        appState.selectedSearchResults.clear();
-        refreshCurrentSection();
-    }).catch(error => {
-        showToast('Erreur lors de la suppression', 'error');
-        console.error('Delete error:', error);
-    });
-}
+Fichier web/js/api.js: remplace la fonction fetchAPI par la version robuste (préfixe /api, gestion JSON/erreurs).
 
-export function showBatchProcessModal() {
-    if (!appState.selectedSearchResults.size) {
-        showToast('Sélectionnez des articles à traiter', 'warning');
-        return;
-    }
-    openModal('batchProcessModal');
-}
-```
+Fichier web/js/articles.js:
 
-#### 1.2 Import/PDF (import.js)  
-**À RÉACTIVER** - Backend vérifié présent :
+Toutes les occurrences de task_id → job_id côté lecture de réponse.
 
-```javascript
-// ✅ Upload PDFs en masse - Route backend présente
-export function handleUploadPdfs() {
-    const fileInput = document.getElementById('pdfFiles');
-    if (!fileInput?.files.length) {
-        showToast('Sélectionnez des fichiers PDF', 'warning');
-        return;
-    }
+handleDeleteSelectedArticles: utiliser POST sur /articles/batch-delete avec {article_ids, project_id} et lire response.job_id, puis rafraîchir via un event “articles:refresh”.
 
-    const formData = new FormData();
-    Array.from(fileInput.files).forEach(file => {
-        if (file.type === 'application/pdf') {
-            formData.append('files', file);
-        }
-    });
+Fichier web/js/analyses.js:
 
-    if (!formData.has('files')) {
-        showToast('Aucun fichier PDF valide sélectionné', 'error');
-        return;
-    }
+Uniformiser les appels d’analyse via /projects/{projectId}/run-analysis.
 
-    showLoadingOverlay();
-    
-    fetchAPI(`/projects/${appState.currentProject.id}/upload-pdfs-bulk`, {
-        method: 'POST',
-        body: formData
-    }).then(response => {
-        showToast(`${response.successful_uploads?.length || 0} PDFs uploadés`);
-        fileInput.value = '';
-    }).finally(() => {
-        closeLoadingOverlay();
-    });
-}
+Pour l’ATN: POST body {type: 'atnscores'}. Afficher le job_id si présent.
 
-// ✅ Indexation PDFs - Tâche backend présente
-export function handleIndexPdfs() {
-    if (!appState.currentProject) return;
-    
-    showLoadingOverlay('Indexation des PDFs en cours...');
-    
-    fetchAPI(`/projects/${appState.currentProject.id}/index-pdfs`, {
-        method: 'POST'
-    }).then(() => {
-        showToast('Indexation des PDFs démarrée');
-    });
-}
-```
+Fichier web/js/tasks.js:
 
-#### 1.3 Rapports (reporting.js)
-**À RÉACTIVER** - Backend complet :
+Consommer /tasks/status, construire le DOM avec data-job-id, afficher job_id, status, progress, created_at.
 
-```javascript
-// ✅ Export thèse complet - Route backend implémentée
-export function exportForThesis() {
-    if (!appState.currentProject) {
-        showToast('Aucun projet sélectionné', 'warning');
-        return;
-    }
+Fichier web/js/settings.js:
 
-    showLoadingOverlay('Génération de l\'export thèse...');
-    
-    // Utiliser window.open pour télécharger le ZIP
-    const exportUrl = `/api/projects/${appState.currentProject.id}/export/thesis`;
-    
-    fetch(exportUrl)
-        .then(response => {
-            if (!response.ok) throw new Error('Export failed');
-            return response.blob();
-        })
-        .then(blob => {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `export_these_${appState.currentProject.id}.zip`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-            
-            showToast('Export thèse téléchargé');
-        })
-        .catch(error => {
-            console.error('Export error:', error);
-            showToast('Erreur lors de l\'export', 'error');
-        })
-        .finally(() => {
-            closeLoadingOverlay();
-        });
-}
+Charger les profils via /analysis-profiles.
 
-// ✅ Génération bibliographie - Implémentation backend
-export function generateBibliography() {
-    if (!appState.currentProject) return;
-    
-    fetchAPI(`/projects/${appState.currentProject.id}/bibliography`)
-        .then(biblio => {
-            // Afficher dans une modale
-            openModal('bibliographyModal');
-            document.getElementById('bibliographyContent').textContent = biblio.formatted_bibliography;
-        });
-}
-```
+Charger les modèles via /settings/models.
 
-#### 1.4 Grilles (grids.js)
-**À RÉACTIVER** - Routes backend complètes :
+HTML/UI
 
-```javascript
-// ✅ Suppression grille - Route DELETE backend présente
-export function handleDeleteGrid(gridId) {
-    if (!confirm('Supprimer cette grille d\'extraction ?')) return;
-    
-    fetchAPI(`/projects/${appState.currentProject.id}/grids/${gridId}`, {
-        method: 'DELETE'
-    }).then(() => {
-        showToast('Grille supprimée');
-        loadProjectGrids();
-    });
-}
+Fichier web/index.html: harmoniser le widget de monitoring pour “job” (compteur, barre de progression et libellés). Conserver la structure visuelle.
 
-// ✅ Formulaire grille - Routes POST/PUT backend présentes  
-export function showGridFormModal(gridId = null) {
-    const modal = document.getElementById('gridFormModal');
-    const form = document.getElementById('gridForm');
-    
-    if (gridId) {
-        // Mode édition
-        const grid = appState.currentProjectGrids.find(g => g.id === gridId);
-        if (grid) {
-            document.getElementById('gridName').value = grid.name;
-            // Remplir les champs existants
-            const fields = JSON.parse(grid.fields);
-            populateGridFields(fields);
-        }
-    } else {
-        // Mode création
-        form.reset();
-        initializeEmptyGrid();
-    }
-    
-    openModal('gridFormModal');
-}
-```
+Nouveaux fichiers
 
-### PHASE 2 : Intégrations Critiques
+Crée web/js/migration-fix.js avec la logique de migration DOM (data-task-id → data-job-id) et mise à jour des listeners d’événements “socket:job_update”.
 
-#### 2.1 Chat RAG (chat.js)
-```javascript
-// ✅ Réactiver - Backend RAG complet
-export function sendChatMessage() {
-    const input = document.getElementById('chatInput');
-    const message = input.value.trim();
-    
-    if (!message || !appState.currentProject) return;
-    
-    // Ajouter message utilisateur immédiatement
-    addChatMessage('user', message);
-    input.value = '';
-    
-    // Envoyer au backend
-    fetchAPI(`/projects/${appState.currentProject.id}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: message })
-    }).then(response => {
-        // La réponse arrivera via WebSocket
-        showToast('Question envoyée à l\'IA');
-    }).catch(error => {
-        addChatMessage('assistant', 'Erreur lors du traitement de votre question.');
-        console.error('Chat error:', error);
-    });
-}
-```
+Crée test_frontend_fixes.js (à la racine du repo ou sous web/js/tests/) qui importe fetchAPI et vérifie /projects, /tasks/status et la présence de job_id.
 
-#### 2.2 Analyses ROB (rob.js)
-```javascript
-// ✅ Réactiver - Route backend présente
-export function handleRunRobAnalysis() {
-    if (!appState.selectedSearchResults.size) {
-        showToast('Sélectionnez des articles pour l\'analyse RoB', 'warning');
-        return;
-    }
-    
-    const articleIds = Array.from(appState.selectedSearchResults);
-    
-    fetchAPI(`/projects/${appState.currentProject.id}/run-rob-analysis`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ article_ids: articleIds })
-    }).then(response => {
-        showToast(`Analyse RoB démarrée pour ${articleIds.length} articles`);
-        // Les résultats arriveront via WebSocket
-    });
-}
-```
+Documentation
 
-### PHASE 3 : Interface et Expérience
+Crée CORRECTIONS_APPLIQUEES.md à la racine, listant:
 
-#### 3.1 Améliorer les Feedbacks
-```javascript
-// Dans ui.js - Améliorer les notifications
-export function showToast(message, type = 'info', duration = 5000) {
-    const toast = document.createElement('div');
-    toast.className = `toast toast--${type}`;
-    toast.innerHTML = `
-        <div class="toast__content">
-            <span class="toast__icon">${getToastIcon(type)}</span>
-            <span class="toast__message">${escapeHtml(message)}</span>
-            <button class="toast__close" onclick="this.parentElement.parentElement.remove()">×</button>
-        </div>
-    `;
-    
-    document.getElementById('toastContainer').appendChild(toast);
-    
-    // Auto-remove
-    setTimeout(() => {
-        if (toast.parentNode) {
-            toast.remove();
-        }
-    }, duration);
-}
-```
+Désynchronisation job_id/task_id corrigée.
 
-#### 3.2 États de Chargement
-```javascript
-// Améliorer les overlays de chargement
-export function showLoadingOverlay(message = 'Chargement...') {
-    const overlay = document.getElementById('loadingOverlay');
-    const messageEl = overlay.querySelector('.loading-message');
-    if (messageEl) messageEl.textContent = message;
-    overlay.classList.add('loading-overlay--show');
-}
-```
+Endpoints corrigés (/analysis-profiles, /settings/models, /projects/{id}/run-analysis).
 
-### PHASE 4 : Tests et Validation
+Fonctions impactées: articles (batch-delete), analyses (ATN), tasks (listing), settings (profils, modèles).
 
-#### 4.1 Tests Fonctionnels
-```bash
-# Vérifier que l'application démarre sans erreur
-docker-compose -f docker-compose-local.yml up -d --build
+Tests effectués et checklisks de validation.
 
-# Tester les endpoints critiques
-curl -X GET http://localhost:8080/api/health
-curl -X GET http://localhost:8080/api/projects/
+Validation
 
-# Accéder à l'interface
-open http://localhost:8080
-```
+Redémarre les services web et worker (compose).
 
-#### 4.2 Checklist de Validation
-- [ ] ✅ Navigation fluide entre sections
-- [ ] ✅ Création de projet fonctionnelle  
-- [ ] ✅ Recherche multi-bases opérationnelle
-- [ ] ✅ Upload PDFs et indexation
-- [ ] ✅ Chat IA avec documents
-- [ ] ✅ Export thèse complet
-- [ ] ✅ WebSocket notifications temps réel
-- [ ] ✅ 0 erreur console au chargement
+Ouvre l’app localement et vérifie l’absence d’erreurs console.
 
-## CONTRAINTES ABSOLUES
+Exécute le script test_frontend_fixes.js et vérifie les ✓ (endpoints OK, job_id présent).
 
-### ❌ INTERDICTIONS
-- **NE PAS modifier** `server_v4_complete.py` 
-- **NE PAS modifier** `tasks_v4_complete.py`
-- **NE PAS casser** l'architecture ES6 Modules existante
-- **NE PAS changer** le système de délégation d'événements
+Cherche encore d’éventuelles occurrences de task_id dans web/js/ et signale-moi les restes.
 
-### ✅ AUTORISATIONS  
-- **Réactiver** les fonctions frontend avec backend correspondant
-- **Corriger** les bugs d'intégration
-- **Améliorer** l'interface utilisateur
-- **Ajouter** des feedbacks et états de chargement
+Fin
 
-## RÉSULTAT FINAL ATTENDU
+Prépare un diff clair des fichiers modifiés/ajoutés.
 
-Une application AnalyLit v4.1 **100% fonctionnelle** permettant :
+Ne modifie pas d’autres zones non listées.
 
-1. **Gestion complète des projets ATN**
-2. **Recherche et screening automatisés**  
-3. **Extraction de données personnalisées**
-4. **Chat IA avec corpus de documents**
-5. **Analyses statistiques avancées** 
-6. **Export complet pour manuscrit de thèse**
+Si un endpoint manque côté backend, remonte l’info au lieu d’inventer.
 
-**Prête à être utilisée immédiatement pour finaliser une thèse sur l'Alliance Thérapeutique Numérique.**
+Contexte de référence
+
+Les changements sont motivés par une désynchronisation prouvée dans les logs/tests: le backend utilise job_id, certains modules front lisaient encore task_id. Les endpoints stables sont /analysis-profiles, /settings/models, et les analyses se déclenchent via /projects/{id}/run-analysis avec un champ type (ex.: 'atnscores').
+
+Ces instructions reflètent fidèlement les actions à mener, basées sur le plan de migration documenté. Merci de les exécuter point par point.
+
+Important: Après ces modifications, je veux un rapport final de Gemini listant: fichiers modifiés/créés, diff concis par fichier, et résultats des vérifications (console JS, script test, résiduels task_id).
+
+—
+
+Remarque pair-review
+
+Le cœur de la désynchronisation est bien “task_id” vs “job_id” côté frontend, alors que les logs/tests backend confirment “job_id”. Corriger toutes les références et les points d’entrée API supprime la cause racine des divergences observées, conformément au plan fourni.

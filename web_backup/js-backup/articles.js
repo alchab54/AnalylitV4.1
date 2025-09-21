@@ -250,36 +250,33 @@ export async function viewArticleDetails(articleId) {
 }
 
 export async function handleDeleteSelectedArticles() {
-    const selectedArticles = getSelectedArticles();
-    if (selectedArticles.length === 0) {
+    const selectedIds = Array.from(appState.selectedSearchResults);
+    const selectedCount = selectedIds.length;
+    
+    if (selectedCount === 0) {
         showToast('Aucun article sélectionné', 'warning');
         return;
     }
 
-    if (!confirm(`Supprimer ${selectedArticles.length} article(s) sélectionné(s) ?`)) {
-        return;
-    }
+    const confirmed = confirm(`Êtes-vous sûr de vouloir supprimer ${selectedCount} article(s) sélectionné(s) ?`);
+    if (!confirmed) return;
 
     try {
-        // CORRECTION : Utilise la route correcte
-        const response = await fetchAPI('/articles/batch-delete', {
-            method: 'POST',
-            body: JSON.stringify({
-                article_ids: selectedArticles.map(a => a.id),
-                project_id: appState.currentProject.id
-            })
+        showLoadingOverlay(true, 'Suppression des articles...');
+        
+        await fetchAPI(`/projects/${appState.currentProject.id}/results/batch-delete`, {
+            method: 'DELETE',
+            body: { article_ids: selectedIds }
         });
 
-        // CORRECTION : Utilise job_id au lieu de task_id
-        if (response.job_id) {
-            showToast(`Suppression lancée (Job ID: ${response.job_id})`, 'success');
-            // Actualiser la liste des articles
-            setTimeout(() => {
-                window.dispatchEvent(new CustomEvent('articles:refresh'));
-            }, 2000);
-        }
+        clearSelectedArticles();
+        await loadSearchResults();
+        showToast(`${selectedCount} article(s) supprimé(s)`, 'success');
+        
     } catch (error) {
-        showToast(`Erreur lors de la suppression : ${error.message}`, 'error');
+        showToast(`Erreur lors de la suppression: ${error.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
     }
 }
 
@@ -328,12 +325,12 @@ export async function startBatchProcessing() {
     showLoadingOverlay(true, `Lancement du screening pour ${selectedIds.length} article(s)...`);
     
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run`, { // This route is correct in server_v4_complete.py
+        await fetchAPI(`/projects/${appState.currentProject.id}/process-batch`, {
             method: 'POST',
             body: {
-                articles: selectedIds,
+                article_ids: selectedIds,
                 analysis_mode: 'screening',
-                profile: profileId,
+                profile_id: profileId,
             }
         });
         
@@ -408,12 +405,12 @@ export async function startFullExtraction() {
     showLoadingOverlay(true, `Lancement de l'extraction pour ${articleIds.length} article(s)...`);
     
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
+        await fetchAPI(`/projects/${appState.currentProject.id}/process-batch`, {
             method: 'POST',
             body: {
-                articles: articleIds,
+                article_ids: articleIds,
                 analysis_mode: 'full_extraction',
-                custom_grid_id: gridId,
+                grid_id: gridId,
             }
         });
         
