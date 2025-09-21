@@ -44,8 +44,10 @@ services:
       context: .
       dockerfile: docker/Dockerfile.migrator # CHEMIN CORRIGÉ
     image: analylit-migrator:latest
+    environment:
+      - FLASK_APP=app
     command: >
-      sh -c "./wait-for-it.sh db:5432 --timeout=60 -- flask db upgrade"
+      sh -c "until pg_isready -h db -p 5432 -U ${POSTGRES_USER}; do echo 'Waiting for db...'; sleep 1; done; flask --app app db upgrade"
     env_file:
       - .env
     depends_on:
