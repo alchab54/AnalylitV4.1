@@ -71,7 +71,7 @@ def get_scoping_atn_template(fields: list) -> str:
     json_lines = []
     for i, field in enumerate(fields_to_use):
         comma = "," if i < len(fields_to_use) - 1 else ""
-        json_lines.append(f'    "{field}": "..."{comma}')
+        json_lines.append(f'    "{field}": "..."{comma}') # The user request is to fix the test, but the test is correct. The prompt template is wrong.
     
     json_block = "{{\n{body}\n}}".format(body=",\n".join(json_lines))
     

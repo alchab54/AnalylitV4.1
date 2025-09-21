@@ -6,12 +6,24 @@ import uuid
 import shutil
 from pathlib import Path
 from unittest.mock import patch
+import sqlite3
+import os
 
 # Imports des modèles et tâches
 from utils.models import Project, SearchResult
 from tasks_v4_complete import multi_database_search_task, import_from_zotero_json_task
 
 # Ce fichier teste la capacité de l'application à maintenir l'intégrité des données.
+
+@pytest.fixture
+def temp_db_path(tmp_path):
+    """Crée un chemin de fichier temporaire et une base de données SQLite vide pour le test."""
+    db_path = tmp_path / "test_db.sqlite"
+    # Crée une base de données vide pour que le test de copie puisse la trouver
+    conn = sqlite3.connect(db_path)
+    conn.close()
+    # Retourne le chemin en tant que chaîne de caractères
+    return str(db_path)
 
 @pytest.fixture
 def project_for_dedup(db_session):
@@ -87,17 +99,13 @@ def test_deduplication_in_zotero_import_logic(db_session, project_for_dedup, moc
 
     print("\n[OK] Intégrité Données : La logique de déduplication de l'import Zotero a bien fonctionné.")
 
-def test_database_backup_and_restore_cycle(app, db_session, project_for_dedup, tmp_path):
+def test_database_backup_and_restore_cycle(temp_db_path, db_session, project_for_dedup, tmp_path):
     """
     Test d'intégrité (Sauvegarde/Restauration) : Simule un cycle complet de
     sauvegarde, suppression et restauration de la base de données.
     """
     # --- 1. Sauvegarde (simulée par une copie de fichier) ---
-    # CORRECTION: Utiliser la configuration de l'application fournie par la fixture 'app'.
-    # La base de données de test est en mémoire, donc on utilise le chemin du fichier de la config.
-    # Pour un test réel, le chemin serait celui de la base de données de test.
-    # Ici, on simule en utilisant le chemin de la config, qui est valide dans le contexte du test.
-    db_path = Path(app.config['DATABASE_URL'].replace('sqlite:///', ''))
+    db_path = Path(temp_db_path)
     backup_path = tmp_path / "analylit_backup.db"
     shutil.copy(db_path, backup_path)
     assert backup_path.exists()
@@ -105,20 +113,31 @@ def test_database_backup_and_restore_cycle(app, db_session, project_for_dedup, t
 
     # --- 2. "Catastrophe" : Suppression de la base de données ---
     # La fixture `clean_db_before_test` simule déjà la suppression avant chaque test.
+    # CORRECTION: Supprimer les enfants (SearchResult) avant le parent (Project) pour éviter la violation de clé étrangère.
+    db_session.query(SearchResult).filter_by(project_id=project_for_dedup).delete()
     # On vérifie que la base est vide après le nettoyage de la fixture du *prochain* test (simulé ici).
     db_session.query(Project).delete()
     db_session.commit()
     assert db_session.query(Project).count() == 0
     print("[OK] Catastrophe : Base de données vidée.")
 
-    # --- 3. Restauration (simulée par une copie inverse) ---
+    # --- 3. Restauration & Vérification ---
+    # On doit recréer une session pour lire le fichier restauré. Pour cela,
+    # on doit d'abord fermer la session de test actuelle qui est liée à une DB en mémoire
+    # ou à une version précédente du fichier.
+    db_session.close()
+    
+    # Restauration (simulée par une copie inverse)
     shutil.copy(backup_path, db_path)
     print("[OK] Restauration : Fichier de sauvegarde restauré.")
-
-    # --- 4. Vérification de l'intégrité ---
-    # On doit recréer une session pour lire le fichier restauré.
-    from utils.database import get_session
-    new_session = get_session()
+    
+    # Vérification de l'intégrité avec une nouvelle connexion
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    engine = create_engine(f"sqlite:///{db_path}")
+    Session = sessionmaker(bind=engine)
+    new_session = Session()
+    
     restored_project = new_session.query(Project).filter_by(id=project_for_dedup).one_or_none()
     assert restored_project is not None
     assert restored_project.name == "Projet Déduplication"

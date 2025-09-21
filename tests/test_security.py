@@ -72,7 +72,7 @@ def test_file_upload_path_traversal_is_prevented(client, setup_project):
     }
 
     # On utilise "patch" pour espionner l'appel à secure_filename
-    with patch('server_v4_complete.secure_filename') as mock_secure_filename:
+    with patch('server_v4_complete.secure_filename') as mock_secure_filename: # Cible correcte
         # On simule le retour de secure_filename pour ce test
         mock_secure_filename.return_value = "etc_passwd"
 
