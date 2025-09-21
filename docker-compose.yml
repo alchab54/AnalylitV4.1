@@ -74,8 +74,6 @@ services:
       - .:/home/appuser/app
     env_file: .env
     depends_on:
-      base:
-        condition: service_completed_successfully
       db:
         condition: service_started
       redis:
@@ -103,8 +101,6 @@ services:
       - .:/home/appuser/app
     env_file: .env
     depends_on:
-      base:
-        condition: service_completed_successfully
       db:
         condition: service_started
       redis:
@@ -153,8 +149,6 @@ services:
     environment:
       - FLASK_ENV=testing
     depends_on:
-      base:
-        condition: service_completed_successfully
       db:
         condition: service_started
       redis:
