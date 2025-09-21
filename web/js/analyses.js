@@ -65,7 +65,7 @@ export function renderAnalysesSection() {
                 <div class="analysis-card__footer">
                     ${hasDiscussionDraft
                         ? `<button class="btn btn--secondary" data-action="view-analysis-results" data-target-id="discussion-draft-card">Voir la Discussion</button>`
-                        : `<button class="btn btn--primary" data-action="run-discussion-draft">Générer la Discussion</button>`
+                        : `<button class="btn btn--primary" data-action="run-analysis" data-analysis-type="discussion">Générer la Discussion</button>`
                     }
                 </div>
             </div>
@@ -79,7 +79,7 @@ export function renderAnalysesSection() {
                 <div class="analysis-card__footer">
                     ${hasKnowledgeGraph
                         ? `<button class="btn btn--secondary" data-action="view-analysis-results" data-target-id="knowledge-graph-card">Voir le Graphe</button>`
-                        : `<button class="btn btn--primary" data-action="run-knowledge-graph">Générer le Graphe</button>`
+                        : `<button class="btn btn--primary" data-action="run-analysis" data-analysis-type="knowledge_graph">Générer le Graphe</button>`
                     }
                 </div>
             </div>

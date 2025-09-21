@@ -8,7 +8,7 @@ import { loadProjects, selectProject, handleCreateProject, confirmDeleteProject,
 import { loadAnalysisProfiles, openProfileEditor, handleDeleteProfile, handleSaveProfile, loadOllamaModels, renderSettings } from './settings.js';
 import { renderImportSection, handleZoteroImport, showPmidImportModal, handleUploadPdfs, handleIndexPdfs, handleZoteroSync, processPmidImport, exportForThesis } from './import.js';
 import { startBatchProcessing, showRunExtractionModal, startFullExtraction } from './articles.js'; // Corrected from pipeline.js and results.js
-import { handleRunDiscussionDraft, handleRunKnowledgeGraph, renderKnowledgeGraph, loadProjectAnalyses, exportAnalyses, handleRunATNAnalysis, runProjectAnalysis, showPRISMAModal, savePRISMAProgress, exportPRISMAReport } from './analyses.js';
+import { renderKnowledgeGraph, loadProjectAnalyses, exportAnalyses, runProjectAnalysis, showPRISMAModal, savePRISMAProgress, exportPRISMAReport } from './analyses.js';
 import { handleGeneratePrisma, renderReportingSection, generateBibliography, generateSummaryTable, exportSummaryTableExcel, savePrismaChecklist } from './reporting.js';
 import { handleRunMetaAnalysis } from './analyses.js'; // Corrected from stats.js
 import { loadValidationSection, handleValidateExtraction, resetValidationStatus, filterValidationList } from './validation.js';

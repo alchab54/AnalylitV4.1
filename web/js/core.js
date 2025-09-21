@@ -14,10 +14,7 @@ import {
     loadSearchResults // --- LA FONCTION EST IMPORTÉE DEPUIS articles.js
 } from './articles.js';
 import {
-    handleRunMetaAnalysis,
     exportAnalyses,
-    handleRunATNAnalysis,
-    showRunAnalysisModal,
     runProjectAnalysis,
     showPRISMAModal,
     savePRISMAProgress,
@@ -147,11 +144,7 @@ const validationActions = {
 };
 
 const analysisActions = {
-    'show-run-analysis-modal': showRunAnalysisModal,
     'run-analysis': (target) => runProjectAnalysis(target.dataset.analysisType),
-    'run-atn-analysis': (target, event) => handleRunATNAnalysis(event),
-    'run-discussion-draft': handleRunDiscussionDraft,
-    'run-knowledge-graph': handleRunKnowledgeGraph,
     'show-prisma-modal': () => showPRISMAModal(),
     'save-prisma-progress': savePRISMAProgress,
     'export-prisma-report': exportPRISMAReport,
@@ -292,17 +285,62 @@ export function setupDelegatedEventListeners() {
 }
 
 export function initializeWebSocket() {
-    // WebSocket désactivé - Mode API polling utilisé
-    console.log('🔄 Mode API polling activé (WebSocket désactivé)');
-    
-    // Fallback vers polling pour les updates
-    setInterval(() => {
-        if (window.currentProject) {
-            refreshCurrentSection();
+    try {
+        if (typeof io !== 'function') {
+            console.warn('Client Socket.IO indisponible.');
+            if (elements.connectionStatus) elements.connectionStatus.textContent = '❌';
+            return;
         }
-    }, 5000); // Refresh toutes les 5 secondes
-    
-    return;
+
+        appState.socket = io(WEBSOCKET_URL, { path: '/socket.io/', transports: ['websocket', 'polling'] });
+
+        appState.socket.on('connect', () => {
+            console.log('✅ WebSocket connecté');
+            appState.socketConnected = true;
+            if (elements.connectionStatus) elements.connectionStatus.textContent = '✅';
+            if (appState.currentProject) {
+                appState.socket.emit('join_room', { room: appState.currentProject.id });
+            }
+        });
+
+        appState.socket.on('disconnect', () => {
+            console.warn('🔌 WebSocket déconnecté.');
+            appState.socketConnected = false;
+            if (elements.connectionStatus) elements.connectionStatus.textContent = '⏳';
+        });
+
+        appState.socket.on('notification', (data) => {
+            console.log('🔔 Notification reçue:', data);
+            showToast(data.message, data.type || 'info');
+            
+            // Logique de rafraîchissement basée sur le type de notification
+            if (data.type === 'task_progress') {
+                // updateLoadingProgress(data.current, data.total, data.message, data.task_id);
+            } else {
+                // handleTaskNotification(data);
+            }
+        });
+
+        appState.socket.on('ANALYSIS_COMPLETED', (data) => {
+            showToast(`Analyse "${data.analysis_type}" terminée.`, 'success');
+            if (appState.currentSection === 'analyses') {
+                console.log('Rafraîchissement de la section analyses...');
+                loadProjectAnalyses();
+            }
+        });
+
+        appState.socket.on('search_completed', (data) => {
+            showToast(`Recherche terminée: ${data.total_results} articles trouvés.`, 'success');
+            if (appState.currentSection === 'results') {
+                console.log('Rafraîchissement de la section résultats...');
+                loadSearchResults();
+            }
+        });
+
+    } catch (e) {
+        console.error('Erreur WebSocket:', e);
+        if (elements.connectionStatus) elements.connectionStatus.textContent = '❌';
+    }
 }
 
 // --- CORRECTION ICI ---
