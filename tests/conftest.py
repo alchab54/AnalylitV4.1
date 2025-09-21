@@ -1,74 +1,69 @@
 # tests/conftest.py
 import pytest
-# from server_v4_complete import create_app # Remove this line
-from utils.database import init_database, get_session
-import sys
-import importlib
+import os
+from sqlalchemy import create_engine
+from utils.database import get_session # Assurez-vous que cette fonction existe
 
 @pytest.fixture(scope='session')
-def app():
-    """Crée une instance de l'application Flask pour les tests."""
-    # Force a fresh import of the module
-    if 'server_v4_complete' in sys.modules:
-        del sys.modules['server_v4_complete']
-    from server_v4_complete import create_app # Import after removal
-
-    app = create_app({
+def app_config():
+    """Fournit une configuration de test propre."""
+    # S'assure que l'URL de la base de données de test est utilisée
+    # La valeur par défaut 'sqlite:///:memory:' est une sécurité si on lance les tests hors de Docker
+    test_db_url = os.environ.get('DATABASE_URL', 'sqlite:///:memory:')
+    return {
         'TESTING': True,
         'WTF_CSRF_ENABLED': False,
-        'DATABASE_URL': 'sqlite:///test_db.sqlite' # Ajout pour les tests qui en ont besoin
-    })
+        'DATABASE_URL': test_db_url,
+        'SERVER_NAME': 'localhost' # Essentiel pour url_for dans les tests
+    }
+
+@pytest.fixture(scope='session')
+def app(app_config):
+    """Crée une instance de l'application Flask pour la session de test."""
+    from server_v4_complete import create_app # Importation locale
+    app = create_app(app_config)
     
     with app.app_context():
-        init_database()
+        from utils.models import Base # Assurez-vous d'importer votre Base déclarative
+        engine = create_engine(app_config['DATABASE_URL'])
+        Base.metadata.drop_all(engine) # Nettoie avant les tests
+        Base.metadata.create_all(engine) # Crée toutes les tables
     
     yield app
 
+    # Nettoyage après tous les tests
+    with app.app_context():
+        engine = create_engine(app_config['DATABASE_URL'])
+        Base.metadata.drop_all(engine)
+
 @pytest.fixture
 def client(app):
-    """Client de test Flask."""
-    return app.test_client()
-
-@pytest.fixture(autouse=True)
-def clean_db_before_test(app):
-    """Nettoyage de la base de données avant chaque test."""
-    with app.app_context():
-        try:
-            from utils.models import Project, AnalysisProfile, SearchResult, Extraction, Grid, ChatMessage, RiskOfBias, Prompt
-            session = get_session()
-            
-            session.query(ChatMessage).delete()
-            session.query(RiskOfBias).delete()
-            session.query(Extraction).delete()
-            session.query(SearchResult).delete()
-            session.query(Grid).delete()
-            session.query(Project).delete()
-            session.query(AnalysisProfile).delete()
-            session.query(Prompt).delete()
-            session.commit()
-            session.close()
-        except Exception:
-            pass
+    """Client de test Flask pour les requêtes HTTP."""
+    with app.test_client() as client:
+        yield client
 
 @pytest.fixture
 def db_session(app):
-    """Session de base de données pour chaque test."""
+    """Fournit une session de base de données par test."""
     with app.app_context():
         session = get_session()
         yield session
+        # On annule les transactions pour isoler chaque test.
+        # C'est plus rapide que de tout supprimer/recréer.
+        session.rollback()
         session.close()
 
 @pytest.fixture
 def setup_project(app, db_session):
     """Crée un projet de test."""
     import uuid
-    from utils.models import Project
+    from utils.models import Project # L'import est fait ici pour être dans le contexte de l'app
     from datetime import datetime
     
     with app.app_context():
         project = Project(
             id=str(uuid.uuid4()),
-            name=f"Test Project {uuid.uuid4().hex[:8]}", 
+            name=f"Test Project {uuid.uuid4().hex[:8]}",
             description="Projet de test",
             analysis_mode="screening",
             created_at=datetime.utcnow()

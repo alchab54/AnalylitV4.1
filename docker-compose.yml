@@ -13,8 +13,7 @@ services:
     image: postgres:15-alpine
     container_name: analylit_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data/ # MODIFIÉ : Chemin du script SQL corrigé
-      - ./init-user-db.sql:/docker-entrypoint-initdb.d/init-user-db.sql # MODIFIÉ : Chemin du script SQL corrigé
+      - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -40,14 +39,12 @@ services:
       - "5001:5000"
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379/0
     env_file:
       - .env
-    # MODIFIÉ : On s'assure que la base est construite AVANT le web
     depends_on:
-      db:
-        condition: service_started
-      redis:
-        condition: service_started
+      - db
+      - redis
 
   worker:
     build:
@@ -60,13 +57,11 @@ services:
       - .:/home/appuser/app
     environment:
       - PYTHONPATH=/home/appuser/app
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379/0
     env_file:
       - .env
-    # MODIFIÉ : On s'assure que la base est construite AVANT le worker
     depends_on:
-      redis:
-        condition: service_started
+      - redis
 
   nginx:
     build:
@@ -82,20 +77,22 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile-tests
-    command: sh -c "PGPASSWORD=strong_password psql -h db -U analylit_user -c \"CREATE DATABASE analylit_db_test;\" && ./wait-for-it.sh db:5432 -t 30 -- python init_test_db.py && pytest"
+    # SIMPLIFIÉ : Le conteneur ne fait que lancer les tests. conftest s'occupe du reste.
+    command: >
+      sh -c "./wait-for-it.sh db:5432 -t 30 -- pytest -v"
     container_name: analylit_tester
     volumes:
       - .:/home/appuser/app
     environment:
-      - PYTHONPATH=/home/appuser/app
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/analylit_db_test # CORRIGÉ : Pointe vers la BDD de test
+      # CRUCIAL : On surcharge la DATABASE_URL pour pointer vers une BDD de test
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/analylit_test_db
+      # CRUCIAL : On corrige le nom d'hôte de Redis pour les tests
+      - REDIS_URL=redis://redis:6379/0
     env_file:
       - .env
     depends_on:
-      db:
-        condition: service_started
-      redis:
-        condition: service_started
+      - db
+      - redis
 
 volumes:
   postgres_data:

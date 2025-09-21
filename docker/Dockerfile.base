@@ -1,7 +1,7 @@
 # =================================================
 # Étape 1: Builder - Compilation des dépendances
 # =================================================
-FROM python:3.11-bookworm as builder
+FROM python:3.11-bookworm AS builder
 
 WORKDIR /home/appuser/app
 

@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = 'INFO'
     
     # --- Connexions aux services externes ---
-    REDIS_URL: str = 'redis://redis:6379/0' # CORRIGÉ : Utilise le nom de service Docker 'redis'
+    REDIS_URL: str = 'redis://localhost:6379/0' # Valeur par défaut pour dev local, surchargée par Docker
     OLLAMA_BASE_URL: str = 'http://ollama:11434'
     DATABASE_URL: str = 'postgresql+psycopg2://analylit_user:strong_password@db:5432/analylit_db'
     
