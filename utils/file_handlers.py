@@ -45,7 +45,7 @@ def sanitize_filename(filename: str) -> str:
 
 # Seuil minimal de caractères pour considérer une extraction "texte" comme réussie.
 # En dessous, nous soupçonnons un PDF scanné et passons à l'OCR.
-MIN_TEXT_LENGTH_THRESHOLD = 250 
+MIN_TEXT_LENGTH_THRESHOLD = 20 
 
 def _clean_text(text: str) -> str:
     """
@@ -160,13 +160,13 @@ def extract_text_from_pdf(pdf_path: str) -> str:
     de fallback robuste (PyMuPDF -> PDFPlumber -> OCR).
     """
     # --- MODIFIEZ CES LIGNES ---
-    # file_path = Path(pdf_path) # Commentez ou supprimez
+    # file_path = Path(pdf_path) # Commentez ou supprimez cette ligne
     if not os.path.exists(pdf_path): # Doit être os.path.exists pour que le test fonctionne
         logger.error(f"Fichier PDF introuvable: {pdf_path}")
         return ""
 
-    text = ""
     file_path = Path(pdf_path) # Recréez l'objet Path ici
+    # --- FIN DE LA MODIFICATION ---
     
     # --- 1. Essai avec PyMuPDF (fitz) ---
     text = _extract_text_with_pymupdf(file_path)

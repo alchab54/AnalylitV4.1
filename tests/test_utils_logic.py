@@ -83,45 +83,40 @@ def test_generate_discussion_draft_logic():
 # =================================================================
 
 @patch('os.path.exists', return_value=True)
-@patch('utils.file_handlers.pdfplumber.open')
-@patch('PyPDF2.PdfReader')
-@patch('utils.file_handlers.pytesseract', None) # Simule l'absence d'OCR
-def test_extract_text_from_pdf_logic(mock_pypdf, mock_pdfplumber, mock_exists):
+@patch('utils.file_handlers._extract_text_with_pymupdf', return_value="Texte de PyMuPDF.")
+def test_extract_text_from_pdf_logic_pymupdf_succeeds(mock_pymupdf, mock_exists):
     """
-    Teste la logique de fallback de l'extraction PDF
-    1. Tente pdfplumber
-    2. Si échec, tente PyPDF2
-    3. Si échec, retourne None
+    Cas 1: Teste que si PyMuPDF réussit, son texte est retourné.
     """
-    # --- Cas 1 pdfplumber fonctionne ---
-    mock_page = MagicMock()
-    mock_page.extract_text.return_value = "Texte de PdfPlumber."
-    mock_pdfplumber.return_value.__enter__.return_value.pages = [mock_page]
-    
     result = extract_text_from_pdf('fake.pdf')
-    assert result == "Texte de PdfPlumber."
-    
-    # --- Cas 2 pdfplumber échoue, PyPDF2 fonctionne ---
-    mock_page_plumber_fail = MagicMock()
-    mock_page_plumber_fail.extract_text.return_value = ""  # Simule un échec d'extraction
-    mock_pdfplumber.return_value.__enter__.return_value.pages = [mock_page_plumber_fail]
+    assert result == "Texte de PyMuPDF."
+    mock_pymupdf.assert_called_once()
 
-    mock_page_pypdf = MagicMock()
-    mock_page_pypdf.extract_text.return_value = "Texte de PyPDF2."
-    mock_pypdf.return_value.pages = [mock_page_pypdf]
-    mock_pypdf.return_value.is_extractable = True
-    
+@patch('os.path.exists', return_value=True)
+@patch('utils.file_handlers._extract_text_with_pymupdf', return_value="") # PyMuPDF échoue
+@patch('utils.file_handlers._extract_text_with_pdfplumber', return_value="Texte de PDFPlumber.") # PDFPlumber réussit
+def test_extract_text_from_pdf_logic_fallback_to_pdfplumber(mock_pdfplumber, mock_pymupdf, mock_exists):
+    """
+    Cas 2: Teste que si PyMuPDF échoue, la fonction se rabat sur PDFPlumber.
+    """
     result = extract_text_from_pdf('fake.pdf')
-    assert result == "Texte de PyPDF2."
-    
-    # --- Cas 3 Tout échoue ---
-    mock_page_plumber_fail.extract_text.return_value = ""
-    mock_page_pypdf_fail = MagicMock()
-    mock_page_pypdf_fail.extract_text.return_value = ""
-    mock_pypdf.return_value.pages = [mock_page_pypdf_fail]
+    assert result == "Texte de PDFPlumber."
+    mock_pymupdf.assert_called_once()
+    mock_pdfplumber.assert_called_once()
 
+@patch('os.path.exists', return_value=True)
+@patch('utils.file_handlers._extract_text_with_pymupdf', return_value="") # PyMuPDF échoue
+@patch('utils.file_handlers._extract_text_with_pdfplumber', return_value="") # PDFPlumber échoue
+@patch('utils.file_handlers._extract_text_with_ocr', return_value="") # OCR échoue
+def test_extract_text_from_pdf_logic_all_fail(mock_ocr, mock_pdfplumber, mock_pymupdf, mock_exists):
+    """
+    Cas 3: Teste que si toutes les méthodes échouent, une chaîne vide est retournée.
+    """
     result = extract_text_from_pdf('fake.pdf')
-    assert result is None # Doit retourner None
+    assert result == "" # La fonction retourne une chaîne vide en cas d'échec total
+    mock_pymupdf.assert_called_once()
+    mock_pdfplumber.assert_called_once()
+    mock_ocr.assert_called_once()
 
 # =================================================================
 # 3. Tests pour utils.fetchers.py (ArXiv & CrossRef)

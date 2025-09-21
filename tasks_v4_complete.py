@@ -1132,6 +1132,12 @@ def import_from_zotero_json_task(session, project_id: str, items_list: list):
         if not article_id:
             continue
         
+        # --- AJOUTEZ CES DEUX LIGNES ---
+        record.pop('zotero_key', None) 
+        record.pop('__hash', None)
+        # --- FIN DE L'AJOUT ---
+
+
         existing = session.query(SearchResult).filter_by(project_id=project_id, article_id=article_id).first()
         if not existing:
             record['id'] = str(uuid.uuid4()) # Assigner un ID pour le nouvel objet

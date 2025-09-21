@@ -167,13 +167,18 @@ class DatabaseManager:
                     if 'family' in author:
                         authors_list.append(f"{author.get('given', '')} {author.get('family', '')}".strip())
 
-                pub_date_parts = item.get("published-print", {}).get("date-parts", [[]])[0]
-                pub_date = "-".join(map(str, pub_date_parts)) if pub_date_parts else ""
+                # Logique de date plus robuste pour gérer 'published-print' et 'issued'
+                pub_date_info = item.get("published-print") or item.get("issued")
+                pub_date_parts = []
+                if pub_date_info and "date-parts" in pub_date_info:
+                    pub_date_parts = pub_date_info["date-parts"][0]
+                pub_date = str(pub_date_parts[0]) if pub_date_parts else ""
 
                 results.append({
                     "id": doi or f"crossref_{len(results)}",
                     "title": title,
-                    "abstract": item.get("abstract", "").replace("</jats:p>", "").replace("<jats:p>", ""), # Nettoyage simple
+                    # --- MODIFIEZ CETTE LIGNE ---
+                    "abstract": item.get("abstract", "").replace("</jats:p>", "").replace("<jats:p>", "").replace("<p>", "").replace("</p>", ""),
                     "authors": ", ".join(authors_list),
                     "publication_date": pub_date,
                     "journal": (item.get("container-title") or [""])[0],

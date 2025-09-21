@@ -470,13 +470,13 @@ def create_app(config=None):
         args = request.args
         page = args.get('page', 1, type=int)
         per_page = args.get('per_page', 20, type=int)
-        sort_by = args.get('sort_by', 'created_at') # <--- MODIFIEZ CECI
+        sort_by = args.get('sort_by', 'created_at') # <--- MODIFIEZ 'title' en 'created_at'
         sort_order = args.get('sort_order', 'asc')
         
         query = session.query(SearchResult).filter_by(project_id=project_id)
 
         # --- CORRECTION DE LA LOGIQUE DE TRI ---
-        valid_sort_columns = ['article_id', 'title', 'authors', 'publication_date', 'journal', 'database_source', 'created_at'] # <--- AJOUTEZ 'created_at'
+        valid_sort_columns = ['article_id', 'title', 'authors', 'publication_date', 'journal', 'database_source', 'created_at'] # <--- VÉRIFIEZ CECI
         if sort_by in valid_sort_columns:
             column_to_sort = getattr(SearchResult, sort_by)
             
@@ -793,15 +793,21 @@ def create_app(config=None):
     def run_rob_analysis_route(session, project_id):
         data = request.get_json()
         article_ids = data.get('article_ids', [])
-        # --- MODIFIEZ CETTE LIGNE ---
-        task_ids = [
-            analysis_queue.enqueue(
+
+        # --- REMPLACEZ CETTE LIGNE ---
+        # task_ids = [analysis_queue.enqueue(run_risk_of_bias_task, project_id, article_id, job_timeout='30m').id for article_id in article_ids]
+    
+        # --- PAR CE BLOC ---
+        task_ids = []
+        for article_id in article_ids:
+            job = analysis_queue.enqueue(
                 run_risk_of_bias_task,
                 project_id=project_id, 
                 article_id=article_id, 
                 job_timeout='30m'
-            ).id for article_id in article_ids
-        ]
+            )
+            task_ids.append(job.id)
+        # --- FIN DE LA CORRECTION ---
         return jsonify({"message": "RoB analysis initiated", "task_ids": task_ids}), 202
 
     # ==================== ROUTES API CHAT ====================
