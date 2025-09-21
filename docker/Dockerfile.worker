@@ -1,13 +1,8 @@
-# Hérite de l'image de base (avec toutes les dépendances déjà installées)
+# Hérite de l'image de base (dépendances déjà installées)  
 FROM analylit-base:latest
 
 # Copier le code de l'application
-COPY . /home/appuser/app
+COPY --chown=appuser:appuser . .
 
-# Ajuster les permissions
-USER root
-RUN chown -R appuser:appuser /home/appuser/app
-USER appuser
-
-# Commande par défaut pour le worker RQ
+# Point d'entrée pour le worker
 CMD ["python", "-m", "rq_worker", "-w", "rq.worker.SimpleWorker", "-c", "app.rq_config"]

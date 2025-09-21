@@ -1,6 +1,0 @@
-FROM analylit-base:latest
-
-# Copie du code spécifique worker
-COPY . .
-
-USER appuser

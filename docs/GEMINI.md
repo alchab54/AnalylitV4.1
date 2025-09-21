@@ -1,35 +1,31 @@
-GEMINI.MD - Architecture Docker Optimisée avec Image de Base
-text
-# Architecture Docker Optimisée AnalyLit v4.1 - Image de Base Partagée
+# Restructuration Docker Optimale AnalyLit v4.1
 
-## Objectif
-Créer une architecture Docker professionnelle qui :
-- Utilise une image `base` commune pour éviter les réinstallations
-- Organise les Dockerfiles dans le dossier `docker/`
-- Maintient `docker-compose.yml` à la racine pour facilité d'usage
-- Garantit un cache Docker optimal et un GitHub propre
+## Objectifs
+1. Image de base partagée pour éviter réinstallations multiples
+2. Architecture propre avec dossier docker/
+3. Cache Docker préservé à 100%
+4. GitHub organisé professionnellement
 
-## Architecture Cible
-/
-├── docker-compose.yml ← Racine (facilité d'usage)
-├── docker/
-│ ├── Dockerfile.base ← Image commune avec dépendances
-│ ├── Dockerfile.web ← Service web (hérite de base)
+## Plan d'Action
 
-│ ├── Dockerfile.nginx ← Proxy (optionnel)
-│ └── entrypoint.sh ← Script démarrage avec migrations
-text
+### Étape 1 : Créer la Structure Docker Propre
+- Créer dossier `docker/` à la racine
+- Déplacer tous les Dockerfiles dans `docker/`
+- docker-compose.yml reste à la racine
 
-## Avantages
-- ✅ **Performance** : Dépendances installées 1 seule fois
-- ✅ **Cache** : Docker réutilise l'image `base` 
-- ✅ **Maintenance** : Modifications code ne triggent pas pip install
-- ✅ **GitHub** : Structure propre et professionnelle
-- ✅ **Évolutivité** : Facile d'ajouter de nouveaux services
+### Étape 2 : Image de Base Optimisée
+- `docker/Dockerfile.base` avec toutes les dépendances
+- Multi-stage build pour optimiser le cache
+- Installation dépendances Python uniquement
 
-## Plan d'Implémentation
-1. Créer `docker/Dockerfile.base` optimisé cache
-2. Créer `docker/Dockerfile.web` lightweight  
-3. Créer `docker/Dockerfile.worker` lightweight
-4. Créer `docker/entrypoint.sh` avec migrations
-5. Configurer `docker-compose.yml` avec dépendances correctes
+### Étape 3 : Images Dérivées Légères  
+- `docker/Dockerfile.web` hérite de l'image base
+- `docker/Dockerfile.worker` hérite de l'image base
+- Copie uniquement le code applicatif
+
+### Étape 4 : Docker-Compose Intelligent
+- Construit d'abord l'image base
+- web et worker dépendent de cette base
+- Cache préservé entre les builds
+
+### Étape 5 : Nettoyage Fichiers Obsolètes
