@@ -413,6 +413,19 @@
         <!-- Modales générées dynamiquement par les modules JS -->
     </div>
 
+    <!-- CORRECTION : Mise à jour des data-attributes -->
+    <div class="task-monitor" id="task-monitor">
+        <div class="task-counter">
+            <span id="jobs-count">0</span> tâches actives
+        </div>
+        <div class="task-progress" id="job-progress" style="display:none;">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <span class="progress-text" id="progress-text">0%</span>
+        </div>
+    </div>
+
     <!-- Scripts JavaScript -->
     <!-- Main application entry point -->
     <script type="module" src="/js/app-improved.js"></script>

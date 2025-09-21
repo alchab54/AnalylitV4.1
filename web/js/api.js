@@ -8,10 +8,10 @@ import { showToast } from './ui-improved.js';
  * @returns {Promise<any|null>} - Parsed JSON, [] for empty collections, or null.
  */
 export async function fetchAPI(endpoint, options = {}) {
-    const baseURL = '/api'; // Use a relative path to go through the proxy
-
+    const baseURL = '/api';
+    
     // Assurez-vous que l'endpoint commence par /api
-    const url = endpoint.startsWith('/api') ? endpoint : `${baseURL}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+    const url = endpoint.startsWith('/api') ? endpoint : `${baseURL}${endpoint}`;
     
     const defaultOptions = {
         headers: {
@@ -25,13 +25,8 @@ export async function fetchAPI(endpoint, options = {}) {
         const response = await fetch(url, defaultOptions);
         
         if (!response.ok) {
-            let errorData = {};
-            try {
-                errorData = await response.json();
-            } catch (e) {
-                // The response was not JSON, which can happen with 404s, etc.
-            }
-            throw new Error(errorData.error || errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
         }
 
         const contentType = response.headers.get('content-type');

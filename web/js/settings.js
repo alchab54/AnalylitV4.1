@@ -31,12 +31,11 @@ export async function loadSettingsData() {
 export async function loadAnalysisProfiles() {
     try {
         // CORRECTION : endpoint correct
-        const profiles = await fetchAPI('/analysis-profiles');
-        appState.analysisProfiles = profiles || [];
+        const response = await fetchAPI('/analysis-profiles');
+        return response.profiles || [];
     } catch (error) {
-        console.error("Erreur lors du chargement des profils d'analyse:", error);
-        showToast(`Erreur chargement profils: ${error.message}`, 'error');
-        appState.analysisProfiles = [];
+        console.error('Erreur chargement profils:', error);
+        return [];
     }
 }
 
@@ -60,11 +59,11 @@ export async function loadPrompts() {
 export async function loadOllamaModels() {
     try {
         // CORRECTION : endpoint correct
-        const data = await fetchAPI('/settings/models');
-        appState.ollamaModels = data.models || [];
+        const response = await fetchAPI('/settings/models');
+        return response.models || [];
     } catch (error) {
         console.error('Erreur chargement modèles:', error);
-        appState.ollamaModels = [];
+        return [];
     }
 }
 

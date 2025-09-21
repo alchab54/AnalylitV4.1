@@ -12,7 +12,7 @@
 FROM nginx:1.25-alpine as final
 
 # Copie la configuration (garde les proxys /api/ et /socket.io/)
-COPY nginx_complete.conf /etc/nginx/conf.d/default.conf
+COPY docker/nginx.conf /etc/nginx/nginx.conf
 
 # Copie le frontend SPA (index.html, app.js, style.css, assets)
 # Si vous aviez un build, ce serait : COPY --from=builder /app/dist /usr/share/nginx/html/

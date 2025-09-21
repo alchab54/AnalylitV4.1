@@ -56,7 +56,7 @@ services:
     image: analylit-web:latest
     build:
       context: .
-      dockerfile: Dockerfile-web-complete
+      dockerfile: docker/Dockerfile.web
     container_name: analylit-web-v4
     ports:
       - "5000:5000"
@@ -98,7 +98,7 @@ services:
     image: analylit-worker:latest
     build:
       context: .
-      dockerfile: Dockerfile-worker-complete
+      dockerfile: docker/Dockerfile.worker
     container_name: analylit-worker-v4
     volumes:
       - ./projects:/home/appuser/app/projects

@@ -250,41 +250,33 @@ export async function viewArticleDetails(articleId) {
 }
 
 export async function handleDeleteSelectedArticles() {
-    const selectedIds = Array.from(appState.selectedSearchResults);
-    const selectedCount = selectedIds.length;
-
-    if (selectedCount === 0) {
+    const selectedArticles = Array.from(appState.selectedSearchResults).map(id => ({ id }));
+    if (selectedArticles.length === 0) {
         showToast('Aucun article sélectionné', 'warning');
         return;
     }
 
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer ${selectedCount} article(s) sélectionné(s) ? Cette action est irréversible.`)) {
+    if (!confirm(`Supprimer ${selectedArticles.length} article(s) sélectionné(s) ?`)) {
         return;
     }
 
     try {
-        showLoadingOverlay(true, `Suppression de ${selectedCount} article(s)...`);
-
-        // CORRECTION: Utilisation de la route correcte et de la logique de suppression.
-        // Le backend ne supprime pas les 'SearchResult' mais les 'Extraction' associées.
-        // La route pour la suppression en lot d'extractions n'est pas implémentée,
-        // mais nous utilisons une route conceptuelle comme demandé.
-        // La réponse du backend pour les tâches en lot retourne un `job_id`.
-        const response = await fetchAPI(`/projects/${appState.currentProject.id}/extractions/batch-delete`, {
-            method: 'POST', // ou 'DELETE' selon l'implémentation finale du backend
+        const response = await fetchAPI('/articles/batch-delete', {
+            method: 'POST',
             body: JSON.stringify({
-                article_ids: selectedIds,
+                article_ids: selectedArticles.map(a => a.id),
+                project_id: appState.currentProject.id
             })
         });
 
-        // CORRECTION: Utilisation de job_id pour le suivi, comme pour les autres tâches.
-        showToast(`La suppression de ${selectedCount} article(s) a été lancée (Job: ${response.job_id || 'N/A'}).`, 'success');
-        clearSelectedArticles();
-        setTimeout(loadSearchResults, 2000); // Rafraîchir la liste après un court délai
+        if (response.job_id) {
+            showToast(`Suppression lancée (Job ID: ${response.job_id})`, 'success');
+            setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('articles:refresh'));
+            }, 2000);
+        }
     } catch (error) {
         showToast(`Erreur lors de la suppression : ${error.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
     }
 }
 

@@ -198,38 +198,32 @@ export function exportPRISMAReport() {
     showToast('Export PRISMA non implémenté.', 'info');
 }
 
-// NOUVELLE FONCTION : pour lancer l'analyse ATN
-export async function handleRunATNAnalysis(event) {
-    if (!appState.currentProject?.id) {
-        showToast('Veuillez sélectionner un projet.', 'warning');
+// CORRECTION de la fonction d'analyse ATN
+export async function handleRunATNAnalysis() {
+    const projectId = appState.currentProject?.id;
+    if (!projectId) {
+        showToast('Aucun projet sélectionné', 'warning');
         return;
     }
 
-    const card = event.target.closest('.analysis-card');
-    if (card) {
-        card.classList.add('analysis-card--loading');
-    } else {
-        showLoadingOverlay(true, "Lancement de l'analyse ATN...");
-    }
-
     try {
-        // CORRECTION: Utilisation du type d'analyse correct et gestion de la réponse.
-        const response = await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, {
+        showOverlay('Lancement de l\'analyse ATN...');
+        
+        const response = await fetchAPI(`/projects/${projectId}/run-analysis`, {
             method: 'POST',
-            body: { type: 'atn_scores' } // CORRECTION : type spécifique selon GEMINI.md
+            body: JSON.stringify({
+                type: 'atnscores' // CORRECTION : type spécifique
+            })
         });
 
         // CORRECTION : Utilise job_id
         if (response.job_id) {
             showToast(`Analyse ATN lancée (Job ID: ${response.job_id})`, 'success');
-        } else {
-            showToast('Analyse ATN lancée. Les résultats apparaîtront une fois le calcul terminé.', 'success');
         }
-    } catch (e) {
-        showToast(`Erreur : ${e.message}`, 'error');
-        if (card) card.classList.remove('analysis-card--loading');
+    } catch (error) {
+        showToast(`Erreur : ${error.message}`, 'error');
     } finally {
-        if (!card) showLoadingOverlay(false);
+        hideOverlay();
     }
 }
 
@@ -240,12 +234,12 @@ export async function runProjectAnalysis(analysisType) {
         return;
     }
     
-    // Mappage pour les messages affichés à l'utilisateur
+    // Mappage pour les messages affichés à l\'utilisateur
     const analysisNames = {
         discussion: 'le brouillon de discussion',
         knowledge_graph: 'le graphe de connaissances',
         prisma_flow: 'le diagramme PRISMA',
-        atn_scores: "l'analyse ATN"
+        atn_scores: "l\'analyse ATN"
     };
 
     // Trouver la carte correspondante pour afficher le spinner
@@ -283,7 +277,7 @@ export async function runProjectAnalysis(analysisType) {
                 body = { type: 'descriptive_stats' };
                 break;
             default:
-                showToast("Type d'analyse inconnu.", 'error');
+                showToast("Type d\'analyse inconnu.", 'error');
                 if (card) card.classList.remove('analysis-card--loading');
                 if (!card) showLoadingOverlay(false);
                 return;

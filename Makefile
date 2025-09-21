@@ -4,7 +4,7 @@
 .PHONY: help install start stop restart status logs backup clean update models shell
 
 # Configuration
-COMPOSE_FILE=docker-compose-local.yml
+COMPOSE_FILE=docker-compose.yml
 PROJECT_NAME=analylit-v4
 
 # Couleurs pour l'affichage
@@ -114,7 +114,7 @@ dev: ## Mode développement avec rechargement automatique
 
 test: ## Exécuter les tests
 	@echo "$(BLUE)🧪 Exécution des tests...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) exec web python -m pytest tests/
+	@docker-compose -f $(COMPOSE_FILE) exec web python -m pytest tests/ > logs/pytest_results.log 2>&1
 
 health: ## Vérifier la santé des services
 	@echo "$(BLUE)🏥 Vérification de la santé des services:$(NC)"

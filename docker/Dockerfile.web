@@ -11,15 +11,15 @@ RUN apt-get update \
 USER appuser
 WORKDIR /home/appuser/app
 
-# CORRECTION: Assurer que l'utilisateur est propriétaire du répertoire de travail
-RUN chown -R appuser:appuser /home/appuser/app
+# Copie le code de l'application
+COPY . .
 
-# Copie TOUT le code de l'application (Python + web + configs)
-# Assure-toi que .dockerignore n'exclut pas des répertoires nécessaires (utils/, api/, profiles.json, etc.)
-COPY --chown=appuser:appuser . /home/appuser/app/
+# CORRECTION: Assurer que l'utilisateur est propriétaire du répertoire de travail et rendre l'entrypoint exécutable
+USER root
+RUN chown -R appuser:appuser /home/appuser/app && \
+    chmod +x /home/appuser/app/entrypoint.sh
+USER appuser
 
-# Rendre l'entrypoint exécutable
-RUN chmod +x /home/appuser/app/entrypoint.sh
 
 # Le service écoute en 5001 (Gunicorn)
 EXPOSE 5001

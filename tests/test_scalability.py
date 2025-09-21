@@ -71,7 +71,7 @@ def test_analysis_task_on_large_dataset(db_session, large_project, mocker):
     
     # Simuler 10 000 extractions avec des scores
     # On mock la requête SQL pour ne pas réellement insérer 10k extractions
-    mock_scores = [7.5] * 10000
+    mock_scores = [7.5 + (i % 3 - 1) * 0.1 for i in range(10000)]
     mocker.patch('sqlalchemy.orm.session.Session.execute').return_value.scalars.return_value.all.return_value = mock_scores
     mocker.patch('tasks_v4_complete.send_project_notification')
 
