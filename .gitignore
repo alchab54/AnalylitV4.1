@@ -37,6 +37,11 @@ model_cache/
 reports/
 exports/
 
+# --- Fichiers de données et de configuration ---
+# Ignorer tous les fichiers JSON, sauf ceux qui sont explicitement nécessaires.
+*.json
+!profiles.json
+
 # --- Logs ---
 # Les fichiers de log sont spécifiques à une exécution et ne doivent pas être versionnés.
 *.log

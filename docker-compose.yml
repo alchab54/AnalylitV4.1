@@ -31,8 +31,8 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.web
-    container_name: analylit_web
-    command: gunicorn --chdir /home/appuser/app --bind 0.0.0.0:5000 --workers 4 --threads 2 --worker-class gevent "server_v4_complete:app"
+    container_name: analylit_web # Ajout du timeout pour laisser le temps aux workers de démarrer
+    command: gunicorn --chdir /home/appuser/app --bind 0.0.0.0:5000 --workers 4 --threads 2 --worker-class gevent --timeout 120 "server_v4_complete:app"
     volumes:
       - .:/home/appuser/app
     ports:
