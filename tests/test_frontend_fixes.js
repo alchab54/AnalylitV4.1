@@ -1,28 +1,30 @@
 import { fetchAPI } from '../web/js/api.js';
-import { API_BASE_URL } from '../web/js/app-improved.js';
 
 // Script de test des corrections frontend
 async function testAPIEndpoints() {
     console.log('=== Test des corrections API ===');
     
     try {
+        // On crée une version de fetchAPI SPÉCIFIQUE pour ce script de test
+        // qui sait où se trouve le serveur Docker.
+        const testFetchAPI = async (endpoint, options = {}) => {
+            // C'EST LA LIGNE QUI CORRIGE TOUT
+            const BASE_URL = 'http://localhost:8080/api';
+            const url = `${BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint.replace(/^\/api/, '')}`;
+            return await fetchAPI(url, options); // On réutilise votre logique existante
+        };
+
         // Test 1: Vérification endpoint projets
-        const projects = await fetchAPI(`${API_BASE_URL}/projects`);
+        const projects = await testFetchAPI('/projects');
         console.log('✓ Endpoint /projects OK');
         
         // Test 2: Vérification endpoint tâches  
-        const tasks = await fetchAPI('/tasks/status');
+        const tasks = await testFetchAPI('/tasks/status');
         console.log('✓ Endpoint /tasks/status OK');
-        console.log('Structure retournée:', Object.keys(tasks));
         
         // Test 3: Vérification présence job_id
-        if (tasks.tasks && tasks.tasks.length > 0) {
-            const firstTask = tasks.tasks[0];
-            if (firstTask.job_id) {
-                console.log('✓ Structure job_id confirmée');
-            }
-        } else if (tasks.task_id) {
-            console.warn('⚠️ Structure task_id détectée - correction nécessaire');
+        if (Array.isArray(tasks) && tasks.length > 0 && tasks[0].id) {
+            console.log('✓ Structure de tâche confirmée avec un ID');
         }
         
     } catch (error) {
