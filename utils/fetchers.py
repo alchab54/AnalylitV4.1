@@ -89,7 +89,7 @@ class DatabaseManager:
                 pub_date = pub_date_node.text.split('T')[0] if pub_date_node is not None else ''
                 
                 results.append({
-                    "id": f"arxiv:{arxiv_id}",
+                    "id": arxiv_id, # <--- MODIFIEZ CECI (supprimez f"arxiv:{arxiv_id}")
                     "title": title,
                     "abstract": abstract,
                     "authors": authors,

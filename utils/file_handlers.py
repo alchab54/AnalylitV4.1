@@ -159,13 +159,14 @@ def extract_text_from_pdf(pdf_path: str) -> str:
     Extrait le texte brut d'un fichier PDF en utilisant une stratégie
     de fallback robuste (PyMuPDF -> PDFPlumber -> OCR).
     """
-    # Utiliser os.path.exists pour être compatible avec les mocks des tests
-    if not os.path.exists(pdf_path):
+    # --- MODIFIEZ CES LIGNES ---
+    # file_path = Path(pdf_path) # Commentez ou supprimez
+    if not os.path.exists(pdf_path): # Doit être os.path.exists pour que le test fonctionne
         logger.error(f"Fichier PDF introuvable: {pdf_path}")
         return ""
 
     text = ""
-    file_path = Path(pdf_path) # On crée l'objet Path après la vérification
+    file_path = Path(pdf_path) # Recréez l'objet Path ici
     
     # --- 1. Essai avec PyMuPDF (fitz) ---
     text = _extract_text_with_pymupdf(file_path)
