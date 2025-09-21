@@ -1,0 +1,35 @@
+# =================================================
+# Étape 1: Builder - Compilation des dépendances
+# =================================================
+FROM python:3.11-bookworm as builder
+
+WORKDIR /home/appuser/app
+
+# Installer les dépendances système nécessaires pour la compilation et les outils
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential libpq-dev netcat-openbsd postgresql-client \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Créer et activer un environnement virtuel
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copier et installer les dépendances Python pour optimiser le cache
+COPY requirements.txt ./
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# =================================================
+# Étape 2: Image de base finale
+# =================================================
+FROM python:3.11-slim-bookworm
+
+ENV PATH="/opt/venv/bin:$PATH"
+RUN useradd --create-home appuser
+WORKDIR /home/appuser/app
+COPY --from=builder /opt/venv /opt/venv
+COPY --from=builder /usr/bin/psql /usr/bin/psql
+COPY --from=builder /usr/bin/nc /usr/bin/nc
+
+USER appuser

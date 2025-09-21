@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # --- Base de données ---
   db:
@@ -51,6 +49,17 @@ services:
       - analylit-network
     restart: unless-stopped
 
+  # --- Image de base pour les services Python ---
+  base:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.base
+    image: analylit-base:latest
+    container_name: analylit-base-builder
+    profiles: ["donotstart"] # Ne pas démarrer ce service, il sert uniquement au build
+    volumes:
+      - .:/home/appuser/app
+
   # --- Serveur Web Applicatif ---
   web:
     build:
@@ -65,6 +74,8 @@ services:
       - .:/home/appuser/app
     env_file: .env
     depends_on:
+      base:
+        condition: service_completed_successfully
       db:
         condition: service_started
       redis:
@@ -75,7 +86,7 @@ services:
       timeout: 3s
       retries: 10
       start_period: 20s
-    command: /home/appuser/app/entrypoint.sh gunicorn --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker --bind 0.0.0.0:5000 server_v4_complete:app
+    command: ["/home/appuser/app/entrypoint.sh", "gunicorn", "--worker-class", "geventwebsocket.gunicorn.workers.GeventWebSocketWorker", "--bind", "0.0.0.0:5000", "server_v4_complete:app"]
     networks:
       - analylit-network
     restart: unless-stopped
@@ -92,6 +103,8 @@ services:
       - .:/home/appuser/app
     env_file: .env
     depends_on:
+      base:
+        condition: service_completed_successfully
       db:
         condition: service_started
       redis:
@@ -107,7 +120,7 @@ services:
     networks:
       - analylit-network
     restart: unless-stopped
-    command: "rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4"
+    command: ["rq", "worker", "-u", "redis://redis:6379/0", "--with-scheduler", "analylit_processing_v4", "analylit_synthesis_v4", "analylit_analysis_v4", "analylit_background_v4"]
 
   # --- Serveur Web Frontend (Nginx) ---
   nginx:
@@ -127,11 +140,29 @@ services:
       - analylit-network
     restart: unless-stopped
 
+  # --- Service pour lancer les tests ---
+  tests:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile-tests
+    container_name: analylit-tests-v4
+    profiles: ["tests"] # Ne démarre que si appelé avec --profile tests
+    volumes:
+      - .:/home/appuser/app
+    env_file: .env
+    environment:
+      - FLASK_ENV=testing
+    depends_on:
+      base:
+        condition: service_completed_successfully
+      db:
+        condition: service_started
+      redis:
+        condition: service_healthy
+
 volumes:
   postgres_data_v4:
   ollama_data_v4:
-  projects_data:
-  model_cache_data:
 
 networks:
   analylit-network:

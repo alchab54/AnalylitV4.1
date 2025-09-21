@@ -1,42 +1,7 @@
-# =================================================
-# Étape 1: Builder - Compilation des dépendances
-# =================================================
-FROM python:3.11-bookworm as builder
+# Utilise l'image de base qui contient Python et toutes les dépendances
+FROM analylit-base:latest
 
-# Installer les dépendances système nécessaires pour la compilation et les outils
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    build-essential libpq-dev netcat-openbsd postgresql-client \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Créer et activer un environnement virtuel pour isoler les dépendances
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-
-# Copier UNIQUEMENT le fichier de dépendances pour optimiser le cache Docker
-COPY requirements.txt ./
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
-
-# =================================================
-# Étape 2: Final - Image d'exécution légère
-# =================================================
-FROM python:3.11-slim-bookworm
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    netcat-openbsd postgresql-client \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Créer un utilisateur non-root pour la sécurité
-RUN useradd --create-home appuser
-WORKDIR /home/appuser/app
-
-# Copier l'environnement virtuel depuis le builder
-COPY --from=builder /opt/venv /opt/venv
 # Copier le code de l'application
-COPY --chown=appuser:appuser . .
-
-USER appuser
-ENV PATH="/opt/venv/bin:$PATH"
+COPY . .
 
 EXPOSE 5000 # Le port est défini à 5000 dans docker-compose.yml
