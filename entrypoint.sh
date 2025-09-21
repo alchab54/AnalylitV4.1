@@ -1,20 +1,17 @@
 #!/bin/bash
 set -e
 
-echo "Entrypoint démarré. En attente de la base de données..."
-
-# Attendre que PostgreSQL soit prêt
-while ! nc -z "$POSTGRES_HOST" "$POSTGRES_PORT"; do
-    sleep 1
+echo "🔍 Waiting for database..."
+until pg_isready -h db -p 5432 -U ${POSTGRES_USER:-postgres}; do
+  echo "Database is unavailable - sleeping"
+  sleep 2
 done
 
-echo "Base de données prête !"
+echo "✅ Database is ready!"
 
-echo "Initialisation de la base de données et seeding..."
+echo "🔄 Running database migrations..."
+export FLASK_APP=app
+python -m flask db upgrade
 
-# Exécute l'initialisation de la base de données de manière explicite
-python -c 'from utils.database import init_database; init_database()'
-
-echo "Démarrage de l'application Flask avec Gunicorn..."
-# Start Gunicorn
-exec "$@"
+echo "🚀 Starting Gunicorn server..."
+exec gunicorn --bind 0.0.0.0:5000 --workers 2 --threads 2 "app:create_app()"

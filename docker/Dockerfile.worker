@@ -1,5 +1,0 @@
-# Utilise l'image de base qui contient Python et toutes les dépendances
-FROM analylit-base
-
-# Copier le code de l'application
-COPY . .

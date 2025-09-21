@@ -1,123 +1,17 @@
-# .dockerignore OPTIMISÉ pour des builds ultra-rapides
-# === FILES SYSTÈME ===
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+.env
+venv
 .git
 .gitignore
-**/.DS_Store
-**/Thumbs.db
-**/.idea
-**/.vscode
-
-# === ENVIRONNEMENTS PYTHON LOCAUX ===
-# Ces environnements ne doivent JAMAIS être copiés dans l'image
-venv/
-.venv/
-env/
-.env/
-**/__pycache__
-**/*.pyc
-**/*.pyo
-**/*.egg-info
-**/.pytest_cache
-
-# === DÉPENDANCES NODE.JS ===
-# Ignore node_modules local - sera installé dans le conteneur
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# === DONNÉES ET CACHE DE L'APPLICATION ===
-# Ces dossiers sont générés par l'application et montés via volumes
-projects/
-model_cache/
-logs/
-reports/
-exports/
-**/*.log
-
-# === FICHIERS DE DÉVELOPPEMENT ET DOCUMENTATION ===
-*.md
-README*
-CHANGELOG*
-LICENSE*
-**/*.docx
-**/*.pdf
-**/*.png
-**/*.jpg
-**/*.jpeg
-htmlcov/
+README.md
+.pytest_cache
 .coverage
-.pytest_cache/
-
-# === FICHIERS DE BUILD ET CI/CD ===
-.github/
-**/.circleci
-**/.travis.yml
-**/Jenkinsfile
-**/docker-compose*.yml
-**/Dockerfile*
-**/.dockerignore
-Makefile*
-# IMPORTANT: NE PAS EXCLURE entrypoint.sh - nécessaire au runtime
-# **/*.sh <- RETIRÉ cette ligne problématique
-
-# === FICHIERS DE CONFIGURATION SENSIBLES ===
-# Le .env contient des secrets et ne doit PAS être dans l'image
-.env
-.env.*
-!.env.example
-**/*.key
-**/*.pem
-**/*.crt
-secrets/
-
-# === ARTEFACTS DE BUILD ===
-dist/
-build/
-*.egg-info/
-.tox/
-.nox/
-
-# === FICHIERS TEMPORAIRES ===
-tmp/
-temp/
-*.tmp
-*.temp
-*.swp
-*~
+htmlcov
 .DS_Store
-
-# === SAUVEGARDES ET EXPORTS ===
-backup/
-backups/
-*.backup
-*.sql
-*.dump
-
-# === FICHIERS SPÉCIFIQUES AU PROJET - AJUSTÉS ===
-# Ignorer les artefacts spécifiques qui ne sont pas nécessaires au runtime
-grille-ATN.json
-# IMPORTANT: NE PAS EXCLURE profiles.json - nécessaire au runtime
-# profiles.json <- RETIRÉ cette ligne problématique
-*.ini
-analyse*.json
-results*.json
-
-# === OPTIMISATION IMPORTANTE ===
-# Garder uniquement les fichiers essentiels :
-# - Code source Python (.py)
-# - Templates et configurations (.html, .css, .js, .json configs)
-# - Fichiers de dépendances (requirements.txt, package.json)
-# - Fichiers de configuration essentiels
-
-# EXCEPTION : Garder les fichiers nécessaires au runtime
-!requirements.txt
-!package*.json
-!profiles.json
-!entrypoint.sh
-!web/
-!utils/
-!api/
-!server_v4_complete.py
-!tasks_v4_complete.py
-!config_v4.py
+node_modules
+.vscode

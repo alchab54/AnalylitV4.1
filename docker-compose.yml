@@ -1,75 +1,55 @@
-version: '3.8'
-
 services:
-  base:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.base
-    image: analylit-base:latest
-
   db:
     image: postgres:15-alpine
     container_name: analylit_db
-    volumes:
-      - ./database/data:/var/lib/postgresql/data
-      - ./database/init-user-db.sql:/docker-entrypoint-initdb.d/init-user-db.sql
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-analylit}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init-user-db.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5433:5432"
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
     container_name: analylit_redis
-    restart: unless-stopped
 
   web:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.web
+    build: .
     container_name: analylit_web
-    entrypoint: [ "/home/appuser/app/docker/entrypoint.sh" ]
-    volumes:
-      - .:/home/appuser/app
     ports:
       - "5001:5000"
+      - "8000:5000"
+    environment:
+      - FLASK_ENV=production
     env_file:
       - .env
-    depends_on:
-      - db
-      - redis
-      - base
-    restart: unless-stopped
-
-  worker:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.worker
-    container_name: analylit_worker
-    command: python -m rq_worker -w rq.worker.SimpleWorker -c app.rq_config
     volumes:
       - .:/home/appuser/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  worker:
+    build: .
+    container_name: analylit_worker
+    command: python -m rq_worker -w rq.worker.SimpleWorker -c app.rq_config
     env_file:
       - .env
+    volumes:
+      - .:/home/appuser/app
     depends_on:
       - redis
-      - base
-    restart: unless-stopped
-
-  nginx:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.nginx
-    container_name: analylit_nginx
-    ports:
-      - "8000:80"
-    depends_on:
-      - web
-    restart: unless-stopped
+      - db
 
 volumes:
   postgres_data:
-    driver: local
