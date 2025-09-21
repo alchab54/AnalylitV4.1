@@ -5,7 +5,6 @@ services:
       context: .
       dockerfile: docker/Dockerfile.base
     image: analylit-base:latest
-    # Ce service n'est jamais lancé, il sert juste à construire l'image
 
   db:
     image: postgres:15-alpine
@@ -44,29 +43,27 @@ services:
     volumes:
       - .:/home/appuser/app
     depends_on:
-      base:
-        condition: service_completed_successfully
-      db:
+      - base  # <-- CORRECTION AJOUTÉE
+      - db:
         condition: service_healthy
-      redis:
+      - redis:
         condition: service_started
 
   worker:
     build:
       context: .  
       dockerfile: docker/Dockerfile.worker
-    command: python -m rq.worker -w rq.worker.SimpleWorker -c app.rq_config
     container_name: analylit_worker
+    command: python -m rq.worker -w rq.worker.SimpleWorker -c app.rq_config
     env_file:
       - .env
     volumes:
       - .:/home/appuser/app
     depends_on:
-      base:
-        condition: service_completed_successfully
-      redis:
+      - base  # <-- CORRECTION AJOUTÉE
+      - redis:
         condition: service_started
-      db:
+      - db:
         condition: service_healthy
 
 volumes:
