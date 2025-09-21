@@ -99,13 +99,31 @@ def test_deduplication_in_zotero_import_logic(db_session, project_for_dedup, moc
 
     print("\n[OK] Intégrité Données : La logique de déduplication de l'import Zotero a bien fonctionné.")
 
-def test_database_backup_and_restore_cycle(temp_db_path, db_session, project_for_dedup, tmp_path):
+def test_database_backup_and_restore_cycle(temp_db_path, tmp_path):
     """
     Test d'intégrité (Sauvegarde/Restauration) : Simule un cycle complet de
     sauvegarde, suppression et restauration de la base de données.
     """
+    # --- 0. Setup: Create a dedicated session for a real file DB ---
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    from utils.models import Base, Project, SearchResult
+
+    engine = create_engine(f"sqlite:///{temp_db_path}")
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    db_session = Session()
+
+    # Add initial data to the real file DB
+    project = Project(name="Projet Déduplication")
+    db_session.add(project)
+    db_session.commit()
+    project_id = project.id
+    db_session.add(SearchResult(project_id=project_id, article_id="PMID123", title="Titre Original"))
+    db_session.commit()
+
     # --- 1. Sauvegarde (simulée par une copie de fichier) ---
-    db_path = Path(temp_db_path)
+    db_path = Path(temp_db_path) # temp_db_path is already a string
     backup_path = tmp_path / "analylit_backup.db"
     shutil.copy(db_path, backup_path)
     assert backup_path.exists()
@@ -113,9 +131,7 @@ def test_database_backup_and_restore_cycle(temp_db_path, db_session, project_for
 
     # --- 2. "Catastrophe" : Suppression de la base de données ---
     # La fixture `clean_db_before_test` simule déjà la suppression avant chaque test.
-    # CORRECTION: Supprimer les enfants (SearchResult) avant le parent (Project) pour éviter la violation de clé étrangère.
-    db_session.query(SearchResult).filter_by(project_id=project_for_dedup).delete()
-    # On vérifie que la base est vide après le nettoyage de la fixture du *prochain* test (simulé ici).
+    db_session.query(SearchResult).delete()
     db_session.query(Project).delete()
     db_session.commit()
     assert db_session.query(Project).count() == 0
@@ -128,22 +144,29 @@ def test_database_backup_and_restore_cycle(temp_db_path, db_session, project_for
     db_session.close()
     
     # Restauration (simulée par une copie inverse)
-    shutil.copy(backup_path, db_path)
+    shutil.copy(backup_path, db_path) # db_path is a string here
     print("[OK] Restauration : Fichier de sauvegarde restauré.")
     
     # Vérification de l'intégrité avec une nouvelle connexion
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
     engine = create_engine(f"sqlite:///{db_path}")
+    
+    # Initialize the schema on the new database engine.
+    from utils.models import Base
+    Base.metadata.create_all(engine)
+    
     Session = sessionmaker(bind=engine)
     new_session = Session()
     
-    restored_project = new_session.query(Project).filter_by(id=project_for_dedup).one_or_none()
-    assert restored_project is not None
-    assert restored_project.name == "Projet Déduplication"
-    
-    restored_articles_count = new_session.query(SearchResult).filter_by(project_id=project_for_dedup).count()
-    assert restored_articles_count == 1
-    new_session.close()
+    try:
+        restored_project = new_session.query(Project).filter_by(id=project_id).one_or_none()
+        assert restored_project is not None
+        assert restored_project.name == "Projet Déduplication"
+        
+        restored_articles_count = new_session.query(SearchResult).filter_by(project_id=project_id).count()
+        assert restored_articles_count == 1
+    finally:
+        new_session.close()
     
     print("[OK] Intégrité Données : Le cycle de sauvegarde/restauration a préservé les données.")

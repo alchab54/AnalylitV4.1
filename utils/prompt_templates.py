@@ -33,7 +33,7 @@ def get_scoping_stakeholder_template(fields: list) -> str:
     json_lines = []
     for i, k in enumerate(all_fields):
         comma = "," if i < len(all_fields) - 1 else ""
-        json_lines.append(f'"{k}": "...""{comma}')
+        json_lines.append(f'    "{k}": "..."{comma}')
     
     json_block = "{{\n{body}\n}}".format(body=",\n".join(json_lines))
     
@@ -71,9 +71,9 @@ def get_scoping_atn_template(fields: list) -> str:
     json_lines = []
     for i, field in enumerate(fields_to_use):
         comma = "," if i < len(fields_to_use) - 1 else ""
-        json_lines.append(f'    "{field}": "..."{comma}')
+        json_lines.append(f'    "{field}": "..."{comma}') # This line is correct, but the logic in the other file was wrong. Let's fix the other one.
     
-    json_block = "{{\n{body}\n}}".format(body=",\n".join(json_lines))
+    json_block = f"{{\n" + ",\n".join(json_lines) + f"\n}}"
     
     return (
         "ROLE: Assistant expert en scoping review sur l'alliance thérapeutique numérique. "
