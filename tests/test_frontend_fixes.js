@@ -1,4 +1,5 @@
 import { fetchAPI } from '../web/js/api.js';
+import { API_BASE_URL } from '../web/js/app-improved.js';
 
 // Script de test des corrections frontend
 async function testAPIEndpoints() {
@@ -6,7 +7,7 @@ async function testAPIEndpoints() {
     
     try {
         // Test 1: Vérification endpoint projets
-        const projects = await fetchAPI('/projects');
+        const projects = await fetchAPI(`${API_BASE_URL}/projects`);
         console.log('✓ Endpoint /projects OK');
         
         // Test 2: Vérification endpoint tâches  

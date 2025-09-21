@@ -19,7 +19,7 @@ import { sendChatMessage, loadChatMessages, renderChatInterface } from './chat.j
 import { fetchTasks } from './tasks.js';
 import { ThemeManager } from './theme-manager.js';
 
-export const API_BASE_URL = '/api';
+export const API_BASE_URL = 'http://localhost:8080/api';
 
 export const WEBSOCKET_URL = '/'; // Use the same origin as the web page
 
