@@ -966,10 +966,33 @@ def run_atn_score_task(session, project_id: str):
             data = json.loads(ext["extracted_data"])
             s = 0
             text_blob = json.dumps(data, ensure_ascii=False).lower()
-            if 'alliance' in text_blob or 'therapeutic' in text_blob: s += 3
-            if any(k in text_blob for k in ['numérique', 'digital', 'app', 'plateforme', 'ia']): s += 3
-            if any(k in text_blob for k in ['patient', 'soignant', 'développeur']): s += 2
-            if any(k in text_blob for k in ['empathie', 'adherence', 'confiance']): s += 2
+            logger.debug(f"PMID: {ext['pmid']}, Text Blob: {text_blob}")
+
+            # Category 1: 'alliance', 'therapeutic'
+            if re.search(r'\balliance\b', text_blob): s += 3
+            if re.search(r'\btherapeutic\b', text_blob): s += 3
+            logger.debug(f"PMID: {ext['pmid']}, Score after C1: {s}")
+
+            # Category 2: 'numérique', 'digital', 'app', 'plateforme', 'ia'
+            for k in ['numérique', 'digital', 'app', 'plateforme', 'ia']:
+                if re.search(r'\b' + re.escape(k) + r'\b', text_blob):
+                    s += 3
+                    logger.debug(f"PMID: {ext['pmid']}, Matched C2 keyword: {k}")
+            logger.debug(f"PMID: {ext['pmid']}, Score after C2: {s}")
+
+            # Category 3: 'patient', 'soignant', 'développeur'
+            for k in ['patient', 'soignant', 'développeur']:
+                if re.search(r'\b' + re.escape(k) + r'\b', text_blob):
+                    s += 2
+                    logger.debug(f"PMID: {ext['pmid']}, Matched C3 keyword: {k}")
+            logger.debug(f"PMID: {ext['pmid']}, Score after C3: {s}")
+
+            # Category 4: 'empathie', 'adherence', 'confiance'
+            for k in ['empathie', 'adherence', 'confiance']:
+                if re.search(r'\b' + re.escape(k) + r'\b', text_blob):
+                    s += 2
+                    logger.debug(f"PMID: {ext['pmid']}, Matched C4 keyword: {k}")
+            logger.debug(f"PMID: {ext['pmid']}, Score after C4: {s}")
             scores.append({'pmid': ext['pmid'], 'title': ext['title'], 'atn_score': min(s, 10)})
         except Exception: continue
     
