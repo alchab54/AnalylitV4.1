@@ -167,7 +167,7 @@ function renderChatSection(project = null, error = false) {
 /**
  * Gère le lancement de l'indexation des PDFs pour le chat RAG.
  */
-export async function handleIndexPdfs() {
+export async function handleStartIndexing() {
     if (!appState.currentProject) {
         showToast('Veuillez sélectionner un projet pour lancer l\'indexation.', 'warning');
         return;

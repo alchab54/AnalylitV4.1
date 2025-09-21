@@ -1,4 +1,12 @@
 import logging
+import feedparser
+
+# --- CORRECTIF DE COMPATIBILITÉ PYZOTERO / FEEDPARSER ---
+# pyzotero tente de patcher une méthode interne de feedparser qui n'existe plus.
+# Nous appliquons manuellement un patch compatible avant d'importer pyzotero.
+if not hasattr(feedparser, '_FeedParserMixin'):
+    feedparser._FeedParserMixin = type('_FeedParserMixin', (object,), {})
+
 import os
 import json
 import uuid
@@ -25,7 +33,6 @@ from utils.file_handlers import save_file_to_project_dir
 from utils.app_globals import PROJECTS_DIR as PROJECTS_DIR_STR
 from utils.prisma_scr import get_base_prisma_checklist
 import utils.models  # noqa
-
 from datetime import datetime
 from rq.job import Job
 from rq.registry import StartedJobRegistry, FinishedJobRegistry, FailedJobRegistry

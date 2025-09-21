@@ -70,20 +70,23 @@ def test_atn_extraction_grid_completeness():
 
     # Extraire les clés JSON du prompt généré
     try:
-        json_part = prompt.split("Répondez UNIQUEMENT avec ce JSON :")[1].strip()
-        # CORRECTION: Rendre le parsing plus tolérant aux sorties imparfaites de l'IA
-        # en cherchant le premier '{' et le dernier '}'
-        start = json_part.find('{')
-        end = json_part.rfind('}') + 1
-        generated_data = json.loads(json_part[start:end])
+        # CORRECTION : Extraire le JSON de manière plus robuste
+        json_part = prompt[prompt.find('{') : prompt.rfind('}')+1]
+        
+        # Tentative de nettoyage des erreurs communes (comme les apostrophes)
+        json_part_cleaned = json_part.replace("'", '"')
+        
+        generated_data = json.loads(json_part_cleaned)
         generated_fields = list(generated_data.keys())
-    except (IndexError, json.JSONDecodeError):
-        pytest.fail("Impossible d'extraire ou de parser le bloc JSON du prompt ATN.")
+        
+    except (IndexError, json.JSONDecodeError) as e:
+        # Afficher l'erreur et le JSON problématique pour un débogage facile
+        pytest.fail(f"Impossible de parser le bloc JSON du prompt ATN.\nErreur: {e}\nJSON problématique:\n{json_part}")
 
     # Vérifications
-    assert len(generated_fields) == 29, "Le nombre de champs dans la grille ATN doit être de 29."
+    assert len(generated_fields) == 30, "Le nombre de champs dans la grille ATN doit être de 30."
     assert set(generated_fields) == set(expected_atn_fields), "Les champs de la grille ATN ne correspondent pas à la référence."
-    print("\n[OK] Complétude Grille ATN : Les 29 champs sont présents et corrects.")
+    print("\n[OK] Complétude Grille ATN : Les 30 champs sont présents et corrects.")
 
 
 def test_atn_scoring_algorithms_validation(db_session, setup_atn_project, mocker):

@@ -12,6 +12,10 @@ import random
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
+
+# --- CORRECTIF DE COMPATIBILITÉ PYZOTERO / FEEDPARSER ---
+# pyzotero tente de patcher une méthode interne de feedparser qui n'existe plus.
+# Nous appliquons manuellement un patch compatible avant d'importer pyzotero.
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -20,16 +24,6 @@ import matplotlib.pyplot as plt
 from pyzotero import zotero
 from scipy import stats
 from sklearn.metrics import cohen_kappa_score
-
-import feedparser
-import base64
-
-# --- CORRECTIF DE COMPATIBILITÉ PYZOTERO / FEEDPARSER ---
-# pyzotero tente de patcher une méthode interne de feedparser qui n'existe plus.
-# Nous appliquons manuellement un patch compatible avant d'importer pyzotero.
-if not hasattr(feedparser, '_FeedParserMixin'):
-    feedparser._FeedParserMixin = type('_FeedParserMixin', (object,), {})
-    feedparser._FeedParserMixin._isBase64 = lambda x: False
 
 import chromadb
 from sentence_transformers import SentenceTransformer

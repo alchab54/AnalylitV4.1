@@ -70,15 +70,16 @@ def get_scoping_atn_template(fields: list) -> str:
     
     json_lines = []
     for i, field in enumerate(fields_to_use):
-        comma = "," if i < len(fields_to_use) - 1 else ""
-        json_lines.append(f'    "{field}": "..."{comma}') # This line is correct, but the logic in the other file was wrong. Let's fix the other one.
-    
-    json_block = f"{{\n" + ",\n".join(json_lines) + f"\n}}"
-    
-    return (
+        # The comma is added inside the join, so we don't need it here.
+        json_lines.append(f'    "{field}": "..."')
+
+    # Construct the JSON block string. The double braces {{ and }} will become single braces
+    # after the .format() call, which is what we want for the final prompt.
+    json_block = "{{\n" + ",\n".join(json_lines) + "\n}}"
+
+    prompt_template = (
         "ROLE: Assistant expert en scoping review sur l'alliance thérapeutique numérique. "
         "Analysez ce texte selon les critères PRISMA-ScR et JBI pour extraire les données ATN.\n\n"
-        
         "CONSIGNES SPÉCIALES ALLIANCE THÉRAPEUTIQUE NUMÉRIQUE :\n"
         "- Identifiez le type d'IA utilisé (chatbot, avatar, assistant virtuel, etc.)\n"
         "- Relevez tous les scores d'empathie (IA vs humain) si mentionnés\n"
@@ -87,17 +88,20 @@ def get_scoping_atn_template(fields: list) -> str:
         "- Évaluez la confiance algorithmique et les aspects éthiques\n"
         "- Vérifiez la conformité RGPD et AI Act si applicable\n"
         "- Identifiez les parties prenantes (patients, soignants, développeurs, régulateurs)\n\n"
-        
         "CONTEXTE MULTIPARTIE PRENANTE :\n"
         "- Patients/Soignés : acceptabilité, satisfaction, adhésion\n"
         "- Professionnels de santé : utilisation, perception, workflow\n"
         "- Développeurs/Tech : performance technique, algorithmes\n"
         "- Régulateurs/Décideurs : conformité, éthique, sécurité\n\n"
-        
         "TEXTE À ANALYSER:\n---\n{text}\n---\n"
         "SOURCE: {database_source}\n\n"
-        f"Répondez UNIQUEMENT avec ce JSON :\n{json_block}\n"
+        "Répondez UNIQUEMENT avec ce JSON :\n{json_block}\n"
     )
+
+    # We format the template but keep the {text} and {database_source} placeholders
+    # by passing them as arguments to .format(). This prevents them from being interpreted
+    # as part of the JSON block.
+    return prompt_template.format(text="{text}", database_source="{database_source}", json_block=json_block.format())
 
 def get_screening_atn_template() -> str:
     """Template de screening spécialisé pour l'ATN."""

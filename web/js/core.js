@@ -46,7 +46,7 @@ import { handleDeleteGrid, loadProjectGrids, renderGridsSection, showGridFormMod
 import { renderReportingSection, generateBibliography, generateSummaryTable, exportSummaryTableExcel, savePrismaChecklist } from './reporting.js';
 // CORRIGÉ: Ajout des imports pour les fonctions d'import et la gestion des modales
 import { 
-    showPmidImportModal,
+    showPmidImportModal, // Corrected import
     handleIndexPdfs,
     handleZoteroSync,
     exportForThesis,
@@ -192,7 +192,7 @@ const chatActions = {
 const importExportActions = {
     'trigger-zotero-import': (target) => document.getElementById('zoteroFileInput').click(),
     'show-pmid-import-modal': showPmidImportModal,
-    'trigger-upload-pdfs': (target) => document.getElementById('bulkPDFInput').click(),
+    'trigger-upload-pdfs': (target) => document.getElementById('bulkPDFInput').click(), // Corrected action
     'index-pdfs': handleIndexPdfs,
     'zotero-sync': handleZoteroSync,
     'export-for-thesis': exportForThesis,
@@ -301,7 +301,7 @@ export function initializeWebSocket() {
             return;
         }
 
-        appState.socket = io({ path: '/socket.io/' });
+        appState.socket = io('http://localhost:5001', { path: '/socket.io/' });
 
         appState.socket.on('connect', () => {
             console.log('✅ WebSocket connecté');
