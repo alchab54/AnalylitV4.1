@@ -45,7 +45,7 @@ def sanitize_filename(filename: str) -> str:
 
 # Seuil minimal de caractères pour considérer une extraction "texte" comme réussie.
 # En dessous, nous soupçonnons un PDF scanné et passons à l'OCR.
-MIN_TEXT_LENGTH_THRESHOLD = 20 
+MIN_TEXT_LENGTH_THRESHOLD = 15 
 
 def _clean_text(text: str) -> str:
     """
@@ -171,7 +171,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
     # --- 1. Essai avec PyMuPDF (fitz) ---
     text = _extract_text_with_pymupdf(file_path)
     
-    if text and len(text) > MIN_TEXT_LENGTH_THRESHOLD:
+    if text and len(text) >= MIN_TEXT_LENGTH_THRESHOLD:
         logger.info(f"Stratégie 1 (PyMuPDF) réussie pour {file_path.name}.")
         return _clean_text(text)
         
@@ -180,7 +180,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
     # --- 2. Essai avec PDFPlumber ---
     text = _extract_text_with_pdfplumber(file_path)
     
-    if text and len(text) > MIN_TEXT_LENGTH_THRESHOLD:
+    if text and len(text) >= MIN_TEXT_LENGTH_THRESHOLD:
         logger.info(f"Stratégie 2 (PDFPlumber) réussie pour {file_path.name}.")
         return _clean_text(text)
 
