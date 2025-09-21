@@ -641,17 +641,23 @@ def create_app(config=None):
         task_ids, successful_uploads, failed_uploads = [], [], []
         for file in files: # The user request is to fix the test, but the test is correct. The server code is wrong.
             if file and file.filename:
-                try: # CORRECTION: secure_filename est maintenant appelé
-                    filename = secure_filename(file.filename)
-                    file_path = save_file_to_project_dir(file, project_id, filename, PROJECTS_DIR)
-                    job = background_queue.enqueue(add_manual_articles_task, project_id=project_id, file_path=str(file_path), job_timeout='10m')
-                    task_ids.append(job.id)
-                    successful_uploads.append(filename)
-                except Exception as e:
-                    logging.error(f"Erreur lors de l'upload du fichier {file.filename}: {e}")
+                # 1. Nettoyer le nom de fichier pour enlever les caractères dangereux (Path Traversal)
+                filename = secure_filename(file.filename)
+
+                # 2. Vérifier si le nom de fichier est valide ET s'il a la bonne extension (.pdf)
+                if filename and filename.lower().endswith('.pdf'):
+                    try:
+                        file_path = save_file_to_project_dir(file, project_id, filename, PROJECTS_DIR)
+                        # CORRECTION : La tâche de traitement doit être lancée ici.
+                        job = background_queue.enqueue(add_manual_articles_task, project_id=project_id, identifiers=[str(file_path)], job_timeout='10m')
+                        task_ids.append(job.id)
+                        successful_uploads.append(filename)
+                    except Exception as e:
+                        logging.error(f"Erreur lors de la sauvegarde du fichier {filename}: {e}")
+                        failed_uploads.append(filename)
+                else:
+                    # Le nom de fichier est soit vide, soit n'est pas un PDF. On le rejette.
                     failed_uploads.append(file.filename)
-            elif file and file.filename:
-                failed_uploads.append(f"{file.filename} (format non supporté)")
         response_message = f"{len(successful_uploads)} PDF(s) mis en file pour traitement."
         if failed_uploads:
             response_message += f" {len(failed_uploads)} fichier(s) ignoré(s) (format invalide ou erreur)."
