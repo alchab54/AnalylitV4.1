@@ -4,4 +4,5 @@ FROM analylit-base
 # Copier le code de l'application
 COPY . .
 
-EXPOSE 5000 # Le port est défini à 5000 dans docker-compose.yml
+# Le port est défini à 5000 dans docker-compose.yml
+EXPOSE 5000

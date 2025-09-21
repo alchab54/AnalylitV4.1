@@ -1,0 +1,393 @@
+/*! AnalyLit UX Fix - Correction Immédiate Interface */
+/* Transforme l'application en interface moderne et utilisable */
+
+/* ==========================================================================
+   🔥 CORRECTIONS CRITIQUES - TRANSFORMATION IMMÉDIATE
+   ========================================================================== */
+
+/* Base Font Scaling - DOUBLE LA TAILLE DU TEXTE */
+:root {
+  /* Nouvelles tailles de police (2x plus grandes) */
+  --font-size-xs: 0.875rem;    /* était 0.75rem */
+  --font-size-sm: 1rem;        /* était 0.875rem */
+  --font-size-base: 1.125rem;  /* était 1rem */
+  --font-size-lg: 1.25rem;     /* était 1.125rem */
+  --font-size-xl: 1.5rem;      /* était 1.25rem */
+  --font-size-2xl: 1.875rem;   /* était 1.5rem */
+  --font-size-3xl: 2.25rem;    /* était 1.875rem */
+  
+  /* Espacement amélioré */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* Breakpoints responsive */
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+}
+
+/* Container responsive amélioré */
+.container {
+  width: 100% !important;
+  max-width: none !important;
+  padding-left: clamp(1rem, 3vw, 2rem) !important;
+  padding-right: clamp(1rem, 3vw, 2rem) !important;
+}
+
+/* ==========================================================================
+   📱 NAVIGATION RESPONSIVE - TRANSFORMATION MOBILE
+   ========================================================================== */
+
+.app-nav {
+  background: var(--color-background-secondary, #f8fafc) !important;
+  border-bottom: 1px solid var(--color-border, #e2e8f0) !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.app-nav__list {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  min-width: max-content !important;
+  gap: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.app-nav__button {
+  font-size: var(--font-size-sm) !important;
+  padding: 0.75rem 1rem !important;
+  min-width: max-content !important;
+  white-space: nowrap !important;
+  border-radius: 0 !important;
+  transition: all 0.2s ease !important;
+}
+
+.app-nav__button:hover {
+  background-color: var(--color-primary-50, #eff6ff) !important;
+}
+
+.app-nav__button--active {
+  background-color: var(--color-primary-100, #dbeafe) !important;
+  font-weight: 600 !important;
+}
+
+/* ==========================================================================
+   🎨 TYPOGRAPHY - TAILLES LISIBLES
+   ========================================================================== */
+
+/* Headers redimensionnés */
+h1, .app-header__title { 
+  font-size: var(--font-size-2xl) !important; 
+  line-height: 1.3 !important;
+  margin-bottom: var(--spacing-md) !important;
+}
+
+h2, .section h2 { 
+  font-size: var(--font-size-xl) !important;
+  line-height: 1.4 !important;
+  margin-bottom: var(--spacing-sm) !important;
+}
+
+h3 { 
+  font-size: var(--font-size-lg) !important;
+  line-height: 1.4 !important;
+}
+
+/* Corps de texte */
+body, p, .card__body, .section-header p {
+  font-size: var(--font-size-base) !important;
+  line-height: 1.6 !important;
+}
+
+/* Boutons lisibles */
+.btn {
+  font-size: var(--font-size-base) !important;
+  padding: 0.75rem 1.5rem !important;
+  min-height: 44px !important; /* Touch target WCAG */
+}
+
+/* Inputs et forms */
+.form-control, input, textarea, select {
+  font-size: var(--font-size-base) !important;
+  padding: 0.75rem 1rem !important;
+  min-height: 44px !important;
+}
+
+/* ==========================================================================
+   📐 LAYOUT RESPONSIVE - GRILLES ADAPTATIVES
+   ========================================================================== */
+
+/* Section headers avec meilleur espacement */
+.section-header {
+  margin-bottom: var(--spacing-xl) !important;
+  padding-bottom: var(--spacing-lg) !important;
+}
+
+.section-header__content h2 {
+  margin-bottom: var(--spacing-sm) !important;
+}
+
+.section-header__content p {
+  color: var(--color-text-secondary, #64748b) !important;
+  margin-bottom: 0 !important;
+}
+
+/* Cards avec meilleur espacement */
+.card {
+  padding: var(--spacing-lg) !important;
+  margin-bottom: var(--spacing-lg) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+.card__header {
+  margin-bottom: var(--spacing-md) !important;
+  padding-bottom: var(--spacing-sm) !important;
+  border-bottom: 1px solid var(--color-border, #e2e8f0) !important;
+}
+
+.card__body {
+  line-height: 1.6 !important;
+}
+
+/* ==========================================================================
+   📱 MOBILE OPTIMIZATIONS
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* Navigation scroll hint */
+  .app-nav::after {
+    content: "← Faire défiler →";
+    display: block;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--color-text-muted, #94a3b8);
+    padding: 0.25rem;
+    background: var(--color-background-tertiary, #f1f5f9);
+  }
+  
+  /* Section headers stack */
+  .section-header {
+    flex-direction: column !important;
+    gap: var(--spacing-md) !important;
+  }
+  
+  .section-header__actions {
+    width: 100% !important;
+  }
+  
+  .section-header__actions .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  
+  /* Cards full width mobile */
+  .projects-grid,
+  .settings-grid,
+  .analysis-grid {
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-md) !important;
+  }
+  
+  /* Chat interface mobile */
+  .chat-input-container {
+    flex-direction: column !important;
+    gap: var(--spacing-sm) !important;
+  }
+  
+  .chat-input-field {
+    min-height: 120px !important;
+  }
+}
+
+/* ==========================================================================
+   💻 TABLET OPTIMIZATIONS
+   ========================================================================== */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .projects-grid,
+  .settings-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .container {
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+  }
+}
+
+/* ==========================================================================
+   🖥️ DESKTOP OPTIMIZATIONS
+   ========================================================================== */
+
+@media (min-width: 1025px) {
+  .container {
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+  }
+  
+  .projects-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+  }
+  
+  .settings-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* ==========================================================================
+   🎯 CORRECTIONS SPÉCIFIQUES ÉLÉMENTS PROBLÉMATIQUES
+   ========================================================================== */
+
+/* Fix app header */
+.app-header {
+  padding: var(--spacing-lg) 0 !important;
+  background: white !important;
+  border-bottom: 1px solid var(--color-border, #e2e8f0) !important;
+}
+
+.app-header__content {
+  align-items: center !important;
+  gap: var(--spacing-lg) !important;
+}
+
+.app-header__subtitle {
+  font-size: var(--font-size-sm) !important;
+  color: var(--color-text-secondary, #64748b) !important;
+  display: block !important;
+  margin-top: 0.25rem !important;
+}
+
+/* Fix connection status */
+.connection-status {
+  font-size: var(--font-size-sm) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+/* Fix placeholders */
+.project-placeholder,
+.results-placeholder,
+.validation-placeholder {
+  padding: var(--spacing-2xl) !important;
+  text-align: center !important;
+}
+
+.project-placeholder__icon,
+.results-placeholder__icon,
+.validation-placeholder__icon {
+  font-size: 4rem !important;
+  margin-bottom: var(--spacing-lg) !important;
+  opacity: 0.5 !important;
+}
+
+/* Fix loading overlay */
+.loading-overlay {
+  backdrop-filter: blur(4px) !important;
+}
+
+.loading-overlay__content {
+  background: white !important;
+  padding: var(--spacing-2xl) !important;
+  border-radius: 16px !important;
+  text-align: center !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+.loading-overlay__message {
+  font-size: var(--font-size-lg) !important;
+  margin-top: var(--spacing-md) !important;
+}
+
+/* ==========================================================================
+   🚀 PERFORMANCE & ACCESSIBILITÉ
+   ========================================================================== */
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth !important;
+}
+
+/* Focus visible amélioré */
+:focus-visible {
+  outline: 2px solid var(--color-primary, #3b82f6) !important;
+  outline-offset: 2px !important;
+  border-radius: 4px !important;
+}
+
+/* Touch targets minimum 44px */
+button, .btn, a, input[type="checkbox"], input[type="radio"] {
+  min-height: 44px !important;
+  min-width: 44px !important;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   ✨ FINISHING TOUCHES
+   ========================================================================== */
+
+/* Toast notifications plus grandes */
+.toast {
+  font-size: var(--font-size-base) !important;
+  padding: var(--spacing-md) var(--spacing-lg) !important;
+  min-width: 300px !important;
+}
+
+/* Modal plus accessible */
+.modal {
+  padding: var(--spacing-xl) !important;
+}
+
+.modal-content {
+  max-width: min(90vw, 600px) !important;
+  padding: var(--spacing-xl) !important;
+}
+
+/* Progress bars plus visibles */
+.progress-bar {
+  height: 12px !important;
+  border-radius: 6px !important;
+}
+
+/* Tables responsive */
+.table-responsive {
+  overflow-x: auto !important;
+}
+
+table {
+  font-size: var(--font-size-sm) !important;
+}
+
+th, td {
+  padding: var(--spacing-sm) !important;
+  min-width: 120px !important;
+}
+
+/* Print styles */
+@media print {
+  .app-nav,
+  .loading-overlay,
+  .toast-container {
+    display: none !important;
+  }
+  
+  body {
+    font-size: 12pt !important;
+    line-height: 1.4 !important;
+  }
+}
+
