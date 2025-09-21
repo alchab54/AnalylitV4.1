@@ -1,0 +1,18 @@
+# Hérite de l'image de base (avec toutes les dépendances déjà installées)
+FROM analylit-base:latest
+
+# Copier le code de l'application
+COPY . /home/appuser/app
+
+# Copier et rendre exécutable le script d'entrée (en tant que root)
+USER root
+COPY docker/entrypoint.sh /home/appuser/app/
+RUN chmod +x /home/appuser/app/entrypoint.sh
+RUN chown -R appuser:appuser /home/appuser/app
+
+# Repasser en utilisateur non-root
+USER appuser
+
+# Le point d'entrée gère les migrations et le démarrage
+EXPOSE 5000
+ENTRYPOINT ["./entrypoint.sh"]

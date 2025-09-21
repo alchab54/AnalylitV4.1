@@ -1,17 +1,36 @@
+# Fichiers de développement
 __pycache__
 *.pyc
 *.pyo
 *.pyd
 .Python
-env
-.env
-venv
-.git
-.gitignore
-README.md
 .pytest_cache
 .coverage
 htmlcov
-.DS_Store
-node_modules
+
+# Fichiers IDE
 .vscode
+.idea
+*.swp
+*.swo
+
+# Fichiers Git
+.git
+.gitignore
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Dépendances Node (si applicable)
+node_modules
+
+# Logs et temporaires
+*.log
+tmp/
+temp/
+
+# Docker
+.dockerignore
+Dockerfile*
+docker-compose*

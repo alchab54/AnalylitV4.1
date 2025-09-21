@@ -1,13 +1,17 @@
+# AnalyLit v4.1 - Architecture Docker Optimisée avec Image de Base
 services:
-  # 🏗️ IMAGE DE BASE - Construite une seule fois avec toutes les dépendances
+  # ÉTAPE 1 : Construire l'image de base (une seule fois)
   base:
     build:
       context: .
-      dockerfile: Dockerfile.base
-      target: base
+      dockerfile: docker/Dockerfile.base
+      cache_from:
+        - analylit-base:latest
     image: analylit-base:latest
-    # Ce service ne démarre pas, il sert juste à construire l'image
+    profiles:
+      - build  # Image fantôme - sert juste à être construite
 
+  # ÉTAPE 2 : Services de données
   db:
     image: postgres:15-alpine
     container_name: analylit_db
@@ -24,24 +28,34 @@ services:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
     container_name: analylit_redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
-  # 🌐 WEB - Utilise l'image de base (ZERO réinstallation)
+  # ÉTAPE 3 : Services applicatifs (héritent de la base)
   web:
     build:
       context: .
-      dockerfile: Dockerfile.web
-    image: analylit-web:latest
+      dockerfile: docker/Dockerfile.web
+      cache_from:
+        - analylit-base:latest
     container_name: analylit_web
     ports:
-      - "5001:5000"
-      - "8000:5000"
+      - "5001:5000"  # Flask
+      - "8000:5000"  # Alternative (si pas de nginx)
     environment:
       - FLASK_ENV=production
+      - FLASK_DEBUG=0
     env_file:
       - .env
     volumes:
@@ -52,16 +66,24 @@ services:
       db:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
-  # 👷 WORKER - Utilise la même image de base (ZERO réinstallation)
   worker:
     build:
       context: .
-      dockerfile: Dockerfile.worker  
-    image: analylit-worker:latest
+      dockerfile: docker/Dockerfile.worker
+      cache_from:
+        - analylit-base:latest
     container_name: analylit_worker
-    command: python -m rq_worker -w rq.worker.SimpleWorker -c app.rq_config
+    environment:
+      - PYTHONPATH=/home/appuser/app
     env_file:
       - .env
     volumes:
@@ -70,9 +92,16 @@ services:
       base:
         condition: service_completed_successfully
       redis:
-        condition: service_started
+        condition: service_healthy
       db:
         condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   postgres_data:
+    driver: local
+
+# Configuration réseau (optionnel - améliore l'isolation)
+networks:
+  default:
+    name: analylit_network
