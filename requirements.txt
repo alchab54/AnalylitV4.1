@@ -28,7 +28,6 @@ sentence-transformers==2.7.0
 chromadb==0.4.22
 onnxruntime==1.17.1
 pydantic==2.5.3
-torch
 
 #--- Utilitaires ---
 PyPDF2==3.0.1
@@ -60,3 +59,6 @@ pytest-mock==3.10.0
 # === DÉPENDANCES AJOUTÉES POUR LES TESTS AVANCÉS ===
 selenium==4.21.0
 locust==2.27.0
+
+# --- PyTorch (version CPU-only pour compatibilité) ---
+torch==2.3.1

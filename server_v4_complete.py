@@ -1125,7 +1125,7 @@ app = create_app()
 if __name__ == "__main__":
     # Ce bloc est pour le développement local UNIQUEMENT
     # Utilise le serveur de développement de SocketIO
-    socketio.run(app, host="0.0.0.0", port=5001, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, host="0.0.0.0", port=8080, debug=True, allow_unsafe_werkzeug=True)
 else:
     # Pour Gunicorn/production, Gunicorn appellera create_app()
     # Gunicorn appellera create_app() via le fichier d'entrypoint.

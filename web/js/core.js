@@ -301,7 +301,7 @@ export function initializeWebSocket() {
             return;
         }
 
-        appState.socket = io(WEBSOCKET_URL, { path: '/socket.io/' });
+        appState.socket = io(WEBSOCKET_URL, { path: '/socket.io/', transports: ['websocket', 'polling'] });
 
         appState.socket.on('connect', () => {
             console.log('✅ WebSocket connecté');
