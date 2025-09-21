@@ -1,28 +1,42 @@
-# Utilise l'image de base qui contient Python/venv/dépendances
-FROM analylit-base:latest AS base
+# =================================================
+# Étape 1: Builder - Compilation des dépendances
+# =================================================
+FROM python:3.11-bookworm as builder
 
-# Outils utiles (psql pour checks, netcat pour waits)
-USER root
-RUN apt-get update \
- && apt-get install -y --no-install-recommends netcat-openbsd postgresql-client \
- && rm -rf /var/lib/apt/lists/*
+# Installer les dépendances système nécessaires pour la compilation et les outils
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential libpq-dev netcat-openbsd postgresql-client \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Répertoire de travail
-USER appuser
+# Créer et activer un environnement virtuel pour isoler les dépendances
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copier UNIQUEMENT le fichier de dépendances pour optimiser le cache Docker
+COPY requirements.txt ./
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# =================================================
+# Étape 2: Final - Image d'exécution légère
+# =================================================
+FROM python:3.11-slim-bookworm
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    netcat-openbsd postgresql-client \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Créer un utilisateur non-root pour la sécurité
+RUN useradd --create-home appuser
 WORKDIR /home/appuser/app
 
-# Copie le code de l'application
-COPY . .
+# Copier l'environnement virtuel depuis le builder
+COPY --from=builder /opt/venv /opt/venv
+# Copier le code de l'application
+COPY --chown=appuser:appuser . .
 
-# CORRECTION: Assurer que l'utilisateur est propriétaire du répertoire de travail et rendre l'entrypoint exécutable
-USER root
-RUN chown -R appuser:appuser /home/appuser/app && \
-    chmod +x /home/appuser/app/entrypoint.sh
 USER appuser
+ENV PATH="/opt/venv/bin:$PATH"
 
-
-# Le service écoute en 5001 (Gunicorn)
-EXPOSE 5001
-
-# L'entrypoint gère l'attente DB, l'init DB/seed unique, puis lance Gunicorn
-ENTRYPOINT ["/home/appuser/app/entrypoint.sh"]
+EXPOSE 5000 # Le port est défini à 5000 dans docker-compose.yml

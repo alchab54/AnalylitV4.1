@@ -1,19 +1,40 @@
-# Dockerfile-worker-complete OPTIMISÉ
-# Utilise l'image de base où tout est déjà installé (dépendances + code source)
-FROM analylit-base:latest
+# =================================================
+# Étape 1: Builder - Compilation des dépendances
+# =================================================
+FROM python:3.11-bookworm as builder
 
-# CORRECTION: Installe les outils réseau (netcat) par cohérence avec l'image web.
-# On repasse temporairement en root pour l'installation.
-USER root
-RUN apt-get update && apt-get install -y netcat-openbsd postgresql-client && \
-    rm -rf /var/lib/apt/lists/*
+# Installer les dépendances système nécessaires pour la compilation et les outils
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential libpq-dev netcat-openbsd postgresql-client \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# On revient à l'utilisateur non-privilégié pour la sécurité.
+# Créer et activer un environnement virtuel
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copier UNIQUEMENT le fichier de dépendances pour optimiser le cache Docker
+COPY requirements.txt ./
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# =================================================
+# Étape 2: Final - Image d'exécution légère
+# =================================================
+FROM python:3.11-slim-bookworm
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    netcat-openbsd postgresql-client \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Créer un utilisateur non-root pour la sécurité
+RUN useradd --create-home appuser
+WORKDIR /home/appuser/app
+
+# Copier l'environnement virtuel depuis le builder
+COPY --from=builder /opt/venv /opt/venv
+# Copier le code de l'application
+COPY --chown=appuser:appuser . .
+
 USER appuser
-
-# Le WORKDIR est déjà défini dans la base à /home/appuser/app
-# Le USER est déjà défini à appuser
-# Le PATH est déjà configuré pour l'environnement virtuel
-# Le code source est déjà présent
-
-# Pas d'EXPOSE nécessaire pour le worker (il ne sert pas de requêtes HTTP)
+ENV PATH="/opt/venv/bin:$PATH"
