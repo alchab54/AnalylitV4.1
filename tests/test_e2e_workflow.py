@@ -42,7 +42,7 @@ def test_full_end_to_end_workflow(client, db_session):
     db_session.commit()
     
     # === ÉTAPE 3: Prise de décision de screening ===
-    extraction_to_include = db_session.query(Extraction).filter_by(pmid="e2e_pmid_1").one()
+    extraction_to_include = db_session.query(Extraction).filter_by(project_id=project_id, pmid="e2e_pmid_1").one()
     decision_data = {"decision": "include", "evaluator": "user1"}
     response = client.put(f'/api/projects/{project_id}/extractions/{extraction_to_include.id}/decision', data=json.dumps(decision_data), content_type='application/json')
     assert response.status_code == 200
