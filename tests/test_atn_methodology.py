@@ -70,13 +70,11 @@ def test_atn_extraction_grid_completeness():
 
     # Extraire les clés JSON du prompt généré
     try:
-        # CORRECTION : Extraire le JSON de manière plus robuste
-        json_part = prompt[prompt.find('{') : prompt.rfind('}')+1]
-        
-        # Tentative de nettoyage des erreurs communes (comme les apostrophes)
-        json_part_cleaned = json_part.replace("'", '"')
-        
-        generated_data = json.loads(json_part_cleaned)
+        # CORRECTION: Isoler le bloc JSON qui commence après "Répondez UNIQUEMENT avec ce JSON :"
+        # et qui est délimité par des accolades.
+        json_marker = "Répondez UNIQUEMENT avec ce JSON :\n"
+        json_part = prompt.split(json_marker)[1].strip()
+        generated_data = json.loads(json_part)
         generated_fields = list(generated_data.keys())
         
     except (IndexError, json.JSONDecodeError) as e:

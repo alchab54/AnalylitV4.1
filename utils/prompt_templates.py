@@ -75,7 +75,7 @@ def get_scoping_atn_template(fields: list) -> str:
 
     # Construct the JSON block string. The double braces {{ and }} will become single braces
     # after the .format() call, which is what we want for the final prompt.
-    json_block = "{{\n" + ",\n".join(json_lines) + "\n}}"
+    json_block = "{{\n" + ",\n".join(json_lines) + "\n}}" # Keep as is
 
     prompt_template = (
         "ROLE: Assistant expert en scoping review sur l'alliance thérapeutique numérique. "
