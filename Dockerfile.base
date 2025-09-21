@@ -1,0 +1,21 @@
+# Stage 1: Construction des dépendances
+FROM python:3.11-slim as dependencies
+WORKDIR /app
+COPY requirements.txt .
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
+
+# Stage 2: Image de base finale avec dépendances installées
+FROM python:3.11-slim as base
+RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
+RUN useradd -m -s /bin/bash appuser
+
+WORKDIR /home/appuser/app
+USER root
+
+# Installation des dépendances (CACHE DOCKER OPTIMAL)
+COPY --from=dependencies /app/wheels /wheels
+COPY --from=dependencies /app/requirements.txt .
+RUN pip install --no-cache /wheels/*
+
+# Copie du code (se fait dans les Dockerfiles spécifiques)
+USER appuser

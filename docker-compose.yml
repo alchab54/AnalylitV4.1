@@ -1,4 +1,13 @@
 services:
+  # 🏗️ IMAGE DE BASE - Construite une seule fois avec toutes les dépendances
+  base:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+      target: base
+    image: analylit-base:latest
+    # Ce service ne démarre pas, il sert juste à construire l'image
+
   db:
     image: postgres:15-alpine
     container_name: analylit_db
@@ -21,8 +30,12 @@ services:
     image: redis:7-alpine
     container_name: analylit_redis
 
+  # 🌐 WEB - Utilise l'image de base (ZERO réinstallation)
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    image: analylit-web:latest
     container_name: analylit_web
     ports:
       - "5001:5000"
@@ -34,13 +47,19 @@ services:
     volumes:
       - .:/home/appuser/app
     depends_on:
+      base:
+        condition: service_completed_successfully
       db:
         condition: service_healthy
       redis:
         condition: service_started
 
+  # 👷 WORKER - Utilise la même image de base (ZERO réinstallation)
   worker:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.worker  
+    image: analylit-worker:latest
     container_name: analylit_worker
     command: python -m rq_worker -w rq.worker.SimpleWorker -c app.rq_config
     env_file:
@@ -48,8 +67,12 @@ services:
     volumes:
       - .:/home/appuser/app
     depends_on:
-      - redis
-      - db
+      base:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+      db:
+        condition: service_healthy
 
 volumes:
   postgres_data:
