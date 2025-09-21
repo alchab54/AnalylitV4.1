@@ -4,7 +4,7 @@
 .PHONY: help install start stop restart status logs backup clean update models shell
 
 # Configuration
-COMPOSE_FILE=docker-compose-complete.yml
+COMPOSE_FILE=docker-compose-local.yml
 PROJECT_NAME=analylit-v4
 
 # Couleurs pour l'affichage

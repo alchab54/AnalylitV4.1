@@ -811,6 +811,14 @@ def create_app(config=None):
         return jsonify({"message": "RoB analysis initiated", "task_ids": task_ids}), 202
 
     # ==================== ROUTES API CHAT ====================
+    @app.route('/api/projects/<project_id>/calculate-kappa', methods=['POST'])
+    @with_db_session
+    def trigger_kappa_calculation(session, project_id):
+        """Déclenche le calcul du coefficient Kappa pour un projet."""
+        job = background_queue.enqueue(calculate_kappa_task, project_id=project_id, job_timeout='5m')
+        return jsonify({"message": "Kappa calculation task enqueued", "task_id": job.id}), 202
+
+
     @app.route("/api/projects/<project_id>/chat", methods=["POST"])
     def chat_with_project(project_id):
         data = request.get_json()
