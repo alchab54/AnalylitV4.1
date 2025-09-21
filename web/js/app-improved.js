@@ -16,7 +16,7 @@ import { loadQueuesStatus, handleClearQueue, handlePullModel, showEditPromptModa
 import { setupDelegatedEventListeners, refreshCurrentSection, showSection, initializeWebSocket } from './core.js';
 import { showGridFormModal, addGridFieldInput, handleSaveGrid, loadProjectGrids, handleDeleteGrid, removeGridField, triggerGridImport, handleGridImportUpload } from './grids.js'; // Corrected import
 import { sendChatMessage, loadChatMessages, renderChatInterface } from './chat.js'; // Corrected import
-import { setupTasksAutoRefresh } from './tasks.js';
+import { fetchTasks } from './tasks.js';
 import { ThemeManager } from './theme-manager.js';
 
 export const API_BASE_URL = '/api';
@@ -114,7 +114,7 @@ async function initializeApplication() {
     try {
         setupDelegatedEventListeners();
         initializeWebSocket();
-        setupTasksAutoRefresh();
+        setInterval(fetchTasks, 5000); // Refresh tasks every 5 seconds
         await loadInitialData();
 
         const last = localStorage.getItem('analylit_last_section') || 'projects';

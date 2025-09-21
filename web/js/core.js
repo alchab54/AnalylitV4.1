@@ -57,7 +57,7 @@ import {
     processPmidImport
 } from './import.js';
 import { showStakeholderManagementModal, addStakeholderGroup, deleteStakeholderGroup, runStakeholderAnalysis } from './stakeholders.js';
-import { loadTasksSection } from './tasks.js';
+import { fetchTasks } from './tasks.js';
 import {
     renderSettings,
     showEditPromptModal,
@@ -415,7 +415,7 @@ export function refreshCurrentSection() {
             renderSettings();
             break;
         case 'tasks':
-            loadTasksSection();
+            fetchTasks();
             break;
         case 'reporting':
             renderReportingSection(elements);

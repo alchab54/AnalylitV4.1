@@ -1,3 +1,5 @@
+import { fetchAPI } from './api.js';
+
 // REMPLACEZ le contenu de tasks.js
 export async function fetchTasks() {
     try {

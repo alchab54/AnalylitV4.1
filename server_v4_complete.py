@@ -1,3 +1,5 @@
+from gevent import monkey
+monkey.patch_all()
 import logging
 import feedparser
 
@@ -71,7 +73,7 @@ def create_app(config=None):
     # Import et initialisation forcés - BON ORDRE :
     # Les modèles sont déjà importés au top du fichier
     from utils.database import init_database
-    # init_database()  # Removed to prevent duplicate initialization  
+    init_database()  
 
     # Configuration des extensions
     CORS(app, 

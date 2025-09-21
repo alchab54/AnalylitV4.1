@@ -17,4 +17,4 @@ python -c 'from utils.database import init_database; init_database()'
 
 echo "Démarrage de l'application Flask avec Gunicorn..."
 # Start Gunicorn
-exec gunicorn -w 4 -b 0.0.0.0:5000 "server_v4_complete:create_app()"
+exec gunicorn --worker-class gevent -w 4 -b 0.0.0.0:5000 "server_v4_complete:create_app()"
