@@ -21,7 +21,7 @@ import { ThemeManager } from './theme-manager.js';
 
 export const API_BASE_URL = '/api';
 
-
+export const WEBSOCKET_URL = '/'; // Use the same origin as the web page
 
 export const appState = {
     currentProject: null,

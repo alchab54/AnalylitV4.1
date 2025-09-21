@@ -136,6 +136,7 @@ services:
       context: .
       dockerfile: Dockerfile-nginx
     volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ./web:/usr/share/nginx/html:ro
     container_name: analylit-nginx-v4
     ports:

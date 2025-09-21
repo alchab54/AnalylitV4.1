@@ -1,6 +1,6 @@
 // web/js/core.js
 
-import { appState, elements } from './app-improved.js';
+import { appState, elements, WEBSOCKET_URL } from './app-improved.js';
 import { setProjects, setCurrentProject } from './state.js';
 import {
     handleDeleteSelectedArticles,
@@ -301,7 +301,7 @@ export function initializeWebSocket() {
             return;
         }
 
-        appState.socket = io('http://localhost:5001', { path: '/socket.io/' });
+        appState.socket = io(WEBSOCKET_URL, { path: '/socket.io/' });
 
         appState.socket.on('connect', () => {
             console.log('✅ WebSocket connecté');

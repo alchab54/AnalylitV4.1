@@ -8,10 +8,10 @@ import { showToast } from './ui-improved.js';
  * @returns {Promise<any|null>} - Parsed JSON, [] for empty collections, or null.
  */
 export async function fetchAPI(endpoint, options = {}) {
-    const baseURL = 'http://localhost:5001/api';
+    const baseURL = '/api'; // Use a relative path to go through the proxy
 
     // Assurez-vous que l'endpoint commence par /api
-    const url = endpoint.startsWith('/api') ? endpoint : `${baseURL}${endpoint}`;
+    const url = endpoint.startsWith('/api') ? endpoint : `${baseURL}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
     
     const defaultOptions = {
         headers: {

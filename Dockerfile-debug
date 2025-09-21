@@ -1,4 +1,0 @@
-FROM alpine/git
-WORKDIR /app
-COPY . .
-RUN ls -la
