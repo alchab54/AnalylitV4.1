@@ -51,6 +51,16 @@ services:
       - analylit-network
     restart: unless-stopped
 
+  # --- Image de base pour web et worker ---
+  base:
+    image: analylit-base:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    # Ce service ne sera pas lancé, juste construit.
+    # On peut utiliser un profil pour ne le construire qu'au besoin.
+    profiles: ["donotstart"]
+
   # --- Serveur Web Applicatif ---
   web:
     image: analylit-web:latest
@@ -61,8 +71,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./projects:/home/appuser/app/projects
-      - ./model_cache:/home/appuser/app/model_cache
+      - projects_data:/home/appuser/app/projects
+      - model_cache_data:/home/appuser/app/model_cache
       - .:/home/appuser/app
     environment:
       - TESTING=true
@@ -70,10 +80,14 @@ services:
       - FLASK_APP=server_v4_complete:create_app
       - FLASK_RUN_HOST=0.0.0.0
       - FLASK_RUN_PORT=5000
+      - POSTGRES_HOST=${POSTGRES_HOST:-db}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
       - PYTHONPATH=/home/appuser/app
     env_file:
       - .env
     depends_on:
+      base:
+        condition: service_completed_successfully
       db:
         condition: service_started
       redis:
@@ -98,18 +112,18 @@ services:
       dockerfile: docker/Dockerfile.worker
     container_name: analylit-worker-v4
     volumes:
-      - ./projects:/home/appuser/app/projects
-      - ./model_cache:/home/appuser/app/model_cache
+      - projects_data:/home/appuser/app/projects
+      - model_cache_data:/home/appuser/app/model_cache
       - .:/home/appuser/app
     env_file: .env
     environment:
       - PYTHONUNBUFFERED=1
       - PYTHONPATH=/home/appuser/app
       - TESTING=true
-      - FLASK_ENV=testing
-    # ----- CORRECTION DE LA SYNTAXE YAML -----
-    command: "rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4"
+      - FLASK_ENV=production # Should probably match web or be specific
     depends_on:
+      base:
+        condition: service_completed_successfully
       db:
         condition: service_started
       redis:
@@ -125,6 +139,7 @@ services:
     networks:
       - analylit-network
     restart: unless-stopped
+    command: "rq worker -u redis://redis:6379/0 --with-scheduler analylit_processing_v4 analylit_synthesis_v4 analylit_analysis_v4 analylit_background_v4"
 
   # --- Serveur Web Frontend (Nginx) ---
   nginx:
