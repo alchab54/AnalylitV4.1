@@ -1,13 +1,6 @@
 # Fichier : docker-compose.yml
 
 services:
-  # NOUVEAU : On dit à Docker COMMENT construire l'image de base
-  base:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.base
-    image: analylit-base
-    profiles: [ "base-builder" ] # Ne s'exécute que si on l'appelle explicitement
 
   db:
     image: postgres:15-alpine
@@ -22,10 +15,20 @@ services:
       - "5433:5432" # Port externe 5433 pour éviter conflits locaux
     restart: unless-stopped
 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   redis:
     image: redis:7-alpine
     container_name: analylit_redis
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   web:
     build:
@@ -43,8 +46,24 @@ services:
     env_file:
       - .env
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+  migrate:
+    image: analylit-base # Utilise directement l'image de base, pas de build lent !
+    container_name: analylit_migrator
+    command: sh docker/migrate.sh
+    working_dir: /home/appuser/app
+    volumes:
+      - .:/home/appuser/app
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
 
   worker:
     build:
@@ -61,7 +80,10 @@ services:
     env_file:
       - .env
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
   nginx:
     build:
@@ -71,7 +93,8 @@ services:
     ports:
       - "8000:80"
     depends_on:
-      - web
+      web:
+        condition: service_started
 
   tester:
     build:
@@ -91,8 +114,10 @@ services:
     env_file:
       - .env
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
 volumes:
   postgres_data:

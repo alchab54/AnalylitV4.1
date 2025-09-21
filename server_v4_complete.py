@@ -70,8 +70,9 @@ def create_app(config=None):
 
     # Import et initialisation forcés - BON ORDRE :
     # Les modèles sont déjà importés au top du fichier
-    from utils.database import init_database
-    init_database()  
+    # L'initialisation est maintenant gérée par le service 'migrate' dans docker-compose
+    # from utils.database import init_database
+    # init_database()  
 
     # Configuration des extensions
     CORS(app, 
