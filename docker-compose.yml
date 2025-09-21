@@ -1,163 +1,76 @@
+# Fichier : docker-compose.yml
+
 services:
-  # --- Base de données ---
-  db:
-    image: postgres:15
-    container_name: analylit-db-v4
-    volumes:
-      - postgres_data_v4:/var/lib/postgresql/data/
-      - ./database/init-user-db.sql:/docker-entrypoint-initdb.d/init-user-db.sql
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER:-analylit_user}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-strong_password}
-      - POSTGRES_DB=${POSTGRES_DB:-analylit_db}
-      - PGDATA=/var/lib/postgresql/data/pgdata
-    networks:
-      - analylit-network
-    restart: unless-stopped
-
-  # --- Cache et File d'attente ---
-  redis:
-    image: redis:7-alpine
-    container_name: analylit-redis-v4
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - analylit-network
-    restart: unless-stopped
-
-  # --- Moteur IA ---
-  ollama:
-    image: ollama/ollama:latest
-    container_name: analylit-ollama-v4
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-    volumes:
-      - ollama_data_v4:/root/.ollama
-    ports:
-      - "11434:11434"
-    networks:
-      - analylit-network
-    restart: unless-stopped
-
-  # --- Image de base pour les services Python ---
+  # NOUVEAU : On dit à Docker COMMENT construire l'image de base
   base:
     build:
       context: .
       dockerfile: docker/Dockerfile.base
-    image: analylit-base:latest
-    container_name: analylit-base-builder
-    profiles: ["donotstart"] # Ne pas démarrer ce service, il sert uniquement au build
-    volumes:
-      - .:/home/appuser/app
+    image: analylit-base
+    profiles: [ "base-builder" ] # Ne s'exécute que si on l'appelle explicitement
 
-  # --- Serveur Web Applicatif ---
+  db:
+    image: postgres:15-alpine
+    container_name: analylit_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./database/init-user-db.sql:/docker-entrypoint-initdb.d/init-user-db.sql
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5433:5432" # Port externe 5433 pour éviter conflits locaux
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: analylit_redis
+    restart: unless-stopped
+
   web:
     build:
       context: .
       dockerfile: docker/Dockerfile.web
-    container_name: analylit-web-v4
-    ports:
-      - "5000:5000"
+    container_name: analylit_web
+    command: gunicorn --bind 0.0.0.0:5000 --workers 4 --threads 2 --worker-class gevent "app:create_app()"
     volumes:
-      - ./projects:/home/appuser/app/projects
-      - ./model_cache:/home/appuser/app/model_cache
       - .:/home/appuser/app
-    env_file: .env
+    ports:
+      - "5001:5000"
+    env_file:
+      - .env
+    # MODIFIÉ : On s'assure que la base est construite AVANT le web
     depends_on:
       db:
         condition: service_started
       redis:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-      start_period: 20s
-    command: ["/home/appuser/app/entrypoint.sh", "gunicorn", "--worker-class", "geventwebsocket.gunicorn.workers.GeventWebSocketWorker", "--bind", "0.0.0.0:5000", "server_v4_complete:app"]
-    networks:
-      - analylit-network
-    restart: unless-stopped
+        condition: service_started
 
-  # --- Worker pour les tâches asynchrones ---
   worker:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-    container_name: analylit-worker-v4
+    container_name: analylit_worker
+    command: python -m rq_worker -w rq.worker.SimpleWorker -c app.rq_config
     volumes:
-      - ./projects:/home/appuser/app/projects
-      - ./model_cache:/home/appuser/app/model_cache
       - .:/home/appuser/app
-    env_file: .env
+    env_file:
+      - .env
+    # MODIFIÉ : On s'assure que la base est construite AVANT le worker
     depends_on:
-      db:
-        condition: service_started
       redis:
-        condition: service_healthy
-    deploy:
-      replicas: 1
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-    networks:
-      - analylit-network
-    restart: unless-stopped
-    command: ["rq", "worker", "-u", "redis://redis:6379/0", "--with-scheduler", "analylit_processing_v4", "analylit_synthesis_v4", "analylit_analysis_v4", "analylit_background_v4"]
+        condition: service_started
 
-  # --- Serveur Web Frontend (Nginx) ---
   nginx:
     build:
       context: .
       dockerfile: docker/Dockerfile.nginx
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./web:/usr/share/nginx/html:ro
-    container_name: analylit-nginx-v4
+    container_name: analylit_nginx
     ports:
-      - "8080:80"
+      - "8000:80"
     depends_on:
-      web:
-        condition: service_healthy
-    networks:
-      - analylit-network
-    restart: unless-stopped
-
-  # --- Service pour lancer les tests ---
-  tests:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile-tests
-    container_name: analylit-tests-v4
-    profiles: ["tests"] # Ne démarre que si appelé avec --profile tests
-    volumes:
-      - .:/home/appuser/app
-    env_file: .env
-    environment:
-      - FLASK_ENV=testing
-    depends_on:
-      db:
-        condition: service_started
-      redis:
-        condition: service_healthy
+      - web
 
 volumes:
-  postgres_data_v4:
-  ollama_data_v4:
-
-networks:
-  analylit-network:
-    driver: bridge
+  postgres_data:
