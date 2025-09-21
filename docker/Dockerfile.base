@@ -5,6 +5,9 @@ FROM python:3.11-slim as dependencies
 WORKDIR /app
 COPY requirements.txt .
 
+# Définir le PATH pour inclure les binaires installés par pip
+ENV PATH="/root/.local/bin:${PATH}"
+
 # Installer les dépendances (étape mise en cache)
 RUN pip install --no-cache-dir --user -r requirements.txt
 

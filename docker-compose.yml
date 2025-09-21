@@ -1,5 +1,4 @@
 services:
-  # Service de base - construit l'image avec toutes les dépendances
   base:
     build:
       context: .
@@ -13,11 +12,27 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}  
       POSTGRES_DB: ${POSTGRES_DB:-analylit}
+    # Commandes de tuning PostgreSQL pour la performance
+    command: >
+      postgres
+      -c shared_buffers=2GB
+      -c effective_cache_size=8GB
+      -c maintenance_work_mem=512MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/init-user-db.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5433:5432"
+    deploy:
+      resources:
+        limits:
+          memory: 3500M # Limite stricte
+        reservations:
+          memory: 2500M # Mémoire réservée
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
       interval: 10s
@@ -27,6 +42,14 @@ services:
   redis:
     image: redis:7-alpine
     container_name: analylit_redis
+    # Commande pour limiter la mémoire et gérer le cache intelligemment
+    command: redis-server --maxmemory 2gb --maxmemory-policy allkeys-lru --save 300 10
+    deploy:
+      resources:
+        limits:
+          memory: 2200M
+        reservations:
+          memory: 1500M
 
   web:
     build:
@@ -34,37 +57,87 @@ services:
       dockerfile: docker/Dockerfile.web
     container_name: analylit_web
     ports:
-      - "5001:5000"
-      - "8000:5000"
+      - "8000:5000"  # Un seul port, plus propre
     environment:
-      - FLASK_ENV=development
+      - FLASK_ENV=production
+      - GUNICORN_WORKERS=6    # Adapté à votre CPU (supposé 6 cœurs)
+      - GUNICORN_THREADS=4    # Plus de threads par worker
+      - GUNICORN_TIMEOUT=300  # Timeout de 5min pour les tâches longues
     env_file:
       - .env
     volumes:
       - .:/home/appuser/app
+    deploy:
+      resources:
+        limits:
+          memory: 4000M
+        reservations:
+          memory: 3000M
     depends_on:
-      - base  # <-- CORRECTION AJOUTÉE
-      - db:
+      base:
+        condition: service_completed_successfully
+      db:
         condition: service_healthy
-      - redis:
+      redis:
         condition: service_started
 
-  worker:
+  # Workers multiples pour paralléliser les tâches
+  worker-fast:
     build:
       context: .  
       dockerfile: docker/Dockerfile.worker
-    container_name: analylit_worker
-    command: python -m rq.worker -w rq.worker.SimpleWorker -c app.rq_config
+    container_name: analylit_worker_fast
+    command: python -m rq.worker fast_queue --url redis://redis:6379/0
     env_file:
       - .env
     volumes:
       - .:/home/appuser/app
-    depends_on:
-      - base  # <-- CORRECTION AJOUTÉE
-      - redis:
-        condition: service_started
-      - db:
-        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 1000M
+
+  worker-default:
+    build:
+      context: .  
+      dockerfile: docker/Dockerfile.worker
+    container_name: analylit_worker_default
+    command: python -m rq.worker default --url redis://redis:6379/0
+    env_file:
+      - .env
+    volumes:
+      - .:/home/appuser/app
+    deploy:
+      resources:
+        limits:
+          memory: 1500M
+
+  # Worker dédié à l'IA, avec accès au GPU
+  worker-ai:
+    build:
+      context: .  
+      dockerfile: docker/Dockerfile.worker
+    container_name: analylit_worker_ai
+    command: python -m rq.worker ai_queue --url redis://redis:6379/0
+    env_file:
+      - .env
+    volumes:
+      - .:/home/appuser/app
+    # Accès direct à la RTX 2060 SUPER
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    deploy:
+      resources:
+        limits:
+          memory: 2000M
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
 volumes:
   postgres_data:
+

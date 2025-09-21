@@ -1,42 +1,51 @@
-# Cache et fichiers temporaires Python
+# =================================================
+# === .dockerignore ULTRA-OPTIMISÉ - AnalyLit v4.1 ===
+# =================================================
+
+# --- Cache et fichiers temporaires Python ---
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
 build/
+develop-eggs/
 dist/
 downloads/
 eggs/
 .eggs/
 lib/
 lib64/
+parts/
+sdist/
+var/
+wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 
-# Environnement et secrets
+# --- Environnement et secrets ---
 .env
 .env.*
 !.env.example
 
-# Contrôle de version et IDE
+# --- Contrôle de version et IDE ---
 .git/
 .gitignore
 .vscode/
 .idea/
 *.md
 !README.md
-!docker/*.md
+!docs/*.md
 
-# Tests et couverture
+# --- Tests et couverture ---
 .pytest_cache/
 .coverage
 htmlcov/
 .tox/
 .nox/
 
-# Logs et données temporaires
+# --- Logs et données générées ---
 *.log
 logs/
 projects/
@@ -46,26 +55,60 @@ exports/
 temp/
 tmp/
 
-# Fichiers système
+# =================================================
+# === NOUVEAU - SECTION ANTI-GB (CRITIQUE) ===
+# =================================================
+
+# --- Documents Office et PDFs ---
+*.pdf
+*.docx
+*.doc
+*.pptx
+*.ppt
+*.xlsx
+*.xls
+
+# --- Images et Médias ---
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.svg
+*.bmp
+*.tiff
+*.webp
+*.ico
+*.mp4
+*.avi
+*.mov
+*.mp3
+
+# --- Archives et Backups ---
+*.zip
+*.tar.gz
+*.tar
+*.rar
+*.7z
+*.bak
+*.backup
+
+# --- Données locales ---
+database/data/
+*.sqlite
+*.db
+
+# --- Fichiers système ---
 .DS_Store
 Thumbs.db
 *.swp
 *~
 
-# Node modules si présents
+# --- Node modules ---
 node_modules/
 
-# Fichiers volumineux à exclure du build
-*.pdf
-*.zip
-*.tar.gz
-*.mp4
-*.avi
-*.mov
-database/data/
-*.sqlite
-*.db
-
+# =================================================
+# === Exceptions (pour ne pas tout casser) ===
+# =================================================
 # Garder les fichiers Docker essentiels
 !docker/
 !Dockerfile*
