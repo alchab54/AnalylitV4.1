@@ -3,6 +3,3 @@ FROM analylit-base:latest
 
 # Copier le code de l'application
 COPY --chown=appuser:appuser . .
-
-# Point d'entrée pour le worker
-CMD ["python", "-m", "rq_worker", "-w", "rq.worker.SimpleWorker", "-c", "app.rq_config"]

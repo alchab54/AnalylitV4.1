@@ -4,11 +4,10 @@ FROM analylit-base:latest
 # Copier le code de l'application
 COPY --chown=appuser:appuser . .
 
-# Copier et rendre exécutable l'entrypoint
-COPY --chown=appuser:appuser docker/entrypoint.sh ./entrypoint.sh
+# Le script entrypoint.sh est déjà dans le projet, pas besoin de le recopier
 USER root
-RUN chmod +x ./entrypoint.sh
+RUN chmod +x docker/entrypoint.sh
 USER appuser
 
 EXPOSE 5000
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["docker/entrypoint.sh"]

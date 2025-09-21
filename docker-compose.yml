@@ -55,6 +55,7 @@ services:
     build:
       context: .  
       dockerfile: docker/Dockerfile.worker
+    command: python -m rq.worker -w rq.worker.SimpleWorker -c app.rq_config
     container_name: analylit_worker
     env_file:
       - .env

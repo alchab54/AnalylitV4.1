@@ -1,41 +1,73 @@
+# Cache et fichiers temporaires Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
 build/
-develop-eggs/
 dist/
 downloads/
 eggs/
 .eggs/
 lib/
 lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
+# Environnement et secrets
 .env
 .env.*
 !.env.example
 
+# Contrôle de version et IDE
 .git/
 .gitignore
+.vscode/
+.idea/
 *.md
+!README.md
+!docker/*.md
+
+# Tests et couverture
 .pytest_cache/
 .coverage
 htmlcov/
-.DS_Store
-node_modules/
-.vscode/
-*.log
+.tox/
+.nox/
 
-# Garder les fichiers Docker
+# Logs et données temporaires
+*.log
+logs/
+projects/
+model_cache/
+reports/
+exports/
+temp/
+tmp/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Node modules si présents
+node_modules/
+
+# Fichiers volumineux à exclure du build
+*.pdf
+*.zip
+*.tar.gz
+*.mp4
+*.avi
+*.mov
+database/data/
+*.sqlite
+*.db
+
+# Garder les fichiers Docker essentiels
 !docker/
 !Dockerfile*
+!docker-compose*
+!requirements.txt
