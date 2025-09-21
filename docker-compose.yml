@@ -1,60 +1,64 @@
-# Fichier : docker-compose.yml (Version Corrigée)
 version: '3.8'
 
 services:
+  # Étape 1 : Construire l'image de base
   base:
     build:
       context: .
-      dockerfile: Dockerfile.base
-    image: analylit-base
+      dockerfile: docker/Dockerfile.base # CHEMIN CORRIGÉ
+    image: analylit-base:latest
 
+  # Étape 2 : Démarrer les services de données
   db:
     image: postgres:15-alpine
     container_name: analylit_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
       - ./database/init-user-db.sql:/docker-entrypoint-initdb.d/init-user-db.sql
+      - ./database/data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     ports:
       - "5433:5432"
-    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
     container_name: analylit_redis
-    restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
-  # Le migrator se lance en parallèle, il ne bloque plus le démarrage du web
+  # Étape 3 : Appliquer les migrations une fois la DB prête
   migrator:
     build:
       context: .
-      dockerfile: Dockerfile.migrator
-    container_name: analylit_migrator
+      dockerfile: docker/Dockerfile.migrator # CHEMIN CORRIGÉ
+    image: analylit-migrator:latest
     command: >
       sh -c "./wait-for-it.sh db:5432 --timeout=60 -- flask db upgrade"
     env_file:
       - .env
     depends_on:
       db:
-        condition: service_healthy # Il attend que la DB soit vraiment prête
+        condition: service_healthy # Attend que la DB soit saine
+      base: # SYNTAXE CORRIGÉE
+        condition: service_completed_successfully # Attend que l'image de base soit construite
 
+  # Étape 4 : Démarrer les services applicatifs
   web:
     build:
       context: .
-      dockerfile: Dockerfile.web
+      dockerfile: docker/Dockerfile.web # CHEMIN CORRIGÉ
     container_name: analylit_web
     command: gunicorn --bind 0.0.0.0:5000 --workers 4 --threads 2 --worker-class gevent "app:create_app()"
     volumes:
@@ -63,40 +67,39 @@ services:
       - "5001:5000"
     env_file:
       - .env
-    # MODIFICATION CLÉ : On ne dépend PLUS du migrator !
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      base: {}
+      migrator: # Dépend du migrator, qui lui-même dépend de la DB et de la base
+        condition: service_completed_successfully
+    restart: unless-stopped
 
   worker:
     build:
       context: .
-      dockerfile: Dockerfile.worker
+      dockerfile: docker/Dockerfile.worker # CHEMIN CORRIGÉ
     container_name: analylit_worker
     command: python -m rq_worker -w rq.worker.SimpleWorker -c app.rq_config
     volumes:
       - .:/home/appuser/app
     env_file:
       - .env
-    # MODIFICATION CLÉ : On ne dépend PLUS du migrator !
     depends_on:
       redis:
         condition: service_healthy
-      base: {}
+      migrator: # Dépend aussi du migrator pour avoir une DB à jour
+        condition: service_completed_successfully
+    restart: unless-stopped
 
+  # Étape 5 : Démarrer le proxy web
   nginx:
     build:
       context: .
-      dockerfile: Dockerfile.nginx
+      dockerfile: docker/Dockerfile.nginx # CHEMIN CORRIGÉ
     container_name: analylit_nginx
     ports:
-      # L'adresse est bien http://localhost:8000
       - "8000:80"
     depends_on:
       - web
+    restart: unless-stopped
 
 volumes:
   postgres_data:

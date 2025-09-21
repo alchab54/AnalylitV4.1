@@ -1,0 +1,11 @@
+# Utilise l'image de base qui contient Python et les dépendances
+FROM analylit-base:latest
+
+# Copie uniquement le script d'attente et le script de migration
+COPY ./docker/wait-for-it.sh /home/appuser/app/wait-for-it.sh
+COPY ./migrations /home/appuser/app/migrations
+COPY ./server_v4_complete.py /home/appuser/app/app.py
+COPY ./.flaskenv /home/appuser/app/.flaskenv
+
+# Donne les permissions d'exécution
+RUN chmod +x /home/appuser/app/wait-for-it.sh
