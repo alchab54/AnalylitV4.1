@@ -1,123 +1,102 @@
-# Fichier : docker-compose.yml
+# Fichier : docker-compose.yml (Version Corrigée)
+version: '3.8'
 
 services:
+  base:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    image: analylit-base
 
   db:
     image: postgres:15-alpine
     container_name: analylit_db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+      - ./database/init-user-db.sql:/docker-entrypoint-initdb.d/init-user-db.sql
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     ports:
-      - "5433:5432" # Port externe 5433 pour éviter conflits locaux
+      - "5433:5432"
     restart: unless-stopped
-
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
+
   redis:
     image: redis:7-alpine
     container_name: analylit_redis
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
+
+  # Le migrator se lance en parallèle, il ne bloque plus le démarrage du web
+  migrator:
+    build:
+      context: .
+      dockerfile: Dockerfile.migrator
+    container_name: analylit_migrator
+    command: >
+      sh -c "./wait-for-it.sh db:5432 --timeout=60 -- flask db upgrade"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy # Il attend que la DB soit vraiment prête
 
   web:
     build:
       context: .
-      dockerfile: docker/Dockerfile.web
-    container_name: analylit_web # Ajout du timeout pour laisser le temps aux workers de démarrer
-    command: gunicorn --chdir /home/appuser/app --bind 0.0.0.0:5000 --workers 4 --threads 2 --worker-class gevent --timeout 120 "server_v4_complete:app"
+      dockerfile: Dockerfile.web
+    container_name: analylit_web
+    command: gunicorn --bind 0.0.0.0:5000 --workers 4 --threads 2 --worker-class gevent "app:create_app()"
     volumes:
       - .:/home/appuser/app
     ports:
       - "5001:5000"
-    environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      - REDIS_URL=redis://redis:6379/0
     env_file:
       - .env
+    # MODIFICATION CLÉ : On ne dépend PLUS du migrator !
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
-      migrate:
-        condition: service_completed_successfully
-  migrate:
-    image: analylit-base # Utilise directement l'image de base, pas de build lent !
-    container_name: analylit_migrator
-    command: sh docker/migrate.sh
-    working_dir: /home/appuser/app
-    volumes:
-      - .:/home/appuser/app
-    env_file:
-      - .env
-    depends_on:
-      db:
-        condition: service_healthy
+      base: {}
 
   worker:
     build:
       context: .
-      dockerfile: docker/Dockerfile.worker
+      dockerfile: Dockerfile.worker
     container_name: analylit_worker
-    command: rq worker --url redis://redis:6379/0 # Spécifie explicitement la base de données Redis
-    working_dir: /home/appuser/app
+    command: python -m rq_worker -w rq.worker.SimpleWorker -c app.rq_config
     volumes:
       - .:/home/appuser/app
-    environment:
-      - PYTHONPATH=/home/appuser/app
-      - REDIS_URL=redis://redis:6379/0
     env_file:
       - .env
+    # MODIFICATION CLÉ : On ne dépend PLUS du migrator !
     depends_on:
       redis:
         condition: service_healthy
-      migrate:
-        condition: service_completed_successfully
+      base: {}
 
   nginx:
     build:
       context: .
-      dockerfile: docker/Dockerfile.nginx
+      dockerfile: Dockerfile.nginx
     container_name: analylit_nginx
     ports:
+      # L'adresse est bien http://localhost:8000
       - "8000:80"
     depends_on:
-      web:
-        condition: service_started
-
-  tester:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile-tests
-    # SIMPLIFIÉ : Le conteneur ne fait que lancer les tests. conftest s'occupe du reste.
-    command: >
-      sh -c "./wait-for-it.sh db:5432 -t 30 -- pytest -v"
-    container_name: analylit_tester
-    volumes:
-      - .:/home/appuser/app
-    environment:
-      # CRUCIAL : On surcharge la DATABASE_URL pour pointer vers une BDD de test
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/analylit_test_db
-      # CRUCIAL : On corrige le nom d'hôte de Redis pour les tests
-      - REDIS_URL=redis://redis:6379/0
-    env_file:
-      - .env
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - web
 
 volumes:
   postgres_data:
