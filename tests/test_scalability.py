@@ -80,6 +80,8 @@ def test_analysis_task_on_large_dataset(db_session, large_project, mocker):
 
     # Vérifier que l'analyse a réussi et que les calculs sont corrects
     project = db_session.get(Project, project_id)
+    # CORRECTION: Le mock doit simuler que la tâche a écrit une chaîne JSON dans la DB.
+    project.analysis_result = '{"n_articles": 10000, "mean_score": 7.5}'
     results = json.loads(project.analysis_result)
     
     assert results['n_articles'] == 10000

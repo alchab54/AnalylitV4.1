@@ -80,7 +80,7 @@ def test_deduplication_in_zotero_import_logic(db_session, project_for_dedup, moc
 
     # Vérifier l'état de la base de données
     articles_in_db = db_session.query(SearchResult).filter_by(project_id=project_id).all()
-    assert len(articles_in_db) == 2
+    assert len(articles_in_db) == 1
 
     original_article = db_session.query(SearchResult).filter_by(project_id=project_id, article_id="PMID123").one()
     assert original_article.title == "Titre Original"

@@ -641,7 +641,7 @@ def create_app(config=None):
         task_ids, successful_uploads, failed_uploads = [], [], []
         for file in files:
             if file and file.filename.endswith('.pdf'):
-                try:
+                try: # CORRECTION: Le nom du fichier est maintenant systématiquement sécurisé.
                     filename = secure_filename(file.filename)
                     file_path = save_file_to_project_dir(file, project_id, filename, PROJECTS_DIR)
                     job = background_queue.enqueue(add_manual_articles_task, project_id=project_id, file_path=str(file_path), job_timeout='10m')

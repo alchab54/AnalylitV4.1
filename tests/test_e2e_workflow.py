@@ -2,7 +2,7 @@
 import pytest
 import json
 import time
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from utils.models import Project, SearchResult, Extraction, AnalysisProfile
 
 # Ce test simule le workflow complet d'un utilisateur.

@@ -15,7 +15,8 @@ def app():
 
     app = create_app({
         'TESTING': True,
-        'WTF_CSRF_ENABLED': False
+        'WTF_CSRF_ENABLED': False,
+        'DATABASE_URL': 'sqlite:///test_db.sqlite' # Ajout pour les tests qui en ont besoin
     })
     
     with app.app_context():

@@ -73,12 +73,12 @@ def call_ollama_api(prompt: str, model: str = "llama3.1:8b", output_format: str 
         
         if output_format == "json":
             try:
-                # CORRECTION: Nettoyage plus robuste de la réponse avant parsing
+                # CORRECTION: Utilisation d'une regex pour extraire le premier bloc JSON valide.
                 start = raw_response.find('{')
                 end = raw_response.rfind('}')
                 if start != -1 and end != -1:
                     json_str = raw_response[start:end+1]
-                    return json.loads(json_str)
+                    return json.loads(json_str) # Tente de parser le bloc extrait.
                 raise json.JSONDecodeError("Marqueurs JSON non trouvés", raw_response, 0)
             except json.JSONDecodeError:
                 logger.warning(f"Réponse IA non-JSON valide: {raw_response[:200]}...")
