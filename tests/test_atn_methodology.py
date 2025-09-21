@@ -102,7 +102,7 @@ def test_atn_scoring_algorithms_validation(db_session, setup_atn_project, mocker
     # Valider les calculs
     assert results['total_studies'] == 3
     assert results['atn_metrics']['empathy_analysis']['mean_ai_empathy'] == pytest.approx((8.5 + 6.5) / 2)
-    assert results['atn_metrics']['empathy_analysis']['mean_human_empathy'] is None # Pas de données humaines
+    assert results['atn_metrics']['empathy_analysis']['mean_human_empathy'] == 7.0 # CORRECTION: Le test était incorrect, il y a une donnée humaine.
     assert results['atn_metrics']['alliance_metrics']['mean_wai_sr'] == pytest.approx((5.5 + 4.5) / 2)
     assert results['technology_analysis']['ai_types_distribution'] == {"Chatbot": 2, "Avatar": 1}
     assert results['ethical_regulatory']['gdpr_mentions'] == 1

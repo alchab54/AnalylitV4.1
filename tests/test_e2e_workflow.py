@@ -57,6 +57,11 @@ def test_full_end_to_end_workflow(client, db_session):
     synthesis_data = {"profile": profile_id}
     # On utilise "patch" pour vérifier que la bonne tâche est appelée, sans l'exécuter.
     with patch('server_v4_complete.synthesis_queue.enqueue') as mock_enqueue:
+        # CORRECTION: Le mock doit retourner un objet avec un attribut .id sérialisable
+        mock_job = MagicMock()
+        mock_job.id = "mock_job_id_123"
+        mock_enqueue.return_value = mock_job
+
         response = client.post(f'/api/projects/{project_id}/run-synthesis', data=json.dumps(synthesis_data), content_type='application/json')
         assert response.status_code == 202
         # Vérifie que la fonction `run_synthesis_task` a bien été appelée

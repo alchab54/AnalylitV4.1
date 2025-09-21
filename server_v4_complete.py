@@ -791,6 +791,11 @@ def create_app(config=None):
     @app.route('/api/projects/<project_id>/run-rob-analysis', methods=['POST'])
     @with_db_session
     def run_rob_analysis_route(session, project_id):
+        # CORRECTION: Vérifier si le projet existe avant de continuer.
+        project = session.query(Project).filter_by(id=project_id).first()
+        if not project:
+            return jsonify({"error": "Projet non trouvé"}), 404
+
         data = request.get_json()
         article_ids = data.get('article_ids', [])
 

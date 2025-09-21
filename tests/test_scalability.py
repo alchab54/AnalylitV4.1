@@ -3,6 +3,7 @@
 import pytest
 import uuid
 import json
+import time
 from unittest.mock import patch, MagicMock
 
 # Imports des modèles et tâches
@@ -43,6 +44,8 @@ def test_api_response_time_with_large_dataset(client, large_project):
     """
     project_id = large_project
 
+    # CORRECTION: Mesurer le temps manuellement car client.get n'a pas .elapsed
+    start_time = time.time()
     # L'appel API ne doit pas charger les 10 000 articles, seulement la première page.
     response = client.get(f'/api/projects/{project_id}/search-results?page=1&per_page=50')
     
@@ -54,8 +57,9 @@ def test_api_response_time_with_large_dataset(client, large_project):
     
     # Assertion de performance : le temps de réponse doit être inférieur à 2 secondes.
     # C'est une hypothèse généreuse, mais elle détectera les régressions majeures.
-    assert response.elapsed.total_seconds() < 2.0
-    print(f"\n[OK] Performance API : Temps de réponse pour 10k articles paginés : {response.elapsed.total_seconds():.2f}s")
+    duration = time.time() - start_time
+    assert duration < 2.0
+    print(f"\n[OK] Performance API : Temps de réponse pour 10k articles paginés : {duration:.2f}s")
 
 
 def test_analysis_task_on_large_dataset(db_session, large_project, mocker):

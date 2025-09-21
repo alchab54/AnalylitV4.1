@@ -93,7 +93,11 @@ def test_database_backup_and_restore_cycle(app, db_session, project_for_dedup, t
     sauvegarde, suppression et restauration de la base de données.
     """
     # --- 1. Sauvegarde (simulée par une copie de fichier) ---
-    db_path = Path(app.config['SQLALCHEMY_DATABASE_URI'].replace('sqlite:///', ''))
+    # CORRECTION: Utiliser la configuration de l'application fournie par la fixture 'app'.
+    # La base de données de test est en mémoire, donc on utilise le chemin du fichier de la config.
+    # Pour un test réel, le chemin serait celui de la base de données de test.
+    # Ici, on simule en utilisant le chemin de la config, qui est valide dans le contexte du test.
+    db_path = Path(app.config['DATABASE_URL'].replace('sqlite:///', ''))
     backup_path = tmp_path / "analylit_backup.db"
     shutil.copy(db_path, backup_path)
     assert backup_path.exists()
