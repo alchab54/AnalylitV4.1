@@ -1,38 +1,30 @@
-# =================================================
-# Étape 1: Builder - Compilation des dépendances
-# =================================================
-FROM python:3.11-bookworm AS builder
+# Étape 1 : Image Python officielle
+FROM python:3.11-slim as builder
 
-WORKDIR /home/appuser/app
+# Variables d'environnement
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-# Installer les dépendances système nécessaires pour la compilation et les outils
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    build-essential libpq-dev netcat-openbsd postgresql-client \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+# Définir le répertoire de travail
+WORKDIR /app
 
-# Créer et activer un environnement virtuel
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+# Étape 2 : Installer les dépendances
+# On copie UNIQUEMENT le fichier requirements pour profiter du cache Docker
+COPY requirements.txt .
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
 
-# Copier et installer les dépendances Python pour optimiser le cache
-COPY requirements.txt ./
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# Étape 3 : Image finale légère
+FROM python:3.11-slim
 
-# =================================================
-# Étape 2: Image de base finale
-# =================================================
-FROM python:3.11-slim-bookworm
-
-ENV PATH="/opt/venv/bin:$PATH"
-RUN useradd --create-home appuser
-WORKDIR /home/appuser/app
-COPY --from=builder /opt/venv /opt/venv
-# Install postgresql-client and netcat-openbsd directly in the final image
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    postgresql-client netcat-openbsd libdbd-pg-perl libpg-perl \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
+# Créer un utilisateur non-root pour la sécurité
+RUN useradd -ms /bin/bash appuser
 USER appuser
+WORKDIR /home/appuser/app
+
+# Copier les dépendances pré-compilées
+COPY --from=builder /app/wheels /wheels
+COPY --from=builder /app/requirements.txt .
+RUN pip install --no-cache /wheels/*
+
+# Copier le code de l'application
+COPY . .
