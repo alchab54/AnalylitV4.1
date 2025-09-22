@@ -10,8 +10,13 @@ from sqlalchemy import text
 # Ajoute le répertoire racine de l'application au path pour trouver 'utils'
 import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
-from server_v4_complete import app # Importer l'instance de l'app
+from server_v4_complete import create_app, db # Importer la factory et l'instance de la DB
 from utils.models import SCHEMA
+
+# Créer l'application et initialiser la DB dans le contexte d'Alembic
+app = create_app()
+with app.app_context():
+    db.init_app(app)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

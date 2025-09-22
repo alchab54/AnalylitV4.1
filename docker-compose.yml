@@ -68,9 +68,9 @@ services:
         window: 120s
       resources:
         limits:
-          memory: 8000M
+          memory: 24000M
         reservations:
-          memory: 3000M
+          memory: 12000M
     # La commande est maintenant dans entrypoint.sh
     depends_on:
       db:
@@ -82,6 +82,8 @@ services:
       # Monter les logs et les projets pour la persistance et l'accès depuis l'hôte
       - ./logs:/home/appuser/app/logs
       - ./projects:/home/appuser/app/projects
+      - ./migrations:/home/appuser/app/migrations
+      - ./run_migrations.py:/home/appuser/app/run_migrations.py
   # Workers multiples pour paralléliser les tâches
   worker-fast:
     build:

@@ -24,7 +24,7 @@ from flask import Flask, request, jsonify, send_from_directory, abort, send_file
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from sqlalchemy.exc import IntegrityError
-from rq.worker import Worker
+from rq.worker import Worker 
 from werkzeug.utils import secure_filename
 from flask_migrate import Migrate # <-- 1. IMPORTER MIGRATE
 
@@ -67,6 +67,7 @@ PROJECTS_DIR = Path(PROJECTS_DIR_STR)
 # On les déclare ici pour qu'elles soient accessibles globalement,
 # mais on les initialise dans create_app()
 socketio = SocketIO()
+migrate = Migrate()
 
 def create_app(config=None):
     """Factory pour créer et configurer l'application Flask."""
@@ -92,10 +93,15 @@ def create_app(config=None):
 
     # L'initialisation de la base de données est maintenant déplacée vers les points d'entrée
     # (post_fork pour Gunicorn, et __main__ pour le dev local) pour éviter la double initialisation.
-    # db.init_app(app)
+    db.init_app(app)
 
     # --- NOUVEAU : INITIALISER FLASK-MIGRATE ---
-    migrate = Migrate(app, db)  # <-- 2. BRANCHER MIGRATE À L'APP ET À LA DB
+    # L'initialisation de la base de données est maintenant déplacée vers les points d'entrée
+    # (post_fork pour Gunicorn, et __main__ pour le dev local) pour éviter la double initialisation.
+    db.init_app(app)
+
+    migrate.init_app(app, db)  # <-- 2. BRANCHER MIGRATE À L'APP ET À LA DB
+
 
     # Import et initialisation forcés - BON ORDRE :
     # Les modèles sont déjà importés au top du fichier
