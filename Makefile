@@ -114,7 +114,7 @@ dev: ## Mode développement avec rechargement automatique
 
 test: ## Exécuter les tests
 	@echo "$(BLUE)🧪 Exécution des tests...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) run --rm tester pytest -v tests/ > logs/pytest_results.log 2>&1
+	@docker-compose -f $(COMPOSE_FILE) run --rm web pytest -v tests/ > logs/pytest_results.log 2>&1
 	@mkdir -p logs
 
 health: ## Vérifier la santé des services
