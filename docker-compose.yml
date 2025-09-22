@@ -9,9 +9,7 @@ services:
     image: postgres:15-alpine
     container_name: analylit_db
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}  
-      POSTGRES_DB: ${POSTGRES_DB:-analylit_user}
+      POSTGRES_PASSWORD: password
     # Commandes de tuning PostgreSQL pour la performance
     command: >
       postgres
@@ -24,7 +22,6 @@ services:
       -c random_page_cost=1.1
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./database/init-user-db.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5433:5432"
     deploy:
@@ -70,6 +67,7 @@ services:
       - GUNICORN_WORKERS=6    # Adapté à votre CPU (supposé 6 cœurs)
       - GUNICORN_THREADS=4    # Plus de threads par worker
       - GUNICORN_TIMEOUT=300  # Timeout de 5min pour les tâches longues
+      - TEST_DATABASE_URL=
     env_file:
       - .env
     deploy:
@@ -80,7 +78,7 @@ services:
         window: 120s
       resources:
         limits:
-          memory: 4000M
+          memory: 8000M
         reservations:
           memory: 3000M
     # La commande est maintenant dans entrypoint.sh
@@ -90,7 +88,7 @@ services:
       redis:
         condition: service_started
     volumes:
-      - migrations_data:/home/appuser/app/migrations
+      - ./migrations:/home/appuser/app/migrations
 
   # Workers multiples pour paralléliser les tâches
   worker-fast:
@@ -153,4 +151,3 @@ services:
 
 volumes:
   postgres_data:
-  migrations_data:

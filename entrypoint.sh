@@ -12,10 +12,7 @@ echo "✅ Base de données prête!"
 
 echo "🔄 Application des migrations..."
 export FLASK_APP=server_v4_complete.py
-if [ ! -f "migrations/env.py" ]; then
-    echo "-> Initialisation du dossier migrations..."
-    python -m flask db init
-fi
+python -m flask db upgrade
 python -m flask db upgrade
 
 echo "🚀 Démarrage du serveur Gunicorn..."
