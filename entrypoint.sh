@@ -10,16 +10,17 @@ done
 echo "✅ Base de données prête!"
 
 echo "🔄 Création des tables de base de données..."
-# Au lieu d'utiliser flask db upgrade (qui pose problème), 
-# on crée les tables directement via SQLAlchemy
 python -c "
 from server_v4_complete import create_app
 from utils.database import db
+from sqlalchemy import text
 
 app = create_app()
 with app.app_context():
     print('Création du schéma analylit_schema...')
-    db.engine.execute('CREATE SCHEMA IF NOT EXISTS analylit_schema;')
+    with db.engine.connect() as conn:
+        conn.execute(text('CREATE SCHEMA IF NOT EXISTS analylit_schema;'))
+        conn.commit()
     
     print('Création de toutes les tables...')
     db.create_all()
