@@ -29,4 +29,5 @@ with app.app_context():
 "
 
 echo "🚀 Démarrage du serveur Gunicorn..."
-exec gunicorn --bind 0.0.0.0:5000 --workers 2 --threads 2 --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker "server_v4_complete:create_app()"
+# Optimisation pour un CPU 8 cœurs : 8 workers pour maximiser l'utilisation du CPU.
+exec gunicorn --bind 0.0.0.0:5000 --workers 8 --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker "server_v4_complete:create_app()"

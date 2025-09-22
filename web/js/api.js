@@ -1,10 +1,16 @@
 // REMPLACEZ cette fonction dans api.js
 export async function fetchAPI(endpoint, options = {}) {
-    const baseURL = '/api';
-    
-    // Assurez-vous que l'endpoint commence par /api
-    const url = endpoint.startsWith('/api') ? endpoint : `${baseURL}${endpoint}`;
-    
+    let url;
+    // Détecte si l'endpoint est une URL complète ou un chemin relatif.
+    if (endpoint.startsWith('http')) {
+        url = endpoint; // Utiliser l'URL telle quelle si elle est absolue
+    } else {
+        // Construit une URL propre en s'assurant qu'il n'y a qu'un seul préfixe /api.
+        // Exemple: '/projects' -> '/api/projects'
+        // Exemple: '/api/projects' -> '/api/projects'
+        url = `/api/${endpoint.replace(/^\/api\//, '').replace(/^\//, '')}`;
+    }
+
     const defaultOptions = {
         headers: {
             'Content-Type': 'application/json',
