@@ -4,6 +4,7 @@ FROM analylit-base:latest
 # Copier le code (copie tout y compris docker/entrypoint.sh)
 COPY --chown=appuser:appuser profiles.json ./ 
 COPY --chown=appuser:appuser server_v4_complete.py config_v4.py tasks_v4_complete.py ./ 
+COPY --chown=appuser:appuser run_migrations.py ./
 COPY --chown=appuser:appuser gunicorn.conf.py ./ 
 COPY --chown=appuser:appuser api/ api/ 
 COPY --chown=appuser:appuser utils/ utils/ 
