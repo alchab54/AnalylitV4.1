@@ -2,7 +2,8 @@
 import os
 import json
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import Dict, Any, Optional
+from pydantic import Field
+from typing import Dict, Any, Optional, List
 from pathlib import Path
 
 def load_default_models() -> Dict[str, Any]:
