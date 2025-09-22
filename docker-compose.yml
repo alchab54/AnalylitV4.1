@@ -9,7 +9,9 @@ services:
     image: postgres:15-alpine
     container_name: analylit_db
     environment:
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: analylit_user
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: analylit_db
     # Commandes de tuning PostgreSQL pour la performance
     command: >
       postgres
@@ -22,6 +24,7 @@ services:
       -c random_page_cost=1.1
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./database/init-user-db.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5433:5432"
     deploy:
