@@ -6,6 +6,7 @@ threads = 2
 worker_class = "geventwebsocket.gunicorn.workers.GeventWebSocketWorker"
 
 # Import the post_fork hook from your application
-from server_v4_complete import post_fork
-
-# The server hook to be executed after a worker has been forked.
+def post_fork(server, worker):
+    # Plus besoin d'initialiser SQLAlchemy ici
+    # L'initialisation se fait déjà dans create_app()
+    pass
