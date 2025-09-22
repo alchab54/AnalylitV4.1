@@ -11,7 +11,11 @@ def load_default_models() -> Dict[str, Any]:
         # Le chemin est relatif à la racine de l'application dans le conteneur
         config_path = Path(__file__).parent / "profiles.json"
         with open(config_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            # CORRECTION : S'assurer que la fonction retourne un dictionnaire
+            # comme l'indique son annotation de type `-> Dict[str, Any]`.
+            # Si profiles.json contient une liste, on la transforme en dictionnaire.
+            data = json.load(f)
+            return {item['id']: item for item in data} if isinstance(data, list) else data
     except (FileNotFoundError, json.JSONDecodeError):
         # Fournit une configuration de secours si le fichier est manquant ou invalide
         print("WARNING: profiles.json not found or invalid. Using fallback default models.")
