@@ -11,12 +11,12 @@ COPY --chown=appuser:appuser entrypoint.sh ./
 
 # Positionner *le chmod* SUR LE FICHIER avec CHEMIN CORRECT
 USER root
-RUN chmod +x entrypoint.sh
+RUN ls -la /home/appuser/.local/bin
 
 # Create logs and projects directories and set permissions
 RUN mkdir -p /home/appuser/app/logs && chown appuser:appuser /home/appuser/app/logs
 RUN mkdir -p /home/appuser/app/projects && chown appuser:appuser /home/appuser/app/projects
-USER appuser
+RUN mkdir -p /home/appuser/app/migrations && chown appuser:appuser /home/appuser/app/migrations
 
 EXPOSE 5000
 ENTRYPOINT ["./entrypoint.sh"]
