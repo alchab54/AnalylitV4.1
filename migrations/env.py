@@ -110,18 +110,16 @@ def run_migrations_online():
 
     engine = get_engine()
 
-    # --- AJOUT POUR LA GESTION DU SCHÉMA ---
-    # Créer le schéma s'il n'existe pas et configurer l'engine pour l'utiliser.
     with engine.connect() as connection:
+        # Configurer la connexion pour utiliser le bon schéma
         if SCHEMA:
             connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
-        connection.commit() # S'assurer que le schéma est créé
 
-    with engine.connect() as connection:
+        # Consolider en un seul appel à context.configure
         context.configure(
             connection=connection,
             target_metadata=get_metadata(),
-            include_schemas=True, # Indiquer à Alembic de prendre en compte les schémas
+            include_schemas=True,  # Indiquer à Alembic de prendre en compte les schémas
             **conf_args
         )
 
