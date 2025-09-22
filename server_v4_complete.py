@@ -70,7 +70,9 @@ socketio = SocketIO()
 
 def create_app(config=None):
     """Factory pour créer et configurer l'application Flask."""
-    app = Flask(__name__)
+    # Configure Flask pour qu'il trouve les fichiers statiques dans le dossier 'web'
+    app = Flask(__name__, static_folder='web', static_url_path='')
+
     if config:
         app.config.update(config)
         
@@ -1105,36 +1107,18 @@ def create_app(config=None):
             'analylit_background_v4': background_queue,
         }
         if queue_name in queues:
-            queues[queue_name].empty()
-            return jsonify({"message": f"File '{queue_name}' vidée."} ), 400
+            q = queues[queue_name]
+            q.empty()
+            # Vider aussi les registres associés
+            FailedJobRegistry(queue=q).empty()
+            FinishedJobRegistry(queue=q).empty()
+            StartedJobRegistry(queue=q).empty()
+            return jsonify({"message": f"File '{queue_name}' et ses registres ont été vidés."} ), 200
         return jsonify({"error": "File non trouvée"}), 404
 
-    @app.route("/", methods=["GET"])
-    def index():
-        """Page d'accueil simple pour confirmer que le service est en ligne."""
-        return '''
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>AnalyLit v4.1 - Serveur Actif</title>
-            <meta charset="utf-8">
-            <style>
-                body { font-family: Arial, sans-serif; margin: 40px; text-align: center; color: #333; }
-                div { border: 1px solid #ddd; padding: 30px; border-radius: 8px; display: inline-block; }
-                h1 { color: #2c3e50; }
-                p { color: #555; }
-                a { color: #3498db; }
-            </style>
-        </head>
-        <body>
-            <div>
-                <h1>🚀 AnalyLit v4.1 est Opérationnel !</h1>
-                <p>Le serveur backend est démarré et fonctionne correctement.</p>
-                <p>Accédez à l'interface via votre client ou vérifiez la santé de l'API : <a href="/api/health">/api/health</a></p>
-            </div>
-        </body>
-        </html>
-        '''
+    # --- ROUTES POUR SERVIR L'INTERFACE UTILISATEUR (FRONTEND) ---
+    # Ces routes doivent être DÉFINIES AVANT les routes API génériques comme /<path:path>
+    # si vous en aviez, mais après les routes API spécifiques comme /api/....
 
     @app.errorhandler(404)
     def not_found(error):
@@ -1145,6 +1129,19 @@ def create_app(config=None):
     def internal_error(error):
         logging.error(f"Erreur interne: {error} pour {request.method} {request.path}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
+
+    @app.route('/')
+    def serve_index():
+        """Sert le fichier principal de l'interface (index.html)."""
+        # Ne pas intercepter les appels API
+        if request.path.startswith('/api/'):
+            return not_found(None)
+        return send_from_directory(app.static_folder, 'index.html')
+
+    @app.route('/<path:path>')
+    def serve_static(path):
+        """Sert les autres fichiers statiques (CSS, JS, images)."""
+        return send_from_directory(app.static_folder, path)
     
     # Enregistrement des Blueprints
     #app.register_blueprint(projects_bp, url_prefix='/api')
