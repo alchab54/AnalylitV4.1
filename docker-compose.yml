@@ -1,10 +1,4 @@
 services:
-  base:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.base
-    image: analylit-base:latest
-
   db:
     image: postgres:15-alpine
     container_name: analylit_db
@@ -12,19 +6,11 @@ services:
       POSTGRES_USER: analylit_user
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_db
-    # Commandes de tuning PostgreSQL pour la performance
-    command: >
-      postgres
-      -c shared_buffers=2GB
-      -c effective_cache_size=8GB
-      -c maintenance_work_mem=512MB
-      -c checkpoint_completion_target=0.9
-      -c wal_buffers=16MB
-      -c default_statistics_target=100
-      -c random_page_cost=1.1
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/init-user-db.sql:/docker-entrypoint-initdb.d/init.sql
+      # Monter la configuration personnalisée
+      - ./database/postgres.conf:/usr/share/postgresql/postgresql.conf.sample
     ports:
       - "5433:5432"
     deploy:
@@ -34,7 +20,7 @@ services:
         reservations:
           memory: 2500M # Mémoire réservée
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -62,7 +48,8 @@ services:
       dockerfile: docker/Dockerfile.web
     container_name: analylit_web
     ports:
-      - "8080:5000"  # Un seul port, plus propre
+      - "5000:5000"
+      - "8080:5000"
     environment:
       - FLASK_ENV=production
       - WAIT_HOSTS=db:5432,redis:6379
@@ -92,6 +79,7 @@ services:
         condition: service_started
     volumes:
       - ./migrations:/home/appuser/app/migrations
+      - ./profiles.json:/home/appuser/app/profiles.json # <-- Mount the profiles file
 
   # Workers multiples pour paralléliser les tâches
   worker-fast:

@@ -8,8 +8,8 @@ from pathlib import Path
 def load_default_models() -> Dict[str, Any]:
     """Charge les profils de modèles depuis un fichier JSON externe."""
     try:
-        # Le chemin est relatif à l'emplacement de ce fichier de configuration
-        config_path = Path(__file__).parent.parent / "profiles.json"
+        # Le chemin est relatif à la racine de l'application dans le conteneur
+        config_path = Path(__file__).parent / "profiles.json"
         with open(config_path, 'r', encoding='utf-8') as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
