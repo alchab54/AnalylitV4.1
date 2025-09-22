@@ -96,10 +96,6 @@ def create_app(config=None):
     db.init_app(app)
 
     # --- NOUVEAU : INITIALISER FLASK-MIGRATE ---
-    # L'initialisation de la base de données est maintenant déplacée vers les points d'entrée
-    # (post_fork pour Gunicorn, et __main__ pour le dev local) pour éviter la double initialisation.
-    db.init_app(app)
-
     migrate.init_app(app, db)  # <-- 2. BRANCHER MIGRATE À L'APP ET À LA DB
 
 
