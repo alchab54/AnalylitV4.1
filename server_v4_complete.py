@@ -345,8 +345,8 @@ def create_app(config=None):
 
     @app.route("/api/projects/", methods=["GET"])
     @with_db_session
-    def get_all_projects(session):
-        projects = session.query(Project).all()
+    def get_all_projects(db_session):
+        projects = db_session.query(Project).all()
         return jsonify([p.to_dict() for p in projects]), 200
 
     @app.route("/api/projects/<project_id>", methods=["GET"])
@@ -1111,34 +1111,30 @@ def create_app(config=None):
 
     @app.route("/", methods=["GET"])
     def index():
-        """Page d'accueil AnalyLit."""
+        """Page d'accueil simple pour confirmer que le service est en ligne."""
         return '''
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>AnalyLit v4.1</title>
-        <meta charset="utf-8">
-        <style>
-            body { font-family: Arial, sans-serif; margin: 40px; }
-            h1 { color: #2c3e50; }
-            ul { list-style-type: none; }
-            li { margin: 10px 0; }
-            a { color: #3498db; text-decoration: none; }
-            a:hover { text-decoration: underline; }
-        </style>
-    </head>
-    <body>
-        <h1>🚀 AnalyLit v4.1</h1>
-        <p>Application de revue systématique de littérature scientifique</p>
-        <h3>Liens utiles :</h3>
-        <ul>
-            <li><a href="/api/health">✅ Health Check</a></li>
-            <li><a href="/api/projects/">📊 API Projects</a></li>
-            <li><a href="/api/analysis-profiles">🔬 Profils d'Analyse</a></li>
-        </ul>
-    </body>
-    </html>
-    '''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>AnalyLit v4.1 - Serveur Actif</title>
+            <meta charset="utf-8">
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; text-align: center; color: #333; }
+                div { border: 1px solid #ddd; padding: 30px; border-radius: 8px; display: inline-block; }
+                h1 { color: #2c3e50; }
+                p { color: #555; }
+                a { color: #3498db; }
+            </style>
+        </head>
+        <body>
+            <div>
+                <h1>🚀 AnalyLit v4.1 est Opérationnel !</h1>
+                <p>Le serveur backend est démarré et fonctionne correctement.</p>
+                <p>Accédez à l'interface via votre client ou vérifiez la santé de l'API : <a href="/api/health">/api/health</a></p>
+            </div>
+        </body>
+        </html>
+        '''
 
     @app.errorhandler(404)
     def not_found(error):
@@ -1175,8 +1171,6 @@ def register_models():
 app = create_app()
 
 if __name__ == "__main__":
-    import gevent.monkey
-    gevent.monkey.patch_all()
     # Ce bloc est pour le développement local UNIQUEMENT
     # Utilise le serveur de développement de SocketIO
     # NOTE FOR PRODUCTION WITH GUNICORN:
