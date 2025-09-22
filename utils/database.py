@@ -20,22 +20,10 @@ from .db_base import Base
 
 # Note : les modèles seront importés par server_v4_complete.py
 
-# Initialize db as None globally
-db = None
-
-def get_db_instance():
-    """Returns the global SQLAlchemy instance, initializing it if necessary."""
-    global db
-    if db is None:
-        db = SQLAlchemy()
-    return db
-
-# Assign the global db instance
-db = get_db_instance()
-
-def get_db():
-    """Returns a new SQLAlchemy instance."""
-    return get_db_instance()
+# Créez l'instance ici, mais ne la liez à aucune application.
+# Elle sera liée dans create_app() pour l'application principale,
+# et dans run_migrations.py pour le script de migration.
+db = SQLAlchemy()
 
 def init_database(database_url=None, is_test: bool = False):
     """Initialise le moteur et la factory de session."""
