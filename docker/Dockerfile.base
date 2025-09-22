@@ -1,5 +1,5 @@
-# Image de base optimisée avec cache Docker
-FROM python:3.11-slim AS dependencies
+# Image de base COMPLÈTE avec code application
+FROM python:3.11-slim as dependencies
 
 # Optimisation cache - copier uniquement requirements.txt
 WORKDIR /app
@@ -11,7 +11,7 @@ ENV PATH="/root/.local/bin:${PATH}"
 # Installer les dépendances (étape mise en cache)
 RUN pip install --no-cache-dir --user -r requirements.txt
 
-# Image finale légère
+# Image finale avec code application
 FROM python:3.11-slim
 
 # Installer les outils système nécessaires
@@ -24,10 +24,13 @@ RUN apt-get update && \
 COPY --from=dependencies /root/.local /home/appuser/.local
 ENV PATH="/home/appuser/.local/bin:${PATH}"
 
-# Configuration utilisateur
+# Configuration utilisateur et répertoire
 WORKDIR /home/appuser/app
 RUN chown -R appuser:appuser /home/appuser
 USER appuser
+
+# ===== NOUVEAU : COPIE DU CODE ICI (UNE SEULE FOIS) =====
+COPY --chown=appuser:appuser . .
 
 # Point d'entrée par défaut
 CMD ["python"]

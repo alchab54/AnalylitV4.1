@@ -1,5 +1,5 @@
-# Hérite de l'image de base (dépendances déjà installées)  
+# Hérite de l'image de base (code DÉJÀ présent)
 FROM analylit-base:latest
 
-# Copier le code de l'application
-COPY --chown=appuser:appuser . .
+# Commande par défaut pour le worker
+CMD ["python", "-m", "rq.worker", "default", "--url", "redis://redis:6379/0"]

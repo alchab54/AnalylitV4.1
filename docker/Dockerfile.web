@@ -1,13 +1,13 @@
-# Hérite de l'image de base (dépendances déjà installées)
+# Hérite de l'image de base (code DÉJÀ présent)
 FROM analylit-base:latest
 
-# Copier le code de l'application
-COPY --chown=appuser:appuser . .
-
-# Le script entrypoint.sh est déjà dans le projet, pas besoin de le recopier
+# Configuration spécifique au service web
 USER root
 RUN chmod +x docker/entrypoint.sh
 USER appuser
 
+# Exposition du port
 EXPOSE 5000
+
+# Point d'entrée spécifique au web
 ENTRYPOINT ["docker/entrypoint.sh"]
