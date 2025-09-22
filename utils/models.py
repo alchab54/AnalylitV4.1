@@ -307,11 +307,30 @@ class Prompt(Base):
     def to_dict(self):
         return {c.name: getattr(self, c.name, None) for c in self.__table__.columns}
 
+class GreyLiterature(Base):
+    __tablename__ = 'grey_literature'
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+
+    project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
+    id = Column(String, primary_key=True, default=_uuid)
+    project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
+    title = Column(Text, nullable=False)
+    institution = Column(String)
+    publication_date = Column(String)
+    url = Column(String)
+    abstract = Column(Text)
+    authors = Column(Text)
+    keywords = Column(Text) # Storing as Text, can be JSON string if needed
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 # === FORCER L'ENREGISTREMENT DES MODÈLES ===
 # Cette ligne force SQLAlchemy à reconnaître tous les modèles
 __all__ = [
     'Project', 'SearchResult', 'Extraction', 'AnalysisProfile', 
-    'Grid', 'Prompt', 'ChatMessage', 'RiskOfBias'
+    'Grid', 'Prompt', 'ChatMessage', 'RiskOfBias', 'GreyLiterature'
 ]
 
 class ProcessingLog(Base):

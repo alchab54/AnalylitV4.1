@@ -21,9 +21,10 @@ from flask_socketio import SocketIO
 from sqlalchemy.exc import IntegrityError
 from rq.worker import Worker
 from werkzeug.utils import secure_filename
+from flask_migrate import Migrate # <-- 1. IMPORTER MIGRATE
 
 # --- Imports des utilitaires et de la configuration ---
-from utils.database import with_db_session
+from utils.database import with_db_session, db # Import db here
 from utils.app_globals import (
     processing_queue, synthesis_queue, analysis_queue, background_queue,
     extension_queue, redis_conn
@@ -67,6 +68,12 @@ def create_app(config=None):
     app = Flask(__name__)
     if config:
         app.config.update(config)
+
+    # Initialisation de SQLAlchemy avec l'application Flask
+    db.init_app(app)
+
+    # --- NOUVEAU : INITIALISER FLASK-MIGRATE ---
+    migrate = Migrate(app, db)  # <-- 2. BRANCHER MIGRATE À L'APP ET À LA DB
 
     # Import et initialisation forcés - BON ORDRE :
     # Les modèles sont déjà importés au top du fichier

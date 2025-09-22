@@ -10,9 +10,12 @@ export async function handleValidateExtraction(extractionId, decision) {
     if (!appState.currentProject?.id || !extractionId) return;
     
     try {
+        // Utiliser l'évaluateur actif depuis l'état de l'application
+        const activeEvaluator = appState.activeEvaluator || 'evaluator1'; // Default to evaluator1 if not set
+
         await fetchAPI(`/projects/${appState.currentProject.id}/extractions/${extractionId}/decision`, {
             method: 'PUT',
-            body: { decision: decision, evaluator: 'evaluator1' }
+            body: { decision: decision, evaluator: activeEvaluator }
         });
         
         await loadValidationSection();
@@ -98,6 +101,16 @@ export async function renderValidationSection(project) {
             <div class="validation-section">
                 <div class="validation-header">
                     <h2>Validation Inter-Évaluateurs</h2>
+                    <button class="btn btn--secondary" data-action="calculate-kappa">
+                        Calculer Kappa
+                    </button>
+                    <div class="evaluator-selection">
+                        <label for="activeEvaluator">Évaluateur Actif:</label>
+                        <select id="activeEvaluator" class="form-select">
+                            <option value="evaluator1" ${appState.activeEvaluator === 'evaluator1' ? 'selected' : ''}>Évaluateur 1</option>
+                            <option value="evaluator2" ${appState.activeEvaluator === 'evaluator2' ? 'selected' : ''}>Évaluateur 2</option>
+                        </select>
+                    </div>
                     <div class="validation-stats">
                         <div class="stat-item stat-item--included">
                             <span class="stat-value">${included.length}</span>
@@ -143,6 +156,24 @@ export async function renderValidationSection(project) {
                     ${extractions.map(extraction => renderValidationItem(extraction)).join('')}
                 </div>
             </div>`;
+
+        // Add event listener for activeEvaluator dropdown
+        const activeEvaluatorSelect = container.querySelector('#activeEvaluator');
+        if (activeEvaluatorSelect) {
+            activeEvaluatorSelect.addEventListener('change', (event) => {
+                appState.activeEvaluator = event.target.value;
+                loadValidationSection(); // Re-render the section with the new active evaluator
+            });
+        }
+
+        // Add event listener for Calculate Kappa button
+        const calculateKappaButton = container.querySelector('[data-action="calculate-kappa"]');
+        if (calculateKappaButton) {
+            calculateKappaButton.addEventListener('click', async () => {
+                await calculateKappa();
+            });
+        }
+
     } catch (e) {
         container.innerHTML = `
             <div class="error-state">
@@ -196,4 +227,28 @@ function renderValidationItem(extraction) {
                 </div>
             </div>
         </div>`;
+}
+
+// New function to calculate Kappa
+export async function calculateKappa() {
+    if (!appState.currentProject?.id) {
+        showToast('Veuillez sélectionner un projet pour calculer Kappa.', 'error');
+        return;
+    }
+
+    showLoadingOverlay(true, 'Calcul du coefficient Kappa...');
+    try {
+        const response = await fetchAPI(`/projects/${appState.currentProject.id}/calculate-kappa`, {
+            method: 'POST'
+        });
+        if (response.success) {
+            showToast(`Calcul Kappa lancé. Task ID: ${response.task_id}`, 'success');
+        } else {
+            showToast(`Erreur lors du lancement du calcul Kappa: ${response.message}`, 'error');
+        }
+    } catch (error) {
+        showToast(`Erreur API lors du calcul Kappa: ${error.message}`, 'error');
+    } finally {
+        showLoadingOverlay(false);
+    }
 }

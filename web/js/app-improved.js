@@ -48,6 +48,7 @@ export const appState = {
     prismaChecklist: null,
     renderedSections: new Set(),
     themeManager: null,
+    activeEvaluator: 'evaluator1',
     performance: {
         startTime: performance.now(),
         loadTimes: {},
