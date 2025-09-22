@@ -83,6 +83,32 @@ services:
           memory: 4000M
         reservations:
           memory: 3000M
+    # La commande est remplacée par un script d'entrée pour gérer les migrations
+    command: >
+      sh -c "
+        echo 'Attente de la base de données...' &&
+        /usr/local/bin/wait &&
+        echo 'Base de données prête.' &&
+        
+        echo 'Vérification et initialisation des migrations...' &&
+        # Vérifie si le dossier migrations existe, sinon l'initialise
+        if [ ! -d 'migrations' ]; then
+          echo 'Dossier migrations non trouvé. Initialisation...'
+          flask db init;
+        fi &&
+        
+        echo 'Génération d'une migration automatique...' &&
+        # Crée une nouvelle migration si des changements de modèle sont détectés
+        flask db migrate -m 'Auto-migration des modèles' &&
+        
+        echo 'Application des migrations...' &&
+        # Applique toutes les migrations en attente
+        flask db upgrade &&
+        
+        echo 'Lancement de Gunicorn...' &&
+        # Lance le serveur web
+        gunicorn --bind 0.0.0.0:5000 --workers ${GUNICORN_WORKERS:-4} --threads ${GUNICORN_THREADS:-2} --timeout ${GUNICORN_TIMEOUT:-120} 'server_v4_complete:create_app()'
+      "
     depends_on:
       base:
         condition: service_completed_successfully
