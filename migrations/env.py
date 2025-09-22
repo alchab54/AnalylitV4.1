@@ -1,8 +1,6 @@
 import logging
 from logging.config import fileConfig
-import sys
 from pathlib import Path
-
 from flask import current_app
 
 from alembic import context
@@ -10,7 +8,9 @@ from sqlalchemy import text
 
 # --- AJOUT POUR LA GESTION DU SCHÉMA ---
 # Ajoute le répertoire racine de l'application au path pour trouver 'utils'
+import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
+from server_v4_complete import app # Importer l'instance de l'app
 from utils.models import SCHEMA
 
 # this is the Alembic Config object, which provides
@@ -26,13 +26,11 @@ logger = logging.getLogger('alembic.env')
 
 def get_engine():
     try:
-        # this works with Flask-SQLAlchemy<3 and Alchemical
-        return current_app.extensions['migrate'].db.get_engine()
-    except (TypeError, AttributeError):
-        # this works with Flask-SQLAlchemy>=3
-        return current_app.extensions['migrate'].db.engine
-
-
+        return app.extensions['migrate'].db.engine
+    except (TypeError, AttributeError, KeyError):
+        # Fallback si l'extension n'est pas encore initialisée
+        from sqlalchemy import create_engine
+        return create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 def get_engine_url():
     try:
         return get_engine().url.render_as_string(hide_password=False).replace(
@@ -44,16 +42,8 @@ def get_engine_url():
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
-config.set_main_option('sqlalchemy.url', get_engine_url())
-
-try:
-    target_db = current_app.extensions['migrate'].db
-except KeyError:
-    # This might happen if the app context is not fully available.
-    # We can try to get it from the app factory.
-    from server_v4_complete import app
-    target_db = app.extensions['migrate'].db
+target_db = app.extensions['migrate'].db
+config.set_main_option('sqlalchemy.url', app.config['SQLALCHEMY_DATABASE_URI'])
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -109,8 +99,12 @@ def run_migrations_online():
             if script.upgrade_ops.is_empty():
                 directives[:] = []
                 logger.info('No changes in schema detected.')
-
-    conf_args = current_app.extensions['migrate'].configure_args
+    
+    try:
+        conf_args = current_app.extensions['migrate'].configure_args
+    except (KeyError, AttributeError):
+        conf_args = {} # Fallback si le contexte n'est pas disponible
+        
     if conf_args.get("process_revision_directives") is None:
         conf_args["process_revision_directives"] = process_revision_directives
 
