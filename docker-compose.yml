@@ -11,7 +11,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}  
-      POSTGRES_DB: ${POSTGRES_DB:-analylit}
+      POSTGRES_DB: ${POSTGRES_DB:-analylit_user}
     # Commandes de tuning PostgreSQL pour la performance
     command: >
       postgres
@@ -42,14 +42,19 @@ services:
   redis:
     image: redis:7-alpine
     container_name: analylit_redis
-    # Commande pour limiter la mémoire et gérer le cache intelligemment
     command: redis-server --maxmemory 2gb --maxmemory-policy allkeys-lru --save 300 10
     deploy:
       resources:
         limits:
+          cpus: '0.50'
           memory: 2200M
         reservations:
           memory: 1500M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 
   web:
     build:
@@ -57,17 +62,22 @@ services:
       dockerfile: docker/Dockerfile.web
     container_name: analylit_web
     ports:
-      - "8000:5000"  # Un seul port, plus propre
+      - "8080:5000"  # Un seul port, plus propre
     environment:
       - FLASK_ENV=production
+      - WAIT_HOSTS=db:5432,redis:6379
+      - WAIT_TIMEOUT=300
       - GUNICORN_WORKERS=6    # Adapté à votre CPU (supposé 6 cœurs)
       - GUNICORN_THREADS=4    # Plus de threads par worker
       - GUNICORN_TIMEOUT=300  # Timeout de 5min pour les tâches longues
     env_file:
       - .env
-    volumes:
-      - .:/home/appuser/app
     deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 120s
       resources:
         limits:
           memory: 4000M
@@ -87,30 +97,32 @@ services:
       context: .  
       dockerfile: docker/Dockerfile.worker
     container_name: analylit_worker_fast
-    command: python -m rq.worker fast_queue --url redis://redis:6379/0
+    command: rq worker fast_queue --url redis://redis:6379/0
     env_file:
       - .env
-    volumes:
-      - .:/home/appuser/app
     deploy:
       resources:
         limits:
           memory: 1000M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
 
   worker-default:
     build:
       context: .  
       dockerfile: docker/Dockerfile.worker
     container_name: analylit_worker_default
-    command: python -m rq.worker default --url redis://redis:6379/0
+    command: rq worker default --url redis://redis:6379/0
     env_file:
       - .env
-    volumes:
-      - .:/home/appuser/app
     deploy:
       resources:
         limits:
           memory: 1500M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
 
   # Worker dédié à l'IA, avec accès au GPU
   worker-ai:
@@ -118,26 +130,25 @@ services:
       context: .  
       dockerfile: docker/Dockerfile.worker
     container_name: analylit_worker_ai
-    command: python -m rq.worker ai_queue --url redis://redis:6379/0
+    command: rq worker default --url redis://redis:6379/0
     env_file:
       - .env
-    volumes:
-      - .:/home/appuser/app
-    # Accès direct à la RTX 2060 SUPER
     runtime: nvidia
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     deploy:
       resources:
-        limits:
-          memory: 2000M
         reservations:
           devices:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+        limits:
+          memory: 2000M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
 
 volumes:
   postgres_data:
-

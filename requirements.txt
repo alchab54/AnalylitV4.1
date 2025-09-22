@@ -1,6 +1,7 @@
 #--- Framework Web ---
 Flask==3.0.0
 Flask-SQLAlchemy==3.1.1
+Flask-Migrate==4.0.7
 pytest-cov
 Flask-Cors
 Flask-SocketIO==5.3.6
@@ -45,7 +46,6 @@ pytesseract==0.3.10
 werkzeug==3.0.1
 pyzotero 
 click 
-
 #--- Outils de Build & Dépendances Correctives ---
 setuptools>=65.0.0
 wheel>=0.38.0

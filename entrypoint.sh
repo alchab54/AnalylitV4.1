@@ -10,8 +10,8 @@ done
 echo "✅ Base de données prête!"
 
 echo "🔄 Application des migrations..."
-export FLASK_APP=app
+export FLASK_APP=server_v4_complete.py
 python -m flask db upgrade
 
 echo "🚀 Démarrage du serveur Gunicorn..."
-exec gunicorn --bind 0.0.0.0:5000 --workers 2 --threads 2 --worker-class gevent "app:create_app()"
+exec gunicorn --bind 0.0.0.0:5000 --workers 2 --threads 2 --worker-class gevent "server_v4_complete:app"
