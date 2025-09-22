@@ -1,5 +1,5 @@
 # Image de base LÉGÈRE - contient UNIQUEMENT les dépendances
-FROM python:3.11-slim as dependencies
+FROM python:3.11-slim AS dependencies
 
 # Optimisation cache - copier uniquement requirements.txt
 WORKDIR /app

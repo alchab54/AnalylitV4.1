@@ -2,7 +2,9 @@
 FROM analylit-base:latest
 
 # Copier le code de l'application
-COPY --chown=appuser:appuser . .
+COPY --chown=appuser:appuser tasks_v4_complete.py config_v4.py ./
+COPY --chown=appuser:appuser api/ api/
+COPY --chown=appuser:appuser utils/ utils/
 
 # Commande par défaut pour le worker
 CMD ["python", "-m", "rq.worker", "default", "--url", "redis://redis:6379/0"]
