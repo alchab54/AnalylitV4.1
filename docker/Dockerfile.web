@@ -7,6 +7,7 @@ COPY --chown=appuser:appuser server_v4_complete.py config_v4.py tasks_v4_complet
 COPY --chown=appuser:appuser api/ api/
 COPY --chown=appuser:appuser utils/ utils/
 COPY --chown=appuser:appuser web/ web/
+COPY --chown=appuser:appuser migrations/ migrations/
 COPY --chown=appuser:appuser entrypoint.sh ./
 
 # Positionner *le chmod* SUR LE FICHIER avec CHEMIN CORRECT
@@ -16,7 +17,6 @@ RUN chmod +x entrypoint.sh
 # Create logs and projects directories and set permissions
 RUN mkdir -p /home/appuser/app/logs && chown appuser:appuser /home/appuser/app/logs
 RUN mkdir -p /home/appuser/app/projects && chown appuser:appuser /home/appuser/app/projects
-RUN mkdir -p /home/appuser/app/migrations && chown appuser:appuser /home/appuser/app/migrations
 
 EXPOSE 5000
 ENTRYPOINT ["./entrypoint.sh"]

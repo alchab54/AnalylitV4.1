@@ -51,6 +51,7 @@ htmlcov/
 *.log
 logs/
 projects/
+!migrations/
 model_cache/
 reports/
 exports/
