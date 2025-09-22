@@ -89,6 +89,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+    volumes:
+      - migrations_data:/home/appuser/app/migrations
 
   # Workers multiples pour paralléliser les tâches
   worker-fast:
@@ -151,3 +153,4 @@ services:
 
 volumes:
   postgres_data:
+  migrations_data:
