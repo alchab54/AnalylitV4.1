@@ -1,4 +1,4 @@
-# Image de base COMPLÈTE avec code application
+# Image de base LÉGÈRE - contient UNIQUEMENT les dépendances
 FROM python:3.11-slim as dependencies
 
 # Optimisation cache - copier uniquement requirements.txt
@@ -11,10 +11,9 @@ ENV PATH="/root/.local/bin:${PATH}"
 # Installer les dépendances (étape mise en cache)
 RUN pip install --no-cache-dir --user -r requirements.txt
 
-# Image finale avec code application
+# Image finale avec les outils système
 FROM python:3.11-slim
 
-# Installer les outils système nécessaires
 RUN apt-get update && \
     apt-get install -y postgresql-client curl && \
     rm -rf /var/lib/apt/lists/* && \
@@ -24,13 +23,5 @@ RUN apt-get update && \
 COPY --from=dependencies /root/.local /home/appuser/.local
 ENV PATH="/home/appuser/.local/bin:${PATH}"
 
-# Configuration utilisateur et répertoire
 WORKDIR /home/appuser/app
-RUN chown -R appuser:appuser /home/appuser
 USER appuser
-
-# ===== NOUVEAU : COPIE DU CODE ICI (UNE SEULE FOIS) =====
-COPY --chown=appuser:appuser . .
-
-# Point d'entrée par défaut
-CMD ["python"]
