@@ -84,6 +84,12 @@ def create_app(config=None):
         'pool_pre_ping': True
     }
 
+    # --- NOUVEAU : CONFIGURATION DU SCHÉMA POUR FLASK-MIGRATE ---
+    # Indique à Alembic de créer les tables dans le bon schéma.
+    from utils.models import SCHEMA
+    if SCHEMA:
+        app.config['SQLALCHEMY_ENGINE_OPTIONS']['connect_args'] = {'options': f'-csearch_path={SCHEMA}'}
+
     # L'initialisation de la base de données est maintenant déplacée vers les points d'entrée
     # (post_fork pour Gunicorn, et __main__ pour le dev local) pour éviter la double initialisation.
     # db.init_app(app)
@@ -348,8 +354,8 @@ def create_app(config=None):
 
     @app.route("/api/projects/", methods=["GET"])
     @with_db_session
-    def get_all_projects(db_session):
-        projects = db_session.query(Project).all()
+    def get_all_projects(session):
+        projects = session.query(Project).all()
         return jsonify([p.to_dict() for p in projects]), 200
 
     @app.route("/api/projects/<project_id>", methods=["GET"])

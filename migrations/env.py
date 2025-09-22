@@ -1,9 +1,17 @@
 import logging
 from logging.config import fileConfig
+import sys
+from pathlib import Path
 
 from flask import current_app
 
 from alembic import context
+from sqlalchemy import text
+
+# --- AJOUT POUR LA GESTION DU SCHÉMA ---
+# Ajoute le répertoire racine de l'application au path pour trouver 'utils'
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+from utils.models import SCHEMA
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -11,7 +19,8 @@ config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-fileConfig(config.config_file_name)
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
 logger = logging.getLogger('alembic.env')
 
 
@@ -37,7 +46,14 @@ def get_engine_url():
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 config.set_main_option('sqlalchemy.url', get_engine_url())
-target_db = current_app.extensions['migrate'].db
+
+try:
+    target_db = current_app.extensions['migrate'].db
+except KeyError:
+    # This might happen if the app context is not fully available.
+    # We can try to get it from the app factory.
+    from server_v4_complete import app
+    target_db = app.extensions['migrate'].db
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -48,7 +64,11 @@ target_db = current_app.extensions['migrate'].db
 def get_metadata():
     if hasattr(target_db, 'metadatas'):
         return target_db.metadatas[None]
-    return target_db.metadata
+    # --- MODIFICATION POUR LE SCHÉMA ---
+    # Assigner le schéma aux métadonnées avant de les retourner
+    meta = target_db.metadata
+    meta.schema = SCHEMA
+    return meta
 
 
 def run_migrations_offline():
@@ -94,12 +114,20 @@ def run_migrations_online():
     if conf_args.get("process_revision_directives") is None:
         conf_args["process_revision_directives"] = process_revision_directives
 
-    connectable = get_engine()
+    engine = get_engine()
 
-    with connectable.connect() as connection:
+    # --- AJOUT POUR LA GESTION DU SCHÉMA ---
+    # Créer le schéma s'il n'existe pas et configurer l'engine pour l'utiliser.
+    with engine.connect() as connection:
+        if SCHEMA:
+            connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
+        connection.commit() # S'assurer que le schéma est créé
+
+    with engine.connect() as connection:
         context.configure(
             connection=connection,
             target_metadata=get_metadata(),
+            include_schemas=True, # Indiquer à Alembic de prendre en compte les schémas
             **conf_args
         )
 

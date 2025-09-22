@@ -3,7 +3,7 @@ from redis import Redis
 from rq import Queue
 from config_v4 import get_config
 
-REDIS_HOST = os.getenv("REDIS_HOST", "analylit-redis-v4")
+REDIS_HOST = os.getenv("REDIS_HOST", "analylit_redis")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 
 redis_conn = Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)

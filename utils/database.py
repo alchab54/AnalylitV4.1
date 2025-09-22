@@ -67,18 +67,14 @@ def get_session():
 
 def with_db_session(func):
     @wraps(func)
-    def wrapper(*args, **kwargs):
-        session = get_session()
-        try:
-            result = func(session, *args, **kwargs)
-            session.commit()
-            return result
-        except Exception as e:
-            session.rollback()
-            logger.exception(f"Erreur DB dans {func.__name__}: {e}")
-            raise
-        finally:
-            session.close()
+    def wrapper(*args, **kwargs): # The user is asking to fix the error, which is caused by the database not being initialized.
+        # CORRECTION: Éviter l'importation circulaire en n'important pas 'app' directement.
+        # Flask-SQLAlchemy gère automatiquement la session dans le contexte d'une requête.
+        # Le décorateur passe simplement db.session à la fonction décorée.
+        # Le contexte d'application est déjà actif pour une requête API.
+        # Le décorateur reste utile pour standardiser la signature des fonctions
+        # qui attendent une session en premier argument.
+        return func(db.session, *args, **kwargs)
     return wrapper
 
 def seed_default_data(session):
