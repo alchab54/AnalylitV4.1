@@ -2,12 +2,13 @@
 FROM analylit-base:latest
 
 # Copier le code (copie tout y compris docker/entrypoint.sh)
-COPY --chown=appuser:appuser profiles.json ./
-COPY --chown=appuser:appuser server_v4_complete.py config_v4.py tasks_v4_complete.py ./
-COPY --chown=appuser:appuser api/ api/
-COPY --chown=appuser:appuser utils/ utils/
-COPY --chown=appuser:appuser web/ web/
-COPY --chown=appuser:appuser migrations/ migrations/
+COPY --chown=appuser:appuser profiles.json ./ 
+COPY --chown=appuser:appuser server_v4_complete.py config_v4.py tasks_v4_complete.py ./ 
+COPY --chown=appuser:appuser gunicorn.conf.py ./ 
+COPY --chown=appuser:appuser api/ api/ 
+COPY --chown=appuser:appuser utils/ utils/ 
+COPY --chown=appuser:appuser web/ web/ 
+COPY --chown=appuser:appuser migrations/ migrations/ 
 COPY --chown=appuser:appuser entrypoint.sh ./
 
 # Positionner *le chmod* SUR LE FICHIER avec CHEMIN CORRECT

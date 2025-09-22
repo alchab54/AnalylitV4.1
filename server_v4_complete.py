@@ -84,8 +84,9 @@ def create_app(config=None):
         'pool_pre_ping': True
     }
 
-    # Initialisation de SQLAlchemy avec l'application Flask
-    db.init_app(app)
+    # L'initialisation de la base de données est maintenant déplacée vers les points d'entrée
+    # (post_fork pour Gunicorn, et __main__ pour le dev local) pour éviter la double initialisation.
+    # db.init_app(app)
 
     # --- NOUVEAU : INITIALISER FLASK-MIGRATE ---
     migrate = Migrate(app, db)  # <-- 2. BRANCHER MIGRATE À L'APP ET À LA DB
@@ -1167,15 +1168,28 @@ def register_models():
 # Gunicorn va chercher cette variable 'app'
 app = create_app()
 
+# --- GUNICORN HOOK ---
+def post_fork(server, worker):
+    """
+    Hook Gunicorn pour s'assurer que chaque worker a sa propre initialisation de DB.
+    Cela évite les problèmes de partage de connexion entre les processus.
+    """
+    server.log.info("Worker %s forked.", worker.pid)
+    db.init_app(app)
+
 if __name__ == "__main__":
     # Ce bloc est pour le développement local UNIQUEMENT
+    # Initialiser la base de données pour le serveur de développement
+    with app.app_context():
+        db.init_app(app)
+
     # Utilise le serveur de développement de SocketIO
     # NOTE FOR PRODUCTION WITH GUNICORN:
     # For WebSockets to work, Gunicorn must be launched with the gevent-websocket worker.
     # 1. Ensure 'gevent-websocket' is in your requirements.txt.
     # 2. Launch Gunicorn with the following command:
     #    gunicorn --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker --bind 0.0.0.0:5000 server_v4_complete:app
-    socketio.run(app, host="0.0.0.0", port=8080, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, host="0.0.0.0", port=5000, debug=True, allow_unsafe_werkzeug=True)
 else:
     # Pour Gunicorn/production, Gunicorn appellera create_app()
     # Gunicorn appellera create_app() via le fichier d'entrypoint.

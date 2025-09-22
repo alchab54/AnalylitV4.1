@@ -16,4 +16,4 @@ python -m flask db upgrade
 python -m flask db upgrade
 
 echo "🚀 Démarrage du serveur Gunicorn..."
-exec gunicorn --bind 0.0.0.0:5000 --workers 2 --threads 2 --worker-class gevent "server_v4_complete:app"
+exec gunicorn --config gunicorn.conf.py "server_v4_complete:app"
