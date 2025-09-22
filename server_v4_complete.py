@@ -1,4 +1,9 @@
 import logging
+import gevent.monkey
+# Le monkey-patching doit être fait le plus tôt possible, avant que d'autres
+# modules (comme socket, ssl, etc.) ne soient importés.
+gevent.monkey.patch_all()
+
 import feedparser
 
 # --- CORRECTIF DE COMPATIBILITÉ PYZOTERO / FEEDPARSER ---
@@ -1103,6 +1108,37 @@ def create_app(config=None):
             queues[queue_name].empty()
             return jsonify({"message": f"File '{queue_name}' vidée."} ), 400
         return jsonify({"error": "File non trouvée"}), 404
+
+    @app.route("/", methods=["GET"])
+    def index():
+        """Page d'accueil AnalyLit."""
+        return '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>AnalyLit v4.1</title>
+        <meta charset="utf-8">
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            h1 { color: #2c3e50; }
+            ul { list-style-type: none; }
+            li { margin: 10px 0; }
+            a { color: #3498db; text-decoration: none; }
+            a:hover { text-decoration: underline; }
+        </style>
+    </head>
+    <body>
+        <h1>🚀 AnalyLit v4.1</h1>
+        <p>Application de revue systématique de littérature scientifique</p>
+        <h3>Liens utiles :</h3>
+        <ul>
+            <li><a href="/api/health">✅ Health Check</a></li>
+            <li><a href="/api/projects/">📊 API Projects</a></li>
+            <li><a href="/api/analysis-profiles">🔬 Profils d'Analyse</a></li>
+        </ul>
+    </body>
+    </html>
+    '''
 
     @app.errorhandler(404)
     def not_found(error):
