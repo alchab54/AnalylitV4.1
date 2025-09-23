@@ -21,7 +21,7 @@ Le frontend d'AnalyLit V4.1 est une application web monopage (SPA) conçue pour 
 Le frontend suit une architecture modulaire basée sur les principes des ES Modules, favorisant la maintenabilité et la scalabilité.
 
 - **`web/index.html`** : Le point d'entrée unique de l'application. Il charge les feuilles de style, les bibliothèques externes et le script principal de l'application (`app-improved.js`).
-- **`web/css/`** :
+- **`web/css/`** : Il est crucial que `index.html` charge le script principal avec `type="module"` pour activer le système de modules ES6. Exemple : `<script type="module" src="js/app-improved.js"></script>`.
     - **`style-improved.css`** : Contient les styles globaux et les styles spécifiques aux composants de l'interface.
     - **`enhanced-design-tokens.css`** : Définit les variables CSS (couleurs, espacements, typographie, etc.) qui constituent le système de design de l'application, permettant une personnalisation facile et une gestion des thèmes.
 - **`web/js/app-improved.js`** : Le script principal qui initialise l'application, gère l'état global (`appState`), initialise les écouteurs d'événements et coordonne le chargement des données initiales.
@@ -79,4 +79,3 @@ Pour lancer l'application en mode développement, assurez-vous que le backend es
 ## 5. Tests
 
 Référez-vous au document `TESTS-FRONTEND.md` pour un guide détaillé sur la façon de tester les fonctionnalités du frontend.
-
