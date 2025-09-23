@@ -1246,7 +1246,7 @@ def generate_summary_table_task(session, project_id: str):
             return
 
         # Fetch articles and their extractions
-        results = session.query(SearchResult, Extraction).
+        results = session.query(SearchResult, Extraction)
             join(Extraction, SearchResult.article_id == Extraction.pmid). 
             filter(SearchResult.project_id == project_id, Extraction.project_id == project_id).all()
 
