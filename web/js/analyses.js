@@ -6,9 +6,8 @@ import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 export async function loadProjectAnalyses() {
     if (!appState.currentProject) {
-        const analysisContainer = document.querySelector(SELECTORS.analysisContainer);
-        if (analysisContainer) {
-            analysisContainer.innerHTML = `<p>${MESSAGES.selectProjectToViewAnalyses}</p>`;
+        if (elements.analysisContainer) {
+            elements.analysisContainer.innerHTML = `<p>${MESSAGES.selectProjectToViewAnalyses}</p>`;
         }
         return;
     }
@@ -25,12 +24,11 @@ export async function loadProjectAnalyses() {
 }
 
 export function renderAnalysesSection() {
-    const analysisContainer = document.querySelector(SELECTORS.analysisContainer);
-    if (!analysisContainer) return;
+    if (!elements.analysisContainer) return;
     const project = appState.currentProject;
 
     if (!project) {
-        analysisContainer.innerHTML = `<div class="empty-state"><p>${MESSAGES.selectProjectToViewAnalyses}</p></div>`;
+        elements.analysisContainer.innerHTML = `<div class="empty-state"><p>${MESSAGES.selectProjectToViewAnalyses}</p></div>`;
         return;
     }
 
@@ -119,7 +117,7 @@ export function renderAnalysesSection() {
 
 // NOUVELLE FONCTION : pour afficher les résultats de l analyse ATN
 function renderATNResults(analysisData) {
-    const container = document.querySelector(SELECTORS.analysisResultContainer);
+    const container = document.querySelector('#analysis-result-container');
     if (!container) return '';
 
     const metrics = analysisData.atn_metrics || {};
@@ -346,15 +344,15 @@ export function renderKnowledgeGraph(graphData) {
     }
     return `
         <div class="card" id="knowledge-graph-card">
-            <h4><i class="fas fa-project-diagram"></i> Graphe de Connaissances</h4>
-            <div id="${SELECTORS.knowledgeGraphContainer.substring(1)}" class="knowledge-graph-container"></div>
+            <h4><i class="fas fa-project-diagram"></i> Graphe de Connaissances</h4> 
+            <div id="knowledge-graph-container" class="knowledge-graph-container"></div>
             <p class="help-text">${MESSAGES.graphStats(graphData.nodes.length, graphData.edges.length)}</p>
         </div>
     `;
 }
 
 export function initializeKnowledgeGraph(data) {
-    const container = document.querySelector(SELECTORS.knowledgeGraphContainer);
+    const container = document.querySelector('#knowledge-graph-container');
     if (!container || typeof vis === 'undefined') return;
 
     const nodes = new vis.DataSet(data.nodes);

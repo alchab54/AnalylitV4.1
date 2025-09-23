@@ -2,9 +2,8 @@
 // --- MODIFIÉ POUR LE RENDU DYNAMIQUE ---
 
 import { fetchAPI } from './api.js';
-import { appState } from './app-improved.js';
+import { appState } from './app-improved.js'; // Assurez-vous que c'est le bon chemin
 import { setQueuesStatus } from './state.js';
-// MODIFIÉ: Utilisation du nouveau module UI amélioré
 import { showToast, showConfirmModal } from './ui-improved.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
@@ -47,8 +46,8 @@ export async function loadPrompts() {
         const prompts = await fetchAPI(API_ENDPOINTS.prompts);
         appState.prompts = prompts || [];
     } catch (error) {
-        console.error(`${MESSAGES.errorLoadingPrompts}:`, error);
-        showToast(`${MESSAGES.errorLoadingPrompts}: ${error.message}`, 'error');
+        console.error("Erreur lors du chargement des prompts:", error);
+        showToast(MESSAGES.errorLoadingPrompts, 'error');
         appState.prompts = [];
     }
 }
@@ -101,17 +100,17 @@ export function renderSettings() {
     if (!profiles || !prompts || !models || !queueStatus) {
         container.innerHTML = `<div class="placeholder">${MESSAGES.loadingSettingsData}</div>`;
         console.warn(MESSAGES.settingsDataNotReady);
-        return;
+        return; 
     }
 
     // 1. Générer le layout HTML dynamique
     container.innerHTML = createSettingsLayout();
 
     // 2. Remplir les conteneurs maintenant qu'ils existent dans le DOM
-    renderAnalysisProfilesList(profiles, document.querySelector(SELECTORS.profileListContainer));
+    renderAnalysisProfilesList(profiles, document.querySelector('#profile-list-container'));
     populateModelSelects(models);
-    renderPromptTemplates(prompts, document.querySelector(SELECTORS.promptTemplatesList));
-    renderQueueStatus(queueStatus, document.querySelector(SELECTORS.queueStatusContainer));
+    renderPromptTemplates(prompts, document.querySelector('#prompt-templates-list'));
+    renderQueueStatus(queueStatus, document.querySelector('#queue-status-container'));
     loadInstalledModels();
 
     // 3. Initialiser les composants interactifs
@@ -126,7 +125,7 @@ export function renderSettings() {
 }
 
 /**
- * NOUVELLE FONCTION : Crée le HTML de la structure de la page des paramètres.
+ * NOUVELLE FONCTION: Crée le HTML de la structure de la page des paramètres.
  * @returns {string} Le HTML de la grille des paramètres.
  */
 function createSettingsLayout() {
@@ -137,7 +136,7 @@ function createSettingsLayout() {
         <div class="settings-col" id="settings-col-1">
             <div class="settings-card">
                 <div class="settings-card__header">
-                    <h3>Profils d'Analyse</h3>
+                    <h3>Profils d'Analyse</h3> 
                     <button id="new-profile-btn" class="btn btn--sm btn--primary">
                         <span class="icon">＋</span> Nouveau Profil
                     </button>
@@ -148,45 +147,45 @@ function createSettingsLayout() {
         </div>
 
         <div class="settings-col" id="settings-col-2">
-            <form id="settings-form" class="settings-card">
-                <input type="hidden" id="${SELECTORS.profileId.substring(1)}" name="id">
-
+            <form id="profile-edit-form" class="settings-card"> 
+                <input type="hidden" id="profile-id" name="id">
+                
                 <div class="settings-card__header">
                     <h3>Éditer le Profil</h3>
                     <div class="form-actions">
-                        <button id="${SELECTORS.deleteProfileBtn.substring(1)}" type="button" class="btn btn--sm btn--danger" disabled>
-                            <span class="icon">🗑️</span> ${MESSAGES.deleteButton}
+                        <button id="delete-profile-btn" type="button" class="btn btn--sm btn--danger" disabled>
+                            <span class="icon">🗑️</span> Supprimer
                         </button>
                         <button type="submit" class="btn btn--sm btn--primary">
-                            <span class="icon">💾</span> ${MESSAGES.saving}
+                            <span class="icon">💾</span> Sauvegarder
                         </button>
                     </div>
                 </div>
 
                 <div class="settings-card__body">
                     <div class="form-group">
-                        <label for="${SELECTORS.profileName.substring(1)}">Nom du Profil</label>
-                        <input type="text" id="${SELECTORS.profileName.substring(1)}" name="name" class="form-control" required>
+                        <label for="profile-name">Nom du Profil</label>
+                        <input type="text" id="profile-name" name="name" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label for="${SELECTORS.profileDescription.substring(1)}">Description</label>
-                        <textarea id="${SELECTORS.profileDescription.substring(1)}" name="description" class="form-control" rows="2"></textarea>
+                        <label for="profile-description">Description</label>
+                        <textarea id="profile-description" name="description" class="form-control" rows="2"></textarea>
                     </div>
                     <div class="form-group form-group--checkbox">
-                        <input type="checkbox" id="${SELECTORS.profileIsDefault.substring(1)}" name="is_default">
-                        <label for="${SELECTORS.profileIsDefault.substring(1)}">Définir comme profil par défaut</label>
+                        <input type="checkbox" id="profile-is_default" name="is_default">
+                        <label for="profile-is_default">Définir comme profil par défaut</label>
                     </div>
-
+                    
                     <hr class="separator">
-
+                    
                     <div class="form-group">
-                        <label for="${SELECTORS.promptTemplateSelect.substring(1)}">Appliquer un modèle de prompt :</label>
+                        <label for="prompt-template-select">Appliquer un modèle de prompt :</label>
                         <div class="input-group">
-                            <select id="${SELECTORS.promptTemplateSelect.substring(1)}" class="form-control">
-                                <option value="">${MESSAGES.chooseModel}</option>
+                            <select id="prompt-template-select" class="form-control">
+                                <option value="">Choisir un modèle...</option>
                                 ${promptOptions}
                             </select>
-                            <button type="button" class="btn btn--secondary" id="${SELECTORS.applyTemplateBtn.substring(1)}">Appliquer</button>
+                            <button type="button" class="btn btn--secondary" id="apply-template-btn">Appliquer</button>
                         </div>
                     </div>
 
@@ -200,7 +199,7 @@ function createSettingsLayout() {
                 <div class="settings-card__header">
                     <h3>Modèles de Prompts (Templates)</h3>
                     </div>
-                <div class="settings-card__body" id="${SELECTORS.promptTemplatesList.substring(1)}">
+                <div class="settings-card__body" id="prompt-templates-list">
                     </div>
             </div>
         </div>
@@ -209,32 +208,32 @@ function createSettingsLayout() {
             <div class="settings-card">
                 <div class="settings-card__header">
                     <h3>Statut des Tâches (Queues)</h3>
-                    <button id="${SELECTORS.refreshQueuesBtn.substring(1)}" class="btn btn--sm btn--secondary">
+                    <button id="refresh-queues-btn" class="btn btn--sm btn--secondary">
                         <span class="icon">🔄</span> Rafraîchir
                     </button>
                 </div>
-                <div class="settings-card__body" id="${SELECTORS.queueStatusContainer.substring(1)}">
+                <div class="settings-card__body" id="queue-status-container">
                     </div>
             </div>
-
+            
             <div id="models-management" class="settings-card">
                 <div class="settings-card__header">
                     <h3>Gestion des Modèles IA</h3>
                 </div>
                 <div class="settings-card__body">
-                    <select id="${SELECTORS.availableModelsSelect.substring(1)}" class="form-control">
+                    <select id="available-models-select" class="form-control">
                         <option value="llama3.1:8b">Llama 3.1 8B</option>
                         <option value="llama3.1:70b">Llama 3.1 70B</option>
                         <option value="phi3:mini">Phi-3 Mini</option>
                         <option value="mistral:8x7b">Mistral 8x7B</option>
                     </select>
                     <button data-action="download-selected-model" class="btn btn-primary">Télécharger le Modèle</button>
-                    <div id="${SELECTORS.downloadProgress.substring(1)}" class="progress-container" style="display:none;">
-                        <div class="progress-bar" id="${SELECTORS.downloadProgressBar.substring(1)}"></div>
-                        <span id="${SELECTORS.downloadStatus.substring(1)}">${MESSAGES.downloadingModel('')}</span>
+                    <div id="download-progress" class="progress-container" style="display:none;">
+                        <div class="progress-bar" id="download-progress-bar"></div>
+                        <span id="download-status">Téléchargement en cours...</span>
                     </div>
                     <h4>Modèles Installés</h4>
-                    <ul id="${SELECTORS.installedModelsList.substring(1)}"></ul>
+                    <ul id="installed-models-list"></ul>
                 </div>
             </div>
         </div>
@@ -248,9 +247,9 @@ function createSettingsLayout() {
 function createPromptEditorTabs() {
     // Crée les en-têtes des onglets
     const tabs = promptTypes.map((type, index) => `
-        <button
-            type="button"
-            class="tab-link ${index === 0 ? 'active' : ''}"
+        <button 
+            type="button" 
+            class="tab-link ${index === 0 ? 'active' : ''}" 
             data-tab="tab-prompt-${type}"
         >
             ${type.charAt(0).toUpperCase() + type.slice(1)}
@@ -306,15 +305,15 @@ function renderAnalysisProfilesList(profiles, container) {
         <div class="list-item" data-profile-id="${profile.id}">
             <div class="list-item__content">
                 <h5 class="list-item__title">${profile.name} ${profile.is_default ? '<span class="badge badge--default">Défaut</span>' : ''}</h5>
-                <p class="list-item__description">${profile.description || MESSAGES.noDescription}</p>
+                <p class="list-item__description">${profile.description || 'Pas de description.'}</p>
             </div>
         </div>
     `).join('');
-
+    
     container.innerHTML = `<div class="list-group">${listHtml}</div>`;
-
+    
     // Attacher les écouteurs de clic
-    container.querySelectorAll(`${SELECTORS.profileListContainer} .list-item`).forEach(item => {
+    container.querySelectorAll('.list-item').forEach(item => {
         item.addEventListener('click', () => selectProfile(item.dataset.profileId));
     });
 }
@@ -325,18 +324,18 @@ function renderAnalysisProfilesList(profiles, container) {
  */
 function setupSettingsEventListeners() {
     // Écouteurs pour les boutons principaux
-    document.querySelector(SELECTORS.newProfileBtn)?.addEventListener('click', handleNewProfile);
-    document.querySelector(SELECTORS.deleteProfileBtn)?.addEventListener('click', handleDeleteProfile);
-    document.querySelector(SELECTORS.applyTemplateBtn)?.addEventListener('click', () => {
-        const select = document.querySelector(SELECTORS.promptTemplateSelect);
+    document.querySelector('#new-profile-btn')?.addEventListener('click', handleNewProfile);
+    document.querySelector('#delete-profile-btn')?.addEventListener('click', handleDeleteProfile);
+    document.querySelector('#apply-template-btn')?.addEventListener('click', () => {
+        const select = document.querySelector('#prompt-template-select');
         if (select.value) {
             applyPromptTemplate(select.value);
         }
     });
-    document.querySelector(SELECTORS.refreshQueuesBtn)?.addEventListener('click', async () => {
+    document.querySelector('#refresh-queues-btn')?.addEventListener('click', async () => {
         showToast(MESSAGES.refreshingQueuesStatus, 'info');
         await loadQueuesStatus();
-        renderQueueStatus(appState.queuesInfo, document.querySelector(SELECTORS.queueStatusContainer));
+        renderQueueStatus(appState.queuesInfo, document.querySelector('#queue-status-container'));
     });
 
     // Écouteur pour le formulaire
@@ -344,7 +343,7 @@ function setupSettingsEventListeners() {
     if (profileEditForm) {
         profileEditForm.addEventListener('submit', handleSaveProfile);
     }
-
+    
     // Écouteurs pour les onglets de prompts
     const tabContainer = profileEditForm.querySelector('.tabs');
     if (tabContainer) {
@@ -359,7 +358,7 @@ function setupSettingsEventListeners() {
                 tabContents.forEach(tc => tc.classList.remove('active'));
 
                 link.classList.add('active');
-                document.getElementById(tabId)?.classList.add('active');
+                document.querySelector(`#${tabId}`)?.classList.add('active');
             });
         });
     }
@@ -378,7 +377,7 @@ function renderPromptTemplates(prompts, container) {
         <div class="list-item list-item--condensed">
              <div class="list-item__content">
                 <h5 class="list-item__title">${prompt.name}</h5>
-                <p class="list-item__description">${prompt.description || MESSAGES.noDescription}</p>
+                <p class="list-item__description">${prompt.description || 'Pas de description.'}</p>
             </div>
         </div>
     `).join('');
@@ -389,18 +388,18 @@ function renderPromptTemplates(prompts, container) {
  * Remplit tous les <select> de modèles avec les modèles Ollama récupérés.
  */
 function populateModelSelects(models) {
-    const modelSelects = document.querySelectorAll(SELECTORS.modelSelects);
+    const modelSelects = document.querySelectorAll('.model-select');
     if (!models || models.length === 0) {
         modelSelects.forEach(select => {
             select.innerHTML = `<option value="">${MESSAGES.noOllamaModelFound}</option>`;
         });
         return;
     }
-
+    
     const optionsHtml = models.map(model => `<option value="${model.name}">${model.name}</option>`).join('');
-
+    
     modelSelects.forEach(select => {
-        select.innerHTML = `<option value="">${MESSAGES.chooseModel}</option>${optionsHtml}`;
+        select.innerHTML = `<option value="">-- Choisir un modèle --</option>${optionsHtml}`;
     });
 }
 
@@ -425,13 +424,13 @@ function initializeAllEditors(retryCount = 0) {
             const systemEditorId = `${type}-prompt-system`;
             const userEditorId = `${type}-prompt-user`;
 
-            if (document.getElementById(systemEditorId)) {
+            if (document.querySelector(`#${systemEditorId}`)) {
                 editors[`${type}_system`] = ace.edit(systemEditorId);
                 editors[`${type}_system`].setTheme(theme);
                 editors[`${type}_system`].session.setMode("ace/mode/markdown");
             }
 
-            if (document.getElementById(userEditorId)) {
+            if (document.querySelector(`#${userEditorId}`)) {
                 editors[`${type}_user`] = ace.edit(userEditorId);
                 editors[`${type}_user`].setTheme(theme);
                 editors[`${type}_user`].session.setMode("ace/mode/markdown");
@@ -450,14 +449,14 @@ export function selectProfile(profileId) {
     const profile = profiles.find(p => p.id === profileId);
 
     if (!profile) {
-        console.error(MESSAGES.profileNotFound(profileId));
+        console.error(`Profil non trouvé: ${profileId}`);
         return;
     }
-
+    
     appState.selectedProfileId = profileId; // Stocker l'ID sélectionné
 
     // Mettre à jour la liste pour afficher la sélection
-    document.querySelectorAll(`${SELECTORS.profileListContainer} .list-item`).forEach(item => {
+    document.querySelectorAll(`${SELECTORS.settingsContainer} #profile-list-container .list-item`).forEach(item => {
         item.classList.remove('active');
         if (item.dataset.profileId === profileId) {
             item.classList.add('active');
@@ -475,10 +474,10 @@ function renderProfileForm(profile) {
     const form = document.querySelector(SELECTORS.settingsForm);
     if (!form) return;
 
-    form.querySelector(SELECTORS.profileId).value = profile.id || '';
-    form.querySelector(SELECTORS.profileName).value = profile.name || '';
-    form.querySelector(SELECTORS.profileDescription).value = profile.description || '';
-    form.querySelector(SELECTORS.profileIsDefault).checked = profile.is_default || false;
+    form.querySelector('#profile-id').value = profile.id || '';
+    form.querySelector('#profile-name').value = profile.name || '';
+    form.querySelector('#profile-description').value = profile.description || '';
+    form.querySelector('#profile-is_default').checked = profile.is_default || false;
 
     // Définir les valeurs des sélecteurs de modèles
     promptTypes.forEach(type => {
@@ -489,7 +488,7 @@ function renderProfileForm(profile) {
     });
 
     // Gérer le bouton de suppression
-    const deleteBtn = document.querySelector(SELECTORS.deleteProfileBtn);
+    const deleteBtn = document.querySelector('#delete-profile-btn');
     if (profile.is_default || profile.id.startsWith('new_')) {
         deleteBtn.disabled = true;
         deleteBtn.title = profile.is_default ? MESSAGES.cannotDeleteDefaultProfile : "";
@@ -597,8 +596,8 @@ function collectProfileData() {
         data[key] = JSON.stringify(combinedPromptData);
     });
 
-    data.is_default = form.querySelector(SELECTORS.profileIsDefault).checked;
-
+    data.is_default = form.querySelector('#profile-is_default').checked;
+    
     return data;
 }
 
@@ -613,19 +612,19 @@ function handleNewProfile() {
         description: "",
         is_default: false,
     };
-
+    
     // Remplir le formulaire avec le profil vide
     renderProfileForm(newProfile);
 
     // Mettre l'ID à "" pour indiquer à l'API qu'il s'agit d'un POST (Créer)
-    document.querySelector(SELECTORS.profileId).value = "";
-
+    document.querySelector('#profile-id').value = "";
+    
     // Désélectionner dans la liste
-    document.querySelectorAll(`${SELECTORS.profileListContainer} .list-item`).forEach(item => {
+    document.querySelectorAll(`${SELECTORS.settingsContainer} #profile-list-container .list-item`).forEach(item => {
         item.classList.remove('active');
     });
-
-    document.querySelector(SELECTORS.profileName).focus();
+    
+    document.getElementById('profile-name').focus();
 }
 
 /**
@@ -641,7 +640,7 @@ export async function handleSaveProfile(e) {
 
     try {
         const profileData = collectProfileData();
-        const profileId = document.querySelector(SELECTORS.profileId).value;
+        const profileId = document.querySelector('#profile-id').value;
 
         let url = API_ENDPOINTS.analysisProfiles;
         let method = 'POST';
@@ -650,7 +649,7 @@ export async function handleSaveProfile(e) {
             url = API_ENDPOINTS.analysisProfileById(profileId);
             method = 'PUT';
         } else {
-            delete profileData.id;
+            delete profileData.id; // Assurez-vous que l'ID n'est pas envoyé pour la création
         }
 
         const updatedProfile = await fetchAPI(url, {
@@ -659,10 +658,10 @@ export async function handleSaveProfile(e) {
         });
 
         showToast(MESSAGES.profileSaved(updatedProfile.name), 'success');
-
+        
         await loadAnalysisProfiles();
         renderSettings(); // Re-render complet
-
+        
         // Resélectionner le profil qui vient d'être sauvegardé/créé
         selectProfile(updatedProfile.id);
 
@@ -700,7 +699,7 @@ export async function handleDeleteProfile() {
                 try {
                     await fetchAPI(API_ENDPOINTS.analysisProfileById(profileId), { method: 'DELETE' });
                     showToast(MESSAGES.profileDeleted(profile.name), 'success');
-
+                    
                     await loadAnalysisProfiles();
                     renderSettings(); // Re-render (sélectionnera le nouveau profil par défaut)
 
@@ -732,21 +731,21 @@ function renderQueueStatus(status, container) {
             </li>
         `;
     });
-
+    
     // Vérifier s'il y a des workers
     if (!status.workers || status.workers.length === 0) {
         html += `
             <li class="list-item list-item--condensed">
                 <div class="list-item__content text-danger">
-                    <strong>${MESSAGES.noWorkerDetected}</strong>
-                    <small>${MESSAGES.tasksNotProcessed}</small>
+                    <strong>Aucun worker actif détecté.</strong>
+                    <small>Les tâches ne seront pas traitées.</small>
                 </div>
             </li>
         `;
     }
-
+    
     html += '</ul>';
-
+    
     container.innerHTML = html;
 }
 
@@ -826,11 +825,11 @@ export function openProfileEditor(profileId = null) {
 }
 
 export function handleDownloadSelectedModel() {
-    const select = document.querySelector(SELECTORS.availableModelsSelect);
+    const select = document.querySelector('#available-models-select');
     if (select) {
         const modelName = select.value;
         // Appelle la logique que Gemini a écrite
-        downloadModel(modelName);
+        downloadModel(modelName); 
     } else {
         console.error(MESSAGES.selectNotFound);
         showToast(MESSAGES.modelListNotFound, 'error');
@@ -843,7 +842,7 @@ export function handleDownloadSelectedModel() {
 export async function downloadModel(modelName) {
     try {
         showDownloadProgress(modelName);
-        const response = await fetchAPI(API_ENDPOINTS.ollamaPull, {
+        const response = await fetchAPI(API_ENDPOINTS.ollamaPull, { // Assurez-vous que cet endpoint existe dans constants.js
             method: 'POST',
             body: JSON.stringify({ model: modelName }),
         });
@@ -863,7 +862,7 @@ export async function downloadModel(modelName) {
 export async function loadInstalledModels() {
     try {
         const response = await fetchAPI(API_ENDPOINTS.ollamaModels);
-        const modelsList = document.querySelector(SELECTORS.installedModelsList);
+        const modelsList = document.querySelector('#installed-models-list');
         modelsList.innerHTML = response.models
             .map(
                 (model) =>
@@ -876,12 +875,12 @@ export async function loadInstalledModels() {
 }
 
 function showDownloadProgress(modelName) {
-    const progressContainer = document.querySelector(SELECTORS.downloadProgress);
-    const statusElement = document.querySelector(SELECTORS.downloadStatus);
+    const progressContainer = document.querySelector('#download-progress');
+    const statusElement = document.querySelector('#download-status');
     progressContainer.style.display = 'block';
     statusElement.textContent = MESSAGES.downloadingModel(modelName);
 }
 
 function hideDownloadProgress() {
-    document.querySelector(SELECTORS.downloadProgress).style.display = 'none';
+    document.querySelector('#download-progress').style.display = 'none';
 }
