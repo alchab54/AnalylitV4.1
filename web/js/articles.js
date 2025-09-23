@@ -7,6 +7,7 @@ import { showSearchModal } from './search.js'; // Assuming this is correct
 import { setSearchResults, clearSelectedArticles, toggleSelectedArticle, setCurrentProjectExtractions } from './state.js';
 import { showSection } from './core.js';
 import { loadProjectGrids } from './grids.js';
+import { API_ENDPOINTS, MESSAGES } from './constants.js';
 
 function debounce(func, delay) {
     let timeout;
@@ -17,14 +18,14 @@ function debounce(func, delay) {
 }
 
 export async function loadSearchResults(page = 1) {
-    showLoadingOverlay(true, 'Chargement des résultats...');
+    showLoadingOverlay(true, MESSAGES.loadingResults);
     
     if (!appState.currentProject?.id) {
         if (elements.resultsContainer) {
             elements.resultsContainer.innerHTML = `
                 <div class="results-empty">
-                    <h3>Aucun projet sélectionné</h3>
-                    <p>Sélectionnez un projet pour voir les résultats de recherche.</p>
+                    <h3>${MESSAGES.noProjectSelected}</h3>
+                    <p>${MESSAGES.selectProjectToViewResults}</p>
                 </div>`;
         }
         showLoadingOverlay(false);
@@ -32,17 +33,17 @@ export async function loadSearchResults(page = 1) {
     }
 
     try {
-        const results = await fetchAPI(`/projects/${appState.currentProject.id}/search-results?page=${page}`);
+        const results = await fetchAPI(`${API_ENDPOINTS.projectSearchResults(appState.currentProject.id)}?page=${page}`);
         setSearchResults(results.articles || [], results.meta || {});
         
-        const extractions = await fetchAPI(`/projects/${appState.currentProject.id}/extractions`);
+        const extractions = await fetchAPI(API_ENDPOINTS.projectExtractions(appState.currentProject.id));
         setCurrentProjectExtractions(extractions);
         
         renderSearchResultsTable();
     } catch (error) {
         showToast(`Erreur: ${error.message}`, 'error');
         if (elements.resultsContainer) {
-            elements.resultsContainer.innerHTML = `<div class="error-state">Erreur de chargement des résultats.</div>`;
+            elements.resultsContainer.innerHTML = `<div class="error-state">${MESSAGES.errorLoadingResults}</div>`;
         }
     } finally {
         showLoadingOverlay(false);
@@ -55,8 +56,8 @@ export function renderSearchResultsTable() {
     if (!appState.currentProject) {
         elements.resultsContainer.innerHTML = `
             <div class="results-empty">
-                <h3>Aucun projet sélectionné</h3>
-                <p>Sélectionnez un projet pour voir les résultats.</p>
+                <h3>${MESSAGES.noProjectSelected}</h3>
+                <p>${MESSAGES.selectProjectToViewResults}</p>
             </div>`;
         return;
     }
@@ -218,7 +219,7 @@ export async function viewArticleDetails(articleId) {
     const extraction = appState.currentProjectExtractions.find(e => e.pmid === articleId);
     
     if (!article) {
-        showToast('Article introuvable', 'error');
+        showToast(MESSAGES.articleNotFound, 'error');
         return;
     }
 
@@ -248,23 +249,22 @@ export async function viewArticleDetails(articleId) {
             ${extractionDetails}
         </div>`;
 
-    showModal('Détails de l\'article', content);
+    showModal(MESSAGES.articleDetailsTitle, content);
 }
 
 export async function handleDeleteSelectedArticles() {
     const selectedArticles = getSelectedArticles();
     if (selectedArticles.length === 0) {
-        showToast('Aucun article sélectionné', 'warning');
+        showToast(MESSAGES.noArticleSelected, 'warning');
         return;
     }
 
-    if (!confirm(`Supprimer ${selectedArticles.length} article(s) sélectionné(s) ?`)) {
+    if (!confirm(MESSAGES.confirmDeleteArticles(selectedArticles.length))) {
         return;
     }
 
     try {
-        // CORRECTION : Utilise la route correcte
-        const response = await fetchAPI('/articles/batch-delete', {
+        const response = await fetchAPI(API_ENDPOINTS.articlesBatchDelete, {
             method: 'POST',
             body: JSON.stringify({
                 article_ids: selectedArticles.map(a => a.id),
@@ -272,10 +272,8 @@ export async function handleDeleteSelectedArticles() {
             })
         });
 
-        // CORRECTION : Utilise job_id au lieu de task_id
         if (response.job_id) {
-            showToast(`Suppression lancée (Job ID: ${response.job_id})`, 'success');
-            // Actualiser la liste des articles
+            showToast(MESSAGES.deleteStarted(response.job_id), 'success');
             setTimeout(() => {
                 window.dispatchEvent(new CustomEvent('articles:refresh'));
             }, 2000);
@@ -289,7 +287,7 @@ export function showBatchProcessModal() {
     const selectedCount = appState.selectedSearchResults.size;
     
     if (selectedCount === 0) {
-        showToast('Aucun article sélectionné', 'warning');
+        showToast(MESSAGES.noArticleSelected, 'warning');
         return;
     }
 
@@ -315,7 +313,7 @@ export function showBatchProcessModal() {
             </div>
         </div>`;
 
-    showModal('Lancer le Screening par Lot', content);
+    showModal(MESSAGES.batchProcessModalTitle, content);
 }
 
 export async function startBatchProcessing() {
@@ -327,10 +325,10 @@ export async function startBatchProcessing() {
     
     if (selectedIds.length === 0) return;
 
-    showLoadingOverlay(true, `Lancement du screening pour ${selectedIds.length} article(s)...`);
+    showLoadingOverlay(true, MESSAGES.screeningStarted(selectedIds.length));
     
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run`, { // This route is correct in server_v4_complete.py
+        await fetchAPI(API_ENDPOINTS.projectRun(appState.currentProject.id), { 
             method: 'POST',
             body: {
                 articles: selectedIds,
@@ -339,7 +337,7 @@ export async function startBatchProcessing() {
             }
         });
         
-        showToast('Tâche de screening lancée en arrière-plan.', 'success');
+        showToast(MESSAGES.screeningTaskStarted, 'success');
         showSection('validation');
         
     } catch (e) {
@@ -356,11 +354,10 @@ export async function showRunExtractionModal() {
         .filter(e => e.user_validation_status === 'include');
     
     if (includedArticles.length === 0) {
-        showToast("Aucun article n'a été marqué comme 'Inclus' pour l'extraction.", 'warning');
+        showToast(MESSAGES.noArticleToExtract, 'warning');
         return;
     }
 
-    // Charger les grilles si elles ne sont pas déjà dans l'état
     if (appState.currentProjectGrids.length === 0) {
         await loadProjectGrids(appState.currentProject.id);
     }
@@ -388,7 +385,7 @@ export async function showRunExtractionModal() {
             </div>
         </div>`;
 
-    showModal('Extraction Complète', content);
+    showModal(MESSAGES.fullExtractionModalTitle, content);
 }
 
 export async function startFullExtraction() {
@@ -396,7 +393,7 @@ export async function startFullExtraction() {
     const gridId = gridSelect ? gridSelect.value : null;
     
     if (!gridId) {
-        showToast('Veuillez sélectionner une grille d\'extraction', 'warning');
+        showToast(MESSAGES.noGridSelectedForExtraction, 'warning');
         return;
     }
 
@@ -407,10 +404,10 @@ export async function startFullExtraction() {
     
     const articleIds = includedArticles.map(e => e.pmid);
 
-    showLoadingOverlay(true, `Lancement de l'extraction pour ${articleIds.length} article(s)...`);
+    showLoadingOverlay(true, MESSAGES.extractionStarted(articleIds.length));
     
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run`, {
+        await fetchAPI(API_ENDPOINTS.projectRun(appState.currentProject.id), {
             method: 'POST',
             body: {
                 articles: articleIds,
@@ -419,7 +416,7 @@ export async function startFullExtraction() {
             }
         });
         
-        showToast('Extraction complète lancée en arrière-plan.', 'success');
+        showToast(MESSAGES.extractionTaskStarted, 'success');
         showSection('validation');
         
     } catch (e) {

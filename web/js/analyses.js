@@ -2,11 +2,12 @@ import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { setAnalysisResults } from './state.js';
 import { showToast, showLoadingOverlay, escapeHtml, showModal, closeModal, openModal } from './ui-improved.js';
+import { API_ENDPOINTS, MESSAGES } from './constants.js';
 
 export async function loadProjectAnalyses() {
     if (!appState.currentProject) {
         if (elements.analysisContainer) {
-            elements.analysisContainer.innerHTML = '<p>Sélectionnez un projet pour voir les analyses.</p>';
+            elements.analysisContainer.innerHTML = `<p>${MESSAGES.selectProjectToViewAnalyses}</p>`;
         }
         return;
     }
@@ -18,7 +19,7 @@ export async function loadProjectAnalyses() {
         renderAnalysesSection();
     } catch (e) {
         console.error('Erreur chargement analyses:', e);
-        showToast('Erreur lors du chargement des analyses', 'error');
+        showToast(MESSAGES.errorLoadingAnalyses, 'error');
     }
 }
 
@@ -27,7 +28,7 @@ export function renderAnalysesSection() {
     const project = appState.currentProject;
 
     if (!project) {
-        elements.analysisContainer.innerHTML = `<div class="empty-state"><p>Sélectionnez un projet pour voir les analyses.</p></div>`;
+        elements.analysisContainer.innerHTML = `<div class="empty-state"><p>${MESSAGES.selectProjectToViewAnalyses}</p></div>`;
         return;
     }
 
@@ -180,13 +181,13 @@ export async function savePRISMAProgress() {
         };
     });
 
-    showLoadingOverlay(true, 'Sauvegarde PRISMA...');
+    showLoadingOverlay(true, MESSAGES.savingPrisma);
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/prisma-checklist`, {
+        await fetchAPI(API_ENDPOINTS.projectPrismaChecklist(appState.currentProject.id), {
             method: 'POST',
             body: { checklist: { ...appState.prismaChecklist, items } }
         });
-        showToast('Progression PRISMA sauvegardée.', 'success');
+        showToast(MESSAGES.prismaSaved, 'success');
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
     } finally {
@@ -195,20 +196,20 @@ export async function savePRISMAProgress() {
 }
 
 export function exportPRISMAReport() {
-    showToast('Export PRISMA non implémenté.', 'info');
+    showToast(MESSAGES.prismaExportNotImplemented, 'info');
 }
 
 export async function handleRunATNAnalysis() {
     const projectId = appState.currentProject?.id;
     if (!projectId) {
-        showToast('Aucun projet sélectionné', 'warning');
+        showToast(MESSAGES.noProjectSelected, 'warning');
         return;
     }
 
     try {
-        showOverlay('Lancement de l\'analyse ATN...');
+        showLoadingOverlay(true, MESSAGES.atnAnalysisStarted);
         
-        const response = await fetchAPI(`/projects/${projectId}/run-analysis`, {
+        const response = await fetchAPI(API_ENDPOINTS.projectRunAnalysis(projectId), {
             method: 'POST',
             body: JSON.stringify({
                 type: 'atnscores' // CORRECTION : type spécifique
@@ -217,28 +218,28 @@ export async function handleRunATNAnalysis() {
 
         // CORRECTION : Utilise job_id
         if (response.job_id) {
-            showToast(`Analyse ATN lancée (Job ID: ${response.job_id})`, 'success');
+            showToast(MESSAGES.atnAnalysisJobStarted(response.job_id), 'success');
         }
     } catch (error) {
         showToast(`Erreur : ${error.message}`, 'error');
     } finally {
-        hideOverlay();
+        showLoadingOverlay(false);
     }
 }
 
 // MODIFICATION : runProjectAnalysis est maintenant déclenché par les boutons sur les cartes
 export async function runProjectAnalysis(analysisType) {
     if (!appState.currentProject?.id) {
-        showToast('Veuillez d\'abord sélectionner un projet.', 'warning');
+        showToast(MESSAGES.selectProjectFirst, 'warning');
         return;
     }
     
-    // Mappage pour les messages affichés à l\'utilisateur
+    // Mappage pour les messages affichés à l'utilisateur
     const analysisNames = {
         discussion: 'le brouillon de discussion',
         knowledge_graph: 'le graphe de connaissances',
         prisma_flow: 'le diagramme PRISMA',
-        atn_scores: "l\'analyse ATN"
+        atn_scores: "l'analyse ATN"
     };
 
     // Trouver la carte correspondante pour afficher le spinner
@@ -246,58 +247,37 @@ export async function runProjectAnalysis(analysisType) {
     if (card) {
         card.classList.add('analysis-card--loading');
     } else {
-        showLoadingOverlay(true, `Lancement de la génération pour ${analysisNames[analysisType] || analysisType}...`);
+        showLoadingOverlay(true, MESSAGES.startingAnalysis(analysisNames[analysisType] || analysisType));
     }
 
     try {
-        
-        // CORRECTION: Centralisation des endpoints et des types de body
-        let endpoint = '';
-        let body = {};
         const projectId = appState.currentProject.id;
-
-        switch(analysisType) {
-            case 'discussion':
-                endpoint = `/projects/${projectId}/run-analysis`;
-                body = { type: 'discussion' };
-                break;
-            case 'knowledge_graph':
-                 endpoint = `/projects/${projectId}/run-analysis`;
-                 body = { type: 'knowledge_graph' };
-                 break;
-            case 'prisma_flow':
-                endpoint = `/projects/${projectId}/run-analysis`;
-                body = { type: 'prisma_flow' };
-                break;
-            case 'meta_analysis':
-                endpoint = `/projects/${projectId}/run-analysis`;
-                body = { type: 'meta_analysis' };
-                break;
-            case 'descriptive_stats':
-                endpoint = `/projects/${projectId}/run-analysis`;
-                body = { type: 'descriptive_stats' };
-                break;
-            default:
-                showToast("Type d\'analyse inconnu.", 'error');
-                if (card) card.classList.remove('analysis-card--loading');
-                if (!card) showLoadingOverlay(false);
-                return;
+        const validTypes = ['discussion', 'knowledge_graph', 'prisma_flow', 'meta_analysis', 'descriptive_stats'];
+        if (!validTypes.includes(analysisType)) {
+            showToast(MESSAGES.unknownAnalysisType, 'error');
+            if (card) card.classList.remove('analysis-card--loading');
+            if (!card) showLoadingOverlay(false);
+            return;
         }
+
+        const response = await fetchAPI(API_ENDPOINTS.projectRunAnalysis(projectId), { 
+            method: 'POST', 
+            body: { type: analysisType } 
+        });
         
-        const response = await fetchAPI(endpoint, { method: 'POST', body });
-        // CORRECTION: Utilisation de job_id pour la cohérence avec le backend.
         const jobId = response.job_id;
         if (jobId) {
-            showToast(`La génération pour ${analysisNames[analysisType]} a été lancée (Job: ${jobId}).`, 'success');
+            showToast(MESSAGES.analysisJobStarted(analysisNames[analysisType], jobId), 'success');
         } else {
-            showToast(`La génération pour ${analysisNames[analysisType]} a été lancée.`, 'success');
+            showToast(MESSAGES.analysisStartedSimple(analysisNames[analysisType]), 'success');
         }
     } catch (e) {
-        showToast(`Erreur lors du lancement de l\'analyse: ${e.message}`, 'error');
+        showToast(`${MESSAGES.errorStartingAnalysis}: ${e.message}`, 'error');
         if (card) card.classList.remove('analysis-card--loading');
         if (!card) showLoadingOverlay(false);
     }
 }
+
 
 export function showRunAnalysisModal() {
     const content = `
@@ -339,7 +319,7 @@ export function showRunAnalysisModal() {
             </div>
         </div>
     `;
-    showModal('Lancer une Analyse Avancée', content);
+    showModal(MESSAGES.advancedAnalysisModalTitle, content);
 }
 
 export function renderDiscussionDraft(draft) {
@@ -453,8 +433,8 @@ export async function handleRunPrismaFlow(event) {
     if (card) card.classList.add('analysis-card--loading');
 
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, { method: 'POST', body: { type: 'prisma_flow' } });
-        showToast('Génération du diagramme PRISMA lancée.', 'success');
+        await fetchAPI(API_ENDPOINTS.projectRunAnalysis(appState.currentProject.id), { method: 'POST', body: { type: 'prisma_flow' } });
+        showToast(MESSAGES.analysisStartedSimple('le diagramme PRISMA'), 'success');
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
         if (card) card.classList.remove('analysis-card--loading');
@@ -463,10 +443,10 @@ export async function handleRunPrismaFlow(event) {
 
 export async function handleRunMetaAnalysis() {
     if (!appState.currentProject?.id) return;
-    showLoadingOverlay(true, 'Lancement de la méta-analyse...');
+    showLoadingOverlay(true, MESSAGES.startingMetaAnalysis);
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, { method: 'POST', body: { type: 'meta_analysis' } });
-        showToast('Méta-analyse lancée avec succès.', 'success');
+        await fetchAPI(API_ENDPOINTS.projectRunAnalysis(appState.currentProject.id), { method: 'POST', body: { type: 'meta_analysis' } });
+        showToast(MESSAGES.metaAnalysisStarted, 'success');
         closeModal();
     } finally {
         showLoadingOverlay(false);
@@ -476,10 +456,10 @@ export async function handleRunMetaAnalysis() {
 
 export async function handleRunDescriptiveStats() {
     if (!appState.currentProject?.id) return;
-    showLoadingOverlay(true, 'Calcul des statistiques descriptives...');
+    showLoadingOverlay(true, MESSAGES.startingDescriptiveStats);
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, { method: 'POST', body: { type: 'descriptive_stats' } });
-        showToast('Calcul des statistiques lancé.', 'success');
+        await fetchAPI(API_ENDPOINTS.projectRunAnalysis(appState.currentProject.id), { method: 'POST', body: { type: 'descriptive_stats' } });
+        showToast(MESSAGES.descriptiveStatsStarted, 'success');
         closeModal();
     } finally {
         showLoadingOverlay(false);
@@ -491,23 +471,24 @@ export async function handleRunDescriptiveStats() {
  */
 export async function exportAnalyses() {
     if (!appState.currentProject?.id) {
-        showToast('Veuillez sélectionner un projet pour exporter les analyses.', 'warning');
+        showToast(MESSAGES.selectProjectToExportAnalyses, 'warning');
         return;
     }
 
     try {
-        showLoadingOverlay(true, 'Préparation de l\'exportation...');
+        showLoadingOverlay(true, MESSAGES.preparingExport);
         // L'URL pointe vers l'endpoint backend qui génère le fichier ZIP
-        const exportUrl = `/api/projects/${appState.currentProject.id}/export/analyses`;
+        const exportUrl = `/api${API_ENDPOINTS.projectExportAnalyses(appState.currentProject.id)}`;
         
         // Ouvre une nouvelle fenêtre pour déclencher le téléchargement du fichier
         window.open(exportUrl, '_blank');
 
-        showToast('L\'exportation des analyses a commencé.', 'info');
+        showToast(MESSAGES.analysisExportStarted, 'info');
     } catch (error) {
         console.error("Erreur lors de l'exportation des analyses:", error);
-        showToast(`Erreur d'exportation : ${error.message}`, 'error');
+        showToast(`${MESSAGES.errorExportingAnalyses} : ${error.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }
 }
+
