@@ -351,7 +351,7 @@ export function showSection(sectionId) {
     appState.currentSection = sectionId;
 
     // Sauvegarder la section active dans le localStorage
-    localStorage.setItem('analylit_last_section', sectionId);
+    localStorage.setItem(CONFIG.LOCAL_STORAGE_LAST_SECTION, sectionId);
 
     if (elements.sections) {
         elements.sections.forEach(section => {
@@ -366,7 +366,7 @@ export function showSection(sectionId) {
     
     // Optimisation : Ne re-rendre la section que si elle n'a pas encore été rendue.
     if (!appState.renderedSections.has(sectionId)) {
-        console.log(`First render for section: ${sectionId}`);
+        console.log(MESSAGES.firstRender(sectionId));
         // La logique de chargement des données est maintenant dans refreshCurrentSection
         refreshCurrentSection();
         appState.renderedSections.add(sectionId);
