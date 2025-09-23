@@ -57,8 +57,8 @@ export async function loadValidationSection() {
         if (validationContainer) {
             validationContainer.innerHTML = `
                 <div class="section-empty">
-                    <h3>Aucun projet sélectionné</h3>
-                    <p>Sélectionnez un projet pour voir les données de validation.</p>
+                    <h3>${MESSAGES.noProjectSelectedValidation}</h3>
+                    <p>${MESSAGES.selectProjectForValidation}</p>
                 </div>`;
         }
         return;
@@ -70,7 +70,7 @@ export async function loadValidationSection() {
 async function loadProjectExtractions(projectId) {
     if (!appState.currentProject) return;
     
-    const extractions = await fetchAPI(`/projects/${projectId}/extractions`);
+    const extractions = await fetchAPI(API_ENDPOINTS.projectExtractions(projectId));
     setCurrentValidations(extractions);
 }
 
@@ -79,13 +79,13 @@ export async function renderValidationSection(project) {
     if (!container || !project) {
         if(container) container.innerHTML = `
             <div class="section-empty">
-                <h3>Aucun projet sélectionné</h3>
-                <p>Sélectionnez un projet pour voir la validation.</p>
+                <h3>${MESSAGES.noProjectSelectedValidation}</h3>
+                <p>${MESSAGES.selectProjectForValidation}</p>
             </div>`;
         return;
     }
 
-    showLoadingOverlay(true, 'Chargement des validations...');
+    showLoadingOverlay(true, MESSAGES.loadingValidations);
 
     try {
         const extractions = appState.currentValidations || [];
@@ -101,54 +101,54 @@ export async function renderValidationSection(project) {
         container.innerHTML = `
             <div class="validation-section">
                 <div class="validation-header">
-                    <h2>Validation Inter-Évaluateurs</h2>
+                    <h2>${MESSAGES.validationSectionTitle}</h2>
                     <button class="btn btn--secondary" data-action="calculate-kappa">
-                        Calculer Kappa
+                        ${MESSAGES.calculateKappaButton}
                     </button>
                     <div class="evaluator-selection">
-                        <label for="activeEvaluator">Évaluateur Actif:</label>
+                        <label for="activeEvaluator">${MESSAGES.activeEvaluator}</label>
                         <select id="activeEvaluator" class="form-select">
-                            <option value="evaluator1" ${appState.activeEvaluator === 'evaluator1' ? 'selected' : ''}>Évaluateur 1</option>
-                            <option value="evaluator2" ${appState.activeEvaluator === 'evaluator2' ? 'selected' : ''}>Évaluateur 2</option>
+                            <option value="evaluator1" ${appState.activeEvaluator === 'evaluator1' ? 'selected' : ''}>${MESSAGES.evaluator1}</option>
+                            <option value="evaluator2" ${appState.activeEvaluator === 'evaluator2' ? 'selected' : ''}>${MESSAGES.evaluator2}</option>
                         </select>
                     </div>
                     <div class="validation-stats">
                         <div class="stat-item stat-item--included">
                             <span class="stat-value">${included.length}</span>
-                            <span class="stat-label">Inclus</span>
+                            <span class="stat-label">${MESSAGES.included}</span>
                         </div>
                         <div class="stat-item stat-item--excluded">
                             <span class="stat-value">${excluded.length}</span>
-                            <span class="stat-label">Exclus</span>
+                            <span class="stat-label">${MESSAGES.excluded}</span>
                         </div>
                         <div class="stat-item stat-item--pending">
                             <span class="stat-value">${pending.length}</span>
-                            <span class="stat-label">En attente</span>
+                            <span class="stat-label">${MESSAGES.pending}</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="validation-filters">
                     <button class="filter-btn filter-btn--active" data-action="filter-validations" data-status="all">
-                        Tous
+                        ${MESSAGES.all}
                     </button>
                     <button class="filter-btn" data-action="filter-validations" data-status="include">
-                        Inclus (${included.length})
+                        ${MESSAGES.included} (${included.length})
                     </button>
                     <button class="filter-btn" data-action="filter-validations" data-status="exclude">  
-                        Exclus (${excluded.length})
+                        ${MESSAGES.excluded} (${excluded.length})
                     </button>
                     <button class="filter-btn" data-action="filter-validations" data-status="pending">
-                        En attente (${pending.length})
+                        ${MESSAGES.pending} (${pending.length})
                     </button>
                 </div>
 
                 ${included.length > 0 ? `
                     <div class="extraction-launch">
-                        <h4>Lancer l'extraction complète</h4>
-                        <p>Lancez une extraction détaillée sur les <strong>${included.length} article(s)</strong> que vous avez inclus.</p>
+                        <h4>${MESSAGES.launchFullExtraction}</h4>
+                        <p>${MESSAGES.launchFullExtractionDescription(included.length)}</p>
                         <button class="btn btn--primary" data-action="run-extraction-modal">
-                            Lancer l'extraction
+                            ${MESSAGES.launchExtractionButton}
                         </button>
                     </div>
                 ` : ''}
@@ -178,8 +178,8 @@ export async function renderValidationSection(project) {
     } catch (e) {
         container.innerHTML = `
             <div class="error-state">
-                <h3>Erreur</h3>
-                <p>Erreur lors de l'affichage de la section de validation.</p>
+                <h3>${MESSAGES.validationErrorTitle}</h3>
+                <p>${MESSAGES.errorDisplayingValidation}</p>
             </div>`;
     } finally {
         showLoadingOverlay(false);
@@ -188,7 +188,7 @@ export async function renderValidationSection(project) {
 
 function renderValidationItem(extraction) {
     const article = appState.searchResults.find(art => art.article_id === extraction.pmid);
-    const title = article?.title || extraction.title || 'Titre non disponible';
+    const title = article?.title || extraction.title || MESSAGES.titleUnavailable;
     
     const statusClass = extraction.user_validation_status === 'include' ? 'included' : 
                        extraction.user_validation_status === 'exclude' ? 'excluded' : 'pending';
@@ -204,7 +204,7 @@ function renderValidationItem(extraction) {
             
             <div class="validation-item__content">
                 <p class="validation-item__justification">
-                    <strong>Justification:</strong> ${escapeHtml(extraction.relevance_justification || 'Aucune')}
+                    <strong>${MESSAGES.justification}</strong> ${escapeHtml(extraction.relevance_justification || MESSAGES.none)}
                 </p>
                 
                 <div class="validation-item__actions">
@@ -212,18 +212,18 @@ function renderValidationItem(extraction) {
                             data-action="validate-extraction" 
                             data-id="${extraction.id}" 
                             data-decision="include">
-                        Inclure
+                        ${MESSAGES.includeButton}
                     </button>
                     <button class="btn btn--sm btn--danger" 
                             data-action="validate-extraction" 
                             data-id="${extraction.id}" 
                             data-decision="exclude">
-                        Exclure
+                        ${MESSAGES.excludeButton}
                     </button>
                     <button class="btn btn--sm btn--secondary" 
                             data-action="reset-validation" 
                             data-id="${extraction.id}">
-                        Réinitialiser
+                        ${MESSAGES.resetButton}
                     </button>
                 </div>
             </div>
@@ -233,22 +233,22 @@ function renderValidationItem(extraction) {
 // New function to calculate Kappa
 export async function calculateKappa() {
     if (!appState.currentProject?.id) {
-        showToast('Veuillez sélectionner un projet pour calculer Kappa.', 'error');
+        showToast(MESSAGES.selectProjectForKappa, 'error');
         return;
     }
 
-    showLoadingOverlay(true, 'Calcul du coefficient Kappa...');
+    showLoadingOverlay(true, MESSAGES.calculatingKappa);
     try {
-        const response = await fetchAPI(`/projects/${appState.currentProject.id}/calculate-kappa`, {
+        const response = await fetchAPI(API_ENDPOINTS.projectCalculateKappa(appState.currentProject.id), {
             method: 'POST'
         });
         if (response.success) {
-            showToast(`Calcul Kappa lancé. Task ID: ${response.task_id}`, 'success');
+            showToast(MESSAGES.kappaCalculationStarted(response.task_id), 'success');
         } else {
-            showToast(`Erreur lors du lancement du calcul Kappa: ${response.message}`, 'error');
+            showToast(MESSAGES.errorCalculatingKappa(response.message), 'error');
         }
     } catch (error) {
-        showToast(`Erreur API lors du calcul Kappa: ${error.message}`, 'error');
+        showToast(MESSAGES.errorApiKappa(error.message), 'error');
     } finally {
         showLoadingOverlay(false);
     }

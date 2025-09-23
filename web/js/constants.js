@@ -16,31 +16,7 @@ export const SELECTORS = {
     importContainer: '#importContainer',
     chatContainer: '#chatContainer',
     settingsContainer: '#settingsContainer',
-    robContainer: '#robContainer',
-    modalsContainer: '#modalsContainer',
-    loadingOverlay: '#loadingOverlay',
-    toastContainer: '#toastContainer',
-    reportingContainer: '#reportingContainer',
-    tasksContainer: '#tasksContainer',
-    newProjectForm: '#newProjectForm',
-    gridsContainer: '#gridsContainer',
-    searchContainer: '#searchContainer',
-    selectedArticles: '.article-checkbox:checked',
-    analysisProgress: '#analysis-progress',
-    analysisResults: '#analysis-results',
-    settingsForm: '#profile-edit-form',
-    ollamaModels: '#ollama-models-select',
-    sidebar: '#sidebar',
-    mainContent: '#main-content',
-    loadingSpinner: '#loading-spinner',
-    gridFieldDesc: '.grid-field-desc',
-    zoteroFileInput: '#zoteroFileInput',
-    bulkPDFInput: '#bulkPDFInput',
-    pmidList: '#pmid-list',
-    zoteroUserId: '#zoteroUserId',
-    zoteroApiKey: '#zoteroApiKey',
-    chatInput: '#chatInput',
-    chatMessages: '#chatMessages'
+    robCard: (articleId) => `#rob-card-${articleId}`
 };
 
 // URLs API centralisées
