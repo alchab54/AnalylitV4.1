@@ -1,13 +1,14 @@
 // web/js/articles.js
 import { fetchAPI } from './api.js';
-import { appState, elements } from './app-improved.js';
-import { showLoadingOverlay, showToast, showModal, closeModal, escapeHtml } from './ui-improved.js';
+import { appState, elements } from './app-improved.js'; // Already correct
+import { showLoadingOverlay, showModal, closeModal, escapeHtml } from './ui-improved.js'; // No change needed here
+import { showToast } from './toast.js';
 import { loadProjectFilesSet } from './projects.js';
-import { showSearchModal } from './search.js';
+import { showSearchModal } from './search.js'; // Assuming this is correct
 import { setSearchResults, clearSelectedArticles, toggleSelectedArticle, setCurrentProjectExtractions } from './state.js';
 import { showSection } from './core.js';
 import { loadProjectGrids } from './grids.js';
-import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
+import { API_ENDPOINTS, MESSAGES } from './constants.js'; // Already correct
 
 function debounce(func, delay) {
     let timeout;
@@ -18,15 +19,14 @@ function debounce(func, delay) {
 }
 
 export async function loadSearchResults(page = 1) {
-    showLoadingOverlay(true, MESSAGES.loadingResults);
-
+    showLoadingOverlay(true, MESSAGES.loadingResults); // Already correct
+    
     if (!appState.currentProject?.id) {
-        const resultsContainer = document.querySelector(SELECTORS.resultsContainer);
-        if (resultsContainer) {
-            resultsContainer.innerHTML = `
+        if (elements.resultsContainer) {
+            elements.resultsContainer.innerHTML = `
                 <div class="results-empty">
-                    <h3>${MESSAGES.noProjectSelected}</h3>
-                    <p>${MESSAGES.selectProjectToViewResults}</p>
+                    <h3>${MESSAGES.noProjectSelected}</h3> 
+                    <p>${MESSAGES.selectProjectToViewResults}</p> 
                 </div>`;
         }
         showLoadingOverlay(false);
@@ -34,17 +34,17 @@ export async function loadSearchResults(page = 1) {
     }
 
     try {
-        const results = await fetchAPI(`${API_ENDPOINTS.projectSearchResults(appState.currentProject.id)}?page=${page}`);
+        const results = await fetchAPI(API_ENDPOINTS.projectSearchResults(appState.currentProject.id) + `?page=${page}`); // Already correct
         setSearchResults(results.articles || [], results.meta || {});
-
-        const extractions = await fetchAPI(API_ENDPOINTS.projectExtractions(appState.currentProject.id));
+        
+        const extractions = await fetchAPI(API_ENDPOINTS.projectExtractions(appState.currentProject.id)); // Already correct
         setCurrentProjectExtractions(extractions);
-
+        
         renderSearchResultsTable();
     } catch (error) {
         showToast(`Erreur: ${error.message}`, 'error');
         if (elements.resultsContainer) {
-            elements.resultsContainer.innerHTML = `<div class="error-state">${MESSAGES.errorLoadingResults}</div>`;
+            elements.resultsContainer.innerHTML = `<div class="error-state">Erreur de chargement des résultats.</div>`;
         }
     } finally {
         showLoadingOverlay(false);
@@ -52,43 +52,40 @@ export async function loadSearchResults(page = 1) {
 }
 
 export function renderSearchResultsTable() {
-    const resultsContainer = document.querySelector(SELECTORS.resultsContainer);
-    if (!resultsContainer) return;
-
+    if (!elements.resultsContainer) return;
+    
     if (!appState.currentProject) {
-        resultsContainer.innerHTML = `
+        elements.resultsContainer.innerHTML = `
             <div class="results-empty">
-                <h3>${MESSAGES.noProjectSelected}</h3>
-                <p>${MESSAGES.selectProjectToViewResults}</p>
+                <h3>${MESSAGES.noProjectSelected}</h3> 
+                <p>${MESSAGES.selectProjectToViewResults}</p> 
             </div>`;
         return;
     }
 
     if (appState.searchResults.length === 0) {
-        resultsContainer.innerHTML = `
-            <div class="empty-state text-center py-5">
-                <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                <h4>${MESSAGES.noArticlesFoundTitle}</h4>
-                <p>${MESSAGES.noArticlesFoundText}</p>
-            </div>
-        `;
+        elements.resultsContainer.innerHTML = `
+            <div class="results-empty">
+                <h3>${MESSAGES.noArticles}</h3> 
+                <p>Lancez une recherche pour voir les articles.</p>
+            </div>`;
         return;
     }
 
     const { selectedSearchResults, currentProjectExtractions, currentProjectFiles } = appState;
-
+    
     const tableRows = appState.searchResults.map(article => {
         const isSelected = selectedSearchResults.has(article.article_id);
         const extraction = currentProjectExtractions.find(e => e.pmid === article.article_id);
-
+        
         // Vérifier si le PDF existe
         const pdfExists = currentProjectFiles?.has(article.article_id.replace(/^PMID:/, '').toLowerCase());
-
+        
         return `
             <tr class="result-row ${isSelected ? 'result-row--selected' : ''}" data-article-id="${article.article_id}">
                 <td>
-                    <input type="checkbox"
-                           data-action="toggle-article-selection"
+                    <input type="checkbox" 
+                           data-action="toggle-article-selection" 
                            data-article-id="${article.article_id}"
                            ${isSelected ? 'checked' : ''}>
                 </td>
@@ -98,20 +95,20 @@ export function renderSearchResultsTable() {
                         ${pdfExists ? '<span class="pdf-badge">📄 PDF</span>' : ''}
                     </div>
                     <div class="article-meta">
-                        <span>${escapeHtml(article.authors)}</span> •
-                        <em>${escapeHtml(article.journal)}</em> •
+                        <span>${escapeHtml(article.authors)}</span> • 
+                        <em>${escapeHtml(article.journal)}</em> • 
                         <span>${escapeHtml(article.publication_date)}</span>
                     </div>
                 </td>
                 <td class="score-column">
-                    ${extraction ?
-                        `<span class="relevance-score">${extraction.relevance_score || 'N/A'}</span>` :
+                    ${extraction ? 
+                        `<span class="relevance-score">${extraction.relevance_score || 'N/A'}</span>` : 
                         '<span class="no-analysis">-</span>'
                     }
                 </td>
                 <td class="actions-column">
-                    <button class="btn btn--sm btn--secondary"
-                            data-action="view-details"
+                    <button class="btn btn--sm btn--secondary" 
+                            data-action="view-details" 
                             data-article-id="${article.article_id}">
                         Détails
                     </button>
@@ -124,33 +121,32 @@ export function renderSearchResultsTable() {
             <div class="results-stats">
                 <strong>${appState.searchResults.length}</strong> articles trouvés
                 <span class="selection-counter">
-                    <strong id="selected-articles-count">${selectedSearchResults.size}</strong> sélectionnés
+                    <strong id="selectedCount">${selectedSearchResults.size}</strong> sélectionnés
                 </span>
             </div>
             <div class="results-actions">
                 <button class="btn btn--secondary" data-action="select-all-articles">
                     Tout sélectionner
                 </button>
-                <button class="btn btn--primary"
+                <button class="btn btn--primary" 
                         data-action="batch-process-modal"
                         ${selectedSearchResults.size === 0 ? 'disabled' : ''}>
                     Traiter la sélection
                 </button>
-                <button class="btn btn--danger"
+                <button class="btn btn--danger" 
                         data-action="delete-selected-articles"
                         ${selectedSearchResults.size === 0 ? 'disabled' : ''}>
                     Supprimer sélection
                 </button>
             </div>
         </div>
-
+        
         <div class="results-table-container">
             <table class="results-table">
                 <thead>
                     <tr>
                         <th width="40">
-                            <input type="checkbox" id="select-all-articles-checkbox">
-                        </th>
+                            <input type="checkbox" id="selectAllCheckbox">
                         </th>
                         <th>Article</th>
                         <th width="80">Score IA</th>
@@ -167,32 +163,32 @@ export function renderSearchResultsTable() {
 }
 
 export function updateSelectionCounter() {
-    const counter = document.querySelector(SELECTORS.selectedCount);
+    const counter = document.getElementById('selectedCount');
     if (counter) {
         counter.textContent = appState.selectedSearchResults.size;
     }
-
+    
     // Mettre à jour l'état des boutons
-    const batchBtn = document.querySelector(SELECTORS.batchProcessBtn);
-    const deleteBtn = document.querySelector(SELECTORS.deleteSelectedBtn);
-
+    const batchBtn = document.querySelector('[data-action="batch-process-modal"]');
+    const deleteBtn = document.querySelector('[data-action="delete-selected-articles"]');
+    
     const hasSelection = appState.selectedSearchResults.size > 0;
     if (batchBtn) batchBtn.disabled = !hasSelection;
     if (deleteBtn) deleteBtn.disabled = !hasSelection;
 }
 
 export function updateAllRowSelections() {
-    const checkboxes = document.querySelectorAll(SELECTORS.toggleArticleSelection);
+    const checkboxes = document.querySelectorAll('[data-action="toggle-article-selection"]');
     checkboxes.forEach(checkbox => {
         const articleId = checkbox.dataset.articleId;
         checkbox.checked = appState.selectedSearchResults.has(articleId);
-
+        
         const row = checkbox.closest('.result-row');
         if (row) {
             row.classList.toggle('result-row--selected', checkbox.checked);
         }
     });
-
+    
     updateSelectionCounter();
 }
 
@@ -203,7 +199,7 @@ export function toggleArticleSelection(articleId) {
 
 export function selectAllArticles(target) {
     const allSelected = appState.selectedSearchResults.size === appState.searchResults.length;
-
+    
     if (allSelected) {
         clearSelectedArticles();
         target.textContent = 'Tout sélectionner';
@@ -213,25 +209,25 @@ export function selectAllArticles(target) {
         });
         target.textContent = 'Tout désélectionner';
     }
-
+    
     updateAllRowSelections();
 }
 
 export async function viewArticleDetails(articleId) {
     const article = appState.searchResults.find(a => a.article_id === articleId);
     const extraction = appState.currentProjectExtractions.find(e => e.pmid === articleId);
-
+    
     if (!article) {
-        showToast(MESSAGES.articleNotFound, 'error');
+        showToast(MESSAGES.articleNotFound, 'error'); // Already correct
         return;
     }
 
-    const extractionDetails = extraction ?
+    const extractionDetails = extraction ? 
         `<div class="extraction-details">
             <h4>Analyse IA</h4>
             <p><strong>Score:</strong> ${extraction.relevance_score}/10</p>
             <p><strong>Justification:</strong> ${escapeHtml(extraction.relevance_justification || 'Aucune')}</p>
-         </div>` :
+         </div>` : 
         '<p class="no-analysis">Aucune analyse IA effectuée pour cet article.</p>';
 
     const content = `
@@ -243,31 +239,31 @@ export async function viewArticleDetails(articleId) {
                 <p><strong>DOI:</strong> ${article.doi ? `<a href="https://doi.org/${article.doi}" target="_blank">${article.doi}</a>` : 'N/A'}</p>
                 <p><strong>ID:</strong> ${escapeHtml(articleId)}</p>
             </div>
-
+            
             <div class="article-abstract">
                 <h4>Résumé</h4>
                 <p>${escapeHtml(article.abstract)}</p>
             </div>
-
+            
             ${extractionDetails}
         </div>`;
 
-    showModal(MESSAGES.articleDetailsTitle, content);
+    showModal(MESSAGES.articleDetailsTitle, content); // Already correct
 }
 
 export async function handleDeleteSelectedArticles() {
     const selectedArticles = getSelectedArticles();
     if (selectedArticles.length === 0) {
-        showToast(MESSAGES.noArticleSelected, 'warning');
+        showToast(MESSAGES.noArticleSelected, 'warning'); // Already correct
         return;
     }
 
-    if (!confirm(MESSAGES.confirmDeleteArticles(selectedArticles.length))) {
+    if (!confirm(MESSAGES.confirmDeleteArticles(selectedArticles.length))) { // Already correct
         return;
     }
 
     try {
-        const response = await fetchAPI(API_ENDPOINTS.articlesBatchDelete, {
+        const response = await fetchAPI(API_ENDPOINTS.articlesBatchDelete, { // Already correct
             method: 'POST',
             body: JSON.stringify({
                 article_ids: selectedArticles.map(a => a.id),
@@ -275,8 +271,10 @@ export async function handleDeleteSelectedArticles() {
             })
         });
 
-        if (response.job_id) {
-            showToast(MESSAGES.deleteStarted(response.job_id), 'success');
+        // CORRECTION : Utilise job_id au lieu de task_id
+        if (response.job_id) { // Already correct
+            showToast(MESSAGES.deleteStarted(response.job_id), 'success'); // Already correct
+            // Actualiser la liste des articles
             setTimeout(() => {
                 window.dispatchEvent(new CustomEvent('articles:refresh'));
             }, 2000);
@@ -288,50 +286,50 @@ export async function handleDeleteSelectedArticles() {
 
 export function showBatchProcessModal() {
     const selectedCount = appState.selectedSearchResults.size;
-
+    
     if (selectedCount === 0) {
-        showToast(MESSAGES.noArticleSelected, 'warning');
+        showToast(MESSAGES.noArticleSelected, 'warning'); // Already correct
         return;
     }
 
     const profiles = appState.analysisProfiles || [];
-    const profileOptions = profiles.map(p =>
+    const profileOptions = profiles.map(p => 
         `<option value="${p.id}">${escapeHtml(p.name)}</option>`
     ).join('');
 
     const content = `
         <div class="batch-process-modal">
             <p>Vous êtes sur le point de lancer un traitement par lot sur <strong>${selectedCount}</strong> article(s).</p>
-
+            
             <div class="form-group">
-                <label class="form-label" for="${SELECTORS.analysisProfileSelect.substring(1)}">Profil d'analyse:</label>
-                <select id="${SELECTORS.analysisProfileSelect.substring(1)}" class="form-control">
+                <label class="form-label" for="analysis-profile-select">Profil d'analyse:</label>
+                <select id="analysis-profile-select" class="form-control">
                     ${profileOptions}
                 </select>
             </div>
-
+            
             <div class="modal-actions">
                 <button class="btn btn--secondary" data-action="close-modal">Annuler</button>
                 <button class="btn btn--primary" data-action="start-batch-process">Lancer le traitement</button>
             </div>
         </div>`;
 
-    showModal(MESSAGES.batchProcessModalTitle, content);
+    showModal(MESSAGES.batchProcessModalTitle, content); // Already correct
 }
 
 export async function startBatchProcessing() {
     closeModal('genericModal');
-
+    
     const selectedIds = Array.from(appState.selectedSearchResults);
-    const profileSelect = document.querySelector(SELECTORS.analysisProfileSelect);
+    const profileSelect = document.getElementById('analysis-profile-select');
     const profileId = profileSelect ? profileSelect.value : null;
-
+    
     if (selectedIds.length === 0) return;
 
-    showLoadingOverlay(true, MESSAGES.screeningStarted(selectedIds.length));
-
+    showLoadingOverlay(true, MESSAGES.screeningStarted(selectedIds.length)); // Already correct
+    
     try {
-        await fetchAPI(API_ENDPOINTS.projectRun(appState.currentProject.id), {
+        await fetchAPI(API_ENDPOINTS.projectRun(appState.currentProject.id), { // Already correct
             method: 'POST',
             body: {
                 articles: selectedIds,
@@ -339,10 +337,10 @@ export async function startBatchProcessing() {
                 profile: profileId,
             }
         });
-
-        showToast(MESSAGES.screeningTaskStarted, 'success');
+        
+        showToast(MESSAGES.screeningTaskStarted, 'success'); // Already correct
         showSection('validation');
-
+        
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
     } finally {
@@ -355,62 +353,63 @@ export async function showRunExtractionModal() {
 
     const includedArticles = (appState.currentProjectExtractions || [])
         .filter(e => e.user_validation_status === 'include');
-
+    
     if (includedArticles.length === 0) {
-        showToast(MESSAGES.noArticleToExtract, 'warning');
+        showToast(MESSAGES.noArticleToExtract, 'warning'); // Already correct
         return;
     }
 
+    // Charger les grilles si elles ne sont pas déjà dans l'état
     if (appState.currentProjectGrids.length === 0) {
         await loadProjectGrids(appState.currentProject.id);
     }
 
-    const gridsOptions = (appState.currentProjectGrids || []).map(g =>
+    const gridsOptions = (appState.currentProjectGrids || []).map(g => 
         `<option value="${g.id}">${escapeHtml(g.name)}</option>`
     ).join('');
 
     const content = `
         <div class="extraction-modal">
-            <p>Vous êtes sur le point de lancer une extraction complète sur les
+            <p>Vous êtes sur le point de lancer une extraction complète sur les 
                <strong>${includedArticles.length} article(s)</strong> que vous avez inclus.</p>
-
+            
             <div class="form-group">
-                <label class="form-label" for="${SELECTORS.extractionGridSelect.substring(1)}">Grille d'extraction:</label>
-                <select id="${SELECTORS.extractionGridSelect.substring(1)}" class="form-control" required>
+                <label class="form-label" for="extraction-grid-select">Grille d'extraction:</label>
+                <select id="extraction-grid-select" class="form-control" required>
                     <option value="">-- Sélectionner une grille --</option>
                     ${gridsOptions}
                 </select>
             </div>
-
+            
             <div class="modal-actions">
                 <button class="btn btn--secondary" data-action="close-modal">Annuler</button>
                 <button class="btn btn--primary" data-action="start-full-extraction">Lancer l'extraction</button>
             </div>
         </div>`;
 
-    showModal(MESSAGES.fullExtractionModalTitle, content);
+    showModal(MESSAGES.fullExtractionModalTitle, content); // Already correct
 }
 
 export async function startFullExtraction() {
-    const gridSelect = document.querySelector(SELECTORS.extractionGridSelect);
+    const gridSelect = document.getElementById('extraction-grid-select');
     const gridId = gridSelect ? gridSelect.value : null;
-
+    
     if (!gridId) {
-        showToast(MESSAGES.noGridSelectedForExtraction, 'warning');
+        showToast(MESSAGES.noGridSelectedForExtraction, 'warning'); // Already correct
         return;
     }
 
     closeModal('genericModal');
-
+    
     const includedArticles = (appState.currentProjectExtractions || [])
         .filter(e => e.user_validation_status === 'include');
-
+    
     const articleIds = includedArticles.map(e => e.pmid);
 
-    showLoadingOverlay(true, MESSAGES.extractionStarted(articleIds.length));
-
+    showLoadingOverlay(true, MESSAGES.extractionStarted(articleIds.length)); // Already correct
+    
     try {
-        await fetchAPI(API_ENDPOINTS.projectRun(appState.currentProject.id), {
+        await fetchAPI(API_ENDPOINTS.projectRun(appState.currentProject.id), { // Already correct
             method: 'POST',
             body: {
                 articles: articleIds,
@@ -418,10 +417,10 @@ export async function startFullExtraction() {
                 custom_grid_id: gridId,
             }
         });
-
-        showToast(MESSAGES.extractionTaskStarted, 'success');
+        
+        showToast(MESSAGES.extractionTaskStarted, 'success'); // Already correct
         showSection('validation');
-
+        
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
     } finally {

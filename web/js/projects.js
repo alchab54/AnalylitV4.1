@@ -2,7 +2,8 @@
 
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
-import { showToast, showLoadingOverlay, closeModal, escapeHtml, showModal } from './ui-improved.js';
+import { showLoadingOverlay, closeModal, escapeHtml, showModal } from './ui-improved.js'; // showSuccess/showError are not used here directly
+import { showToast } from './toast.js';
 import { API_ENDPOINTS, MESSAGES } from './constants.js';
 
 // Fonctions utilitaires locales ou importées d'autres modules si nécessaire
@@ -12,7 +13,7 @@ import { API_ENDPOINTS, MESSAGES } from './constants.js';
  */
 async function loadProjects() {
   const oldProjectIds = new Set((appState.projects || []).map(p => p.id));
-  const projects = await fetchAPI(API_ENDPOINTS.projects);
+  const projects = await fetchAPI(API_ENDPOINTS.projects); // Already correct
   appState.projects = projects || [];
 
   const newProjectIds = new Set(appState.projects.map(p => p.id));
@@ -40,17 +41,17 @@ async function autoSelectFirstProject() {
 async function handleCreateProject(event) {
   event.preventDefault();
   const form = event.target;
-  const name = form.querySelector(SELECTORS.projectName).value.trim();
-  const description = form.querySelector(SELECTORS.projectDescription).value.trim();
-  const mode = form.querySelector(SELECTORS.analysisMode).value;
+  const name = form.querySelector('#projectName').value.trim();
+  const description = form.querySelector('#projectDescription').value.trim();
+  const mode = form.querySelector('#analysisMode').value;
 
   if (!name) {
-    showToast(MESSAGES.projectNameRequired, 'warning');
+    showToast(MESSAGES.projectNameRequired, 'warning'); // Already correct
     return;
   }
 
   try {
-    showLoadingOverlay(true, MESSAGES.creatingProject);
+    showLoadingOverlay(true, MESSAGES.creatingProject); // Already correct
 
     const newProject = await fetchAPI(API_ENDPOINTS.projects, {
       method: 'POST',
@@ -61,7 +62,7 @@ async function handleCreateProject(event) {
     if (newProject?.id) {
       await selectProject(newProject.id);
     }
-    showToast(MESSAGES.projectCreated, 'success');
+    showToast(MESSAGES.projectCreated, 'success'); // Already correct
     closeModal('newProjectModal');
   } catch (e) {
     showToast(`Erreur: ${e.message}`, 'error');
@@ -96,27 +97,27 @@ async function selectProject(projectId) {
  */
 function deleteProject(projectId, projectName) {
   if (!projectId) return;
-  appState.projectToDelete = { id: projectId, name: projectName };
+  appState.projectToDelete = { id: projectId, name: projectName }; // No change needed here
   const modalContent = `
-    <p>${MESSAGES.confirmDeleteProjectBody(escapeHtml(projectName))}</p>
+    <p>${MESSAGES.confirmDeleteProjectBody(escapeHtml(projectName))}</p> 
     <p>Cette action est irréversible.</p>
     <div class="modal-actions">
       <button class="btn btn--secondary" data-action="close-modal">Annuler</button>
       <button class="btn btn--danger" data-action="confirm-delete-project">Supprimer</button>
     </div>
   `;
-  showModal(MESSAGES.confirmDeleteProjectTitle, modalContent);
+  showModal(MESSAGES.confirmDeleteProjectTitle, modalContent); // Already correct
 }
 
 /**
  * Logique de suppression effective, appelée par le gestionnaire d'événements.
  */
 async function confirmDeleteProject(projectId) {
-    showLoadingOverlay(true, MESSAGES.deletingProject);
+    showLoadingOverlay(true, MESSAGES.deletingProject); // Already correct
     closeModal(); // Ferme la modale de confirmation
     try {
-        await fetchAPI(API_ENDPOINTS.projectById(projectId), { method: 'DELETE' });
-        showToast(MESSAGES.projectDeleted, 'success');
+        await fetchAPI(API_ENDPOINTS.projectById(projectId), { method: 'DELETE' }); // Already correct
+        showToast(MESSAGES.projectDeleted, 'success'); // Already correct
         
         // Mettre à jour l'état localement pour une UI plus réactive
         appState.projects = appState.projects.filter(p => p.id !== projectId);
@@ -138,11 +139,11 @@ async function confirmDeleteProject(projectId) {
  */
 async function handleExportProject(projectId) {
   if (!projectId) {
-    showToast(MESSAGES.projectIdMissingForExport, 'warning');
+    showToast(MESSAGES.projectIdMissingForExport, 'warning'); // Already correct
     return;
   }
-  window.open(`/api${API_ENDPOINTS.projectExport(projectId)}`, '_blank');
-  showToast(MESSAGES.projectExportStarted, 'info');
+  window.open(API_ENDPOINTS.projectExport(projectId), '_blank'); // Already correct
+  showToast(MESSAGES.projectExportStarted, 'info'); // Already correct
 }
 
 /**
@@ -166,33 +167,16 @@ async function loadProjectFilesSet(projectId) {
 }
 
 /**
- * Affiche un message lorsque la liste des projets est vide.
- */
-function displayEmptyProjectsState() {
-    const container = document.querySelector(SELECTORS.projectsList);
-    if (!container) return;
-    container.innerHTML = `
-        <div class="empty-state text-center py-4">
-            <h3>Aucun projet trouvé</h3>
-            <p>Créez votre premier projet pour commencer votre revue de littérature.</p>
-            <button data-action="create-project-modal" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Créer un projet
-            </button>
-        </div>
-    `;
-}
-
-/**
  * Rendu de la liste des projets (colonne gauche).
  */
 function renderProjectsList() {
-  const container = document.querySelector(SELECTORS.projectsList);
+  const container = elements.projectsList;
   if (!container) return;
 
   const projects = Array.isArray(appState.projects) ? appState.projects : [];
 
   if (projects.length === 0) {
-    displayEmptyProjectsState();
+    container.innerHTML = '<div class="placeholder">Aucun projet. Créez-en un pour commencer.</div>';
     return;
   }
 
@@ -253,8 +237,8 @@ function getStatusClass(status) {
  * Rendu du panneau de détails du projet (colonne droite).
  */
 function renderProjectDetail(project) {
-  const detailContainer = document.querySelector(SELECTORS.projectContainer);
-  const placeholder = document.querySelector(SELECTORS.projectContainer);
+  const detailContainer = elements.projectDetailContent;
+  const placeholder = elements.projectPlaceholder;
   if (!detailContainer || !placeholder) return;
 
   if (!project) {
@@ -262,93 +246,6 @@ function renderProjectDetail(project) {
     placeholder.style.display = 'block';
     return;
   }
-
-  placeholder.style.display = 'none';
-  
-  // Métriques
-  const articlesCount = Number(project.article_count || 0);
-  const pdfCount = appState.currentProjectFiles?.size || 0;
-  const isIndexed = Boolean(project.indexed_at);
-  const synthesis = appState.analysisResults?.synthesis_result;
-  const discussion = appState.analysisResults?.discussion_draft;
-  const graph = appState.analysisResults?.knowledge_graph;
-
-  try {
-    detailContainer.innerHTML = `
-      <div class="section-header">
-        <div class="section-header__content">
-          <h2>${escapeHtml(project.name)}</h2>
-          <p>${escapeHtml(project.description || 'Aucune description')}</p>
-        </div>
-        <div class="section-header__actions">
-          <button class="btn btn--secondary" data-action="export-project" data-project-id="${project.id}">📥 Export</button>
-        </div>
-      </div>
-
-      <div class="metrics-grid project-dashboard">
-        <div class="metric-card">
-          <h5 class="metric-value">${articlesCount}</h5>
-          <p>Articles</p>
-        </div>
-        <div class="metric-card">
-          <h5 class="metric-value">${pdfCount}</h5>
-          <p>PDFs Trouvés</p>
-        </div>
-        <div class="metric-card">
-          <h5 class="metric-value">${isIndexed ? '✅' : '❌'}</h5>
-          <p>Indexé (RAG)</p>
-        </div>
-        <div class="metric-card">
-          <h5 class="metric-value">${synthesis ? '✅' : '⏳'}</h5>
-          <p>Synthèse</p>
-        </div>
-        <div class="metric-card">
-          <h5 class="metric-value">${discussion ? '✅' : '⏳'}</h5>
-          <p>Discussion</p>
-        </div>
-        <div class="metric-card">
-          <h5 class="metric-value">${graph ? '✅' : '⏳'}</h5>
-          <p>Graphe</p>
-        </div>
-      </div>
-    `;
-  } catch (e) {
-    console.error('Erreur renderProjectDetail:', e);
-    detailContainer.innerHTML = `
-      <div class="placeholder error">
-        <p>Erreur lors de l'affichage de la synthèse.</p>
-      </div>
-    `;
-  }
-}
-
-function getStatusText(status) {
-    const statusTexts = {
-        'pending': 'En attente', 'processing': 'Traitement...', 'synthesizing': 'Synthèse...',
-        'completed': 'Terminé', 'failed': 'Échec', 'indexing': 'Indexation...',
-        'generating_discussion': 'Génération discussion...', 'generating_graph': 'Génération graphe...',
-        'generating_prisma': 'Génération PRISMA...', 'generating_analysis': 'Analyse statistique...',
-        'search_completed': 'Recherche terminée', 'in_progress': 'En cours', 'queued': 'En file',
-        'started': 'Démarré', 'finished': 'Fini'
-    };
-    return statusTexts[status] || status;
-}
-
-// --- CORRECTION : Bloc d'exportation unifié ---
-export {
-    loadProjects,
-    autoSelectFirstProject,
-    handleCreateProject,
-    selectProject,
-    deleteProject,
-    confirmDeleteProject,
-    handleExportProject,
-    loadProjectFilesSet, // <- La fonction est maintenant exportée d'ici
-    renderProjectsList,
-    updateProjectListSelection,
-    renderProjectDetail,
-    getStatusText
-};
 
   placeholder.style.display = 'none';
   

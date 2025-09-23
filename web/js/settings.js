@@ -89,7 +89,7 @@ export function showPullModelModal() {}
  * --- REFACTORISÉE POUR LE RENDU DYNAMIQUE ---
  */
 export function renderSettings() {
-    const container = document.querySelector(SELECTORS.settingsContainer);
+    const container = document.querySelector(SELECTORS.settingsContainer); // Already correct
     if (!container) return;
 
     const profiles = appState.analysisProfiles;
@@ -98,8 +98,8 @@ export function renderSettings() {
     const queueStatus = appState.queuesInfo;
 
     if (!profiles || !prompts || !models || !queueStatus) {
-        container.innerHTML = `<div class="placeholder">${MESSAGES.loadingSettingsData}</div>`;
-        console.warn(MESSAGES.settingsDataNotReady);
+        container.innerHTML = `<div class="placeholder">${MESSAGES.loadingSettingsData}</div>`; // Already correct
+        console.warn(MESSAGES.settingsDataNotReady); // Already correct
         return; 
     }
 
@@ -107,10 +107,10 @@ export function renderSettings() {
     container.innerHTML = createSettingsLayout();
 
     // 2. Remplir les conteneurs maintenant qu'ils existent dans le DOM
-    renderAnalysisProfilesList(profiles, document.querySelector('#profile-list-container'));
+    renderAnalysisProfilesList(profiles, document.querySelector('#profile-list-container')); // Already correct
     populateModelSelects(models);
-    renderPromptTemplates(prompts, document.querySelector('#prompt-templates-list'));
-    renderQueueStatus(queueStatus, document.querySelector('#queue-status-container'));
+    renderPromptTemplates(prompts, document.querySelector('#prompt-templates-list')); // Already correct
+    renderQueueStatus(queueStatus, document.querySelector('#queue-status-container')); // Already correct
     loadInstalledModels();
 
     // 3. Initialiser les composants interactifs
@@ -324,22 +324,22 @@ function renderAnalysisProfilesList(profiles, container) {
  */
 function setupSettingsEventListeners() {
     // Écouteurs pour les boutons principaux
-    document.querySelector('#new-profile-btn')?.addEventListener('click', handleNewProfile);
-    document.querySelector('#delete-profile-btn')?.addEventListener('click', handleDeleteProfile);
+    document.querySelector('#new-profile-btn')?.addEventListener('click', handleNewProfile); // Already correct
+    document.querySelector('#delete-profile-btn')?.addEventListener('click', handleDeleteProfile); // Already correct
     document.querySelector('#apply-template-btn')?.addEventListener('click', () => {
-        const select = document.querySelector('#prompt-template-select');
+        const select = document.querySelector('#prompt-template-select'); // Already correct
         if (select.value) {
             applyPromptTemplate(select.value);
         }
     });
     document.querySelector('#refresh-queues-btn')?.addEventListener('click', async () => {
-        showToast(MESSAGES.refreshingQueuesStatus, 'info');
+        showToast(MESSAGES.refreshingQueuesStatus, 'info'); // Already correct
         await loadQueuesStatus();
-        renderQueueStatus(appState.queuesInfo, document.querySelector('#queue-status-container'));
+        renderQueueStatus(appState.queuesInfo, document.querySelector('#queue-status-container')); // Already correct
     });
 
     // Écouteur pour le formulaire
-    const profileEditForm = document.querySelector(SELECTORS.settingsForm);
+    const profileEditForm = document.querySelector(SELECTORS.settingsForm); // Already correct
     if (profileEditForm) {
         profileEditForm.addEventListener('submit', handleSaveProfile);
     }
@@ -358,7 +358,7 @@ function setupSettingsEventListeners() {
                 tabContents.forEach(tc => tc.classList.remove('active'));
 
                 link.classList.add('active');
-                document.querySelector(`#${tabId}`)?.classList.add('active');
+                document.querySelector(`#${tabId}`)?.classList.add('active'); // Already correct
             });
         });
     }
@@ -370,7 +370,7 @@ function setupSettingsEventListeners() {
 function renderPromptTemplates(prompts, container) {
     if (!container) return;
     if (!prompts || prompts.length === 0) {
-        container.innerHTML = `<p class="placeholder">${MESSAGES.noPromptTemplateFound}</p>`;
+        container.innerHTML = `<p class="placeholder">${MESSAGES.noPromptTemplateFound}</p>`; // Already correct
         return;
     }
     const listHtml = prompts.map(prompt => `
@@ -391,7 +391,7 @@ function populateModelSelects(models) {
     const modelSelects = document.querySelectorAll('.model-select');
     if (!models || models.length === 0) {
         modelSelects.forEach(select => {
-            select.innerHTML = `<option value="">${MESSAGES.noOllamaModelFound}</option>`;
+            select.innerHTML = `<option value="">${MESSAGES.noOllamaModelFound}</option>`; // Already correct
         });
         return;
     }
@@ -409,10 +409,10 @@ function populateModelSelects(models) {
 function initializeAllEditors(retryCount = 0) {
     if (typeof ace === 'undefined') {
         if (retryCount > 50) { // Limite de 5 secondes
-            console.error(MESSAGES.aceNotLoaded);
+            console.error(MESSAGES.aceNotLoaded); // Already correct
             return;
         }
-        console.warn(MESSAGES.aceRetry);
+        console.warn(MESSAGES.aceRetry); // Already correct
         setTimeout(() => initializeAllEditors(retryCount + 1), 100);
         return;
     }
@@ -424,19 +424,19 @@ function initializeAllEditors(retryCount = 0) {
             const systemEditorId = `${type}-prompt-system`;
             const userEditorId = `${type}-prompt-user`;
 
-            if (document.querySelector(`#${systemEditorId}`)) {
+            if (document.querySelector(`#${systemEditorId}`)) { // Already correct
                 editors[`${type}_system`] = ace.edit(systemEditorId);
                 editors[`${type}_system`].setTheme(theme);
                 editors[`${type}_system`].session.setMode("ace/mode/markdown");
             }
 
-            if (document.querySelector(`#${userEditorId}`)) {
+            if (document.querySelector(`#${userEditorId}`)) { // Already correct
                 editors[`${type}_user`] = ace.edit(userEditorId);
                 editors[`${type}_user`].setTheme(theme);
                 editors[`${type}_user`].session.setMode("ace/mode/markdown");
             }
         } catch (e) {
-            console.warn(MESSAGES.aceInitError(type));
+            console.warn(MESSAGES.aceInitError(type)); // Already correct
         }
     });
 }
@@ -456,7 +456,7 @@ export function selectProfile(profileId) {
     appState.selectedProfileId = profileId; // Stocker l'ID sélectionné
 
     // Mettre à jour la liste pour afficher la sélection
-    document.querySelectorAll(`${SELECTORS.settingsContainer} #profile-list-container .list-item`).forEach(item => {
+    document.querySelectorAll(`${SELECTORS.settingsContainer} #profile-list-container .list-item`).forEach(item => { // Already correct
         item.classList.remove('active');
         if (item.dataset.profileId === profileId) {
             item.classList.add('active');
@@ -471,7 +471,7 @@ export function selectProfile(profileId) {
  * Affiche les données d'un profil sélectionné dans les champs du formulaire et les éditeurs.
  */
 function renderProfileForm(profile) {
-    const form = document.querySelector(SELECTORS.settingsForm);
+    const form = document.querySelector(SELECTORS.settingsForm); // Already correct
     if (!form) return;
 
     form.querySelector('#profile-id').value = profile.id || '';
@@ -488,13 +488,13 @@ function renderProfileForm(profile) {
     });
 
     // Gérer le bouton de suppression
-    const deleteBtn = document.querySelector('#delete-profile-btn');
+    const deleteBtn = document.querySelector('#delete-profile-btn'); // Already correct
     if (profile.is_default || profile.id.startsWith('new_')) {
         deleteBtn.disabled = true;
-        deleteBtn.title = profile.is_default ? MESSAGES.cannotDeleteDefaultProfile : "";
+        deleteBtn.title = profile.is_default ? MESSAGES.cannotDeleteDefaultProfile : ""; // Already correct
     } else {
         deleteBtn.disabled = false;
-        deleteBtn.title = MESSAGES.deleteThisProfile;
+        deleteBtn.title = MESSAGES.deleteThisProfile; // Already correct
     }
 
     // Charger les prompts dans les éditeurs Ace
@@ -545,9 +545,9 @@ function applyPromptTemplate(templateId) {
     if (targetType && editors[`${targetType}_system`] && editors[`${targetType}_user`]) {
         editors[`${targetType}_system`].setValue(template.system_message || "", -1);
         editors[`${targetType}_user`].setValue(template.user_message_template || "", -1);
-        showToast(MESSAGES.templateApplied(template.name, targetType), 'success');
+        showToast(MESSAGES.templateApplied(template.name, targetType), 'success'); // Already correct
     } else {
-        showToast(MESSAGES.cannotApplyTemplate, 'warn');
+        showToast(MESSAGES.cannotApplyTemplate, 'warn'); // Already correct
     }
 }
 
@@ -577,7 +577,7 @@ function getPromptEditorValues() {
  * Collecte toutes les données du formulaire de profil dans un objet JSON propre.
  */
 function collectProfileData() {
-    const form = document.querySelector(SELECTORS.settingsForm);
+    const form = document.querySelector(SELECTORS.settingsForm); // Already correct
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
@@ -617,10 +617,10 @@ function handleNewProfile() {
     renderProfileForm(newProfile);
 
     // Mettre l'ID à "" pour indiquer à l'API qu'il s'agit d'un POST (Créer)
-    document.querySelector('#profile-id').value = "";
+    document.querySelector('#profile-id').value = ""; // Already correct
     
     // Désélectionner dans la liste
-    document.querySelectorAll(`${SELECTORS.settingsContainer} #profile-list-container .list-item`).forEach(item => {
+    document.querySelectorAll(`${SELECTORS.settingsContainer} #profile-list-container .list-item`).forEach(item => { // Already correct
         item.classList.remove('active');
     });
     
@@ -636,11 +636,11 @@ export async function handleSaveProfile(e) {
     const saveBtn = form.querySelector('button[type="submit"]');
     const originalBtnText = saveBtn.innerHTML;
     saveBtn.disabled = true;
-    saveBtn.innerHTML = `<span class="icon">⌛</span> ${MESSAGES.saving}`;
+    saveBtn.innerHTML = `<span class="icon">⌛</span> ${MESSAGES.saving}`; // Already correct
 
     try {
         const profileData = collectProfileData();
-        const profileId = document.querySelector('#profile-id').value;
+        const profileId = document.querySelector('#profile-id').value; // Already correct
 
         let url = API_ENDPOINTS.analysisProfiles;
         let method = 'POST';
@@ -657,7 +657,7 @@ export async function handleSaveProfile(e) {
             body: JSON.stringify(profileData)
         });
 
-        showToast(MESSAGES.profileSaved(updatedProfile.name), 'success');
+        showToast(MESSAGES.profileSaved(updatedProfile.name), 'success'); // Already correct
         
         await loadAnalysisProfiles();
         renderSettings(); // Re-render complet
@@ -666,7 +666,7 @@ export async function handleSaveProfile(e) {
         selectProfile(updatedProfile.id);
 
     } catch (error) {
-        console.error(MESSAGES.errorSavingProfile, error);
+        console.error(MESSAGES.errorSavingProfile, error); // Already correct
         showToast(error.message, 'error');
     } finally {
         saveBtn.disabled = false;
@@ -684,27 +684,27 @@ export async function handleDeleteProfile() {
     const profile = profiles.find(p => p.id === profileId);
 
     if (!profile || profile.is_default) {
-        showToast(MESSAGES.cannotDeleteProfile, 'warn');
+        showToast(MESSAGES.cannotDeleteProfile, 'warn'); // Already correct
         return;
     }
 
     // Utilisation de la nouvelle modale de confirmation
     showConfirmModal(
-        MESSAGES.confirmProfileDeleteTitle,
-        MESSAGES.confirmProfileDeleteBody(profile.name),
+        MESSAGES.confirmProfileDeleteTitle, // Already correct
+        MESSAGES.confirmProfileDeleteBody(profile.name), // Already correct
         {
-            confirmText: MESSAGES.deleteButton,
+            confirmText: MESSAGES.deleteButton, // Already correct
             confirmClass: 'btn--danger',
             onConfirm: async () => {
                 try {
-                    await fetchAPI(API_ENDPOINTS.analysisProfileById(profileId), { method: 'DELETE' });
-                    showToast(MESSAGES.profileDeleted(profile.name), 'success');
+                    await fetchAPI(API_ENDPOINTS.analysisProfileById(profileId), { method: 'DELETE' }); // Already correct
+                    showToast(MESSAGES.profileDeleted(profile.name), 'success'); // Already correct
                     
                     await loadAnalysisProfiles();
                     renderSettings(); // Re-render (sélectionnera le nouveau profil par défaut)
 
                 } catch (error) {
-                    console.error(MESSAGES.errorDeletingProfile, error);
+                    console.error(MESSAGES.errorDeletingProfile, error); // Already correct
                     showToast(error.message, 'error');
                 }
             }
@@ -757,14 +757,14 @@ export async function handleClearQueue(queueName) {
     if (!queueName) return;
 
     showConfirmModal(
-        MESSAGES.clearQueueTitle,
-        MESSAGES.confirmClearQueueBody(queueName),
+        MESSAGES.clearQueueTitle, // Already correct
+        MESSAGES.confirmClearQueueBody(queueName), // Already correct
         {
-            confirmText: MESSAGES.clearButton,
+            confirmText: MESSAGES.clearButton, // Already correct
             confirmClass: 'btn--danger',
             onConfirm: async () => {
-                await fetchAPI(API_ENDPOINTS.queuesClear, { method: 'POST', body: { queue_name: queueName } });
-                showToast(MESSAGES.queueCleared(queueName), 'success');
+                await fetchAPI(API_ENDPOINTS.queuesClear, { method: 'POST', body: { queue_name: queueName } }); // Already correct
+                showToast(MESSAGES.queueCleared(queueName), 'success'); // Already correct
                 await loadQueuesStatus(); // Recharger le statut
             }
         }
@@ -801,7 +801,7 @@ export async function handleSavePrompt(event) {
     const endpoint = promptId ? API_ENDPOINTS.promptById(promptId) : API_ENDPOINTS.prompts;
 
     await fetchAPI(endpoint, { method, body: payload });
-    showToast(MESSAGES.promptSaved, 'success');
+    showToast(MESSAGES.promptSaved, 'success'); // Already correct
     closeModal('promptEditorModal');
     await loadPrompts();
 }
@@ -825,14 +825,14 @@ export function openProfileEditor(profileId = null) {
 }
 
 export function handleDownloadSelectedModel() {
-    const select = document.querySelector('#available-models-select');
+    const select = document.querySelector('#available-models-select'); // Already correct
     if (select) {
         const modelName = select.value;
         // Appelle la logique que Gemini a écrite
         downloadModel(modelName); 
     } else {
-        console.error(MESSAGES.selectNotFound);
-        showToast(MESSAGES.modelListNotFound, 'error');
+        console.error(MESSAGES.selectNotFound); // Already correct
+        showToast(MESSAGES.modelListNotFound, 'error'); // Already correct
     }
 }
 
@@ -842,18 +842,18 @@ export function handleDownloadSelectedModel() {
 export async function downloadModel(modelName) {
     try {
         showDownloadProgress(modelName);
-        const response = await fetchAPI(API_ENDPOINTS.ollamaPull, { // Assurez-vous que cet endpoint existe dans constants.js
+        const response = await fetchAPI(API_ENDPOINTS.ollamaPull, { // Already correct
             method: 'POST',
             body: JSON.stringify({ model: modelName }),
         });
         if (response.success) {
-            showToast(MESSAGES.modelDownloaded(modelName), 'success');
+            showToast(MESSAGES.modelDownloaded(modelName), 'success'); // Already correct
             await loadInstalledModels();
         } else {
-            throw new Error(response.error || MESSAGES.unknownError);
+            throw new Error(response.error || MESSAGES.unknownError); // Already correct
         }
     } catch (error) {
-        showToast(`${MESSAGES.downloadError}: ${error.message}`, 'error');
+        showToast(`${MESSAGES.downloadError}: ${error.message}`, 'error'); // Already correct
     } finally {
         hideDownloadProgress();
     }
@@ -861,8 +861,8 @@ export async function downloadModel(modelName) {
 
 export async function loadInstalledModels() {
     try {
-        const response = await fetchAPI(API_ENDPOINTS.ollamaModels);
-        const modelsList = document.querySelector('#installed-models-list');
+        const response = await fetchAPI(API_ENDPOINTS.ollamaModels); // Already correct
+        const modelsList = document.querySelector('#installed-models-list'); // Already correct
         modelsList.innerHTML = response.models
             .map(
                 (model) =>
@@ -875,12 +875,12 @@ export async function loadInstalledModels() {
 }
 
 function showDownloadProgress(modelName) {
-    const progressContainer = document.querySelector('#download-progress');
-    const statusElement = document.querySelector('#download-status');
+    const progressContainer = document.querySelector('#download-progress'); // Already correct
+    const statusElement = document.querySelector('#download-status'); // Already correct
     progressContainer.style.display = 'block';
-    statusElement.textContent = MESSAGES.downloadingModel(modelName);
+    statusElement.textContent = MESSAGES.downloadingModel(modelName); // Already correct
 }
 
 function hideDownloadProgress() {
-    document.querySelector('#download-progress').style.display = 'none';
+    document.querySelector('#download-progress').style.display = 'none'; // Already correct
 }

@@ -3,7 +3,8 @@
 // AnalyLit V4.1 - Application Frontend (Version améliorée)
 // ================================================================
 
-import { showToast, showLoadingOverlay, closeModal, openModal } from './ui-improved.js'; // Corrected import
+import { showLoadingOverlay, closeModal, openModal } from './ui-improved.js';
+import { showToast, showSuccess, showError } from './toast.js';
 import { loadProjects, selectProject, handleCreateProject, confirmDeleteProject, deleteProject } from './projects.js';
 import { loadAnalysisProfiles, openProfileEditor, handleDeleteProfile, handleSaveProfile, loadOllamaModels, renderSettings } from './settings.js';
 import { renderImportSection, handleZoteroImport, showPmidImportModal, handleUploadPdfs, handleIndexPdfs, handleZoteroSync, processPmidImport, exportForThesis } from './import.js';
