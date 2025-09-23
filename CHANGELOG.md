@@ -16,12 +16,9 @@
 
 - **Fonctionnalités en attente (commentées):**
     - Les appels API pour les fonctionnalités backend non implémentées ont été commentés dans le code JavaScript avec un `// TODO:` pour une implémentation future. Cela inclut:
-        - Suppression par lot d'articles (`articles.js`)
         - Téléchargement en masse de PDFs (`import.js`)
-        - Indexation de PDFs (`import.js`, `chat.js`)
         - Sauvegarde des paramètres Zotero (`import.js`)
         - Réessai de tâches (`core.js`)
-        - Suppression de grilles (`grids.js`)
         - Récupération des fichiers de projet (`projects.js`)
         - Rapports (bibliographie, tableau de synthèse, export Excel) (`reporting.js`)
         - Gestion du risque de biais (récupération et sauvegarde) (`rob.js`)
@@ -35,6 +32,27 @@
 - **Modernisation de l'interface:**
     - Mise à jour du titre de la page dans `index.html` pour une meilleure clarté.
     - Vérification de la structure HTML et des styles CSS existants, confirmant l'utilisation d'un système de design moderne et accessible.
+
+### Infrastructure de Tests & Réorganisation de l'Espace de Travail
+
+- **Configuration des Tests Frontend:**
+    - Implémentation complète d'une suite de tests automatisés pour le frontend avec Jest (tests unitaires) et Cypress (tests End-to-End).
+    - Création et configuration des fichiers `package.json`, `jest.config.js`, et `cypress.config.js` à la racine du projet.
+    - Installation des dépendances npm nécessaires (`jest`, `jest-environment-jsdom`, `cypress`, `@testing-library/jest-dom`).
+    - Définition des scripts npm pour l'exécution des tests unitaires (`test:unit`, `test:unit:watch`), des tests E2E (`test:e2e`, `test:e2e:open`), et de tous les tests (`test:all`).
+- **Réorganisation de l'Espace de Travail:**
+    - Déplacement des fichiers de test Jest (`toast.test.js`, `constants.test.js`) de `tests/` vers `web/js/`.
+    - Création de fichiers de test Jest (`projects.test.js`, `articles.test.js`) dans `web/js/`.
+    - Création de la structure de répertoires `cypress/e2e/`.
+    - Déplacement des fichiers de test Cypress E2E (`smoke-test.cy.js`, `projects-workflow.cy.js`, `articles-workflow.cy.js`) de `tests/` vers `cypress/e2e/`.
+    - Création d'un fichier de test Cypress E2E (`analyses-workflow.cy.js`) dans `cypress/e2e/`.
+    - Création de la structure de répertoires pour les rapports de tests (`reports/coverage-frontend/`, `reports/cypress/screenshots/`, `reports/cypress/videos/`).
+    - Nettoyage du répertoire `tests/` en supprimant les fichiers de test déplacés et les configurations Jest/Cypress redondantes.
+    - Déplacement de divers fichiers du répertoire racine vers des sous-répertoires appropriés (`database/sql/`, `scripts/`, `config/`, `backend/`, `web/`, `web/js/`) pour une meilleure organisation.
+    - Suppression du répertoire vide et redondant `server_v4_complete/`.
+- **Correction de Configuration:**
+    - Résolution du conflit de configuration Jest en supprimant le bloc `jest` du `package.json` racine, assurant que `jest.config.js` est la source unique de configuration Jest.
+
 - **Chat RAG & Indexation (`chat.js`, `import.js`):**
     - La fonction `handleIndexPdfs` est réactivée et fonctionnelle, appelant la route `POST /api/projects/{id}/index-pdfs` pour permettre au chat de lire le contenu des documents.
     - La fonctionnalité de chat est maintenant pleinement opérationnelle.

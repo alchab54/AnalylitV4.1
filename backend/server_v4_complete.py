@@ -24,6 +24,7 @@ import rq
 import subprocess
 import requests
 from flask import Flask, request, jsonify, send_from_directory, abort, send_file, Blueprint
+from api.reporting import reporting_bp
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from sqlalchemy.exc import IntegrityError
@@ -1170,6 +1171,7 @@ def create_app(config=None):
     
     # Enregistrement des Blueprints
     #app.register_blueprint(projects_bp, url_prefix='/api')
+    app.register_blueprint(reporting_bp, url_prefix='/api')
 
     # La factory DOIT retourner l'objet app
     return app
