@@ -1,7 +1,7 @@
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js'; // Already correct
 import { showToast, showLoadingOverlay, escapeHtml } from './ui-improved.js'; // Already correct
-import { API_ENDPOINTS, MESSAGES } from './constants.js';
+import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 export async function loadRobSection() {
     if (!elements.robContainer) return;
@@ -22,13 +22,13 @@ export async function loadRobSection() {
     const extractions = appState.currentProjectExtractions || [];
 
     const articlesHtml = articles.map(article => `
-        <div class="rob-article-card" id="rob-card-${article.article_id}">
+        <div class="rob-article-card" id="${SELECTORS.robCard(article.article_id).substring(1)}">
             <div class="rob-article-header">
                 <input type="checkbox" class="article-select-checkbox" data-action="toggle-article-selection" data-article-id="${escapeHtml(article.article_id)}">
                 <h4 class="rob-article-title">${escapeHtml(article.title)}</h4>
                 <button class="btn btn--secondary btn--sm" data-action="edit-rob" data-article-id="${article.article_id}">${MESSAGES.editButton}</button>
             </div>
-            <div class="rob-assessment-summary" id="rob-summary-${article.article_id}">
+            <div class="rob-assessment-summary" id="${SELECTORS.robSummary(article.article_id).substring(1)}">
                 <!-- Le résumé de l'évaluation sera chargé ici -->
             </div>
         </div>
@@ -43,7 +43,7 @@ export async function loadRobSection() {
 }
 
 export async function fetchAndDisplayRob(articleId, editMode = false) {
-    const summaryContainer = document.getElementById(`rob-summary-${articleId}`);
+    const summaryContainer = document.querySelector(SELECTORS.robSummary(articleId));
     if (!summaryContainer) return;
 
     try {
@@ -71,17 +71,17 @@ function renderRobDetails(robData) {
         <div class="rob-details">
             <div class="rob-domain">
                 <strong>${MESSAGES.robDomainRandomization}</strong>
-                <span class="status status--${getBiasClass(robData.domain_1_bias)}">${robData.domain_1_bias || 'N/A'}</span>
+                <span class="status status--${getBiasClass(robData.domain_1_bias)}">${robData.domain_1_bias || MESSAGES.notApplicable}</span>
                 <p class="rob-justification">${escapeHtml(robData.domain_1_justification)}</p>
             </div>
             <div class="rob-domain">
                 <strong>${MESSAGES.robDomainMissingData}</strong>
-                <span class="status status--${getBiasClass(robData.domain_2_bias)}">${robData.domain_2_bias || 'N/A'}</span>
+                <span class="status status--${getBiasClass(robData.domain_2_bias)}">${robData.domain_2_bias || MESSAGES.notApplicable}</span>
                 <p class="rob-justification">${escapeHtml(robData.domain_2_justification)}</p>
             </div>
             <div class="rob-domain rob-overall">
                 <strong>${MESSAGES.robDomainOverall}</strong>
-                <span class="status status--${getBiasClass(robData.overall_bias)}">${robData.overall_bias || 'N/A'}</span>
+                <span class="status status--${getBiasClass(robData.overall_bias)}">${robData.overall_bias || MESSAGES.notApplicable}</span>
                 <p class="rob-justification">${escapeHtml(robData.overall_justification)}</p>
             </div>
         </div>
@@ -183,10 +183,10 @@ export async function handleRunRobAnalysis() {
 
 export function getRobDomainFromKey(key) {
     const domainMap = {
-        'domain_1_bias': 'Biais dans le processus de randomisation',
-        'domain_2_bias': 'Biais dus aux écarts par rapport aux interventions prévues',
+        'domain_1_bias': MESSAGES.biasRandomization,
+        'domain_2_bias': MESSAGES.biasMissingData,
         // Ajoutez d'autres domaines ici si nécessaire
-        'overall_bias': 'Biais global'
+        'overall_bias': MESSAGES.biasOverall
     };
     return domainMap[key] || key.replace(/_/g, ' ');
 }
