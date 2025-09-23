@@ -8,7 +8,7 @@ import { showSearchModal } from './search.js'; // Assuming this is correct
 import { setSearchResults, clearSelectedArticles, toggleSelectedArticle, setCurrentProjectExtractions } from './state.js';
 import { showSection } from './core.js';
 import { loadProjectGrids } from './grids.js';
-import { API_ENDPOINTS, MESSAGES } from './constants.js'; // Already correct
+import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 function debounce(func, delay) {
     let timeout;
@@ -19,7 +19,7 @@ function debounce(func, delay) {
 }
 
 export async function loadSearchResults(page = 1) {
-    showLoadingOverlay(true, MESSAGES.loadingResults); // Already correct
+    showLoadingOverlay(true, MESSAGES.loadingResults);
     
     if (!appState.currentProject?.id) {
         if (elements.resultsContainer) {
@@ -34,10 +34,10 @@ export async function loadSearchResults(page = 1) {
     }
 
     try {
-        const results = await fetchAPI(API_ENDPOINTS.projectSearchResults(appState.currentProject.id) + `?page=${page}`); // Already correct
+        const results = await fetchAPI(API_ENDPOINTS.projectSearchResults(appState.currentProject.id) + `?page=${page}`);
         setSearchResults(results.articles || [], results.meta || {});
         
-        const extractions = await fetchAPI(API_ENDPOINTS.projectExtractions(appState.currentProject.id)); // Already correct
+        const extractions = await fetchAPI(API_ENDPOINTS.projectExtractions(appState.currentProject.id));
         setCurrentProjectExtractions(extractions);
         
         renderSearchResultsTable();
@@ -52,7 +52,8 @@ export async function loadSearchResults(page = 1) {
 }
 
 export function renderSearchResultsTable() {
-    if (!elements.resultsContainer) return;
+    const container = document.querySelector(SELECTORS.resultsContainer);
+    if (!container) return;
     
     if (!appState.currentProject) {
         elements.resultsContainer.innerHTML = `
@@ -64,8 +65,14 @@ export function renderSearchResultsTable() {
     }
 
     if (appState.searchResults.length === 0) {
-        // Utiliser la nouvelle fonction dédiée
-        displayEmptyArticlesState();
+    if (!container) return;
+    elements.resultsContainer.innerHTML = `
+        <div class="results-empty">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4>Aucun article trouvé</h4>
+            <p>Lancez une recherche pour commencer à collecter des articles.</p>
+        </div>
+    `;
         return;
     }
 
@@ -74,15 +81,18 @@ export function renderSearchResultsTable() {
     // ... le reste de la fonction renderSearchResultsTable reste inchangé
     // ...
 }
-
+    
 export function displayEmptyArticlesState() {
-    if (!elements.resultsContainer) return;
-    elements.resultsContainer.innerHTML = `
-        <div class="results-empty">
-            <i class="fas fa-search fa-3x text-muted mb-3"></i>
-            <h4>Aucun article trouvé</h4>
-            <p>Lancez une recherche pour commencer à collecter des articles.</p>
-        </div>
+    const tableBody = document.querySelector(SELECTORS.articleTableBody); // Cible le corps du tableau
+    if (!tableBody) return;
+    tableBody.innerHTML = `
+        <tr class="empty-state-row">
+            <td colspan="6" class="text-center py-4">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4>Aucun article trouvé</h4>
+                <p>Lancez une recherche pour commencer à collecter des articles.</p>
+            </td>
+        </tr>
     `;
 }
     
@@ -128,7 +138,7 @@ export function displayEmptyArticlesState() {
             </tr>`;
     }).join('');
 
-    elements.resultsContainer.innerHTML = `
+    container.innerHTML = `
         <div class="results-header">
             <div class="results-stats">
                 <strong>${appState.searchResults.length}</strong> articles trouvés
@@ -175,14 +185,14 @@ export function displayEmptyArticlesState() {
 }
 
 export function updateSelectionCounter() {
-    const counter = document.getElementById('selectedCount');
+    const counter = document.querySelector('#selectedCount'); 
     if (counter) {
         counter.textContent = appState.selectedSearchResults.size;
     }
     
     // Mettre à jour l'état des boutons
-    const batchBtn = document.querySelector('[data-action="batch-process-modal"]');
-    const deleteBtn = document.querySelector('[data-action="delete-selected-articles"]');
+    const batchBtn = document.querySelector('[data-action="batch-process-modal"]'); 
+    const deleteBtn = document.querySelector('[data-action="delete-selected-articles"]'); 
     
     const hasSelection = appState.selectedSearchResults.size > 0;
     if (batchBtn) batchBtn.disabled = !hasSelection;
@@ -230,7 +240,7 @@ export async function viewArticleDetails(articleId) {
     const extraction = appState.currentProjectExtractions.find(e => e.pmid === articleId);
     
     if (!article) {
-        showToast(MESSAGES.articleNotFound, 'error'); // Already correct
+        showToast(MESSAGES.articleNotFound, 'error');
         return;
     }
 
@@ -260,22 +270,22 @@ export async function viewArticleDetails(articleId) {
             ${extractionDetails}
         </div>`;
 
-    showModal(MESSAGES.articleDetailsTitle, content); // Already correct
+    showModal(MESSAGES.articleDetailsTitle, content);
 }
 
 export async function handleDeleteSelectedArticles() {
     const selectedArticles = getSelectedArticles();
     if (selectedArticles.length === 0) {
-        showToast(MESSAGES.noArticleSelected, 'warning'); // Already correct
+        showToast(MESSAGES.noArticleSelected, 'warning');
         return;
     }
 
-    if (!confirm(MESSAGES.confirmDeleteArticles(selectedArticles.length))) { // Already correct
+    if (!confirm(MESSAGES.confirmDeleteArticles(selectedArticles.length))) {
         return;
     }
 
     try {
-        const response = await fetchAPI(API_ENDPOINTS.articlesBatchDelete, { // Already correct
+        const response = await fetchAPI(API_ENDPOINTS.articlesBatchDelete, {
             method: 'POST',
             body: JSON.stringify({
                 article_ids: selectedArticles.map(a => a.id),
@@ -284,8 +294,8 @@ export async function handleDeleteSelectedArticles() {
         });
 
         // CORRECTION : Utilise job_id au lieu de task_id
-        if (response.job_id) { // Already correct
-            showToast(MESSAGES.deleteStarted(response.job_id), 'success'); // Already correct
+        if (response.job_id) {
+            showToast(MESSAGES.deleteStarted(response.job_id), 'success');
             // Actualiser la liste des articles
             setTimeout(() => {
                 window.dispatchEvent(new CustomEvent('articles:refresh'));
@@ -300,7 +310,7 @@ export function showBatchProcessModal() {
     const selectedCount = appState.selectedSearchResults.size;
     
     if (selectedCount === 0) {
-        showToast(MESSAGES.noArticleSelected, 'warning'); // Already correct
+        showToast(MESSAGES.noArticleSelected, 'warning');
         return;
     }
 
@@ -326,22 +336,22 @@ export function showBatchProcessModal() {
             </div>
         </div>`;
 
-    showModal(MESSAGES.batchProcessModalTitle, content); // Already correct
+    showModal(MESSAGES.batchProcessModalTitle, content);
 }
 
 export async function startBatchProcessing() {
     closeModal('genericModal');
     
     const selectedIds = Array.from(appState.selectedSearchResults);
-    const profileSelect = document.getElementById('analysis-profile-select');
+    const profileSelect = document.querySelector('#analysis-profile-select'); 
     const profileId = profileSelect ? profileSelect.value : null;
     
     if (selectedIds.length === 0) return;
 
-    showLoadingOverlay(true, MESSAGES.screeningStarted(selectedIds.length)); // Already correct
+    showLoadingOverlay(true, MESSAGES.screeningStarted(selectedIds.length));
     
     try {
-        await fetchAPI(API_ENDPOINTS.projectRun(appState.currentProject.id), { // Already correct
+        await fetchAPI(API_ENDPOINTS.projectRun(appState.currentProject.id), {
             method: 'POST',
             body: {
                 articles: selectedIds,
@@ -350,7 +360,7 @@ export async function startBatchProcessing() {
             }
         });
         
-        showToast(MESSAGES.screeningTaskStarted, 'success'); // Already correct
+        showToast(MESSAGES.screeningTaskStarted, 'success');
         showSection('validation');
         
     } catch (e) {
@@ -367,7 +377,7 @@ export async function showRunExtractionModal() {
         .filter(e => e.user_validation_status === 'include');
     
     if (includedArticles.length === 0) {
-        showToast(MESSAGES.noArticleToExtract, 'warning'); // Already correct
+        showToast(MESSAGES.noArticleToExtract, 'warning');
         return;
     }
 
@@ -399,15 +409,15 @@ export async function showRunExtractionModal() {
             </div>
         </div>`;
 
-    showModal(MESSAGES.fullExtractionModalTitle, content); // Already correct
+    showModal(MESSAGES.fullExtractionModalTitle, content);
 }
 
 export async function startFullExtraction() {
-    const gridSelect = document.getElementById('extraction-grid-select');
+    const gridSelect = document.querySelector('#extraction-grid-select'); 
     const gridId = gridSelect ? gridSelect.value : null;
     
     if (!gridId) {
-        showToast(MESSAGES.noGridSelectedForExtraction, 'warning'); // Already correct
+        showToast(MESSAGES.noGridSelectedForExtraction, 'warning');
         return;
     }
 
@@ -418,10 +428,10 @@ export async function startFullExtraction() {
     
     const articleIds = includedArticles.map(e => e.pmid);
 
-    showLoadingOverlay(true, MESSAGES.extractionStarted(articleIds.length)); // Already correct
+    showLoadingOverlay(true, MESSAGES.extractionStarted(articleIds.length));
     
     try {
-        await fetchAPI(API_ENDPOINTS.projectRun(appState.currentProject.id), { // Already correct
+        await fetchAPI(API_ENDPOINTS.projectRun(appState.currentProject.id), {
             method: 'POST',
             body: {
                 articles: articleIds,
@@ -430,7 +440,7 @@ export async function startFullExtraction() {
             }
         });
         
-        showToast(MESSAGES.extractionTaskStarted, 'success'); // Already correct
+        showToast(MESSAGES.extractionTaskStarted, 'success');
         showSection('validation');
         
     } catch (e) {

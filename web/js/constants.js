@@ -1,4 +1,3 @@
-0,0 @@
 // web/js/constants.js
 
 // Sélecteurs DOM centralisés

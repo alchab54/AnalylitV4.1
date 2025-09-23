@@ -4,7 +4,7 @@ import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { showLoadingOverlay, closeModal, escapeHtml, showModal } from './ui-improved.js'; 
 import { showToast, showSuccess, showError } from './toast.js';
-import { API_ENDPOINTS, MESSAGES } from './constants.js';
+import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 // Fonctions utilitaires locales ou importées d'autres modules si nécessaire
 
@@ -13,7 +13,7 @@ import { API_ENDPOINTS, MESSAGES } from './constants.js';
  */
 async function loadProjects() {
   const oldProjectIds = new Set((appState.projects || []).map(p => p.id));
-  const projects = await fetchAPI(API_ENDPOINTS.projects); // Already correct
+  const projects = await fetchAPI(API_ENDPOINTS.projects);
   appState.projects = projects || [];
 
   const newProjectIds = new Set(appState.projects.map(p => p.id));
@@ -46,12 +46,12 @@ async function handleCreateProject(event) {
   const mode = form.querySelector('#analysisMode').value;
 
   if (!name) {
-    showToast(MESSAGES.projectNameRequired, 'warning'); // Already correct
+    showToast(MESSAGES.projectNameRequired, 'warning');
     return;
   }
 
   try {
-    showLoadingOverlay(true, MESSAGES.creatingProject); // Already correct
+    showLoadingOverlay(true, MESSAGES.creatingProject);
 
     const newProject = await fetchAPI(API_ENDPOINTS.projects, {
       method: 'POST',
@@ -97,7 +97,7 @@ async function selectProject(projectId) {
  */
 function deleteProject(projectId, projectName) {
   if (!projectId) return;
-  appState.projectToDelete = { id: projectId, name: projectName }; // No change needed here
+  appState.projectToDelete = { id: projectId, name: projectName };
   const modalContent = `
     <p>${MESSAGES.confirmDeleteProjectBody(escapeHtml(projectName))}</p> 
     <p>Cette action est irréversible.</p>
@@ -106,18 +106,18 @@ function deleteProject(projectId, projectName) {
       <button class="btn btn--danger" data-action="confirm-delete-project">Supprimer</button>
     </div>
   `;
-  showModal(MESSAGES.confirmDeleteProjectTitle, modalContent); // Already correct
+  showModal(MESSAGES.confirmDeleteProjectTitle, modalContent);
 }
 
 /**
  * Logique de suppression effective, appelée par le gestionnaire d'événements.
  */
 async function confirmDeleteProject(projectId) {
-    showLoadingOverlay(true, MESSAGES.deletingProject); // Already correct
+    showLoadingOverlay(true, MESSAGES.deletingProject);
     closeModal(); // Ferme la modale de confirmation
     try {
-        await fetchAPI(API_ENDPOINTS.projectById(projectId), { method: 'DELETE' }); // Already correct
-        showToast(MESSAGES.projectDeleted, 'success'); // Already correct
+        await fetchAPI(API_ENDPOINTS.projectById(projectId), { method: 'DELETE' });
+        showToast(MESSAGES.projectDeleted, 'success');
         
         // Mettre à jour l'état localement pour une UI plus réactive
         appState.projects = appState.projects.filter(p => p.id !== projectId);
@@ -139,11 +139,11 @@ async function confirmDeleteProject(projectId) {
  */
 async function handleExportProject(projectId) {
   if (!projectId) {
-    showToast(MESSAGES.projectIdMissingForExport, 'warning'); // Already correct
+    showToast(MESSAGES.projectIdMissingForExport, 'warning');
     return;
   }
-  window.open(API_ENDPOINTS.projectExport(projectId), '_blank'); // Already correct
-  showToast(MESSAGES.projectExportStarted, 'info'); // Already correct
+  window.open(API_ENDPOINTS.projectExport(projectId), '_blank');
+  showToast(MESSAGES.projectExportStarted, 'info');
 }
 
 /**
@@ -170,13 +170,13 @@ async function loadProjectFilesSet(projectId) {
  * Rendu de la liste des projets (colonne gauche).
  */
 function renderProjectsList() {
-  const container = elements.projectsList;
+  const container = document.querySelector(SELECTORS.projectsList);
   if (!container) return;
 
   const projects = Array.isArray(appState.projects) ? appState.projects : [];
 
   if (projects.length === 0) {
-    container.innerHTML = '<div class="placeholder">Aucun projet. Créez-en un pour commencer.</div>';
+    displayEmptyProjectsState();
     return;
   }
 
@@ -200,6 +200,23 @@ function renderProjectsList() {
   }).join('');
 
   container.innerHTML = projectsHtml;
+}
+
+/**
+ * Affiche un état vide quand aucun projet n'est trouvé.
+ */
+export function displayEmptyProjectsState() {
+    const container = elements.projectsList;
+    if (!container) return;
+    container.innerHTML = `
+        <div class="empty-state">
+            <h3>Aucun projet trouvé</h3>
+            <p>Créez votre premier projet pour commencer votre revue de littérature.</p>
+            <button data-action="create-project-modal" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Créer un projet
+            </button>
+        </div>
+    `;
 }
 
 function updateProjectListSelection() {
@@ -237,8 +254,8 @@ function getStatusClass(status) {
  * Rendu du panneau de détails du projet (colonne droite).
  */
 function renderProjectDetail(project) {
-  const detailContainer = elements.projectDetailContent;
-  const placeholder = elements.projectPlaceholder;
+  const detailContainer = document.querySelector(SELECTORS.projectDetailContent);
+  const placeholder = document.querySelector(SELECTORS.projectPlaceholder);
   if (!detailContainer || !placeholder) return;
 
   if (!project) {
@@ -331,5 +348,6 @@ export {
     renderProjectsList,
     updateProjectListSelection,
     renderProjectDetail,
-    getStatusText
+    getStatusText,
+    displayEmptyProjectsState
 };

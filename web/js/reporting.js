@@ -1,11 +1,11 @@
 import { appState, elements } from './app-improved.js'; 
 import { fetchAPI } from './api.js';
-import { showToast, showLoadingOverlay, escapeHtml } from './ui-improved.js';
-import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js'; 
+import { showLoadingOverlay, escapeHtml } from './ui-improved.js'; 
+import { showToast } from './toast.js';
 
 export async function renderReportingSection(elements) {
     if (!appState.currentProject) {
-        elements.reportingContainer.innerHTML = `<p>${MESSAGES.selectProjectForReporting}</p>`;
+        elements.reportingContainer.innerHTML = '<p>Veuillez sélectionner un projet pour accéder aux rapports.</p>';
         return;
     }
 
@@ -13,28 +13,28 @@ export async function renderReportingSection(elements) {
         <div class="report-section">
             <h3>Générateur de Bibliographie</h3>
             <div class="form-group">
-                <label for="${SELECTORS.bibliographyStyle.substring(1)}">Style de citation:</label>
-                <select id="${SELECTORS.bibliographyStyle.substring(1)}" class="form-control">
+                <label for="bibliographyStyle">Style de citation:</label>
+                <select id="bibliographyStyle" class="form-control">
                     <option value="apa" selected>APA 7</option>
                     <option value="vancouver">Vancouver</option>
                     <option value="mla">MLA</option>
                 </select>
                 <button data-action="generate-bibliography" class="btn btn-primary mt-2">Générer Bibliographie</button>
             </div>
-            <div id="${SELECTORS.bibliographyOutput.substring(1)}" class="output-box mt-3"></div>
+            <div id="bibliographyOutput" class="output-box mt-3"></div>
         </div>
 
         <div class="report-section mt-4">
             <h3>Tableau de Synthèse des Études Incluses</h3>
-            <button data-action="generate-summary-table" class="btn btn--primary">Générer Tableau</button>
-            <button data-action="export-summary-excel" class="btn btn--success ml-2">Exporter en Excel</button>
-            <div id="${SELECTORS.summaryTableOutput.substring(1)}" class="output-box mt-3"></div>
+            <button data-action="generate-summary-table" class="btn btn-primary">Générer Tableau</button>
+            <button data-action="export-summary-excel" class="btn btn-success ml-2">Exporter en Excel</button>
+            <div id="summaryTableOutput" class="output-box mt-3"></div>
         </div>
 
         <div class="report-section mt-4">
             <h3>Checklist PRISMA-ScR Interactive</h3>
-            <div id="${SELECTORS.prismaChecklistOutput.substring(1)}" class="output-box mt-3"></div>
-            <button data-action="save-prisma-checklist" class="btn btn--primary mt-2">Sauvegarder Checklist</button>
+            <div id="prismaChecklistOutput" class="output-box mt-3"></div>
+            <button data-action="save-prisma-checklist" class="btn btn-primary mt-2">Sauvegarder Checklist</button>
         </div>
     `;
 
@@ -42,30 +42,30 @@ export async function renderReportingSection(elements) {
     await loadPrismaChecklist();
 }
 export async function generateBibliography() {
-    showLoadingOverlay(true, MESSAGES.generatingBibliography, elements);
+    showLoadingOverlay(true, 'Génération de la bibliographie...', elements);
     try {
-        const style = document.querySelector(SELECTORS.bibliographyStyle).value;
+        const style = document.getElementById('bibliographyStyle').value;
         // TODO: Backend route for generating bibliography is missing.
-        // const bibliography = await fetchAPI(API_ENDPOINTS.projectBibliography(appState.currentProject.id, style));
-        // const outputDiv = document.querySelector(SELECTORS.bibliographyOutput);
+        // const bibliography = await fetchAPI(`/projects/${appState.currentProject.id}/reports/bibliography?style=${style}`);
+        // const outputDiv = document.getElementById('bibliographyOutput');
         // outputDiv.innerHTML = bibliography.map(item => `<p>${item}</p>`).join('');
-        showToast(MESSAGES.bibliographyNotImplemented, 'info');
+        showToast('Génération de la bibliographie non implémentée.', 'info');
     } catch (error) {
         console.error('Erreur lors de la génération de la bibliographie:', error);
-        showToast(MESSAGES.errorGeneratingBibliography, 'error', elements);
+        showToast('Erreur lors de la génération de la bibliographie.', 'error', elements);
     } finally {
         showLoadingOverlay(false, '', elements);
     }
 }
 
 export async function generateSummaryTable() {
-    showLoadingOverlay(true, MESSAGES.generatingSummaryTable, elements);
+    showLoadingOverlay(true, 'Génération du tableau de synthèse...', elements);
     try {
         // TODO: Backend route for generating summary table is missing.
-        // const data = await fetchAPI(API_ENDPOINTS.projectSummaryTable(appState.currentProject.id));
-        // const outputDiv = document.querySelector(SELECTORS.summaryTableOutput);
+        // const data = await fetchAPI(`/projects/${appState.currentProject.id}/reports/summary-table`);
+        // const outputDiv = document.getElementById('summaryTableOutput');
         // if (data.length === 0) {
-        //     outputDiv.innerHTML = `<p>${MESSAGES.noSummaryTableData}</p>`;
+        //     outputDiv.innerHTML = '<p>Aucune donnée disponible pour le tableau de synthèse.</p>';
         //     return;
         // }
 
@@ -99,20 +99,20 @@ export async function generateSummaryTable() {
         // });
         // tableHtml += '</tbody></table>';
         // outputDiv.innerHTML = tableHtml;
-        showToast(MESSAGES.summaryTableNotImplemented, 'info');
+        showToast('Génération du tableau de synthèse non implémentée.', 'info');
     } catch (error) {
         console.error('Erreur lors de la génération du tableau de synthèse:', error);
-        showToast(MESSAGES.errorGeneratingSummaryTable, 'error', elements);
+        showToast('Erreur lors de la génération du tableau de synthèse.', 'error', elements);
     } finally {
         showLoadingOverlay(false, '', elements);
     }
 }
 
 export async function exportSummaryTableExcel() {
-    showLoadingOverlay(true, MESSAGES.exportingExcel, elements);
+    showLoadingOverlay(true, 'Exportation du tableau en Excel...', elements);
     try {
         // TODO: Backend route for exporting summary table is missing.
-        // const response = await fetchAPI(API_ENDPOINTS.projectExportSummaryTable(appState.currentProject.id), { rawResponse: true });
+        // const response = await fetchAPI(`/projects/${appState.currentProject.id}/reports/summary-table/export/excel`, { rawResponse: true });
         // const blob = await response.blob();
         // const url = window.URL.createObjectURL(blob);
         // const a = document.createElement('a');
@@ -122,34 +122,34 @@ export async function exportSummaryTableExcel() {
         // a.click();
         // a.remove();
         // window.URL.revokeObjectURL(url);
-        showToast(MESSAGES.exportExcelNotImplemented, 'info');
+        showToast('Exportation du tableau non implémentée.', 'info');
     } catch (error) {
         console.error('Erreur lors de l\'exportation du tableau en Excel:', error);
-        showToast(MESSAGES.errorExportingExcel, 'error', elements);
+        showToast('Erreur lors de l\'exportation du tableau en Excel.', 'error', elements);
     } finally {
         showLoadingOverlay(false, '', elements);
     }
 }
 
 async function loadPrismaChecklist() {
-    showLoadingOverlay(true, MESSAGES.loadingPrisma, elements);
+    showLoadingOverlay(true, 'Chargement de la checklist PRISMA-ScR...', elements);
     try {
-        const checklist = await fetchAPI(API_ENDPOINTS.projectPrismaChecklist(appState.currentProject.id));
+        const checklist = await fetchAPI(`/projects/${appState.currentProject.id}/prisma-checklist`);
         appState.prismaChecklist = checklist;
         renderPrismaChecklist();
-        showToast(MESSAGES.prismaLoaded, 'success', elements);
+        showToast('Checklist PRISMA-ScR chargée.', 'success', elements);
     } catch (error) {
         console.error('Erreur lors du chargement de la checklist PRISMA-ScR:', error);
-        showToast(MESSAGES.errorLoadingPrisma, 'error', elements);
+        showToast('Erreur lors du chargement de la checklist PRISMA-ScR.', 'error', elements);
     } finally {
         showLoadingOverlay(false, '', elements);
     }
 }
 
 function renderPrismaChecklist() {
-    const outputDiv = document.querySelector(SELECTORS.prismaChecklistOutput);
+    const outputDiv = document.getElementById('prismaChecklistOutput');
     if (!appState.prismaChecklist) {
-        outputDiv.innerHTML = `<p>${MESSAGES.prismaUnavailable}</p>`;
+        outputDiv.innerHTML = '<p>Checklist PRISMA-ScR non disponible.</p>';
         return;
     }
 
@@ -198,18 +198,18 @@ export function updatePrismaChecklistItem(itemId, field, value) {
 }
 
 export async function savePrismaChecklist() {
-    showLoadingOverlay(true, MESSAGES.savingPrismaChecklist, elements);
+    showLoadingOverlay(true, 'Sauvegarde de la checklist PRISMA-ScR...', elements);
     try {
         const payload = { checklist: appState.prismaChecklist };
-        await fetchAPI(API_ENDPOINTS.projectPrismaChecklist(appState.currentProject.id), {
+        await fetchAPI(`/projects/${appState.currentProject.id}/prisma-checklist`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        showToast(MESSAGES.prismaChecklistSaved, 'success', elements);
+        showToast('Checklist PRISMA-ScR sauvegardée avec succès.', 'success', elements);
     } catch (error) {
         console.error('Erreur lors de la sauvegarde de la checklist PRISMA-ScR:', error);
-        showToast(MESSAGES.errorSavingPrismaChecklist, 'error', elements);
+        showToast('Erreur lors de la sauvegarde de la checklist PRISMA-ScR.', 'error', elements);
     } finally {
         showLoadingOverlay(false, '', elements);
     }
@@ -220,15 +220,15 @@ export async function savePrismaChecklist() {
  */
 export async function handleGeneratePrisma() {
     if (!appState.currentProject?.id) {
-        showToast(MESSAGES.selectProject, 'warning');
+        showToast('Veuillez sélectionner un projet.', 'warning');
         return;
     }
-    showLoadingOverlay(true, MESSAGES.generatingPrismaDiagram);
+    showLoadingOverlay(true, 'Génération du diagramme PRISMA...');
     try {
-        await fetchAPI(API_ENDPOINTS.projectRunAnalysis(appState.currentProject.id), { method: 'POST', body: { type: 'prisma_flow' } });
-        showToast(MESSAGES.prismaDiagramStarted, 'success');
+        await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, { method: 'POST', body: { type: 'prisma_flow' } });
+        showToast('Génération du diagramme PRISMA lancée en arrière-plan.', 'success');
     } catch (error) {
-        showToast(`${MESSAGES.errorGeneratingPrismaDiagram}: ${error.message}`, 'error');
+        showToast(`Erreur lors de la génération du diagramme PRISMA : ${error.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }

@@ -5,7 +5,7 @@ import { fetchAPI } from './api.js';
 import { setCurrentProjectGrids } from './state.js';
 import { escapeHtml } from './ui-improved.js';
 import { showToast } from './toast.js';
-import { API_ENDPOINTS, MESSAGES } from './constants.js';
+import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 // CORRECTION : Ajout de la fonction manquante `loadProjectGrids`
 export async function loadProjectGrids(projectId) {
@@ -93,21 +93,21 @@ export async function handleDeleteGrid(gridId) {
 }
 
 export function showGridFormModal(gridId = null) {
-    const modal = document.getElementById('gridFormModal');
-    const title = document.getElementById('gridFormModalTitle');
-    const form = document.getElementById('gridForm');
-    const fieldsContainer = document.getElementById('gridFields');
+    const modal = document.querySelector('#gridFormModal'); // Assuming static ID
+    const title = document.querySelector('#gridFormModalTitle');
+    const form = document.querySelector('#gridForm');
+    const fieldsContainer = document.querySelector('#gridFields');
 
     form.reset();
     fieldsContainer.innerHTML = '';
-    document.getElementById('gridId').value = gridId || '';
+    document.querySelector('#gridId').value = gridId || '';
 
     if (gridId) {
         title.textContent = MESSAGES.editGridTitle;
         const grid = appState.currentProjectGrids.find(g => g.id === gridId);
         if (grid) {
-            document.getElementById('gridName').value = grid.name;
-            document.getElementById('gridDescription').value = grid.description || '';
+            document.querySelector('#gridName').value = grid.name;
+            document.querySelector('#gridDescription').value = grid.description || '';
             const fields = Array.isArray(grid.fields) ? grid.fields : [];
             fields.forEach(field => addFieldInput(fieldsContainer, field.name, field.description));
         }
@@ -121,7 +121,7 @@ export function showGridFormModal(gridId = null) {
 }
 
 export function addGridFieldInput() {
-    const container = document.getElementById('gridFields');
+    const container = document.querySelector('#gridFields'); // Assuming static ID
     if (container) {
         addFieldInput(container);
     }
@@ -142,7 +142,7 @@ function addFieldInput(container, name = '', description = '') {
  * Déclenche le clic sur le champ de fichier caché
  */
 export function triggerGridImport() {
-    document.getElementById('grid-import-input').click();
+    document.querySelector('#grid-import-input').click(); // Assuming static ID
 }
 
 /**
@@ -186,7 +186,7 @@ export function removeGridField(target) {
 
 export async function handleSaveGrid(event) {
     event.preventDefault();
-    const form = document.getElementById('gridForm');
+    const form = document.querySelector('#gridForm'); // Assuming static ID
     const gridId = form.elements.id.value;
     const name = form.elements.name.value;
     const description = form.elements.description.value;
@@ -223,7 +223,7 @@ export async function handleSaveGrid(event) {
         setCurrentProjectGrids([...appState.currentProjectGrids]);
 
         showToast(MESSAGES.gridSaved(!!gridId), 'success');
-        document.getElementById('gridFormModal').classList.remove('modal--show');
+        document.querySelector('#gridFormModal').classList.remove('modal--show'); // Assuming static ID
 
     } catch (error) {
         showToast(`${MESSAGES.errorSavingGrid}: ${error.message}`, 'error');

@@ -233,7 +233,7 @@ function createSettingsLayout() {
                         <div class="progress-bar" id="download-progress-bar"></div>
                         <span id="download-status">Téléchargement en cours...</span>
                     </div>
-                    <h4>Modèles Installés</h4>
+                    <h4>Modèles Installés</h4> 
                     <ul id="installed-models-list"></ul>
                 </div>
             </div>
@@ -325,10 +325,10 @@ function renderAnalysisProfilesList(profiles, container) {
  */
 function setupSettingsEventListeners() {
     // Écouteurs pour les boutons principaux
-    document.querySelector('#new-profile-btn')?.addEventListener('click', handleNewProfile);
-    document.querySelector('#delete-profile-btn')?.addEventListener('click', handleDeleteProfile);
+    document.querySelector('#new-profile-btn')?.addEventListener('click', handleNewProfile); 
+    document.querySelector('#delete-profile-btn')?.addEventListener('click', handleDeleteProfile); 
     document.querySelector('#apply-template-btn')?.addEventListener('click', () => {
-        const select = document.querySelector('#prompt-template-select');
+        const select = document.querySelector('#prompt-template-select'); 
         if (select.value) {
             applyPromptTemplate(select.value);
         }
@@ -359,7 +359,7 @@ function setupSettingsEventListeners() {
                 tabContents.forEach(tc => tc.classList.remove('active'));
 
                 link.classList.add('active');
-                document.querySelector(`#${tabId}`)?.classList.add('active');
+                document.querySelector(`#${tabId}`)?.classList.add('active'); 
             });
         });
     }
@@ -473,12 +473,12 @@ export function selectProfile(profileId) {
  */
 function renderProfileForm(profile) {
     const form = document.querySelector('#profile-edit-form');
-    if (!form) return;
+    if (!form) return; 
 
-    form.querySelector('#profile-id').value = profile.id || '';
-    form.querySelector('#profile-name').value = profile.name || '';
-    form.querySelector('#profile-description').value = profile.description || '';
-    form.querySelector('#profile-is_default').checked = profile.is_default || false;
+    form.querySelector('#profile-id').value = profile.id || ''; 
+    form.querySelector('#profile-name').value = profile.name || ''; 
+    form.querySelector('#profile-description').value = profile.description || ''; 
+    form.querySelector('#profile-is_default').checked = profile.is_default || false; 
 
     // Définir les valeurs des sélecteurs de modèles
     promptTypes.forEach(type => {
@@ -489,7 +489,7 @@ function renderProfileForm(profile) {
     });
 
     // Gérer le bouton de suppression
-    const deleteBtn = document.querySelector('#delete-profile-btn');
+    const deleteBtn = document.querySelector('#delete-profile-btn'); 
     if (profile.is_default || profile.id.startsWith('new_')) {
         deleteBtn.disabled = true;
         deleteBtn.title = profile.is_default ? MESSAGES.cannotDeleteDefaultProfile : "";
@@ -618,14 +618,14 @@ function handleNewProfile() {
     renderProfileForm(newProfile);
 
     // Mettre l'ID à "" pour indiquer à l'API qu'il s'agit d'un POST (Créer)
-    document.querySelector('#profile-id').value = "";
+    document.querySelector('#profile-id').value = ""; 
     
     // Désélectionner dans la liste
     document.querySelectorAll(`${SELECTORS.settingsContainer} .list-item`).forEach(item => {
         item.classList.remove('active');
     });
     
-    document.getElementById('profile-name').focus();
+    document.querySelector('#profile-name').focus();
 }
 
 /**
@@ -641,7 +641,7 @@ export async function handleSaveProfile(e) {
 
     try {
         const profileData = collectProfileData();
-        const profileId = document.querySelector('#profile-id').value;
+        const profileId = document.querySelector('#profile-id').value; 
 
         let url = API_ENDPOINTS.analysisProfiles;
         let method = 'POST';
@@ -826,7 +826,7 @@ export function openProfileEditor(profileId = null) {
 }
 
 export function handleDownloadSelectedModel() {
-    const select = document.querySelector('#available-models-select');
+    const select = document.querySelector('#available-models-select'); 
     if (select) {
         const modelName = select.value;
         // Appelle la logique que Gemini a écrite
@@ -863,7 +863,7 @@ export async function downloadModel(modelName) {
 export async function loadInstalledModels() {
     try {
         const response = await fetchAPI(API_ENDPOINTS.ollamaModels);
-        const modelsList = document.querySelector('#installed-models-list');
+        const modelsList = document.querySelector('#installed-models-list'); 
         modelsList.innerHTML = response.models
             .map(
                 (model) =>
@@ -876,12 +876,12 @@ export async function loadInstalledModels() {
 }
 
 function showDownloadProgress(modelName) {
-    const progressContainer = document.querySelector('#download-progress');
-    const statusElement = document.querySelector('#download-status');
+    const progressContainer = document.querySelector('#download-progress'); 
+    const statusElement = document.querySelector('#download-status'); 
     progressContainer.style.display = 'block';
     statusElement.textContent = MESSAGES.downloadingModel(modelName);
 }
 
 function hideDownloadProgress() {
-    document.querySelector('#download-progress').style.display = 'none';
+    document.querySelector('#download-progress').style.display = 'none'; 
 }

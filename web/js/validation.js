@@ -1,8 +1,9 @@
 // web/js/validation.js
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
-import { showLoadingOverlay, showToast, escapeHtml } from './ui-improved.js';
-import { API_ENDPOINTS, MESSAGES } from './constants.js';
+import { showLoadingOverlay, escapeHtml } from './ui-improved.js';
+import { showToast } from './toast.js';
+import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 import { loadProjectGrids } from './grids.js';
 import { setCurrentValidations } from './state.js';
 
@@ -53,7 +54,7 @@ export function filterValidationList(status, target) {
 
 export async function loadValidationSection() {
     if (!appState.currentProject) {
-        const validationContainer = document.getElementById('validationContainer');
+        const validationContainer = document.querySelector(SELECTORS.validationContainer);
         if (validationContainer) {
             validationContainer.innerHTML = `
                 <div class="section-empty">
@@ -75,7 +76,7 @@ async function loadProjectExtractions(projectId) {
 }
 
 export async function renderValidationSection(project) {
-    const container = document.getElementById('validationContainer');
+    const container = document.querySelector(SELECTORS.validationContainer);
     if (!container || !project) {
         if(container) container.innerHTML = `
             <div class="section-empty">

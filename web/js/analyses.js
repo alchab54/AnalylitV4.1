@@ -1,7 +1,8 @@
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { setAnalysisResults } from './state.js';
-import { showToast, showLoadingOverlay, escapeHtml, showModal, closeModal, openModal } from './ui-improved.js';
+import { showLoadingOverlay, escapeHtml, showModal, closeModal, openModal } from './ui-improved.js';
+import { showToast } from './toast.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 export async function loadProjectAnalyses() {
@@ -117,7 +118,7 @@ export function renderAnalysesSection() {
 
 // NOUVELLE FONCTION : pour afficher les résultats de l analyse ATN
 function renderATNResults(analysisData) {
-    const container = document.querySelector('#analysis-result-container');
+    const container = document.querySelector(SELECTORS.analysisResultContainer);
     if (!container) return '';
 
     const metrics = analysisData.atn_metrics || {};
@@ -352,7 +353,7 @@ export function renderKnowledgeGraph(graphData) {
 }
 
 export function initializeKnowledgeGraph(data) {
-    const container = document.querySelector('#knowledge-graph-container');
+    const container = document.querySelector(SELECTORS.knowledgeGraphContainer);
     if (!container || typeof vis === 'undefined') return;
 
     const nodes = new vis.DataSet(data.nodes);
@@ -405,7 +406,7 @@ export function renderPrismaFlow(prismaPath) {
     return `
         <div class="card" id="prisma-flow-card">
             <h4><i class="fas fa-sitemap"></i> Diagramme de flux PRISMA</h4>
-            <img src="${prismaPath}?v=${cacheBuster}" alt="Diagramme PRISMA" style="max-width:100%; height:auto; border-radius: var(--radius-base);">
+            <img src="${prismaPath}?v=${cacheBuster}" alt="Diagramme PRISMA" style="max-width:100%; height:auto; border-radius: var(--radius-base);"> 
         </div>
     `;
 }
