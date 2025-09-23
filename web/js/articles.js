@@ -1,13 +1,13 @@
 // web/js/articles.js
 import { fetchAPI } from './api.js';
-import { appState, elements } from './app-improved.js'; // Already correct
+import { appState, elements } from './app-improved.js';
 import { showLoadingOverlay, showToast, showModal, closeModal, escapeHtml } from './ui-improved.js';
 import { loadProjectFilesSet } from './projects.js';
-import { showSearchModal } from './search.js'; // Assuming this is correct
+import { showSearchModal } from './search.js';
 import { setSearchResults, clearSelectedArticles, toggleSelectedArticle, setCurrentProjectExtractions } from './state.js';
 import { showSection } from './core.js';
 import { loadProjectGrids } from './grids.js';
-import { API_ENDPOINTS, MESSAGES } from './constants.js';
+import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 function debounce(func, delay) {
     let timeout;
@@ -19,7 +19,7 @@ function debounce(func, delay) {
 
 export async function loadSearchResults(page = 1) {
     showLoadingOverlay(true, MESSAGES.loadingResults);
-    
+
     if (!appState.currentProject?.id) {
         if (elements.resultsContainer) {
             elements.resultsContainer.innerHTML = `
@@ -35,10 +35,10 @@ export async function loadSearchResults(page = 1) {
     try {
         const results = await fetchAPI(`${API_ENDPOINTS.projectSearchResults(appState.currentProject.id)}?page=${page}`);
         setSearchResults(results.articles || [], results.meta || {});
-        
+
         const extractions = await fetchAPI(API_ENDPOINTS.projectExtractions(appState.currentProject.id));
         setCurrentProjectExtractions(extractions);
-        
+
         renderSearchResultsTable();
     } catch (error) {
         showToast(`Erreur: ${error.message}`, 'error');
@@ -52,7 +52,7 @@ export async function loadSearchResults(page = 1) {
 
 export function renderSearchResultsTable() {
     if (!elements.resultsContainer) return;
-    
+
     if (!appState.currentProject) {
         elements.resultsContainer.innerHTML = `
             <div class="results-empty">
@@ -66,27 +66,27 @@ export function renderSearchResultsTable() {
         elements.resultsContainer.innerHTML = `
             <div class="empty-state text-center py-5">
                 <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                <h4>Aucun article trouvé</h4>
-                <p>Lancez une recherche pour commencer à collecter des articles.</p>
+                <h4>${MESSAGES.noArticlesFoundTitle}</h4>
+                <p>${MESSAGES.noArticlesFoundText}</p>
             </div>
         `;
         return;
     }
 
     const { selectedSearchResults, currentProjectExtractions, currentProjectFiles } = appState;
-    
+
     const tableRows = appState.searchResults.map(article => {
         const isSelected = selectedSearchResults.has(article.article_id);
         const extraction = currentProjectExtractions.find(e => e.pmid === article.article_id);
-        
+
         // Vérifier si le PDF existe
         const pdfExists = currentProjectFiles?.has(article.article_id.replace(/^PMID:/, '').toLowerCase());
-        
+
         return `
             <tr class="result-row ${isSelected ? 'result-row--selected' : ''}" data-article-id="${article.article_id}">
                 <td>
-                    <input type="checkbox" 
-                           data-action="toggle-article-selection" 
+                    <input type="checkbox"
+                           data-action="toggle-article-selection"
                            data-article-id="${article.article_id}"
                            ${isSelected ? 'checked' : ''}>
                 </td>
@@ -96,20 +96,20 @@ export function renderSearchResultsTable() {
                         ${pdfExists ? '<span class="pdf-badge">📄 PDF</span>' : ''}
                     </div>
                     <div class="article-meta">
-                        <span>${escapeHtml(article.authors)}</span> • 
-                        <em>${escapeHtml(article.journal)}</em> • 
+                        <span>${escapeHtml(article.authors)}</span> •
+                        <em>${escapeHtml(article.journal)}</em> •
                         <span>${escapeHtml(article.publication_date)}</span>
                     </div>
                 </td>
                 <td class="score-column">
-                    ${extraction ? 
-                        `<span class="relevance-score">${extraction.relevance_score || 'N/A'}</span>` : 
+                    ${extraction ?
+                        `<span class="relevance-score">${extraction.relevance_score || 'N/A'}</span>` :
                         '<span class="no-analysis">-</span>'
                     }
                 </td>
                 <td class="actions-column">
-                    <button class="btn btn--sm btn--secondary" 
-                            data-action="view-details" 
+                    <button class="btn btn--sm btn--secondary"
+                            data-action="view-details"
                             data-article-id="${article.article_id}">
                         Détails
                     </button>
@@ -122,32 +122,32 @@ export function renderSearchResultsTable() {
             <div class="results-stats">
                 <strong>${appState.searchResults.length}</strong> articles trouvés
                 <span class="selection-counter">
-                    <strong id="selectedCount">${selectedSearchResults.size}</strong> sélectionnés
+                    <strong id="${SELECTORS.selectedCount.substring(1)}">${selectedSearchResults.size}</strong> sélectionnés
                 </span>
             </div>
             <div class="results-actions">
                 <button class="btn btn--secondary" data-action="select-all-articles">
                     Tout sélectionner
                 </button>
-                <button class="btn btn--primary" 
+                <button class="btn btn--primary"
                         data-action="batch-process-modal"
                         ${selectedSearchResults.size === 0 ? 'disabled' : ''}>
                     Traiter la sélection
                 </button>
-                <button class="btn btn--danger" 
+                <button class="btn btn--danger"
                         data-action="delete-selected-articles"
                         ${selectedSearchResults.size === 0 ? 'disabled' : ''}>
                     Supprimer sélection
                 </button>
             </div>
         </div>
-        
+
         <div class="results-table-container">
             <table class="results-table">
                 <thead>
                     <tr>
                         <th width="40">
-                            <input type="checkbox" id="selectAllCheckbox">
+                            <input type="checkbox" id="${SELECTORS.selectAllArticlesCheckbox.substring(1)}">
                         </th>
                         <th>Article</th>
                         <th width="80">Score IA</th>
@@ -164,32 +164,32 @@ export function renderSearchResultsTable() {
 }
 
 export function updateSelectionCounter() {
-    const counter = document.getElementById('selectedCount');
+    const counter = document.querySelector(SELECTORS.selectedCount);
     if (counter) {
         counter.textContent = appState.selectedSearchResults.size;
     }
-    
+
     // Mettre à jour l'état des boutons
-    const batchBtn = document.querySelector('[data-action="batch-process-modal"]');
-    const deleteBtn = document.querySelector('[data-action="delete-selected-articles"]');
-    
+    const batchBtn = document.querySelector(SELECTORS.batchProcessBtn);
+    const deleteBtn = document.querySelector(SELECTORS.deleteSelectedBtn);
+
     const hasSelection = appState.selectedSearchResults.size > 0;
     if (batchBtn) batchBtn.disabled = !hasSelection;
     if (deleteBtn) deleteBtn.disabled = !hasSelection;
 }
 
 export function updateAllRowSelections() {
-    const checkboxes = document.querySelectorAll('[data-action="toggle-article-selection"]');
+    const checkboxes = document.querySelectorAll(SELECTORS.toggleArticleSelection);
     checkboxes.forEach(checkbox => {
         const articleId = checkbox.dataset.articleId;
         checkbox.checked = appState.selectedSearchResults.has(articleId);
-        
+
         const row = checkbox.closest('.result-row');
         if (row) {
             row.classList.toggle('result-row--selected', checkbox.checked);
         }
     });
-    
+
     updateSelectionCounter();
 }
 
@@ -200,7 +200,7 @@ export function toggleArticleSelection(articleId) {
 
 export function selectAllArticles(target) {
     const allSelected = appState.selectedSearchResults.size === appState.searchResults.length;
-    
+
     if (allSelected) {
         clearSelectedArticles();
         target.textContent = 'Tout sélectionner';
@@ -210,25 +210,25 @@ export function selectAllArticles(target) {
         });
         target.textContent = 'Tout désélectionner';
     }
-    
+
     updateAllRowSelections();
 }
 
 export async function viewArticleDetails(articleId) {
     const article = appState.searchResults.find(a => a.article_id === articleId);
     const extraction = appState.currentProjectExtractions.find(e => e.pmid === articleId);
-    
+
     if (!article) {
         showToast(MESSAGES.articleNotFound, 'error');
         return;
     }
 
-    const extractionDetails = extraction ? 
+    const extractionDetails = extraction ?
         `<div class="extraction-details">
             <h4>Analyse IA</h4>
             <p><strong>Score:</strong> ${extraction.relevance_score}/10</p>
             <p><strong>Justification:</strong> ${escapeHtml(extraction.relevance_justification || 'Aucune')}</p>
-         </div>` : 
+         </div>` :
         '<p class="no-analysis">Aucune analyse IA effectuée pour cet article.</p>';
 
     const content = `
@@ -240,12 +240,12 @@ export async function viewArticleDetails(articleId) {
                 <p><strong>DOI:</strong> ${article.doi ? `<a href="https://doi.org/${article.doi}" target="_blank">${article.doi}</a>` : 'N/A'}</p>
                 <p><strong>ID:</strong> ${escapeHtml(articleId)}</p>
             </div>
-            
+
             <div class="article-abstract">
                 <h4>Résumé</h4>
                 <p>${escapeHtml(article.abstract)}</p>
             </div>
-            
+
             ${extractionDetails}
         </div>`;
 
@@ -285,28 +285,28 @@ export async function handleDeleteSelectedArticles() {
 
 export function showBatchProcessModal() {
     const selectedCount = appState.selectedSearchResults.size;
-    
+
     if (selectedCount === 0) {
         showToast(MESSAGES.noArticleSelected, 'warning');
         return;
     }
 
     const profiles = appState.analysisProfiles || [];
-    const profileOptions = profiles.map(p => 
+    const profileOptions = profiles.map(p =>
         `<option value="${p.id}">${escapeHtml(p.name)}</option>`
     ).join('');
 
     const content = `
         <div class="batch-process-modal">
             <p>Vous êtes sur le point de lancer un traitement par lot sur <strong>${selectedCount}</strong> article(s).</p>
-            
+
             <div class="form-group">
-                <label class="form-label" for="analysis-profile-select">Profil d'analyse:</label>
-                <select id="analysis-profile-select" class="form-control">
+                <label class="form-label" for="${SELECTORS.analysisProfileSelect.substring(1)}">Profil d'analyse:</label>
+                <select id="${SELECTORS.analysisProfileSelect.substring(1)}" class="form-control">
                     ${profileOptions}
                 </select>
             </div>
-            
+
             <div class="modal-actions">
                 <button class="btn btn--secondary" data-action="close-modal">Annuler</button>
                 <button class="btn btn--primary" data-action="start-batch-process">Lancer le traitement</button>
@@ -318,17 +318,17 @@ export function showBatchProcessModal() {
 
 export async function startBatchProcessing() {
     closeModal('genericModal');
-    
+
     const selectedIds = Array.from(appState.selectedSearchResults);
-    const profileSelect = document.getElementById('analysis-profile-select');
+    const profileSelect = document.querySelector(SELECTORS.analysisProfileSelect);
     const profileId = profileSelect ? profileSelect.value : null;
-    
+
     if (selectedIds.length === 0) return;
 
     showLoadingOverlay(true, MESSAGES.screeningStarted(selectedIds.length));
-    
+
     try {
-        await fetchAPI(API_ENDPOINTS.projectRun(appState.currentProject.id), { 
+        await fetchAPI(API_ENDPOINTS.projectRun(appState.currentProject.id), {
             method: 'POST',
             body: {
                 articles: selectedIds,
@@ -336,10 +336,10 @@ export async function startBatchProcessing() {
                 profile: profileId,
             }
         });
-        
+
         showToast(MESSAGES.screeningTaskStarted, 'success');
         showSection('validation');
-        
+
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
     } finally {
@@ -352,7 +352,7 @@ export async function showRunExtractionModal() {
 
     const includedArticles = (appState.currentProjectExtractions || [])
         .filter(e => e.user_validation_status === 'include');
-    
+
     if (includedArticles.length === 0) {
         showToast(MESSAGES.noArticleToExtract, 'warning');
         return;
@@ -362,23 +362,23 @@ export async function showRunExtractionModal() {
         await loadProjectGrids(appState.currentProject.id);
     }
 
-    const gridsOptions = (appState.currentProjectGrids || []).map(g => 
+    const gridsOptions = (appState.currentProjectGrids || []).map(g =>
         `<option value="${g.id}">${escapeHtml(g.name)}</option>`
     ).join('');
 
     const content = `
         <div class="extraction-modal">
-            <p>Vous êtes sur le point de lancer une extraction complète sur les 
+            <p>Vous êtes sur le point de lancer une extraction complète sur les
                <strong>${includedArticles.length} article(s)</strong> que vous avez inclus.</p>
-            
+
             <div class="form-group">
-                <label class="form-label" for="extraction-grid-select">Grille d'extraction:</label>
-                <select id="extraction-grid-select" class="form-control" required>
+                <label class="form-label" for="${SELECTORS.extractionGridSelect.substring(1)}">Grille d'extraction:</label>
+                <select id="${SELECTORS.extractionGridSelect.substring(1)}" class="form-control" required>
                     <option value="">-- Sélectionner une grille --</option>
                     ${gridsOptions}
                 </select>
             </div>
-            
+
             <div class="modal-actions">
                 <button class="btn btn--secondary" data-action="close-modal">Annuler</button>
                 <button class="btn btn--primary" data-action="start-full-extraction">Lancer l'extraction</button>
@@ -389,23 +389,23 @@ export async function showRunExtractionModal() {
 }
 
 export async function startFullExtraction() {
-    const gridSelect = document.getElementById('extraction-grid-select');
+    const gridSelect = document.querySelector(SELECTORS.extractionGridSelect);
     const gridId = gridSelect ? gridSelect.value : null;
-    
+
     if (!gridId) {
         showToast(MESSAGES.noGridSelectedForExtraction, 'warning');
         return;
     }
 
     closeModal('genericModal');
-    
+
     const includedArticles = (appState.currentProjectExtractions || [])
         .filter(e => e.user_validation_status === 'include');
-    
+
     const articleIds = includedArticles.map(e => e.pmid);
 
     showLoadingOverlay(true, MESSAGES.extractionStarted(articleIds.length));
-    
+
     try {
         await fetchAPI(API_ENDPOINTS.projectRun(appState.currentProject.id), {
             method: 'POST',
@@ -415,10 +415,10 @@ export async function startFullExtraction() {
                 custom_grid_id: gridId,
             }
         });
-        
+
         showToast(MESSAGES.extractionTaskStarted, 'success');
         showSection('validation');
-        
+
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
     } finally {

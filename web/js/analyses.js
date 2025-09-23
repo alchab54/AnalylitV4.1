@@ -2,7 +2,7 @@ import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { setAnalysisResults } from './state.js';
 import { showToast, showLoadingOverlay, escapeHtml, showModal, closeModal, openModal } from './ui-improved.js';
-import { API_ENDPOINTS, MESSAGES } from './constants.js';
+import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 export async function loadProjectAnalyses() {
     if (!appState.currentProject) {
@@ -11,7 +11,7 @@ export async function loadProjectAnalyses() {
         }
         return;
     }
-    
+
     try {
         // TODO: Backend route for getting analyses is missing.
         // const analyses = await fetchAPI(`/projects/${appState.currentProject.id}/analyses`);
@@ -47,15 +47,15 @@ export function renderAnalysesSection() {
                     <h4>Analyse ATN Multipartite</h4>
                     ${hasAtnAnalysis ? '<span class="badge badge--success">Effectuée</span>' : ''}
                 </div>
-                <div class="analysis-card__body"><p class="analysis-card__description">Analyse spécialisée pour l'alliance thérapeutique numérique, incluant les scores d'empathie, types d'IA, et conformité réglementaire.</p></div>
+                <div class="analysis-card__body"><p class="analysis-card__description">Analyse spécialisée pour l alliance thérapeutique numérique, incluant les scores d empathie, types d IA, et conformité réglementaire.</p></div>
                 <div class="analysis-card__footer">
                     ${hasAtnAnalysis
                         ? `<button class="btn btn--secondary" data-action="view-analysis-results" data-target-id="atn-results-card">Voir les résultats</button>`
-                        : `<button class="btn btn--primary" data-action="run-atn-analysis">Lancer l'Analyse ATN</button>`
+                        : `<button class="btn btn--primary" data-action="run-atn-analysis">Lancer l Analyse ATN</button>`
                     }
                 </div>
             </div>
-            
+
             <div class="analysis-card ${hasDiscussionDraft ? 'analysis-card--done' : ''}">
                 <div class="analysis-card__header">
                      <span class="analysis-card__icon">📝</span>
@@ -86,7 +86,7 @@ export function renderAnalysesSection() {
             </div>
         </div>
 
-        <div id="analysisResultContainer" class="mt-24">
+        <div id="${SELECTORS.analysisResultContainer.substring(1)}" class="mt-24">
             </div>
     `;
 
@@ -103,21 +103,21 @@ export function renderAnalysesSection() {
 
     // AFFICHER LE BROUILLON DE DISCUSSION S'IL EXISTE
     if (hasDiscussionDraft) {
-        const container = document.getElementById('analysisResultContainer');
+        const container = document.querySelector(SELECTORS.analysisResultContainer);
         container.innerHTML += renderDiscussionDraft(analysisResults.discussion_draft);
     }
 
     // AFFICHER LE DIAGRAMME PRISMA S'IL EXISTE
     if (analysisResults.prisma_flow_path) {
-        const container = document.getElementById('analysisResultContainer');
+        const container = document.querySelector(SELECTORS.analysisResultContainer);
         container.innerHTML += renderPrismaFlow(analysisResults.prisma_flow_path);
     }
 }
 
 
-// NOUVELLE FONCTION : pour afficher les résultats de l'analyse ATN
+// NOUVELLE FONCTION : pour afficher les résultats de l analyse ATN
 function renderATNResults(analysisData) {
-    const container = document.getElementById('analysisResultContainer');
+    const container = document.querySelector(SELECTORS.analysisResultContainer);
     if (!container) return '';
 
     const metrics = analysisData.atn_metrics || {};
@@ -129,11 +129,11 @@ function renderATNResults(analysisData) {
 
     container.innerHTML += `
         <div class="card" id="atn-results-card">
-            <div class="card__header"><h4>Résultats de l'Analyse ATN</h4></div>
+            <div class="card__header"><h4>Résultats de l Analyse ATN</h4></div>
             <div class="card__body">
                 <div class="atn-results">
                     <div class="metrics-section">
-                        <h5>📊 Métriques d'Empathie & Alliance</h5>
+                        <h5>📊 Métriques d Empathie & Alliance</h5>
                         <div class="metrics-grid">
                             <div class="metric-card">
                                 <h6>Empathie IA (Moy)</h6>
@@ -151,7 +151,7 @@ function renderATNResults(analysisData) {
                     </div>
                     <div class="metrics-section">
                         <h5>🤖 Technologie Utilisée</h5>
-                        <p><strong>Type d'IA le plus courant :</strong> ${tech.most_common_ai_type || 'N/A'}</p>
+                        <p><strong>Type d IA le plus courant :</strong> ${tech.most_common_ai_type || 'N/A'}</p>
                         </div>
                      <div class="metrics-section">
                         <h5>⚖️ Conformité Réglementaire</h5>
@@ -163,13 +163,14 @@ function renderATNResults(analysisData) {
     `;
 }
 
+
 export function showPRISMAModal() {
     openModal('prismaModal');
     // La logique de rendu et de sauvegarde est déjà dans le HTML/core.js
 }
 
 export async function savePRISMAProgress() {
-    const checklistContent = document.getElementById('prismaChecklistContent');
+    const checklistContent = document.querySelector(SELECTORS.prismaChecklistContent);
     if (!checklistContent) return;
 
     const items = Array.from(checklistContent.querySelectorAll('.prisma-item')).map(itemEl => {
@@ -208,7 +209,7 @@ export async function handleRunATNAnalysis() {
 
     try {
         showLoadingOverlay(true, MESSAGES.atnAnalysisStarted);
-        
+
         const response = await fetchAPI(API_ENDPOINTS.projectRunAnalysis(projectId), {
             method: 'POST',
             body: JSON.stringify({
@@ -233,17 +234,17 @@ export async function runProjectAnalysis(analysisType) {
         showToast(MESSAGES.selectProjectFirst, 'warning');
         return;
     }
-    
-    // Mappage pour les messages affichés à l'utilisateur
+
+    // Mappage pour les messages affichés à l utilisateur
     const analysisNames = {
         discussion: 'le brouillon de discussion',
         knowledge_graph: 'le graphe de connaissances',
         prisma_flow: 'le diagramme PRISMA',
-        atn_scores: "l'analyse ATN"
+        atn_scores: "l analyse ATN"
     };
 
     // Trouver la carte correspondante pour afficher le spinner
-    const card = document.querySelector(`[data-action="run-${analysisType}"]`)?.closest('.analysis-card');
+    const card = document.querySelector(`[data-action="run-analysis"][data-analysis-type="${analysisType}"]`)?.closest('.analysis-card');
     if (card) {
         card.classList.add('analysis-card--loading');
     } else {
@@ -260,11 +261,11 @@ export async function runProjectAnalysis(analysisType) {
             return;
         }
 
-        const response = await fetchAPI(API_ENDPOINTS.projectRunAnalysis(projectId), { 
-            method: 'POST', 
-            body: { type: analysisType } 
+        const response = await fetchAPI(API_ENDPOINTS.projectRunAnalysis(projectId), {
+            method: 'POST',
+            body: { type: analysisType }
         });
-        
+
         const jobId = response.job_id;
         if (jobId) {
             showToast(MESSAGES.analysisJobStarted(analysisNames[analysisType], jobId), 'success');
@@ -273,7 +274,7 @@ export async function runProjectAnalysis(analysisType) {
         }
     } catch (e) {
         showToast(`${MESSAGES.errorStartingAnalysis}: ${e.message}`, 'error');
-        if (card) card.classList.remove('analysis-card--loading');
+        // The loading state on the card should be removed by a websocket event later
         if (!card) showLoadingOverlay(false);
     }
 }
@@ -337,22 +338,22 @@ export function renderKnowledgeGraph(graphData) {
         return `
             <div class="card" id="knowledge-graph-card">
                 <h4><i class="fas fa-project-diagram"></i> Graphe de Connaissances</h4>
-                <p class="text-muted">Aucune donnée pour le graphe. Lancez l'analyse pour le générer.</p>
+                <p class="text-muted">${MESSAGES.noDataForGraph}</p>
             </div>
         `;
     }
     return `
         <div class="card" id="knowledge-graph-card">
             <h4><i class="fas fa-project-diagram"></i> Graphe de Connaissances</h4>
-            <div id="knowledgeGraph" class="knowledge-graph-container"></div>
-            <p class="help-text">${graphData.nodes.length} noeuds et ${graphData.edges.length} relations.</p>
+            <div id="${SELECTORS.knowledgeGraphContainer.substring(1)}" class="knowledge-graph-container"></div>
+            <p class="help-text">${MESSAGES.graphStats(graphData.nodes.length, graphData.edges.length)}</p>
         </div>
     `;
 }
 
 export function initializeKnowledgeGraph(data) {
-    const container = document.getElementById('knowledgeGraph');
-    if (!container || !vis) return;
+    const container = document.querySelector(SELECTORS.knowledgeGraphContainer);
+    if (!container || typeof vis === 'undefined') return;
 
     const nodes = new vis.DataSet(data.nodes);
     const edges = new vis.DataSet(data.edges);
@@ -399,7 +400,7 @@ export function initializeKnowledgeGraph(data) {
 
 export function renderPrismaFlow(prismaPath) {
     if (!prismaPath) return '';
-    // On ajoute un timestamp pour forcer le rechargement de l\'image
+    // On ajoute un timestamp pour forcer le rechargement de l antimage
     const cacheBuster = new Date().getTime();
     return `
         <div class="card" id="prisma-flow-card">
@@ -437,6 +438,7 @@ export async function handleRunPrismaFlow(event) {
         showToast(MESSAGES.analysisStartedSimple('le diagramme PRISMA'), 'success');
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
+    } finally {
         if (card) card.classList.remove('analysis-card--loading');
     }
 }
@@ -467,7 +469,7 @@ export async function handleRunDescriptiveStats() {
 }
 
 /**
- * Exporte les résultats d'analyse (données brutes et graphiques).
+ * Exporte les résultats d analyse (données brutes et graphiques).
  */
 export async function exportAnalyses() {
     if (!appState.currentProject?.id) {
@@ -477,18 +479,17 @@ export async function exportAnalyses() {
 
     try {
         showLoadingOverlay(true, MESSAGES.preparingExport);
-        // L'URL pointe vers l'endpoint backend qui génère le fichier ZIP
+        // L URL pointe vers l endpoint backend qui génère le fichier ZIP
         const exportUrl = `/api${API_ENDPOINTS.projectExportAnalyses(appState.currentProject.id)}`;
-        
+
         // Ouvre une nouvelle fenêtre pour déclencher le téléchargement du fichier
         window.open(exportUrl, '_blank');
 
         showToast(MESSAGES.analysisExportStarted, 'info');
     } catch (error) {
-        console.error("Erreur lors de l'exportation des analyses:", error);
+        console.error("Erreur lors de l exportation des analyses:", error);
         showToast(`${MESSAGES.errorExportingAnalyses} : ${error.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }
 }
-

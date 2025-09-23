@@ -2,13 +2,14 @@
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { showLoadingOverlay, showToast, escapeHtml, openModal } from './ui-improved.js';
+import { API_ENDPOINTS, MESSAGES } from './constants.js';
 
 export function renderSearchSection(project) {
     const container = document.getElementById('searchContainer');
     if (!container) return;
 
     if (!project) {
-        container.innerHTML = `<div class="card"><div class="card__body text-center"><p>Veuillez sélectionner un projet pour commencer une recherche.</p></div></div>`;
+        container.innerHTML = `<div class="card"><div class="card__body text-center"><p>${MESSAGES.selectProjectForSearch}</p></div></div>`;
         return;
     }
 
@@ -113,23 +114,23 @@ export async function handleMultiDatabaseSearch(event) {
             }
         }
         if (allQueriesEmpty) {
-            showToast('Veuillez saisir au moins une requête en mode expert.', 'warning'); // Correction: Utilisation de showToast
+            showToast(MESSAGES.expertQueryRequired, 'warning'); // Correction: Utilisation de showToast
             return;
         }
         searchPayload.expert_queries = expertQueries;
     } else {
         const query = form.elements.query.value;
         if (!query.trim()) {
-            showToast('Veuillez saisir une requête de recherche.', 'warning'); // Correction: Utilisation de showToast
+            showToast(MESSAGES.queryRequired, 'warning'); // Correction: Utilisation de showToast
             return;
         }
         searchPayload.query = query;
     }
 
-    showLoadingOverlay(true, 'Recherche en cours...');
+    showLoadingOverlay(true, MESSAGES.searching);
     try {
-        await fetchAPI('/search', { method: 'POST', body: searchPayload }); // Correction: Utilisation de fetchAPI
-        showToast('Recherche lancée en arrière-plan. Les résultats apparaîtront progressivement.', 'success');
+        await fetchAPI(API_ENDPOINTS.search, { method: 'POST', body: searchPayload }); // Correction: Utilisation de fetchAPI
+        showToast(MESSAGES.searchStarted, 'success');
     } catch (error) {
         showToast(`Erreur : ${error.message}`, 'error');
     } finally {
@@ -139,7 +140,7 @@ export async function handleMultiDatabaseSearch(event) {
 
 export function showSearchModal() {
     if (!appState.currentProject) {
-        showToast('Veuillez sélectionner un projet pour lancer une recherche.', 'warning');
+        showToast(MESSAGES.selectProjectToSearch, 'warning');
         return;
     }
 
@@ -161,7 +162,7 @@ export function showSearchModal() {
             <button type="submit" class="btn btn--primary" data-action="run-multi-search">Lancer la recherche</button>
         </form>
     `;
-    openModal('Nouvelle Recherche', content);
+    openModal(MESSAGES.newSearchModalTitle, content);
 }
 
 let sortState = { key: 'relevance_score', asc: false };

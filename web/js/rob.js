@@ -1,6 +1,7 @@
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js'; // Already correct
 import { showToast, showLoadingOverlay, escapeHtml } from './ui-improved.js'; // Already correct
+import { API_ENDPOINTS, MESSAGES } from './constants.js';
 
 export async function loadRobSection() {
     if (!elements.robContainer) return;

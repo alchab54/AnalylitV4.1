@@ -1,10 +1,11 @@
 import { appState, elements } from './app-improved.js'; 
 import { fetchAPI } from './api.js';
-import { showToast, showLoadingOverlay, escapeHtml } from './ui-improved.js'; 
+import { showToast, showLoadingOverlay, escapeHtml } from './ui-improved.js';
+import { API_ENDPOINTS, MESSAGES } from './constants.js'; 
 
 export async function renderReportingSection(elements) {
     if (!appState.currentProject) {
-        elements.reportingContainer.innerHTML = '<p>Veuillez sélectionner un projet pour accéder aux rapports.</p>';
+        elements.reportingContainer.innerHTML = `<p>${MESSAGES.selectProjectForReporting}</p>`;
         return;
     }
 
@@ -41,17 +42,17 @@ export async function renderReportingSection(elements) {
     await loadPrismaChecklist();
 }
 export async function generateBibliography() {
-    showLoadingOverlay(true, 'Génération de la bibliographie...', elements);
+    showLoadingOverlay(true, MESSAGES.generatingBibliography, elements);
     try {
         const style = document.getElementById('bibliographyStyle').value;
         // TODO: Backend route for generating bibliography is missing.
-        // const bibliography = await fetchAPI(`/projects/${appState.currentProject.id}/reports/bibliography?style=${style}`);
+        // const bibliography = await fetchAPI(API_ENDPOINTS.projectBibliography(appState.currentProject.id, style));
         // const outputDiv = document.getElementById('bibliographyOutput');
         // outputDiv.innerHTML = bibliography.map(item => `<p>${item}</p>`).join('');
-        showToast('Génération de la bibliographie non implémentée.', 'info');
+        showToast(MESSAGES.bibliographyNotImplemented, 'info');
     } catch (error) {
         console.error('Erreur lors de la génération de la bibliographie:', error);
-        showToast('Erreur lors de la génération de la bibliographie.', 'error', elements);
+        showToast(MESSAGES.errorGeneratingBibliography, 'error', elements);
     } finally {
         showLoadingOverlay(false, '', elements);
     }
@@ -101,7 +102,7 @@ export async function generateSummaryTable() {
         showToast('Génération du tableau de synthèse non implémentée.', 'info');
     } catch (error) {
         console.error('Erreur lors de la génération du tableau de synthèse:', error);
-        showToast('Erreur lors de la génération du tableau de synthèse.', 'error', elements);
+        showToast(MESSAGES.errorGeneratingSummaryTable, 'error', elements);
     } finally {
         showLoadingOverlay(false, '', elements);
     }
@@ -124,22 +125,22 @@ export async function exportSummaryTableExcel() {
         showToast('Exportation du tableau non implémentée.', 'info');
     } catch (error) {
         console.error('Erreur lors de l\'exportation du tableau en Excel:', error);
-        showToast('Erreur lors de l\'exportation du tableau en Excel.', 'error', elements);
+        showToast(MESSAGES.errorExportingExcel, 'error', elements);
     } finally {
         showLoadingOverlay(false, '', elements);
     }
 }
 
 async function loadPrismaChecklist() {
-    showLoadingOverlay(true, 'Chargement de la checklist PRISMA-ScR...', elements);
+    showLoadingOverlay(true, MESSAGES.loadingPrisma, elements);
     try {
-        const checklist = await fetchAPI(`/projects/${appState.currentProject.id}/prisma-checklist`);
+        const checklist = await fetchAPI(API_ENDPOINTS.projectPrismaChecklist(appState.currentProject.id));
         appState.prismaChecklist = checklist;
         renderPrismaChecklist();
-        showToast('Checklist PRISMA-ScR chargée.', 'success', elements);
+        showToast(MESSAGES.prismaLoaded, 'success', elements);
     } catch (error) {
         console.error('Erreur lors du chargement de la checklist PRISMA-ScR:', error);
-        showToast('Erreur lors du chargement de la checklist PRISMA-ScR.', 'error', elements);
+        showToast(MESSAGES.errorLoadingPrisma, 'error', elements);
     } finally {
         showLoadingOverlay(false, '', elements);
     }
@@ -148,7 +149,7 @@ async function loadPrismaChecklist() {
 function renderPrismaChecklist() {
     const outputDiv = document.getElementById('prismaChecklistOutput');
     if (!appState.prismaChecklist) {
-        outputDiv.innerHTML = '<p>Checklist PRISMA-ScR non disponible.</p>';
+        outputDiv.innerHTML = `<p>${MESSAGES.prismaUnavailable}</p>`;
         return;
     }
 
@@ -197,18 +198,18 @@ export function updatePrismaChecklistItem(itemId, field, value) {
 }
 
 export async function savePrismaChecklist() {
-    showLoadingOverlay(true, 'Sauvegarde de la checklist PRISMA-ScR...', elements);
+    showLoadingOverlay(true, MESSAGES.savingPrismaChecklist, elements);
     try {
         const payload = { checklist: appState.prismaChecklist };
-        await fetchAPI(`/projects/${appState.currentProject.id}/prisma-checklist`, {
+        await fetchAPI(API_ENDPOINTS.projectPrismaChecklist(appState.currentProject.id), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        showToast('Checklist PRISMA-ScR sauvegardée avec succès.', 'success', elements);
+        showToast(MESSAGES.prismaChecklistSaved, 'success', elements);
     } catch (error) {
         console.error('Erreur lors de la sauvegarde de la checklist PRISMA-ScR:', error);
-        showToast('Erreur lors de la sauvegarde de la checklist PRISMA-ScR.', 'error', elements);
+        showToast(MESSAGES.errorSavingPrismaChecklist, 'error', elements);
     } finally {
         showLoadingOverlay(false, '', elements);
     }
@@ -219,15 +220,15 @@ export async function savePrismaChecklist() {
  */
 export async function handleGeneratePrisma() {
     if (!appState.currentProject?.id) {
-        showToast('Veuillez sélectionner un projet.', 'warning');
+        showToast(MESSAGES.selectProject, 'warning');
         return;
     }
-    showLoadingOverlay(true, 'Génération du diagramme PRISMA...');
+    showLoadingOverlay(true, MESSAGES.generatingPrismaDiagram);
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, { method: 'POST', body: { type: 'prisma_flow' } });
-        showToast('Génération du diagramme PRISMA lancée en arrière-plan.', 'success');
+        await fetchAPI(API_ENDPOINTS.projectRunAnalysis(appState.currentProject.id), { method: 'POST', body: { type: 'prisma_flow' } });
+        showToast(MESSAGES.prismaDiagramStarted, 'success');
     } catch (error) {
-        showToast(`Erreur lors de la génération du diagramme PRISMA : ${error.message}`, 'error');
+        showToast(`${MESSAGES.errorGeneratingPrismaDiagram}: ${error.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }
