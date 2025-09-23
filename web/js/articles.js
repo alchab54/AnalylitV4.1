@@ -182,7 +182,7 @@ export function displayEmptyArticlesState() {
         </div>`;
 
     updateSelectionCounter();
-}
+} 
 
 export function updateSelectionCounter() {
     const counter = document.querySelector('#selectedCount'); 
