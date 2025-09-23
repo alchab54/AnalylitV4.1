@@ -5,7 +5,8 @@ import { fetchAPI } from './api.js';
 import { appState } from './app-improved.js';
 import { setQueuesStatus } from './state.js';
 // MODIFIÉ: Utilisation du nouveau module UI amélioré
-import { showToast, showConfirmModal } from './ui-improved.js'; 
+import { showToast, showConfirmModal } from './ui-improved.js';
+import { API_ENDPOINTS, MESSAGES } from './constants.js'; 
 
 let editors = {}; // Stocke les instances d'Ace Editor
 
@@ -30,8 +31,7 @@ export async function loadSettingsData() {
  */
 export async function loadAnalysisProfiles() {
     try {
-        // CORRECTION : endpoint correct
-        const response = await fetchAPI('/analysis-profiles');
+        const response = await fetchAPI(API_ENDPOINTS.analysisProfiles);
         return response.profiles || [];
     } catch (error) {
         console.error('Erreur chargement profils:', error);
@@ -44,11 +44,11 @@ export async function loadAnalysisProfiles() {
  */
 export async function loadPrompts() {
     try {
-        const prompts = await fetchAPI('/prompts');
+        const prompts = await fetchAPI(API_ENDPOINTS.prompts);
         appState.prompts = prompts || [];
     } catch (error) {
         console.error("Erreur lors du chargement des prompts:", error);
-        showToast(`Erreur chargement prompts: ${error.message}`, 'error');
+        showToast(`${MESSAGES.errorLoadingPrompts}: ${error.message}`, 'error');
         appState.prompts = [];
     }
 }
@@ -58,8 +58,7 @@ export async function loadPrompts() {
  */
 export async function loadOllamaModels() {
     try {
-        // CORRECTION : endpoint correct
-        const response = await fetchAPI('/settings/models');
+        const response = await fetchAPI(API_ENDPOINTS.ollamaModels);
         return response.models || [];
     } catch (error) {
         console.error('Erreur chargement modèles:', error);
@@ -72,7 +71,7 @@ export async function loadOllamaModels() {
  */
 export async function loadQueuesStatus() {
     try {
-        const status = await fetchAPI('/queues/info');
+        const status = await fetchAPI(API_ENDPOINTS.queuesInfo);
         setQueuesStatus(status);
     } catch (error) {
         console.error("Erreur lors du chargement du statut des files:", error);
@@ -298,7 +297,7 @@ function createPromptEditorTabs() {
 function renderAnalysisProfilesList(profiles, container) {
     if (!container) return;
     if (!profiles || profiles.length === 0) {
-        container.innerHTML = '<p class="placeholder">Aucun profil d\'analyse trouvé.</p>';
+        container.innerHTML = `<p class="placeholder">${MESSAGES.noAnalysisProfileFound}</p>`;
         return;
     }
 
@@ -549,7 +548,7 @@ function applyPromptTemplate(templateId) {
         editors[`${targetType}_user`].setValue(template.user_message_template || "", -1);
         showToast(`Modèle '${template.name}' appliqué aux éditeurs '${targetType}'.`, 'success');
     } else {
-        showToast(`Impossible de déterminer à quel éditeur ce modèle s'applique. Veuillez sélectionner un onglet.`, 'warn');
+        showToast(MESSAGES.cannotApplyTemplate, 'warn');
     }
 }
 
@@ -638,17 +637,17 @@ export async function handleSaveProfile(e) {
     const saveBtn = form.querySelector('button[type="submit"]');
     const originalBtnText = saveBtn.innerHTML;
     saveBtn.disabled = true;
-    saveBtn.innerHTML = '<span class="icon">⌛</span> Sauvegarde...';
+    saveBtn.innerHTML = `<span class="icon">⌛</span> ${MESSAGES.saving}`;
 
     try {
         const profileData = collectProfileData();
         const profileId = document.getElementById('profile-id').value;
 
-        let url = '/api/analysis-profiles';
+        let url = API_ENDPOINTS.analysisProfiles;
         let method = 'POST';
 
         if (profileId && !profileId.startsWith('new_')) {
-            url = `/analysis-profiles/${profileId}`;
+            url = API_ENDPOINTS.analysisProfileById(profileId);
             method = 'PUT';
         } else {
             delete profileData.id;
@@ -659,7 +658,7 @@ export async function handleSaveProfile(e) {
             body: JSON.stringify(profileData)
         });
 
-        showToast(`Profil '${updatedProfile.name}' sauvegardé.`, 'success');
+        showToast(MESSAGES.profileSaved(updatedProfile.name), 'success');
         
         await loadAnalysisProfiles();
         renderSettings(); // Re-render complet
@@ -668,7 +667,7 @@ export async function handleSaveProfile(e) {
         selectProfile(updatedProfile.id);
 
     } catch (error) {
-        console.error("Erreur lors de la sauvegarde du profil:", error);
+        console.error(MESSAGES.errorSavingProfile, error);
         showToast(error.message, 'error');
     } finally {
         saveBtn.disabled = false;
@@ -686,27 +685,27 @@ export async function handleDeleteProfile() {
     const profile = profiles.find(p => p.id === profileId);
 
     if (!profile || profile.is_default) {
-        showToast("Impossible de supprimer ce profil (défaut ou non sélectionné).", 'warn');
+        showToast(MESSAGES.cannotDeleteProfile, 'warn');
         return;
     }
 
     // Utilisation de la nouvelle modale de confirmation
     showConfirmModal(
-        'Confirmer la suppression',
-        `Êtes-vous sûr de vouloir supprimer définitivement le profil "${profile.name}" ?`,
+        MESSAGES.confirmProfileDeleteTitle,
+        MESSAGES.confirmProfileDeleteBody(profile.name),
         {
-            confirmText: 'Supprimer',
+            confirmText: MESSAGES.deleteButton,
             confirmClass: 'btn--danger',
             onConfirm: async () => {
                 try {
-                    await fetchAPI(`/analysis-profiles/${profileId}`, { method: 'DELETE' });
-                    showToast(`Profil "${profile.name}" supprimé.`, 'success');
+                    await fetchAPI(API_ENDPOINTS.analysisProfileById(profileId), { method: 'DELETE' });
+                    showToast(MESSAGES.profileDeleted(profile.name), 'success');
                     
                     await loadAnalysisProfiles();
                     renderSettings(); // Re-render (sélectionnera le nouveau profil par défaut)
 
                 } catch (error) {
-                    console.error("Erreur lors de la suppression du profil:", error);
+                    console.error(MESSAGES.errorDeletingProfile, error);
                     showToast(error.message, 'error');
                 }
             }
@@ -759,14 +758,14 @@ export async function handleClearQueue(queueName) {
     if (!queueName) return;
 
     showConfirmModal(
-        'Vider la file d\'attente',
-        `Êtes-vous sûr de vouloir vider la file "${queueName}" ? Toutes les tâches en attente seront perdues.`,
+        MESSAGES.clearQueueTitle,
+        MESSAGES.confirmClearQueueBody(queueName),
         {
-            confirmText: 'Vider',
+            confirmText: MESSAGES.clearButton,
             confirmClass: 'btn--danger',
             onConfirm: async () => {
-                await fetchAPI('/queues/clear', { method: 'POST', body: { queue_name: queueName } });
-                showToast(`La file "${queueName}" a été vidée.`, 'success');
+                await fetchAPI(API_ENDPOINTS.queuesClear, { method: 'POST', body: { queue_name: queueName } });
+                showToast(MESSAGES.queueCleared(queueName), 'success');
                 await loadQueuesStatus(); // Recharger le statut
             }
         }
@@ -800,10 +799,10 @@ export async function handleSavePrompt(event) {
     };
 
     const method = promptId ? 'PUT' : 'POST';
-    const endpoint = promptId ? `/prompts/${promptId}` : '/prompts';
+    const endpoint = promptId ? API_ENDPOINTS.promptById(promptId) : API_ENDPOINTS.prompts;
 
     await fetchAPI(endpoint, { method, body: payload });
-    showToast('Modèle de prompt sauvegardé.', 'success');
+    showToast(MESSAGES.promptSaved, 'success');
     closeModal('promptEditorModal');
     await loadPrompts();
 }
@@ -833,8 +832,8 @@ export function handleDownloadSelectedModel() {
         // Appelle la logique que Gemini a écrite
         downloadModel(modelName); 
     } else {
-        console.error("L'élément select 'available-models-select' est introuvable.");
-        showToast("Erreur : Impossible de trouver la liste des modèles.", 'error');
+        console.error(MESSAGES.selectNotFound);
+        showToast(MESSAGES.modelListNotFound, 'error');
     }
 }
 
@@ -844,18 +843,18 @@ export function handleDownloadSelectedModel() {
 export async function downloadModel(modelName) {
     try {
         showDownloadProgress(modelName);
-        const response = await fetchAPI('/api/ollama/pull', {
+        const response = await fetchAPI(API_ENDPOINTS.ollamaPull, {
             method: 'POST',
             body: JSON.stringify({ model: modelName }),
         });
         if (response.success) {
-            showToast(`Modèle ${modelName} téléchargé avec succès`, 'success');
+            showToast(MESSAGES.modelDownloaded(modelName), 'success');
             await loadInstalledModels();
         } else {
-            throw new Error(response.error || 'Erreur inconnue');
+            throw new Error(response.error || MESSAGES.unknownError);
         }
     } catch (error) {
-        showToast(`Erreur téléchargement : ${error.message}`, 'error');
+        showToast(`${MESSAGES.downloadError}: ${error.message}`, 'error');
     } finally {
         hideDownloadProgress();
     }
@@ -863,7 +862,7 @@ export async function downloadModel(modelName) {
 
 export async function loadInstalledModels() {
     try {
-        const response = await fetchAPI('/api/ollama/models');
+        const response = await fetchAPI(API_ENDPOINTS.ollamaModels);
         const modelsList = document.getElementById('installed-models-list');
         modelsList.innerHTML = response.models
             .map(
@@ -880,7 +879,7 @@ function showDownloadProgress(modelName) {
     const progressContainer = document.getElementById('download-progress');
     const statusElement = document.getElementById('download-status');
     progressContainer.style.display = 'block';
-    statusElement.textContent = `Téléchargement de ${modelName}...`;
+    statusElement.textContent = MESSAGES.downloadingModel(modelName);
 }
 
 function hideDownloadProgress() {

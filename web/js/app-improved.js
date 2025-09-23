@@ -19,9 +19,9 @@ import { sendChatMessage, loadChatMessages, renderChatInterface } from './chat.j
 import { fetchTasks } from './tasks.js';
 import { ThemeManager } from './theme-manager.js';
 
-export const API_BASE_URL = 'http://localhost:8080/api';
+export const API_BASE_URL = CONFIG.API_BASE_URL;
 
-export const WEBSOCKET_URL = '/'; // Use the same origin as the web page
+export const WEBSOCKET_URL = CONFIG.WEBSOCKET_URL;
 
 export const appState = {
     currentProject: null,
@@ -59,36 +59,36 @@ export const appState = {
 export let elements = {};
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 Démarrage de AnalyLit V4.1 Frontend (Version améliorée)...');
+    console.log(MESSAGES.appStart);
 
     // Initialiser le gestionnaire de thème
     appState.themeManager = new ThemeManager();
 
     // Sélection et vérification des éléments DOM
     const queries = {
-        sections:        document.querySelectorAll('.section'),
-        navButtons:      document.querySelectorAll('.app-nav__button'),
-        connectionStatus: document.querySelector('[data-connection-status]'),
-        projectsList:   document.getElementById('projectsList'),
-        createProjectBtn: document.getElementById('createProjectBtn'),
-        projectDetail:  document.getElementById('projectDetail'),
-        projectDetailContent: document.getElementById('projectDetailContent'),
-        projectPlaceholder:   document.getElementById('projectPlaceholder'),
-        resultsContainer:     document.getElementById('resultsContainer'),
-        validationContainer:  document.getElementById('validationContainer'),
-        analysisContainer:    document.getElementById('analysisContainer'),
-        importContainer:      document.getElementById('importContainer'),
-        chatContainer:        document.getElementById('chatContainer'),
-        settingsContainer:    document.getElementById('settingsContainer'),
-        robContainer:         document.getElementById('robContainer'),
-        modalsContainer:      document.getElementById('modalsContainer'),
-        loadingOverlay:       document.getElementById('loadingOverlay'),
-        toastContainer:       document.getElementById('toastContainer'),
-        reportingContainer:   document.getElementById('reportingContainer'),
-        tasksContainer:       document.getElementById('tasksContainer'),
-        newProjectForm:       document.getElementById('newProjectForm'),
-        gridsContainer:       document.getElementById('gridsContainer'),
-        searchContainer:      document.getElementById('searchContainer'),
+        sections:        document.querySelectorAll(SELECTORS.sections),
+        navButtons:      document.querySelectorAll(SELECTORS.navButtons),
+        connectionStatus: document.querySelector(SELECTORS.connectionStatus),
+        projectsList:   document.querySelector(SELECTORS.projectsList),
+        createProjectBtn: document.querySelector(SELECTORS.createProjectBtn),
+        projectDetail:  document.querySelector(SELECTORS.projectDetail),
+        projectDetailContent: document.querySelector(SELECTORS.projectDetailContent),
+        projectPlaceholder:   document.querySelector(SELECTORS.projectPlaceholder),
+        resultsContainer:     document.querySelector(SELECTORS.resultsContainer),
+        validationContainer:  document.querySelector(SELECTORS.validationContainer),
+        analysisContainer:    document.querySelector(SELECTORS.analysisContainer),
+        importContainer:      document.querySelector(SELECTORS.importContainer),
+        chatContainer:        document.querySelector(SELECTORS.chatContainer),
+        settingsContainer:    document.querySelector(SELECTORS.settingsContainer),
+        robContainer:         document.querySelector(SELECTORS.robContainer),
+        modalsContainer:      document.querySelector(SELECTORS.modalsContainer),
+        loadingOverlay:       document.querySelector(SELECTORS.loadingOverlay),
+        toastContainer:       document.querySelector(SELECTORS.toastContainer),
+        reportingContainer:   document.querySelector(SELECTORS.reportingContainer),
+        tasksContainer:       document.querySelector(SELECTORS.tasksContainer),
+        newProjectForm:       document.querySelector(SELECTORS.newProjectForm),
+        gridsContainer:       document.querySelector(SELECTORS.gridsContainer),
+        searchContainer:      document.querySelector(SELECTORS.searchContainer),
     };
 
     const critical = ['sections','navButtons','loadingOverlay','toastContainer'];
@@ -102,8 +102,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (missing.length) {
-        console.error('Éléments DOM critiques manquants:', missing);
-        showToast("Erreur : éléments d'interface manquants", 'error');
+        console.error(MESSAGES.missingDOMElement, missing);
+        showToast(MESSAGES.errorUI, 'error');
         return;
     }
 
@@ -118,7 +118,7 @@ async function initializeApplication() {
         setInterval(fetchTasks, 5000); // Refresh tasks every 5 seconds
         await loadInitialData();
 
-        const last = localStorage.getItem('analylit_last_section') || 'projects';
+        const last = localStorage.getItem(CONFIG.LOCAL_STORAGE_LAST_SECTION) || 'projects';
         showSection(last);
 
         if (appState.projects.length && !appState.currentProject) {
@@ -131,12 +131,12 @@ async function initializeApplication() {
         setupPerformanceMonitoring();
 
         const initMs = performance.now() - t0;
-        console.log(`✅ Application initialisée en ${initMs.toFixed(2)}ms`);
+        console.log(MESSAGES.appInitialized(initMs.toFixed(2)));
         appState.performance.loadTimes.initialization = initMs;
     } catch (err) {
-        console.error("❌ Erreur d'initialisation:", err);
+        console.error(MESSAGES.initError, err);
         appState.performance.errors.push({type:'init',error:err.message,timestamp:Date.now()});
-        showToast("Impossible de charger l'application. Rechargez la page.", 'error');
+        showToast(MESSAGES.loadError, 'error');
     }
 }
 
@@ -146,16 +146,16 @@ async function loadInitialData() {
         await Promise.all([loadProjects(), loadAvailableDatabases(), loadAnalysisProfiles()]);
         const loadMs = performance.now() - t1;
         appState.performance.loadTimes.initialData = loadMs;
-        console.log(`📊 Données initiales chargées en ${loadMs.toFixed(2)}ms`);
+        console.log(MESSAGES.initialDataLoaded(loadMs.toFixed(2)));
     } catch (err) {
-        console.error('Erreur chargement initial:', err);
+        console.error(MESSAGES.initialDataError, err);
         throw err;
     }
 }
 
 async function loadAvailableDatabases() {
     try {
-        appState.availableDatabases = await fetchAPI('/databases');
+        appState.availableDatabases = await fetchAPI(API_ENDPOINTS.databases);
     } catch {
         appState.availableDatabases = [];
     }
@@ -217,9 +217,9 @@ window.AnalyLit = {
             selectedResults: appState.selectedSearchResults.size,
             performance: getPerformanceReport()
         };
-        console.log('État de l\'application:', report);
+        console.log(MESSAGES.appStateLog, report);
         return report;
     }
 };
 
-console.log('🎯 Interface de debug disponible: window.AnalyLit');
+console.log(MESSAGES.debugInterface);

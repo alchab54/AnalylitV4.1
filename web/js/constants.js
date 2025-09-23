@@ -2,30 +2,37 @@
 
 // Sélecteurs DOM centralisés
 export const SELECTORS = {
-    // Projets
+    sections: '.section',
+    navButtons: '.app-nav__button',
+    connectionStatus: '[data-connection-status]',
     projectsList: '#projectsList',
-    projectContainer: '.projects-container',
     createProjectBtn: '#createProjectBtn',
-    
-    // Articles
+    projectDetail: '#projectDetail',
+    projectDetailContent: '#projectDetailContent',
+    projectPlaceholder: '#projectPlaceholder',
     resultsContainer: '#resultsContainer',
-    selectedArticles: '.article-checkbox:checked',
-    
-    // Analyses
+    validationContainer: '#validationContainer',
     analysisContainer: '#analysisContainer',
+    importContainer: '#importContainer',
+    chatContainer: '#chatContainer',
+    settingsContainer: '#settingsContainer',
+    robContainer: '#robContainer',
+    modalsContainer: '#modalsContainer',
+    loadingOverlay: '#loadingOverlay',
+    toastContainer: '#toastContainer',
+    reportingContainer: '#reportingContainer',
+    tasksContainer: '#tasksContainer',
+    newProjectForm: '#newProjectForm',
+    gridsContainer: '#gridsContainer',
+    searchContainer: '#searchContainer',
+    selectedArticles: '.article-checkbox:checked',
     analysisProgress: '#analysis-progress',
     analysisResults: '#analysis-results',
-    
-    // Paramètres
-    settingsContainer: '#settingsContainer',
     settingsForm: '#profile-edit-form',
     ollamaModels: '#ollama-models-select',
-    
-    // Interface
     sidebar: '#sidebar',
     mainContent: '#main-content',
-    loadingSpinner: '#loading-spinner',
-    toastContainer: '#toastContainer'
+    loadingSpinner: '#loading-spinner'
 };
 
 // URLs API centralisées
@@ -52,7 +59,10 @@ export const API_ENDPOINTS = {
     analysisProfileById: (id) => `/analysis-profiles/${id}`,
     prompts: '/prompts',
     promptById: (id) => `/prompts/${id}`,
-    ollamaModels: '/settings/models',
+    ollamaModels: '/ollama/models',
+    taskCancel: (id) => `/tasks/${id}/cancel`,
+    taskRetry: (id) => `/tasks/${id}/retry`,
+};
     
     // Queues
     queuesInfo: '/queues/info',
@@ -68,7 +78,19 @@ export const API_ENDPOINTS = {
 // Messages d'état
 export const MESSAGES = {
     loading: 'Chargement en cours...', 
+    // App
+    appStart: '🚀 Démarrage de AnalyLit V4.1 Frontend (Version améliorée)...',
+    missingDOMElement: 'Éléments DOM critiques manquants:',
+    errorUI: "Erreur : éléments d'interface manquants",
+    appInitialized: (time) => `✅ Application initialisée en ${time}ms`,
+    initError: "❌ Erreur d'initialisation:",
+    loadError: "Impossible de charger l'application. Rechargez la page.",
+    initialDataLoaded: (time) => `📊 Données initiales chargées en ${time}ms`,
+    initialDataError: 'Erreur chargement initial:',
+    appStateLog: 'État de l'application:',
+    debugInterface: '🎯 Interface de debug disponible: window.AnalyLit',
     // Projets
+
     projectCreated: 'Projet créé avec succès',
     projectDeleted: 'Projet supprimé',
     projectNameRequired: 'Le nom du projet est requis.',
@@ -122,6 +144,13 @@ export const MESSAGES = {
     preparingExport: "Préparation de l'exportation...",
     analysisExportStarted: "L'exportation des analyses a commencé.",
     errorExportingAnalyses: "Erreur d'exportation",
+};
+
+export const CONFIG = {
+    API_BASE_URL: 'http://localhost:8080/api',
+    WEBSOCKET_URL: '/',
+    LOCAL_STORAGE_LAST_SECTION: 'analylit_last_section',
+};
     // Settings
     errorLoadingPrompts: 'Erreur chargement prompts',
     loadingSettingsData: 'Chargement des données de configuration...', 

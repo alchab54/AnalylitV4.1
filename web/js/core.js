@@ -62,16 +62,17 @@ import {
     handleSaveProfile
 } from './settings.js';
 import { fetchAPI } from './api.js';
+import { API_ENDPOINTS, MESSAGES, CONFIG } from './constants.js';
 
 async function handleCancelTask(target) {
     const taskId = target.dataset.taskId;
     if (!taskId) return;
     try {
-        await fetchAPI(`/tasks/${taskId}/cancel`, { method: 'POST' });
-        showToast('Demande d\'annulation de la tâche envoyée.', 'info');
+        await fetchAPI(API_ENDPOINTS.taskCancel(taskId), { method: 'POST' });
+        showToast(MESSAGES.taskCancelRequestSent, 'info');
         showLoadingOverlay(false); // Masquer l'overlay immédiatement
     } catch (error) {
-        showToast(`Erreur lors de l'annulation : ${error.message}`, 'error');
+        showToast(`${MESSAGES.taskCancelError}: ${error.message}`, 'error');
     }
 }
 
@@ -80,10 +81,10 @@ async function handleRetryTask(target) {
     if (!taskId) return;
     try {
         target.disabled = true;
-        await fetchAPI(`/tasks/${taskId}/retry`, { method: 'POST' });
-        showToast(`Tâche ${taskId} relancée.`, 'success');
+        await fetchAPI(API_ENDPOINTS.taskRetry(taskId), { method: 'POST' });
+        showToast(MESSAGES.taskRetrySuccess(taskId), 'success');
     } catch (error) {
-        showToast(`Erreur lors de la relance : ${error.message}`, 'error');
+        showToast(`${MESSAGES.taskRetryError}: ${error.message}`, 'error');
         target.disabled = false;
     }
 }
@@ -114,7 +115,7 @@ const uiActions = {
 };
 
 const compactModeAction = {
-    'toggle-compact-mode': () => { document.body.classList.toggle('compact'); localStorage.setItem('compactMode', document.body.classList.contains('compact')); },
+    'toggle-compact-mode': () => { document.body.classList.toggle('compact'); localStorage.setItem(CONFIG.COMPACT_MODE_STORAGE, document.body.classList.contains('compact')); },
 };
 
 
@@ -287,7 +288,7 @@ export function setupDelegatedEventListeners() {
 export function initializeWebSocket() {
     try {
         if (typeof io !== 'function') {
-            console.warn('Client Socket.IO indisponible.');
+            console.warn(MESSAGES.socketUnavailable);
             if (elements.connectionStatus) elements.connectionStatus.textContent = '❌';
             return;
         }
@@ -295,7 +296,7 @@ export function initializeWebSocket() {
         appState.socket = io(WEBSOCKET_URL, { path: '/socket.io/', transports: ['websocket', 'polling'] });
 
         appState.socket.on('connect', () => {
-            console.log('✅ WebSocket connecté');
+            console.log(MESSAGES.websocketConnected);
             appState.socketConnected = true;
             if (elements.connectionStatus) elements.connectionStatus.textContent = '✅';
             if (appState.currentProject) {
@@ -304,13 +305,13 @@ export function initializeWebSocket() {
         });
 
         appState.socket.on('disconnect', () => {
-            console.warn('🔌 WebSocket déconnecté.');
+            console.warn(MESSAGES.websocketDisconnected);
             appState.socketConnected = false;
             if (elements.connectionStatus) elements.connectionStatus.textContent = '⏳';
         });
 
         appState.socket.on('notification', (data) => {
-            console.log('🔔 Notification reçue:', data);
+            console.log(MESSAGES.notificationReceived, data);
             showToast(data.message, data.type || 'info');
             
             // Logique de rafraîchissement basée sur le type de notification
@@ -322,23 +323,23 @@ export function initializeWebSocket() {
         });
 
         appState.socket.on('ANALYSIS_COMPLETED', (data) => {
-            showToast(`Analyse "${data.analysis_type}" terminée.`, 'success');
+            showToast(MESSAGES.analysisComplete(data.analysis_type), 'success');
             if (appState.currentSection === 'analyses') {
-                console.log('Rafraîchissement de la section analyses...');
+                console.log(MESSAGES.refreshingAnalyses);
                 loadProjectAnalyses();
             }
         });
 
         appState.socket.on('search_completed', (data) => {
-            showToast(`Recherche terminée: ${data.total_results} articles trouvés.`, 'success');
+            showToast(MESSAGES.searchComplete(data.total_results), 'success');
             if (appState.currentSection === 'results') {
-                console.log('Rafraîchissement de la section résultats...');
+                console.log(MESSAGES.refreshingResults);
                 loadSearchResults();
             }
         });
 
     } catch (e) {
-        console.error('Erreur WebSocket:', e);
+        console.error(MESSAGES.websocketError, e);
         if (elements.connectionStatus) elements.connectionStatus.textContent = '❌';
     }
 }
