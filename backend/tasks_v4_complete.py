@@ -458,17 +458,15 @@ def run_knowledge_graph_task(session, project_id: str):
     """Génère un graphe de connaissances JSON à partir des titres d'articles extraits."""
     update_project_status(session, project_id, status='generating_graph')
     
-    profile_info = session.execute(text("""
-        SELECT ap.extract_model 
-        FROM projects p
-        JOIN analysis_profiles ap ON p.profile_used = ap.id
-        WHERE p.id = :pid
-    """), {"pid": project_id}).mappings().fetchone()
-    model_to_use = profile_info.get('extract_model') if profile_info else 'llama3.1:8b'
+    # Utiliser le modèle de synthèse pour cette tâche, car il est plus adapté à la génération de JSON structuré.
+    profile_info = session.query(Project).filter_by(id=project_id).first()
+    analysis_profile = session.query(AnalysisProfile).filter_by(id=profile_info.profile_used).first() if profile_info else None
+    model_to_use = analysis_profile.synthesis_model if analysis_profile else 'llama3.1:8b'
     
     rows = session.execute(text("SELECT title, pmid FROM extractions WHERE project_id = :pid"), {"pid": project_id}).mappings().all()
     if not rows:
-        update_project_status(session, project_id, status='completed')
+        update_project_status(session, project_id, status='failed')
+        send_project_notification(project_id, 'analysis_failed', 'Aucun article trouvé pour générer le graphe de connaissances.', {'analysis_type': 'knowledge_graph'})
         return
     
     titles = [f"{r['title']} (ID: {r['pmid']})" for r in rows[:100]]
@@ -701,18 +699,18 @@ def import_pdfs_from_zotero_task(project_id: str, pmids: list, zotero_user_id: s
         send_project_notification(project_id, 'import_failed', f'Erreur Zotero: {e}')
 
 @with_db_session
-def index_project_pdfs_task(session, project_id: str):
+def index_project_pdfs_task(session, project_id: str): # Ajout de 'session'
     """Indexe les PDFs d'un projet pour le RAG."""
     logger.info(f"ðŸ”  Indexation des PDFs pour projet {project_id}")
     try:
         project_dir = PROJECTS_DIR / project_id
         if not project_dir.exists():
-            send_project_notification(project_id, 'indexing_failed', 'Dossier projet introuvable.')
+            send_project_notification(project_id, 'indexing_failed', 'Dossier projet introuvable.', {'task_name': 'indexation'})
             return
         
         pdf_files = list(project_dir.glob("*.pdf"))
         if not pdf_files:
-            send_project_notification(project_id, 'indexing_completed', 'Aucun PDF à indexer.')
+            send_project_notification(project_id, 'indexing_completed', 'Aucun PDF à indexer.', {'task_name': 'indexation'})
             return
         
         if embedding_model is None:
@@ -725,7 +723,7 @@ def index_project_pdfs_task(session, project_id: str):
                 session.rollback()
             # FIN CORRECTION
             logger.warning("Modèle d'embedding non disponible")
-            send_project_notification(project_id, 'indexing_failed', 'Modèle embedding non chargé.')
+            send_project_notification(project_id, 'indexing_failed', 'Modèle embedding non chargé.', {'task_name': 'indexation'})
             return
         
         client = chromadb.Client()
@@ -755,7 +753,7 @@ def index_project_pdfs_task(session, project_id: str):
                         all_metadatas.append({"source_id": pdf_path.stem, "filename": pdf_path.name, "chunk": chunk_index})
 
         if not all_chunks:
-            send_project_notification(project_id, 'indexing_completed', 'Aucun contenu textuel trouvé dans les PDFs.')
+            send_project_notification(project_id, 'indexing_completed', 'Aucun contenu textuel trouvé dans les PDFs.', {'task_name': 'indexation'})
             return
 
         # Étape d'encodage par lots (beaucoup plus rapide)
@@ -774,7 +772,7 @@ def index_project_pdfs_task(session, project_id: str):
         # Mettre à jour le projet (cette ligne peut maintenant appeler la fonction 'text' importée)
         session.execute(text("UPDATE projects SET indexed_at = :ts WHERE id = :pid"), {"ts": datetime.now().isoformat(), "pid": project_id})
         
-        send_project_notification(project_id, 'indexing_completed', f'{total_pdfs} PDF(s) ont été traités et indexés.')
+        send_project_notification(project_id, 'indexing_completed', f'{total_pdfs} PDF(s) ont été traités et indexés.', {'task_name': 'indexation'})
     
     except Exception as e:
         logger.error(f"Erreur index_project_pdfs_task: {e}", exc_info=True)
@@ -786,15 +784,13 @@ def index_project_pdfs_task(session, project_id: str):
             logger.error(f"Impossible de mettre à jour le statut du projet {project_id} en 'failed' après une erreur d'indexation: {db_err}")
             session.rollback()
         
-        send_project_notification(project_id, 'indexing_failed', f'Erreur lors de l\'indexation: {e}')
+        send_project_notification(project_id, 'indexing_failed', f'Erreur lors de l\'indexation: {e}', {'task_name': 'indexation'})
 
-
-def fetch_online_pdf_task(project_id: str, article_id: str):
+@with_db_session
+def fetch_online_pdf_task(session, project_id: str, article_id: str):
     """Récupère un PDF en ligne pour un article via Unpaywall si possible."""
     logger.info(f"ðŸ“„ Récupération PDF en ligne pour {article_id}")
-    session = Session()
-    
-    try:
+    try: # Le bloc try/finally n'est plus nécessaire grâce au décorateur
         article = session.execute(text("""
             SELECT doi, url FROM search_results
             WHERE project_id = :pid AND article_id = :aid
@@ -820,12 +816,8 @@ def fetch_online_pdf_task(project_id: str, article_id: str):
                 return
         
         send_project_notification(project_id, 'pdf_fetch_failed', f'PDF non trouvé pour {article_id}')
-    except SQLAlchemyError as e:
-        logger.error(f"Erreur DB fetch_online_pdf_task: {e}", exc_info=True)
     except Exception as e:
         logger.error(f"Erreur fetch_online_pdf_task: {e}")
-    finally:
-        session.close()
 
 # ================================================================ 
 # === OLLAMA
@@ -1067,11 +1059,11 @@ def run_risk_of_bias_task(session, project_id: str, article_id: str):
             domain_2_bias = EXCLUDED.domain_2_bias, domain_2_justification = EXCLUDED.domain_2_justification,
             overall_bias = EXCLUDED.overall_bias, overall_justification = EXCLUDED.overall_justification;
         """), {
-        "id": str(uuid.uuid4()), "project_id": project_id, "pmid": article_id,
-        "article_id": article_id, "d1b": "Low risk", "d1j": "Randomisation claire.",
-        "d2b": "Some concerns", "d2j": "Données manquantes notées.",
-        "ob": "Some concerns", "oj": "Globalement OK.",
-        "ts": datetime.now().isoformat()
+            "id": str(uuid.uuid4()), "project_id": project_id, "pmid": article_id,
+            "article_id": article_id, "d1b": rob_data.get("domain_1_bias", "N/A"),
+            "d1j": rob_data.get("domain_1_justification", "N/A"), "d2b": rob_data.get("domain_2_bias", "N/A"),
+            "d2j": rob_data.get("domain_2_justification", "N/A"), "ob": rob_data.get("overall_bias", "N/A"),
+            "oj": rob_data.get("overall_justification", "N/A"), "ts": datetime.now().isoformat()
         })
     
     send_project_notification(project_id, 'rob_completed', f"Analyse RoB terminée pour {article_id}.")
@@ -1255,9 +1247,8 @@ def generate_summary_table_task(session, project_id: str):
 
         # Fetch articles and their extractions
         results = session.query(SearchResult, Extraction).
-            join(Extraction, SearchResult.article_id == Extraction.pmid).
-            filter(SearchResult.project_id == project_id, Extraction.project_id == project_id).
-            all()
+            join(Extraction, SearchResult.article_id == Extraction.pmid). 
+            filter(SearchResult.project_id == project_id, Extraction.project_id == project_id).all()
 
         if not results:
             send_project_notification(project_id, 'report_completed', 'Aucune donnée d\'extraction pour le tableau de synthèse.')

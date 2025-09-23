@@ -94,9 +94,8 @@ services:
       - ./migrations:/home/appuser/app/migrations
       - ./tests:/home/appuser/app/tests
       - ./scripts/run_migrations.py:/home/appuser/app/run_migrations.py
-      - ./web:/home/appuser/app/web # Assuming this is for static/template files
-      - ./backend/server_v4_complete.py:/home/appuser/app/server_v4_complete.py
-      - ./backend/tasks_v4_complete.py:/home/appuser/app/tasks_v4_complete.py
+      - ./web:/home/appuser/app/web
+      - ./backend:/home/appuser/app/backend
 
   # Workers multiples pour paralléliser les tâches
   worker-fast:

@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * <!-- Import failed: jest-environment - ENOENT: no such file or directory, access 'c:\Users\alich\Downloads\exported-assets (1)\docs\jest-environment' --> jsdom
  */
 import { SELECTORS, API_ENDPOINTS, MESSAGES } from './constants.js';
 
