@@ -24,7 +24,7 @@ from sqlalchemy import text
 from sklearn.metrics import cohen_kappa_score # Ajout pour le test Kappa
 
 # --- Imports de Config (Corrigé pour importer la fonction) ---
-from config_v4 import get_config
+from backend.config.config_v4 import get_config
 config = get_config()
 from unittest import mock
 

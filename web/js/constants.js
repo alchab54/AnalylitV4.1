@@ -109,13 +109,13 @@ export const MESSAGES = {
     debugInterface: '🎯 Interface de debug disponible: window.AnalyLit',
     error: 'Erreur',
     unknownError: 'Erreur inconnue',
-    appStateLog: 'État de l'application:',
-
+    appStateLog: 'État de lapplication:',
+    
     // Projets
     projectCreated: 'Projet créé avec succès',
     projectDeleted: 'Projet supprimé',
     projectNameRequired: 'Le nom du projet est requis.',
-    creatingProject: 'Création du projet...', 
+    creatingProject: 'Création du projet...',
     deletingProject: 'Suppression du projet...', 
     projectIdMissingForExport: "ID du projet manquant pour l'exportation.",
     projectExportStarted: "L'exportation du projet a commencé...",
@@ -159,7 +159,7 @@ export const MESSAGES = {
     analysisStartedSimple: (type) => `La génération pour ${type} a été lancée.`,
     errorStartingAnalysis: "Erreur lors du lancement de l'analyse",
     advancedAnalysisModalTitle: 'Lancer une Analyse Avancée',
-    startingMetaAnalysis: 'Lancement de la méta-analyse...', 
+    startingMetaAnalysis: 'Lancement de la méta-analyse...',
     metaAnalysisStarted: 'Méta-analyse lancée avec succès.',
     startingDescriptiveStats: 'Calcul des statistiques descriptives...', 
     descriptiveStatsStarted: 'Calcul des statistiques lancé.',
@@ -265,7 +265,7 @@ export const MESSAGES = {
     // Chat
     enterQuestion: 'Veuillez saisir une question',
     questionSent: 'Question envoyée. Réponse en cours...',
-    errorSendingQuestion: "Erreur lors de l'envoi de la question",
+    errorSendingQuestion: "Erreur lors de l'envoi de la question", // Correction : Ajout d'une virgule
     selectProjectForIndexing: "Veuillez sélectionner un projet pour lancer l'indexation.",
     errorStartingIndexing: "Erreur lors du lancement de l'indexation",
 };

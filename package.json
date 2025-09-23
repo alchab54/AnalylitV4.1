@@ -1,14 +1,21 @@
 {
-  "name": "analylit_frontend",
+  "name": "analylit-frontend-tests",
   "version": "1.0.0",
-  "description": "Tests unitaires pour le frontend AnalyLit JS",
+  "description": "Suite de tests pour le frontend AnalyLit V4.1",
   "private": true,
+  "type": "module",
   "scripts": {
-    "test": "jest"
+    "test:unit": "jest --coverage --verbose",
+    "test:unit:watch": "jest --watch --coverage",
+    "test:e2e": "cypress run --headless",
+    "test:e2e:open": "cypress open",
+    "test:all": "npm run test:unit && npm run test:e2e",
+    "install-deps": "npm install"
   },
   "devDependencies": {
     "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0"
-  },
-  "type": "module"
+    "jest-environment-jsdom": "^29.7.0",
+    "cypress": "^13.10.0",
+    "@testing-library/jest-dom": "^6.1.0"
+  }
 }

@@ -1,11 +1,26 @@
-// jest.config.js
 export default {
   testEnvironment: 'jest-environment-jsdom',
-  // Indique à Jest où trouver les tests
-  testMatch: ['<rootDir>/web/js/**/*.test.js'],
-  // Nécessaire pour supporter 'import/export' dans les tests et les mocks
+  roots: ['<rootDir>/web/js'],
+  testMatch: [
+    '**/__tests__/**/*.js',
+    '**/?(*.)+(spec|test).js'
+  ],
+  collectCoverageFrom: [
+    'web/js/**/*.js',
+    '!web/js/**/*.test.js',
+    '!web/js/**/*.cy.js',
+    '!web/js/tests/test_frontend_fixes.js', // Exclure l'ancien fichier temporaire
+    '!**/node_modules/**'
+  ],
+  coverageDirectory: 'reports/coverage-frontend',
+  coverageReporters: ['text', 'lcov', 'html'],
+  setupFilesAfterEnv: ['@testing-library/jest-dom'],
+  verbose: true,
   transform: {},
-  moduleFileExtensions: ['js', 'json', 'node'],
-  // Permet aux tests de trouver les modules (ex: app.js depuis core.js)
-  moduleDirectories: ['node_modules', 'web/js', 'web'],
+  extensionsToTreatAsEsm: ['.js'],
+  globals: {
+    'ts-jest': {
+      useESM: true
+    }
+  }
 };

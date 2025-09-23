@@ -12,7 +12,7 @@ def mock_config():
         yield mock_config_obj
 
 # Import the function after config is potentially mocked
-from utils.ai_processors import call_ollama_api, AIResponseError
+from backend.config.config_v4 import get_config
 
 @pytest.fixture
 def mock_requests_session(mocker):
