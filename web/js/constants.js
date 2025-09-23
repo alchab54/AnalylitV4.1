@@ -14,9 +14,14 @@ export const SELECTORS = {
     validationContainer: '#validationContainer',
     analysisContainer: '#analysisContainer',
     importContainer: '#importContainer',
-    chatContainer: '#chatContainer',
+    biasOverall: 'Biais global',
+    // Chat
     settingsContainer: '#settingsContainer',
-    robCard: (articleId) => `#rob-card-${articleId}`
+    robCard: (articleId) => `#rob-card-${articleId}`,
+    bibliographyStyle: '#bibliographyStyle',
+    bibliographyOutput: '#bibliographyOutput',
+    summaryTableOutput: '#summaryTableOutput',
+    prismaChecklistOutput: '#prismaChecklistOutput'
 };
 
 // URLs API centralisées

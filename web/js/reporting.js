@@ -1,7 +1,7 @@
 import { appState, elements } from './app-improved.js'; 
 import { fetchAPI } from './api.js';
 import { showToast, showLoadingOverlay, escapeHtml } from './ui-improved.js';
-import { API_ENDPOINTS, MESSAGES } from './constants.js'; 
+import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js'; 
 
 export async function renderReportingSection(elements) {
     if (!appState.currentProject) {
@@ -13,28 +13,28 @@ export async function renderReportingSection(elements) {
         <div class="report-section">
             <h3>Générateur de Bibliographie</h3>
             <div class="form-group">
-                <label for="bibliographyStyle">Style de citation:</label>
-                <select id="bibliographyStyle" class="form-control">
+                <label for="${SELECTORS.bibliographyStyle.substring(1)}">Style de citation:</label>
+                <select id="${SELECTORS.bibliographyStyle.substring(1)}" class="form-control">
                     <option value="apa" selected>APA 7</option>
                     <option value="vancouver">Vancouver</option>
                     <option value="mla">MLA</option>
                 </select>
                 <button data-action="generate-bibliography" class="btn btn-primary mt-2">Générer Bibliographie</button>
             </div>
-            <div id="bibliographyOutput" class="output-box mt-3"></div>
+            <div id="${SELECTORS.bibliographyOutput.substring(1)}" class="output-box mt-3"></div>
         </div>
 
         <div class="report-section mt-4">
             <h3>Tableau de Synthèse des Études Incluses</h3>
-            <button data-action="generate-summary-table" class="btn btn-primary">Générer Tableau</button>
-            <button data-action="export-summary-excel" class="btn btn-success ml-2">Exporter en Excel</button>
-            <div id="summaryTableOutput" class="output-box mt-3"></div>
+            <button data-action="generate-summary-table" class="btn btn--primary">Générer Tableau</button>
+            <button data-action="export-summary-excel" class="btn btn--success ml-2">Exporter en Excel</button>
+            <div id="${SELECTORS.summaryTableOutput.substring(1)}" class="output-box mt-3"></div>
         </div>
 
         <div class="report-section mt-4">
             <h3>Checklist PRISMA-ScR Interactive</h3>
-            <div id="prismaChecklistOutput" class="output-box mt-3"></div>
-            <button data-action="save-prisma-checklist" class="btn btn-primary mt-2">Sauvegarder Checklist</button>
+            <div id="${SELECTORS.prismaChecklistOutput.substring(1)}" class="output-box mt-3"></div>
+            <button data-action="save-prisma-checklist" class="btn btn--primary mt-2">Sauvegarder Checklist</button>
         </div>
     `;
 
@@ -44,10 +44,10 @@ export async function renderReportingSection(elements) {
 export async function generateBibliography() {
     showLoadingOverlay(true, MESSAGES.generatingBibliography, elements);
     try {
-        const style = document.getElementById('bibliographyStyle').value;
+        const style = document.querySelector(SELECTORS.bibliographyStyle).value;
         // TODO: Backend route for generating bibliography is missing.
         // const bibliography = await fetchAPI(API_ENDPOINTS.projectBibliography(appState.currentProject.id, style));
-        // const outputDiv = document.getElementById('bibliographyOutput');
+        // const outputDiv = document.querySelector(SELECTORS.bibliographyOutput);
         // outputDiv.innerHTML = bibliography.map(item => `<p>${item}</p>`).join('');
         showToast(MESSAGES.bibliographyNotImplemented, 'info');
     } catch (error) {
@@ -59,13 +59,13 @@ export async function generateBibliography() {
 }
 
 export async function generateSummaryTable() {
-    showLoadingOverlay(true, 'Génération du tableau de synthèse...', elements);
+    showLoadingOverlay(true, MESSAGES.generatingSummaryTable, elements);
     try {
         // TODO: Backend route for generating summary table is missing.
-        // const data = await fetchAPI(`/projects/${appState.currentProject.id}/reports/summary-table`);
-        // const outputDiv = document.getElementById('summaryTableOutput');
+        // const data = await fetchAPI(API_ENDPOINTS.projectSummaryTable(appState.currentProject.id));
+        // const outputDiv = document.querySelector(SELECTORS.summaryTableOutput);
         // if (data.length === 0) {
-        //     outputDiv.innerHTML = '<p>Aucune donnée disponible pour le tableau de synthèse.</p>';
+        //     outputDiv.innerHTML = `<p>${MESSAGES.noSummaryTableData}</p>`;
         //     return;
         // }
 
@@ -99,7 +99,7 @@ export async function generateSummaryTable() {
         // });
         // tableHtml += '</tbody></table>';
         // outputDiv.innerHTML = tableHtml;
-        showToast('Génération du tableau de synthèse non implémentée.', 'info');
+        showToast(MESSAGES.summaryTableNotImplemented, 'info');
     } catch (error) {
         console.error('Erreur lors de la génération du tableau de synthèse:', error);
         showToast(MESSAGES.errorGeneratingSummaryTable, 'error', elements);
@@ -109,10 +109,10 @@ export async function generateSummaryTable() {
 }
 
 export async function exportSummaryTableExcel() {
-    showLoadingOverlay(true, 'Exportation du tableau en Excel...', elements);
+    showLoadingOverlay(true, MESSAGES.exportingExcel, elements);
     try {
         // TODO: Backend route for exporting summary table is missing.
-        // const response = await fetchAPI(`/projects/${appState.currentProject.id}/reports/summary-table/export/excel`, { rawResponse: true });
+        // const response = await fetchAPI(API_ENDPOINTS.projectExportSummaryTable(appState.currentProject.id), { rawResponse: true });
         // const blob = await response.blob();
         // const url = window.URL.createObjectURL(blob);
         // const a = document.createElement('a');
@@ -122,7 +122,7 @@ export async function exportSummaryTableExcel() {
         // a.click();
         // a.remove();
         // window.URL.revokeObjectURL(url);
-        showToast('Exportation du tableau non implémentée.', 'info');
+        showToast(MESSAGES.exportExcelNotImplemented, 'info');
     } catch (error) {
         console.error('Erreur lors de l\'exportation du tableau en Excel:', error);
         showToast(MESSAGES.errorExportingExcel, 'error', elements);
@@ -147,7 +147,7 @@ async function loadPrismaChecklist() {
 }
 
 function renderPrismaChecklist() {
-    const outputDiv = document.getElementById('prismaChecklistOutput');
+    const outputDiv = document.querySelector(SELECTORS.prismaChecklistOutput);
     if (!appState.prismaChecklist) {
         outputDiv.innerHTML = `<p>${MESSAGES.prismaUnavailable}</p>`;
         return;
