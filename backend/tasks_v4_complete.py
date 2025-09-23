@@ -1246,10 +1246,12 @@ def generate_summary_table_task(session, project_id: str):
             return
 
         # Fetch articles and their extractions
-        results = session.query(SearchResult, Extraction)
-            join(Extraction, SearchResult.article_id == Extraction.pmid). 
-            filter(SearchResult.project_id == project_id, Extraction.project_id == project_id).all()
-
+        results = (session.query(SearchResult, Extraction)
+            .join(Extraction, SearchResult.article_id == Extraction.pmid)
+            .filter(SearchResult.project_id == project_id, Extraction.project_id == project_id)
+            .all()
+        )
+Ce que j'ai changé :
         if not results:
             send_project_notification(project_id, 'report_completed', 'Aucune donnée d\'extraction pour le tableau de synthèse.')
             return
