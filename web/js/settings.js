@@ -138,17 +138,17 @@ function createSettingsLayout() {
             <div class="settings-card">
                 <div class="settings-card__header">
                     <h3>Profils d'Analyse</h3>
-                    <button id="${SELECTORS.newProfileBtn.substring(1)}" class="btn btn--sm btn--primary">
+                    <button id="new-profile-btn" class="btn btn--sm btn--primary">
                         <span class="icon">＋</span> Nouveau Profil
                     </button>
                 </div>
-                <div class="settings-card__body" id="${SELECTORS.profileListContainer.substring(1)}">
+                <div class="settings-card__body" id="profile-list-container">
                     </div>
             </div>
         </div>
 
         <div class="settings-col" id="settings-col-2">
-            <form id="${SELECTORS.settingsForm.substring(1)}" class="settings-card">
+            <form id="settings-form" class="settings-card">
                 <input type="hidden" id="${SELECTORS.profileId.substring(1)}" name="id">
 
                 <div class="settings-card__header">

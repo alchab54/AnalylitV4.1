@@ -40,9 +40,9 @@ async function autoSelectFirstProject() {
 async function handleCreateProject(event) {
   event.preventDefault();
   const form = event.target;
-  const name = form.querySelector('#projectName').value.trim();
-  const description = form.querySelector('#projectDescription').value.trim();
-  const mode = form.querySelector('#analysisMode').value;
+  const name = form.querySelector(SELECTORS.projectName).value.trim();
+  const description = form.querySelector(SELECTORS.projectDescription).value.trim();
+  const mode = form.querySelector(SELECTORS.analysisMode).value;
 
   if (!name) {
     showToast(MESSAGES.projectNameRequired, 'warning');
@@ -169,7 +169,7 @@ async function loadProjectFilesSet(projectId) {
  * Affiche un message lorsque la liste des projets est vide.
  */
 function displayEmptyProjectsState() {
-    const container = elements.projectsList;
+    const container = document.querySelector(SELECTORS.projectsList);
     if (!container) return;
     container.innerHTML = `
         <div class="empty-state text-center py-4">
@@ -186,7 +186,7 @@ function displayEmptyProjectsState() {
  * Rendu de la liste des projets (colonne gauche).
  */
 function renderProjectsList() {
-  const container = elements.projectsList;
+  const container = document.querySelector(SELECTORS.projectsList);
   if (!container) return;
 
   const projects = Array.isArray(appState.projects) ? appState.projects : [];
@@ -253,8 +253,8 @@ function getStatusClass(status) {
  * Rendu du panneau de détails du projet (colonne droite).
  */
 function renderProjectDetail(project) {
-  const detailContainer = elements.projectDetailContent;
-  const placeholder = elements.projectPlaceholder;
+  const detailContainer = document.querySelector(SELECTORS.projectContainer);
+  const placeholder = document.querySelector(SELECTORS.projectContainer);
   if (!detailContainer || !placeholder) return;
 
   if (!project) {
@@ -262,6 +262,93 @@ function renderProjectDetail(project) {
     placeholder.style.display = 'block';
     return;
   }
+
+  placeholder.style.display = 'none';
+  
+  // Métriques
+  const articlesCount = Number(project.article_count || 0);
+  const pdfCount = appState.currentProjectFiles?.size || 0;
+  const isIndexed = Boolean(project.indexed_at);
+  const synthesis = appState.analysisResults?.synthesis_result;
+  const discussion = appState.analysisResults?.discussion_draft;
+  const graph = appState.analysisResults?.knowledge_graph;
+
+  try {
+    detailContainer.innerHTML = `
+      <div class="section-header">
+        <div class="section-header__content">
+          <h2>${escapeHtml(project.name)}</h2>
+          <p>${escapeHtml(project.description || 'Aucune description')}</p>
+        </div>
+        <div class="section-header__actions">
+          <button class="btn btn--secondary" data-action="export-project" data-project-id="${project.id}">📥 Export</button>
+        </div>
+      </div>
+
+      <div class="metrics-grid project-dashboard">
+        <div class="metric-card">
+          <h5 class="metric-value">${articlesCount}</h5>
+          <p>Articles</p>
+        </div>
+        <div class="metric-card">
+          <h5 class="metric-value">${pdfCount}</h5>
+          <p>PDFs Trouvés</p>
+        </div>
+        <div class="metric-card">
+          <h5 class="metric-value">${isIndexed ? '✅' : '❌'}</h5>
+          <p>Indexé (RAG)</p>
+        </div>
+        <div class="metric-card">
+          <h5 class="metric-value">${synthesis ? '✅' : '⏳'}</h5>
+          <p>Synthèse</p>
+        </div>
+        <div class="metric-card">
+          <h5 class="metric-value">${discussion ? '✅' : '⏳'}</h5>
+          <p>Discussion</p>
+        </div>
+        <div class="metric-card">
+          <h5 class="metric-value">${graph ? '✅' : '⏳'}</h5>
+          <p>Graphe</p>
+        </div>
+      </div>
+    `;
+  } catch (e) {
+    console.error('Erreur renderProjectDetail:', e);
+    detailContainer.innerHTML = `
+      <div class="placeholder error">
+        <p>Erreur lors de l'affichage de la synthèse.</p>
+      </div>
+    `;
+  }
+}
+
+function getStatusText(status) {
+    const statusTexts = {
+        'pending': 'En attente', 'processing': 'Traitement...', 'synthesizing': 'Synthèse...',
+        'completed': 'Terminé', 'failed': 'Échec', 'indexing': 'Indexation...',
+        'generating_discussion': 'Génération discussion...', 'generating_graph': 'Génération graphe...',
+        'generating_prisma': 'Génération PRISMA...', 'generating_analysis': 'Analyse statistique...',
+        'search_completed': 'Recherche terminée', 'in_progress': 'En cours', 'queued': 'En file',
+        'started': 'Démarré', 'finished': 'Fini'
+    };
+    return statusTexts[status] || status;
+}
+
+// --- CORRECTION : Bloc d'exportation unifié ---
+export {
+    loadProjects,
+    autoSelectFirstProject,
+    handleCreateProject,
+    selectProject,
+    deleteProject,
+    confirmDeleteProject,
+    handleExportProject,
+    loadProjectFilesSet, // <- La fonction est maintenant exportée d'ici
+    renderProjectsList,
+    updateProjectListSelection,
+    renderProjectDetail,
+    getStatusText
+};
 
   placeholder.style.display = 'none';
   

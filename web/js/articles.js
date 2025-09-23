@@ -21,8 +21,9 @@ export async function loadSearchResults(page = 1) {
     showLoadingOverlay(true, MESSAGES.loadingResults);
 
     if (!appState.currentProject?.id) {
-        if (elements.resultsContainer) {
-            elements.resultsContainer.innerHTML = `
+        const resultsContainer = document.querySelector(SELECTORS.resultsContainer);
+        if (resultsContainer) {
+            resultsContainer.innerHTML = `
                 <div class="results-empty">
                     <h3>${MESSAGES.noProjectSelected}</h3>
                     <p>${MESSAGES.selectProjectToViewResults}</p>
@@ -51,10 +52,11 @@ export async function loadSearchResults(page = 1) {
 }
 
 export function renderSearchResultsTable() {
-    if (!elements.resultsContainer) return;
+    const resultsContainer = document.querySelector(SELECTORS.resultsContainer);
+    if (!resultsContainer) return;
 
     if (!appState.currentProject) {
-        elements.resultsContainer.innerHTML = `
+        resultsContainer.innerHTML = `
             <div class="results-empty">
                 <h3>${MESSAGES.noProjectSelected}</h3>
                 <p>${MESSAGES.selectProjectToViewResults}</p>
@@ -63,7 +65,7 @@ export function renderSearchResultsTable() {
     }
 
     if (appState.searchResults.length === 0) {
-        elements.resultsContainer.innerHTML = `
+        resultsContainer.innerHTML = `
             <div class="empty-state text-center py-5">
                 <i class="fas fa-search fa-3x text-muted mb-3"></i>
                 <h4>${MESSAGES.noArticlesFoundTitle}</h4>
@@ -122,7 +124,7 @@ export function renderSearchResultsTable() {
             <div class="results-stats">
                 <strong>${appState.searchResults.length}</strong> articles trouvés
                 <span class="selection-counter">
-                    <strong id="${SELECTORS.selectedCount.substring(1)}">${selectedSearchResults.size}</strong> sélectionnés
+                    <strong id="selected-articles-count">${selectedSearchResults.size}</strong> sélectionnés
                 </span>
             </div>
             <div class="results-actions">
@@ -147,7 +149,8 @@ export function renderSearchResultsTable() {
                 <thead>
                     <tr>
                         <th width="40">
-                            <input type="checkbox" id="${SELECTORS.selectAllArticlesCheckbox.substring(1)}">
+                            <input type="checkbox" id="select-all-articles-checkbox">
+                        </th>
                         </th>
                         <th>Article</th>
                         <th width="80">Score IA</th>

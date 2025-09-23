@@ -6,8 +6,9 @@ import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 export async function loadProjectAnalyses() {
     if (!appState.currentProject) {
-        if (elements.analysisContainer) {
-            elements.analysisContainer.innerHTML = `<p>${MESSAGES.selectProjectToViewAnalyses}</p>`;
+        const analysisContainer = document.querySelector(SELECTORS.analysisContainer);
+        if (analysisContainer) {
+            analysisContainer.innerHTML = `<p>${MESSAGES.selectProjectToViewAnalyses}</p>`;
         }
         return;
     }
@@ -24,11 +25,12 @@ export async function loadProjectAnalyses() {
 }
 
 export function renderAnalysesSection() {
-    if (!elements.analysisContainer) return;
+    const analysisContainer = document.querySelector(SELECTORS.analysisContainer);
+    if (!analysisContainer) return;
     const project = appState.currentProject;
 
     if (!project) {
-        elements.analysisContainer.innerHTML = `<div class="empty-state"><p>${MESSAGES.selectProjectToViewAnalyses}</p></div>`;
+        analysisContainer.innerHTML = `<div class="empty-state"><p>${MESSAGES.selectProjectToViewAnalyses}</p></div>`;
         return;
     }
 
@@ -86,7 +88,7 @@ export function renderAnalysesSection() {
             </div>
         </div>
 
-        <div id="${SELECTORS.analysisResultContainer.substring(1)}" class="mt-24">
+        <div id="analysis-result-container" class="mt-24">
             </div>
     `;
 

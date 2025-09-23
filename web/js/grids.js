@@ -13,7 +13,7 @@ export async function loadProjectGrids(projectId) {
     try {
         const grids = await fetchAPI(API_ENDPOINTS.grids(projectId));
         setCurrentProjectGrids(grids || []);
-        renderGridsSection(appState.currentProject, elements);
+        renderGridsSection(appState.currentProject);
     } catch (error) {
         console.error('Failed to load project grids:', error);
         showToast(MESSAGES.errorLoadingGrids, 'error');
@@ -128,7 +128,7 @@ export function addGridFieldInput() {
 
 function addFieldInput(container, name = '', description = '') {
     const fieldDiv = document.createElement('div');
-    fieldDiv.className = SELECTORS.gridFieldItem.substring(1); // Remove the dot for class name
+    fieldDiv.className = SELECTORS.gridFieldItem.replace('.', ''); // Remove the dot for class name
     fieldDiv.innerHTML = `
         <input type="text" placeholder="${MESSAGES.fieldNamePlaceholder}" value="${escapeHtml(name)}" class="form-control grid-field-name" required>
         <input type="text" placeholder="${MESSAGES.fieldDescriptionPlaceholder}" value="${escapeHtml(description)}" class="form-control grid-field-desc">
