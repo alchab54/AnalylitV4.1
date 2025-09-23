@@ -4,7 +4,8 @@
 import { fetchAPI } from './api.js';
 import { appState } from './app-improved.js'; // Assurez-vous que c'est le bon chemin
 import { setQueuesStatus } from './state.js';
-import { showToast, showConfirmModal } from './ui-improved.js';
+import { showConfirmModal } from './ui-improved.js';
+import { showToast } from './toast.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 let editors = {}; // Stocke les instances d'Ace Editor
@@ -136,7 +137,7 @@ function createSettingsLayout() {
         <div class="settings-col" id="settings-col-1">
             <div class="settings-card">
                 <div class="settings-card__header">
-                    <h3>Profils d'Analyse</h3> 
+                    <h3>Profils d'Analyse</h3>
                     <button id="new-profile-btn" class="btn btn--sm btn--primary">
                         <span class="icon">＋</span> Nouveau Profil
                     </button>
@@ -147,7 +148,7 @@ function createSettingsLayout() {
         </div>
 
         <div class="settings-col" id="settings-col-2">
-            <form id="profile-edit-form" class="settings-card"> 
+            <form id="profile-edit-form" class="settings-card">
                 <input type="hidden" id="profile-id" name="id">
                 
                 <div class="settings-card__header">
@@ -296,7 +297,7 @@ function createPromptEditorTabs() {
 function renderAnalysisProfilesList(profiles, container) {
     if (!container) return;
     if (!profiles || profiles.length === 0) {
-        container.innerHTML = `<p class="placeholder">${MESSAGES.noAnalysisProfileFound}</p>`;
+        container.innerHTML = `<p class="placeholder">${MESSAGES.noAnalysisProfileFound}</p>`; // Already correct
         return;
     }
 
@@ -324,22 +325,22 @@ function renderAnalysisProfilesList(profiles, container) {
  */
 function setupSettingsEventListeners() {
     // Écouteurs pour les boutons principaux
-    document.querySelector('#new-profile-btn')?.addEventListener('click', handleNewProfile); // Already correct
-    document.querySelector('#delete-profile-btn')?.addEventListener('click', handleDeleteProfile); // Already correct
+    document.querySelector(SELECTORS.newProfileBtn)?.addEventListener('click', handleNewProfile);
+    document.querySelector(SELECTORS.deleteProfileBtn)?.addEventListener('click', handleDeleteProfile);
     document.querySelector('#apply-template-btn')?.addEventListener('click', () => {
-        const select = document.querySelector('#prompt-template-select'); // Already correct
+        const select = document.querySelector(SELECTORS.promptTemplateSelect);
         if (select.value) {
             applyPromptTemplate(select.value);
         }
     });
-    document.querySelector('#refresh-queues-btn')?.addEventListener('click', async () => {
-        showToast(MESSAGES.refreshingQueuesStatus, 'info'); // Already correct
+    document.querySelector(SELECTORS.refreshQueuesBtn)?.addEventListener('click', async () => {
+        showToast(MESSAGES.refreshingQueuesStatus, 'info');
         await loadQueuesStatus();
-        renderQueueStatus(appState.queuesInfo, document.querySelector('#queue-status-container')); // Already correct
+        renderQueueStatus(appState.queuesInfo, document.querySelector(SELECTORS.queueStatusContainer));
     });
 
     // Écouteur pour le formulaire
-    const profileEditForm = document.querySelector(SELECTORS.settingsForm); // Already correct
+    const profileEditForm = document.querySelector(SELECTORS.settingsForm);
     if (profileEditForm) {
         profileEditForm.addEventListener('submit', handleSaveProfile);
     }
@@ -358,7 +359,7 @@ function setupSettingsEventListeners() {
                 tabContents.forEach(tc => tc.classList.remove('active'));
 
                 link.classList.add('active');
-                document.querySelector(`#${tabId}`)?.classList.add('active'); // Already correct
+                document.querySelector(`#${tabId}`)?.classList.add('active');
             });
         });
     }
@@ -370,7 +371,7 @@ function setupSettingsEventListeners() {
 function renderPromptTemplates(prompts, container) {
     if (!container) return;
     if (!prompts || prompts.length === 0) {
-        container.innerHTML = `<p class="placeholder">${MESSAGES.noPromptTemplateFound}</p>`; // Already correct
+        container.innerHTML = `<p class="placeholder">${MESSAGES.noPromptTemplateFound}</p>`;
         return;
     }
     const listHtml = prompts.map(prompt => `
@@ -388,10 +389,10 @@ function renderPromptTemplates(prompts, container) {
  * Remplit tous les <select> de modèles avec les modèles Ollama récupérés.
  */
 function populateModelSelects(models) {
-    const modelSelects = document.querySelectorAll('.model-select');
+    const modelSelects = document.querySelectorAll(SELECTORS.modelSelects);
     if (!models || models.length === 0) {
         modelSelects.forEach(select => {
-            select.innerHTML = `<option value="">${MESSAGES.noOllamaModelFound}</option>`; // Already correct
+            select.innerHTML = `<option value="">${MESSAGES.noOllamaModelFound}</option>`;
         });
         return;
     }
@@ -409,10 +410,10 @@ function populateModelSelects(models) {
 function initializeAllEditors(retryCount = 0) {
     if (typeof ace === 'undefined') {
         if (retryCount > 50) { // Limite de 5 secondes
-            console.error(MESSAGES.aceNotLoaded); // Already correct
+            console.error(MESSAGES.aceNotLoaded);
             return;
         }
-        console.warn(MESSAGES.aceRetry); // Already correct
+        console.warn(MESSAGES.aceRetry);
         setTimeout(() => initializeAllEditors(retryCount + 1), 100);
         return;
     }
@@ -424,19 +425,19 @@ function initializeAllEditors(retryCount = 0) {
             const systemEditorId = `${type}-prompt-system`;
             const userEditorId = `${type}-prompt-user`;
 
-            if (document.querySelector(`#${systemEditorId}`)) { // Already correct
+            if (document.querySelector(`#${systemEditorId}`)) {
                 editors[`${type}_system`] = ace.edit(systemEditorId);
                 editors[`${type}_system`].setTheme(theme);
                 editors[`${type}_system`].session.setMode("ace/mode/markdown");
             }
 
-            if (document.querySelector(`#${userEditorId}`)) { // Already correct
+            if (document.querySelector(`#${userEditorId}`)) {
                 editors[`${type}_user`] = ace.edit(userEditorId);
                 editors[`${type}_user`].setTheme(theme);
                 editors[`${type}_user`].session.setMode("ace/mode/markdown");
             }
         } catch (e) {
-            console.warn(MESSAGES.aceInitError(type)); // Already correct
+            console.warn(MESSAGES.aceInitError(type)(e.message));
         }
     });
 }
@@ -456,7 +457,7 @@ export function selectProfile(profileId) {
     appState.selectedProfileId = profileId; // Stocker l'ID sélectionné
 
     // Mettre à jour la liste pour afficher la sélection
-    document.querySelectorAll(`${SELECTORS.settingsContainer} #profile-list-container .list-item`).forEach(item => { // Already correct
+    document.querySelectorAll(`${SELECTORS.settingsContainer} .list-item`).forEach(item => {
         item.classList.remove('active');
         if (item.dataset.profileId === profileId) {
             item.classList.add('active');
@@ -471,7 +472,7 @@ export function selectProfile(profileId) {
  * Affiche les données d'un profil sélectionné dans les champs du formulaire et les éditeurs.
  */
 function renderProfileForm(profile) {
-    const form = document.querySelector(SELECTORS.settingsForm); // Already correct
+    const form = document.querySelector(SELECTORS.settingsForm);
     if (!form) return;
 
     form.querySelector('#profile-id').value = profile.id || '';
@@ -488,13 +489,13 @@ function renderProfileForm(profile) {
     });
 
     // Gérer le bouton de suppression
-    const deleteBtn = document.querySelector('#delete-profile-btn'); // Already correct
+    const deleteBtn = document.querySelector(SELECTORS.deleteProfileBtn);
     if (profile.is_default || profile.id.startsWith('new_')) {
         deleteBtn.disabled = true;
-        deleteBtn.title = profile.is_default ? MESSAGES.cannotDeleteDefaultProfile : ""; // Already correct
+        deleteBtn.title = profile.is_default ? MESSAGES.cannotDeleteDefaultProfile : "";
     } else {
         deleteBtn.disabled = false;
-        deleteBtn.title = MESSAGES.deleteThisProfile; // Already correct
+        deleteBtn.title = MESSAGES.deleteThisProfile;
     }
 
     // Charger les prompts dans les éditeurs Ace
@@ -545,9 +546,9 @@ function applyPromptTemplate(templateId) {
     if (targetType && editors[`${targetType}_system`] && editors[`${targetType}_user`]) {
         editors[`${targetType}_system`].setValue(template.system_message || "", -1);
         editors[`${targetType}_user`].setValue(template.user_message_template || "", -1);
-        showToast(MESSAGES.templateApplied(template.name, targetType), 'success'); // Already correct
+        showToast(MESSAGES.templateApplied(template.name, targetType), 'success');
     } else {
-        showToast(MESSAGES.cannotApplyTemplate, 'warn'); // Already correct
+        showToast(MESSAGES.cannotApplyTemplate, 'warn');
     }
 }
 
@@ -577,7 +578,7 @@ function getPromptEditorValues() {
  * Collecte toutes les données du formulaire de profil dans un objet JSON propre.
  */
 function collectProfileData() {
-    const form = document.querySelector(SELECTORS.settingsForm); // Already correct
+    const form = document.querySelector(SELECTORS.settings_form);
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
@@ -617,10 +618,10 @@ function handleNewProfile() {
     renderProfileForm(newProfile);
 
     // Mettre l'ID à "" pour indiquer à l'API qu'il s'agit d'un POST (Créer)
-    document.querySelector('#profile-id').value = ""; // Already correct
+    document.querySelector(SELECTORS.profileId).value = "";
     
     // Désélectionner dans la liste
-    document.querySelectorAll(`${SELECTORS.settingsContainer} #profile-list-container .list-item`).forEach(item => { // Already correct
+    document.querySelectorAll(`${SELECTORS.settingsContainer} .list-item`).forEach(item => {
         item.classList.remove('active');
     });
     
@@ -636,11 +637,11 @@ export async function handleSaveProfile(e) {
     const saveBtn = form.querySelector('button[type="submit"]');
     const originalBtnText = saveBtn.innerHTML;
     saveBtn.disabled = true;
-    saveBtn.innerHTML = `<span class="icon">⌛</span> ${MESSAGES.saving}`; // Already correct
+    saveBtn.innerHTML = `<span class="icon">⌛</span> ${MESSAGES.saving}`;
 
     try {
         const profileData = collectProfileData();
-        const profileId = document.querySelector('#profile-id').value; // Already correct
+        const profileId = document.querySelector(SELECTORS.profileId).value;
 
         let url = API_ENDPOINTS.analysisProfiles;
         let method = 'POST';
@@ -657,7 +658,7 @@ export async function handleSaveProfile(e) {
             body: JSON.stringify(profileData)
         });
 
-        showToast(MESSAGES.profileSaved(updatedProfile.name), 'success'); // Already correct
+        showToast(MESSAGES.profileSaved(updatedProfile.name), 'success');
         
         await loadAnalysisProfiles();
         renderSettings(); // Re-render complet
@@ -666,7 +667,7 @@ export async function handleSaveProfile(e) {
         selectProfile(updatedProfile.id);
 
     } catch (error) {
-        console.error(MESSAGES.errorSavingProfile, error); // Already correct
+        console.error(MESSAGES.errorSavingProfile, error);
         showToast(error.message, 'error');
     } finally {
         saveBtn.disabled = false;
@@ -684,27 +685,27 @@ export async function handleDeleteProfile() {
     const profile = profiles.find(p => p.id === profileId);
 
     if (!profile || profile.is_default) {
-        showToast(MESSAGES.cannotDeleteProfile, 'warn'); // Already correct
+        showToast(MESSAGES.cannotDeleteProfile, 'warn');
         return;
     }
 
     // Utilisation de la nouvelle modale de confirmation
     showConfirmModal(
-        MESSAGES.confirmProfileDeleteTitle, // Already correct
-        MESSAGES.confirmProfileDeleteBody(profile.name), // Already correct
+        MESSAGES.confirmProfileDeleteTitle,
+        MESSAGES.confirmProfileDeleteBody(profile.name),
         {
-            confirmText: MESSAGES.deleteButton, // Already correct
+            confirmText: MESSAGES.deleteButton,
             confirmClass: 'btn--danger',
             onConfirm: async () => {
                 try {
-                    await fetchAPI(API_ENDPOINTS.analysisProfileById(profileId), { method: 'DELETE' }); // Already correct
-                    showToast(MESSAGES.profileDeleted(profile.name), 'success'); // Already correct
+                    await fetchAPI(API_ENDPOINTS.analysisProfileById(profileId), { method: 'DELETE' });
+                    showToast(MESSAGES.profileDeleted(profile.name), 'success');
                     
                     await loadAnalysisProfiles();
                     renderSettings(); // Re-render (sélectionnera le nouveau profil par défaut)
 
                 } catch (error) {
-                    console.error(MESSAGES.errorDeletingProfile, error); // Already correct
+                    console.error(MESSAGES.errorDeletingProfile, error);
                     showToast(error.message, 'error');
                 }
             }
@@ -757,14 +758,14 @@ export async function handleClearQueue(queueName) {
     if (!queueName) return;
 
     showConfirmModal(
-        MESSAGES.clearQueueTitle, // Already correct
-        MESSAGES.confirmClearQueueBody(queueName), // Already correct
+        MESSAGES.clearQueueTitle,
+        MESSAGES.confirmClearQueueBody(queueName),
         {
-            confirmText: MESSAGES.clearButton, // Already correct
+            confirmText: MESSAGES.clearButton,
             confirmClass: 'btn--danger',
             onConfirm: async () => {
-                await fetchAPI(API_ENDPOINTS.queuesClear, { method: 'POST', body: { queue_name: queueName } }); // Already correct
-                showToast(MESSAGES.queueCleared(queueName), 'success'); // Already correct
+                await fetchAPI(API_ENDPOINTS.queuesClear, { method: 'POST', body: { queue_name: queueName } });
+                showToast(MESSAGES.queueCleared(queueName), 'success');
                 await loadQueuesStatus(); // Recharger le statut
             }
         }
@@ -801,7 +802,7 @@ export async function handleSavePrompt(event) {
     const endpoint = promptId ? API_ENDPOINTS.promptById(promptId) : API_ENDPOINTS.prompts;
 
     await fetchAPI(endpoint, { method, body: payload });
-    showToast(MESSAGES.promptSaved, 'success'); // Already correct
+    showToast(MESSAGES.promptSaved, 'success');
     closeModal('promptEditorModal');
     await loadPrompts();
 }
@@ -825,14 +826,14 @@ export function openProfileEditor(profileId = null) {
 }
 
 export function handleDownloadSelectedModel() {
-    const select = document.querySelector('#available-models-select'); // Already correct
+    const select = document.querySelector(SELECTORS.availableModelsSelect);
     if (select) {
         const modelName = select.value;
         // Appelle la logique que Gemini a écrite
         downloadModel(modelName); 
     } else {
-        console.error(MESSAGES.selectNotFound); // Already correct
-        showToast(MESSAGES.modelListNotFound, 'error'); // Already correct
+        console.error(MESSAGES.selectNotFound);
+        showToast(MESSAGES.modelListNotFound, 'error');
     }
 }
 
@@ -842,18 +843,18 @@ export function handleDownloadSelectedModel() {
 export async function downloadModel(modelName) {
     try {
         showDownloadProgress(modelName);
-        const response = await fetchAPI(API_ENDPOINTS.ollamaPull, { // Already correct
+        const response = await fetchAPI(API_ENDPOINTS.ollamaPull, {
             method: 'POST',
             body: JSON.stringify({ model: modelName }),
         });
         if (response.success) {
-            showToast(MESSAGES.modelDownloaded(modelName), 'success'); // Already correct
+            showToast(MESSAGES.modelDownloaded(modelName), 'success');
             await loadInstalledModels();
         } else {
-            throw new Error(response.error || MESSAGES.unknownError); // Already correct
+            throw new Error(response.error || MESSAGES.unknownError);
         }
     } catch (error) {
-        showToast(`${MESSAGES.downloadError}: ${error.message}`, 'error'); // Already correct
+        showToast(`${MESSAGES.downloadError}: ${error.message}`, 'error');
     } finally {
         hideDownloadProgress();
     }
@@ -861,8 +862,8 @@ export async function downloadModel(modelName) {
 
 export async function loadInstalledModels() {
     try {
-        const response = await fetchAPI(API_ENDPOINTS.ollamaModels); // Already correct
-        const modelsList = document.querySelector('#installed-models-list'); // Already correct
+        const response = await fetchAPI(API_ENDPOINTS.ollamaModels);
+        const modelsList = document.querySelector(SELECTORS.installedModelsList);
         modelsList.innerHTML = response.models
             .map(
                 (model) =>
@@ -875,12 +876,12 @@ export async function loadInstalledModels() {
 }
 
 function showDownloadProgress(modelName) {
-    const progressContainer = document.querySelector('#download-progress'); // Already correct
-    const statusElement = document.querySelector('#download-status'); // Already correct
+    const progressContainer = document.querySelector(SELECTORS.downloadProgress);
+    const statusElement = document.querySelector(SELECTORS.downloadStatus);
     progressContainer.style.display = 'block';
-    statusElement.textContent = MESSAGES.downloadingModel(modelName); // Already correct
+    statusElement.textContent = MESSAGES.downloadingModel(modelName);
 }
 
 function hideDownloadProgress() {
-    document.querySelector('#download-progress').style.display = 'none'; // Already correct
+    document.querySelector(SELECTORS.downloadProgress).style.display = 'none';
 }

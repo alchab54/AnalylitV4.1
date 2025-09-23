@@ -2,8 +2,8 @@
 
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
-import { showLoadingOverlay, closeModal, escapeHtml, showModal } from './ui-improved.js'; // showSuccess/showError are not used here directly
-import { showToast } from './toast.js';
+import { showLoadingOverlay, closeModal, escapeHtml, showModal } from './ui-improved.js';
+import { showToast, showSuccess } from './toast.js';
 import { API_ENDPOINTS, MESSAGES } from './constants.js';
 
 // Fonctions utilitaires locales ou importées d'autres modules si nécessaire
@@ -62,7 +62,7 @@ async function handleCreateProject(event) {
     if (newProject?.id) {
       await selectProject(newProject.id);
     }
-    showToast(MESSAGES.projectCreated, 'success'); // Already correct
+    showSuccess(MESSAGES.projectCreated);
     closeModal('newProjectModal');
   } catch (e) {
     showToast(`Erreur: ${e.message}`, 'error');
