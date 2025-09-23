@@ -3,6 +3,7 @@
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { showToast, showLoadingOverlay, escapeHtml } from './ui-improved.js';
+import { API_ENDPOINTS, MESSAGES } from './constants.js';
 import { setScreeningDecisions } from './state.js'; // Supposant que cette fonction existe dans state.js
 
 /**
@@ -10,14 +11,13 @@ import { setScreeningDecisions } from './state.js'; // Supposant que cette fonct
  */
 async function loadScreeningDecisions() {
     if (!appState.currentProject?.id) return;
-    showLoadingOverlay(true, 'Chargement du screening...');
+    showLoadingOverlay(true, MESSAGES.loadingScreening);
     try {
-        // TODO: Backend route for getting screening decisions is missing.
-    // const decisions = await fetchAPI(`/projects/${appState.currentProject.id}/screening-decisions`);
+        const decisions = await fetchAPI(API_ENDPOINTS.projectScreeningDecisions(appState.currentProject.id));
         setScreeningDecisions(decisions || []);
         renderScreeningView();
     } catch (error) {
-        showToast(`Erreur de chargement du screening: ${error.message}`, 'error');
+        showToast(`${MESSAGES.errorLoadingScreening}: ${error.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }
@@ -31,13 +31,13 @@ export function renderScreeningView() {
     if (!container) return;
 
     if (!appState.currentProject) {
-        container.innerHTML = `<div class="placeholder">Sélectionnez un projet pour commencer le screening.</div>`;
+        container.innerHTML = `<div class="placeholder">${MESSAGES.selectProjectForScreening}</div>`;
         return;
     }
 
     const decisions = appState.screeningDecisions || [];
     if (decisions.length === 0) {
-        container.innerHTML = `<div class="placeholder">Aucun article à screener. Lancez un traitement par lot.</div>`;
+        container.innerHTML = `<div class="placeholder">${MESSAGES.noArticlesToScreen}</div>`;
         return;
     }
 

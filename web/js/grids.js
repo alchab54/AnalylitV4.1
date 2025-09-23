@@ -2,9 +2,9 @@
 
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
-import { setCurrentProjectGrids } from './state.js'; // Assuming this is correct, no ui import here.
+import { setCurrentProjectGrids } from './state.js';
 import { showToast, escapeHtml } from './ui-improved.js';
-import { API_ENDPOINTS, MESSAGES } from './constants.js';
+import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 // CORRECTION : Ajout de la fonction manquante `loadProjectGrids`
 export async function loadProjectGrids(projectId) {
@@ -21,7 +21,7 @@ export async function loadProjectGrids(projectId) {
 }
 
 export function renderGridsSection(project, elements) {
-    const container = document.getElementById('gridsContainer');
+    const container = document.querySelector(SELECTORS.gridsContainer);
     if (!container) return;
     if (!project) {
         container.innerHTML = `<div class="placeholder">${MESSAGES.selectProjectToViewGrids}</div>`;
@@ -32,7 +32,7 @@ export function renderGridsSection(project, elements) {
     const gridsHtml = grids.length > 0
         ? grids.map(renderGridItem).join('')
         : `<div class="placeholder">${MESSAGES.noCustomGrids}</div>`;
-    
+
     container.innerHTML = `
         <!-- L'en-tête est maintenant dans index.html -->
         <div class="grid-layout">
@@ -53,18 +53,18 @@ function renderGridItem(grid) {
             fieldCount = 0;
         }
     }
-    
+
     return `
         <div class="card" data-grid-id="${grid.id}">
             <div class="card__header">
-                <h3>${escapeHtml(grid.name || 'Sans titre')}</h3>
+                <h3>${escapeHtml(grid.name || MESSAGES.noTitle)}</h3>
                 <div class="card-actions">
                     <button class="btn btn--icon btn--small" data-action="edit-grid" data-grid-id="${grid.id}">✏️</button>
                     <button class="btn btn--icon btn--small btn--danger" data-action="delete-grid" data-grid-id="${grid.id}">🗑️</button>
                 </div>
             </div>
             <div class="card__body">
-                <p>${escapeHtml(grid.description || 'Aucune description.')}</p>
+                <p>${escapeHtml(grid.description || MESSAGES.noDescriptionAvailable)}</p>
             </div>
             <div class="card__footer">
                 <span>${fieldCount} champ(s)</span>
@@ -80,7 +80,7 @@ export async function handleDeleteGrid(gridId) {
     try {
         await fetchAPI(API_ENDPOINTS.gridById(appState.currentProject.id, gridId), { method: 'DELETE' });
         showToast(MESSAGES.gridDeleted, 'success');
-        
+
         // Mettre à jour l'état localement
         const updatedGrids = (appState.currentProjectGrids || []).filter(g => g.id !== gridId);
         setCurrentProjectGrids(updatedGrids);
@@ -92,21 +92,21 @@ export async function handleDeleteGrid(gridId) {
 }
 
 export function showGridFormModal(gridId = null) {
-    const modal = document.getElementById('gridFormModal');
-    const title = document.getElementById('gridFormModalTitle');
-    const form = document.getElementById('gridForm');
-    const fieldsContainer = document.getElementById('gridFields');
+    const modal = document.querySelector(SELECTORS.gridFormModal);
+    const title = document.querySelector(SELECTORS.gridFormModalTitle);
+    const form = document.querySelector(SELECTORS.gridForm);
+    const fieldsContainer = document.querySelector(SELECTORS.gridFields);
 
     form.reset();
     fieldsContainer.innerHTML = '';
-    document.getElementById('gridId').value = gridId || '';
+    document.querySelector(SELECTORS.gridId).value = gridId || '';
 
     if (gridId) {
         title.textContent = MESSAGES.editGridTitle;
         const grid = appState.currentProjectGrids.find(g => g.id === gridId);
         if (grid) {
-            document.getElementById('gridName').value = grid.name;
-            document.getElementById('gridDescription').value = grid.description || '';
+            document.querySelector(SELECTORS.gridName).value = grid.name;
+            document.querySelector(SELECTORS.gridDescription).value = grid.description || '';
             const fields = Array.isArray(grid.fields) ? grid.fields : [];
             fields.forEach(field => addFieldInput(fieldsContainer, field.name, field.description));
         }
@@ -120,7 +120,7 @@ export function showGridFormModal(gridId = null) {
 }
 
 export function addGridFieldInput() {
-    const container = document.getElementById('gridFields');
+    const container = document.querySelector(SELECTORS.gridFields);
     if (container) {
         addFieldInput(container);
     }
@@ -128,10 +128,10 @@ export function addGridFieldInput() {
 
 function addFieldInput(container, name = '', description = '') {
     const fieldDiv = document.createElement('div');
-    fieldDiv.className = 'grid-field-item';
+    fieldDiv.className = SELECTORS.gridFieldItem.substring(1); // Remove the dot for class name
     fieldDiv.innerHTML = `
-        <input type="text" placeholder="Nom du champ" value="${escapeHtml(name)}" class="form-control grid-field-name" required>
-        <input type="text" placeholder="Description (optionnel)" value="${escapeHtml(description)}" class="form-control grid-field-desc">
+        <input type="text" placeholder="${MESSAGES.fieldNamePlaceholder}" value="${escapeHtml(name)}" class="form-control grid-field-name" required>
+        <input type="text" placeholder="${MESSAGES.fieldDescriptionPlaceholder}" value="${escapeHtml(description)}" class="form-control grid-field-desc">
         <button type="button" class="btn btn--danger btn--sm" data-action="remove-grid-field">X</button>
     `;
     container.appendChild(fieldDiv);
@@ -141,7 +141,7 @@ function addFieldInput(container, name = '', description = '') {
  * Déclenche le clic sur le champ de fichier caché
  */
 export function triggerGridImport() {
-    document.getElementById('grid-import-input').click();
+    document.querySelector(SELECTORS.gridImportInput).click();
 }
 
 /**
@@ -180,19 +180,19 @@ export async function handleGridImportUpload(event) {
 }
 
 export function removeGridField(target) {
-    target.closest('.grid-field-item').remove();
+    target.closest(SELECTORS.gridFieldItem).remove();
 }
 
 export async function handleSaveGrid(event) {
     event.preventDefault();
-    const form = document.getElementById('gridForm');
+    const form = document.querySelector(SELECTORS.gridForm);
     const gridId = form.elements.id.value;
     const name = form.elements.name.value;
     const description = form.elements.description.value;
 
-    const fields = Array.from(document.querySelectorAll('.grid-field-item')).map(item => ({
-        name: item.querySelector('.grid-field-name').value,
-        description: item.querySelector('.grid-field-desc').value,
+    const fields = Array.from(document.querySelectorAll(SELECTORS.gridFieldItem)).map(item => ({
+        name: item.querySelector(SELECTORS.gridFieldName).value,
+        description: item.querySelector(SELECTORS.gridFieldDesc).value,
     })).filter(field => field.name.trim() !== '');
 
     if (!name || fields.length === 0) {
@@ -222,7 +222,7 @@ export async function handleSaveGrid(event) {
         setCurrentProjectGrids([...appState.currentProjectGrids]);
 
         showToast(MESSAGES.gridSaved(!!gridId), 'success');
-        document.getElementById('gridFormModal').classList.remove('modal--show');
+        document.querySelector(SELECTORS.gridFormModal).classList.remove('modal--show');
 
     } catch (error) {
         showToast(`${MESSAGES.errorSavingGrid}: ${error.message}`, 'error');

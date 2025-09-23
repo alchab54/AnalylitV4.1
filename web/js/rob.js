@@ -7,14 +7,14 @@ export async function loadRobSection() {
     if (!elements.robContainer) return;
 
     if (!appState.currentProject?.id) {
-        elements.robContainer.innerHTML = `<div class="empty-state"><p>Sélectionnez un projet pour évaluer le risque de biais.</p></div>`;
+        elements.robContainer.innerHTML = `<div class="empty-state"><p>${MESSAGES.selectProjectForRob}</p></div>`;
         return;
     }
 
     // On se base sur les articles déjà chargés dans `searchResults`
     const articles = appState.searchResults || [];
     if (articles.length === 0) {
-        elements.robContainer.innerHTML = `<div class="empty-state"><p>Aucun article dans ce projet. Lancez une recherche d'abord.</p></div>`;
+        elements.robContainer.innerHTML = `<div class="empty-state"><p>${MESSAGES.noArticlesInProject}</p></div>`;
         return;
     }
 
@@ -26,7 +26,7 @@ export async function loadRobSection() {
             <div class="rob-article-header">
                 <input type="checkbox" class="article-select-checkbox" data-action="toggle-article-selection" data-article-id="${escapeHtml(article.article_id)}">
                 <h4 class="rob-article-title">${escapeHtml(article.title)}</h4>
-                <button class="btn btn--secondary btn--sm" data-action="edit-rob" data-article-id="${article.article_id}">Éditer</button>
+                <button class="btn btn--secondary btn--sm" data-action="edit-rob" data-article-id="${article.article_id}">${MESSAGES.editButton}</button>
             </div>
             <div class="rob-assessment-summary" id="rob-summary-${article.article_id}">
                 <!-- Le résumé de l'évaluation sera chargé ici -->
@@ -36,7 +36,7 @@ export async function loadRobSection() {
 
     elements.robContainer.innerHTML = `
         <div class="section-header__actions">
-            <button class="btn btn--primary" data-action="run-rob-analysis">Lancer l'analyse RoB sur la sélection</button>
+            <button class="btn btn--primary" data-action="run-rob-analysis">${MESSAGES.runRobAnalysisButton}</button>
         </div>
         <div class="rob-list mt-24">${articlesHtml}</div>
     `;
@@ -47,11 +47,11 @@ export async function fetchAndDisplayRob(articleId, editMode = false) {
     if (!summaryContainer) return;
 
     try {
-        summaryContainer.innerHTML = `<div class="loading-spinner"></div>`;
-        const robData = await fetchAPI(`/projects/${appState.currentProject.id}/risk-of-bias/${articleId}`);
+        summaryContainer.innerHTML = MESSAGES.loadingSpinner;
+        const robData = await fetchAPI(API_ENDPOINTS.projectRob(appState.currentProject.id, articleId));
         
         if (!robData || Object.keys(robData).length === 0) {
-            summaryContainer.innerHTML = `<p class="text-secondary">Aucune évaluation de biais pour cet article. Lancez l'analyse.</p>`;
+            summaryContainer.innerHTML = `<p class="text-secondary">${MESSAGES.noRobAssessment}</p>`;
             return;
         }
 
@@ -62,7 +62,7 @@ export async function fetchAndDisplayRob(articleId, editMode = false) {
         }
 
     } catch (e) {
-        summaryContainer.innerHTML = `<p class="error">Erreur: ${e.message}</p>`;
+        summaryContainer.innerHTML = `<p class="error">${MESSAGES.errorPrefix} ${e.message}</p>`;
     }
 }
 
@@ -70,17 +70,17 @@ function renderRobDetails(robData) {
     return `
         <div class="rob-details">
             <div class="rob-domain">
-                <strong>Randomisation:</strong>
+                <strong>${MESSAGES.robDomainRandomization}</strong>
                 <span class="status status--${getBiasClass(robData.domain_1_bias)}">${robData.domain_1_bias || 'N/A'}</span>
                 <p class="rob-justification">${escapeHtml(robData.domain_1_justification)}</p>
             </div>
             <div class="rob-domain">
-                <strong>Données manquantes:</strong>
+                <strong>${MESSAGES.robDomainMissingData}</strong>
                 <span class="status status--${getBiasClass(robData.domain_2_bias)}">${robData.domain_2_bias || 'N/A'}</span>
                 <p class="rob-justification">${escapeHtml(robData.domain_2_justification)}</p>
             </div>
             <div class="rob-domain rob-overall">
-                <strong>Évaluation globale:</strong>
+                <strong>${MESSAGES.robDomainOverall}</strong>
                 <span class="status status--${getBiasClass(robData.overall_bias)}">${robData.overall_bias || 'N/A'}</span>
                 <p class="rob-justification">${escapeHtml(robData.overall_justification)}</p>
             </div>
@@ -99,23 +99,23 @@ function renderRobEditForm(articleId, robData) {
     return `
         <form class="rob-edit-form" data-action="save-rob-assessment" data-article-id="${articleId}">
             <div class="form-group">
-                <label class="form-label">1. Biais dans le processus de randomisation</label>
+                <label class="form-label">1. ${MESSAGES.robDomainRandomization}</label>
                 ${renderSelect('domain_1_bias', robData.domain_1_bias)}
-                <textarea name="domain_1_justification" class="form-control mt-8" rows="2" placeholder="Justification...">${escapeHtml(robData.domain_1_justification || '')}</textarea>
+                <textarea name="domain_1_justification" class="form-control mt-8" rows="2" placeholder="${MESSAGES.justificationPlaceholder}">${escapeHtml(robData.domain_1_justification || '')}</textarea>
             </div>
             <div class="form-group">
-                <label class="form-label">2. Biais dû aux données manquantes</label>
+                <label class="form-label">2. ${MESSAGES.robDomainMissingData}</label>
                 ${renderSelect('domain_2_bias', robData.domain_2_bias)}
-                <textarea name="domain_2_justification" class="form-control mt-8" rows="2" placeholder="Justification...">${escapeHtml(robData.domain_2_justification || '')}</textarea>
+                <textarea name="domain_2_justification" class="form-control mt-8" rows="2" placeholder="${MESSAGES.justificationPlaceholder}">${escapeHtml(robData.domain_2_justification || '')}</textarea>
             </div>
             <div class="form-group">
-                <label class="form-label">Évaluation globale du risque de biais</label>
+                <label class="form-label">${MESSAGES.robDomainOverall}</label>
                 ${renderSelect('overall_bias', robData.overall_bias)}
-                <textarea name="overall_justification" class="form-control mt-8" rows="2" placeholder="Justification globale...">${escapeHtml(robData.overall_justification || '')}</textarea>
+                <textarea name="overall_justification" class="form-control mt-8" rows="2" placeholder="${MESSAGES.overallJustificationPlaceholder}">${escapeHtml(robData.overall_justification || '')}</textarea>
             </div>
             <div class="form-actions">
-                <button type="button" class="btn btn--secondary" data-action="cancel-edit-rob" data-article-id="${articleId}">Annuler</button>
-                <button type="submit" class="btn btn--primary">Sauvegarder</button>
+                <button type="button" class="btn btn--secondary" data-action="cancel-edit-rob" data-article-id="${articleId}">${MESSAGES.cancelButton}</button>
+                <button type="submit" class="btn btn--primary">${MESSAGES.saveButton}</button>
             </div>
         </form>
     `;
@@ -135,19 +135,19 @@ export async function handleSaveRobAssessment(event) {
 
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
-    button.textContent = 'Sauvegarde...';
+    button.textContent = MESSAGES.savingButton;
 
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/risk-of-bias/${articleId}`, {
+        await fetchAPI(API_ENDPOINTS.projectRob(appState.currentProject.id, articleId), {
             method: 'POST',
             body: data
         });
-        showToast('Évaluation RoB sauvegardée.', 'success');
+        showToast(MESSAGES.robAssessmentSaved, 'success');
         await fetchAndDisplayRob(articleId, false); // Re-render in view mode
     } catch (e) {
-        showToast(`Erreur: ${e.message}`, 'error');
+        showToast(`${MESSAGES.errorPrefix} ${e.message}`, 'error');
         button.disabled = false;
-        button.textContent = 'Sauvegarder';
+        button.textContent = MESSAGES.saveButton;
     }
 }
 
@@ -164,18 +164,18 @@ export async function handleRunRobAnalysis() {
     if (!appState.currentProject) return;
     const selectedIds = Array.from(appState.selectedSearchResults);
     if (selectedIds.length === 0) {
-        showToast("Veuillez sélectionner au moins un article pour l'analyse RoB.", 'warning');
+        showToast(MESSAGES.selectAtLeastOneArticleForRob, 'warning');
         return;
     }
-    showLoadingOverlay(true, `Lancement de l'analyse RoB pour ${selectedIds.length} article(s)...`);
+    showLoadingOverlay(true, MESSAGES.startingRobAnalysis(selectedIds.length));
     try {
-        await fetchAPI(`/projects/${appState.currentProject.id}/run-rob-analysis`, {
+        await fetchAPI(API_ENDPOINTS.projectRunRobAnalysis(appState.currentProject.id), {
             method: 'POST',
             body: { article_ids: selectedIds }
         });
-        showToast("Analyse du risque de biais lancée. Les résultats apparaîtront progressivement.", 'success');
+        showToast(MESSAGES.robAnalysisStarted, 'success');
     } catch (e) {
-        showToast(`Erreur: ${e.message}`, 'error');
+        showToast(`${MESSAGES.errorPrefix} ${e.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }

@@ -1,16 +1,17 @@
 // web/js/chat.js
 import { escapeHtml, showToast } from './ui-improved.js';
+import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 import { appState } from './app-improved.js';
 import { fetchAPI } from './api.js';
 
 function formatMessageContent(content) {
     if (!content) return '';
     const urlRegex = /(https?:\/\/[^\s]+)/g;
-    
+
     let safeContent = escapeHtml(content);
     safeContent = safeContent.replace(/\n/g, '<br>');
     safeContent = safeContent.replace(urlRegex, '<a href="$1" target="_blank">$1</a>');
-    
+
     return safeContent;
 }
 
@@ -18,7 +19,7 @@ function formatMessageContent(content) {
  * Charge et affiche l'historique des messages du chat pour le projet en cours.
  */
 export async function loadChatMessages() {
-    const chatContainer = document.getElementById('chatContainer');
+    const chatContainer = document.querySelector(SELECTORS.chatContainer);
     if (!chatContainer) return;
 
     if (!appState.currentProject?.id) {
@@ -27,24 +28,24 @@ export async function loadChatMessages() {
     }
 
     try {
-        const messages = await fetchAPI(`/api/projects/${appState.currentProject.id}/chat-history`);
+        const messages = await fetchAPI(API_ENDPOINTS.projectChatHistory(appState.currentProject.id));
         appState.chatMessages = Array.isArray(messages) ? messages : [];
         renderChatInterface(appState.chatMessages);
     } catch (error) {
-        console.error('Erreur lors du chargement des messages de chat:', error);
+        console.error(MESSAGES.errorLoadingChatMessages, error);
         renderChatSection(null, true);
     }
 }
 
 export function renderChatInterface(messages = appState.chatMessages, error = false) {
-    const chatContainer = document.getElementById('chatContainer');
+    const chatContainer = document.querySelector(SELECTORS.chatContainer);
     if (!chatContainer) return;
 
     if (!appState.currentProject?.id) {
         chatContainer.innerHTML = `
             <div class="chat-empty">
-                <h3>Aucun projet sélectionné</h3>
-                <p>Sélectionnez un projet pour accéder au chat RAG.</p>
+                <h3>${MESSAGES.noProjectSelectedChat}</h3>
+                <p>${MESSAGES.selectProjectForChat}</p>
             </div>`;
         return;
     }
@@ -52,8 +53,8 @@ export function renderChatInterface(messages = appState.chatMessages, error = fa
     if (error) {
         chatContainer.innerHTML = `
             <div class="chat-error">
-                <h3>Erreur</h3>
-                <p>Erreur lors du chargement du chat.</p>
+                <h3>${MESSAGES.chatError}</h3>
+                <p>${MESSAGES.errorLoadingChat}</p>
             </div>`;
         return;
     }
@@ -71,38 +72,38 @@ export function renderChatInterface(messages = appState.chatMessages, error = fa
 
     chatContainer.innerHTML = `
         <div class="chat-interface">
-            <div class="chat-messages" id="chatMessages">
+            <div class="chat-messages" id="${SELECTORS.chatMessages.substring(1)}">
                 ${messagesHtml}
             </div>
-            
+
             <div class="chat-input-container">
                 <div class="chat-input-group">
-                    <textarea id="chatInput" 
-                              class="chat-input" 
-                              placeholder="Posez votre question sur les PDFs indexés..."
+                    <textarea id="${SELECTORS.chatInput.substring(1)}"
+                              class="chat-input"
+                              placeholder="${MESSAGES.chatPlaceholder}"
                               rows="3"
                               data-action="submit-chat-on-enter"></textarea>
-                    <button class="btn btn--primary chat-send-btn" 
+                    <button class="btn btn--primary chat-send-btn"
                             data-action="send-chat-message">
-                        Envoyer
+                        ${MESSAGES.sendButton}
                     </button>
                 </div>
             </div>
         </div>`;
 
     // Faire défiler vers le bas
-    const messagesContainer = document.getElementById('chatMessages');
+    const messagesContainer = document.querySelector(SELECTORS.chatMessages);
     if (messagesContainer) {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 }
 
 async function sendChatMessage() {
-    const input = document.getElementById('chatInput');
+    const input = document.querySelector(SELECTORS.chatInput);
     const question = input?.value?.trim();
-    
+
     if (!question || !appState.currentProject?.id) {
-        showToast('Veuillez saisir une question', 'warning');
+        showToast(MESSAGES.questionRequired, 'warning');
         return;
     }
 
@@ -112,26 +113,26 @@ async function sendChatMessage() {
         content: question,
         timestamp: new Date().toISOString()
     };
-    
+
     appState.chatMessages.push(userMessage);
     renderChatInterface(appState.chatMessages);
-    
+
     // Vider l'input
     input.value = '';
 
     try {
         // Envoyer la question à l'API
-        const response = await fetchAPI(`/projects/${appState.currentProject.id}/chat`, {
+        const response = await fetchAPI(API_ENDPOINTS.projectChat(appState.currentProject.id), {
             method: 'POST',
             body: { question: question }
         });
 
-        showToast('Question envoyée. Réponse en cours...', 'info');
-        
+        showToast(MESSAGES.questionSent, 'info');
+
     } catch (error) {
-        console.error('Erreur lors de l\'envoi de la question:', error);
-        showToast('Erreur lors de l\'envoi de la question', 'error');
-        
+        console.error(MESSAGES.errorSendingQuestion, error);
+        showToast(MESSAGES.errorSendingQuestionGeneric, 'error');
+
         // Retirer le message utilisateur en cas d'erreur
         appState.chatMessages.pop();
         renderChatInterface(appState.chatMessages);
@@ -141,14 +142,14 @@ async function sendChatMessage() {
 export { sendChatMessage };
 
 function renderChatSection(project = null, error = false) {
-    const chatContainer = document.getElementById('chatContainer');
+    const chatContainer = document.querySelector(SELECTORS.chatContainer);
     if (!chatContainer) return;
 
     if (error) {
         chatContainer.innerHTML = `
             <div class="chat-error">
-                <h3>Erreur</h3>
-                <p>Erreur lors du chargement du chat.</p>
+                <h3>${MESSAGES.chatError}</h3>
+                <p>${MESSAGES.errorLoadingChat}</p>
             </div>`;
         return;
     }
@@ -156,8 +157,8 @@ function renderChatSection(project = null, error = false) {
     if (!project) {
         chatContainer.innerHTML = `
             <div class="chat-empty">
-                <h3>Aucun projet sélectionné</h3>
-                <p>Sélectionnez un projet pour accéder au chat RAG.</p>
+                <h3>${MESSAGES.noProjectSelectedChat}</h3>
+                <p>${MESSAGES.selectProjectForChat}</p>
             </div>`;
         return;
     }
@@ -169,20 +170,20 @@ function renderChatSection(project = null, error = false) {
  */
 export async function handleStartIndexing() {
     if (!appState.currentProject) {
-        showToast('Veuillez sélectionner un projet pour lancer l\'indexation.', 'warning');
+        showToast(MESSAGES.selectProjectForIndexing, 'warning');
         return;
     }
 
-    showLoadingOverlay(true, 'Lancement de l\'indexation des PDFs...');
+    showLoadingOverlay(true, MESSAGES.startingPdfIndexing);
     try {
         // The route is defined in server_v4_complete.py but not with the /api prefix in the route definition itself.
         // The fetchAPI helper adds the /api prefix. The route is `/projects/<project_id>/index-pdfs`
-        const response = await fetchAPI(`/projects/${appState.currentProject.id}/index-pdfs`, { method: 'POST' });
-        showToast('Indexation des PDFs lancée en arrière-plan.', 'success');
+        const response = await fetchAPI(API_ENDPOINTS.projectIndexPdfs(appState.currentProject.id), { method: 'POST' });
+        showToast(MESSAGES.pdfIndexingStarted, 'success');
         // On peut utiliser le task_id pour suivre la progression si nécessaire
         console.log('Task ID for indexing:', response.task_id);
     } catch (error) {
-        showToast(`Erreur lors du lancement de l\'indexation : ${error.message}`, 'error');
+        showToast(`${MESSAGES.errorStartingIndexing}: ${error.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }

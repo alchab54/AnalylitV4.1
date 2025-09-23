@@ -6,7 +6,7 @@ import { appState } from './app-improved.js';
 import { setQueuesStatus } from './state.js';
 // MODIFIÉ: Utilisation du nouveau module UI amélioré
 import { showToast, showConfirmModal } from './ui-improved.js';
-import { API_ENDPOINTS, MESSAGES } from './constants.js'; 
+import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 let editors = {}; // Stocke les instances d'Ace Editor
 
@@ -47,7 +47,7 @@ export async function loadPrompts() {
         const prompts = await fetchAPI(API_ENDPOINTS.prompts);
         appState.prompts = prompts || [];
     } catch (error) {
-        console.error("Erreur lors du chargement des prompts:", error);
+        console.error(`${MESSAGES.errorLoadingPrompts}:`, error);
         showToast(`${MESSAGES.errorLoadingPrompts}: ${error.message}`, 'error');
         appState.prompts = [];
     }
@@ -90,7 +90,7 @@ export function showPullModelModal() {}
  * --- REFACTORISÉE POUR LE RENDU DYNAMIQUE ---
  */
 export function renderSettings() {
-    const container = document.getElementById('settingsContainer');
+    const container = document.querySelector(SELECTORS.settingsContainer);
     if (!container) return;
 
     const profiles = appState.analysisProfiles;
@@ -99,19 +99,19 @@ export function renderSettings() {
     const queueStatus = appState.queuesInfo;
 
     if (!profiles || !prompts || !models || !queueStatus) {
-        container.innerHTML = `<div class="placeholder">Chargement des données de configuration...</div>`;
-        console.warn("Les données des paramètres ne sont pas prêtes, le rendu est annulé.");
-        return; 
+        container.innerHTML = `<div class="placeholder">${MESSAGES.loadingSettingsData}</div>`;
+        console.warn(MESSAGES.settingsDataNotReady);
+        return;
     }
 
     // 1. Générer le layout HTML dynamique
     container.innerHTML = createSettingsLayout();
 
     // 2. Remplir les conteneurs maintenant qu'ils existent dans le DOM
-    renderAnalysisProfilesList(profiles, document.getElementById('profile-list-container'));
+    renderAnalysisProfilesList(profiles, document.querySelector(SELECTORS.profileListContainer));
     populateModelSelects(models);
-    renderPromptTemplates(prompts, document.getElementById('prompt-templates-list'));
-    renderQueueStatus(queueStatus, document.getElementById('queue-status-container'));
+    renderPromptTemplates(prompts, document.querySelector(SELECTORS.promptTemplatesList));
+    renderQueueStatus(queueStatus, document.querySelector(SELECTORS.queueStatusContainer));
     loadInstalledModels();
 
     // 3. Initialiser les composants interactifs
@@ -126,7 +126,7 @@ export function renderSettings() {
 }
 
 /**
- * NOUVELLE FONCTION: Crée le HTML de la structure de la page des paramètres.
+ * NOUVELLE FONCTION : Crée le HTML de la structure de la page des paramètres.
  * @returns {string} Le HTML de la grille des paramètres.
  */
 function createSettingsLayout() {
@@ -138,55 +138,55 @@ function createSettingsLayout() {
             <div class="settings-card">
                 <div class="settings-card__header">
                     <h3>Profils d'Analyse</h3>
-                    <button id="new-profile-btn" class="btn btn--sm btn--primary">
+                    <button id="${SELECTORS.newProfileBtn.substring(1)}" class="btn btn--sm btn--primary">
                         <span class="icon">＋</span> Nouveau Profil
                     </button>
                 </div>
-                <div class="settings-card__body" id="profile-list-container">
+                <div class="settings-card__body" id="${SELECTORS.profileListContainer.substring(1)}">
                     </div>
             </div>
         </div>
 
         <div class="settings-col" id="settings-col-2">
-            <form id="profile-edit-form" class="settings-card">
-                <input type="hidden" id="profile-id" name="id">
-                
+            <form id="${SELECTORS.settingsForm.substring(1)}" class="settings-card">
+                <input type="hidden" id="${SELECTORS.profileId.substring(1)}" name="id">
+
                 <div class="settings-card__header">
                     <h3>Éditer le Profil</h3>
                     <div class="form-actions">
-                        <button id="delete-profile-btn" type="button" class="btn btn--sm btn--danger" disabled>
-                            <span class="icon">🗑️</span> Supprimer
+                        <button id="${SELECTORS.deleteProfileBtn.substring(1)}" type="button" class="btn btn--sm btn--danger" disabled>
+                            <span class="icon">🗑️</span> ${MESSAGES.deleteButton}
                         </button>
                         <button type="submit" class="btn btn--sm btn--primary">
-                            <span class="icon">💾</span> Sauvegarder
+                            <span class="icon">💾</span> ${MESSAGES.saving}
                         </button>
                     </div>
                 </div>
 
                 <div class="settings-card__body">
                     <div class="form-group">
-                        <label for="profile-name">Nom du Profil</label>
-                        <input type="text" id="profile-name" name="name" class="form-control" required>
+                        <label for="${SELECTORS.profileName.substring(1)}">Nom du Profil</label>
+                        <input type="text" id="${SELECTORS.profileName.substring(1)}" name="name" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label for="profile-description">Description</label>
-                        <textarea id="profile-description" name="description" class="form-control" rows="2"></textarea>
+                        <label for="${SELECTORS.profileDescription.substring(1)}">Description</label>
+                        <textarea id="${SELECTORS.profileDescription.substring(1)}" name="description" class="form-control" rows="2"></textarea>
                     </div>
                     <div class="form-group form-group--checkbox">
-                        <input type="checkbox" id="profile-is_default" name="is_default">
-                        <label for="profile-is_default">Définir comme profil par défaut</label>
+                        <input type="checkbox" id="${SELECTORS.profileIsDefault.substring(1)}" name="is_default">
+                        <label for="${SELECTORS.profileIsDefault.substring(1)}">Définir comme profil par défaut</label>
                     </div>
-                    
+
                     <hr class="separator">
-                    
+
                     <div class="form-group">
-                        <label for="prompt-template-select">Appliquer un modèle de prompt :</label>
+                        <label for="${SELECTORS.promptTemplateSelect.substring(1)}">Appliquer un modèle de prompt :</label>
                         <div class="input-group">
-                            <select id="prompt-template-select" class="form-control">
-                                <option value="">Choisir un modèle...</option>
+                            <select id="${SELECTORS.promptTemplateSelect.substring(1)}" class="form-control">
+                                <option value="">${MESSAGES.chooseModel}</option>
                                 ${promptOptions}
                             </select>
-                            <button type="button" class="btn btn--secondary" id="apply-template-btn">Appliquer</button>
+                            <button type="button" class="btn btn--secondary" id="${SELECTORS.applyTemplateBtn.substring(1)}">Appliquer</button>
                         </div>
                     </div>
 
@@ -200,7 +200,7 @@ function createSettingsLayout() {
                 <div class="settings-card__header">
                     <h3>Modèles de Prompts (Templates)</h3>
                     </div>
-                <div class="settings-card__body" id="prompt-templates-list">
+                <div class="settings-card__body" id="${SELECTORS.promptTemplatesList.substring(1)}">
                     </div>
             </div>
         </div>
@@ -209,32 +209,32 @@ function createSettingsLayout() {
             <div class="settings-card">
                 <div class="settings-card__header">
                     <h3>Statut des Tâches (Queues)</h3>
-                    <button id="refresh-queues-btn" class="btn btn--sm btn--secondary">
+                    <button id="${SELECTORS.refreshQueuesBtn.substring(1)}" class="btn btn--sm btn--secondary">
                         <span class="icon">🔄</span> Rafraîchir
                     </button>
                 </div>
-                <div class="settings-card__body" id="queue-status-container">
+                <div class="settings-card__body" id="${SELECTORS.queueStatusContainer.substring(1)}">
                     </div>
             </div>
-            
+
             <div id="models-management" class="settings-card">
                 <div class="settings-card__header">
                     <h3>Gestion des Modèles IA</h3>
                 </div>
                 <div class="settings-card__body">
-                    <select id="available-models-select" class="form-control">
+                    <select id="${SELECTORS.availableModelsSelect.substring(1)}" class="form-control">
                         <option value="llama3.1:8b">Llama 3.1 8B</option>
                         <option value="llama3.1:70b">Llama 3.1 70B</option>
                         <option value="phi3:mini">Phi-3 Mini</option>
                         <option value="mistral:8x7b">Mistral 8x7B</option>
                     </select>
                     <button data-action="download-selected-model" class="btn btn-primary">Télécharger le Modèle</button>
-                    <div id="download-progress" class="progress-container" style="display:none;">
-                        <div class="progress-bar" id="download-progress-bar"></div>
-                        <span id="download-status">Téléchargement en cours...</span>
+                    <div id="${SELECTORS.downloadProgress.substring(1)}" class="progress-container" style="display:none;">
+                        <div class="progress-bar" id="${SELECTORS.downloadProgressBar.substring(1)}"></div>
+                        <span id="${SELECTORS.downloadStatus.substring(1)}">${MESSAGES.downloadingModel('')}</span>
                     </div>
                     <h4>Modèles Installés</h4>
-                    <ul id="installed-models-list"></ul>
+                    <ul id="${SELECTORS.installedModelsList.substring(1)}"></ul>
                 </div>
             </div>
         </div>
@@ -248,9 +248,9 @@ function createSettingsLayout() {
 function createPromptEditorTabs() {
     // Crée les en-têtes des onglets
     const tabs = promptTypes.map((type, index) => `
-        <button 
-            type="button" 
-            class="tab-link ${index === 0 ? 'active' : ''}" 
+        <button
+            type="button"
+            class="tab-link ${index === 0 ? 'active' : ''}"
             data-tab="tab-prompt-${type}"
         >
             ${type.charAt(0).toUpperCase() + type.slice(1)}
@@ -306,15 +306,15 @@ function renderAnalysisProfilesList(profiles, container) {
         <div class="list-item" data-profile-id="${profile.id}">
             <div class="list-item__content">
                 <h5 class="list-item__title">${profile.name} ${profile.is_default ? '<span class="badge badge--default">Défaut</span>' : ''}</h5>
-                <p class="list-item__description">${profile.description || 'Pas de description.'}</p>
+                <p class="list-item__description">${profile.description || MESSAGES.noDescription}</p>
             </div>
         </div>
     `).join('');
-    
+
     container.innerHTML = `<div class="list-group">${listHtml}</div>`;
-    
+
     // Attacher les écouteurs de clic
-    container.querySelectorAll('.list-item').forEach(item => {
+    container.querySelectorAll(`${SELECTORS.profileListContainer} .list-item`).forEach(item => {
         item.addEventListener('click', () => selectProfile(item.dataset.profileId));
     });
 }
@@ -325,26 +325,26 @@ function renderAnalysisProfilesList(profiles, container) {
  */
 function setupSettingsEventListeners() {
     // Écouteurs pour les boutons principaux
-    document.getElementById('new-profile-btn')?.addEventListener('click', handleNewProfile);
-    document.getElementById('delete-profile-btn')?.addEventListener('click', handleDeleteProfile);
-    document.getElementById('apply-template-btn')?.addEventListener('click', () => {
-        const select = document.getElementById('prompt-template-select');
+    document.querySelector(SELECTORS.newProfileBtn)?.addEventListener('click', handleNewProfile);
+    document.querySelector(SELECTORS.deleteProfileBtn)?.addEventListener('click', handleDeleteProfile);
+    document.querySelector(SELECTORS.applyTemplateBtn)?.addEventListener('click', () => {
+        const select = document.querySelector(SELECTORS.promptTemplateSelect);
         if (select.value) {
             applyPromptTemplate(select.value);
         }
     });
-    document.getElementById('refresh-queues-btn')?.addEventListener('click', async () => {
-        showToast("Rafraîchissement du statut des files...", 'info');
+    document.querySelector(SELECTORS.refreshQueuesBtn)?.addEventListener('click', async () => {
+        showToast(MESSAGES.refreshingQueuesStatus, 'info');
         await loadQueuesStatus();
-        renderQueueStatus(appState.queuesInfo, document.getElementById('queue-status-container'));
+        renderQueueStatus(appState.queuesInfo, document.querySelector(SELECTORS.queueStatusContainer));
     });
 
     // Écouteur pour le formulaire
-    const profileEditForm = document.getElementById('profile-edit-form');
+    const profileEditForm = document.querySelector(SELECTORS.settingsForm);
     if (profileEditForm) {
         profileEditForm.addEventListener('submit', handleSaveProfile);
     }
-    
+
     // Écouteurs pour les onglets de prompts
     const tabContainer = profileEditForm.querySelector('.tabs');
     if (tabContainer) {
@@ -371,14 +371,14 @@ function setupSettingsEventListeners() {
 function renderPromptTemplates(prompts, container) {
     if (!container) return;
     if (!prompts || prompts.length === 0) {
-        container.innerHTML = '<p class="placeholder">Aucun modèle de prompt trouvé.</p>';
+        container.innerHTML = `<p class="placeholder">${MESSAGES.noPromptTemplateFound}</p>`;
         return;
     }
     const listHtml = prompts.map(prompt => `
         <div class="list-item list-item--condensed">
              <div class="list-item__content">
                 <h5 class="list-item__title">${prompt.name}</h5>
-                <p class="list-item__description">${prompt.description || 'Pas de description.'}</p>
+                <p class="list-item__description">${prompt.description || MESSAGES.noDescription}</p>
             </div>
         </div>
     `).join('');
@@ -389,18 +389,18 @@ function renderPromptTemplates(prompts, container) {
  * Remplit tous les <select> de modèles avec les modèles Ollama récupérés.
  */
 function populateModelSelects(models) {
-    const modelSelects = document.querySelectorAll('.model-select');
+    const modelSelects = document.querySelectorAll(SELECTORS.modelSelects);
     if (!models || models.length === 0) {
         modelSelects.forEach(select => {
-            select.innerHTML = '<option value="">Aucun modèle Ollama trouvé</option>';
+            select.innerHTML = `<option value="">${MESSAGES.noOllamaModelFound}</option>`;
         });
         return;
     }
-    
+
     const optionsHtml = models.map(model => `<option value="${model.name}">${model.name}</option>`).join('');
-    
+
     modelSelects.forEach(select => {
-        select.innerHTML = `<option value="">-- Choisir un modèle --</option>${optionsHtml}`;
+        select.innerHTML = `<option value="">${MESSAGES.chooseModel}</option>${optionsHtml}`;
     });
 }
 
@@ -410,10 +410,10 @@ function populateModelSelects(models) {
 function initializeAllEditors(retryCount = 0) {
     if (typeof ace === 'undefined') {
         if (retryCount > 50) { // Limite de 5 secondes
-            console.error("La bibliothèque Ace n'a pas pu être chargée.");
+            console.error(MESSAGES.aceNotLoaded);
             return;
         }
-        console.warn("Ace non chargé. Nouvel essai dans 100ms.");
+        console.warn(MESSAGES.aceRetry);
         setTimeout(() => initializeAllEditors(retryCount + 1), 100);
         return;
     }
@@ -437,7 +437,7 @@ function initializeAllEditors(retryCount = 0) {
                 editors[`${type}_user`].session.setMode("ace/mode/markdown");
             }
         } catch (e) {
-            console.warn(`Impossible d'initialiser l'éditeur Ace pour ${type}: ${e.message}.`);
+            console.warn(MESSAGES.aceInitError(type));
         }
     });
 }
@@ -450,14 +450,14 @@ export function selectProfile(profileId) {
     const profile = profiles.find(p => p.id === profileId);
 
     if (!profile) {
-        console.error(`Profil non trouvé: ${profileId}`);
+        console.error(MESSAGES.profileNotFound(profileId));
         return;
     }
-    
+
     appState.selectedProfileId = profileId; // Stocker l'ID sélectionné
 
     // Mettre à jour la liste pour afficher la sélection
-    document.querySelectorAll('#profile-list-container .list-item').forEach(item => {
+    document.querySelectorAll(`${SELECTORS.profileListContainer} .list-item`).forEach(item => {
         item.classList.remove('active');
         if (item.dataset.profileId === profileId) {
             item.classList.add('active');
@@ -472,13 +472,13 @@ export function selectProfile(profileId) {
  * Affiche les données d'un profil sélectionné dans les champs du formulaire et les éditeurs.
  */
 function renderProfileForm(profile) {
-    const form = document.getElementById('profile-edit-form');
+    const form = document.querySelector(SELECTORS.settingsForm);
     if (!form) return;
 
-    form.querySelector('#profile-id').value = profile.id || '';
-    form.querySelector('#profile-name').value = profile.name || '';
-    form.querySelector('#profile-description').value = profile.description || '';
-    form.querySelector('#profile-is_default').checked = profile.is_default || false;
+    form.querySelector(SELECTORS.profileId).value = profile.id || '';
+    form.querySelector(SELECTORS.profileName).value = profile.name || '';
+    form.querySelector(SELECTORS.profileDescription).value = profile.description || '';
+    form.querySelector(SELECTORS.profileIsDefault).checked = profile.is_default || false;
 
     // Définir les valeurs des sélecteurs de modèles
     promptTypes.forEach(type => {
@@ -489,13 +489,13 @@ function renderProfileForm(profile) {
     });
 
     // Gérer le bouton de suppression
-    const deleteBtn = document.getElementById('delete-profile-btn');
+    const deleteBtn = document.querySelector(SELECTORS.deleteProfileBtn);
     if (profile.is_default || profile.id.startsWith('new_')) {
         deleteBtn.disabled = true;
-        deleteBtn.title = profile.is_default ? "Impossible de supprimer le profil par défaut." : "";
+        deleteBtn.title = profile.is_default ? MESSAGES.cannotDeleteDefaultProfile : "";
     } else {
         deleteBtn.disabled = false;
-        deleteBtn.title = "Supprimer ce profil";
+        deleteBtn.title = MESSAGES.deleteThisProfile;
     }
 
     // Charger les prompts dans les éditeurs Ace
@@ -546,7 +546,7 @@ function applyPromptTemplate(templateId) {
     if (targetType && editors[`${targetType}_system`] && editors[`${targetType}_user`]) {
         editors[`${targetType}_system`].setValue(template.system_message || "", -1);
         editors[`${targetType}_user`].setValue(template.user_message_template || "", -1);
-        showToast(`Modèle '${template.name}' appliqué aux éditeurs '${targetType}'.`, 'success');
+        showToast(MESSAGES.templateApplied(template.name, targetType), 'success');
     } else {
         showToast(MESSAGES.cannotApplyTemplate, 'warn');
     }
@@ -578,7 +578,7 @@ function getPromptEditorValues() {
  * Collecte toutes les données du formulaire de profil dans un objet JSON propre.
  */
 function collectProfileData() {
-    const form = document.getElementById('profile-edit-form');
+    const form = document.querySelector(SELECTORS.settingsForm);
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
@@ -597,8 +597,8 @@ function collectProfileData() {
         data[key] = JSON.stringify(combinedPromptData);
     });
 
-    data.is_default = form.querySelector('#profile-is_default').checked;
-    
+    data.is_default = form.querySelector(SELECTORS.profileIsDefault).checked;
+
     return data;
 }
 
@@ -613,19 +613,19 @@ function handleNewProfile() {
         description: "",
         is_default: false,
     };
-    
+
     // Remplir le formulaire avec le profil vide
     renderProfileForm(newProfile);
 
     // Mettre l'ID à "" pour indiquer à l'API qu'il s'agit d'un POST (Créer)
-    document.getElementById('profile-id').value = "";
-    
+    document.querySelector(SELECTORS.profileId).value = "";
+
     // Désélectionner dans la liste
-    document.querySelectorAll('#profile-list-container .list-item').forEach(item => {
+    document.querySelectorAll(`${SELECTORS.profileListContainer} .list-item`).forEach(item => {
         item.classList.remove('active');
     });
-    
-    document.getElementById('profile-name').focus();
+
+    document.querySelector(SELECTORS.profileName).focus();
 }
 
 /**
@@ -641,7 +641,7 @@ export async function handleSaveProfile(e) {
 
     try {
         const profileData = collectProfileData();
-        const profileId = document.getElementById('profile-id').value;
+        const profileId = document.querySelector(SELECTORS.profileId).value;
 
         let url = API_ENDPOINTS.analysisProfiles;
         let method = 'POST';
@@ -659,10 +659,10 @@ export async function handleSaveProfile(e) {
         });
 
         showToast(MESSAGES.profileSaved(updatedProfile.name), 'success');
-        
+
         await loadAnalysisProfiles();
         renderSettings(); // Re-render complet
-        
+
         // Resélectionner le profil qui vient d'être sauvegardé/créé
         selectProfile(updatedProfile.id);
 
@@ -700,7 +700,7 @@ export async function handleDeleteProfile() {
                 try {
                     await fetchAPI(API_ENDPOINTS.analysisProfileById(profileId), { method: 'DELETE' });
                     showToast(MESSAGES.profileDeleted(profile.name), 'success');
-                    
+
                     await loadAnalysisProfiles();
                     renderSettings(); // Re-render (sélectionnera le nouveau profil par défaut)
 
@@ -732,21 +732,21 @@ function renderQueueStatus(status, container) {
             </li>
         `;
     });
-    
+
     // Vérifier s'il y a des workers
     if (!status.workers || status.workers.length === 0) {
         html += `
             <li class="list-item list-item--condensed">
                 <div class="list-item__content text-danger">
-                    <strong>Aucun worker actif détecté.</strong>
-                    <small>Les tâches ne seront pas traitées.</small>
+                    <strong>${MESSAGES.noWorkerDetected}</strong>
+                    <small>${MESSAGES.tasksNotProcessed}</small>
                 </div>
             </li>
         `;
     }
-    
+
     html += '</ul>';
-    
+
     container.innerHTML = html;
 }
 
@@ -826,11 +826,11 @@ export function openProfileEditor(profileId = null) {
 }
 
 export function handleDownloadSelectedModel() {
-    const select = document.getElementById('available-models-select');
+    const select = document.querySelector(SELECTORS.availableModelsSelect);
     if (select) {
         const modelName = select.value;
         // Appelle la logique que Gemini a écrite
-        downloadModel(modelName); 
+        downloadModel(modelName);
     } else {
         console.error(MESSAGES.selectNotFound);
         showToast(MESSAGES.modelListNotFound, 'error');
@@ -863,7 +863,7 @@ export async function downloadModel(modelName) {
 export async function loadInstalledModels() {
     try {
         const response = await fetchAPI(API_ENDPOINTS.ollamaModels);
-        const modelsList = document.getElementById('installed-models-list');
+        const modelsList = document.querySelector(SELECTORS.installedModelsList);
         modelsList.innerHTML = response.models
             .map(
                 (model) =>
@@ -876,12 +876,12 @@ export async function loadInstalledModels() {
 }
 
 function showDownloadProgress(modelName) {
-    const progressContainer = document.getElementById('download-progress');
-    const statusElement = document.getElementById('download-status');
+    const progressContainer = document.querySelector(SELECTORS.downloadProgress);
+    const statusElement = document.querySelector(SELECTORS.downloadStatus);
     progressContainer.style.display = 'block';
     statusElement.textContent = MESSAGES.downloadingModel(modelName);
 }
 
 function hideDownloadProgress() {
-    document.getElementById('download-progress').style.display = 'none';
+    document.querySelector(SELECTORS.downloadProgress).style.display = 'none';
 }

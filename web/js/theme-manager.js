@@ -1,4 +1,5 @@
 // web/js/theme-manager.js
+import { CONFIG, MESSAGES } from './constants.js';
 export class ThemeManager {
     constructor() {
         this.currentTheme = this.getStoredTheme() || this.getSystemTheme();
@@ -16,11 +17,11 @@ export class ThemeManager {
     }
 
     getStoredTheme() {
-        return localStorage.getItem('analylit-theme');
+        return localStorage.getItem(CONFIG.THEME_STORAGE_KEY);
     }
 
     storeTheme(theme) {
-        localStorage.setItem('analylit-theme', theme);
+        localStorage.setItem(CONFIG.THEME_STORAGE_KEY, theme);
     }
 
     applyTheme(theme) {
@@ -31,15 +32,15 @@ export class ThemeManager {
     }
 
     toggleTheme() {
-        const newTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+        const newTheme = this.currentTheme === MESSAGES.themeLight ? MESSAGES.themeDark : MESSAGES.themeLight;
         this.applyTheme(newTheme);
     }
 
     setTheme(theme) {
-        if (['light', 'dark', 'auto'].includes(theme)) {
-            if (theme === 'auto') {
+        if ([MESSAGES.themeLight, MESSAGES.themeDark, MESSAGES.themeAuto].includes(theme)) {
+            if (theme === MESSAGES.themeAuto) {
                 this.applyTheme(this.getSystemTheme());
-                localStorage.removeItem('analylit-theme');
+                localStorage.removeItem(CONFIG.THEME_STORAGE_KEY);
             } else {
                 this.applyTheme(theme);
             }
@@ -49,7 +50,7 @@ export class ThemeManager {
     setupSystemThemeListener() {
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
             if (!this.getStoredTheme()) { // Only follow system if no stored preference
-                this.applyTheme(e.matches ? 'dark' : 'light');
+                this.applyTheme(e.matches ? MESSAGES.themeDark : MESSAGES.themeLight);
             }
         });
     }
@@ -60,8 +61,8 @@ export class ThemeManager {
             const themeToggle = document.createElement('button');
             themeToggle.id = 'theme-toggle';
             themeToggle.className = 'btn btn--icon theme-toggle';
-            themeToggle.setAttribute('aria-label', 'Changer le thème');
-            themeToggle.title = 'Changer le thème';
+            themeToggle.setAttribute('aria-label', MESSAGES.themeToggleLabel);
+            themeToggle.title = MESSAGES.themeToggleLabel;
             
             const headerRight = document.querySelector('.app-header__right');
             if (headerRight) {
@@ -77,8 +78,8 @@ export class ThemeManager {
     updateThemeButton() {
         const button = document.getElementById('theme-toggle');
         if (button) {
-            const icon = this.currentTheme === 'light' ? '🌙' : '☀️';
-            const label = this.currentTheme === 'light' ? 'Mode sombre' : 'Mode clair';
+            const icon = this.currentTheme === MESSAGES.themeLight ? '🌙' : '☀️';
+            const label = this.currentTheme === MESSAGES.themeLight ? MESSAGES.darkMode : MESSAGES.lightMode;
             button.innerHTML = icon;
             button.title = label;
             button.setAttribute('aria-label', label);
@@ -89,11 +90,11 @@ export class ThemeManager {
     createThemeSelector() {
         return `
             <div class="theme-selector">
-                <label for="theme-select" class="form-label">Thème</label>
+                <label for="theme-select" class="form-label">${MESSAGES.themeLabel}</label>
                 <select id="theme-select" class="form-control">
-                    <option value="auto" ${!this.getStoredTheme() ? 'selected' : ''}>Automatique</option>
-                    <option value="light" ${this.currentTheme === 'light' && this.getStoredTheme() ? 'selected' : ''}>Clair</option>
-                    <option value="dark" ${this.currentTheme === 'dark' && this.getStoredTheme() ? 'selected' : ''}>Sombre</option>
+                    <option value="${MESSAGES.themeAuto}" ${!this.getStoredTheme() ? 'selected' : ''}>${MESSAGES.themeAuto}</option>
+                    <option value="${MESSAGES.themeLight}" ${this.currentTheme === MESSAGES.themeLight && this.getStoredTheme() ? 'selected' : ''}>${MESSAGES.themeLight}</option>
+                    <option value="${MESSAGES.themeDark}" ${this.currentTheme === MESSAGES.themeDark && this.getStoredTheme() ? 'selected' : ''}>${MESSAGES.themeDark}</option>
                 </select>
             </div>
         `;

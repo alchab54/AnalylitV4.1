@@ -1,9 +1,10 @@
 import { fetchAPI } from './api.js';
+import { API_ENDPOINTS, MESSAGES } from './constants.js';
 
 // REMPLACEZ le contenu de tasks.js
 export async function fetchTasks() {
     try {
-        const response = await fetchAPI('/tasks/status');
+        const response = await fetchAPI(API_ENDPOINTS.tasksStatus);
         
         // CORRECTION : Traite les tâches avec job_id
         const tasks = response.tasks || [];
@@ -23,9 +24,9 @@ export async function fetchTasks() {
 
         const tasksContainer = document.getElementById('tasks-list');
         if (tasksContainer) {
-            tasksContainer.innerHTML = tasksHtml || '<p>Aucune tâche en cours</p>';
+            tasksContainer.innerHTML = tasksHtml || `<p>${MESSAGES.noTasksInProgress}</p>`;
         }
     } catch (error) {
-        console.error('Erreur lors du chargement des tâches:', error);
+        console.error(MESSAGES.errorLoadingTasks, error);
     }
 }

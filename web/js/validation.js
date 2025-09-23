@@ -2,6 +2,7 @@
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { showLoadingOverlay, showToast, escapeHtml } from './ui-improved.js';
+import { API_ENDPOINTS, MESSAGES } from './constants.js';
 import { loadProjectGrids } from './grids.js';
 import { setCurrentValidations } from './state.js';
 
@@ -13,15 +14,15 @@ export async function handleValidateExtraction(extractionId, decision) {
         // Utiliser l'évaluateur actif depuis l'état de l'application
         const activeEvaluator = appState.activeEvaluator || 'evaluator1'; // Default to evaluator1 if not set
 
-        await fetchAPI(`/projects/${appState.currentProject.id}/extractions/${extractionId}/decision`, {
+        await fetchAPI(API_ENDPOINTS.projectExtractionDecision(appState.currentProject.id, extractionId), {
             method: 'PUT',
             body: { decision: decision, evaluator: activeEvaluator }
         });
         
         await loadValidationSection();
-        showToast('Décision mise à jour.', 'success');
+        showToast(MESSAGES.decisionUpdated, 'success');
     } catch (error) {
-        showToast(`Erreur de validation : ${error.message}`, 'error');
+        showToast(`${MESSAGES.validationError} : ${error.message}`, 'error');
     }
 }
 
