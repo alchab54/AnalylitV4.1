@@ -13,7 +13,7 @@ import {
     selectAllArticles, 
     loadSearchResults // --- LA FONCTION EST IMPORTÉE DEPUIS articles.js
 } from './articles.js';
-import {
+import { 
     exportAnalyses,
     runProjectAnalysis,
     showPRISMAModal,
