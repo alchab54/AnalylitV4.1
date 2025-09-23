@@ -106,10 +106,10 @@ export const MESSAGES = {
     loadError: "Impossible de charger l'application. Rechargez la page.",
     initialDataLoaded: (time) => `📊 Données initiales chargées en ${time}ms`,
     initialDataError: 'Erreur chargement initial:',
-    appStateLog: 'État de l'application:',
     debugInterface: '🎯 Interface de debug disponible: window.AnalyLit',
     error: 'Erreur',
     unknownError: 'Erreur inconnue',
+    appStateLog: 'État de l'application:',
 
     // Projets
     projectCreated: 'Projet créé avec succès',
@@ -274,4 +274,4 @@ export const CONFIG = {
     API_BASE_URL: 'http://localhost:8080/api',
     WEBSOCKET_URL: '/',
     LOCAL_STORAGE_LAST_SECTION: 'analylit_last_section',
-}; 
+};

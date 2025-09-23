@@ -78,24 +78,6 @@ export function renderSearchResultsTable() {
 
     const { selectedSearchResults, currentProjectExtractions, currentProjectFiles } = appState;
 
-    // ... le reste de la fonction renderSearchResultsTable reste inchangé
-    // ...
-}
-    
-export function displayEmptyArticlesState() {
-    const tableBody = document.querySelector(SELECTORS.articleTableBody); // Cible le corps du tableau
-    if (!tableBody) return;
-    tableBody.innerHTML = `
-        <tr class="empty-state-row">
-            <td colspan="6" class="text-center py-4">
-                <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                <h4>Aucun article trouvé</h4>
-                <p>Lancez une recherche pour commencer à collecter des articles.</p>
-            </td>
-        </tr>
-    `;
-}
-    
     const tableRows = appState.searchResults.map(article => {
         const isSelected = selectedSearchResults.has(article.article_id);
         const extraction = currentProjectExtractions.find(e => e.pmid === article.article_id);
@@ -182,7 +164,21 @@ export function displayEmptyArticlesState() {
         </div>`;
 
     updateSelectionCounter();
-} 
+}
+
+export function displayEmptyArticlesState() {
+    const tableBody = document.querySelector(SELECTORS.articleTableBody); // Cible le corps du tableau
+    if (!tableBody) return;
+    tableBody.innerHTML = `
+        <tr class="empty-state-row">
+            <td colspan="6" class="text-center py-4">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4>Aucun article trouvé</h4>
+                <p>Lancez une recherche pour commencer à collecter des articles.</p>
+            </td>
+        </tr>
+    `;
+}
 
 export function updateSelectionCounter() {
     const counter = document.querySelector('#selectedCount'); 
