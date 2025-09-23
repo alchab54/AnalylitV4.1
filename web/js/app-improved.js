@@ -11,6 +11,8 @@ import { renderImportSection, handleZoteroImport, showPmidImportModal, handleUpl
 import { startBatchProcessing, showRunExtractionModal, startFullExtraction } from './articles.js'; // Corrected from pipeline.js and results.js
 import { renderKnowledgeGraph, loadProjectAnalyses, exportAnalyses, runProjectAnalysis, showPRISMAModal, savePRISMAProgress, exportPRISMAReport } from './analyses.js';
 import { handleGeneratePrisma, renderReportingSection, generateBibliography, generateSummaryTable, exportSummaryTableExcel, savePrismaChecklist } from './reporting.js';
+import stakeholdersModule from './stakeholders.js';
+import reportingModule from './reporting.js';
 import { handleRunMetaAnalysis } from './analyses.js'; // Corrected from stats.js
 import { loadValidationSection, handleValidateExtraction, resetValidationStatus, filterValidationList } from './validation.js';
 import { loadQueuesStatus, handleClearQueue, handlePullModel, showEditPromptModal, handleSavePrompt } from './settings.js'; // Corrected from admin.js
@@ -116,6 +118,8 @@ async function initializeApplication() {
     try {
         setupDelegatedEventListeners();
         initializeWebSocket();
+        stakeholdersModule.init();
+        reportingModule.init();
         setInterval(fetchTasks, 5000); // Refresh tasks every 5 seconds
         await loadInitialData();
 

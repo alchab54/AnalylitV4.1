@@ -330,7 +330,7 @@ class GreyLiterature(Base):
 # Cette ligne force SQLAlchemy à reconnaître tous les modèles
 __all__ = [
     'Project', 'SearchResult', 'Extraction', 'AnalysisProfile', 
-    'Grid', 'Prompt', 'ChatMessage', 'RiskOfBias', 'GreyLiterature'
+    'Grid', 'Prompt', 'ChatMessage', 'RiskOfBias', 'GreyLiterature', 'Stakeholder'
 ]
 
 class ProcessingLog(Base):
@@ -358,3 +358,24 @@ class ProcessingLog(Base):
             "message": self.message,
             "timestamp": self.timestamp.isoformat(),
         }
+
+class Stakeholder(Base):
+    __tablename__ = 'stakeholders'
+    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+
+    id = Column(String, primary_key=True, default=_uuid)
+    project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
+    project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
+    name = Column(String, nullable=False)
+    role = Column(String)
+    contact_info = Column(Text)
+    notes = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        data = {}
+        for c in self.__table__.columns:
+            v = getattr(self, c.name)
+            data[c.name] = v.isoformat() if isinstance(v, datetime) else v
+        return data

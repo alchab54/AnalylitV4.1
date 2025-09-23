@@ -32,6 +32,10 @@ export const SELECTORS = {
     tasksContainer: '#tasksContainer',
     gridsContainer: '#gridsContainer',
     searchContainer: '#searchContainer',
+    stakeholdersContainer: '#stakeholdersContainer',
+    stakeholdersList: '#stakeholdersList',
+    createStakeholderBtn: '#createStakeholderBtn',
+    newStakeholderForm: '#newStakeholderForm',
 
     // Paramètres
     settingsForm: '#profile-edit-form',
@@ -64,6 +68,15 @@ export const API_ENDPOINTS = {
     projectRob: (id, articleId) => `/projects/${id}/risk-of-bias/${articleId}`,
     projectPrismaChecklist: (id) => `/projects/${id}/prisma-checklist`,
     projectExportAnalyses: (id) => `/projects/${id}/export/analyses`,
+
+    // Stakeholders
+    projectStakeholders: (projectId) => `/projects/${projectId}/stakeholders`,
+    stakeholderById: (projectId, stakeholderId) => `/projects/${projectId}/stakeholders/${stakeholderId}`,
+
+    // Reporting
+    reportBibliography: (projectId) => `/projects/${projectId}/reports/bibliography`,
+    reportSummaryTable: (projectId) => `/projects/${projectId}/reports/summary-table`,
+    reportExcelExport: (projectId) => `/projects/${projectId}/reports/excel-export`,
 
     // Grids
     grids: (projectId) => `/projects/${projectId}/grids`,
@@ -115,7 +128,7 @@ export const MESSAGES = {
     projectCreated: 'Projet créé avec succès',
     projectDeleted: 'Projet supprimé',
     projectNameRequired: 'Le nom du projet est requis.',
-    creatingProject: 'Création du projet...',
+    creatingProject: 'Création du projet...', 
     deletingProject: 'Suppression du projet...', 
     projectIdMissingForExport: "ID du projet manquant pour l'exportation.",
     projectExportStarted: "L'exportation du projet a commencé...",
@@ -159,7 +172,7 @@ export const MESSAGES = {
     analysisStartedSimple: (type) => `La génération pour ${type} a été lancée.`,
     errorStartingAnalysis: "Erreur lors du lancement de l'analyse",
     advancedAnalysisModalTitle: 'Lancer une Analyse Avancée',
-    startingMetaAnalysis: 'Lancement de la méta-analyse...',
+    startingMetaAnalysis: 'Lancement de la méta-analyse...', 
     metaAnalysisStarted: 'Méta-analyse lancée avec succès.',
     startingDescriptiveStats: 'Calcul des statistiques descriptives...', 
     descriptiveStatsStarted: 'Calcul des statistiques lancé.',
@@ -222,14 +235,14 @@ export const MESSAGES = {
     // Import
     selectProjectForImport: 'Veuillez sélectionner un projet pour gérer les imports et les fichiers.',
     manualImportTitle: 'Import Manuel PMID/DOI',
-    searchingFreePdfs: 'Recherche des PDFs gratuits...',
+    searchingFreePdfs: 'Recherche des PDFs gratuits...', 
     pdfSearchStarted: 'Recherche de PDFs lancée en arrière-plan.',
     generatingThesisExport: "Génération de l'export thèse...",
     startingIndexing: "Lancement de l'indexation...",
-    indexingInProgress: 'Indexation en cours...',
+    indexingInProgress: 'Indexation en cours...', 
     indexingStarted: 'Indexation lancée en arrière-plan.',
     zoteroSyncNotImplemented: 'Synchronisation Zotero non implémentée dans cette version.',
-    importingZoteroFile: 'Import du fichier Zotero...',
+    importingZoteroFile: 'Import du fichier Zotero...', 
     zoteroImportSuccess: (count) => `${count} références importées.`,
     zoteroImportError: "Erreur lors de l'import Zotero",
     pmidImportFieldNotFound: "Erreur : le champ d'import de PMID n'a pas été trouvé.",
@@ -245,10 +258,10 @@ export const MESSAGES = {
     uploadError: "l'upload",
 
     // Search
-    selectProjectForSearch: 'Veuillez sélectionner un projet pour commencer une recherche.',
+    selectProjectForSearch: 'Veuillez sélectionner un un projet pour commencer une recherche.',
     expertQueryRequired: 'Veuillez saisir au moins une requête en mode expert.',
     searchQueryRequired: 'Veuillez saisir une requête de recherche.',
-    searching: 'Recherche en cours...',
+    searching: 'Recherche en cours...', 
     searchStarted: 'Recherche lancée en arrière-plan. Les résultats apparaîtront progressivement.',
     newSearch: 'Nouvelle Recherche',
 
@@ -264,7 +277,7 @@ export const MESSAGES = {
 
     // Chat
     enterQuestion: 'Veuillez saisir une question',
-    questionSent: 'Question envoyée. Réponse en cours...',
+    questionSent: 'Question envoyée. Réponse en cours...', 
     errorSendingQuestion: "Erreur lors de l'envoi de la question", // Correction : Ajout d'une virgule
     selectProjectForIndexing: "Veuillez sélectionner un projet pour lancer l'indexation.",
     errorStartingIndexing: "Erreur lors du lancement de l'indexation",

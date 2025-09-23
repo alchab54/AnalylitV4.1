@@ -64,10 +64,13 @@
 - **Gestion des Articles (`articles.js`):**
     - La fonction `handleDeleteSelectedArticles` a été réactivée. Elle utilise la route `/articles/batch-delete` comme spécifié dans les instructions initiales.
 
-### ❌ Fonctionnalités Restant Désactivées (Backend Manquant)
+- **Parties Prenantes (`stakeholders.js`):**
+    - Implémentation complète du module de gestion des parties prenantes, incluant les opérations CRUD via les routes API dédiées.
 
-- **Rapports (`reporting.js`):** Les fonctions `generateBibliography`, `generateSummaryTable`, et `exportSummaryTableExcel` restent désactivées car les routes backend dédiées n'existent pas.
-- **Parties Prenantes (`stakeholders.js`):** L'ensemble du module reste désactivé en l'absence des routes API correspondantes.
+- **Rapports (`reporting.js`):**
+    - Implémentation des fonctions de génération de bibliographie, de tableau de synthèse et d'export Excel, utilisant les routes API dédiées pour enfiler les tâches de fond.
+
+
 
 ### Fichiers Modifiés
 
