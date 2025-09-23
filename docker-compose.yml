@@ -80,6 +80,8 @@ services:
           memory: 12000M
     # La commande est maintenant dans entrypoint.sh
     depends_on:
+      base:
+        condition: service_started
       db:
         condition: service_healthy
       redis:
@@ -94,6 +96,7 @@ services:
       - ./run_migrations.py:/home/appuser/app/run_migrations.py
       - ./web:/home/appuser/app/web # Assuming this is for static/template files
       - ./server_v4_complete.py:/home/appuser/app/server_v4_complete.py
+
   # Workers multiples pour paralléliser les tâches
   worker-fast:
     build:
@@ -110,6 +113,8 @@ services:
       restart_policy:
         condition: on-failure
         delay: 5s
+    depends_on:
+      - base
 
   worker-default:
     build:
@@ -126,6 +131,8 @@ services:
       restart_policy:
         condition: on-failure
         delay: 5s
+    depends_on:
+      - base
 
   # Worker dédié à l'IA, avec accès au GPU
   worker-ai:
@@ -152,6 +159,8 @@ services:
       restart_policy:
         condition: on-failure
         delay: 5s
+    depends_on:
+      - base
 
 volumes:
   postgres_data:

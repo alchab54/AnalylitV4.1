@@ -229,7 +229,7 @@ function createSettingsLayout() {
                         <option value="phi3:mini">Phi-3 Mini</option>
                         <option value="mistral:8x7b">Mistral 8x7B</option>
                     </select>
-                    <button id="download-model-btn" class="btn btn-primary">Télécharger le Modèle</button>
+                    <button data-action="download-selected-model" class="btn btn-primary">Télécharger le Modèle</button>
                     <div id="download-progress" class="progress-container" style="display:none;">
                         <div class="progress-bar" id="download-progress-bar"></div>
                         <span id="download-status">Téléchargement en cours...</span>
@@ -338,12 +338,6 @@ function setupSettingsEventListeners() {
         showToast("Rafraîchissement du statut des files...", 'info');
         await loadQueuesStatus();
         renderQueueStatus(appState.queuesInfo, document.getElementById('queue-status-container'));
-    });
-
-    document.getElementById('download-model-btn').addEventListener('click', async () => {
-        const select = document.getElementById('available-models-select');
-        const modelName = select.value;
-        await downloadModel(modelName);
     });
 
     // Écouteur pour le formulaire
@@ -830,6 +824,18 @@ export function openProfileEditor(profileId = null) {
         console.log('Creating new profile');
     }
     openModal('profileEditorModal'); // Assurez-vous que ce modal existe dans votre HTML
+}
+
+export function handleDownloadSelectedModel() {
+    const select = document.getElementById('available-models-select');
+    if (select) {
+        const modelName = select.value;
+        // Appelle la logique que Gemini a écrite
+        downloadModel(modelName); 
+    } else {
+        console.error("L'élément select 'available-models-select' est introuvable.");
+        showToast("Erreur : Impossible de trouver la liste des modèles.", 'error');
+    }
 }
 
 // --- New functions from GEMINI.md ---
