@@ -14,7 +14,7 @@ export default {
   ],
   coverageDirectory: 'reports/coverage-frontend',
   coverageReporters: ['text', 'lcov', 'html'],
-  setupFilesAfterEnv: ['@testing-library/jest-dom'],
+  setupFilesAfterEnv: ['@testing-library/jest-dom', '<rootDir>/web/js/tests/jest.setup.js'],
   verbose: true,
   transform: {
     '^.+\.js$': 'babel-jest',

@@ -1251,7 +1251,7 @@ def generate_summary_table_task(session, project_id: str):
             .filter(SearchResult.project_id == project_id, Extraction.project_id == project_id)
             .all()
         )
-Ce que j'ai changé :
+
         if not results:
             send_project_notification(project_id, 'report_completed', 'Aucune donnée d\'extraction pour le tableau de synthèse.')
             return
