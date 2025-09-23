@@ -325,10 +325,10 @@ function renderAnalysisProfilesList(profiles, container) {
  */
 function setupSettingsEventListeners() {
     // Écouteurs pour les boutons principaux
-    document.querySelector(SELECTORS.newProfileBtn)?.addEventListener('click', handleNewProfile);
-    document.querySelector(SELECTORS.deleteProfileBtn)?.addEventListener('click', handleDeleteProfile);
+    document.querySelector('#new-profile-btn')?.addEventListener('click', handleNewProfile);
+    document.querySelector('#delete-profile-btn')?.addEventListener('click', handleDeleteProfile);
     document.querySelector('#apply-template-btn')?.addEventListener('click', () => {
-        const select = document.querySelector(SELECTORS.promptTemplateSelect);
+        const select = document.querySelector('#prompt-template-select');
         if (select.value) {
             applyPromptTemplate(select.value);
         }
@@ -336,7 +336,7 @@ function setupSettingsEventListeners() {
     document.querySelector(SELECTORS.refreshQueuesBtn)?.addEventListener('click', async () => {
         showToast(MESSAGES.refreshingQueuesStatus, 'info');
         await loadQueuesStatus();
-        renderQueueStatus(appState.queuesInfo, document.querySelector(SELECTORS.queueStatusContainer));
+        renderQueueStatus(appState.queuesInfo, document.querySelector('#queue-status-container'));
     });
 
     // Écouteur pour le formulaire
@@ -389,7 +389,7 @@ function renderPromptTemplates(prompts, container) {
  * Remplit tous les <select> de modèles avec les modèles Ollama récupérés.
  */
 function populateModelSelects(models) {
-    const modelSelects = document.querySelectorAll(SELECTORS.modelSelects);
+    const modelSelects = document.querySelectorAll('.model-select');
     if (!models || models.length === 0) {
         modelSelects.forEach(select => {
             select.innerHTML = `<option value="">${MESSAGES.noOllamaModelFound}</option>`;
@@ -472,7 +472,7 @@ export function selectProfile(profileId) {
  * Affiche les données d'un profil sélectionné dans les champs du formulaire et les éditeurs.
  */
 function renderProfileForm(profile) {
-    const form = document.querySelector(SELECTORS.settingsForm);
+    const form = document.querySelector('#profile-edit-form');
     if (!form) return;
 
     form.querySelector('#profile-id').value = profile.id || '';
@@ -489,7 +489,7 @@ function renderProfileForm(profile) {
     });
 
     // Gérer le bouton de suppression
-    const deleteBtn = document.querySelector(SELECTORS.deleteProfileBtn);
+    const deleteBtn = document.querySelector('#delete-profile-btn');
     if (profile.is_default || profile.id.startsWith('new_')) {
         deleteBtn.disabled = true;
         deleteBtn.title = profile.is_default ? MESSAGES.cannotDeleteDefaultProfile : "";
@@ -578,7 +578,7 @@ function getPromptEditorValues() {
  * Collecte toutes les données du formulaire de profil dans un objet JSON propre.
  */
 function collectProfileData() {
-    const form = document.querySelector(SELECTORS.settings_form);
+    const form = document.querySelector(SELECTORS.settingsForm);
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
@@ -618,7 +618,7 @@ function handleNewProfile() {
     renderProfileForm(newProfile);
 
     // Mettre l'ID à "" pour indiquer à l'API qu'il s'agit d'un POST (Créer)
-    document.querySelector(SELECTORS.profileId).value = "";
+    document.querySelector('#profile-id').value = "";
     
     // Désélectionner dans la liste
     document.querySelectorAll(`${SELECTORS.settingsContainer} .list-item`).forEach(item => {
@@ -641,7 +641,7 @@ export async function handleSaveProfile(e) {
 
     try {
         const profileData = collectProfileData();
-        const profileId = document.querySelector(SELECTORS.profileId).value;
+        const profileId = document.querySelector('#profile-id').value;
 
         let url = API_ENDPOINTS.analysisProfiles;
         let method = 'POST';
@@ -826,7 +826,7 @@ export function openProfileEditor(profileId = null) {
 }
 
 export function handleDownloadSelectedModel() {
-    const select = document.querySelector(SELECTORS.availableModelsSelect);
+    const select = document.querySelector('#available-models-select');
     if (select) {
         const modelName = select.value;
         // Appelle la logique que Gemini a écrite
@@ -863,7 +863,7 @@ export async function downloadModel(modelName) {
 export async function loadInstalledModels() {
     try {
         const response = await fetchAPI(API_ENDPOINTS.ollamaModels);
-        const modelsList = document.querySelector(SELECTORS.installedModelsList);
+        const modelsList = document.querySelector('#installed-models-list');
         modelsList.innerHTML = response.models
             .map(
                 (model) =>
@@ -876,12 +876,12 @@ export async function loadInstalledModels() {
 }
 
 function showDownloadProgress(modelName) {
-    const progressContainer = document.querySelector(SELECTORS.downloadProgress);
-    const statusElement = document.querySelector(SELECTORS.downloadStatus);
+    const progressContainer = document.querySelector('#download-progress');
+    const statusElement = document.querySelector('#download-status');
     progressContainer.style.display = 'block';
     statusElement.textContent = MESSAGES.downloadingModel(modelName);
 }
 
 function hideDownloadProgress() {
-    document.querySelector(SELECTORS.downloadProgress).style.display = 'none';
+    document.querySelector('#download-progress').style.display = 'none';
 }

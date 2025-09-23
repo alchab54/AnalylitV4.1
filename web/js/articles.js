@@ -64,15 +64,27 @@ export function renderSearchResultsTable() {
     }
 
     if (appState.searchResults.length === 0) {
-        elements.resultsContainer.innerHTML = `
-            <div class="results-empty">
-                <h3>${MESSAGES.noArticles}</h3> 
-                <p>Lancez une recherche pour voir les articles.</p>
-            </div>`;
+        // Utiliser la nouvelle fonction dédiée
+        displayEmptyArticlesState();
         return;
     }
 
     const { selectedSearchResults, currentProjectExtractions, currentProjectFiles } = appState;
+
+    // ... le reste de la fonction renderSearchResultsTable reste inchangé
+    // ...
+}
+
+export function displayEmptyArticlesState() {
+    if (!elements.resultsContainer) return;
+    elements.resultsContainer.innerHTML = `
+        <div class="results-empty">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4>Aucun article trouvé</h4>
+            <p>Lancez une recherche pour commencer à collecter des articles.</p>
+        </div>
+    `;
+}
     
     const tableRows = appState.searchResults.map(article => {
         const isSelected = selectedSearchResults.has(article.article_id);
