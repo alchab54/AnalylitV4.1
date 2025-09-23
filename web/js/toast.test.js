@@ -7,7 +7,7 @@ describe('Module Toast - Notifications', () => {
   
   beforeEach(() => {
     // Nettoie le DOM avant chaque test
-    document.body.innerHTML = '';
+    document.body.innerHTML = '<div id="toastContainer"></div>';
     
     // Mock de setTimeout pour contrôler les timers
     jest.useFakeTimers();

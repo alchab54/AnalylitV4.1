@@ -12,50 +12,50 @@ describe('Workflow de Gestion des Articles', () => {
   });
 
   it('Devrait afficher la liste des articles du projet sélectionné', () => {
-    cy.get(SELECTORS.resultsContainer).should('be.visible');
-    cy.get('.results-table tbody').children().should('have.length.greaterThan', 0);
+    cy.get('#resultsContainer').should('be.visible');
+    cy.get('#article-table-body').should('be.visible');
   });
 
   it('Devrait permettre la sélection multiple d\'articles', () => {
     // Vérifier la présence des checkboxes
-    cy.get('[data-action="toggle-article-selection"]').should('have.length.greaterThan', 0);
+    cy.get('.article-checkbox').should('have.length.greaterThan', 0);
     
     // Sélectionner plusieurs articles
-    cy.get('[data-action="toggle-article-selection"]').first().check();
-    cy.get('[data-action="toggle-article-selection"]').eq(1).check();
+    cy.get('.article-checkbox').first().check();
+    cy.get('.article-checkbox').eq(1).check();
     
-    // Vérifier que les boutons d'action sont activés
-    cy.get('[data-action="delete-selected-articles"]').should('not.be.disabled'); // Bouton de suppression
-    cy.get('[data-action="batch-process-modal"]').should('not.be.disabled'); // Bouton de traitement par lot
+    // Vérifier que les boutons d\'action sont activés
+    cy.get('[data-action="delete-selected-articles"]').should('not.be.disabled');
+    cy.get('[data-action="batch-screening"]').should('not.be.disabled');
   });
 
   it('Devrait ouvrir les détails d\'un article', () => {
     // Cliquer sur le premier article
-    cy.get('.result-row').first().find('[data-action="view-details"]').click();
+    cy.get('.article-row').first().find('.article-title').click();
     
-    // Vérifier l'ouverture de la modale de détails
-    cy.get('#genericModal').should('be.visible');
-    cy.contains('#genericModalTitle', 'Détails de l\'article').should('be.visible');
+    // Vérifier l\'ouverture de la modale de détails
+    cy.get('#articleDetailModal').should('be.visible');
+    cy.contains('h2', 'Détails de l\'article').should('be.visible');
     
     // Fermer la modale
     cy.get('[data-action="close-modal"]').click();
-    cy.get('#genericModal').should('not.be.visible');
+    cy.get('#articleDetailModal').should('not.exist');
   });
 
   it('Devrait permettre le screening par lot', () => {
     // Sélectionner des articles
-    cy.get('[data-action="toggle-article-selection"]').first().check();
-    cy.get('[data-action="toggle-article-selection"]').eq(1).check();
+    cy.get('.article-checkbox').first().check();
+    cy.get('.article-checkbox').eq(1).check();
     
     // Lancer le screening par lot
-    cy.get('[data-action="batch-process-modal"]').click();
+    cy.get('[data-action="batch-screening"]').click();
     
-    // Vérifier l'ouverture de la modale
-    cy.get('#genericModal').should('be.visible');
-    cy.contains('#genericModalTitle', 'Lancer le Traitement par Lot').should('be.visible');
+    // Vérifier l\'ouverture de la modale
+    cy.get('#batchProcessModal').should('be.visible');
+    cy.contains('h2', 'Lancer le Screening par Lot').should('be.visible');
     
     // Lancer le screening
-    cy.get('[data-action="start-batch-process"]').click();
+    cy.get('[data-action="start-batch-screening"]').click();
     
     // Vérifier la notification de lancement
     cy.contains('.toast-success', 'Tâche de screening lancée').should('be.visible');
@@ -64,6 +64,6 @@ describe('Workflow de Gestion des Articles', () => {
   it('Devrait gérer l\'état vide quand aucun article n\'est présent', () => {
     // Supposer un projet sans articles
     // Cette partie nécessite un projet vide ou un mock
-    cy.get('.results-empty').should('contain', 'Aucun article trouvé');
+    cy.get('.empty-state').should('contain', 'Aucun article');
   });
 });

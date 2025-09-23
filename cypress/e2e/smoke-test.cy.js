@@ -22,7 +22,7 @@ describe('Tests de Smoke - Vérifications de base AnalyLit', () => {
 
   it('Devrait afficher la section des projets par défaut', () => {
     cy.contains('Projets').should('be.visible');
-    cy.get('[data-section-id="projects"]').should('have.class', 'app-nav__button--active');
+    cy.get('[data-section-id="projects"]').should('have.class', 'active');
   });
 
   it('Devrait permettre la navigation entre les sections principales', () => {
@@ -45,8 +45,8 @@ describe('Tests de Smoke - Vérifications de base AnalyLit', () => {
 
   it('Devrait vérifier la connexion WebSocket', () => {
     // Vérifier l'indicateur de connexion WebSocket
-    cy.get('[data-connection-status]', { timeout: 10000 })
+    cy.get('.connection-indicator', { timeout: 10000 })
       .should('be.visible')
-      .and('not.contain', '❌'); // Vérifie qu'il n'y a pas d'erreur de connexion
+      .and('contain', 'Connecté');
   });
 });

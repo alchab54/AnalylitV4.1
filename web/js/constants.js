@@ -17,6 +17,7 @@ export const SELECTORS = {
     projectDetailContent: '#projectDetailContent',
     projectPlaceholder: '#projectPlaceholder',
     newProjectForm: '#newProjectForm',
+    projectContainer: '#projectContainer', // Added missing constant
 
     // Articles / Résultats
     resultsContainer: '#resultsContainer',
@@ -123,6 +124,7 @@ export const MESSAGES = {
     error: 'Erreur',
     unknownError: 'Erreur inconnue',
     appStateLog: 'État de lapplication:',
+    loading: 'Chargement...', // Added missing constant
     
     // Projets
     projectCreated: 'Projet créé avec succès',
@@ -160,7 +162,7 @@ export const MESSAGES = {
     analysisStarted: 'Analyse lancée avec succès',
     selectProjectToViewAnalyses: 'Sélectionnez un projet pour voir les analyses.',
     errorLoadingAnalyses: 'Erreur lors du chargement des analyses',
-    savingPrisma: 'Sauvegarde PRISMA...',
+    savingPrisma: 'Sauvegarde PRISMA...', 
     prismaSaved: 'Progression PRISMA sauvegardée.',
     prismaExportNotImplemented: 'Export PRISMA non implémenté.',
     atnAnalysisStarted: "Lancement de l'analyse ATN...",
@@ -169,7 +171,7 @@ export const MESSAGES = {
     startingAnalysis: (type) => `Lancement de la génération pour ${type}...`,
     unknownAnalysisType: "Type d'analyse inconnu.",
     analysisJobStarted: (type, jobId) => `La génération pour ${type} a été lancée (Job: ${jobId}).`,
-    analysisStartedSimple: (type) => `La génération pour ${type} a été lancée.`,
+    analysisStartedSimple: (type) => `La génération pour ${type} a été lancée.`, 
     errorStartingAnalysis: "Erreur lors du lancement de l'analyse",
     advancedAnalysisModalTitle: 'Lancer une Analyse Avancée',
     startingMetaAnalysis: 'Lancement de la méta-analyse...', 
@@ -197,20 +199,20 @@ export const MESSAGES = {
     cannotDeleteDefaultProfile: "Impossible de supprimer le profil par défaut.",
     deleteThisProfile: "Supprimer ce profil",
     templateApplied: (name, type) => `Modèle '${name}' appliqué aux éditeurs '${type}'.`,
-    cannotApplyTemplate: `Impossible de déterminer à quel éditeur ce modèle s'applique. Veuillez sélectionner un onglet.`,
+    cannotApplyTemplate: `Impossible de déterminer à quel éditeur ce modèle s'applique. Veuillez sélectionner un onglet.`, 
     saving: 'Sauvegarde...', 
-    profileSaved: (name) => `Profil '${name}' sauvegardé.`,
+    profileSaved: (name) => `Profil '${name}' sauvegardé.`, 
     errorSavingProfile: "Erreur lors de la sauvegarde du profil:",
     cannotDeleteProfile: "Impossible de supprimer ce profil (défaut ou non sélectionné).",
     confirmProfileDeleteTitle: 'Confirmer la suppression',
-    confirmProfileDeleteBody: (name) => `Êtes-vous sûr de vouloir supprimer définitivement le profil "${name}" ?`,
+    confirmDeleteProjectBody: (name) => `Êtes-vous sûr de vouloir supprimer le projet "<strong>${name}</strong>" ?`,
     deleteButton: 'Supprimer',
-    profileDeleted: (name) => `Profil "${name}" supprimé.`,
+    profileDeleted: (name) => `Profil "${name}" supprimé.`, 
     errorDeletingProfile: "Erreur lors de la suppression du profil:",
     clearQueueTitle: 'Vider la file d\'attente',
-    confirmClearQueueBody: (name) => `Êtes-vous sûr de vouloir vider la file "${name}" ? Toutes les tâches en attente seront perdues.`,
+    confirmClearQueueBody: (name) => `Êtes-vous sûr de vouloir vider la file "${name}" ? Toutes les tâches en attente seront perdues.`, 
     clearButton: 'Vider',
-    queueCleared: (name) => `La file "${name}" a été vidée.`,
+    queueCleared: (name) => `La file "${name}" a été vidée.`, 
     promptSaved: 'Modèle de prompt sauvegardé.',
     selectNotFound: "L'élément select 'available-models-select' est introuvable.",
     modelListNotFound: "Erreur : Impossible de trouver la liste des modèles.",
@@ -229,7 +231,7 @@ export const MESSAGES = {
     invalidJsonFile: 'Veuillez sélectionner un fichier .json valide.',
     gridImported: 'Grille importée avec succès.',
     gridNameAndFieldRequired: 'Le nom de la grille et au moins un champ sont requis.',
-    gridSaved: (isUpdate) => `Grille ${isUpdate ? 'mise à jour' : 'créée'} avec succès.`,
+    gridSaved: (isUpdate) => `Grille ${isUpdate ? 'mise à jour' : 'créée'} avec succès.`, 
     errorSavingGrid: 'Erreur lors de la sauvegarde de la grille',
 
     // Import
@@ -243,7 +245,7 @@ export const MESSAGES = {
     indexingStarted: 'Indexation lancée en arrière-plan.',
     zoteroSyncNotImplemented: 'Synchronisation Zotero non implémentée dans cette version.',
     importingZoteroFile: 'Import du fichier Zotero...', 
-    zoteroImportSuccess: (count) => `${count} références importées.`,
+    zoteroImportSuccess: (count) => `${count} références importées.`, 
     zoteroImportError: "Erreur lors de l'import Zotero",
     pmidImportFieldNotFound: "Erreur : le champ d'import de PMID n'a pas été trouvé.",
     atLeastOneIdRequired: 'Veuillez saisir au moins un identifiant.',
@@ -278,7 +280,7 @@ export const MESSAGES = {
     // Chat
     enterQuestion: 'Veuillez saisir une question',
     questionSent: 'Question envoyée. Réponse en cours...', 
-    errorSendingQuestion: "Erreur lors de l'envoi de la question", // Correction : Ajout d'une virgule
+    errorSendingQuestion: "Erreur lors de l'envoi de la question",
     selectProjectForIndexing: "Veuillez sélectionner un projet pour lancer l'indexation.",
     errorStartingIndexing: "Erreur lors du lancement de l'indexation",
 };

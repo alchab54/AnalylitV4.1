@@ -32,7 +32,12 @@ describe('fetchAPI Utility', () => {
     const result = await fetchAPI('/test-endpoint');
     
     expect(result).toEqual(mockData);
-    expect(global.fetch).toHaveBeenCalledWith('/api/test-endpoint', {});
+    expect(global.fetch).toHaveBeenCalledWith('/api/test-endpoint', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    });
   });
 
   test('devrait retourner un tableau vide pour une réponse vide sur un endpoint de collection', async () => {

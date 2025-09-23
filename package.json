@@ -13,25 +13,11 @@
     "install-deps": "npm install"
   },
   "devDependencies": {
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
+    "@babel/preset-env": "^7.28.3",
+    "@testing-library/jest-dom": "^6.1.0",
+    "babel-jest": "^30.1.2",
     "cypress": "^13.10.0",
-    "@testing-library/jest-dom": "^6.1.0"
-  },
-  "jest": {
-    "testEnvironment": "jest-environment-jsdom",
-    "roots": ["<rootDir>/web/js"],
-    "testMatch": ["**/__tests__/**/*.js", "**/?(*.)+(spec|test).js"],
-    "collectCoverageFrom": [
-      "web/js/**/*.js",
-      "!web/js/**/*.test.js",
-      "!web/js/**/*.cy.js",
-      "!web/js/tests/**",
-      "!**/node_modules/**"
-    ],
-    "coverageDirectory": "reports/coverage-frontend",
-    "coverageReporters": ["text", "lcov", "html"],
-    "setupFilesAfterEnv": ["@testing-library/jest-dom"],
-    "verbose": true
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
   }
 }

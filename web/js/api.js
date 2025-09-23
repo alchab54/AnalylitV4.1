@@ -29,7 +29,14 @@ export async function fetchAPI(endpoint, options = {}) {
         
         const text = await response.text();
         // Gère le cas où la réponse est vide
-        return text ? JSON.parse(text) : {};
+        if (!text) {
+            // Si l'endpoint est une collection (ex: /results, /articles), retourne un tableau vide
+            if (endpoint.includes('/results') || endpoint.includes('/articles')) {
+                return [];
+            }
+            return {};
+        }
+        return JSON.parse(text);
 
     } catch (error) {
         console.error(`❌ API Error for ${url}:`, error);

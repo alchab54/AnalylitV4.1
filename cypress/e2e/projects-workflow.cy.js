@@ -7,12 +7,12 @@ describe('Workflow de Gestion des Projets', () => {
 
   it('Devrait ouvrir et fermer la modale de création de projet', () => {
     // Ouvrir la modale
-    cy.get('#createProjectBtn').click(); // Utilisation de l'ID du bouton
+    cy.get('[data-action="create-project-modal"]').click();
     cy.get('#newProjectModal').should('be.visible');
-    cy.contains('.modal__header h3', 'Nouveau Projet').should('be.visible');
+    cy.contains('h2', 'Nouveau Projet').should('be.visible');
     
     // Fermer la modale
-    cy.get('#newProjectModal [data-action="close-modal"]').click();
+    cy.get('[data-action="close-modal"]').click();
     cy.get('#newProjectModal').should('not.exist');
   });
 
@@ -36,17 +36,17 @@ describe('Workflow de Gestion des Projets', () => {
   });
 
   it('Devrait afficher les détails d\'un projet sélectionné', () => {
-    // Supposer qu'il y a au moins un projet
+    // Supposer qu\'il y a au moins un projet
     cy.get('.project-card').first().click();
     
-    // Vérifier l'affichage des détails
+    // Vérifier l\'affichage des détails
     cy.get('.project-detail').should('be.visible');
     cy.get('.metrics-grid').should('be.visible');
     cy.get('.metric-card').should('have.length.greaterThan', 0);
   });
 
   it('Devrait permettre la suppression d\'un projet', () => {
-    // Créer d'abord un projet pour le supprimer
+    // Créer d\'abord un projet pour le supprimer
     cy.get('[data-action="create-project-modal"]').click();
     cy.get('#projectName').type('Projet à Supprimer');
     cy.get('#projectDescription').type('Ce projet sera supprimé');
@@ -66,7 +66,7 @@ describe('Workflow de Gestion des Projets', () => {
     // Vérifier la notification de suppression
     cy.contains('.toast-success', 'Projet supprimé').should('be.visible');
     
-    // Vérifier que le projet n'apparaît plus
-    cy.contains('.project-card', projectToDelete).should('not.exist');
+    // Vérifier que le projet n\'apparaît plus
+    cy.contains('.project-card', 'Projet à Supprimer').should('not.exist');
   });
 });

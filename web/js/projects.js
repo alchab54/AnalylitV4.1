@@ -348,6 +348,5 @@ export {
     renderProjectsList,
     updateProjectListSelection,
     renderProjectDetail,
-    getStatusText,
-    displayEmptyProjectsState
+    getStatusText
 };

@@ -16,8 +16,9 @@ export default {
   coverageReporters: ['text', 'lcov', 'html'],
   setupFilesAfterEnv: ['@testing-library/jest-dom'],
   verbose: true,
-  transform: {},
-  extensionsToTreatAsEsm: ['.js'],
+  transform: {
+    '^.+\.js$': 'babel-jest',
+  },
   globals: {
     'ts-jest': {
       useESM: true
