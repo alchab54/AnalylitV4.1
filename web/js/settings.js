@@ -113,6 +113,7 @@ export function renderSettings() {
     populateModelSelects(models);
     renderPromptTemplates(prompts, document.getElementById('prompt-templates-list'));
     renderQueueStatus(queueStatus, document.getElementById('queue-status-container'));
+    loadInstalledModels();
 
     // 3. Initialiser les composants interactifs
     initializeAllEditors();
@@ -217,15 +218,24 @@ function createSettingsLayout() {
                     </div>
             </div>
             
-            <div class="settings-card">
+            <div id="models-management" class="settings-card">
                 <div class="settings-card__header">
-                    <h3>Gérer les Modèles Ollama</h3>
+                    <h3>Gestion des Modèles IA</h3>
                 </div>
                 <div class="settings-card__body">
-                    <p>Utilisez Ollama pour gérer les modèles (pull, delete, etc.).</p>
-                    <button class="btn btn--secondary" data-action="show-pull-model-modal" disabled>
-                        Pull un nouveau modèle (Bientôt)
-                    </button>
+                    <select id="available-models-select" class="form-control">
+                        <option value="llama3.1:8b">Llama 3.1 8B</option>
+                        <option value="llama3.1:70b">Llama 3.1 70B</option>
+                        <option value="phi3:mini">Phi-3 Mini</option>
+                        <option value="mistral:8x7b">Mistral 8x7B</option>
+                    </select>
+                    <button id="download-model-btn" class="btn btn-primary">Télécharger le Modèle</button>
+                    <div id="download-progress" class="progress-container" style="display:none;">
+                        <div class="progress-bar" id="download-progress-bar"></div>
+                        <span id="download-status">Téléchargement en cours...</span>
+                    </div>
+                    <h4>Modèles Installés</h4>
+                    <ul id="installed-models-list"></ul>
                 </div>
             </div>
         </div>
@@ -328,6 +338,12 @@ function setupSettingsEventListeners() {
         showToast("Rafraîchissement du statut des files...", 'info');
         await loadQueuesStatus();
         renderQueueStatus(appState.queuesInfo, document.getElementById('queue-status-container'));
+    });
+
+    document.getElementById('download-model-btn').addEventListener('click', async () => {
+        const select = document.getElementById('available-models-select');
+        const modelName = select.value;
+        await downloadModel(modelName);
     });
 
     // Écouteur pour le formulaire
@@ -767,25 +783,7 @@ export async function handleClearQueue(queueName) {
  * Gère le téléchargement (pull) d'un nouveau modèle Ollama.
  */
 export async function handlePullModel() {
-    const modelNameInput = document.getElementById('pullModelName');
-    const modelName = modelNameInput ? modelNameInput.value.trim() : null;
-
-    if (!modelName) {
-        showToast('Veuillez entrer un nom de modèle valide (ex: llama3:latest).', 'warning');
-        return;
-    }
-
-    closeModal('pullModelModal');
-    showLoadingOverlay(true, `Téléchargement du modèle "${modelName}"...`);
-
-    try {
-        await fetchAPI('/ollama/pull', { method: 'POST', body: { model_name: modelName } });
-        showToast(`Le téléchargement de "${modelName}" a commencé.`, 'info');
-    } catch (error) {
-        showToast(`Erreur lors du lancement du téléchargement : ${error.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
+    // This function is now handled by downloadModel
 }
 
 /**
@@ -832,4 +830,53 @@ export function openProfileEditor(profileId = null) {
         console.log('Creating new profile');
     }
     openModal('profileEditorModal'); // Assurez-vous que ce modal existe dans votre HTML
+}
+
+// --- New functions from GEMINI.md ---
+
+// Fonction pour démarrer le téléchargement d'un modèle
+export async function downloadModel(modelName) {
+    try {
+        showDownloadProgress(modelName);
+        const response = await fetchAPI('/api/ollama/pull', {
+            method: 'POST',
+            body: JSON.stringify({ model: modelName }),
+        });
+        if (response.success) {
+            showToast(`Modèle ${modelName} téléchargé avec succès`, 'success');
+            await loadInstalledModels();
+        } else {
+            throw new Error(response.error || 'Erreur inconnue');
+        }
+    } catch (error) {
+        showToast(`Erreur téléchargement : ${error.message}`, 'error');
+    } finally {
+        hideDownloadProgress();
+    }
+}
+
+export async function loadInstalledModels() {
+    try {
+        const response = await fetchAPI('/api/ollama/models');
+        const modelsList = document.getElementById('installed-models-list');
+        modelsList.innerHTML = response.models
+            .map(
+                (model) =>
+                `<li>${model.name} <span class="model-size">${model.size || ''}</span></li>`
+            )
+            .join('');
+    } catch (error) {
+        console.error('Erreur chargement modèles :', error);
+    }
+}
+
+function showDownloadProgress(modelName) {
+    const progressContainer = document.getElementById('download-progress');
+    const statusElement = document.getElementById('download-status');
+    progressContainer.style.display = 'block';
+    statusElement.textContent = `Téléchargement de ${modelName}...`;
+}
+
+function hideDownloadProgress() {
+    document.getElementById('download-progress').style.display = 'none';
 }

@@ -20,7 +20,10 @@ import csv
 import zipfile
 from pathlib import Path
 import pandas as pd
-from flask import Flask, request, jsonify, send_from_directory, abort, send_file
+import rq
+import subprocess
+import requests
+from flask import Flask, request, jsonify, send_from_directory, abort, send_file, Blueprint
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from sqlalchemy.exc import IntegrityError
@@ -68,6 +71,7 @@ PROJECTS_DIR = Path(PROJECTS_DIR_STR)
 # mais on les initialise dans create_app()
 socketio = SocketIO()
 migrate = Migrate()
+models_queue = rq.Queue('models', connection=redis_conn)
 
 def create_app(config=None):
     """Factory pour créer et configurer l'application Flask."""
@@ -997,14 +1001,35 @@ def create_app(config=None):
         return jsonify(prompt.to_dict()), 200
 
     # ==================== ROUTES API OLLAMA & ADMIN ====================
-    @app.route("/api/settings/models", methods=["GET"])
-    def get_available_models():
+    def pull_model_task(model_name):
+        # Caller la commande système pour lancer ollama pull
         try:
-            models = ["llama3.1:8b", "llama3.1:70b", "mistral:7b", "codellama:7b"]
-            return jsonify({"models": models})
-        except Exception as e:
-            logging.error(f"Erreur lors de la récupération des modèles: {e}")
-            return jsonify({"error": "Erreur serveur"}), 500
+            res = subprocess.run(
+                ['ollama', 'pull', model_name], capture_output=True, text=True, check=True
+            )
+            return {'status': 'success', 'message': res.stdout}
+        except subprocess.CalledProcessError as e:
+            return {'status': 'error', 'message': e.stderr}
+
+    @app.route('/api/ollama/pull', methods=['POST'])
+    def api_pull_model():
+        data = request.json
+        model_name = data.get('model')
+        if not model_name:
+            return jsonify({'success': False, 'error': 'Model name required'}), 400
+        job = models_queue.enqueue(pull_model_task, model_name, job_timeout='30m')
+        return jsonify({'success': True, 'job_id': job.get_id(), 'message': f'Downloading {model_name}'})
+
+    @app.route('/api/ollama/models', methods=['GET'])
+    def api_list_models():
+        # Appeler Ollama API locale pour récupérer la liste des modèles installés
+        import requests
+        try:
+            response = requests.get('http://localhost:11434/api/tags')  # Adapter URL
+            response.raise_for_status()
+            return jsonify({'success': True, 'models': response.json().get('models', [])})
+        except requests.RequestException as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
 
     @app.route("/api/databases", methods=["GET"])
     def get_available_databases():
@@ -1015,15 +1040,6 @@ def create_app(config=None):
             {"id": "crossref", "name": "CrossRef", "description": "DOI-based search"}
         ]
         return jsonify(databases), 200
-
-    @app.route("/api/ollama/pull", methods=["POST"])
-    def pull_model():
-        data = request.get_json()
-        model_name = data.get('model_name')
-        if not model_name:
-            return jsonify({"error": "model_name est requis"}), 400
-        job = background_queue.enqueue(pull_ollama_model_task, model_name, job_timeout=7200)
-        return jsonify({"message": f"Téléchargement du modèle {model_name} lancé", "task_id": job.id}), 202
 
     @app.route('/api/tasks/status', methods=['GET'])
     @with_db_session
