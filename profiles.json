@@ -1,29 +1,47 @@
 [
-    {
-        "id": "fast",
-        "name": "Rapide",
-        "description": "Traitement rapide avec qualité standard",
-        "preprocess_model": "phi3:mini",
-        "extract_model": "phi3:mini",
-        "synthesis_model": "llama3.1:8b",
-        "is_custom": false
-    },
-    {
-        "id": "standard",
-        "name": "Standard",
-        "description": "Équilibre entre vitesse et qualité",
-        "preprocess_model": "phi3:mini",
-        "extract_model": "llama3.1:8b",
-        "synthesis_model": "llama3.1:8b",
-        "is_custom": false
-    },
-    {
-        "id": "thorough",
-        "name": "Approfondi",
-        "description": "Analyse complète et précise",
-        "preprocess_model": "llama3.1:8b",
-        "extract_model": "mixtral:8x7b",
-        "synthesis_model": "llama3.1:70b",
-        "is_custom": false
-    }
+  {
+    "id": "fast-local",
+    "name": "⚡ Rapide (Local)",
+    "description": "Pour tests et développement. Utilise les plus petits modèles locaux. 100% hors-ligne.",
+    "preprocess_model": "phi3:mini",
+    "extract_model": "phi3:mini",
+    "synthesis_model": "llama3:8b",
+    "is_custom": false
+  },
+  {
+    "id": "standard-local",
+    "name": " balanced Standard (Local)",
+    "description": "Bon équilibre vitesse/qualité pour le travail quotidien. 100% hors-ligne.",
+    "preprocess_model": "phi3:mini",
+    "extract_model": "llama3:8b",
+    "synthesis_model": "llama3:8b",
+    "is_custom": false
+  },
+  {
+    "id": "deep-local",
+    "name": "🔬 Approfondi (Local)",
+    "description": "Qualité maximale en local. Nécessite une machine puissante (GPU). 100% hors-ligne.",
+    "preprocess_model": "llama3:8b",
+    "extract_model": "mixtral:8x7b",
+    "synthesis_model": "llama3:70b",
+    "is_custom": false
+  },
+  {
+    "id": "cloud-balanced",
+    "name": "☁️ Cloud Équilibré",
+    "description": "Qualité supérieure via le cloud. Idéal pour des analyses robustes. Connexion requise.",
+    "preprocess_model": "llama3:8b",
+    "extract_model": "gpt-oss:20b-cloud",
+    "synthesis_model": "gpt-oss:120b-cloud",
+    "is_custom": false
+  },
+  {
+    "id": "cloud-maximum",
+    "name": "🏆 Cloud Maximum (Qualité Thèse)",
+    "description": "Qualité d'analyse ultime pour la publication. Utilise les plus grands modèles cloud.",
+    "preprocess_model": "llama3:8b",
+    "extract_model": "deepseek-v3.1:671b-cloud",
+    "synthesis_model": "deepseek-v3.1:671b-cloud",
+    "is_custom": false
+  }
 ]
