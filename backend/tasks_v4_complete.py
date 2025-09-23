@@ -155,7 +155,7 @@ def log_processing_status(session, project_id: str, article_id: str, status: str
     log_id = str(uuid.uuid4()) 
     
     session.execute(text("""
-        INSERT INTO processing_log (id, project_id, pmid, task_name, status, details, "timestamp")
+        INSERT INTO processing_log (id, project_id, pmid, task_name, status, details, \"timestamp\")
         VALUES (:id, :project_id, :pmid, :task_name, :status, :details, :ts)
     """), {
         "id": log_id,
@@ -969,27 +969,27 @@ def run_atn_score_task(session, project_id: str):
             logger.debug(f"PMID: {ext['pmid']}, Text Blob: {text_blob}")
 
             # Category 1: 'alliance', 'therapeutic'
-            if re.search(r'\balliance\b', text_blob): s += 3
-            if re.search(r'\btherapeutic\b', text_blob): s += 3
+            if re.search(r'\\balliance\\b', text_blob): s += 3
+            if re.search(r'\\btherapeutic\\b', text_blob): s += 3
             logger.debug(f"PMID: {ext['pmid']}, Score after C1: {s}")
 
             # Category 2: 'numérique', 'digital', 'app', 'plateforme', 'ia'
             for k in ['numérique', 'digital', 'app', 'plateforme', 'ia']:
-                if re.search(r'\b' + re.escape(k) + r'\b', text_blob):
+                if re.search(r'\\b' + re.escape(k) + r'\\b', text_blob):
                     s += 3
                     logger.debug(f"PMID: {ext['pmid']}, Matched C2 keyword: {k}")
             logger.debug(f"PMID: {ext['pmid']}, Score after C2: {s}")
 
             # Category 3: 'patient', 'soignant', 'développeur'
             for k in ['patient', 'soignant', 'développeur']:
-                if re.search(r'\b' + re.escape(k) + r'\b', text_blob):
+                if re.search(r'\\b' + re.escape(k) + r'\\b', text_blob):
                     s += 2
                     logger.debug(f"PMID: {ext['pmid']}, Matched C3 keyword: {k}")
             logger.debug(f"PMID: {ext['pmid']}, Score after C3: {s}")
 
             # Category 4: 'empathie', 'adherence', 'confiance'
             for k in ['empathie', 'adherence', 'confiance']:
-                if re.search(r'\b' + re.escape(k) + r'\b', text_blob):
+                if re.search(r'\\b' + re.escape(k) + r'\\b', text_blob):
                     s += 2
                     logger.debug(f"PMID: {ext['pmid']}, Matched C4 keyword: {k}")
             logger.debug(f"PMID: {ext['pmid']}, Score after C4: {s}")
@@ -1077,7 +1077,7 @@ def run_risk_of_bias_task(session, project_id: str, article_id: str):
     send_project_notification(project_id, 'rob_completed', f"Analyse RoB terminée pour {article_id}.")
 
 # ================================================================ 
-# === TâCHE POUR AJOUT MANUEL D'ARTICLES (ASYNCHRONE)
+# === TÂCHE POUR AJOUT MANUEL D'ARTICLES (ASYNCHRONE)
 # ================================================================ 
 
 @with_db_session
@@ -1191,5 +1191,164 @@ def run_extension_task(session, project_id: str, extension_name: str):
     # Here, you would add the actual logic for the extension
     # For now, it just logs and sends a notification
     send_project_notification(project_id, 'extension_completed', f"Extension '{extension_name}' exécutée avec succès.", {'extension_name': extension_name})
+
+# ================================================================
+# === REPORTING TASKS
+# ================================================================
+
+@with_db_session
+def generate_bibliography_task(session, project_id: str):
+    """
+    Génère une bibliographie pour le projet spécifié et la sauvegarde.
+    """
+    logger.info(f"ðŸ“š Génération de la bibliographie pour le projet {project_id}")
+    try:
+        project = session.query(Project).filter_by(id=project_id).first()
+        if not project:
+            send_project_notification(project_id, 'report_failed', 'Projet non trouvé.')
+            return
+
+        articles = session.query(SearchResult).filter_by(project_id=project_id).all()
+        if not articles:
+            send_project_notification(project_id, 'report_completed', 'Aucun article pour générer la bibliographie.')
+            return
+
+        bibliography_entries = []
+        for article in articles:
+            # Simple APA-like formatting for demonstration
+            authors = article.authors.split(';')[0] if article.authors else 'N.A.'
+            year = article.publication_date.split('-')[0] if article.publication_date else 'N.D.'
+            title = article.title if article.title else 'Sans titre'
+            journal = article.journal if article.journal else 'N.D.'
+            doi = f"DOI: {article.doi}" if article.doi else ''
+            url = article.url if article.url else ''
+
+            bibliography_entries.append(
+                f"{authors} ({year}). {title}. {journal}. {doi} {url}".strip()
+            )
+
+        bibliography_content = "\n\n".join(sorted(bibliography_entries))
+        
+        project_dir = PROJECTS_DIR / project_id
+        project_dir.mkdir(exist_ok=True)
+        file_path = project_dir / f"bibliography_{project_id}.txt"
+        file_path.write_text(bibliography_content, encoding='utf-8')
+
+        send_project_notification(project_id, 'report_completed', 'Bibliographie générée avec succès.', {'report_path': str(file_path)})
+        logger.info(f"âœ… Bibliographie générée pour le projet {project_id} à {file_path}")
+
+    except Exception as e:
+        logger.error(f"Erreur lors de la génération de la bibliographie pour le projet {project_id}: {e}", exc_info=True)
+        send_project_notification(project_id, 'report_failed', f'Erreur lors de la génération de la bibliographie: {e}')
+
+@with_db_session
+def generate_summary_table_task(session, project_id: str):
+    """
+    Génère un tableau de synthèse des extractions pour le projet spécifié et le sauvegarde.
+    """
+    logger.info(f"ðŸ“š Génération du tableau de synthèse pour le projet {project_id}")
+    try:
+        project = session.query(Project).filter_by(id=project_id).first()
+        if not project:
+            send_project_notification(project_id, 'report_failed', 'Projet non trouvé.')
+            return
+
+        # Fetch articles and their extractions
+        results = session.query(SearchResult, Extraction).\n            join(Extraction, SearchResult.article_id == Extraction.pmid).\n            filter(SearchResult.project_id == project_id, Extraction.project_id == project_id).\n            all()
+
+        if not results:
+            send_project_notification(project_id, 'report_completed', 'Aucune donnée d\'extraction pour le tableau de synthèse.')
+            return
+
+        summary_data = []
+        for article, extraction in results:
+            extracted_data = json.loads(extraction.extracted_data) if extraction.extracted_data else {}
+            summary_data.append({
+                "PMID": article.article_id,
+                "Titre": article.title,
+                "Auteurs": article.authors,
+                "Année": article.publication_date.split('-')[0] if article.publication_date else 'N.D.',
+                "Journal": article.journal,
+                "Score de pertinence": extraction.relevance_score,
+                "Justification pertinence": extraction.relevance_justification,
+                **extracted_data # Include all extracted fields
+            })
+        
+        # Convert to pandas DataFrame for easy handling
+        df = pd.DataFrame(summary_data)
+        
+        project_dir = PROJECTS_DIR / project_id
+        project_dir.mkdir(exist_ok=True)
+        file_path = project_dir / f"summary_table_{project_id}.json" # Save as JSON for simplicity
+        df.to_json(file_path, orient='records', indent=4, force_ascii=False)
+
+        send_project_notification(project_id, 'report_completed', 'Tableau de synthèse généré avec succès.', {'report_path': str(file_path)})
+        logger.info(f"âœ… Tableau de synthèse généré pour le projet {project_id} à {file_path}")
+
+    except Exception as e:
+        logger.error(f"Erreur lors de la génération du tableau de synthèse pour le projet {project_id}: {e}", exc_info=True)
+        send_project_notification(project_id, 'report_failed', f'Erreur lors de la génération du tableau de synthèse: {e}')
+
+@with_db_session
+def export_excel_report_task(session, project_id: str):
+    """
+    Exporte toutes les données pertinentes du projet vers un fichier Excel.
+    """
+    logger.info(f"ðŸ“š Export Excel pour le projet {project_id}")
+    try:
+        project = session.query(Project).filter_by(id=project_id).first()
+        if not project:
+            send_project_notification(project_id, 'report_failed', 'Projet non trouvé.')
+            return
+
+        # Fetch all search results
+        search_results = session.query(SearchResult).filter_by(project_id=project_id).all()
+        search_data = [{c.name: getattr(sr, c.name) for c in sr.__table__.columns} for sr in search_results]
+        df_search = pd.DataFrame(search_data)
+
+        # Fetch all extractions
+        extractions = session.query(Extraction).filter_by(project_id=project_id).all()
+        extraction_data = []
+        for ext in extractions:
+            row = {c.name: getattr(ext, c.name) for c in ext.__table__.columns}
+            if ext.extracted_data:
+                try:
+                    # Flatten extracted_data JSON into top-level columns
+                    flattened_data = json.loads(ext.extracted_data)
+                    row.update(flattened_data)
+                except json.JSONDecodeError:
+                    logger.warning(f"Could not decode extracted_data for extraction ID {ext.id}")
+            extraction_data.append(row)
+        df_extractions = pd.DataFrame(extraction_data)
+
+        # Fetch all risk of bias assessments
+        rob_assessments = session.query(RiskOfBias).filter_by(project_id=project_id).all()
+        rob_data = [{c.name: getattr(rob, c.name) for c in rob.__table__.columns} for rob in rob_assessments]
+        df_rob = pd.DataFrame(rob_data)
+
+        project_dir = PROJECTS_DIR / project_id
+        project_dir.mkdir(exist_ok=True)
+        file_path = project_dir / f"report_{project_id}.xlsx"
+
+        with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
+            if not df_search.empty:
+                df_search.to_excel(writer, sheet_name='Search Results', index=False)
+            if not df_extractions.empty:
+                df_extractions.to_excel(writer, sheet_name='Extractions', index=False)
+            if not df_rob.empty:
+                df_rob.to_excel(writer, sheet_name='Risk of Bias', index=False)
+            
+            # Optionally, merge dataframes for a combined view
+            if not df_search.empty and not df_extractions.empty:
+                df_combined = pd.merge(df_search, df_extractions, left_on=['project_id', 'article_id'], right_on=['project_id', 'pmid'], how='left', suffixes=('_search', '_extraction'))
+                df_combined.to_excel(writer, sheet_name='Combined Data', index=False)
+
+
+        send_project_notification(project_id, 'report_completed', 'Export Excel généré avec succès.', {'report_path': str(file_path)})
+        logger.info(f"âœ… Export Excel généré pour le projet {project_id} à {file_path}")
+
+    except Exception as e:
+        logger.error(f"Erreur lors de l'export Excel pour le projet {project_id}: {e}", exc_info=True)
+        send_project_notification(project_id, 'report_failed', f'Erreur lors de l\'export Excel: {e}')
 
 print(f"DEBUG: tasks_v4_complete.py loaded. run_extension_task is defined: {'run_extension_task' in globals()}")

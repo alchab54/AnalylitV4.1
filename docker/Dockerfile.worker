@@ -2,7 +2,8 @@
 FROM analylit-base:latest
 
 # Copier le code de l'application
-COPY --chown=appuser:appuser profiles.json ./
-COPY --chown=appuser:appuser tasks_v4_complete.py config_v4.py ./
+COPY --chown=appuser:appuser config/profiles.json ./
+COPY --chown=appuser:appuser backend/tasks_v4_complete.py ./
+COPY --chown=appuser:appuser config/config_v4.py ./
 COPY --chown=appuser:appuser api/ api/
 COPY --chown=appuser:appuser utils/ utils/
