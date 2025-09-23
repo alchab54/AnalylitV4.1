@@ -63,10 +63,12 @@ export function renderSearchResultsTable() {
 
     if (appState.searchResults.length === 0) {
         elements.resultsContainer.innerHTML = `
-            <div class="results-empty">
-                <h3>Aucun résultat</h3>
-                <p>Lancez une recherche pour voir les articles.</p>
-            </div>`;
+            <div class="empty-state text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4>Aucun article trouvé</h4>
+                <p>Lancez une recherche pour commencer à collecter des articles.</p>
+            </div>
+        `;
         return;
     }
 

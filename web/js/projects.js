@@ -3,6 +3,7 @@
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { showToast, showLoadingOverlay, closeModal, escapeHtml, showModal } from './ui-improved.js';
+import { API_ENDPOINTS, MESSAGES } from './constants.js';
 
 // Fonctions utilitaires locales ou importées d'autres modules si nécessaire
 
@@ -11,7 +12,7 @@ import { showToast, showLoadingOverlay, closeModal, escapeHtml, showModal } from
  */
 async function loadProjects() {
   const oldProjectIds = new Set((appState.projects || []).map(p => p.id));
-  const projects = await fetchAPI('/projects/');
+  const projects = await fetchAPI(API_ENDPOINTS.projects);
   appState.projects = projects || [];
 
   const newProjectIds = new Set(appState.projects.map(p => p.id));
@@ -44,14 +45,14 @@ async function handleCreateProject(event) {
   const mode = form.querySelector('#analysisMode').value;
 
   if (!name) {
-    showToast('Le nom du projet est requis.', 'warning');
+    showToast(MESSAGES.projectNameRequired, 'warning');
     return;
   }
 
   try {
-    showLoadingOverlay(true, 'Création du projet...');
+    showLoadingOverlay(true, MESSAGES.creatingProject);
 
-    const newProject = await fetchAPI('/projects', {
+    const newProject = await fetchAPI(API_ENDPOINTS.projects, {
       method: 'POST',
       body: { name, description, mode }
     });
@@ -60,7 +61,7 @@ async function handleCreateProject(event) {
     if (newProject?.id) {
       await selectProject(newProject.id);
     }
-    showToast('Projet créé avec succès!', 'success');
+    showToast(MESSAGES.projectCreated, 'success');
     closeModal('newProjectModal');
   } catch (e) {
     showToast(`Erreur: ${e.message}`, 'error');
@@ -97,25 +98,25 @@ function deleteProject(projectId, projectName) {
   if (!projectId) return;
   appState.projectToDelete = { id: projectId, name: projectName };
   const modalContent = `
-    <p>Êtes-vous sûr de vouloir supprimer le projet "<strong>${escapeHtml(projectName)}</strong>" ?</p>
+    <p>${MESSAGES.confirmDeleteProjectBody(escapeHtml(projectName))}</p>
     <p>Cette action est irréversible.</p>
     <div class="modal-actions">
       <button class="btn btn--secondary" data-action="close-modal">Annuler</button>
       <button class="btn btn--danger" data-action="confirm-delete-project">Supprimer</button>
     </div>
   `;
-  showModal('Confirmer la suppression', modalContent);
+  showModal(MESSAGES.confirmDeleteProjectTitle, modalContent);
 }
 
 /**
  * Logique de suppression effective, appelée par le gestionnaire d'événements.
  */
 async function confirmDeleteProject(projectId) {
-    showLoadingOverlay(true, 'Suppression du projet...');
+    showLoadingOverlay(true, MESSAGES.deletingProject);
     closeModal(); // Ferme la modale de confirmation
     try {
-        await fetchAPI(`/projects/${projectId}`, { method: 'DELETE' });
-        showToast('Projet supprimé.', 'success');
+        await fetchAPI(API_ENDPOINTS.projectById(projectId), { method: 'DELETE' });
+        showToast(MESSAGES.projectDeleted, 'success');
         
         // Mettre à jour l'état localement pour une UI plus réactive
         appState.projects = appState.projects.filter(p => p.id !== projectId);
@@ -137,11 +138,11 @@ async function confirmDeleteProject(projectId) {
  */
 async function handleExportProject(projectId) {
   if (!projectId) {
-    showToast("ID du projet manquant pour l'exportation.", 'warning');
+    showToast(MESSAGES.projectIdMissingForExport, 'warning');
     return;
   }
-  window.open(`/api/projects/${projectId}/export`, '_blank');
-  showToast("L'exportation du projet a commencé...", 'info');
+  window.open(`/api${API_ENDPOINTS.projectExport(projectId)}`, '_blank');
+  showToast(MESSAGES.projectExportStarted, 'info');
 }
 
 /**
@@ -165,6 +166,23 @@ async function loadProjectFilesSet(projectId) {
 }
 
 /**
+ * Affiche un message lorsque la liste des projets est vide.
+ */
+function displayEmptyProjectsState() {
+    const container = elements.projectsList;
+    if (!container) return;
+    container.innerHTML = `
+        <div class="empty-state text-center py-4">
+            <h3>Aucun projet trouvé</h3>
+            <p>Créez votre premier projet pour commencer votre revue de littérature.</p>
+            <button data-action="create-project-modal" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Créer un projet
+            </button>
+        </div>
+    `;
+}
+
+/**
  * Rendu de la liste des projets (colonne gauche).
  */
 function renderProjectsList() {
@@ -174,7 +192,7 @@ function renderProjectsList() {
   const projects = Array.isArray(appState.projects) ? appState.projects : [];
 
   if (projects.length === 0) {
-    container.innerHTML = '<div class="placeholder">Aucun projet. Créez-en un pour commencer.</div>';
+    displayEmptyProjectsState();
     return;
   }
 

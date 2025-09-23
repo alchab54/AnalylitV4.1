@@ -1,159 +1,274 @@
-# Automatisation Implémentation Téléchargement Modèles Ollama - AnalyLit v4.1
+Plan de Finalisation du Frontend AnalyLit V4.1
+🎯 Contexte et Objectif Stratégique
+Contexte : Le frontend de l'application AnalyLit V4.1 est fonctionnellement riche et bien structuré, mais souffre de quelques problèmes techniques et d'incohérences qui l'empêchent d'atteindre un niveau professionnel. L'application utilise une architecture ES6 Modules qui n'est pas complètement finalisée.
 
-## Objectif
-Automatiser complètement l'implémentation du téléchargement de modèles IA Ollama dans l'application AnalyLit v4.1, incluant :
+Objectif : Finaliser et professionnaliser le frontend en corrigeant les problèmes ESM, en nettoyant le code, et en améliorant l'expérience utilisateur, pour passer de 80% à 100% de qualité professionnelle.
 
-- Interface utilisateur avec bouton téléchargement
-- Fonctions JavaScript pour gérer le téléchargement
-- API Flask backend pour déclencher et suivre les téléchargements
-- Tâches asynchrones pour traitement en background
-- Notifications et état d'avancement
+Environnement de Travail : VS Code local dans le répertoire C:\Users\alich\Downloads\exported-assets (1)
 
-## Prérequis
-- Backend Python Flask configuré avec RQ pour tâches asynchrones
-- Frontend SPA avec JS ES Modules prêt à intégrer nouveau module
-- Docker et volume persistant Ollama configuré
-- Commande `ollama pull <model>` fonctionnelle sur serveur
-
----
-
-## 1. Interface Utilisateur (frontend/web/js/settings.js)
-
-// Fonction pour démarrer le téléchargement d'un modèle
-export async function downloadModel(modelName) {
-try {
-showDownloadProgress(modelName);
-const response = await fetchAPI('/api/ollama/pull', {
-method: 'POST',
-body: JSON.stringify({ model: modelName }),
-});
-if (response.success) {
-showToast(Modèle ${modelName} téléchargé avec succès, 'success');
-await loadInstalledModels();
-} else {
-throw new Error(response.error || 'Erreur inconnue');
-}
-} catch (error) {
-showToast(Erreur téléchargement : ${error.message}, 'error');
-} finally {
-hideDownloadProgress();
-}
-}
-
-export async function loadInstalledModels() {
-try {
-const response = await fetchAPI('/api/ollama/models');
-const modelsList = document.getElementById('installed-models-list');
-modelsList.innerHTML = response.models
-.map(
-(model) =>
-<li>${model.name} <span class="model-size">${model.size || ''}</span></li>
-)
-.join('');
-} catch (error) {
-console.error('Erreur chargement modèles :', error);
-}
-}
-
-function showDownloadProgress(modelName) {
-const progressContainer = document.getElementById('download-progress');
-const statusElement = document.getElementById('download-status');
-progressContainer.style.display = 'block';
-statusElement.textContent = Téléchargement de ${modelName}...;
-}
-
-function hideDownloadProgress() {
-document.getElementById('download-progress').style.display = 'none';
-}
+📂 Structure des Fichiers Frontend
+L'application frontend se trouve dans le dossier web/ avec l'organisation suivante :
 
 text
+web/
+├── index.html (Point d'entrée principal)
+├── css/ (Fichiers de style)
+├── js/ (Modules JavaScript - À CORRIGER)
+│   ├── core.js (Gestionnaire central - IMPORTANT)
+│   ├── api.js (Communications backend)
+│   ├── articles.js (Gestion articles - À CORRIGER)
+│   ├── analyses.js (Analyses IA - À CORRIGER)
+│   ├── projects.js (Gestion projets - À CORRIGER)
+│   ├── grids.js (Grilles extraction - À CORRIGER)
+│   ├── settings.js (Paramètres - À CORRIGER)
+│   ├── search.js (Recherche - À CORRIGER)
+│   ├── import.js (Imports - À CORRIGER)
+│   ├── reporting.js (Rapports - À CORRIGER)
+│   ├── rob.js (Risk of Bias - À CORRIGER)
+│   ├── screening.js (Screening - À CORRIGER)
+│   ├── ui.js (Interface utilisateur)
+│   ├── state.js (Gestion d'état)
+│   └── ... (autres fichiers)
+└── js-backup/ (À SUPPRIMER)
+🔧 MISSION 1 - CRITIQUE : Finaliser la Migration ES6 Modules
+Problème Identifié
+Les fichiers JavaScript utilisent des fonctions entre eux mais n'exportent pas ces fonctions, causant des erreurs Uncaught SyntaxError: The requested module does not provide an export named.
 
----
+Action Requise
+POUR CHAQUE FICHIER JAVASCRIPT dans web/js/, ajouter le mot-clé export devant TOUTES les fonctions qui sont appelées depuis d'autres fichiers.
 
-## 2. HTML Interface (frontend/web/index.html ou fichier HTML Settings)
+Liste des Fichiers à Corriger (Par Ordre de Priorité)
+1. web/js/articles.js
+Fonctions à exporter (exemples identifiés) :
 
-<div id="models-management" class="settings-section"> <h3>Gestion des Modèles IA</h3> <select id="available-models-select"> <option value="llama3.1:8b">Llama 3.1 8B</option> <option value="llama3.1:70b">Llama 3.1 70B</option> <option value="phi3:mini">Phi-3 Mini</option> <option value="mistral:8x7b">Mistral 8x7B</option> </select> <button id="download-model-btn" class="btn btn-primary">Télécharger le Modèle</button> <div id="download-progress" class="progress-container" style="display:none;"> <div class="progress-bar" id="download-progress-bar"></div> <span id="download-status">Téléchargement en cours...</span> </div> <h4>Modèles Installés</h4> <ul id="installed-models-list"></ul> </div> <script> document .getElementById('download-model-btn') .addEventListener('click', async () => { const select = document.getElementById('available-models-select'); const modelName = select.value; await downloadModel(modelName); }); loadInstalledModels(); // Charger liste à l'initialisation </script>
+javascript
+// AVANT
+function handleDeleteSelectedArticles() { /* ... */ }
+function showBatchProcessModal() { /* ... */ }
+function startBatchProcessing() { /* ... */ }
+function refreshArticlesList() { /* ... */ }
+function updateArticleStatus() { /* ... */ }
+
+// APRÈS
+export function handleDeleteSelectedArticles() { /* ... */ }
+export function showBatchProcessModal() { /* ... */ }
+export function startBatchProcessing() { /* ... */ }
+export function refreshArticlesList() { /* ... */ }
+export function updateArticleStatus() { /* ... */ }
+2. web/js/analyses.js
+Fonctions probables à exporter :
+
+javascript
+export function runAnalysis() { /* ... */ }
+export function showAnalysisModal() { /* ... */ }
+export function loadAnalysisResults() { /* ... */ }
+export function displayAnalysisProgress() { /* ... */ }
+3. web/js/projects.js
+Fonctions probables à exporter :
+
+javascript
+export function createProject() { /* ... */ }
+export function deleteProject() { /* ... */ }
+export function loadProjectsList() { /* ... */ }
+export function selectProject() { /* ... */ }
+4. web/js/grids.js
+Fonctions probables à exporter :
+
+javascript
+export function handleDeleteGrid() { /* ... */ }
+export function createNewGrid() { /* ... */ }
+export function editGrid() { /* ... */ }
+export function loadGridsList() { /* ... */ }
+5. web/js/settings.js
+Fonctions probables à exporter :
+
+javascript
+export function saveSettings() { /* ... */ }
+export function loadSettings() { /* ... */ }
+export function updateOllamaModels() { /* ... */ }
+export function testConnection() { /* ... */ }
+Instruction Technique Précise
+Ouvrir chaque fichier JavaScript listé ci-dessus
+
+Identifier toutes les déclarations de fonction function nomDeLaFonction()
+
+Ajouter le mot-clé export devant chaque fonction (sauf les fonctions internes/privées)
+
+Vérifier que le fichier core.js peut maintenant importer ces fonctions
+
+🧹 MISSION 2 - HAUTE PRIORITÉ : Nettoyage du Code
+Fichiers à Supprimer Complètement
+Dans web/js/
 text
-
----
-
-## 3. Backend Flask (server_v4_complete.py ou equivalent)
-
-from flask import Blueprint, jsonify, request
-import rq
-from worker import redis_conn
-import subprocess
-
-api_bp = Blueprint('api', name)
-models_queue = rq.Queue('models', connection=redis_conn)
-
-def pull_model_task(model_name):
-# Caller la commande système pour lancer ollama pull
-try:
-res = subprocess.run(
-['ollama', 'pull', model_name], capture_output=True, text=True, check=True
-)
-return {'status': 'success', 'message': res.stdout}
-except subprocess.CalledProcessError as e:
-return {'status': 'error', 'message': e.stderr}
-
-@api_bp.route('/ollama/pull', methods=['POST'])
-def api_pull_model():
-data = request.json
-model_name = data.get('model')
-if not model_name:
-return jsonify({'success': False, 'error': 'Model name required'}), 400
-job = models_queue.enqueue(pull_model_task, model_name, job_timeout='30m')
-return jsonify({'success': True, 'job_id': job.get_id(), 'message': f'Downloading {model_name}'})
-
-@api_bp.route('/ollama/models', methods=['GET'])
-def api_list_models():
-# Appeler Ollama API locale pour récupérer la liste des modèles installés
-import requests
+web/js/settings.js.bak (fichier de sauvegarde - À SUPPRIMER)
+web/js/migration-fix.js (script temporaire - À SUPPRIMER)
+web/test_frontend_fixes.js (script temporaire - À SUPPRIMER)
+web/migration-fix.js (script temporaire - À SUPPRIMER)
+Dossier Complet
+text
+web/js-backup/ (dossier entier - À SUPPRIMER)
+Décision sur les Fichiers Améliorés
+Si les fichiers suivants existent, CHOISIR UNE VERSION et supprimer l'autre :
 
 text
-try:
-    response = requests.get('http://localhost:11434/api/tags')  # Adapter URL
-    response.raise_for_status()
-    return jsonify({'success': True, 'models': response.json().get('models', [])})
-except requests.RequestException as e:
-    return jsonify({'success': False, 'error': str(e)}), 500
-text
+web/js/app.js vs web/js/app-improved.js
+web/js/ui.js vs web/js/ui-improved.js
+Recommandation : Garder les versions -improved et supprimer les versions originales si les versions améliorées sont plus récentes et fonctionnelles.
 
----
+🎨 MISSION 3 - MOYENNE PRIORITÉ : Amélioration UX
+Gestion des États Vides
+Dans web/js/projects.js - Ajouter une fonction d'état vide :
 
-## 4. Configuration Docker & Environnement
+javascript
+export function displayEmptyProjectsState() {
+    const container = document.querySelector('#projects-container');
+    container.innerHTML = `
+        <div class="empty-state">
+            <h3>Aucun projet trouvé</h3>
+            <p>Créez votre premier projet pour commencer votre revue de littérature.</p>
+            <button onclick="createNewProject()" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Créer un projet
+            </button>
+        </div>
+    `;
+}
+Dans web/js/articles.js - Ajouter une fonction d'état vide :
 
-- S'assurer que docker-compose.yml expose le port 11434 pour lomlama
-- Volume persistant pour ollama-data dans docker-compose
-- Redis et worker RQ actifs pour la gestion des tâches asynchrones
+javascript
+export function displayEmptyArticlesState() {
+    const tableBody = document.querySelector('#article-table-body');
+    tableBody.innerHTML = `
+        <tr class="empty-state-row">
+            <td colspan="6" class="text-center py-4">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4>Aucun article trouvé</h4>
+                <p>Lancez une recherche pour commencer à collecter des articles.</p>
+            </td>
+        </tr>
+    `;
+}
+Amélioration des Notifications
+Créer un nouveau fichier web/js/toast.js :
 
----
+javascript
+export function showToast(message, type = 'info', duration = 3000) {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'info'}-circle"></i>
+        <span>${message}</span>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
 
-## 5. Tests & Validation
+export function showSuccess(message) {
+    showToast(message, 'success');
+}
 
-- Tests unitaires pour API `ollama/pull` et `ollama/models`
-- Tests d'intégration frontend/backend interaction téléchargements
-- Validation UX bouton + messages et barre progression
+export function showError(message) {
+    showToast(message, 'error');
+}
+🔧 MISSION 4 - ORGANISATION : Centralisation des Constantes
+Créer web/js/constants.js
+javascript
+// Sélecteurs DOM centralisés
+export const SELECTORS = {
+    // Projets
+    projectsList: '#projects-list',
+    projectContainer: '#projects-container',
+    createProjectBtn: '#create-project-btn',
+    
+    // Articles
+    articleTableBody: '#article-table-body',
+    articleContainer: '#articles-container',
+    selectedArticles: '.article-checkbox:checked',
+    
+    // Analyses
+    analysisContainer: '#analysis-container',
+    analysisProgress: '#analysis-progress',
+    analysisResults: '#analysis-results',
+    
+    // Paramètres
+    settingsForm: '#settings-form',
+    ollamaModels: '#ollama-models-select',
+    
+    // Interface
+    sidebar: '#sidebar',
+    mainContent: '#main-content',
+    loadingSpinner: '#loading-spinner'
+};
 
----
+// URLs API centralisées
+export const API_ENDPOINTS = {
+    projects: '/api/projects',
+    articles: '/api/articles',
+    analyses: '/api/analyses',
+    settings: '/api/settings',
+    models: '/api/settings/models'
+};
 
-## 6. Commandes Utiles
+// Messages d'état
+export const MESSAGES = {
+    loading: 'Chargement en cours...',
+    noProjects: 'Aucun projet trouvé. Créez-en un pour commencer !',
+    noArticles: 'Aucun article dans ce projet.',
+    analysisStarted: 'Analyse lancée avec succès',
+    projectCreated: 'Projet créé avec succès',
+    projectDeleted: 'Projet supprimé'
+};
+Mise à Jour des Autres Fichiers
+Après avoir créé constants.js, REMPLACER dans tous les autres fichiers JS :
 
-Télécharger modèles de base manuellement
-make models
+AVANT :
 
-Lancer worker RQ si non actif
-rq worker -u redis://redis:6379
+javascript
+document.querySelector('#projects-list')
+APRÈS :
 
-Démarrer app avec docker-compose
-docker-compose up -d
+javascript
+import { SELECTORS } from './constants.js';
+document.querySelector(SELECTORS.projectsList)
+✅ Plan de Validation
+Tests à Effectuer Après Chaque Mission
+Après Mission 1 (ESM) :
 
+Ouvrir l'application dans le navigateur
 
+Vérifier qu'il n'y a aucune erreur dans la console (F12)
 
-## Conclusion
+Tester la navigation entre les sections
 
-Ce Gemini.md offre le guide complet pour automatiser le développement et l'intégration du téléchargement de modèles IA Ollama dans AnalyLit v4.1, couvrant frontend, backend, docker et tests.
+Après Mission 2 (Nettoyage) :
 
+Vérifier que l'application se charge toujours
 
-inscrire dans C:\Users\alich\Downloads\exported-assets (1)\docs\README-improvements.md  les changements réalisés
+Confirmer la suppression des fichiers inutiles
+
+Après Mission 3 (UX) :
+
+Créer un projet vide et vérifier l'état vide
+
+Tester les notifications
+
+Après Mission 4 (Constants) :
+
+S'assurer que toutes les fonctionnalités marchent encore
+
+Vérifier qu'il n'y a pas d'erreurs de références
+
+🚀 Ordre d'Exécution Recommandé
+MISSION 1 (CRITIQUE) - Finaliser ESM - 30 minutes
+
+MISSION 2 (NETTOYAGE) - Supprimer fichiers - 10 minutes
+
+MISSION 3 (UX) - États vides et notifications - 45 minutes
+
+MISSION 4 (CONSTANTS) - Centralisation - 30 minutes
+
+Temps Total Estimé : 2 heures
