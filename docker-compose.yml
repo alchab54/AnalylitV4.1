@@ -84,6 +84,7 @@ services:
       - ./projects:/home/appuser/app/projects
       - ./migrations:/home/appuser/app/migrations
       - ./run_migrations.py:/home/appuser/app/run_migrations.py
+      - ./web:/home/appuser/app/web
   # Workers multiples pour paralléliser les tâches
   worker-fast:
     build:

@@ -1,6 +1,6 @@
 // web/js/test_frontend_fixes.js
 
-import { fetchAPI } from './api.js';
+import { fetchAPI } from './js/api.js';
 
 /**
  * Script de test pour valider les corrections apportées au frontend,

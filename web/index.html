@@ -413,6 +413,51 @@
 
     <!-- Conteneur pour toutes les modales -->
     <div id="modalsContainer">
+        <div id="genericModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1">
+            <div class="modal__backdrop" data-action="close-modal"></div>
+            <div class="modal__content">
+                <div class="modal__header">
+                    <h3 id="genericModalTitle" class="modal__title"></h3>
+                    <button class="modal__close-btn" data-action="close-modal" aria-label="Fermer la modale">×</button>
+                </div>
+                <div id="genericModalBody" class="modal__body"></div>
+                <div id="genericModalActions" class="modal__actions"></div>
+            </div>
+        </div>
+
+        <div id="newProjectModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1">
+            <div class="modal__backdrop" data-action="close-modal"></div>
+            <div class="modal__content">
+                <div class="modal__header">
+                    <h3 class="modal__title">Créer un nouveau projet</h3>
+                    <button class="modal__close-btn" data-action="close-modal" aria-label="Fermer la modale">×</button>
+                </div>
+                <div class="modal__body">
+                    <form id="createProjectForm">
+                        <div class="form-group">
+                            <label for="projectName">Nom du projet</label>
+                            <input type="text" id="projectName" name="name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="projectDescription">Description</label>
+                            <textarea id="projectDescription" name="description" class="form-control"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="projectAnalysisMode">Mode d'analyse</label>
+                            <select id="projectAnalysisMode" name="mode" class="form-control">
+                                <option value="screening">Screening</option>
+                                <option value="extraction">Extraction</option>
+                                <option value="full">Full Analysis</option>
+                            </select>
+                        </div>
+                        <div class="modal__actions">
+                            <button type="button" class="btn btn--secondary" data-action="close-modal">Annuler</button>
+                            <button type="submit" class="btn btn--primary" data-action="create-project">Créer le projet</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <!-- Modales générées dynamiquement par les modules JS -->
     </div>
 
@@ -437,8 +482,7 @@
         document.addEventListener('DOMContentLoaded', migrateTaskReferences);
     </script>
 
-    <!-- Temporary test script for frontend fixes -->
-    <script type="module" src="/js/tests/test_frontend_fixes.js"></script>
+    
 
     <!-- Main application entry point -->
     <script type="module" src="/js/app-improved.js"></script>

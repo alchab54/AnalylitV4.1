@@ -11,21 +11,12 @@ echo "✅ Base de données prête!"
 
 echo "🔄 Création des tables de base de données..."
 python -c "
-from server_v4_complete import create_app
-from utils.database import db
-from sqlalchemy import text
+from utils.database import init_database
+from utils import models # Ensure models are loaded to populate Base.metadata
 
-app = create_app()
-with app.app_context():
-    print('Création du schéma analylit_schema...')
-    with db.engine.connect() as conn:
-        conn.execute(text('CREATE SCHEMA IF NOT EXISTS analylit_schema;'))
-        conn.commit()
-    
-    print('Création de toutes les tables...')
-    db.create_all()
-    
-    print('✅ Tables créées avec succès!')
+print('Création du schéma et des tables...')
+init_database()
+print('✅ Schéma et tables créés avec succès via init_database!')
 "
 
 echo "🚀 Démarrage du serveur Gunicorn..."
