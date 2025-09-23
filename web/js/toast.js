@@ -1,4 +1,9 @@
 export function showToast(message, type = 'info', duration = 3000) {
+    const toastContainer = document.querySelector('#toastContainer');
+    if (!toastContainer) {
+        console.error("Toast container not found!");
+        return;
+    }
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.innerHTML = `
@@ -6,7 +11,7 @@ export function showToast(message, type = 'info', duration = 3000) {
         <span>${message}</span>
     `;
     
-    document.body.appendChild(toast);
+    toastContainer.appendChild(toast);
     
     setTimeout(() => {
         toast.classList.add('fade-out');
