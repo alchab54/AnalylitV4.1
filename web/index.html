@@ -8,21 +8,31 @@
     <meta name="keywords" content="revue littérature, IA, recherche scientifique, méta-analyse">
     <meta name="author" content="AnalyLit Team">
     
+
+
     <!-- Favicon optimisé -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔬</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔬</text></svg>">
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/style-improved.css">
+    <!-- ORDRE CRITIQUE DES CSS -->
+    <!-- 1. CSS d'urgence EN PREMIER -->
+    <link rel="stylesheet" href="css/emergency-fixes.css">
+    
+    <!-- 2. Design tokens de base -->
     <link rel="stylesheet" href="css/enhanced-design-tokens.css">
     
-    <!-- Correction UX critique -->
+    <!-- 3. Styles principaux -->
+    <link rel="stylesheet" href="css/style-improved.css">
+    
+    <!-- 4. Corrections UX -->
     <link rel="stylesheet" href="css/ux-fix.css">
+    
+    <!-- 5. Responsive EN DERNIER -->
+    <link rel="stylesheet" href="css/responsive-fixes.css">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- Corrections responsive -->
-    <link rel="stylesheet" href="css/responsive-fixes.css">
     
     <!-- Scripts externes -->
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js" defer></script>
@@ -528,6 +538,113 @@
             layoutOptimizer.setupResponsiveOptimization();
         });
     </script>
+        <!-- Script de debug d'urgence -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🔧 Debug AnalyLit Interface');
+        
+        // Vérifier les éléments critiques
+        const critical = {
+            header: document.querySelector('.app-header'),
+            nav: document.querySelector('.app-nav'),
+            main: document.querySelector('.app-main'),
+            container: document.querySelector('.container')
+        };
+        
+        Object.entries(critical).forEach(([name, el]) => {
+            if (!el) {
+                console.error(`❌ Élément manquant: ${name}`);
+            } else {
+                console.log(`✅ Élément trouvé: ${name}`, el);
+                // Forcer l'affichage
+                el.style.display = 'block';
+                el.style.visibility = 'visible';
+            }
+        });
+        
+        // Forcer l'affichage de l'en-tête
+        const header = document.querySelector('.app-header');
+        if (header) {
+            header.style.cssText = `
+                display: block !important;
+                visibility: visible !important;
+                position: relative !important;
+                background: #ffffff !important;
+                border-bottom: 1px solid #e5e7eb !important;
+                padding: 12px 0 !important;
+                z-index: 1000 !important;
+            `;
+            console.log('🔧 En-tête forcé');
+        }
+        
+        // Vérifier les styles CSS
+        const stylesheets = Array.from(document.styleSheets);
+        console.log('📄 CSS chargés:', stylesheets.length);
+        stylesheets.forEach((sheet, i) => {
+            try {
+                console.log(`CSS ${i}:`, sheet.href || 'inline');
+            } catch(e) {
+                console.log(`CSS ${i}: (CORS protégé)`);
+            }
+        });
+        
+        // Auto-diagnostic
+        setTimeout(() => {
+            const headerVisible = header && header.offsetHeight > 0;
+            const navVisible = critical.nav && critical.nav.offsetHeight > 0;
+            
+            console.log('📊 Diagnostic:', {
+                headerVisible,
+                navVisible,
+                headerHeight: header ? header.offsetHeight : 0,
+                navHeight: critical.nav ? critical.nav.offsetHeight : 0
+            });
+            
+            if (!headerVisible) {
+                alert('⚠️ PROBLÈME: En-tête invisible - Vérifiez les CSS');
+            }
+        }, 1000);
+    });
 
+    // Fonction de réparation d'urgence
+    window.fixInterface = function() {
+        console.log('🚨 Réparation d\'urgence...');
+        
+        // Réinitialiser tous les styles
+        document.documentElement.style.cssText = '';
+        document.body.style.cssText = 'margin:0;padding:0;font-family:system-ui;';
+        
+        // Recréer l'en-tête si nécessaire
+        let header = document.querySelector('.app-header');
+        if (!header || header.offsetHeight === 0) {
+            console.log('🔨 Reconstruction de l\'en-tête...');
+            const newHeader = document.createElement('header');
+            newHeader.className = 'app-header';
+            newHeader.innerHTML = `
+                <div class="container">
+                    <div class="app-header__content">
+                        <h1 class="app-header__title">
+                            🔬 AnalyLit v4.1
+                            <span class="app-header__subtitle">Plateforme IA pour revues scientifiques</span>
+                        </h1>
+                    </div>
+                </div>
+            `;
+            newHeader.style.cssText = `
+                display: block !important;
+                background: #ffffff !important;
+                border-bottom: 1px solid #e5e7eb !important;
+                padding: 12px 0 !important;
+            `;
+            
+            const body = document.body;
+            body.insertBefore(newHeader, body.firstChild);
+        }
+        
+        console.log('✅ Réparation terminée');
+    };
+
+    console.log('🛠️ Script de debug chargé. Utilisez fixInterface() en cas de problème.');
+    </script>
 </body>
 </html>
