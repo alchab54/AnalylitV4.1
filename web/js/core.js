@@ -1,7 +1,7 @@
 // web/js/core.js
 
 import { appState, elements, initializeEventHandlers } from './app-improved.js';
-import { setProjects, setCurrentProject } from './state.js';
+import { setProjects, setCurrentProject, setActiveEvaluator, setCurrentSection, setConnectionStatus } from './state.js';
 import {
     handleDeleteSelectedArticles,
     showBatchProcessModal,
@@ -63,9 +63,12 @@ import {
     showPullModelModal,
     handleSaveProfile
 } from './settings.js'; // This was already correct
-import { setActiveEvaluator } from './state.js';
 import { fetchAPI } from './api.js';
 import { API_ENDPOINTS, MESSAGES, CONFIG } from './constants.js';
+
+export function showSection(sectionId) {
+    setCurrentSection(sectionId);
+}
 
 async function handleCancelTask(target) {
     const taskId = target.dataset.taskId;

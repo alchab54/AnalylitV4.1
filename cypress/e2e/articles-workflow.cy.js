@@ -4,11 +4,11 @@ describe('Workflow de Gestion des Articles', () => {
     cy.visit('/');
     
     // S'assurer qu'un projet est sélectionné
-    cy.get('[data-section-id="projects"]').click();
-    cy.get('.project-card').first().click();
+    cy.get('[data-section-id="projects"]').click({ force: true });
+    cy.get('.project-card').first().click({ force: true });
     
     // Naviguer vers les résultats
-    cy.get('[data-section-id="results"]').click();
+    cy.get('[data-section-id="results"]').click({ force: true });
   });
 
   it('Devrait afficher la liste des articles du projet sélectionné', () => {

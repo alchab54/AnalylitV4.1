@@ -326,5 +326,6 @@ export const deleteStakeholderGroup = (groupId) => stakeholdersModule.removeStak
 export const addStakeholderGroup = (groupData) => stakeholdersModule.addStakeholderGroup(appState.currentProject?.id, groupData); // This was already correct
 export function runStakeholderAnalysis() { /* Logic to run stakeholder analysis */ } // This was already correct
 export const renderStakeholdersSection = stakeholdersModule.renderStakeholdersSection; // Export the render function
+export const init = stakeholdersModule.init;
 
 export default stakeholdersModule;

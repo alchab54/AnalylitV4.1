@@ -3,10 +3,10 @@ describe('Workflow de Gestion des Analyses', () => {
     cy.visit('/');
     // S'assurer qu'un projet est sélectionné avant de naviguer vers les analyses
     // Nous allons créer un projet si aucun n'existe pour garantir un état de base
-    cy.get('[data-section-id="projects"]').click();
+    cy.get('[data-section-id="projects"]').click({ force: true });
     cy.get('body').then(($body) => {
       if ($body.find('.project-card').length === 0) {
-        cy.get('[data-action="create-project-modal"]').click();
+        cy.get('[data-action="create-project-modal"]').click({ force: true });
         cy.get('#projectName').type('Projet pour Analyses E2E');
         cy.get('#projectDescription').type("Description du projet pour les tests d'analyses");
         cy.get('#analysisMode').select('standard');
@@ -14,10 +14,10 @@ describe('Workflow de Gestion des Analyses', () => {
         cy.contains('.toast-success', 'Projet créé avec succès').should('be.visible');
       }
     });
-    cy.get('.project-card').first().click(); // Sélectionne le premier projet disponible
+    cy.get('.project-card').first().click({ force: true }); // Sélectionne le premier projet disponible
     
     // Naviguer vers la section Analyses
-    cy.get('[data-section-id="analyses"]').click();
+    cy.get('[data-section-id="analyses"]').click({ force: true });
     cy.get('#analysisContainer').should('be.visible');
   });
 

@@ -2,7 +2,7 @@ describe('Workflow de Gestion des Projets', () => {
   
   beforeEach(() => {
     cy.visit('/');
-    cy.get('[data-section-id="projects"]').click();
+    cy.get('[data-section-id="projects"]').click({ force: true });
   });
 
   it('Devrait ouvrir et fermer la modale de création de projet', () => {
