@@ -328,4 +328,5 @@ export function runStakeholderAnalysis() { /* Logic to run stakeholder analysis 
 export const renderStakeholdersSection = stakeholdersModule.renderStakeholdersSection; // Export the render function
 export const init = stakeholdersModule.init;
 
+export { stakeholdersModule };
 export default stakeholdersModule;
