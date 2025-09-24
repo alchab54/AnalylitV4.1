@@ -114,6 +114,7 @@ export const API_ENDPOINTS = {
 export const MESSAGES = {
     // App
     appStart: '🚀 Démarrage de AnalyLit V4.1 Frontend (Version améliorée)...',
+    firstRender: (sectionId) => `✅ Premier rendu de la section '${sectionId}' effectué.`,   
     missingDOMElement: 'Éléments DOM critiques manquants:',
     errorUI: "Erreur : éléments d'interface manquants",
     appInitialized: (time) => `✅ Application initialisée en ${time}ms`,

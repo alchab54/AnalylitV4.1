@@ -1,9 +1,11 @@
 // web/js/search.js
-import { appState, elements } from './app-improved.js';
+
+import { SELECTORS, MESSAGES, API_ENDPOINTS } from './constants.js';
 import { fetchAPI } from './api.js';
 import { showLoadingOverlay, escapeHtml, openModal } from './ui-improved.js';
 import { showToast } from './toast.js';
-import { API_ENDPOINTS, MESSAGES } from './constants.js';
+import { API_ENDPOINTS } from './constants.js';
+import { appState, elements } from './app-improved.js';
 
 export function renderSearchSection(project) {
     const container = document.querySelector(SELECTORS.searchContainer);

@@ -292,6 +292,50 @@
                     </div>
                 </div>
             </section>
+                        <!-- Section des analyses -->
+            <section id="analyses" class="app-section">
+                <div class="container">
+                    <h2>Gestion des Analyses</h2>
+                    <div class="analysis-controls">
+                        <select id="analysisMode">
+                            <option value="automatic">Automatique</option>
+                            <option value="manual">Manuel</option>
+                            <option value="hybrid">Hybride</option>
+                        </select>
+                    </div>
+                    <div id="analysis-cards-container"></div>
+                </div>
+            </section>
+
+            <!-- Section des projets -->
+            <section id="projects" class="app-section">
+                <div class="container">
+                    <h2>Gestion des Projets</h2>
+                    <div id="projects-list">
+                        <!-- Les cartes de projets seront générées ici -->
+                    </div>
+                    <button id="create-project-btn" class="btn btn-primary">Nouveau Projet</button>
+                </div>
+            </section>
+
+            <!-- Statut de connexion -->
+            <div id="connection-status" class="connection-indicator">
+                <span class="status-dot"></span>
+                <span class="status-text">Connexion...</span>
+            </div>
+
+            <!-- Modal de création de projet -->
+            <div id="create-project-modal" class="modal">
+                <div class="modal-content">
+                    <h2>Nouveau Projet</h2>
+                    <form id="create-project-form" data-form="create-project">
+                        <input type="text" name="name" placeholder="Nom du projet" required>
+                        <input type="text" name="description" placeholder="Description">
+                        <button type="submit">Créer</button>
+                        <button type="button" class="close-modal">Annuler</button>
+                    </form>
+                </div>
+            </div>
 
             <!-- Section Import & Fichiers -->
             <section class="section" data-section="import" aria-labelledby="import-title">

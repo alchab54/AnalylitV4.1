@@ -4,6 +4,12 @@ import { API_ENDPOINTS, MESSAGES } from './constants.js';
 // REMPLACEZ le contenu de tasks.js
 export async function fetchTasks() {
     try {
+        if (!API_ENDPOINTS?.tasks) {
+            console.warn('API_ENDPOINTS.tasks not defined yet');
+            return;
+        }
+        const tasks = await fetchAPI(API_ENDPOINTS.tasks);
+    try {
         const response = await fetchAPI(API_ENDPOINTS.tasksStatus);
         
         // CORRECTION : Traite les tâches avec job_id
