@@ -406,3 +406,222 @@ if (typeof window !== 'undefined') {
 
 // Export par défaut
 export default appState;
+
+// Ajoutez ces fonctions à la fin de votre fichier web/js/state.js
+
+/**
+ * Gère la sélection d'articles pour validation
+ */
+export const selectedArticles = new Set();
+
+/**
+ * Ajoute un article à la sélection
+ * @param {string|number} articleId - ID de l'article
+ */
+export function addSelectedArticle(articleId) {
+    selectedArticles.add(articleId);
+    console.log(`📄 Article ajouté à la sélection: ${articleId}`);
+    
+    // Émettre un événement
+    window.dispatchEvent(new CustomEvent('articles-selection-changed', {
+        detail: { selectedIds: Array.from(selectedArticles) }
+    }));
+}
+
+/**
+ * Retire un article de la sélection
+ * @param {string|number} articleId - ID de l'article
+ */
+export function removeSelectedArticle(articleId) {
+    selectedArticles.delete(articleId);
+    console.log(`📄 Article retiré de la sélection: ${articleId}`);
+    
+    // Émettre un événement
+    window.dispatchEvent(new CustomEvent('articles-selection-changed', {
+        detail: { selectedIds: Array.from(selectedArticles) }
+    }));
+}
+
+/**
+ * Vide la sélection d'articles
+ */
+export function clearSelectedArticles() {
+    selectedArticles.clear();
+    console.log('🗑️ Sélection d\'articles vidée');
+    
+    // Émettre un événement
+    window.dispatchEvent(new CustomEvent('articles-selection-changed', {
+        detail: { selectedIds: [] }
+    }));
+}
+
+/**
+ * Vérifie si un article est sélectionné
+ * @param {string|number} articleId - ID de l'article
+ * @returns {boolean}
+ */
+export function isArticleSelected(articleId) {
+    return selectedArticles.has(articleId);
+}
+
+/**
+ * Obtient tous les articles sélectionnés
+ * @returns {Array} IDs des articles sélectionnés
+ */
+export function getSelectedArticles() {
+    return Array.from(selectedArticles);
+}
+
+/**
+ * Sélectionne ou désélectionne tous les articles
+ * @param {Array} articleIds - IDs de tous les articles
+ * @param {boolean} select - true pour sélectionner, false pour désélectionner
+ */
+export function toggleAllArticles(articleIds, select = true) {
+    if (select) {
+        articleIds.forEach(id => selectedArticles.add(id));
+        console.log(`📄 ${articleIds.length} articles sélectionnés`);
+    } else {
+        selectedArticles.clear();
+        console.log('📄 Tous les articles désélectionnés');
+    }
+    
+    // Émettre un événement
+    window.dispatchEvent(new CustomEvent('articles-selection-changed', {
+        detail: { selectedIds: Array.from(selectedArticles) }
+    }));
+}
+
+/**
+ * Met à jour les résultats de recherche dans l'état
+ * @param {Array} results - Résultats de la recherche
+ * @param {string} searchQuery - Requête de recherche
+ */
+export function setSearchResults(results, searchQuery = '') {
+    appState.searchResults = results || [];
+    appState.lastSearchQuery = searchQuery;
+    appState.cache.searchResults.set(searchQuery, {
+        results,
+        timestamp: Date.now()
+    });
+    
+    console.log(`🔍 ${results.length} résultats de recherche mis à jour`);
+    
+    // Émettre un événement
+    window.dispatchEvent(new CustomEvent('search-results-updated', {
+        detail: { results, query: searchQuery }
+    }));
+}
+
+/**
+ * Filtre les résultats de recherche
+ * @param {Object} filters - Filtres à appliquer
+ */
+export function filterSearchResults(filters) {
+    const { status, dateRange, authors, keywords } = filters || {};
+    
+    if (!appState.searchResults) return [];
+    
+    let filtered = [...appState.searchResults];
+    
+    if (status && status !== 'all') {
+        filtered = filtered.filter(article => article.status === status);
+    }
+    
+    if (dateRange && dateRange.start && dateRange.end) {
+        filtered = filtered.filter(article => {
+            const articleDate = new Date(article.published_date || article.date);
+            return articleDate >= new Date(dateRange.start) && 
+                   articleDate <= new Date(dateRange.end);
+        });
+    }
+    
+    if (authors && authors.length > 0) {
+        filtered = filtered.filter(article => 
+            authors.some(author => 
+                article.authors?.some(a => 
+                    a.toLowerCase().includes(author.toLowerCase())
+                )
+            )
+        );
+    }
+    
+    if (keywords && keywords.length > 0) {
+        filtered = filtered.filter(article =>
+            keywords.some(keyword =>
+                article.title?.toLowerCase().includes(keyword.toLowerCase()) ||
+                article.abstract?.toLowerCase().includes(keyword.toLowerCase())
+            )
+        );
+    }
+    
+    console.log(`🎯 ${filtered.length} résultats après filtrage`);
+    return filtered;
+}
+
+/**
+ * Met à jour l'état de chargement global
+ * @param {boolean} loading - État de chargement
+ * @param {string} message - Message de chargement
+ */
+export function setLoadingState(loading, message = '') {
+    appState.isLoading = loading;
+    appState.loadingMessage = message;
+    
+    console.log(`⏳ État de chargement: ${loading ? 'ACTIF' : 'INACTIF'} - ${message}`);
+    
+    // Émettre un événement
+    window.dispatchEvent(new CustomEvent('loading-state-changed', {
+        detail: { loading, message }
+    }));
+}
+
+/**
+ * Met à jour la section active
+ * @param {string} sectionId - ID de la nouvelle section active
+ */
+export function setCurrentSection(sectionId) {
+    if (appState.currentSection !== sectionId) {
+        const previousSection = appState.currentSection;
+        appState.currentSection = sectionId;
+        
+        console.log(`🔄 Section changée: ${previousSection} → ${sectionId}`);
+        
+        // Émettre un événement
+        window.dispatchEvent(new CustomEvent('section-changed', {
+            detail: { 
+                previousSection, 
+                currentSection: sectionId 
+            }
+        }));
+    }
+}
+
+// Ajouter toutes ces nouvelles fonctions à l'interface de debug
+if (typeof window !== 'undefined') {
+    window.AnalyLitState = {
+        ...window.AnalyLitState,
+        
+        // Articles selection
+        selectedArticles,
+        addSelectedArticle,
+        removeSelectedArticle,
+        clearSelectedArticles,
+        isArticleSelected,
+        getSelectedArticles,
+        toggleAllArticles,
+        
+        // Search and filtering
+        setSearchResults,
+        filterSearchResults,
+        
+        // UI state
+        setLoadingState,
+        setCurrentSection,
+        
+        // Debug helpers
+        debugSelectedArticles: () => console.log('Articles sélectionnés:', Array.from(selectedArticles)),
+        debugSearchResults: () => console.log('Résultats de recherche:', appState.searchResults),
+        debugCurrentState: () => console.log('État complet:', appState)
+    };
+}
