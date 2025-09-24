@@ -6,8 +6,8 @@
 import { fetchAPI } from './api.js';
 
 // Mocker les dépendances (showToast et global.fetch)
-// Note : 'ui.js' est mocké car il n'est pas pertinent pour ce test unitaire.
-jest.mock('./ui.js', () => ({
+// Note : 'ui-improved.js' est mocké car il n'est pas pertinent pour ce test unitaire.
+jest.mock('./ui-improved.js', () => ({
   showToast: jest.fn(),
 }));
 

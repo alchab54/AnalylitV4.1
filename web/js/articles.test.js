@@ -26,8 +26,7 @@ jest.mock('./api.js');
 jest.mock('./ui-improved.js');
 jest.mock('./state.js');
 
-import * as articles from './articles.js';
-jest.mock('./app-improved.js'); // Mock app-improved.js
+// L'import de 'articles' est déjà fait en haut, pas besoin de le répéter.
 
 describe('Module Articles', () => {
   test('devrait charger le module sans erreur', () => {

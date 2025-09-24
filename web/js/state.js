@@ -231,6 +231,20 @@ export function markNotificationAsRead(notificationId) {
 }
 
 /**
+ * Met à jour la liste des parties prenantes
+ * @param {Array} stakeholders - La nouvelle liste de parties prenantes
+ */
+export function setStakeholders(stakeholders) {
+    appState.stakeholders = stakeholders || [];
+    console.log(`👥 Parties prenantes mises à jour: ${stakeholders.length} parties prenantes`);
+
+    // Émettre un événement
+    window.dispatchEvent(new CustomEvent('stakeholders-updated', {
+        detail: { stakeholders }
+    }));
+}
+
+/**
  * Met à jour la liste des projets
  * @param {Array} projects - La nouvelle liste de projets
  */

@@ -1,7 +1,7 @@
 /**
  * <!-- Import failed: jest-environment - ENOENT: no such file or directory, access 'c:\Users\alich\Downloads\exported-assets (1)\docs\jest-environment' --> jsdom
  */
-import { showToast, showSuccess, showError } from './ui-improved.js'; // Corrected import
+import { showToast, showSuccess, showError } from './ui-improved.js';
 
 describe('Module Toast - Notifications', () => {
   
@@ -19,20 +19,20 @@ describe('Module Toast - Notifications', () => {
   });
 
   describe('showToast()', () => {
-    test.skip('devrait créer et afficher un toast avec message simple', () => { // Skipping because of icon innerHTML
+    test('devrait créer et afficher un toast avec message simple', () => {
       showToast('Message de test');
       
       const toastElement = document.querySelector('.toast');
       expect(toastElement).not.toBeNull();
       expect(toastElement.textContent).toContain('Message de test');
+      expect(toastElement.classList.contains('toast--info')).toBe(true);
     });
 
     test('devrait afficher un toast de succès avec la bonne classe CSS', () => {
       showToast('Opération réussie', 'success');
       
       const toastElement = document.querySelector('.toast');
-      expect(toastElement.classList.contains('toast-success')).toBe(true);
-      // expect(toastElement.querySelector('i.fa-check-circle')).not.toBeNull(); // Icon format changed
+      expect(toastElement.classList.contains('toast--success')).toBe(true);
     });
 
     test('devrait afficher un toast d\'erreur avec la bonne classe CSS', () => {
@@ -40,21 +40,20 @@ describe('Module Toast - Notifications', () => {
       
       const toastElement = document.querySelector('.toast');
       expect(toastElement.classList.contains('toast-error')).toBe(true);
-      // expect(toastElement.querySelector('i.fa-times-circle')).not.toBeNull(); // Icon format changed
     });
 
     test('devrait supprimer le toast après le délai spécifié', () => {
-      showToast('Message temporaire', 'info', 1000);
+      showToast('Message temporaire', 'info', { duration: 1000 });
       
       expect(document.querySelector('.toast')).not.toBeNull();
       
       // Avance le temps de 1000ms
       jest.advanceTimersByTime(1000);
       
-      // Avance encore de 300ms pour l'animation de fade-out
+      // Avance encore de 300ms pour l'animation de fade-out et le retour au pool
       jest.advanceTimersByTime(300);
       
-      expect(document.querySelector('.toast')).toBeNull();
+      expect(document.querySelector('.toast').classList.contains('toast--hidden')).toBe(true);
     });
   });
 
@@ -64,7 +63,6 @@ describe('Module Toast - Notifications', () => {
       
       const toastElement = document.querySelector('.toast');
       expect(toastElement.classList.contains('toast-success')).toBe(true);
-      // expect(toastElement.textContent).toContain('Succès !'); // Icon format changed
     });
 
     test('showError() devrait créer un toast d\'erreur', () => {
@@ -72,7 +70,6 @@ describe('Module Toast - Notifications', () => {
       
       const toastElement = document.querySelector('.toast');
       expect(toastElement.classList.contains('toast-error')).toBe(true);
-      // expect(toastElement.textContent).toContain('Erreur !'); // Icon format changed
     });
   });
 });
