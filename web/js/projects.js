@@ -350,30 +350,6 @@ function getStatusText(status) {
     return statusTexts[status] || status;
 }
 
-export function renderProjectCards(projects) {
-    const container = document.getElementById('projects-list');
-    if (!container) return;
-    
-    container.innerHTML = '';
-    
-    if (!projects || projects.length === 0) {
-        container.innerHTML = '<p>Aucun projet disponible.</p>';
-        return;
-    }
-    
-    projects.forEach(project => {
-        const card = document.createElement('div');
-        card.className = 'project-card';
-        card.innerHTML = `
-            <h3>${project.name}</h3>
-            <p>${project.description || 'Pas de description'}</p>
-            <small>Créé le ${new Date(project.created_at).toLocaleDateString()}</small>
-        `;
-        card.addEventListener('click', () => selectProject(project.id));
-        container.appendChild(card);
-    });
-}
-
 export async function loadProjects() {
     try {
         const projects = await fetchAPI(API_ENDPOINTS.projects);
