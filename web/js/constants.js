@@ -11,7 +11,7 @@ export const SELECTORS = {
     modalsContainer: '#modalsContainer',
     
     // Projets
-    projectsList: '#projectsList',
+    projectsList: '#projects-list',
     createProjectBtn: '#createProjectBtn',
     projectDetail: '#projectDetail', // This was already correct
     projectDetailContent: '#projectDetailContent',

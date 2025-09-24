@@ -9,7 +9,7 @@ describe('Workflow de Gestion des Projets', () => {
     // Ouvrir la modale
     cy.get('[data-action="create-project-modal"]').click();
     cy.get('#newProjectModal').should('be.visible');
-    cy.contains('h2', 'Nouveau Projet').should('be.visible');
+    cy.contains('h3', 'Créer un Nouveau Projet').should('be.visible');
     
     // Fermer la modale
     cy.get('[data-action="close-modal"]').click();
@@ -23,7 +23,7 @@ describe('Workflow de Gestion des Projets', () => {
     // Remplir le formulaire
     cy.get('#projectName').type('Projet Test E2E');
     cy.get('#projectDescription').type('Description du projet créé par Cypress');
-    cy.get('#analysisMode').select('standard');
+    cy.get('#projectAnalysisMode').select('screening');
     
     // Soumettre le formulaire
     cy.get('form[data-form="create-project"]').submit();

@@ -27,9 +27,9 @@ describe('Tests de Smoke - Vérifications de base AnalyLit', () => {
 
   it('Devrait permettre la navigation entre les sections principales', () => {
     cy.wait(1000); // Attendre que l'interface se stabilise
-    // Tester la navigation vers Recherche
-    cy.get('[data-section-id="search"]').click({ force: true });
-    cy.get('#searchContainer').should('be.visible');
+    // Tester la navigation vers Articles
+    cy.get('[data-section-id="articles"]').click({ force: true });
+    cy.get('#articlesContainer').should('be.visible');
     
     // Tester la navigation vers Résultats
     cy.get('[data-section-id="results"]').click({ force: true });

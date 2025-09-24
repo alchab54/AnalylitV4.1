@@ -53,7 +53,7 @@ import {
     handleUploadPdfs,
     processPmidImport
 } from './import.js';
-import { showStakeholderManagementModal, addStakeholderGroup, deleteStakeholderGroup, runStakeholderAnalysis, init as initStakeholdersModule, renderStakeholdersSection } from './stakeholders.js'; // Corrected import
+import { showStakeholderManagementModal, addStakeholderGroup, deleteStakeholderGroup, runStakeholderAnalysis, renderStakeholdersSection } from './stakeholders.js'; // Corrected import
 import { fetchTasks, renderTasks } from './tasks.js';
 import {
     renderSettings,
