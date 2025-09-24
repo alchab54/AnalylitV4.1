@@ -11,7 +11,7 @@ import {
     toggleArticleSelection,
     viewArticleDetails,
     selectAllArticles, 
-    loadSearchResults // --- LA FONCTION EST IMPORTÉE DEPUIS articles.js
+    loadSearchResults 
 } from './articles.js';
 import { 
     exportAnalyses,

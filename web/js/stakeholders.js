@@ -250,4 +250,16 @@ const stakeholdersModule = (() => {
     };
 })();
 
-export default stakeholdersModule;
+export function showStakeholderManagementModal() {
+    console.log('Ouverture modale gestion parties prenantes');
+    // Logic à implémenter selon vos besoins
+}
+
+export function deleteStakeholderGroup(groupId) {
+    return removeStakeholderGroup(appState.currentProject?.id, groupId);
+}
+
+export function runStakeholderAnalysis() {
+    console.log('Lancement analyse parties prenantes');
+    // Logic à implémenter selon vos besoins
+}
