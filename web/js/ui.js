@@ -7,18 +7,6 @@
  * @param {string} unsafe - La chaîne de caractères à échapper.
  * @returns {string} - La chaîne échappée.
  */
-export function escapeHtml(unsafe) {
-    if (unsafe === null || unsafe === undefined) {
-        return '';
-    }
-    return unsafe
-         .toString()
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
-}
 
 /**
  * Affiche un message toast.

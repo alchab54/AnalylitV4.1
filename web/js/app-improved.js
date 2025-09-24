@@ -1,243 +1,224 @@
-// web/app.js
-// ================================================================
-// AnalyLit V4.1 - Application Frontend (Version améliorée)
-// ================================================================
+// web/js/app-improved.js
+
+import { appState, initializeState } from './state.js';
 import { API_ENDPOINTS, SELECTORS, MESSAGES } from './constants.js';
-import CONFIG from './config.js';
-import { layoutOptimizer } from './layout-optimizer.js';
-import { showLoadingOverlay, closeModal, openModal } from './ui-improved.js';
-import { showToast, showSuccess, showError } from './toast.js';
-import { loadProjects, selectProject, handleCreateProject, confirmDeleteProject, deleteProject } from './projects.js';
-import { loadAnalysisProfiles, openProfileEditor, handleDeleteProfile, handleSaveProfile, loadOllamaModels, renderSettings } from './settings.js';
-import { renderImportSection, handleZoteroImport, showPmidImportModal, handleUploadPdfs, handleIndexPdfs, handleZoteroSync, processPmidImport, exportForThesis } from './import.js';
-import { startBatchProcessing, showRunExtractionModal, startFullExtraction } from './articles.js'; // Corrected from pipeline.js and results.js
-import { renderKnowledgeGraph, loadProjectAnalyses, exportAnalyses, runProjectAnalysis, showPRISMAModal, savePRISMAProgress, exportPRISMAReport } from './analyses.js';
-import { handleGeneratePrisma, renderReportingSection, generateBibliography, generateSummaryTable, exportSummaryTableExcel, savePrismaChecklist } from './reporting.js';
-import stakeholdersModule from './stakeholders.js';
-import reportingModule from './reporting.js';
-import { handleRunMetaAnalysis } from './analyses.js'; // Corrected from stats.js
-import { loadValidationSection, handleValidateExtraction, resetValidationStatus, filterValidationList } from './validation.js';
-import { loadQueuesStatus, handleClearQueue, handlePullModel, showEditPromptModal, handleSavePrompt } from './settings.js'; // Corrected from admin.js
-import { setupDelegatedEventListeners, refreshCurrentSection, showSection, initializeWebSocket } from './core.js';
-import { showGridFormModal, addGridFieldInput, handleSaveGrid, loadProjectGrids, handleDeleteGrid, removeGridField, triggerGridImport, handleGridImportUpload } from './grids.js'; // Corrected import
-import { sendChatMessage, loadChatMessages, renderChatInterface } from './chat.js'; // Corrected import
-import { fetchTasks } from './tasks.js';
-import { ThemeManager } from './theme-manager.js';
+import { loadProjects } from './projects.js';
+import { renderProjectCards } from './ui-improved.js';
+import { showSection } from './core.js';
 
-export const API_BASE_URL = CONFIG.API_BASE_URL;
+// ============================
+// Variables globales
+// ============================
 
-export const WEBSOCKET_URL = CONFIG.WEBSOCKET_URL;
+let isInitialized = false;
 
-export const appState = {
-    currentProject: null,
-    projects: [],
-    searchResults: [],
-    searchResultsMeta: {},
-    analysisProfiles: [],
-    ollamaModels: [],
-    prompts: [],
-    currentProjectGrids: [],
-    currentProjectExtractions: [],
-    currentProjectChatHistory: [],
-    socketConnected: false,
-    currentSection: 'projects',
-    socket: null,
-    availableDatabases: [],
-    notifications: [],
-    unreadNotifications: 0,
-    analysisResults: {},
-    chatMessages: [],
-    currentValidations: [],
-    queuesInfo: [],
-    selectedSearchResults: new Set(),
-    prismaChecklist: null,
-    renderedSections: new Set(),
-    themeManager: null,
-    activeEvaluator: 'evaluator1',
-    performance: {
-        startTime: performance.now(),
-        loadTimes: {},
-        errors: []
-    }
-};
+// ============================
+// Initialisation principale
+// ============================
 
-export let elements = {};
-
+/**
+ * Point d'entrée principal de l'application
+ */
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log(MESSAGES.appStart);
-
-    // Initialiser le gestionnaire de thème
-    appState.themeManager = new ThemeManager();
-
-    // Sélection et vérification des éléments DOM
-    const queries = {
-        sections:        document.querySelectorAll(SELECTORS.sections),
-        navButtons:      document.querySelectorAll(SELECTORS.navButtons),
-        connectionStatus: document.querySelector(SELECTORS.connectionStatus),
-        projectsList:   document.querySelector(SELECTORS.projectsList),
-        createProjectBtn: document.querySelector(SELECTORS.createProjectBtn),
-        projectDetail:  document.querySelector(SELECTORS.projectDetail),
-        projectDetailContent: document.querySelector(SELECTORS.projectDetailContent),
-        projectPlaceholder:   document.querySelector(SELECTORS.projectPlaceholder),
-        resultsContainer:     document.querySelector(SELECTORS.resultsContainer),
-        validationContainer:  document.querySelector(SELECTORS.validationContainer),
-        analysisContainer:    document.querySelector(SELECTORS.analysisContainer),
-        importContainer:      document.querySelector(SELECTORS.importContainer),
-        chatContainer:        document.querySelector(SELECTORS.chatContainer),
-        settingsContainer:    document.querySelector(SELECTORS.settingsContainer),
-        robContainer:         document.querySelector(SELECTORS.robContainer),
-        modalsContainer:      document.querySelector(SELECTORS.modalsContainer),
-        loadingOverlay:       document.querySelector(SELECTORS.loadingOverlay),
-        toastContainer:       document.querySelector(SELECTORS.toastContainer),
-        reportingContainer:   document.querySelector(SELECTORS.reportingContainer),
-        tasksContainer:       document.querySelector(SELECTORS.tasksContainer),
-        newProjectForm:       document.querySelector(SELECTORS.newProjectForm),
-        gridsContainer:       document.querySelector(SELECTORS.gridsContainer),
-        searchContainer:      document.querySelector(SELECTORS.searchContainer),
-    };
-
-    const critical = ['sections','navButtons','loadingOverlay','toastContainer'];
-    const missing = [];
-
-    for (const [key, el] of Object.entries(queries)) {
-        elements[key] = el;
-        if (!el || (el instanceof NodeList && el.length === 0)) {
-            if (critical.includes(key)) missing.push(key);
-        }
-    }
-
-    if (missing.length) {
-        console.error(MESSAGES.missingDOMElement, missing);
-        showToast(MESSAGES.errorUI, 'error');
-        return;
-    }
-
-    initializeApplication();
-
-     // Initialiser l'optimiseur de layout
-    layoutOptimizer.init();
-    layoutOptimizer.setupResponsiveOptimization();
+    if (isInitialized) return;
     
-    // Auto-optimisation sur changement de section
-    document.addEventListener('click', (e) => {
-        if (e.target.matches('.app-nav__button')) {
-            setTimeout(() => layoutOptimizer.optimizeCurrentSection(), 200);
-        }
-    });
+    console.log('🚀 Démarrage de AnalyLit V4.1 Frontend (Version améliorée)...');
+    
+    try {
+        const startTime = performance.now();
+        
+        // Initialisation de l'état
+        initializeState();
+        
+        // Initialisation des gestionnaires d'événements
+        initializeEventHandlers();
+        
+        // Chargement des données initiales
+        await loadInitialData();
+        
+        // Affichage de la section par défaut
+        await showSection('projects');
+        
+        const endTime = performance.now();
+        console.log(`✅ Application initialisée en ${(endTime - startTime).toFixed(2)}ms`);
+        
+        isInitialized = true;
+        
+    } catch (error) {
+        console.error('❌ Erreur lors de l\'initialisation:', error);
+        showError('Erreur lors de l\'initialisation de l\'application');
+    }
 });
 
-async function initializeApplication() {
-    const t0 = performance.now();
-    try {
-        setupDelegatedEventListeners();
-        initializeWebSocket();
-        stakeholdersModule.init();
-        reportingModule.init();
-        setInterval(fetchTasks, 5000); // Refresh tasks every 5 seconds
-        await loadInitialData();
+/**
+ * Initialise tous les gestionnaires d'événements
+ */
+function initializeEventHandlers() {
+    // Gestionnaire de navigation
+    document.addEventListener('click', handleNavigation);
+    
+    // Gestionnaire de modales
+    document.addEventListener('click', handleModalActions);
+    
+    // Gestionnaire de formulaires
+    document.addEventListener('submit', handleForms);
+    
+    // Gestionnaire d'événements personnalisés
+    document.addEventListener('project-select', handleProjectSelect);
+    
+    console.log('🔧 Gestionnaires d\'événements initialisés');
+}
 
-        const last = localStorage.getItem(CONFIG.LOCAL_STORAGE_LAST_SECTION) || 'projects';
-        showSection(last);
-
-        if (appState.projects.length && !appState.currentProject) {
-            const id = appState.projects[0].id;
-            await selectProject(id);
-            if (last==='projects') refreshCurrentSection();
-        }
-
-        setupKeyboardShortcuts();
-        setupPerformanceMonitoring();
-
-        const initMs = performance.now() - t0;
-        console.log(MESSAGES.appInitialized(initMs.toFixed(2)));
-        appState.performance.loadTimes.initialization = initMs;
-    } catch (err) {
-        console.error(MESSAGES.initError, err);
-        appState.performance.errors.push({type:'init',error:err.message,timestamp:Date.now()});
-        showToast(MESSAGES.loadError, 'error');
+/**
+ * Gestionnaire unifié de navigation
+ */
+function handleNavigation(event) {
+    const button = event.target.closest('[data-action="show-section"]');
+    if (!button) return;
+    
+    event.preventDefault();
+    
+    const sectionId = button.dataset.sectionId;
+    if (sectionId) {
+        // Mettre à jour l'état actif des boutons
+        document.querySelectorAll('.app-nav__button').forEach(btn => {
+            btn.classList.remove('app-nav__button--active');
+        });
+        button.classList.add('app-nav__button--active');
+        
+        // Afficher la section
+        showSection(sectionId);
     }
 }
 
+/**
+ * Gestionnaire des actions de modales
+ */
+function handleModalActions(event) {
+    const action = event.target.dataset.action;
+    
+    switch (action) {
+        case 'create-project-modal':
+            import('./ui-improved.js').then(({ showCreateProjectModal }) => {
+                showCreateProjectModal();
+            });
+            break;
+            
+        case 'close-modal':
+            import('./ui-improved.js').then(({ closeModal }) => {
+                closeModal();
+            });
+            break;
+            
+        case 'select-project':
+            const projectId = event.target.closest('[data-project-id]')?.dataset.projectId;
+            if (projectId) {
+                import('./projects.js').then(({ selectProject }) => {
+                    selectProject(projectId);
+                });
+            }
+            break;
+    }
+}
+
+/**
+ * Gestionnaire de formulaires
+ */
+function handleForms(event) {
+    const form = event.target;
+    const formType = form.dataset.form;
+    
+    switch (formType) {
+        case 'create-project':
+            event.preventDefault();
+            import('./projects.js').then(({ handleCreateProject }) => {
+                handleCreateProject(event);
+            });
+            break;
+    }
+}
+
+/**
+ * Gestionnaire de sélection de projet (événement personnalisé)
+ */
+function handleProjectSelect(event) {
+    const { projectId } = event.detail;
+    import('./projects.js').then(({ selectProject }) => {
+        selectProject(projectId);
+    });
+}
+
+/**
+ * Charge les données initiales de l'application
+ */
 async function loadInitialData() {
-    const t1 = performance.now();
+    const startTime = performance.now();
+    
     try {
-        await Promise.all([loadProjects(), loadAvailableDatabases(), loadAnalysisProfiles()]);
-        const loadMs = performance.now() - t1;
-        appState.performance.loadTimes.initialData = loadMs;
-        console.log(MESSAGES.initialDataLoaded(loadMs.toFixed(2)));
-    } catch (err) {
-        console.error(MESSAGES.initialDataError, err);
-        throw err;
+        // Chargement en parallèle des données essentielles
+        const promises = [
+            loadProjects(),
+            loadAnalysisProfiles()
+        ];
+        
+        await Promise.all(promises);
+        
+        const endTime = performance.now();
+        console.log(`📊 Données initiales chargées en ${(endTime - startTime).toFixed(2)}ms`);
+        
+    } catch (error) {
+        console.error('Erreur lors du chargement des données initiales:', error);
+        throw error;
     }
 }
 
-async function loadAvailableDatabases() {
+/**
+ * Charge les profils d'analyse
+ */
+async function loadAnalysisProfiles() {
     try {
-        appState.availableDatabases = await fetchAPI(API_ENDPOINTS.databases);
-    } catch {
-        appState.availableDatabases = [];
+        const { fetchAPI } = await import('./api.js');
+        const profiles = await fetchAPI(API_ENDPOINTS.analysisProfiles);
+        appState.analysisProfiles = profiles || [];
+        return profiles;
+    } catch (error) {
+        console.error('Erreur lors du chargement des profils d\'analyse:', error);
+        appState.analysisProfiles = [];
+        return [];
     }
 }
 
-function setupKeyboardShortcuts() {
-    document.addEventListener('keydown', e => {
-        if ((e.ctrlKey||e.metaKey)&&e.key==='k') { e.preventDefault(); showSection('search'); }
-        if (e.key==='Escape') document.querySelector('.modal--show')?.classList.remove('modal--show');
-        if (e.altKey && /^[1-9]$/.test(e.key)) {
-            e.preventDefault();
-            const seq = ['projects','search','results','validation','grids','rob','analyses','import','chat'];
-            showSection(seq[+e.key-1]);
-        }
+/**
+ * Affiche un message d'erreur
+ */
+function showError(message) {
+    import('./toast.js').then(({ showError }) => {
+        showError(message);
     });
 }
 
-function setupPerformanceMonitoring() {
-    window.addEventListener('error', ev => {
-        appState.performance.errors.push({type:'js',error:ev.error?.message||ev.message,filename:ev.filename,line:ev.lineno,timestamp:Date.now()});
-    });
-    window.addEventListener('unhandledrejection', ev => {
-        appState.performance.errors.push({type:'promise',error:ev.reason?.message||ev.reason,timestamp:Date.now()});
-    });
-    const orig = showSection;
-    window.showSection = function(sec) {
-        const t = performance.now();
-        const res = orig.call(this,sec);
-        appState.performance.loadTimes[`section_${sec}`]=performance.now()-t;
-        return res;
-    };
-}
-
-export function getPerformanceReport() {
-    const total = performance.now() - appState.performance.startTime;
-    return {
-        totalRunTime: total,
-        loadTimes: appState.performance.loadTimes,
-        errorCount: appState.performance.errors.length,
-        errors: appState.performance.errors.slice(-10),
-        memoryUsage: performance.memory ? {
-            used: Math.round(performance.memory.usedJSHeapSize/1024/1024),
-            total: Math.round(performance.memory.totalJSHeapSize/1024/1024),
-            limit: Math.round(performance.memory.jsHeapSizeLimit/1024/1024)
-        } : null
-    };
-}
+// ============================
+// Interface de debug globale
+// ============================
 
 window.AnalyLit = {
-    state: appState,
-    elements,
-    performance: getPerformanceReport,
-    switchTheme: theme => appState.themeManager.setTheme(theme),
-    exportState: () => {
-        const report = {
-            currentProject: appState.currentProject?.id,
-            currentSection: appState.currentSection,
-            projectsCount: appState.projects.length,
-            selectedResults: appState.selectedSearchResults.size,
-            performance: getPerformanceReport()
-        };
-        console.log(MESSAGES.appStateLog, report);
-        return report;
+    appState,
+    reinitialize: () => {
+        isInitialized = false;
+        location.reload();
+    },
+    debug: {
+        showState: () => console.log('État actuel:', appState),
+        showProjects: () => console.log('Projets:', appState.projects),
+        forceRender: () => {
+            if (appState.projects) {
+                renderProjectCards(appState.projects);
+            }
+        }
     }
 };
 
-console.log(MESSAGES.debugInterface);
+console.log('🎯 Interface de debug disponible: window.AnalyLit');
+
+// Export pour les modules qui en ont besoin
+export { appState, loadInitialData, initializeEventHandlers };

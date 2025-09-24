@@ -3,8 +3,7 @@
  * Module UI amélioré avec animations, accessibilité et gestion d'erreurs
  */
 import { MESSAGES, SELECTORS } from './constants.js';
-import { selectProject } from './projects.js'; // Importez la fonction pour gérer le clic
-import { escapeHtml } from './utils.js'; // Importez la fonction de sécurité
+
 // ============================
 // Utilitaires de base
 // ============================
@@ -41,6 +40,32 @@ export function debounce(func, wait, immediate = false) {
         if (callNow) func.apply(this, args);
     };
 }
+
+/**
+ * Throttle pour limiter la fréquence d'exécution
+ */
+export function throttle(func, limit) {
+    let lastFunc;
+    let lastRan;
+    return function(...args) {
+        if (!lastRan) {
+            func.apply(this, args);
+            lastRan = Date.now();
+        } else {
+            clearTimeout(lastFunc);
+            lastFunc = setTimeout(() => {
+                if ((Date.now() - lastRan) >= limit) {
+                    func.apply(this, args);
+                    lastRan = Date.now();
+                }
+            }, limit - (Date.now() - lastRan));
+        }
+    }
+}
+
+// ============================
+// Rendu des cartes de projets
+// ============================
 
 /**
  * Affiche la liste des projets sous forme de cartes interactives.
@@ -97,36 +122,17 @@ export function renderProjectCards(projects) {
         `;
 
         // Ajoute un écouteur d'événement pour rendre la carte cliquable.
-        // Au clic, la fonction selectProject est appelée avec l'ID du projet.
+        // Au clic, on émet un événement personnalisé que le module projects pourra écouter
         card.addEventListener('click', () => {
-            selectProject(project.id);
+            card.dispatchEvent(new CustomEvent('project-select', {
+                bubbles: true,
+                detail: { projectId: project.id }
+            }));
         });
 
         // Ajoute la carte nouvellement créée au conteneur.
         container.appendChild(card);
     });
-}
-
-/**
- * Throttle pour limiter la fréquence d'exécution
- */
-export function throttle(func, limit) {
-    let lastFunc;
-    let lastRan;
-    return function(...args) {
-        if (!lastRan) {
-            func.apply(this, args);
-            lastRan = Date.now();
-        } else {
-            clearTimeout(lastFunc);
-            lastFunc = setTimeout(() => {
-                if ((Date.now() - lastRan) >= limit) {
-                    func.apply(this, args);
-                    lastRan = Date.now();
-                }
-            }, limit - (Date.now() - lastRan));
-        }
-    }
 }
 
 // ============================
@@ -811,5 +817,6 @@ export default {
     logger,
     validateForm,
     animateIn,
-    animateOut
+    animateOut,
+    renderProjectCards
 };

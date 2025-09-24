@@ -2,39 +2,41 @@
 
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
-import { showLoadingOverlay, closeModal, escapeHtml, showModal } from './ui-improved.js'; 
+import { showLoadingOverlay, closeModal, escapeHtml, showModal, renderProjectCards } from './ui-improved.js'; 
 import { showToast, showSuccess, showError } from './toast.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
-import { renderProjectCards } from './ui-improved.js';
 
-// Fonctions utilitaires locales ou importées d'autres modules si nécessaire
+// ============================
+// Fonctions principales
+// ============================
 
 /**
- * Charge la liste des projets et déclenche le rendu de la liste.
+ * Charge la liste des projets depuis l'API et met à jour l'interface utilisateur.
+ * Cette fonction unifie le chargement et le rendu des projets.
  */
-async function loadProjects() {
-  const oldProjectIds = new Set((appState.projects || []).map(p => p.id));
-  const projects = await fetchAPI(API_ENDPOINTS.projects);
-  appState.projects = projects || [];
-
-  const newProjectIds = new Set(appState.projects.map(p => p.id));
-
-  if (oldProjectIds.size !== newProjectIds.size || ![...oldProjectIds].every(id => newProjectIds.has(id))) {
-    renderProjectsList();
-  }
-  autoSelectFirstProject();
-  try {
+export async function loadProjects() {
+    try {
         const projects = await fetchAPI(API_ENDPOINTS.projects);
-        appState.projects = projects;
+        appState.projects = projects || [];
         
-        // CET APPEL EST CRUCIAL !
+        // Appeler le rendu des cartes pour Cypress
         renderProjectCards(projects);
+        
+        // Rendu de la liste pour l'interface principale
+        renderProjectsList();
+        
+        // Sélection automatique du premier projet si nécessaire
+        autoSelectFirstProject();
         
         return projects;
     } catch (error) {
         console.error("Erreur lors du chargement des projets:", error);
         showError("Impossible de charger les projets.");
-        renderProjectCards([]); // Affiche un état vide en cas d'erreur
+        
+        // Afficher un état vide en cas d'erreur
+        renderProjectCards([]);
+        displayEmptyProjectsState();
+        
         return [];
     }
 }
@@ -43,47 +45,47 @@ async function loadProjects() {
  * Sélectionne automatiquement le premier projet si aucun n'est encore sélectionné.
  */
 async function autoSelectFirstProject() {
-  if (appState.projects.length > 0 && !appState.currentProject) {
-    const firstProject = appState.projects[0];
-    console.log('Sélection automatique du premier projet:', firstProject.id);
-    await selectProject(firstProject.id);
-  }
+    if (appState.projects.length > 0 && !appState.currentProject) {
+        const firstProject = appState.projects[0];
+        console.log('Sélection automatique du premier projet:', firstProject.id);
+        await selectProject(firstProject.id);
+    }
 }
 
 /**
  * Crée un projet.
  */
 async function handleCreateProject(event) {
-  event.preventDefault();
-  const form = event.target;
-  const name = form.querySelector('#projectName').value.trim();
-  const description = form.querySelector('#projectDescription').value.trim();
-  const mode = form.querySelector('#analysisMode').value;
+    event.preventDefault();
+    const form = event.target;
+    const name = form.querySelector('#projectName').value.trim();
+    const description = form.querySelector('#projectDescription').value.trim();
+    const mode = form.querySelector('#analysisMode').value;
 
-  if (!name) {
-    showToast(MESSAGES.projectNameRequired, 'warning');
-    return;
-  }
-
-  try {
-    showLoadingOverlay(true, MESSAGES.creatingProject);
-
-    const newProject = await fetchAPI(API_ENDPOINTS.projects, {
-      method: 'POST',
-      body: { name, description, mode }
-    });
-
-    await loadProjects();
-    if (newProject?.id) {
-      await selectProject(newProject.id);
+    if (!name) {
+        showToast(MESSAGES.projectNameRequired, 'warning');
+        return;
     }
-    showSuccess(MESSAGES.projectCreated);
-    closeModal('newProjectModal');
-  } catch (e) {
-    showError(`Erreur: ${e.message}`);
-  } finally {
-    showLoadingOverlay(false, '');
-  }
+
+    try {
+        showLoadingOverlay(true, MESSAGES.creatingProject);
+
+        const newProject = await fetchAPI(API_ENDPOINTS.projects, {
+            method: 'POST',
+            body: { name, description, mode }
+        });
+
+        await loadProjects();
+        if (newProject?.id) {
+            await selectProject(newProject.id);
+        }
+        showSuccess(MESSAGES.projectCreated);
+        closeModal('newProjectModal');
+    } catch (e) {
+        showError(`Erreur: ${e.message}`);
+    } finally {
+        showLoadingOverlay(false, '');
+    }
 }
 
 /**
@@ -91,37 +93,40 @@ async function handleCreateProject(event) {
  * charge les fichiers PDF liés, et rafraîchit la section active.
  */
 async function selectProject(projectId) {
-  if (!projectId) return;
-  try {
-    appState.currentProject = appState.projects.find(p => p.id === projectId);
-    renderProjectsList();
+    if (!projectId) return;
+    
+    try {
+        appState.currentProject = appState.projects.find(p => p.id === projectId);
+        renderProjectsList();
 
-    // Rejoindre la room WebSocket du projet
-    if (appState.socket) {
-      appState.socket.emit('join_room', { room: projectId });
+        // Rejoindre la room WebSocket du projet
+        if (appState.socket) {
+            appState.socket.emit('join_room', { room: projectId });
+        }
+        
+        // La logique de rafraîchissement est gérée par le gestionnaire de navigation principal
+        document.querySelector('.app-nav__button[data-section-id="results"]')?.click();
+    } catch (e) {
+        showToast(`Erreur: ${e.message}`, 'error');
     }
-    // La logique de rafraîchissement est gérée par le gestionnaire de navigation principal
-    document.querySelector('.app-nav__button[data-section-id="results"]').click();
-  } catch (e) {
-    showToast(`Erreur: ${e.message}`, 'error');
-  }
 }
 
 /**
  * Supprime un projet.
  */
 function deleteProject(projectId, projectName) {
-  if (!projectId) return;
-  appState.projectToDelete = { id: projectId, name: projectName };
-  const modalContent = `
-    <p>${MESSAGES.confirmDeleteProjectBody(escapeHtml(projectName))}</p> 
-    <p>Cette action est irréversible.</p>
-    <div class="modal-actions">
-      <button class="btn btn--secondary" data-action="close-modal">Annuler</button>
-      <button class="btn btn--danger" data-action="confirm-delete-project">Supprimer</button>
-    </div>
-  `;
-  showModal(MESSAGES.confirmDeleteProjectTitle, modalContent);
+    if (!projectId) return;
+    
+    appState.projectToDelete = { id: projectId, name: projectName };
+    const modalContent = `
+        <p>${MESSAGES.confirmDeleteProjectBody(escapeHtml(projectName))}</p> 
+        <p>Cette action est irréversible.</p>
+        <div class="modal-actions">
+            <button class="btn btn--secondary" data-action="close-modal">Annuler</button>
+            <button class="btn btn--danger" data-action="confirm-delete-project">Supprimer</button>
+        </div>
+    `;
+    showModal(MESSAGES.confirmDeleteProjectTitle, modalContent);
 }
 
 /**
@@ -130,6 +135,7 @@ function deleteProject(projectId, projectName) {
 async function confirmDeleteProject(projectId) {
     showLoadingOverlay(true, MESSAGES.deletingProject);
     closeModal(); // Ferme la modale de confirmation
+    
     try {
         await fetchAPI(API_ENDPOINTS.projectById(projectId), { method: 'DELETE' });
         showToast(MESSAGES.projectDeleted, 'success');
@@ -140,6 +146,7 @@ async function confirmDeleteProject(projectId) {
         if (appState.currentProject?.id === projectId) {
             appState.currentProject = null;
         }
+        
         renderProjectsList();
         renderProjectDetail(appState.currentProject);
     } catch (e) {
@@ -153,12 +160,13 @@ async function confirmDeleteProject(projectId) {
  * Exporte un projet.
  */
 async function handleExportProject(projectId) {
-  if (!projectId) {
-    showToast(MESSAGES.projectIdMissingForExport, 'warning');
-    return;
-  }
-  window.open(API_ENDPOINTS.projectExport(projectId), '_blank');
-  showToast(MESSAGES.projectExportStarted, 'info');
+    if (!projectId) {
+        showToast(MESSAGES.projectIdMissingForExport, 'warning');
+        return;
+    }
+    
+    window.open(API_ENDPOINTS.projectExport(projectId), '_blank');
+    showToast(MESSAGES.projectExportStarted, 'info');
 }
 
 /**
@@ -169,60 +177,72 @@ async function loadProjectFilesSet(projectId) {
         appState.currentProjectFiles = new Set();
         return;
     }
-  try {
-    // TODO: Backend route for getting project files is missing.
-    // const files = await fetchAPI(`/projects/${projectId}/files`);
-    const filenames = (files || [])
-      .map(f => String(f.filename || '').replace(/\.pdf$/i, '').toLowerCase());
-    appState.currentProjectFiles = new Set(filenames);
-  } catch (error) {
-    console.error('Erreur chargement des fichiers projet:', error);
-    appState.currentProjectFiles = new Set();
-  }
+    
+    try {
+        // TODO: Backend route for getting project files is missing.
+        // const files = await fetchAPI(`/projects/${projectId}/files`);
+        const files = []; // Temporaire en attendant l'implémentation backend
+        const filenames = (files || [])
+            .map(f => String(f.filename || '').replace(/\.pdf$/i, '').toLowerCase());
+        appState.currentProjectFiles = new Set(filenames);
+    } catch (error) {
+        console.error('Erreur chargement des fichiers projet:', error);
+        appState.currentProjectFiles = new Set();
+    }
 }
+
+// ============================
+// Fonctions de rendu
+// ============================
 
 /**
  * Rendu de la liste des projets (colonne gauche).
  */
 function renderProjectsList() {
-  const container = document.querySelector(SELECTORS.projectsList);
-  if (!container) return;
+    const container = document.querySelector(SELECTORS.projectsList);
+    if (!container) return;
 
-  const projects = Array.isArray(appState.projects) ? appState.projects : [];
+    const projects = Array.isArray(appState.projects) ? appState.projects : [];
 
-  if (projects.length === 0) {
-    displayEmptyProjectsState();
-    return;
-  }
+    if (projects.length === 0) {
+        displayEmptyProjectsState();
+        return;
+    }
 
-  const projectsHtml = projects.map(project => {
-    const isActive = appState.currentProject?.id === project.id;
-    return `
-      <div class="project-card ${isActive ? 'project-card--active' : ''}" data-action="select-project" data-project-id="${project.id}">
-        <div class="project-card__header">
-            <h3 class="project-title">${escapeHtml(project.name)}</h3>
-            <span class="status ${getStatusClass(project.status)}">${getStatusText(project.status)}</span>
-        </div>
-        <p class="project-description">${escapeHtml(project.description || 'Pas de description.')}</p>
-        <div class="project-footer">
-            <small>Modifié le: ${new Date(project.updated_at).toLocaleString('fr-FR')}</small>
-            <button class="btn btn--danger btn--sm" data-action="delete-project" data-project-id="${project.id}" data-project-name="${escapeHtml(project.name)}">
-                🗑️ Supprimer
-            </button>
-        </div>
-      </div>
-    `;
-  }).join('');
+    const projectsHtml = projects.map(project => {
+        const isActive = appState.currentProject?.id === project.id;
+        return `
+            <div class="project-card ${isActive ? 'project-card--active' : ''}" 
+                 data-action="select-project" 
+                 data-project-id="${project.id}">
+                <div class="project-card__header">
+                    <h3 class="project-title">${escapeHtml(project.name)}</h3>
+                    <span class="status ${getStatusClass(project.status)}">${getStatusText(project.status)}</span>
+                </div>
+                <p class="project-description">${escapeHtml(project.description || 'Pas de description.')}</p>
+                <div class="project-footer">
+                    <small>Modifié le: ${new Date(project.updated_at).toLocaleString('fr-FR')}</small>
+                    <button class="btn btn--danger btn--sm" 
+                            data-action="delete-project" 
+                            data-project-id="${project.id}" 
+                            data-project-name="${escapeHtml(project.name)}">
+                        🗑️ Supprimer
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
 
-  container.innerHTML = projectsHtml;
+    container.innerHTML = projectsHtml;
 }
 
 /**
  * Affiche un état vide quand aucun projet n'est trouvé.
  */
 export function displayEmptyProjectsState() {
-    const container = elements.projectsList;
+    const container = elements.projectsList || document.querySelector(SELECTORS.projectsList);
     if (!container) return;
+    
     container.innerHTML = `
         <div class="empty-state">
             <h3>Aucun projet trouvé</h3>
@@ -234,150 +254,155 @@ export function displayEmptyProjectsState() {
     `;
 }
 
-function updateProjectListSelection() {
-  const projectCards = document.querySelectorAll('.project-card');
-  projectCards?.forEach(card => {
-    const projectId = card.dataset.projectId;
-    if (appState.currentProject?.id === projectId) {
-      card.classList.add('project-card--active'); // Assurez-vous que cette classe existe dans votre CSS
-    } else {
-      card.classList.remove('project-card--active');
-    }
-  });
-}
-
 /**
- * Renvoie une classe de badge status compatible avec le CSS.
+ * Met à jour la sélection dans la liste des projets.
  */
-function getStatusClass(status) {
-  switch (status) {
-    case 'completed':
-    case 'search_completed':
-      return 'status--success';
-    case 'in_progress':
-      return 'status--warning';
-    case 'pending':
-      return 'status--info';
-    case 'error':
-      return 'status--error';
-    default:
-      return 'status--secondary';
-  }
+function updateProjectListSelection() {
+    const projectCards = document.querySelectorAll('.project-card');
+    projectCards?.forEach(card => {
+        const projectId = card.dataset.projectId;
+        if (appState.currentProject?.id === projectId) {
+            card.classList.add('project-card--active');
+        } else {
+            card.classList.remove('project-card--active');
+        }
+    });
 }
 
 /**
  * Rendu du panneau de détails du projet (colonne droite).
  */
 function renderProjectDetail(project) {
-  const detailContainer = document.querySelector(SELECTORS.projectDetailContent);
-  const placeholder = document.querySelector(SELECTORS.projectPlaceholder);
-  if (!detailContainer || !placeholder) return;
+    const detailContainer = document.querySelector(SELECTORS.projectDetailContent);
+    const placeholder = document.querySelector(SELECTORS.projectPlaceholder);
+    if (!detailContainer || !placeholder) return;
 
-  if (!project) {
-    detailContainer.innerHTML = '';
-    placeholder.style.display = 'block';
-    return;
-  }
+    if (!project) {
+        detailContainer.innerHTML = '';
+        placeholder.style.display = 'block';
+        return;
+    }
 
-  placeholder.style.display = 'none';
-  
-  // Métriques
-  const articlesCount = Number(project.article_count || 0);
-  const pdfCount = appState.currentProjectFiles?.size || 0;
-  const isIndexed = Boolean(project.indexed_at);
-  const synthesis = appState.analysisResults?.synthesis_result;
-  const discussion = appState.analysisResults?.discussion_draft;
-  const graph = appState.analysisResults?.knowledge_graph;
+    placeholder.style.display = 'none';
+    
+    // Métriques
+    const articlesCount = Number(project.article_count || 0);
+    const pdfCount = appState.currentProjectFiles?.size || 0;
+    const isIndexed = Boolean(project.indexed_at);
+    const synthesis = appState.analysisResults?.synthesis_result;
+    const discussion = appState.analysisResults?.discussion_draft;
+    const graph = appState.analysisResults?.knowledge_graph;
 
-  try {
-    detailContainer.innerHTML = `
-      <div class="section-header">
-        <div class="section-header__content">
-          <h2>${escapeHtml(project.name)}</h2>
-          <p>${escapeHtml(project.description || 'Aucune description')}</p>
-        </div>
-        <div class="section-header__actions">
-          <button class="btn btn--secondary" data-action="export-project" data-project-id="${project.id}">📥 Export</button>
-        </div>
-      </div>
+    try {
+        detailContainer.innerHTML = `
+            <div class="section-header">
+                <div class="section-header__content">
+                    <h2>${escapeHtml(project.name)}</h2>
+                    <p>${escapeHtml(project.description || 'Aucune description')}</p>
+                </div>
+                <div class="section-header__actions">
+                    <button class="btn btn--secondary" 
+                            data-action="export-project" 
+                            data-project-id="${project.id}">📥 Export</button>
+                </div>
+            </div>
 
-      <div class="metrics-grid project-dashboard">
-        <div class="metric-card">
-          <h5 class="metric-value">${articlesCount}</h5>
-          <p>Articles</p>
-        </div>
-        <div class="metric-card">
-          <h5 class="metric-value">${pdfCount}</h5>
-          <p>PDFs Trouvés</p>
-        </div>
-        <div class="metric-card">
-          <h5 class="metric-value">${isIndexed ? '✅' : '❌'}</h5>
-          <p>Indexé (RAG)</p>
-        </div>
-        <div class="metric-card">
-          <h5 class="metric-value">${synthesis ? '✅' : '⏳'}</h5>
-          <p>Synthèse</p>
-        </div>
-        <div class="metric-card">
-          <h5 class="metric-value">${discussion ? '✅' : '⏳'}</h5>
-          <p>Discussion</p>
-        </div>
-        <div class="metric-card">
-          <h5 class="metric-value">${graph ? '✅' : '⏳'}</h5>
-          <p>Graphe</p>
-        </div>
-      </div>
-    `;
-  } catch (e) {
-    console.error('Erreur renderProjectDetail:', e);
-    detailContainer.innerHTML = `
-      <div class="placeholder error">
-        <p>Erreur lors de l'affichage de la synthèse.</p>
-      </div>
-    `;
-  }
+            <div class="metrics-grid project-dashboard">
+                <div class="metric-card">
+                    <h5 class="metric-value">${articlesCount}</h5>
+                    <p>Articles</p>
+                </div>
+                <div class="metric-card">
+                    <h5 class="metric-value">${pdfCount}</h5>
+                    <p>PDFs Trouvés</p>
+                </div>
+                <div class="metric-card">
+                    <h5 class="metric-value">${isIndexed ? '✅' : '❌'}</h5>
+                    <p>Indexé (RAG)</p>
+                </div>
+                <div class="metric-card">
+                    <h5 class="metric-value">${synthesis ? '✅' : '⏳'}</h5>
+                    <p>Synthèse</p>
+                </div>
+                <div class="metric-card">
+                    <h5 class="metric-value">${discussion ? '✅' : '⏳'}</h5>
+                    <p>Discussion</p>
+                </div>
+                <div class="metric-card">
+                    <h5 class="metric-value">${graph ? '✅' : '⏳'}</h5>
+                    <p>Graphe</p>
+                </div>
+            </div>
+        `;
+    } catch (e) {
+        console.error('Erreur renderProjectDetail:', e);
+        detailContainer.innerHTML = `
+            <div class="placeholder error">
+                <p>Erreur lors de l'affichage de la synthèse.</p>
+            </div>
+        `;
+    }
 }
 
+// ============================
+// Fonctions utilitaires
+// ============================
+
+/**
+ * Renvoie une classe de badge status compatible avec le CSS.
+ */
+function getStatusClass(status) {
+    switch (status) {
+        case 'completed':
+        case 'search_completed':
+            return 'status--success';
+        case 'in_progress':
+            return 'status--warning';
+        case 'pending':
+            return 'status--info';
+        case 'error':
+            return 'status--error';
+        default:
+            return 'status--secondary';
+    }
+}
+
+/**
+ * Convertit un statut technique en texte lisible.
+ */
 function getStatusText(status) {
     const statusTexts = {
-        'pending': 'En attente', 'processing': 'Traitement...', 'synthesizing': 'Synthèse...',
-        'completed': 'Terminé', 'failed': 'Échec', 'indexing': 'Indexation...',
-        'generating_discussion': 'Génération discussion...', 'generating_graph': 'Génération graphe...',
-        'generating_prisma': 'Génération PRISMA...', 'generating_analysis': 'Analyse statistique...',
-        'search_completed': 'Recherche terminée', 'in_progress': 'En cours', 'queued': 'En file',
-        'started': 'Démarré', 'finished': 'Fini'
+        'pending': 'En attente', 
+        'processing': 'Traitement...', 
+        'synthesizing': 'Synthèse...',
+        'completed': 'Terminé', 
+        'failed': 'Échec', 
+        'indexing': 'Indexation...',
+        'generating_discussion': 'Génération discussion...', 
+        'generating_graph': 'Génération graphe...',
+        'generating_prisma': 'Génération PRISMA...', 
+        'generating_analysis': 'Analyse statistique...',
+        'search_completed': 'Recherche terminée', 
+        'in_progress': 'En cours', 
+        'queued': 'En file',
+        'started': 'Démarré', 
+        'finished': 'Fini'
     };
     return statusTexts[status] || status;
 }
 
-export async function loadProjects() {
-    try {
-        const projects = await fetchAPI(API_ENDPOINTS.projects);
-        appState.projects = projects;
-        
-        // LIGNE CRUCIALE MANQUANTE : Appeler la fonction de rendu ici !
-        renderProjectCards(projects); // Cette ligne va afficher les cartes
-        
-        return projects;
-    } catch (error) {
-        console.error("Erreur lors du chargement des projets:", error);
-        showError("Impossible de charger les projets.");
-        // Affichez un état vide en cas d'erreur
-        renderProjectCards([]); 
-        return [];
-    }
-}
+// ============================
+// Exports
+// ============================
 
-// --- CORRECTION : Bloc d'exportation unifié ---
 export {
-    loadProjects,
     autoSelectFirstProject,
     handleCreateProject,
     selectProject,
     deleteProject,
     confirmDeleteProject,
     handleExportProject,
-    loadProjectFilesSet, // <- La fonction est maintenant exportée d'ici
+    loadProjectFilesSet,
     renderProjectsList,
     updateProjectListSelection,
     renderProjectDetail,
