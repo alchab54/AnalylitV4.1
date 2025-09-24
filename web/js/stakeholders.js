@@ -298,3 +298,5 @@ export { addStakeholderGroup };
 if (typeof window !== 'undefined') {
     window.addStakeholderGroup = addStakeholderGroup;
 }
+
+export default stakeholdersModule;
