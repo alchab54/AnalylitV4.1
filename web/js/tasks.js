@@ -1,9 +1,10 @@
+// web/js/tasks.js
 import { fetchAPI } from './api.js';
-import { API_ENDPOINTS, MESSAGES } from './constants.js';
+import { API_ENDPOINTS } from './constants.js';
 
-// REMPLACEZ le contenu de tasks.js
 export async function fetchTasks() {
     try {
+        // Le garde est bon, mais le bloc doit être complet
         if (!API_ENDPOINTS?.tasks) {
             console.warn('API_ENDPOINTS.tasks not defined yet');
             return;
@@ -33,6 +34,7 @@ export async function fetchTasks() {
             tasksContainer.innerHTML = tasksHtml || `<p>${MESSAGES.noTasksInProgress}</p>`;
         }
     } catch (error) {
-        console.error(MESSAGES.errorLoadingTasks, error);
+
+        console.error("Erreur lors de la récupération des tâches:", error);
     }
 }

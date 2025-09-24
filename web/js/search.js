@@ -4,7 +4,6 @@ import { SELECTORS, MESSAGES, API_ENDPOINTS } from './constants.js';
 import { fetchAPI } from './api.js';
 import { showLoadingOverlay, escapeHtml, openModal } from './ui-improved.js';
 import { showToast } from './toast.js';
-import { API_ENDPOINTS } from './constants.js';
 import { appState, elements } from './app-improved.js';
 
 export function renderSearchSection(project) {
