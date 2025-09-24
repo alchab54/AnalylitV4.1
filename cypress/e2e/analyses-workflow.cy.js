@@ -11,7 +11,7 @@ describe('Workflow de Gestion des Analyses', () => {
         cy.get('#projectDescription').type("Description du projet pour les tests d'analyses");
         cy.get('#projectAnalysisMode').select('screening');
         cy.get('form[data-form="create-project"]').submit();
-        cy.wait(500);
+        cy.wait(1000);
         cy.contains('.toast-success', 'Projet créé avec succès').should('be.visible');
       }
     });

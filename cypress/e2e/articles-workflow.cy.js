@@ -5,6 +5,9 @@ describe('Workflow de Gestion des Articles', () => {
     
     // S'assurer qu'un projet est sélectionné
     cy.get('[data-section-id="projects"]').click({ force: true });
+    cy.window().then((win) => {
+      cy.log('appState.projects length:', win.AnalyLit.appState.projects.length);
+    });
     cy.get('.project-card').first().click({ force: true });
     
     // Naviguer vers les résultats

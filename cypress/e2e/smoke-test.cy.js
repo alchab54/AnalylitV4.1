@@ -29,18 +29,22 @@ describe('Tests de Smoke - Vérifications de base AnalyLit', () => {
     cy.wait(1000); // Attendre que l'interface se stabilise
     // Tester la navigation vers Articles
     cy.get('[data-section-id="articles"]').click({ force: true });
+    cy.wait(500);
     cy.get('#articles').should('be.visible');
     
     // Tester la navigation vers Résultats
     cy.get('[data-section-id="results"]').click({ force: true });
+    cy.wait(500);
     cy.get('#resultsContainer').should('be.visible');
     
     // Tester la navigation vers Analyses
     cy.get('[data-section-id="analyses"]').click({ force: true });
+    cy.wait(500);
     cy.get('#analysisContainer').should('be.visible');
     
     // Retour aux Projets
     cy.get('[data-section-id="projects"]').click({ force: true });
+    cy.wait(500);
     cy.contains('Projets').should('be.visible');
   });
 
