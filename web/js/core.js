@@ -19,7 +19,9 @@ import {
     showPRISMAModal,
     savePRISMAProgress,
     loadProjectAnalyses,
-    exportPRISMAReport
+    exportPRISMAReport,
+    showRunAnalysisModal,
+    handleDeleteAnalysis
 } from './analyses.js';
 import { sendChatMessage, loadChatMessages, renderChatInterface } from './chat.js';
 import {
@@ -150,6 +152,8 @@ const analysisActions = {
     'save-prisma-progress': savePRISMAProgress,
     'export-prisma-report': exportPRISMAReport,
     'export-analyses': exportAnalyses,
+    'show-advanced-analysis-modal': showRunAnalysisModal,
+    'delete-analysis': (target) => handleDeleteAnalysis(target.dataset.analysisType),
 };
 
 const robActions = {

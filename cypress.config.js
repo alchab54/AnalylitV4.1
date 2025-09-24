@@ -1,9 +1,10 @@
 import { defineConfig } from 'cypress';
 
 export default defineConfig({
+  projectId: 'tn6aw5',
   e2e: {
     baseUrl: 'http://localhost:8080',
-    supportFile: false,
+    supportFile: 'cypress/support/e2e.js',
     video: true,
     screenshotOnRunFailure: true,
     screenshotsFolder: 'reports/cypress/screenshots',

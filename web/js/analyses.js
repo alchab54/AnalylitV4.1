@@ -41,6 +41,10 @@ export function renderAnalysesSection() {
     const hasKnowledgeGraph = !!analysisResults.knowledge_graph;
 
     elements.analysisContainer.innerHTML = `
+        <div class="analysis-actions">
+            <button class="btn btn--secondary" data-action="export-analyses">Exporter toutes les analyses</button>
+            <button class="btn btn--primary" data-action="show-advanced-analysis-modal">Lancer une analyse avancée</button>
+        </div>
         <div class="analysis-grid">
             <div class="analysis-card ${hasAtnAnalysis ? 'analysis-card--done' : ''}">
                 <div class="analysis-card__header">
@@ -51,7 +55,7 @@ export function renderAnalysesSection() {
                 <div class="analysis-card__body"><p class="analysis-card__description">Analyse spécialisée pour l alliance thérapeutique numérique, incluant les scores d empathie, types d IA, et conformité réglementaire.</p></div>
                 <div class="analysis-card__footer">
                     ${hasAtnAnalysis
-                        ? `<button class="btn btn--secondary" data-action="view-analysis-results" data-target-id="atn-results-card">Voir les résultats</button>`
+                        ? `<button class="btn btn--secondary" data-action="view-analysis-results" data-target-id="atn-results-card">Voir les résultats</button><button class="btn btn--danger btn--small" data-action="delete-analysis" data-analysis-type="atn_scores">Supprimer</button>`
                         : `<button class="btn btn--primary" data-action="run-atn-analysis">Lancer l Analyse ATN</button>`
                     }
                 </div>
@@ -66,7 +70,7 @@ export function renderAnalysesSection() {
                 <div class="analysis-card__body"><p class="analysis-card__description">Génère une section Discussion basée sur la synthèse.</p></div>
                 <div class="analysis-card__footer">
                     ${hasDiscussionDraft
-                        ? `<button class="btn btn--secondary" data-action="view-analysis-results" data-target-id="discussion-draft-card">Voir la Discussion</button>`
+                        ? `<button class="btn btn--secondary" data-action="view-analysis-results" data-target-id="discussion-draft-card">Voir la Discussion</button><button class="btn btn--danger btn--small" data-action="delete-analysis" data-analysis-type="discussion">Supprimer</button>`
                         : `<button class="btn btn--primary" data-action="run-analysis" data-analysis-type="discussion">Générer la Discussion</button>`
                     }
                 </div>
@@ -80,9 +84,20 @@ export function renderAnalysesSection() {
                 <div class="analysis-card__body"><p class="analysis-card__description">Visualise les relations entre les concepts et les articles.</p></div>
                 <div class="analysis-card__footer">
                     ${hasKnowledgeGraph
-                        ? `<button class="btn btn--secondary" data-action="view-analysis-results" data-target-id="knowledge-graph-card">Voir le Graphe</button>`
+                        ? `<button class="btn btn--secondary" data-action="view-analysis-results" data-target-id="knowledge-graph-card">Voir le Graphe</button><button class="btn btn--danger btn--small" data-action="delete-analysis" data-analysis-type="knowledge_graph">Supprimer</button>`
                         : `<button class="btn btn--primary" data-action="run-analysis" data-analysis-type="knowledge_graph">Générer le Graphe</button>`
                     }
+                </div>
+            </div>
+
+            <div class="analysis-card">
+                <div class="analysis-card__header">
+                    <span class="analysis-card__icon">📋</span>
+                    <h4>Checklist PRISMA</h4>
+                </div>
+                <div class="analysis-card__body"><p class="analysis-card__description">Gérer et suivre la checklist PRISMA pour la conformité méthodologique.</p></div>
+                <div class="analysis-card__footer">
+                    <button class="btn btn--primary" data-action="show-prisma-modal">Ouvrir la Checklist PRISMA</button><button class="btn btn--danger btn--small" data-action="delete-analysis" data-analysis-type="prisma_checklist">Supprimer</button>
                 </div>
             </div>
         </div>
@@ -464,6 +479,34 @@ export async function handleRunDescriptiveStats() {
         await fetchAPI(API_ENDPOINTS.projectRunAnalysis(appState.currentProject.id), { method: 'POST', body: { type: 'descriptive_stats' } });
         showToast(MESSAGES.descriptiveStatsStarted, 'success');
         closeModal();
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+export async function handleDeleteAnalysis(analysisType) {
+    if (!appState.currentProject?.id) {
+        showToast(MESSAGES.noProjectSelected, 'warning');
+        return;
+    }
+
+    const confirmDelete = confirm(`Êtes-vous sûr de vouloir supprimer les résultats de l'analyse ${analysisType} pour ce projet ?`);
+    if (!confirmDelete) {
+        return;
+    }
+
+    try {
+        showLoadingOverlay(true, `Suppression de l'analyse ${analysisType}...`);
+        // Appel API pour supprimer les résultats de l'analyse
+        // NOTE: Cet endpoint est hypothétique et doit être implémenté côté backend.
+        await fetchAPI(API_ENDPOINTS.projectDeleteAnalysis(appState.currentProject.id, analysisType), {
+            method: 'DELETE',
+        });
+        showToast(`Résultats de l'analyse ${analysisType} supprimés avec succès.`, 'success');
+        // Recharger la section des analyses pour refléter le changement
+        loadProjectAnalyses();
+    } catch (error) {
+        showToast(`Erreur lors de la suppression de l'analyse ${analysisType}: ${error.message}`, 'error');
     } finally {
         showLoadingOverlay(false);
     }

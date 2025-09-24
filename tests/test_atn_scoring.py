@@ -24,10 +24,10 @@ def test_run_atn_score_task_scoring_logic(db_session):
     
     # Create mock extractions with different keywords
     extractions_data = [
-        {'pmid': 'PMID1', 'title': 'Article 1', 'extracted_data': json.dumps({'content': 'alliance numérique patient'})}, # Score: 3 + 3 + 2 = 8
-        {'pmid': 'PMID2', 'title': 'Article 2', 'extracted_data': json.dumps({'content': 'empathie et confiance'})}, # Score: 2 + 2 = 4
-        {'pmid': 'PMID3', 'title': 'Article 3', 'extracted_data': json.dumps({'content': 'just some random text'})}, # Score: 0
-        {'pmid': 'PMID4', 'title': 'Article 4', 'extracted_data': json.dumps({'content': 'therapeutic digital app developer empathy adherence trust'})}, # Score: 3 + 3 + 2 + 2 = 10
+        {'pmid': 'PMID1', 'title': 'Article 1', 'extracted_data': json.dumps({'description': 'alliance numerique patient'})}, # Score: 3 + 3 + 2 = 8
+        {'pmid': 'PMID2', 'title': 'Article 2', 'extracted_data': json.dumps({'description': 'empathie et confiance'})}, # Score: 2 + 2 = 4
+        {'pmid': 'PMID3', 'title': 'Article 3', 'extracted_data': json.dumps({'description': 'just some random text'})}, # Score: 0
+        {'pmid': 'PMID4', 'title': 'Article 4', 'extracted_data': json.dumps({'description': 'therapeutic digital app developer empathy adherence trust'})}, # Score: 3 + 3 + 2 + 2 = 10
     ]
 
     for ext in extractions_data:

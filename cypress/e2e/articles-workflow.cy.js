@@ -16,7 +16,7 @@ describe('Workflow de Gestion des Articles', () => {
     cy.get('#article-table-body').should('be.visible');
   });
 
-  it('Devrait permettre la sélection multiple d\'articles', () => {
+  it("Devrait permettre la sélection multiple d'articles", () => {
     // Vérifier la présence des checkboxes
     cy.get('.article-checkbox').should('have.length.greaterThan', 0);
     
@@ -24,18 +24,18 @@ describe('Workflow de Gestion des Articles', () => {
     cy.get('.article-checkbox').first().check();
     cy.get('.article-checkbox').eq(1).check();
     
-    // Vérifier que les boutons d\'action sont activés
+    // Vérifier que les boutons d'action sont activés
     cy.get('[data-action="delete-selected-articles"]').should('not.be.disabled');
     cy.get('[data-action="batch-screening"]').should('not.be.disabled');
   });
 
-  it('Devrait ouvrir les détails d\'un article', () => {
+  it("Devrait ouvrir les détails d'un article", () => {
     // Cliquer sur le premier article
     cy.get('.article-row').first().find('.article-title').click();
     
-    // Vérifier l\'ouverture de la modale de détails
+    // Vérifier l'ouverture de la modale de détails
     cy.get('#articleDetailModal').should('be.visible');
-    cy.contains('h2', 'Détails de l\'article').should('be.visible');
+    cy.contains('h2', "Détails de l'article").should('be.visible');
     
     // Fermer la modale
     cy.get('[data-action="close-modal"]').click();
@@ -50,7 +50,7 @@ describe('Workflow de Gestion des Articles', () => {
     // Lancer le screening par lot
     cy.get('[data-action="batch-screening"]').click();
     
-    // Vérifier l\'ouverture de la modale
+    // Vérifier l'ouverture de la modale
     cy.get('#batchProcessModal').should('be.visible');
     cy.contains('h2', 'Lancer le Screening par Lot').should('be.visible');
     
@@ -61,7 +61,7 @@ describe('Workflow de Gestion des Articles', () => {
     cy.contains('.toast-success', 'Tâche de screening lancée').should('be.visible');
   });
 
-  it('Devrait gérer l\'état vide quand aucun article n\'est présent', () => {
+  it("Devrait gérer l'état vide quand aucun article n'est présent", () => {
     // Supposer un projet sans articles
     // Cette partie nécessite un projet vide ou un mock
     cy.get('.empty-state').should('contain', 'Aucun article');

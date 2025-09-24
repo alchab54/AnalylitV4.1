@@ -2,6 +2,7 @@
 import pytest
 import json
 import time
+import uuid # Added import
 from unittest.mock import patch, MagicMock
 from utils.models import Project, SearchResult, Extraction, AnalysisProfile
 
@@ -49,7 +50,7 @@ def test_full_end_to_end_workflow(client, db_session):
     
     # === ÉTAPE 4: Lancement d'une synthèse (on s'assure que la tâche est bien mise en file) ===
     # Il faut un profil d'analyse
-    profile = AnalysisProfile(name="Default Profile E2E", is_custom=False)
+    profile = AnalysisProfile(name=f"Default Profile E2E - {uuid.uuid4().hex}", is_custom=False)
     db_session.add(profile)
     db_session.commit()
     profile_id = profile.id

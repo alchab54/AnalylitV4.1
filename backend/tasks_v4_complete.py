@@ -460,8 +460,8 @@ def run_knowledge_graph_task(session, project_id: str):
     
     # Utiliser le modèle de synthèse pour cette tâche, car il est plus adapté à la génération de JSON structuré.
     profile_info = session.query(Project).filter_by(id=project_id).first()
-    analysis_profile = session.query(AnalysisProfile).filter_by(id=profile_info.profile_used).first() if profile_info else None
-    model_to_use = analysis_profile.synthesis_model if analysis_profile else 'llama3.1:8b'
+    analysis_profile = session.query(AnalysisProfile).filter_by(id=profile_info.profile_used).first() if profile_info and profile_info.profile_used else None
+    model_to_use = (analysis_profile.extract_model or analysis_profile.synthesis_model) if analysis_profile else 'llama3.1:8b'
     
     rows = session.execute(text("SELECT title, pmid FROM extractions WHERE project_id = :pid"), {"pid": project_id}).mappings().all()
     if not rows:
@@ -666,7 +666,7 @@ def import_pdfs_from_zotero_task(project_id: str, pmids: list, zotero_user_id: s
     try:
         from pyzotero import zotero
         zot = zotero.Zotero(zotero_user_id, 'user', zotero_api_key)
-        project_dir = PROJECTS_DIR / project_id
+        project_dir = Path(config.PROJECTS_DIR) / project_id
         project_dir.mkdir(exist_ok=True)
 
         success_count = 0
@@ -957,34 +957,39 @@ def run_atn_score_task(session, project_id: str):
         try:
             data = json.loads(ext["extracted_data"])
             s = 0
-            text_blob = json.dumps(data, ensure_ascii=False).lower()
-            logger.debug(f"PMID: {ext['pmid']}, Text Blob: {text_blob}")
+            # Extract text from all string values in the dictionary
+            text_blob = " ".join([str(v) for v in data.values() if isinstance(v, str)]).lower()
+            # logger.debug(f"PMID: {ext['pmid']}, Initial Text Blob: {text_blob}")
 
             # Category 1: 'alliance', 'therapeutic'
-            if re.search(r'\\balliance\\b', text_blob): s += 3
-            if re.search(r'\\btherapeutic\\b', text_blob): s += 3
-            logger.debug(f"PMID: {ext['pmid']}, Score after C1: {s}")
+            if re.search(r'\balliance\b', text_blob):
+                s += 3
+                # logger.debug(f"PMID: {ext['pmid']}, Matched C1 keyword: alliance")
+            if re.search(r'\btherapeutic\b', text_blob):
+                s += 3
+                # logger.debug(f"PMID: {ext['pmid']}, Matched C1 keyword: therapeutic")
+            # logger.debug(f"PMID: {ext['pmid']}, Score after C1: {s}")
 
             # Category 2: 'numérique', 'digital', 'app', 'plateforme', 'ia'
-            for k in ['numérique', 'digital', 'app', 'plateforme', 'ia']:
-                if re.search(r'\\b' + re.escape(k) + r'\\b', text_blob):
+            for k in ['numerique', 'digital', 'app', 'plateforme', 'ia']:
+                if re.search(r'\b' + re.escape(k) + r'\b', text_blob, re.IGNORECASE):
                     s += 3
-                    logger.debug(f"PMID: {ext['pmid']}, Matched C2 keyword: {k}")
-            logger.debug(f"PMID: {ext['pmid']}, Score after C2: {s}")
+                    # logger.debug(f"PMID: {ext['pmid']}, Matched C2 keyword: {k}")
+            # logger.debug(f"PMID: {ext['pmid']}, Score after C2: {s}")
 
             # Category 3: 'patient', 'soignant', 'développeur'
-            for k in ['patient', 'soignant', 'développeur']:
-                if re.search(r'\\b' + re.escape(k) + r'\\b', text_blob):
+            for k in ['patient', 'soignant', 'developpeur']:
+                if re.search(r'\b' + re.escape(k) + r'\b', text_blob):
                     s += 2
-                    logger.debug(f"PMID: {ext['pmid']}, Matched C3 keyword: {k}")
-            logger.debug(f"PMID: {ext['pmid']}, Score after C3: {s}")
+                    # logger.debug(f"PMID: {ext['pmid']}, Matched C3 keyword: {k}")
+            # logger.debug(f"PMID: {ext['pmid']}, Score after C3: {s}")
 
             # Category 4: 'empathie', 'adherence', 'confiance'
             for k in ['empathie', 'adherence', 'confiance']:
-                if re.search(r'\\b' + re.escape(k) + r'\\b', text_blob):
+                if re.search(r'\b' + re.escape(k) + r'\b', text_blob):
                     s += 2
-                    logger.debug(f"PMID: {ext['pmid']}, Matched C4 keyword: {k}")
-            logger.debug(f"PMID: {ext['pmid']}, Score after C4: {s}")
+                    # logger.debug(f"PMID: {ext['pmid']}, Matched C4 keyword: {k}")
+            # logger.debug(f"PMID: {ext['pmid']}, Score after C4: {s}")
             scores.append({'pmid': ext['pmid'], 'title': ext['title'], 'atn_score': min(s, 10)})
         except Exception: continue
     
@@ -1142,24 +1147,16 @@ def import_from_zotero_json_task(session, project_id: str, items_list: list):
         if not article_id:
             continue
         
-        # --- AJOUTEZ CES DEUX LIGNES ---
-        record.pop('zotero_key', None) 
-        record.pop('__hash', None)
-        # --- FIN DE L'AJOUT ---
-
-
         existing = session.query(SearchResult).filter_by(project_id=project_id, article_id=article_id).first()
         if not existing:
-            record['id'] = str(uuid.uuid4()) # Assigner un ID pour le nouvel objet
-            record['project_id'] = project_id # Assigner le project_id
+            record.pop('zotero_key', None)
+            record.pop('__hash', None)
+            record['project_id'] = project_id
             new_articles.append(SearchResult(**record))
         else:
-            # --- AJOUTEZ CE BLOC ELSE ---
-            logger.debug(f"Mise à jour de l'article existant : {article_id}")
-            for key, value in record.items():
-                if key not in ['id', 'project_id', 'created_at']: # Ne pas écraser les clés
-                    setattr(existing, key, value)
-            # --- FIN DE L'AJOUT ---
+            # If article already exists, skip it for deduplication test
+            logger.debug(f"Article existant ignoré (déduplication) : {article_id}")
+            continue # Skip to the next record
 
     if new_articles:
         session.add_all(new_articles)

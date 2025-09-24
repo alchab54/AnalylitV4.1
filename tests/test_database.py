@@ -19,20 +19,20 @@ def test_seed_default_data_when_empty(db_session):
  
 def test_seed_default_data_when_exists(db_session):
     """Teste que le seeding ne crée pas de doublons."""
-    # Arrange: insérer les données une première fois
-    db_session.add(AnalysisProfile(
-        id=str(uuid.uuid4()),
-        name='Standard'
-    ))
-    db_session.add(Project(
-        id=str(uuid.uuid4()),
-        name='Projet par défaut'
-    ))
-    db_session.commit()
-    count_before = db_session.query(Project).count()
+    # Arrange: Assume default data is already seeded by test_app fixture
+    
+    # Assert initial state (data should exist from initial seeding)
+    profile_before = db_session.query(AnalysisProfile).filter_by(name='Standard').first()
+    project_before = db_session.query(Project).filter_by(name='Projet par défaut').first()
+    assert profile_before is not None
+    assert project_before is not None
+
+    count_profiles_before = db_session.query(AnalysisProfile).count()
+    count_projects_before = db_session.query(Project).count()
  
     # Act: lancer le seeding une deuxième fois
     seed_default_data(db_session)
  
     # Assert: vérifier que le nombre d'entrées n'a pas changé
-    assert db_session.query(Project).count() == count_before
+    assert db_session.query(AnalysisProfile).count() == count_profiles_before
+    assert db_session.query(Project).count() == count_projects_before

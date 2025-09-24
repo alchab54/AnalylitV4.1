@@ -35,18 +35,18 @@ describe('Workflow de Gestion des Projets', () => {
     cy.contains('.project-card', 'Projet Test E2E').should('be.visible');
   });
 
-  it('Devrait afficher les détails d\'un projet sélectionné', () => {
-    // Supposer qu\'il y a au moins un projet
+  it("Devrait afficher les détails d'un projet sélectionné", () => {
+    // Supposer qu'il y a au moins un projet
     cy.get('.project-card').first().click();
     
-    // Vérifier l\'affichage des détails
+    // Vérifier l'affichage des détails
     cy.get('.project-detail').should('be.visible');
     cy.get('.metrics-grid').should('be.visible');
     cy.get('.metric-card').should('have.length.greaterThan', 0);
   });
 
-  it('Devrait permettre la suppression d\'un projet', () => {
-    // Créer d\'abord un projet pour le supprimer
+  it("Devrait permettre la suppression d'un projet", () => {
+    // Créer d'abord un projet pour le supprimer
     cy.get('[data-action="create-project-modal"]').click();
     cy.get('#projectName').type('Projet à Supprimer');
     cy.get('#projectDescription').type('Ce projet sera supprimé');
@@ -66,7 +66,7 @@ describe('Workflow de Gestion des Projets', () => {
     // Vérifier la notification de suppression
     cy.contains('.toast-success', 'Projet supprimé').should('be.visible');
     
-    // Vérifier que le projet n\'apparaît plus
+    // Vérifier que le projet n'apparaît plus
     cy.contains('.project-card', 'Projet à Supprimer').should('not.exist');
   });
 });

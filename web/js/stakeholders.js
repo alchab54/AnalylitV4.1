@@ -3,7 +3,7 @@
 import { API_ENDPOINTS, SELECTORS, MESSAGES } from './constants.js';
 import { fetchAPI } from './api.js';
 import { showToast, showError } from './toast.js';
-import { appState } from './state.js';
+import { appState } from './app-improved.js';
 
 const stakeholdersModule = (() => {
     let currentProjectId = null;

@@ -13,12 +13,9 @@ logger = logging.getLogger(__name__)
 engine = None
 SessionFactory = None
 
-# Définir le schéma, mais le rendre None si en mode test
-SCHEMA = 'analylit_schema' if os.getenv('TESTING') != 'true' else None
-
+# Base est maintenant importée directement, et sa définition de schéma sera gérée
+# par le fichier models.py en fonction de l'environnement.
 from .db_base import Base
-
-# Note : les modèles seront importés par server_v4_complete.py
 
 # Créez l'instance ici, mais ne la liez à aucune application.
 # Elle sera liée dans create_app() pour l'application principale,
@@ -32,24 +29,28 @@ def init_database(database_url=None, is_test: bool = False):
         return engine
 
     if not database_url:
-        # Si c'est un test, on s'assure d'utiliser l'URL de la BDD de test
-        # fournie par la variable d'environnement du conteneur 'tester'.
         if is_test:
             database_url = os.getenv("DATABASE_URL", "postgresql://user:pass@db/analylit_db_test")
-            logger.info(f"Initialisation en mode TEST avec la base de données : {database_url.split('@')[-1]}")
         else:
             database_url = os.getenv("DATABASE_URL", "postgresql://user:pass@db/analylit_db")
     
-    # Si l'URL contient 'analylit_db_test', on considère que c'est un test.
-    # Cela rend la fonction plus robuste même si is_test n'est pas passé explicitement.
-    if 'analylit_db_test' in database_url:
-        logger.info("Détection de la base de données de test dans l'URL.")
+    if is_test:
+        os.environ['TESTING'] = 'true'
+        logger.info(f"Initialisation en mode TEST avec la base de données : {database_url.split('@')[-1]}")
+    else:
+        os.environ['TESTING'] = 'false' # Ensure it's explicitly false for non-test environments
+        logger.info(f"Initialisation en mode PROD/DEV avec la base de données : {database_url.split('@')[-1]}")
 
     try:
         engine = create_engine(database_url, pool_pre_ping=True)
-        if SCHEMA:
+        
+        # Import models here to ensure SCHEMA is correctly set based on os.environ['TESTING']
+        from . import models
+        
+        # Conditionally create schema only if it's defined (i.e., not in test mode)
+        if models.SCHEMA:
             with engine.connect() as connection:
-                connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
+                connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {models.SCHEMA}"))
                 connection.commit()
         
         Base.metadata.create_all(bind=engine)

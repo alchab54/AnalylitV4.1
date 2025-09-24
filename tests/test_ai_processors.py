@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import MagicMock, patch, call
 import requests
 import json
+from utils.ai_processors import call_ollama_api, AIResponseError
 
 # Mock the config_v4 module and its attributes
 @pytest.fixture(autouse=True)
@@ -10,9 +11,6 @@ def mock_config():
         mock_config_obj.OLLAMA_BASE_URL = "http://mock-ollama:11434"
         mock_config_obj.REQUEST_TIMEOUT = 5
         yield mock_config_obj
-
-# Import the function after config is potentially mocked
-from backend.config.config_v4 import get_config
 
 @pytest.fixture
 def mock_requests_session(mocker):

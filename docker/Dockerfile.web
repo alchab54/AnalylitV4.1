@@ -2,12 +2,12 @@
 FROM analylit-base:latest
 
 # Copier le code (copie tout y compris docker/entrypoint.sh)
-COPY --chown=appuser:appuser config/profiles.json ./ 
+COPY --chown=appuser:appuser backend/config/profiles.json ./ 
 COPY --chown=appuser:appuser backend/server_v4_complete.py ./ 
-COPY --chown=appuser:appuser config/config_v4.py ./ 
+COPY --chown=appuser:appuser backend/config/config_v4.py ./ 
 COPY --chown=appuser:appuser backend/tasks_v4_complete.py ./ 
 COPY --chown=appuser:appuser scripts/run_migrations.py ./ 
-COPY --chown=appuser:appuser config/gunicorn.conf.py ./ 
+COPY --chown=appuser:appuser backend/config/gunicorn.conf.py ./ 
 COPY --chown=appuser:appuser api/ api/ 
 COPY --chown=appuser:appuser utils/ utils/ 
 COPY --chown=appuser:appuser web/ web/ 

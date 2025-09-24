@@ -179,7 +179,7 @@ def test_get_all_projects(client, db_session): # Utilise session
     assert found_project1['name'] == project1_data['name']
     assert found_project1['analysis_mode'] == project1_data['mode']
 
-def test_get_all_projects_empty(client, db_session): # Utilise session
+def test_get_all_projects_empty(client, db_session, clean_db): # Utilise session et clean_db
     """
     GIVEN a Flask test client with no projects (guaranteed by clean_db)
     WHEN the '/api/projects' route is called with GET

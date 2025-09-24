@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     # --- Paramètres de l'application ---
     ANALYLIT_VERSION: str = "4.1.0"
     SECRET_KEY: str
-    LOG_LEVEL: str = 'INFO'
+    LOG_LEVEL: str = 'DEBUG'
     
     # --- Connexions aux services externes ---
     REDIS_URL: str = 'redis://localhost:6379/0' # Valeur par défaut pour dev local, surchargée par Docker

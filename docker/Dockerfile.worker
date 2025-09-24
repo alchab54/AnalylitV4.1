@@ -7,7 +7,7 @@ WORKDIR /home/appuser/app
 # Copier les fichiers et répertoires essentiels pour le worker
 COPY --chown=appuser:appuser api/ api/
 COPY --chown=appuser:appuser backend/ backend/
-COPY --chown=appuser:appuser config/ config/
+COPY --chown=appuser:appuser backend/config/ backend/config/
 COPY --chown=appuser:appuser utils/ utils/
 COPY --chown=appuser:appuser migrations/ migrations/
 COPY --chown=appuser:appuser run_migrations.py ./

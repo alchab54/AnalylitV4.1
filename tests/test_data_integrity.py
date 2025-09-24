@@ -35,7 +35,7 @@ def project_for_dedup(db_session):
     # Article déjà présent dans la base
     existing_article = SearchResult(
         project_id=project.id,
-        article_id="PMID123",
+        article_id="1234567",  # Use a valid 7-digit PMID
         title="Titre Original",
         abstract="Résumé original."
     )
@@ -53,7 +53,7 @@ def test_deduplication_on_conflict_during_search(db_session, project_for_dedup, 
     
     # Simuler une recherche qui retourne l'article existant (PMID123) et un nouveau (PMID456)
     mock_search_results = [
-        {'id': 'PMID123', 'title': 'Titre Dupliqué', 'abstract': 'Résumé dupliqué.', 'database_source': 'pubmed'},
+        {'id': '1234567', 'title': 'Titre Dupliqué', 'abstract': 'Résumé dupliqué.', 'database_source': 'pubmed'},
         {'id': 'PMID456', 'title': 'Nouveau Titre', 'abstract': 'Nouveau résumé.', 'database_source': 'pubmed'}
     ]
     mocker.patch('tasks_v4_complete.db_manager.search_pubmed', return_value=mock_search_results)
@@ -68,7 +68,7 @@ def test_deduplication_on_conflict_during_search(db_session, project_for_dedup, 
     articles_in_db = db_session.query(SearchResult).filter_by(project_id=project_id).all()
     assert len(articles_in_db) == 2, "Il ne doit y avoir que 2 articles au total (l'existant + le nouveau)."
 
-    original_article = db_session.query(SearchResult).filter_by(project_id=project_id, article_id="PMID123").one()
+    original_article = db_session.query(SearchResult).filter_by(project_id=project_id, article_id="1234567").one()
     assert original_article.title == "Titre Original", "L'article existant ne doit pas avoir été écrasé."
     
     print("\n[OK] Intégrité Données : La déduplication `ON CONFLICT` a bien fonctionné.")
@@ -82,7 +82,7 @@ def test_deduplication_in_zotero_import_logic(db_session, project_for_dedup, moc
 
     # Simuler un import Zotero avec l'article existant (PMID123) et un nouveau
     zotero_items = [
-        {"data": {"DOI": "10.123/existing", "PMID": "PMID123", "title": "Titre Zotero Dupliqué"}},
+        {"data": {"PMID": "1234567", "title": "Titre Zotero Dupliqué"}}, # Use the same valid PMID
         {"data": {"DOI": "10.123/new", "PMID": "PMID789", "title": "Nouveau Titre Zotero"}}
     ]
     mocker.patch('tasks_v4_complete.send_project_notification')
@@ -92,9 +92,9 @@ def test_deduplication_in_zotero_import_logic(db_session, project_for_dedup, moc
 
     # Vérifier l'état de la base de données
     articles_in_db = db_session.query(SearchResult).filter_by(project_id=project_id).all()
-    assert len(articles_in_db) == 1
+    assert len(articles_in_db) == 2, "Il ne doit y avoir que 2 articles au total (l'existant + le nouveau)."
 
-    original_article = db_session.query(SearchResult).filter_by(project_id=project_id, article_id="PMID123").one()
+    original_article = db_session.query(SearchResult).filter_by(project_id=project_id, article_id="1234567").one()
     assert original_article.title == "Titre Original"
 
     print("\n[OK] Intégrité Données : La logique de déduplication de l'import Zotero a bien fonctionné.")

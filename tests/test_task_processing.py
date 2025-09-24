@@ -590,7 +590,7 @@ def test_run_knowledge_graph_task(db_session, mocker):
 
     # ACT
     run_knowledge_graph_task.__wrapped__(db_session, project_id)
-
+    
     # ASSERT
     mock_ollama.assert_called_once_with(mocker.ANY, model="test-kg-model", output_format="json")
     
@@ -712,7 +712,7 @@ def test_run_atn_score_task(db_session, mocker):
     db_session.commit()
 
     # Score: alliance (3) + numérique (3) + patient (2) + empathie (2) = 10
-    ext1_data = json.dumps({"description": "Analyse de l'alliance thérapeutique numérique et de l'empathie du patient."})
+    ext1_data = json.dumps({"description": "Analyse de l'alliance therapeutique numerique et de l'empathie du patient."})
     ext1 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid1", title="Full ATN", extracted_data=ext1_data)
 
     # Score: app (3) = 3. Le mot "rapport" contient "app".
@@ -847,7 +847,7 @@ def test_index_project_pdfs_task(db_session, mocker, mock_embedding_model):
     assert call_args.kwargs['ids'][0] == "mock_pdf_stem_0"
     assert call_args.kwargs['ids'][17] == "mock_pdf_stem_17"
     
-    mock_notify.assert_any_call(project_id, 'indexing_completed', f'{total_pdfs} PDF(s) ont été traités et indexés.')
+    mock_notify.assert_any_call(project_id, 'indexing_completed', f'{total_pdfs} PDF(s) ont été traités et indexés.', {'task_name': 'indexation'})
     
 @patch('tasks_v4_complete.fetch_unpaywall_pdf_url') # <-- CHEMIN CORRIGÉ
 def test_fetch_online_pdf_task(mock_unpaywall, db_session, mocker):

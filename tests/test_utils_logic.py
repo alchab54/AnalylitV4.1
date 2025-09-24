@@ -210,7 +210,8 @@ def test_import_from_zotero_json_task_logic(mock_notify, mock_session, db_sessio
     existing_article = SearchResult(
         id=str(uuid.uuid4()),
         project_id=project_id,
-        article_id="10.1000/existing" # L'ID unique
+        article_id="10.1000/existing", # L'ID unique
+        title="Titre existant" # Add a title to the existing article
     )
     db_session.add(existing_article)
     db_session.commit()

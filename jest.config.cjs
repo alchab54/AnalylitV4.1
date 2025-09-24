@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   testEnvironment: 'jest-environment-jsdom',
   roots: ['<rootDir>/web/js'],
   testMatch: [
@@ -14,14 +14,12 @@ export default {
   ],
   coverageDirectory: 'reports/coverage-frontend',
   coverageReporters: ['text', 'lcov', 'html'],
-  setupFilesAfterEnv: ['@testing-library/jest-dom', '<rootDir>/web/js/tests/jest.setup.js'],
+  setupFilesAfterEnv: ['@testing-library/jest-dom'],
   verbose: true,
   transform: {
-    '^.+\.js$': 'babel-jest',
+    '^.+\\.js$': 'babel-jest',
   },
-  globals: {
-    'ts-jest': {
-      useESM: true
-    }
-  }
+  moduleFileExtensions: ['js', 'mjs'], // Add mjs for ES modules
+  
+  
 };
