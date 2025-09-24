@@ -137,11 +137,32 @@ function exportSummaryTableExcel(data, filename = 'summary_table.xlsx') {
     }
 }
 
-// Export ES6
-export { exportSummaryTableExcel };
+// Export manquant : generateBibliography
+function generateBibliography(articles, style = 'apa') {
+    console.log('Generating bibliography:', articles?.length || 0, 'articles');
+    
+    if (!Array.isArray(articles)) return [];
+    
+    return articles.map((article, index) => {
+        const authors = article.authors || 'Unknown Author';
+        const title = article.title || 'Untitled';
+        const journal = article.journal || 'Unknown Journal';
+        const year = article.year || article.publication_date || 'n.d.';
+        
+        return {
+            id: article.id || index + 1,
+            citation: `${authors} (${year}). ${title}. ${journal}.`,
+            raw: article
+        };
+    });
+}
 
-// Compatibilité globale
+// Export final
+export { 
+    exportSummaryTableExcel,
+    generateBibliography 
+};
+
 if (typeof window !== 'undefined') {
     window.exportSummaryTableExcel = exportSummaryTableExcel;
 }
-
