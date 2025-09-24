@@ -1,8 +1,8 @@
 // web/js/app-improved.js
 
-import { appState, initializeState } from './state.js';
-import { API_ENDPOINTS, SELECTORS, MESSAGES } from './constants.js';
-import { showSection } from './core.js';
+import { appState, initializeState, setConnectionStatus, setAnalysisProfiles, setAvailableDatabases } from './state.js';
+import { API_ENDPOINTS, MESSAGES, CONFIG } from './constants.js';
+import { showSection, setupDelegatedEventListeners, initializeWebSocket } from './core.js';
 
 // ============================
 // Objet elements - UNIQUE EXPORT
@@ -57,98 +57,8 @@ let isInitialized = false;
  * Initialise tous les gestionnaires d'événements
  */
 function initializeEventHandlers() {
-    // Gestionnaire de navigation
-    document.addEventListener('click', handleNavigation);
-    
-    // Gestionnaire de modales
-    document.addEventListener('click', handleModalActions);
-    
-    // Gestionnaire de formulaires
-    document.addEventListener('submit', handleForms);
-    
-    // Gestionnaire d'événements personnalisés
-    document.addEventListener('project-select', handleProjectSelect);
-    
+    setupDelegatedEventListeners();
     console.log('🔧 Gestionnaires d\'événements initialisés');
-}
-
-/**
- * Gestionnaire unifié de navigation
- */
-function handleNavigation(event) {
-    const button = event.target.closest('[data-action="show-section"]');
-    if (!button) return;
-    
-    event.preventDefault();
-    
-    const sectionId = button.dataset.sectionId;
-    if (sectionId) {
-        // Mettre à jour l'état actif des boutons
-        document.querySelectorAll('.app-nav__button').forEach(btn => {
-            btn.classList.remove('app-nav__button--active');
-        });
-        button.classList.add('app-nav__button--active');
-        
-        // Afficher la section
-        showSection(sectionId);
-    }
-}
-
-/**
- * Gestionnaire des actions de modales
- */
-function handleModalActions(event) {
-    const action = event.target.dataset.action;
-    
-    switch (action) {
-        case 'create-project-modal':
-            import('./ui-improved.js').then(({ showCreateProjectModal }) => {
-                showCreateProjectModal();
-            });
-            break;
-            
-        case 'close-modal':
-            import('./ui-improved.js').then(({ closeModal }) => {
-                closeModal();
-            });
-            break;
-            
-        case 'select-project':
-            const projectId = event.target.closest('[data-project-id]')?.dataset.projectId;
-            if (projectId) {
-                import('./projects.js').then(({ selectProject }) => {
-                    selectProject(projectId);
-                });
-            }
-            break;
-    }
-}
-
-/**
- * Gestionnaire de formulaires
- */
-function handleForms(event) {
-    const form = event.target;
-    const formType = form.dataset.form;
-    
-    switch (formType) {
-        case 'create-project':
-            event.preventDefault();
-            import('./projects.js').then(({ handleCreateProject }) => {
-                handleCreateProject(event);
-            });
-            break;
-    }
-}
-
-/**
- * Gestionnaire de sélection de projet (événement personnalisé)
- */
-function handleProjectSelect(event) {
-    const { projectId } = event.detail;
-    import('./projects.js').then(({ selectProject }) => {
-        selectProject(projectId);
-    });
 }
 
 /**
@@ -163,11 +73,13 @@ async function loadInitialData() {
         
         // Chargement en parallèle des données essentielles
         const promises = [
-            loadProjects(),
-            loadAnalysisProfiles()
+            loadProjects(), // This updates appState.projects
+            loadAnalysisProfiles(), // This updates appState.analysisProfiles
+            loadAvailableDatabases() // This updates appState.availableDatabases
         ];
         
         await Promise.all(promises);
+        console.log('appState after initial load:', appState);
         
         const endTime = performance.now();
         console.log(`📊 Données initiales chargées en ${(endTime - startTime).toFixed(2)}ms`);
@@ -184,13 +96,27 @@ async function loadInitialData() {
 async function loadAnalysisProfiles() {
     try {
         const { fetchAPI } = await import('./api.js');
-        const profiles = await fetchAPI(API_ENDPOINTS.analysisProfiles);
-        appState.analysisProfiles = profiles || [];
-        return profiles;
+        const response = await fetchAPI(API_ENDPOINTS.analysisProfiles);
+        setAnalysisProfiles(response.profiles || []);
+        return response.profiles || [];
     } catch (error) {
         console.error('Erreur lors du chargement des profils d\'analyse:', error);
-        appState.analysisProfiles = [];
+        setAnalysisProfiles([]);
         return [];
+    }
+}
+
+/**
+ * Charge les bases de données disponibles
+ */
+async function loadAvailableDatabases() {
+    try {
+        const { fetchAPI } = await import('./api.js');
+        const databases = await fetchAPI(API_ENDPOINTS.databases);
+        setAvailableDatabases(databases || []);
+    } catch (error) {
+        console.error('Erreur lors du chargement des bases de données:', error);
+        setAvailableDatabases([]);
     }
 }
 
@@ -220,6 +146,9 @@ async function initializeApplication() {
         // Initialisation des gestionnaires d'événements
         initializeEventHandlers();
         
+        // Initialisation du WebSocket
+        initializeWebSocket();
+
         // Chargement des données initiales
         await loadInitialData();
         
@@ -275,4 +204,4 @@ window.AnalyLit = {
 console.log('🎯 Interface de debug disponible: window.AnalyLit');
 
 // EXPORT UNIQUE - Pas de duplication !
-export { appState, loadInitialData, initializeEventHandlers };
+export { appState, loadInitialData, initializeEventHandlers, elements };

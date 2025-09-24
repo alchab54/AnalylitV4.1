@@ -1,28 +1,11 @@
-export function showToast(message, type = 'info', duration = 3000) {
-    const toastContainer = document.querySelector('#toastContainer');
-    if (!toastContainer) {
-        console.error("Toast container not found!");
-        return;
-    }
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'info'}-circle"></i>
-        <span>${message}</span>
-    `;
-    
-    toastContainer.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.classList.add('fade-out');
-        setTimeout(() => toast.remove(), 300);
-    }, duration);
-}
-
-export function showSuccess(message) {
-    showToast(message, 'success');
-}
-
-export function showError(message) {
-    showToast(message, 'error');
-}
+// This file is deprecated. All toast functionalities are now handled by ui-improved.js.
+// Please remove this file from your project.
+//
+// If you need to use showToast, showSuccess, or showError,
+// import them from 'ui-improved.js'.
+//
+// Example:
+// import { showToast, showSuccess, showError } from './ui-improved.js';
+//
+// The old implementation was basic and lacked features like accessibility,
+// action buttons, and a toast pool, which are now available in ui-improved.js.

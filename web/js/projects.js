@@ -1,8 +1,9 @@
 // web/js/projects.js
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
-import { showLoadingOverlay, closeModal, escapeHtml, showModal, renderProjectCards } from './ui-improved.js'; 
+import { showLoadingOverlay, closeModal, escapeHtml, showModal, renderProjectCards } from './ui-improved.js';
 import { showToast, showSuccess, showError } from './toast.js';
+import { setProjects, setCurrentProject, setCurrentSection, setCurrentProjectFiles } from './state.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 // ============================
@@ -16,7 +17,7 @@ import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 export async function loadProjects() {
     try {
         const projects = await fetchAPI(API_ENDPOINTS.projects);
-        appState.projects = projects || [];
+        setProjects(projects || []);
         
         // Appeler le rendu des cartes pour Cypress
         renderProjectCards(projects);
@@ -94,17 +95,15 @@ async function handleCreateProject(event) {
 async function selectProject(projectId) {
     if (!projectId) return;
     
+    const projectToSelect = appState.projects.find(p => p.id === projectId);
+    if (!projectToSelect) return;
+
     try {
-        appState.currentProject = appState.projects.find(p => p.id === projectId);
+        setCurrentProject(projectToSelect);
         renderProjectsList();
 
-        // Rejoindre la room WebSocket du projet
-        if (appState.socket) {
-            appState.socket.emit('join_room', { room: projectId });
-        }
-        
-        // La logique de rafraîchissement est gérée par le gestionnaire de navigation principal
-        document.querySelector('.app-nav__button[data-section-id="results"]')?.click();
+        // Change de section via le state manager au lieu de simuler un clic
+        setCurrentSection('articles');
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
     }
@@ -140,10 +139,11 @@ async function confirmDeleteProject(projectId) {
         showToast(MESSAGES.projectDeleted, 'success');
         
         // Mettre à jour l'état localement pour une UI plus réactive
-        appState.projects = appState.projects.filter(p => p.id !== projectId);
+        const updatedProjects = appState.projects.filter(p => p.id !== projectId);
+        setProjects(updatedProjects);
 
         if (appState.currentProject?.id === projectId) {
-            appState.currentProject = null;
+            setCurrentProject(null);
         }
         
         renderProjectsList();
@@ -173,17 +173,17 @@ async function handleExportProject(projectId) {
  */
 async function loadProjectFilesSet(projectId) {
     if (!projectId) {
-        appState.currentProjectFiles = new Set();
+        setCurrentProjectFiles(new Set());
         return;
     }
     
     try {
         // TODO: Backend route for getting project files is missing.
         // const files = await fetchAPI(`/projects/${projectId}/files`);
-        const files = []; // Temporaire en attendant l'implémentation backend
+        const files = await fetchAPI(API_ENDPOINTS.projectFiles(projectId)); // Assuming this endpoint exists
         const filenames = (files || [])
             .map(f => String(f.filename || '').replace(/\.pdf$/i, '').toLowerCase());
-        appState.currentProjectFiles = new Set(filenames);
+        setCurrentProjectFiles(new Set(filenames));
     } catch (error) {
         console.error('Erreur chargement des fichiers projet:', error);
         appState.currentProjectFiles = new Set();

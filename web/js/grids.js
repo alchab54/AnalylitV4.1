@@ -4,7 +4,7 @@ import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { setCurrentProjectGrids } from './state.js';
 import { escapeHtml } from './ui-improved.js';
-import { showToast } from './toast.js';
+import { showToast } from './ui-improved.js'; // Use ui-improved.js for toast
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 // CORRECTION : Ajout de la fonction manquante `loadProjectGrids`
@@ -13,7 +13,7 @@ export async function loadProjectGrids(projectId) {
 
     try {
         const grids = await fetchAPI(API_ENDPOINTS.grids(projectId));
-        setCurrentProjectGrids(grids || []);
+        setCurrentProjectGrids(grids || []); // Update state via setCurrentProjectGrids
         renderGridsSection(appState.currentProject, elements);
     } catch (error) {
         console.error('Failed to load project grids:', error);
@@ -23,7 +23,7 @@ export async function loadProjectGrids(projectId) {
 
 export function renderGridsSection(project, elements) {
     const container = document.querySelector(SELECTORS.gridsContainer);
-    if (!container) return;
+    if (!container) return; // Use SELECTORS
     if (!project) {
         container.innerHTML = `<div class="placeholder">${MESSAGES.selectProjectToViewGrids}</div>`;
         return;
@@ -31,7 +31,7 @@ export function renderGridsSection(project, elements) {
 
     const grids = appState.currentProjectGrids || [];
     const gridsHtml = grids.length > 0
-        ? grids.map(renderGridItem).join('')
+        ? (appState.currentProjectGrids || []).map(renderGridItem).join('') // Read from state
         : `<div class="placeholder">${MESSAGES.noCustomGrids}</div>`;
     
     container.innerHTML = `
@@ -83,7 +83,7 @@ export async function handleDeleteGrid(gridId) {
         showToast(MESSAGES.gridDeleted, 'success');
         
         // Mettre à jour l'état localement
-        const updatedGrids = (appState.currentProjectGrids || []).filter(g => g.id !== gridId);
+        const updatedGrids = (appState.currentProjectGrids || []).filter(g => g.id !== gridId); // Read from state
         setCurrentProjectGrids(updatedGrids);
         await loadProjectGrids(appState.currentProject.id);
 
@@ -104,7 +104,7 @@ export function showGridFormModal(gridId = null) {
 
     if (gridId) {
         title.textContent = MESSAGES.editGridTitle;
-        const grid = appState.currentProjectGrids.find(g => g.id === gridId);
+        const grid = (appState.currentProjectGrids || []).find(g => g.id === gridId); // Read from state
         if (grid) {
             document.querySelector('#gridName').value = grid.name;
             document.querySelector('#gridDescription').value = grid.description || '';
@@ -149,7 +149,7 @@ export function triggerGridImport() {
  * Gère l'upload du fichier de grille JSON sélectionné
  */
 export async function handleGridImportUpload(event) {
-    const file = event.target.files[0];
+    const file = event.target.files[0]; // Read from event
     if (!file || !appState.currentProject?.id) {
         return;
     }
@@ -209,18 +209,24 @@ export async function handleSaveGrid(event) {
         const savedGrid = await fetchAPI(endpoint, { method, body: payload });
 
         if (gridId) {
-            // Remplacer la grille existante dans l'état
-            const index = appState.currentProjectGrids.findIndex(g => g.id === gridId);
+            // Remplacer la grille existante dans l'état via setCurrentProjectGrids
+            const updatedGrids = (appState.currentProjectGrids || []).map(g => g.id === gridId ? savedGrid : g);
+            setCurrentProjectGrids(updatedGrids);
+        } else {
+            // Ajouter la nouvelle grille à l'état via setCurrentProjectGrids
+            const updatedGrids = [...(appState.currentProjectGrids || []), savedGrid];
+            setCurrentProjectGrids(updatedGrids);
+        }
+        
+        // Mettre à jour l'état et re-rendre la section
+        /* const index = appState.currentProjectGrids.findIndex(g => g.id === gridId);
             if (index !== -1) {
                 appState.currentProjectGrids[index] = savedGrid;
             }
         } else {
             // Ajouter la nouvelle grille à l'état
             appState.currentProjectGrids.push(savedGrid);
-        }
-        
-        // Mettre à jour l'état et re-rendre la section
-        setCurrentProjectGrids([...appState.currentProjectGrids]);
+        } */
 
         showToast(MESSAGES.gridSaved(!!gridId), 'success');
         document.querySelector('#gridFormModal').classList.remove('modal--show'); // Assuming static ID

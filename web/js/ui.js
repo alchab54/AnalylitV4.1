@@ -1,13 +1,13 @@
-// ============================
-// UI Utilities
-// ============================
-
-/**
- * Échappe le HTML pour éviter les injections XSS.
- * @param {string} unsafe - La chaîne de caractères à échapper.
- * @returns {string} - La chaîne échappée.
- */
-
+// This file is deprecated. All UI utilities, including showToast,
+// are now handled by ui-improved.js to avoid duplication and
+// ensure consistency.
+//
+// Please remove this file from your project.
+//
+// If you need to use showToast or other UI functions,
+// import them from 'ui-improved.js'.
+//
+// Example: import { showToast } from './ui-improved.js';
 /**
  * Affiche un message toast.
  * @param {string} message - Le message à afficher.

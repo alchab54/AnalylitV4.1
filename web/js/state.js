@@ -30,6 +30,10 @@ export const appState = {
     // Données des analyses
     analysisResults: null,
     analysisProfiles: [],
+    prompts: [], // Added
+    ollamaModels: [], // Added
+    selectedProfileId: null, // Added
+    availableDatabases: [], // Added
 
     // Paramètres et configuration
     settings: {
@@ -52,7 +56,15 @@ export const appState = {
 
     // Gestion des tâches en arrière-plan
     backgroundTasks: new Map(),
-    taskProgress: new Map()
+    taskProgress: new Map(),
+    queuesInfo: null,
+
+    // Données spécifiques à une section
+    searchResults: [],
+    currentProjectExtractions: [],
+    currentValidations: [],
+    chatMessages: [], // Added
+    activeEvaluator: 'evaluator1', // Added default evaluator
 };
 
 // ============================
@@ -216,6 +228,20 @@ export function markNotificationAsRead(notificationId) {
 }
 
 /**
+ * Met à jour la liste des projets
+ * @param {Array} projects - La nouvelle liste de projets
+ */
+export function setProjects(projects) {
+    appState.projects = projects || [];
+    console.log(`📁 Liste des projets mise à jour: ${projects.length} projets`);
+
+    // Émettre un événement pour que l'UI puisse réagir
+    window.dispatchEvent(new CustomEvent('projects-updated', {
+        detail: { projects }
+    }));
+}
+
+/**
  * Met à jour le projet actuel
  * @param {Object} project - Données du projet
  */
@@ -230,6 +256,20 @@ export function setCurrentProject(project) {
             detail: { project }
         }));
     }
+}
+
+/**
+ * Met à jour les fichiers du projet actuel (Set de noms de fichiers)
+ * @param {Set<string>} filesSet - Le Set des noms de fichiers du projet
+ */
+export function setCurrentProjectFiles(filesSet) {
+    appState.currentProjectFiles = filesSet || new Set();
+    console.log(`📄 Fichiers du projet mis à jour: ${filesSet.size} fichiers`);
+
+    // Émettre un événement
+    window.dispatchEvent(new CustomEvent('project-files-updated', {
+        detail: { files: Array.from(filesSet) }
+    }));
 }
 
 /**
@@ -295,34 +335,6 @@ export function setCurrentProjectGrids(grids) {
 }
 
 /**
- * Ajoute une grille au projet actuel
- * @param {Object} grid - Nouvelle grille à ajouter
- */
-export function addCurrentProjectGrid(grid) {
-    if (appState.currentProject) {
-        if (!appState.currentProject.grids) {
-            appState.currentProject.grids = [];
-        }
-        appState.currentProject.grids.push(grid);
-        console.log(`📋 Grille ajoutée au projet: ${appState.currentProject.name}`, grid);
-    }
-}
-
-/**
- * Supprime une grille du projet actuel
- * @param {string|number} gridId - ID de la grille à supprimer
- */
-export function removeCurrentProjectGrid(gridId) {
-    if (appState.currentProject && appState.currentProject.grids) {
-        const index = appState.currentProject.grids.findIndex(g => g.id === gridId);
-        if (index !== -1) {
-            const removed = appState.currentProject.grids.splice(index, 1)[0];
-            console.log(`📋 Grille supprimée du projet: ${appState.currentProject.name}`, removed);
-        }
-    }
-}
-
-/**
  * Met à jour les articles du projet actuel
  * @param {Array} articles - Nouveaux articles du projet
  */
@@ -343,6 +355,63 @@ export function setCurrentProjectAnalyses(analyses) {
         console.log(`📊 Analyses mises à jour pour le projet: ${appState.currentProject.name}`, analyses.length);
     }
 }
+
+/**
+ * Met à jour les profils d'analyse dans l'état
+ * @param {Array} profiles - La nouvelle liste de profils
+ */
+export function setAnalysisProfiles(profiles) {
+    appState.analysisProfiles = profiles || [];
+    console.log(`👤 Profils d'analyse mis à jour: ${profiles.length} profils`);
+
+    // Émettre un événement pour que l'UI puisse réagir
+    window.dispatchEvent(new CustomEvent('analysis-profiles-updated', {
+        detail: { profiles }
+    }));
+}
+
+/**
+ * Met à jour la liste des prompts (modèles)
+ * @param {Array} prompts - La nouvelle liste de prompts
+ */
+export function setPrompts(prompts) {
+    appState.prompts = prompts || [];
+    console.log(`💬 Prompts mis à jour: ${prompts.length} prompts`);
+
+    // Émettre un événement
+    window.dispatchEvent(new CustomEvent('prompts-updated', {
+        detail: { prompts }
+    }));
+}
+
+/**
+ * Met à jour la liste des modèles Ollama
+ * @param {Array} models - La nouvelle liste de modèles Ollama
+ */
+export function setOllamaModels(models) {
+    appState.ollamaModels = models || [];
+    console.log(`🧠 Modèles Ollama mis à jour: ${models.length} modèles`);
+
+    // Émettre un événement
+    window.dispatchEvent(new CustomEvent('ollama-models-updated', {
+        detail: { models }
+    }));
+}
+
+/**
+ * Définit l'ID du profil d'analyse actuellement sélectionné
+ * @param {string|null} profileId - L'ID du profil sélectionné
+ */
+export function setSelectedProfileId(profileId) {
+    appState.selectedProfileId = profileId;
+    console.log(`👤 Profil sélectionné: ${profileId || 'aucun'}`);
+
+    // Émettre un événement
+    window.dispatchEvent(new CustomEvent('selected-profile-changed', {
+        detail: { profileId }
+    }));
+}
+
 
 /**
  * Obtient les grilles du projet actuel
@@ -368,41 +437,83 @@ export function getCurrentProjectAnalyses() {
     return appState.currentProject?.analyses || [];
 }
 
+/**
+ * Met à jour les extractions du projet actuel
+ * @param {Array} extractions - Nouvelles extractions du projet
+ */
+export function setCurrentProjectExtractions(extractions) {
+    appState.currentProjectExtractions = extractions || [];
+    console.log(`📋 Extractions mises à jour pour le projet: ${appState.currentProject?.name}`, extractions.length);
+
+    window.dispatchEvent(new CustomEvent('project-extractions-updated', {
+        detail: { extractions }
+    }));
+}
+
+/**
+ * Met à jour les messages du chat
+ * @param {Array} messages - Les nouveaux messages du chat
+ */
+export function setChatMessages(messages) {
+    appState.chatMessages = messages || [];
+    console.log(`💬 Messages de chat mis à jour: ${messages.length} messages`);
+
+    // Émettre un événement
+    window.dispatchEvent(new CustomEvent('chat-messages-updated', {
+        detail: { messages }
+    }));
+}
+
+/**
+ * Définit l'évaluateur actif pour la validation
+ * @param {string} evaluator - L'ID de l'évaluateur actif ('evaluator1' ou 'evaluator2')
+ */
+export function setActiveEvaluator(evaluator) {
+    if (appState.activeEvaluator !== evaluator) {
+        appState.activeEvaluator = evaluator;
+        console.log(`🧑‍💻 Évaluateur actif défini sur: ${evaluator}`);
+
+        // Émettre un événement
+        window.dispatchEvent(new CustomEvent('active-evaluator-changed', {
+            detail: { evaluator }
+        }));
+    }
+}
+
+/**
+ * Met à jour les décisions de screening
+ * @param {Array} decisions - Les nouvelles décisions de screening
+ */
+export function setScreeningDecisions(decisions) {
+    appState.screeningDecisions = decisions || [];
+    console.log(`🔍 Décisions de screening mises à jour: ${decisions.length} décisions`);
+
+    // Émettre un événement
+    window.dispatchEvent(new CustomEvent('screening-decisions-updated', {
+        detail: { decisions }
+    }));
+}
+
+/**
+ * Met à jour la liste des notifications
+ * @param {Array} notifications - La nouvelle liste de notifications
+ */
+export function setNotifications(notifications) {
+    appState.notifications = notifications || [];
+    console.log(`🔔 Notifications mises à jour: ${notifications.length} notifications`);
+
+    window.dispatchEvent(new CustomEvent('notifications-updated', {
+        detail: { notifications }
+    }));
+}
+
+export function setUnreadNotificationsCount(count) {
+    appState.unreadNotifications = count;
+}
+
 // ============================
 // Initialisation automatique
 // ============================
-
-// Charger les paramètres au démarrage
-loadSettings();
-
-// Interface de debug globale
-if (typeof window !== 'undefined') {
-    window.AnalyLitState = {
-        appState,
-        initializeState,
-        setConnectionStatus,
-        addBackgroundTask,
-        updateTaskProgress,
-        removeBackgroundTask,
-        updateSettings,
-        loadSettings,
-        addNotification,
-        markNotificationAsRead,
-        setCurrentProject,
-        clearState,
-        getStateDebugInfo,
-        setCurrentProjectGrids,
-        addCurrentProjectGrid,
-        removeCurrentProjectGrid,
-        setCurrentProjectArticles,
-        setCurrentProjectAnalyses,
-        getCurrentProjectGrids,
-        getCurrentProjectArticles,
-        getCurrentProjectAnalyses
-    };
-    
-    console.log('🔍 Interface de debug disponible: window.AnalyLitState');
-}
 
 // Export par défaut
 export default appState;
@@ -597,10 +708,72 @@ export function setCurrentSection(sectionId) {
     }
 }
 
+/**
+ * Met à jour les résultats d'analyse dans l'état
+ * @param {Object} results - Résultats de l'analyse
+ */
+export function setAnalysisResults(results) {
+    appState.analysisResults = results || null;
+    console.log(`📊 Résultats d'analyse mis à jour`, results);
+    
+    // Émettre un événement
+    window.dispatchEvent(new CustomEvent('analysis-results-updated', {
+        detail: { results }
+    }));
+}
+
+/**
+ * Met à jour le statut des files d'attente (queues)
+ * @param {Object} status - Le nouvel objet de statut des files
+ */
+export function setQueuesStatus(status) {
+    appState.queuesInfo = status || { queues: [] };
+    console.log(`🔄 Statut des files d'attente mis à jour.`);
+
+    // Émettre un événement pour que l'UI puisse réagir
+    window.dispatchEvent(new CustomEvent('queues-status-updated', {
+        detail: { status: appState.queuesInfo }
+    }));
+}
+
+/**
+ * Met à jour les données de validation pour la section de validation.
+ * @param {Array} validations - Les données de validation (généralement des extractions).
+ */
+export function setCurrentValidations(validations) {
+    appState.currentValidations = validations || [];
+    console.log(`✅ Données de validation mises à jour: ${validations.length} éléments`);
+
+    // Émettre un événement pour que l'UI puisse réagir si nécessaire
+    window.dispatchEvent(new CustomEvent('validations-updated', {
+        detail: { validations }
+    }));
+}
+
+// ============================
+// Initialisation et Debug
+// ============================
+
+// Charger les paramètres au démarrage
+loadSettings();
+
 // Ajouter toutes ces nouvelles fonctions à l'interface de debug
 if (typeof window !== 'undefined') {
     window.AnalyLitState = {
-        ...window.AnalyLitState,
+        // Core state
+        appState,
+        initializeState,
+        clearState,
+        getStateDebugInfo,
+
+        // Project specific data
+        setProjects,
+        setCurrentProject,
+        setCurrentProjectGrids,
+        setCurrentProjectArticles,
+        setCurrentProjectAnalyses,
+        setCurrentProjectExtractions,
+        getCurrentProjectGrids,
         
         // Articles selection
         selectedArticles,
@@ -614,14 +787,28 @@ if (typeof window !== 'undefined') {
         // Search and filtering
         setSearchResults,
         filterSearchResults,
+        setAnalysisResults,
         
         // UI state
         setLoadingState,
         setCurrentSection,
+        setConnectionStatus,
+        setAnalysisProfiles,
+        setCurrentValidations,
+        setPrompts,
+        setOllamaModels,
+        setSelectedProfileId,
+        setAvailableDatabases,
+        setChatMessages,
+        setActiveEvaluator,
+        setScreeningDecisions,
+        setQueuesStatus,
         
         // Debug helpers
         debugSelectedArticles: () => console.log('Articles sélectionnés:', Array.from(selectedArticles)),
         debugSearchResults: () => console.log('Résultats de recherche:', appState.searchResults),
         debugCurrentState: () => console.log('État complet:', appState)
     };
+
+    console.log('🔍 Interface de debug disponible: window.AnalyLitState');
 }

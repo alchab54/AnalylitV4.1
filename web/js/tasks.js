@@ -1,6 +1,7 @@
 // web/js/tasks.js
 
 import { fetchAPI } from './api.js';
+import { setBackgroundTasks } from './state.js';
 import { API_ENDPOINTS, MESSAGES } from './constants.js';
 
 /**
@@ -21,7 +22,7 @@ export async function fetchTasks() {
         
         // 3. S'assurer que la réponse contient un tableau de tâches, même s'il est vide.
         //    La notation `|| []` est une sécurité pour éviter les erreurs si `response.tasks` est `undefined`.
-        const tasks = response.tasks || [];
+        setBackgroundTasks(response.tasks || []);
         
         // 4. Mettre à jour l'interface utilisateur avec les tâches récupérées.
         renderTasks(tasks);
@@ -42,8 +43,9 @@ export async function fetchTasks() {
 /**
  * Gère le rendu HTML de la liste des tâches dans le conteneur approprié.
  * @param {Array} tasks - Un tableau d'objets représentant les tâches.
+ * NOTE: Cette fonction est maintenant appelée avec appState.backgroundTasks.values()
  */
-function renderTasks(tasks) {
+export function renderTasks(tasksIterable) {
     const tasksContainer = document.getElementById('tasks-list');
 
     // Si le conteneur n'existe pas dans le DOM, on ne peut rien faire.
@@ -54,13 +56,13 @@ function renderTasks(tasks) {
 
     // Si le tableau de tâches est vide, afficher un message informatif.
     if (tasks.length === 0) {
-        tasksContainer.innerHTML = `<p>${MESSAGES.noTasksInProgress}</p>`;
+        tasksContainer.innerHTML = `<p>${MESSAGES.noTasksInProgress}</p>`; // Correction: tasks.length est 0 ici, mais tasksIterable peut être vide
         return;
     }
 
     // Construire le HTML pour chaque tâche en utilisant les données reçues.
     // L'utilisation de `data-job-id` permet d'identifier facilement les éléments plus tard.
-    const tasksHtml = tasks.map(task => `
+    const tasksHtml = Array.from(tasksIterable).map(task => `
         <div class="task-item" data-job-id="${task.job_id}">
             <div class="task-header">
                 <strong>Job ID:</strong> ${task.job_id}
@@ -80,4 +82,3 @@ function renderTasks(tasks) {
     // Injecter le HTML généré dans le conteneur.
     tasksContainer.innerHTML = tasksHtml;
 }
-

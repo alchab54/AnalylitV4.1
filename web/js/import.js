@@ -1,8 +1,7 @@
 // web/js/import.js
-import { appState } from './app-improved.js'; // L'état global vient de l'entrypoint
+import { appState } from './app-improved.js'; // Read from state
 import { fetchAPI } from './api.js';         // La fonction API vient de son module dédié
-import { showLoadingOverlay, showModal, closeModal, updateLoadingProgress } from './ui-improved.js';
-import { showToast } from './toast.js';
+import { showLoadingOverlay, showModal, closeModal, updateLoadingProgress, showToast } from './ui-improved.js';
 import { loadSearchResults } from './articles.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
@@ -100,7 +99,7 @@ export function handleUploadPdfs(target) {
 }
 
 export async function handleBulkPdfDownload() {
-    if (!appState.currentProject) return;
+    if (!appState.currentProject) return; // Read from state
     showLoadingOverlay(true, MESSAGES.searchingFreePdfs);
     try {
         await fetchAPI(API_ENDPOINTS.projectBulkPdfDownload(appState.currentProject.id), { method: 'POST' });
@@ -113,7 +112,7 @@ export async function handleBulkPdfDownload() {
 }
 
 export async function exportForThesis() {
-    if (!appState.currentProject) {
+    if (!appState.currentProject) { // Read from state
         showToast(MESSAGES.noProjectSelected, 'warning');
         return;
     }
@@ -124,7 +123,7 @@ export async function exportForThesis() {
 }
 
 export async function handleIndexPdfs() {
-  if (!appState.currentProject) return;
+  if (!appState.currentProject) return; // Read from state
   
   // Affiche l'overlay avec un message initial et prépare la barre de progression
   showLoadingOverlay(true, MESSAGES.startingIndexing);
@@ -149,7 +148,7 @@ export async function handleZoteroSync() {
 }
 
 async function processZoteroFile(file) {
-  if (!appState.currentProject) {
+  if (!appState.currentProject) { // Read from state
     showToast(MESSAGES.selectProjectFirst, 'warning');
     return;
   }
@@ -182,7 +181,7 @@ export async function processPmidImport(event) {
   closeModal();
 
   // 3. CONTINUER LE TRAITEMENT
-  if (!appState.currentProject) {
+  if (!appState.currentProject) { // Read from state
     showToast(MESSAGES.selectProjectFirst, 'warning');
     return;
   }

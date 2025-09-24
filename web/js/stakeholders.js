@@ -2,11 +2,11 @@
 
 import { API_ENDPOINTS, SELECTORS, MESSAGES } from './constants.js';
 import { fetchAPI } from './api.js';
-import { showToast, showError } from './toast.js';
+import { showToast, showError } from './ui-improved.js'; // Use ui-improved.js for toast
 import { appState } from './app-improved.js';
+import { setStakeholders, setStakeholderGroups } from './state.js';
 
 const stakeholdersModule = (() => {
-    let currentProjectId = null;
 
     const getStakeholdersContainer = () => document.querySelector(SELECTORS.stakeholdersContainer);
     const getStakeholdersList = () => document.querySelector(SELECTORS.stakeholdersList);
@@ -16,25 +16,25 @@ const stakeholdersModule = (() => {
     const init = () => {
         console.log('Stakeholders module initialized.');
         // Event listener for project selection change
-        document.addEventListener('projectSelected', handleProjectSelected);
+        window.addEventListener('current-project-changed', handleProjectChanged);
 
         // Event listener for creating a new stakeholder
         const createBtn = getCreateStakeholderBtn();
         if (createBtn) {
-            createBtn.addEventListener('click', showCreateStakeholderModal);
+            createBtn.addEventListener('click', () => showCreateStakeholderModal(appState.currentProject?.id));
         }
 
         // Event listener for new stakeholder form submission
         const newForm = getNewStakeholderForm();
         if (newForm) {
-            newForm.addEventListener('submit', handleCreateStakeholder);
+            newForm.addEventListener('submit', (e) => handleCreateStakeholder(e, appState.currentProject?.id));
         }
     };
 
-    const handleProjectSelected = (event) => {
-        currentProjectId = event.detail.projectId;
-        if (currentProjectId) {
-            loadStakeholders(currentProjectId);
+    const handleProjectChanged = () => {
+        const projectId = appState.currentProject?.id;
+        if (projectId) {
+            loadStakeholders(projectId);
             getStakeholdersContainer().classList.remove('hidden');
         } else {
             getStakeholdersContainer().classList.add('hidden');
@@ -43,7 +43,8 @@ const stakeholdersModule = (() => {
 
     const loadStakeholders = async (projectId) => {
         try {
-            const stakeholders = await fetchAPI(API_ENDPOINTS.projectStakeholders(projectId));
+            const stakeholders = await fetchAPI(API_ENDPOINTS.projectStakeholders(projectId)); // Assuming this endpoint exists
+            setStakeholders(stakeholders || []); // Update state
             renderStakeholders(stakeholders);
         } catch (error) {
             showError('Erreur lors du chargement des parties prenantes.');
@@ -52,12 +53,12 @@ const stakeholdersModule = (() => {
     };
 
     const renderStakeholders = (stakeholders) => {
-        const listElement = getStakeholdersList();
+        const listElement = getStakeholdersList(); // Use getter
         if (!listElement) return;
 
         listElement.innerHTML = ''; // Clear existing list
 
-        if (stakeholders.length === 0) {
+        if (!stakeholders || stakeholders.length === 0) {
             listElement.innerHTML = '<p>Aucune partie prenante pour ce projet.</p>';
             return;
         }
@@ -78,14 +79,14 @@ const stakeholdersModule = (() => {
 
         // Add event listeners for edit and delete buttons
         listElement.querySelectorAll('[data-action="edit-stakeholder"]').forEach(button => {
-            button.addEventListener('click', (e) => showEditStakeholderModal(e.target.dataset.id));
+            button.addEventListener('click', (e) => showEditStakeholderModal(appState.currentProject?.id, e.target.dataset.id));
         });
         listElement.querySelectorAll('[data-action="delete-stakeholder"]').forEach(button => {
-            button.addEventListener('click', (e) => handleDeleteStakeholder(e.target.dataset.id));
+            button.addEventListener('click', (e) => handleDeleteStakeholder(appState.currentProject?.id, e.target.dataset.id));
         });
     };
 
-    const showCreateStakeholderModal = () => {
+    const showCreateStakeholderModal = (projectId) => {
         // Logic to show a modal for creating a new stakeholder
         // For now, just log and reset form
         console.log('Showing create stakeholder modal');
@@ -98,9 +99,9 @@ const stakeholdersModule = (() => {
         }
     };
 
-    const handleCreateStakeholder = async (event) => {
+    const handleCreateStakeholder = async (event, projectId) => {
         event.preventDefault();
-        if (!currentProjectId) {
+        if (!projectId) {
             showError('Veuillez sélectionner un projet d\'abord.');
             return;
         }
@@ -112,12 +113,12 @@ const stakeholdersModule = (() => {
         const notes = form.querySelector('#stakeholderNotes').value;
 
         try {
-            const newStakeholder = await fetchAPI(API_ENDPOINTS.projectStakeholders(currentProjectId), {
+            const newStakeholder = await fetchAPI(API_ENDPOINTS.projectStakeholders(projectId), {
                 method: 'POST',
                 body: JSON.stringify({ name, role, contact_info, notes })
             });
             showToast('Partie prenante créée avec succès.', 'success');
-            loadStakeholders(currentProjectId);
+            loadStakeholders(projectId);
             // Close modal
             const modal = document.getElementById('newStakeholderModal');
             if (modal) modal.classList.add('hidden');
@@ -127,13 +128,13 @@ const stakeholdersModule = (() => {
         }
     };
 
-    const showEditStakeholderModal = async (stakeholderId) => {
-        if (!currentProjectId) {
+    const showEditStakeholderModal = async (projectId, stakeholderId) => {
+        if (!projectId) {
             showError('Veuillez sélectionner un projet d\'abord.');
             return;
         }
         try {
-            const stakeholder = await fetchAPI(API_ENDPOINTS.stakeholderById(currentProjectId, stakeholderId));
+            const stakeholder = await fetchAPI(API_ENDPOINTS.stakeholderById(projectId, stakeholderId));
             // Populate a modal form with stakeholder data
             console.log('Showing edit modal for:', stakeholder);
             // Assuming a modal with ID 'editStakeholderModal' exists
@@ -144,8 +145,8 @@ const stakeholdersModule = (() => {
                 modal.querySelector('#editStakeholderRole').value = stakeholder.role;
                 modal.querySelector('#editStakeholderContact').value = stakeholder.contact_info;
                 modal.querySelector('#editStakeholderNotes').value = stakeholder.notes;
-                modal.classList.remove('hidden');
-                modal.querySelector('form').onsubmit = (e) => handleUpdateStakeholder(e, stakeholder.id);
+                modal.classList.remove('hidden'); // Assuming 'hidden' class for modal
+                modal.querySelector('form').onsubmit = (e) => handleUpdateStakeholder(e, projectId, stakeholder.id);
             }
         } catch (error) {
             showError('Erreur lors du chargement des détails de la partie prenante.');
@@ -153,9 +154,9 @@ const stakeholdersModule = (() => {
         }
     };
 
-    const handleUpdateStakeholder = async (event, stakeholderId) => {
+    const handleUpdateStakeholder = async (event, projectId, stakeholderId) => {
         event.preventDefault();
-        if (!currentProjectId) {
+        if (!projectId) {
             showError('Veuillez sélectionner un projet d\'abord.');
             return;
         }
@@ -167,12 +168,12 @@ const stakeholdersModule = (() => {
         const notes = form.querySelector('#editStakeholderNotes').value;
 
         try {
-            await fetchAPI(API_ENDPOINTS.stakeholderById(currentProjectId, stakeholderId), {
+            await fetchAPI(API_ENDPOINTS.stakeholderById(projectId, stakeholderId), {
                 method: 'PUT',
                 body: JSON.stringify({ name, role, contact_info, notes })
             });
             showToast('Partie prenante mise à jour avec succès.', 'success');
-            loadStakeholders(currentProjectId);
+            loadStakeholders(projectId);
             // Close modal
             const modal = document.getElementById('editStakeholderModal');
             if (modal) modal.classList.add('hidden');
@@ -182,19 +183,19 @@ const stakeholdersModule = (() => {
         }
     };
 
-    const handleDeleteStakeholder = async (stakeholderId) => {
-        if (!currentProjectId) {
+    const handleDeleteStakeholder = async (projectId, stakeholderId) => {
+        if (!projectId) {
             showError('Veuillez sélectionner un projet d\'abord.');
             return;
         }
         if (!confirm(MESSAGES.confirmDeleteStakeholder)) return; // Assuming a confirmation message
 
-        try {
-            await fetchAPI(API_ENDPOINTS.stakeholderById(currentProjectId, stakeholderId), {
+        try { // Assuming this endpoint exists
+            await fetchAPI(API_ENDPOINTS.stakeholderById(projectId, stakeholderId), {
                 method: 'DELETE'
             });
             showToast('Partie prenante supprimée avec succès.', 'success');
-            loadStakeholders(currentProjectId);
+            loadStakeholders(projectId);
         } catch (error) {
             showError('Erreur lors de la suppression de la partie prenante.');
             console.error('Error deleting stakeholder:', error);
@@ -202,7 +203,7 @@ const stakeholdersModule = (() => {
     };
 
     const addStakeholderGroup = async (projectId, groupData) => {
-        if (!projectId) {
+        if (!projectId) { // Assuming this endpoint exists
             showError('ID du projet requis pour ajouter un groupe de parties prenantes.');
             return null;
         }
@@ -212,6 +213,7 @@ const stakeholdersModule = (() => {
                 method: 'POST',
                 body: JSON.stringify(groupData)
             });
+            setStakeholderGroups([...(appState.stakeholderGroups || []), newGroup]); // Update state
             showToast('Groupe de parties prenantes créé avec succès.', 'success');
             return newGroup;
         } catch (error) {
@@ -222,7 +224,7 @@ const stakeholdersModule = (() => {
     };
 
     const removeStakeholderGroup = async (projectId, groupId) => {
-        if (!projectId || !groupId) {
+        if (!projectId || !groupId) { // Assuming this endpoint exists
             showError('ID du projet et du groupe requis.');
             return false;
         }
@@ -233,6 +235,7 @@ const stakeholdersModule = (() => {
             await fetchAPI(API_ENDPOINTS.stakeholderGroupById(projectId, groupId), {
                 method: 'DELETE'
             });
+            setStakeholderGroups((appState.stakeholderGroups || []).filter(g => g.id !== groupId)); // Update state
             showToast('Groupe supprimé avec succès.', 'success');
             return true;
         } catch (error) {
@@ -250,53 +253,13 @@ const stakeholdersModule = (() => {
     };
 })();
 
-export function showStakeholderManagementModal() {
+export function showStakeholderManagementModal() { // This function is called by core.js
     console.log('Ouverture modale gestion parties prenantes');
     // Logic à implémenter selon vos besoins
 }
 
-export function deleteStakeholderGroup(groupId) {
-    return removeStakeholderGroup(appState.currentProject?.id, groupId);
-}
-
-export function runStakeholderAnalysis() {
-    console.log('Lancement analyse parties prenantes');
-    // Logic à implémenter selon vos besoins
-}
-
-// === Export manquant : addStakeholderGroup ===
-function addStakeholderGroup(groupData) {
-    console.log('Adding stakeholder group:', groupData);
-    
-    try {
-        // Implémentation de base pour éviter l'erreur
-        const groupId = Date.now().toString();
-        
-        // Simuler l'ajout du groupe
-        if (typeof showToast === 'function') {
-            showToast('Groupe de parties prenantes ajouté', 'success');
-        }
-        
-        return { 
-            success: true, 
-            id: groupId,
-            data: { ...groupData, id: groupId }
-        };
-    } catch (error) {
-        console.error('Erreur ajout groupe:', error);
-        if (typeof showToast === 'function') {
-            showToast('Erreur lors de l\'ajout du groupe', 'error');
-        }
-        return { success: false, error: error.message };
-    }
-}
-
-// Export ES6
-export { addStakeholderGroup };
-
-// Compatibilité globale
-if (typeof window !== 'undefined') {
-    window.addStakeholderGroup = addStakeholderGroup;
-}
+export const deleteStakeholderGroup = (groupId) => stakeholdersModule.removeStakeholderGroup(appState.currentProject?.id, groupId);
+export const addStakeholderGroup = (groupData) => stakeholdersModule.addStakeholderGroup(appState.currentProject?.id, groupData);
+export function runStakeholderAnalysis() { /* Logic to run stakeholder analysis */ }
 
 export default stakeholdersModule;

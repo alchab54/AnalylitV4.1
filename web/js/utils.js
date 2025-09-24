@@ -95,27 +95,6 @@ export function formatNumber(number, locale = 'fr-FR') {
 }
 
 /**
- * Échappe les caractères HTML pour éviter les injections XSS
- * 
- * @param {string} text - Texte à échapper
- * @returns {string} Texte échappé
- */
-export function escapeHtml(text) {
-    if (typeof text !== 'string') return text;
-    
-    const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;',
-        '/': '&#x2F;'
-    };
-    
-    return text.replace(/[&<>"'\/]/g, (s) => map[s]);
-}
-
-/**
  * Valide une adresse email
  * 
  * @param {string} email - Email à valider

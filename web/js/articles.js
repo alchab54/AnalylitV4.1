@@ -1,22 +1,12 @@
 // web/js/articles.js
 import { fetchAPI } from './api.js';
-import { appState, elements } from './app-improved.js'; // Already correct
-import { showLoadingOverlay, showModal, closeModal, escapeHtml } from './ui-improved.js'; // No change needed here
-import { showToast } from './toast.js';
+import { appState, elements } from './app-improved.js';
+import { showLoadingOverlay, showModal, closeModal, escapeHtml, showToast } from './ui-improved.js';
 import { loadProjectFilesSet } from './projects.js';
 import { showSearchModal } from './search.js'; // Assuming this is correct
-import { setSearchResults, clearSelectedArticles, toggleSelectedArticle, setCurrentProjectExtractions } from './state.js';
-import { showSection } from './core.js';
+import { setSearchResults, clearSelectedArticles, addSelectedArticle, removeSelectedArticle, getSelectedArticles, toggleAllArticles, setCurrentProjectExtractions, setCurrentSection } from './state.js';
 import { loadProjectGrids } from './grids.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
-
-function debounce(func, delay) {
-    let timeout;
-    return function(...args) {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, args), delay);
-    };
-}
 
 export async function loadSearchResults(page = 1) {
     showLoadingOverlay(true, MESSAGES.loadingResults);
@@ -37,7 +27,7 @@ export async function loadSearchResults(page = 1) {
         const results = await fetchAPI(API_ENDPOINTS.projectSearchResults(appState.currentProject.id) + `?page=${page}`);
         setSearchResults(results.articles || [], results.meta || {});
         
-        const extractions = await fetchAPI(API_ENDPOINTS.projectExtractions(appState.currentProject.id));
+        const extractions = await fetchAPI(API_ENDPOINTS.projectExtractions(appState.currentProject.id)); // This endpoint needs to be defined in constants.js
         setCurrentProjectExtractions(extractions);
         
         renderSearchResultsTable();
@@ -64,7 +54,7 @@ export function renderSearchResultsTable() {
         return;
     }
 
-    if (appState.searchResults.length === 0) {
+    if (!appState.searchResults || appState.searchResults.length === 0) {
     if (!container) return;
     elements.resultsContainer.innerHTML = `
         <div class="results-empty">
@@ -76,10 +66,10 @@ export function renderSearchResultsTable() {
         return;
     }
 
-    const { selectedSearchResults, currentProjectExtractions, currentProjectFiles } = appState;
+    const { currentProjectExtractions, currentProjectFiles, searchResults } = appState;
 
     const tableRows = appState.searchResults.map(article => {
-        const isSelected = selectedSearchResults.has(article.article_id);
+        const isSelected = isArticleSelected(article.article_id);
         const extraction = currentProjectExtractions.find(e => e.pmid === article.article_id);
         
         // Vérifier si le PDF existe
@@ -125,21 +115,21 @@ export function renderSearchResultsTable() {
             <div class="results-stats">
                 <strong>${appState.searchResults.length}</strong> articles trouvés
                 <span class="selection-counter">
-                    <strong id="selectedCount">${selectedSearchResults.size}</strong> sélectionnés
+                    <strong id="selectedCount">${getSelectedArticles().length}</strong> sélectionnés
                 </span>
             </div>
             <div class="results-actions">
-                <button class="btn btn--secondary" data-action="select-all-articles">
+                <button class="btn btn--secondary" id="selectAllBtn" data-action="select-all-articles">
                     Tout sélectionner
                 </button>
                 <button class="btn btn--primary" 
                         data-action="batch-process-modal"
-                        ${selectedSearchResults.size === 0 ? 'disabled' : ''}>
+                        ${getSelectedArticles().length === 0 ? 'disabled' : ''}>
                     Traiter la sélection
                 </button>
                 <button class="btn btn--danger" 
                         data-action="delete-selected-articles"
-                        ${selectedSearchResults.size === 0 ? 'disabled' : ''}>
+                        ${getSelectedArticles().length === 0 ? 'disabled' : ''}>
                     Supprimer sélection
                 </button>
             </div>
@@ -150,7 +140,7 @@ export function renderSearchResultsTable() {
                 <thead>
                     <tr>
                         <th width="40">
-                            <input type="checkbox" id="selectAllCheckbox">
+                            <input type="checkbox" id="selectAllCheckbox" data-action="select-all-articles-checkbox">
                         </th>
                         <th>Article</th>
                         <th width="80">Score IA</th>
@@ -182,24 +172,27 @@ export function displayEmptyArticlesState() {
 
 export function updateSelectionCounter() {
     const counter = document.querySelector('#selectedCount'); 
+    const selectedCount = getSelectedArticles().length;
     if (counter) {
-        counter.textContent = appState.selectedSearchResults.size;
+        counter.textContent = selectedCount;
     }
     
     // Mettre à jour l'état des boutons
     const batchBtn = document.querySelector('[data-action="batch-process-modal"]'); 
     const deleteBtn = document.querySelector('[data-action="delete-selected-articles"]'); 
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
     
-    const hasSelection = appState.selectedSearchResults.size > 0;
+    const hasSelection = selectedCount > 0;
     if (batchBtn) batchBtn.disabled = !hasSelection;
     if (deleteBtn) deleteBtn.disabled = !hasSelection;
+    if (selectAllCheckbox) selectAllCheckbox.checked = hasSelection && selectedCount === (appState.searchResults?.length || 0);
 }
 
 export function updateAllRowSelections() {
     const checkboxes = document.querySelectorAll('[data-action="toggle-article-selection"]');
     checkboxes.forEach(checkbox => {
-        const articleId = checkbox.dataset.articleId;
-        checkbox.checked = appState.selectedSearchResults.has(articleId);
+        const articleId = checkbox.dataset.articleId; // Correction: articleId est une string
+        checkbox.checked = isArticleSelected(articleId);
         
         const row = checkbox.closest('.result-row');
         if (row) {
@@ -211,23 +204,22 @@ export function updateAllRowSelections() {
 }
 
 export function toggleArticleSelection(articleId) {
-    toggleSelectedArticle(articleId);
-    updateAllRowSelections();
+    // La logique de l'état est maintenant centrale, cette fonction est appelée par le listener
+    // et va déclencher l'événement 'articles-selection-changed'
+    if (isArticleSelected(articleId)) removeSelectedArticle(articleId);
+    else addSelectedArticle(articleId);
 }
 
-export function selectAllArticles(target) {
-    const allSelected = appState.selectedSearchResults.size === appState.searchResults.length;
-    
-    if (allSelected) {
-        clearSelectedArticles();
-        target.textContent = 'Tout sélectionner';
-    } else {
-        appState.searchResults.forEach(article => {
-            appState.selectedSearchResults.add(article.article_id);
-        });
-        target.textContent = 'Tout désélectionner';
+export function selectAllArticles(shouldSelect) {
+    const allArticleIds = appState.searchResults.map(article => article.article_id);
+    toggleAllArticles(allArticleIds, shouldSelect);
+
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    if (selectAllBtn) {
+        selectAllBtn.textContent = shouldSelect ? 'Tout désélectionner' : 'Tout sélectionner';
     }
-    
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    if (selectAllCheckbox) selectAllCheckbox.checked = shouldSelect;
     updateAllRowSelections();
 }
 
@@ -293,9 +285,8 @@ export async function handleDeleteSelectedArticles() {
         if (response.job_id) {
             showToast(MESSAGES.deleteStarted(response.job_id), 'success');
             // Actualiser la liste des articles
-            setTimeout(() => {
-                window.dispatchEvent(new CustomEvent('articles:refresh'));
-            }, 2000);
+            // La mise à jour se fera via un événement WebSocket ou un rechargement de la section
+            // loadSearchResults(); // Ou attendre un événement WebSocket
         }
     } catch (error) {
         showToast(`Erreur lors de la suppression : ${error.message}`, 'error');
@@ -303,7 +294,7 @@ export async function handleDeleteSelectedArticles() {
 }
 
 export function showBatchProcessModal() {
-    const selectedCount = appState.selectedSearchResults.size;
+    const selectedCount = getSelectedArticles().length;
     
     if (selectedCount === 0) {
         showToast(MESSAGES.noArticleSelected, 'warning');
@@ -338,7 +329,7 @@ export function showBatchProcessModal() {
 export async function startBatchProcessing() {
     closeModal('genericModal');
     
-    const selectedIds = Array.from(appState.selectedSearchResults);
+    const selectedIds = getSelectedArticles();
     const profileSelect = document.querySelector('#analysis-profile-select'); 
     const profileId = profileSelect ? profileSelect.value : null;
     
@@ -357,7 +348,7 @@ export async function startBatchProcessing() {
         });
         
         showToast(MESSAGES.screeningTaskStarted, 'success');
-        showSection('validation');
+        setCurrentSection('validation'); // Utilise la fonction de state.js
         
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
@@ -369,7 +360,7 @@ export async function startBatchProcessing() {
 export async function showRunExtractionModal() {
     if (!appState.currentProject) return;
 
-    const includedArticles = (appState.currentProjectExtractions || [])
+    const includedArticles = (appState.currentProjectExtractions || []) // Read from state
         .filter(e => e.user_validation_status === 'include');
     
     if (includedArticles.length === 0) {
@@ -378,7 +369,7 @@ export async function showRunExtractionModal() {
     }
 
     // Charger les grilles si elles ne sont pas déjà dans l'état
-    if (appState.currentProjectGrids.length === 0) {
+    if (!appState.currentProjectGrids || appState.currentProjectGrids.length === 0) { // Read from state
         await loadProjectGrids(appState.currentProject.id);
     }
 
@@ -437,7 +428,7 @@ export async function startFullExtraction() {
         });
         
         showToast(MESSAGES.extractionTaskStarted, 'success');
-        showSection('validation');
+        setCurrentSection('validation'); // Utilise la fonction de state.js
         
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');

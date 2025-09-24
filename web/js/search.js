@@ -2,11 +2,11 @@
 
 import { API_ENDPOINTS, SELECTORS, MESSAGES } from './constants.js';
 import { fetchAPI } from './api.js';
-import { showLoadingOverlay, escapeHtml, openModal } from './ui-improved.js';
-import { showToast } from './toast.js';
-import { appState, elements } from './app-improved.js';
+import { showLoadingOverlay, escapeHtml, openModal, showToast } from './ui-improved.js';
+import { appState, elements } from './app-improved.js'; // Read from state
+import { setAvailableDatabases, setSearchResults, setCurrentProjectExtractions } from './state.js';
 
-export function renderSearchSection(project) {
+export function renderSearchSection(project) { // This function is called by core.js
     const container = document.querySelector(SELECTORS.searchContainer);
     if (!container) return;
 
@@ -15,7 +15,7 @@ export function renderSearchSection(project) {
         return;
     }
 
-    const dbOptions = appState.availableDatabases.map(db => `
+    const dbOptions = (appState.availableDatabases || []).map(db => `
         <label class="checkbox-item">
             <input type="checkbox" name="databases" value="${db.id}" ${db.enabled ? 'checked' : ''}>
             ${escapeHtml(db.name)}
@@ -92,7 +92,7 @@ export function renderSearchSection(project) {
 
 export async function handleMultiDatabaseSearch(event) {
     event.preventDefault();
-    if (!appState.currentProject) return;
+    if (!appState.currentProject) return; // Read from state
 
     const form = event.target;
     const isExpertMode = form.elements.expertSearchToggle?.checked;
@@ -132,7 +132,7 @@ export async function handleMultiDatabaseSearch(event) {
     showLoadingOverlay(true, MESSAGES.searching);
     try {
         await fetchAPI(API_ENDPOINTS.search, { method: 'POST', body: searchPayload });
-        showToast(MESSAGES.searchStarted, 'success');
+        showToast(MESSAGES.searchStarted, 'success'); // This toast is fine
     } catch (error) {
         showToast(`${MESSAGES.error}: ${error.message}`, 'error');
     } finally {
@@ -142,11 +142,11 @@ export async function handleMultiDatabaseSearch(event) {
 
 export function showSearchModal() {
     if (!appState.currentProject) {
-        showToast(MESSAGES.selectProjectForSearch, 'warning');
+        showToast(MESSAGES.selectProjectForSearch, 'warning'); // This toast is fine
         return;
     }
 
-    const dbOptions = appState.availableDatabases.map(db => `
+    const dbOptions = (appState.availableDatabases || []).map(db => `
         <label class="checkbox-item">
             <input type="checkbox" name="databases" value="${db.id}" ${db.enabled ? 'checked' : ''}>
             ${escapeHtml(db.name)}
@@ -177,7 +177,7 @@ export function sortResults(key) {
         sortState.asc = key === 'title'; // Par défaut, tri ascendant pour le titre
     }
 
-    appState.searchResults.sort((a, b) => {
+    (appState.searchResults || []).sort((a, b) => { // Read from state
         let valA, valB;
         if (key === 'relevance_score') {
             const extraA = appState.currentProjectExtractions.find(e => e.pmid === a.article_id) || { relevance_score: -1 };
@@ -199,9 +199,9 @@ export function sortResults(key) {
 
 // Fonction utilitaire pour vérifier la présence d'un PDF
 export function hasPdfForArticle(articleId) {
-    if (!appState.projectFiles) return false;
+    if (!appState.currentProjectFiles) return false; // Read from state
     const sanitizedId = sanitizeForFilename(articleId);
-    return appState.projectFiles.has(sanitizedId);
+    return appState.currentProjectFiles.has(sanitizedId);
 }
 export function sanitizeForFilename(name) {
     return String(name || '').replace(/[<>:"/\\|?*]/g, '_').trim();

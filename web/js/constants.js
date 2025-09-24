@@ -54,6 +54,7 @@ export const API_ENDPOINTS = {
     // Projects
     projects: '/projects',
     projectById: (id) => `/projects/${id}`,
+    projectFiles: (id) => `/projects/${id}/files`, // Added missing endpoint
     projectExport: (id) => `/projects/${id}/export`,
     projectExportThesis: (id) => `/api/projects/${id}/export/thesis`,
     projectRun: (id) => `/projects/${id}/run`,
@@ -66,6 +67,7 @@ export const API_ENDPOINTS = {
     projectChatHistory: (id) => `/api/projects/${id}/chat-history`,
     projectChat: (id) => `/projects/${id}/chat`,
     projectRunRobAnalysis: (id) => `/projects/${id}/run-rob-analysis`,
+    projectRobAnalysis: (id) => `/projects/${id}/rob-analysis`, // Added missing endpoint
     projectRob: (id, articleId) => `/projects/${id}/risk-of-bias/${articleId}`,
     projectPrismaChecklist: (id) => `/projects/${id}/prisma-checklist`,
     projectExportAnalyses: (id) => `/projects/${id}/export/analyses`,
@@ -87,6 +89,7 @@ export const API_ENDPOINTS = {
 
     // Articles
     articlesBatchDelete: '/articles/batch-delete',
+    projectArticles: (id) => `/projects/${id}/articles`, // Added missing endpoint
     projectSearchResults: (id) => `/projects/${id}/search-results`,
     projectExtractions: (id) => `/projects/${id}/extractions`,
     
@@ -96,6 +99,7 @@ export const API_ENDPOINTS = {
     prompts: '/prompts',
     promptById: (id) => `/prompts/${id}`,
     ollamaModels: '/ollama/models',
+    ollamaModelsList: '/ollama/models/list', // Added missing endpoint
     ollamaPull: '/api/ollama/pull',
     zoteroSettings: '/settings/zotero',
     
@@ -108,6 +112,10 @@ export const API_ENDPOINTS = {
 
     // Search
     search: '/search',
+
+    // Analyses
+    projectAnalyses: (id) => `/projects/${id}/analyses`, // Added missing endpoint
+    projectDeleteAnalysis: (projectId, analysisType) => `/projects/${projectId}/analyses/${analysisType}`, // Added missing endpoint
 };
 
 // Messages d'état
@@ -222,6 +230,10 @@ export const MESSAGES = {
     downloadError: 'Erreur téléchargement',
     downloadingModel: (name) => `Téléchargement de ${name}...`,
 
+    // Screening
+    loadingScreening: 'Chargement des décisions de screening...',
+    noArticlesToScreen: 'Aucun article à screener pour le moment.',
+    selectProjectForScreening: 'Sélectionnez un projet pour commencer le screening.',
     // Grids
     errorLoadingGrids: 'Erreur lors du chargement des grilles.',
     selectProjectToViewGrids: 'Sélectionnez un projet pour voir ses grilles.',
@@ -287,8 +299,19 @@ export const MESSAGES = {
     errorStartingIndexing: "Erreur lors du lancement de l'indexation",
 };
 
+// Configuration de l'application
 export const CONFIG = {
     API_BASE_URL: 'http://localhost:8080/api',
     WEBSOCKET_URL: '/',
     LOCAL_STORAGE_LAST_SECTION: 'analylit_last_section',
+    LOCAL_STORAGE_THEME: 'analylit_theme', // Moved from config.js
+};
+
+// Messages pour le ThemeManager
+export const THEME_MESSAGES = {
+    themeToggleLabel: 'Basculer le thème',
+    darkMode: 'Mode sombre',
+    lightMode: 'Mode clair',
+    themeLabel: 'Thème',
+    themeAuto: 'Automatique',
 };

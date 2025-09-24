@@ -3,7 +3,7 @@
 
 import { fetchAPI } from './api.js';
 import { appState } from './app-improved.js'; // Assurez-vous que c'est le bon chemin
-import { setQueuesStatus } from './state.js';
+import { setQueuesStatus, setAnalysisResults, setAnalysisProfiles, setPrompts, setOllamaModels, setSelectedProfileId } from './state.js';
 import { showConfirmModal } from './ui-improved.js';
 import { showToast } from './toast.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
@@ -31,25 +31,25 @@ export async function loadSettingsData() {
  */
 export async function loadAnalysisProfiles() {
     try {
-        const response = await fetchAPI(API_ENDPOINTS.analysisProfiles);
-        return response.profiles || [];
+        const profiles = await fetchAPI(API_ENDPOINTS.analysisProfiles);
+        setAnalysisProfiles(profiles || []);
     } catch (error) {
         console.error('Erreur chargement profils:', error);
-        return [];
+        setAnalysisProfiles([]);
     }
 }
 
 /**
  * Récupère les modèles de prompts depuis l'API et les stocke dans l'état.
  */
-export async function loadPrompts() {
+async function loadPrompts() {
     try {
         const prompts = await fetchAPI(API_ENDPOINTS.prompts);
-        appState.prompts = prompts || [];
+        setPrompts(prompts || []);
     } catch (error) {
         console.error("Erreur lors du chargement des prompts:", error);
         showToast(MESSAGES.errorLoadingPrompts, 'error');
-        appState.prompts = [];
+        setPrompts([]);
     }
 }
 
@@ -58,11 +58,11 @@ export async function loadPrompts() {
  */
 export async function loadOllamaModels() {
     try {
-        const response = await fetchAPI(API_ENDPOINTS.ollamaModels);
-        return response.models || [];
+        const models = await fetchAPI(API_ENDPOINTS.ollamaModels);
+        setOllamaModels(models.models || []); // Assuming response.models contains the array
     } catch (error) {
         console.error('Erreur chargement modèles:', error);
-        return [];
+        setOllamaModels([]);
     }
 }
 
@@ -79,9 +79,10 @@ export async function loadQueuesStatus() {
     }
 }
 
-export function showEditPromptModal() {}
-export function showEditProfileModal() {}
-export function deleteProfile() {}
+export function showEditPromptModal() { /* Logic to show modal for prompt editing */ }
+export function showEditProfileModal() { /* Logic to show modal for profile editing */ }
+export function deleteProfile() { /* Logic to delete profile */ }
+
 export function showPullModelModal() {}
 
 
@@ -92,10 +93,10 @@ export function showPullModelModal() {}
 export function renderSettings() {
     const container = document.querySelector(SELECTORS.settingsContainer); // Already correct
     if (!container) return;
-
-    const profiles = appState.analysisProfiles;
-    const prompts = appState.prompts;
-    const models = appState.ollamaModels;
+    
+    const profiles = appState.analysisProfiles; // Read from state
+    const prompts = appState.prompts; // Read from state
+    const models = appState.ollamaModels; // Read from state
     const queueStatus = appState.queuesInfo;
 
     if (!profiles || !prompts || !models || !queueStatus) {
@@ -107,11 +108,11 @@ export function renderSettings() {
     // 1. Générer le layout HTML dynamique
     container.innerHTML = createSettingsLayout();
 
-    // 2. Remplir les conteneurs maintenant qu'ils existent dans le DOM
-    renderAnalysisProfilesList(profiles, document.querySelector('#profile-list-container')); // Already correct
-    populateModelSelects(models);
-    renderPromptTemplates(prompts, document.querySelector('#prompt-templates-list')); // Already correct
-    renderQueueStatus(queueStatus, document.querySelector('#queue-status-container')); // Already correct
+    // 2. Remplir les conteneurs maintenant qu'ils existent dans le DOM (read from appState)
+    renderAnalysisProfilesList(appState.analysisProfiles, document.querySelector('#profile-list-container'));
+    populateModelSelects(appState.ollamaModels);
+    renderPromptTemplates(appState.prompts, document.querySelector('#prompt-templates-list'));
+    renderQueueStatus(appState.queuesInfo, document.querySelector('#queue-status-container'));
     loadInstalledModels();
 
     // 3. Initialiser les composants interactifs
@@ -120,7 +121,7 @@ export function renderSettings() {
 
     // 4. Sélectionner le premier profil par défaut
     const defaultProfile = profiles.find(p => p.is_default) || profiles[0];
-    if (defaultProfile) {
+    if (defaultProfile && !appState.selectedProfileId) { // Only select if no profile is already selected
         selectProfile(defaultProfile.id);
     }
 }
@@ -454,7 +455,7 @@ export function selectProfile(profileId) {
         return;
     }
     
-    appState.selectedProfileId = profileId; // Stocker l'ID sélectionné
+    setSelectedProfileId(profileId); // Stocker l'ID sélectionné via state.js
 
     // Mettre à jour la liste pour afficher la sélection
     document.querySelectorAll(`${SELECTORS.settingsContainer} .list-item`).forEach(item => {
@@ -605,7 +606,7 @@ function collectProfileData() {
 
 /**
  * Gestionnaire pour la création d'un nouveau profil.
- */
+ */ // This function is not exported, so it's fine
 function handleNewProfile() {
     const newProfile = {
         id: `new_${Date.now()}`,
@@ -624,7 +625,7 @@ function handleNewProfile() {
     document.querySelectorAll(`${SELECTORS.settingsContainer} .list-item`).forEach(item => {
         item.classList.remove('active');
     });
-    
+
     document.querySelector('#profile-name').focus();
 }
 
@@ -660,7 +661,7 @@ export async function handleSaveProfile(e) {
 
         showToast(MESSAGES.profileSaved(updatedProfile.name), 'success');
         
-        await loadAnalysisProfiles();
+        await loadAnalysisProfiles(); // This now updates state via setAnalysisProfiles
         renderSettings(); // Re-render complet
         
         // Resélectionner le profil qui vient d'être sauvegardé/créé
@@ -680,7 +681,7 @@ export async function handleSaveProfile(e) {
  * --- REFACTORISÉ AVEC showConfirmModal ---
  */
 export async function handleDeleteProfile() {
-    const profileId = appState.selectedProfileId;
+    const profileId = appState.selectedProfileId; // Read from state
     const profiles = appState.analysisProfiles;
     const profile = profiles.find(p => p.id === profileId);
 
@@ -701,7 +702,7 @@ export async function handleDeleteProfile() {
                     await fetchAPI(API_ENDPOINTS.analysisProfileById(profileId), { method: 'DELETE' });
                     showToast(MESSAGES.profileDeleted(profile.name), 'success');
                     
-                    await loadAnalysisProfiles();
+                    await loadAnalysisProfiles(); // This now updates state via setAnalysisProfiles
                     renderSettings(); // Re-render (sélectionnera le nouveau profil par défaut)
 
                 } catch (error) {
@@ -813,7 +814,7 @@ export async function handleSavePrompt(event) {
  */
 export function openProfileEditor(profileId = null) {
     if (profileId) {
-        const profile = appState.analysisProfiles.find(p => p.id === profileId);
+        const profile = appState.analysisProfiles.find(p => p.id === profileId); // Read from state
         if (profile) {
             // Logique pour pré-remplir le formulaire avec les données du profil
             console.log('Editing profile:', profile);

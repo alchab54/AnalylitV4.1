@@ -246,11 +246,8 @@ export class LayoutOptimizer {
      * Observe les changements de section pour optimiser
      */
     setupSectionObserver() {
-        const navButtons = document.querySelectorAll('.app-nav__button');
-        navButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                setTimeout(() => this.optimizeCurrentSection(), 100);
-            });
+        window.addEventListener('section-changed', () => {
+            setTimeout(() => this.optimizeCurrentSection(), 100);
         });
     }
 

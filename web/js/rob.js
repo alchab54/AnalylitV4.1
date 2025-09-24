@@ -1,7 +1,7 @@
-import { appState, elements } from './app-improved.js';
+import { appState, elements } from './app-improved.js'; // Read from state
 import { fetchAPI } from './api.js'; // Already correct
 import { showLoadingOverlay, escapeHtml } from './ui-improved.js'; // Already correct
-import { showToast } from './toast.js';
+import { showToast } from './ui-improved.js'; // Use ui-improved.js for toast
 import { API_ENDPOINTS, MESSAGES } from './constants.js';
 
 export async function loadRobSection() {
@@ -13,14 +13,14 @@ export async function loadRobSection() {
     }
 
     // On se base sur les articles déjà chargés dans `searchResults`
-    const articles = appState.searchResults || [];
+    const articles = appState.searchResults || []; // Read from state
     if (articles.length === 0) {
         elements.robContainer.innerHTML = `<div class="empty-state"><p>${MESSAGES.noArticlesForRob}</p></div>`;
         return;
     }
 
     // On s'assure que les extractions sont chargées pour avoir les données RoB
-    const extractions = appState.currentProjectExtractions || [];
+    const extractions = appState.currentProjectExtractions || []; // Read from state
 
     const articlesHtml = articles.map(article => `
         <div class="rob-article-card" id="rob-card-${article.article_id}">
@@ -49,7 +49,7 @@ export async function fetchAndDisplayRob(articleId, editMode = false) {
 
     try {
         summaryContainer.innerHTML = `<div class="loading-spinner"></div>`;
-        const robData = await fetchAPI(API_ENDPOINTS.projectRob(appState.currentProject.id, articleId));
+        const robData = await fetchAPI(API_ENDPOINTS.projectRob(appState.currentProject.id, articleId)); // Read from state
         
         if (!robData || Object.keys(robData).length === 0) {
             summaryContainer.innerHTML = `<p class="text-secondary">${MESSAGES.noRobData}</p>`;
@@ -139,7 +139,7 @@ export async function handleSaveRobAssessment(event) {
     button.textContent = 'Sauvegarde...';
 
     try {
-        await fetchAPI(API_ENDPOINTS.projectRob(appState.currentProject.id, articleId), {
+        await fetchAPI(API_ENDPOINTS.projectRob(appState.currentProject.id, articleId), { // Read from state
             method: 'POST',
             body: data
         });
@@ -162,7 +162,7 @@ function getBiasClass(bias) {
 }
 
 export async function handleRunRobAnalysis() {
-    if (!appState.currentProject) return;
+    if (!appState.currentProject) return; // Read from state
     const selectedIds = Array.from(appState.selectedSearchResults);
     if (selectedIds.length === 0) {
         showToast(MESSAGES.selectArticleForRob, 'warning');

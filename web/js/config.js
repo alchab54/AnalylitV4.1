@@ -12,8 +12,8 @@ const CONFIG = {
 
     // Clés pour le stockage local (localStorage)
     LOCAL_STORAGE_LAST_PROJECT: 'analylit_last_project_id',
-    LOCAL_STORAGE_LAST_SECTION: 'analylit_last_section',
-    LOCAL_STORAGE_THEME: 'analylit_theme',
+    LOCAL_STORAGE_LAST_SECTION: 'analylit_last_section', // This is now in constants.js
+    // LOCAL_STORAGE_THEME: 'analylit_theme', // Moved to constants.js
     LOCAL_STORAGE_USER_PREFS: 'analylit_user_prefs',
 
     // Paramètres de l'application

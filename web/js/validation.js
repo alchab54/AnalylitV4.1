@@ -2,10 +2,10 @@
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { showLoadingOverlay, escapeHtml } from './ui-improved.js';
-import { showToast } from './toast.js';
+import { showToast } from './ui-improved.js'; // Use ui-improved.js for toast
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 import { loadProjectGrids } from './grids.js';
-import { setCurrentValidations } from './state.js';
+import { setCurrentValidations, setActiveEvaluator } from './state.js';
 
 // CORRIGÉ: Ajout des exports manquants
 export async function handleValidateExtraction(extractionId, decision) {
@@ -14,7 +14,7 @@ export async function handleValidateExtraction(extractionId, decision) {
     try {
         // Utiliser l'évaluateur actif depuis l'état de l'application
         const activeEvaluator = appState.activeEvaluator || 'evaluator1'; // Default to evaluator1 if not set
-
+        
         await fetchAPI(API_ENDPOINTS.projectExtractionDecision(appState.currentProject.id, extractionId), {
             method: 'PUT',
             body: { decision: decision, evaluator: activeEvaluator }
@@ -53,7 +53,7 @@ export function filterValidationList(status, target) {
 }
 
 export async function loadValidationSection() {
-    if (!appState.currentProject) {
+    if (!appState.currentProject) { // Read from state
         const validationContainer = document.querySelector(SELECTORS.validationContainer);
         if (validationContainer) {
             validationContainer.innerHTML = `
@@ -69,13 +69,13 @@ export async function loadValidationSection() {
 }
 
 async function loadProjectExtractions(projectId) {
-    if (!appState.currentProject) return;
+    if (!appState.currentProject) return; // Read from state
     
     const extractions = await fetchAPI(API_ENDPOINTS.projectExtractions(projectId));
     setCurrentValidations(extractions);
 }
 
-export async function renderValidationSection(project) {
+export async function renderValidationSection(project) { // This function is called by core.js
     const container = document.querySelector(SELECTORS.validationContainer);
     if (!container || !project) {
         if(container) container.innerHTML = `
@@ -89,12 +89,12 @@ export async function renderValidationSection(project) {
     showLoadingOverlay(true, MESSAGES.loadingValidations);
 
     try {
-        const extractions = appState.currentValidations || [];
+        const extractions = appState.currentValidations || []; // Read from state
         const included = extractions.filter(e => e.user_validation_status === 'include');
         const excluded = extractions.filter(e => e.user_validation_status === 'exclude');
         const pending = extractions.filter(e => !e.user_validation_status);
-
-        const grids = appState.currentProjectGrids || [];
+        
+        const grids = appState.currentProjectGrids || []; // Read from state
         const gridOptions = grids.map(g => 
             `<option value="${g.id}">${escapeHtml(g.name)}</option>`
         ).join('');
@@ -108,7 +108,7 @@ export async function renderValidationSection(project) {
                     </button>
                     <div class="evaluator-selection">
                         <label for="activeEvaluator">${MESSAGES.activeEvaluator}</label>
-                        <select id="activeEvaluator" class="form-select">
+                        <select id="activeEvaluator" class="form-select" data-action="set-active-evaluator">
                             <option value="evaluator1" ${appState.activeEvaluator === 'evaluator1' ? 'selected' : ''}>${MESSAGES.evaluator1}</option>
                             <option value="evaluator2" ${appState.activeEvaluator === 'evaluator2' ? 'selected' : ''}>${MESSAGES.evaluator2}</option>
                         </select>
@@ -162,10 +162,11 @@ export async function renderValidationSection(project) {
         // Add event listener for activeEvaluator dropdown
         const activeEvaluatorSelect = container.querySelector('#activeEvaluator');
         if (activeEvaluatorSelect) {
-            activeEvaluatorSelect.addEventListener('change', (event) => {
-                appState.activeEvaluator = event.target.value;
-                loadValidationSection(); // Re-render the section with the new active evaluator
-            });
+            // This is now handled by delegated event listener in core.js
+            // activeEvaluatorSelect.addEventListener('change', (event) => {
+            //     setActiveEvaluator(event.target.value);
+            //     loadValidationSection(); // Re-render the section with the new active evaluator
+            // });
         }
 
         // Add event listener for Calculate Kappa button
@@ -188,7 +189,7 @@ export async function renderValidationSection(project) {
 }
 
 function renderValidationItem(extraction) {
-    const article = appState.searchResults.find(art => art.article_id === extraction.pmid);
+    const article = appState.searchResults.find(art => art.article_id === extraction.pmid); // Read from state
     const title = article?.title || extraction.title || MESSAGES.titleUnavailable;
     
     const statusClass = extraction.user_validation_status === 'include' ? 'included' : 
@@ -233,7 +234,7 @@ function renderValidationItem(extraction) {
 
 // New function to calculate Kappa
 export async function calculateKappa() {
-    if (!appState.currentProject?.id) {
+    if (!appState.currentProject?.id) { // Read from state
         showToast(MESSAGES.selectProjectForKappa, 'error');
         return;
     }

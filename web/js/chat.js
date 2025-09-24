@@ -1,7 +1,7 @@
 // web/js/chat.js
 import { escapeHtml } from './ui-improved.js';
-import { showToast } from './toast.js';
-import { appState } from './app-improved.js';
+import { showToast } from './ui-improved.js'; // Use ui-improved.js for toast
+import { appState } from './app-improved.js'; // Read from state
 import { fetchAPI } from './api.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
@@ -30,7 +30,7 @@ export async function loadChatMessages() {
 
     try {
         const messages = await fetchAPI(API_ENDPOINTS.projectChatHistory(appState.currentProject.id));
-        appState.chatMessages = Array.isArray(messages) ? messages : [];
+        setChatMessages(Array.isArray(messages) ? messages : []); // Update state via setChatMessages
         renderChatInterface(appState.chatMessages);
     } catch (error) {
         console.error('Erreur lors du chargement des messages de chat:', error);
@@ -41,7 +41,7 @@ export async function loadChatMessages() {
 export function renderChatInterface(messages = appState.chatMessages, error = false) {
     const chatContainer = document.querySelector(SELECTORS.chatContainer);
     if (!chatContainer) return;
-
+    
     if (!appState.currentProject?.id) {
         chatContainer.innerHTML = `
             <div class="chat-empty">
@@ -115,7 +115,7 @@ async function sendChatMessage() {
         timestamp: new Date().toISOString()
     };
     
-    appState.chatMessages.push(userMessage);
+    appState.chatMessages.push(userMessage); // Direct modification, but then re-rendered
     renderChatInterface(appState.chatMessages);
     
     // Vider l'input
@@ -135,7 +135,7 @@ async function sendChatMessage() {
         showToast(MESSAGES.errorSendingQuestion, 'error');
         
         // Retirer le message utilisateur en cas d'erreur
-        appState.chatMessages.pop();
+        appState.chatMessages.pop(); // Direct modification, but then re-rendered
         renderChatInterface(appState.chatMessages);
     }
 }

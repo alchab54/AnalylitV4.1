@@ -1,6 +1,6 @@
 // web/js/core.js
 
-import { appState, elements, WEBSOCKET_URL } from './app-improved.js';
+import { appState, elements, initializeEventHandlers } from './app-improved.js';
 import { setProjects, setCurrentProject } from './state.js';
 import {
     handleDeleteSelectedArticles,
@@ -27,18 +27,18 @@ import { sendChatMessage, loadChatMessages, renderChatInterface } from './chat.j
 import {
     handleCreateProject,
     deleteProject, // This was already correct, but I'm confirming it.
-    selectProject,
-    confirmDeleteProject,
+    selectProject, // This was already correct
+    confirmDeleteProject, // This was already correct
     handleExportProject,
     loadProjects,
     renderProjectDetail
 } from './projects.js';
 import { handleRunRobAnalysis, fetchAndDisplayRob, loadRobSection, handleSaveRobAssessment } from './rob.js';
 import { showSearchModal, handleMultiDatabaseSearch, renderSearchSection } from './search.js';
-import { handleValidateExtraction, resetValidationStatus, filterValidationList, loadValidationSection } from './validation.js';
+import { handleValidateExtraction, resetValidationStatus, filterValidationList, loadValidationSection, renderValidationSection, calculateKappa } from './validation.js';
 import {
-    closeModal, toggleSidebar, showCreateProjectModal, showToast, showLoadingOverlay } from './ui-improved.js';
-import { clearNotifications } from './notifications.js'; // Already correct
+    closeModal, toggleSidebar, showCreateProjectModal, showToast, showLoadingOverlay, showSuccess, showError } from './ui-improved.js';
+import { clearNotifications, updateNotificationIndicator, handleWebSocketNotification } from './notifications.js';
 import { handleDeleteGrid, loadProjectGrids, renderGridsSection, showGridFormModal, addGridFieldInput, removeGridField, handleSaveGrid, triggerGridImport, handleGridImportUpload } from './grids.js';
 import { renderReportingSection, generateBibliography, generateSummaryTable, exportSummaryTableExcel, savePrismaChecklist } from './reporting.js';
 // CORRIGÉ: Ajout des imports pour les fonctions d'import et la gestion des modales
@@ -53,8 +53,8 @@ import {
     handleUploadPdfs,
     processPmidImport
 } from './import.js';
-import { showStakeholderManagementModal, addStakeholderGroup, deleteStakeholderGroup, runStakeholderAnalysis } from './stakeholders.js';
-import { fetchTasks } from './tasks.js';
+import { showStakeholderManagementModal, addStakeholderGroup, deleteStakeholderGroup, runStakeholderAnalysis, init as initStakeholdersModule } from './stakeholders.js';
+import { fetchTasks, renderTasks } from './tasks.js';
 import {
     renderSettings,
     showEditPromptModal,
@@ -62,7 +62,8 @@ import {
     deleteProfile,
     showPullModelModal,
     handleSaveProfile
-} from './settings.js';
+} from './settings.js'; // This was already correct
+import { setActiveEvaluator } from './state.js';
 import { fetchAPI } from './api.js';
 import { API_ENDPOINTS, MESSAGES, CONFIG } from './constants.js';
 
@@ -112,6 +113,7 @@ const uiActions = {
     'create-project-modal': showCreateProjectModal, // CORRIGÉ: La fonction est bien showCreateProjectModal
     'retry-task': handleRetryTask,
     'cancel-task': handleCancelTask,
+    'set-active-evaluator': (target) => setActiveEvaluator(target.value),
     'show-section': (target) => showSection(target.dataset.sectionId),
     'view-analysis-results': handleViewAnalysisResults,
 };
@@ -142,6 +144,7 @@ const validationActions = {
     'validate-extraction': (target) => handleValidateExtraction(target.dataset.id, target.dataset.decision),
     'reset-validation': (target) => resetValidationStatus(target.dataset.id),
     'filter-validations': (target) => filterValidationList(target.dataset.status, target),
+    'calculate-kappa': calculateKappa,
     'run-extraction-modal': showRunExtractionModal,
     'start-full-extraction': startFullExtraction,
 };
@@ -197,6 +200,7 @@ const importExportActions = {
 const stakeholderActions = {
     'manage-stakeholders': showStakeholderManagementModal,
     'add-stakeholder-group': addStakeholderGroup,
+    'run-stakeholder-analysis': runStakeholderAnalysis,
     'delete-stakeholder-group': (target) => deleteStakeholderGroup(target.dataset.groupId),
 };
 
@@ -262,11 +266,11 @@ export function setupDelegatedEventListeners() {
             'save-zotero-settings': (event) => import('./settings.js').then(settings => settings.handleSaveZoteroSettings(event)), // This dynamic import is fine
             'run-multi-search': (event) => handleMultiDatabaseSearch(event)
         };
-        const action = submitActions[actionName]; // Correction: action est la fonction handler
+const action = submitActions[actionName];
         if (action) {
-            submitEvent.preventDefault();
-            action(submitEvent);
-        }
+    submitEvent.preventDefault();
+    action(submitEvent);
+}
     });
 
     // CORRECTION : Ajout des listeners pour les inputs file
@@ -287,6 +291,14 @@ export function setupDelegatedEventListeners() {
         const action = clickActions['submit-chat-on-enter'];
         if (action) action(target, event);
     });
+
+    // Gestionnaire d'événements personnalisés pour la sélection de projet
+    document.addEventListener('project-select', (event) => {
+        const { projectId } = event.detail;
+        if (projectId) {
+            selectProject(projectId);
+        }
+    });
 }
 
 export function initializeWebSocket() {
@@ -297,17 +309,17 @@ export function initializeWebSocket() {
             return;
         }
 
-        appState.socket = io(WEBSOCKET_URL, { path: '/socket.io/', transports: ['websocket', 'polling'] });
+        appState.socket = io(CONFIG.WEBSOCKET_URL, { path: '/socket.io/', transports: ['websocket', 'polling'] });
 
         appState.socket.on('connect', () => {
             console.log(MESSAGES.websocketConnected);
-            appState.socketConnected = true;
-            if (elements.connectionStatus) elements.connectionStatus.textContent = '✅';
+            setConnectionStatus('connected');
+            if (elements.connectionStatus()) elements.connectionStatus().textContent = '✅';
             if (appState.currentProject) {
                 appState.socket.emit('join_room', { room: appState.currentProject.id });
             }
         });
-
+        
         appState.socket.on('disconnect', () => {
             console.warn(MESSAGES.websocketDisconnected);
             appState.socketConnected = false;
@@ -316,10 +328,10 @@ export function initializeWebSocket() {
 
         appState.socket.on('notification', (data) => {
             console.log(MESSAGES.notificationReceived, data);
-            showToast(data.message, data.type || 'info');
+            handleWebSocketNotification(data);
             
             // Logique de rafraîchissement basée sur le type de notification
-            if (data.type === 'task_progress') {
+            if (data.type === 'task_progress' && data.task_id) {
                 // updateLoadingProgress(data.current, data.total, data.message, data.task_id);
             } else {
                 // handleTaskNotification(data);
@@ -327,7 +339,7 @@ export function initializeWebSocket() {
         });
 
         appState.socket.on('ANALYSIS_COMPLETED', (data) => {
-            showToast(MESSAGES.analysisComplete(data.analysis_type), 'success');
+            showSuccess(MESSAGES.analysisComplete(data.analysis_type));
             if (appState.currentSection === 'analyses') {
                 console.log(MESSAGES.refreshingAnalyses);
                 loadProjectAnalyses();
@@ -335,7 +347,7 @@ export function initializeWebSocket() {
         });
 
         appState.socket.on('search_completed', (data) => {
-            showToast(MESSAGES.searchComplete(data.total_results), 'success');
+            showSuccess(MESSAGES.searchComplete(data.total_results));
             if (appState.currentSection === 'results') {
                 console.log(MESSAGES.refreshingResults);
                 loadSearchResults();
@@ -344,36 +356,7 @@ export function initializeWebSocket() {
 
     } catch (e) {
         console.error(MESSAGES.websocketError, e);
-        if (elements.connectionStatus) elements.connectionStatus.textContent = '❌';
-    }
-}
-
-// --- CORRECTION ICI ---
-// La fonction est maintenant exportée directement lors de sa définition.
-export function showSection(sectionId) {
-    if (!sectionId) return;
-    appState.currentSection = sectionId;
-
-    // Sauvegarder la section active dans le localStorage
-    localStorage.setItem(CONFIG.LOCAL_STORAGE_LAST_SECTION, sectionId);
-
-    if (elements.sections) {
-        elements.sections.forEach(section => {
-            section.classList.toggle('section--active', section.dataset.section === sectionId);
-        });
-    }
-    if (elements.navButtons) {
-        elements.navButtons.forEach(btn => {
-            btn.classList.toggle('app-nav__button--active', btn.dataset.sectionId === sectionId);
-        });
-    }
-    
-    // Optimisation : Ne re-rendre la section que si elle n'a pas encore été rendue.
-    if (!appState.renderedSections.has(sectionId)) {
-        console.log(MESSAGES.firstRender(sectionId));
-        // La logique de chargement des données est maintenant dans refreshCurrentSection
-        refreshCurrentSection();
-        appState.renderedSections.add(sectionId);
+        if (elements.connectionStatus()) elements.connectionStatus().textContent = '❌';
     }
 }
 
@@ -387,7 +370,7 @@ export function refreshCurrentSection() {
             loadSearchResults();
             break;
         case 'validation':
-            loadValidationSection();
+            loadValidationSection(); // This will call renderValidationSection internally
             break;
         case 'grids':
             if (appState.currentProject) {
@@ -411,7 +394,7 @@ export function refreshCurrentSection() {
             renderSettings();
             break;
         case 'tasks':
-            fetchTasks();
+            fetchTasks(); // This will call renderTasks internally
             break;
         case 'reporting':
             renderReportingSection(elements);
@@ -420,14 +403,13 @@ export function refreshCurrentSection() {
             loadChatMessages();
             renderChatInterface();
             break;
+        case 'stakeholders':
+            initStakeholdersModule(); // Initialize and load stakeholders for the current project
+            break;
         default:
             break;
     }
 }
-
-// --- CORRECTION ICI ---
-// L'exportation redondante de 'showSection' a été supprimée.
-// export { showSection }; 
 
 export function getStatusClass(status) {
     switch (status) {
@@ -444,3 +426,30 @@ export function getStatusClass(status) {
             return 'status--secondary';
     }
 }
+
+// ============================
+// UI Update from State Events
+// ============================
+
+/**
+ * Met à jour l'interface utilisateur lorsqu'une section change.
+ * @param {CustomEvent} event - L'événement 'section-changed'
+ */
+function handleSectionChange(event) {
+    const { currentSection } = event.detail;
+    const sections = document.querySelectorAll('.section');
+    const navButtons = document.querySelectorAll('.app-nav__button');
+
+    sections.forEach(section => {
+        section.classList.toggle('app-section--active', section.id === currentSection);
+        section.setAttribute('aria-hidden', section.id === currentSection ? 'false' : 'true');
+    });
+
+    navButtons.forEach(btn => {
+        btn.classList.toggle('app-nav__button--active', btn.dataset.sectionId === currentSection);
+    });
+    
+    refreshCurrentSection();
+}
+
+window.addEventListener('section-changed', handleSectionChange);

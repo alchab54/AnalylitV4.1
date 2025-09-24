@@ -2,11 +2,11 @@
 
 import { API_ENDPOINTS, SELECTORS, MESSAGES } from './constants.js';
 import { fetchAPI } from './api.js';
-import { showToast, showError } from './toast.js';
+import { showToast, showError } from './ui-improved.js'; // Use ui-improved.js for toast
 import { appState } from './app-improved.js';
 
 const reportingModule = (() => {
-    let currentProjectId = null;
+    // currentProjectId is now read from appState.currentProject?.id
 
     const getReportingContainer = () => document.querySelector(SELECTORS.reportingContainer);
     const getGenerateBibliographyBtn = () => document.querySelector('#generateBibliographyBtn');
@@ -15,27 +15,27 @@ const reportingModule = (() => {
 
     const init = () => {
         console.log('Reporting module initialized.');
-        document.addEventListener('projectSelected', handleProjectSelected);
+        window.addEventListener('current-project-changed', handleProjectChanged);
 
         const bibBtn = getGenerateBibliographyBtn();
         if (bibBtn) {
-            bibBtn.addEventListener('click', handleGenerateBibliography);
+            bibBtn.addEventListener('click', () => handleGenerateBibliography(appState.currentProject?.id));
         }
 
         const summaryBtn = getGenerateSummaryTableBtn();
         if (summaryBtn) {
-            summaryBtn.addEventListener('click', handleGenerateSummaryTable);
+            summaryBtn.addEventListener('click', () => handleGenerateSummaryTable(appState.currentProject?.id));
         }
 
         const excelBtn = getExportExcelBtn();
         if (excelBtn) {
-            excelBtn.addEventListener('click', handleExportExcel);
+            excelBtn.addEventListener('click', () => handleExportExcel(appState.currentProject?.id));
         }
     };
 
-    const handleProjectSelected = (event) => {
-        currentProjectId = event.detail.projectId;
-        if (currentProjectId) {
+    const handleProjectChanged = () => {
+        const projectId = appState.currentProject?.id;
+        if (projectId) {
             getReportingContainer().classList.remove('hidden');
             // Potentially load existing reports or enable buttons
         } else {
@@ -43,13 +43,13 @@ const reportingModule = (() => {
         }
     };
 
-    const handleGenerateBibliography = async () => {
-        if (!currentProjectId) {
+    const handleGenerateBibliography = async (projectId) => {
+        if (!projectId) {
             showError(MESSAGES.selectProjectFirst);
             return;
         }
-        try {
-            const response = await fetchAPI(API_ENDPOINTS.reportBibliography(currentProjectId));
+        try { // Assuming this endpoint exists
+            const response = await fetchAPI(API_ENDPOINTS.reportBibliography(projectId));
             showToast(response.message || 'Génération de la bibliographie lancée.', 'info');
             // Further logic to poll for task status or display result
         } catch (error) {
@@ -58,13 +58,13 @@ const reportingModule = (() => {
         }
     };
 
-    const handleGenerateSummaryTable = async () => {
-        if (!currentProjectId) {
+    const handleGenerateSummaryTable = async (projectId) => {
+        if (!projectId) {
             showError(MESSAGES.selectProjectFirst);
             return;
         }
-        try {
-            const response = await fetchAPI(API_ENDPOINTS.reportSummaryTable(currentProjectId));
+        try { // Assuming this endpoint exists
+            const response = await fetchAPI(API_ENDPOINTS.reportSummaryTable(projectId));
             showToast(response.message || 'Génération du tableau de synthèse lancée.', 'info');
             // Further logic to poll for task status or display result
         } catch (error) {
@@ -73,13 +73,13 @@ const reportingModule = (() => {
         }
     };
 
-    const handleExportExcel = async () => {
-        if (!currentProjectId) {
+    const handleExportExcel = async (projectId) => {
+        if (!projectId) {
             showError(MESSAGES.selectProjectFirst);
             return;
         }
-        try {
-            const response = await fetchAPI(API_ENDPOINTS.reportExcelExport(currentProjectId));
+        try { // Assuming this endpoint exists
+            const response = await fetchAPI(API_ENDPOINTS.reportExcelExport(projectId));
             showToast(response.message || 'Export Excel lancé.', 'info');
             // Further logic to poll for task status or trigger download
         } catch (error) {
@@ -107,10 +107,10 @@ function exportSummaryTableExcel(data, filename = 'summary_table.xlsx') {
             XLSX.utils.book_append_sheet(wb, ws, "Summary");
             XLSX.writeFile(wb, filename);
             
-            if (typeof showToast === 'function') {
-                showToast('Fichier Excel exporté avec succès', 'success');
-            }
-        } else {
+            showToast('Fichier Excel exporté avec succès', 'success');
+        } else { // Fallback if XLSX is not available
+            console.warn('XLSX library not found. Exporting as JSON.');
+            
             // Fallback JSON
             const jsonStr = JSON.stringify(data, null, 2);
             const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -123,9 +123,7 @@ function exportSummaryTableExcel(data, filename = 'summary_table.xlsx') {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            if (typeof showToast === 'function') {
-                showToast('Données exportées en JSON', 'info');
-            }
+            showToast('Données exportées en JSON', 'info');
         }
         return { success: true };
     } catch (error) {
@@ -137,7 +135,7 @@ function exportSummaryTableExcel(data, filename = 'summary_table.xlsx') {
     }
 }
 
-function generateBibliography(articles, style = 'apa') {
+export function generateBibliography(articles, style = 'apa') {
     console.log('Generating bibliography:', articles?.length || 0, 'articles');
     
     if (!Array.isArray(articles)) return [];
@@ -156,8 +154,7 @@ function generateBibliography(articles, style = 'apa') {
     });
 }
 
-// === Export manquant : generateSummaryTable ===
-function generateSummaryTable(data, options = {}) {
+export function generateSummaryTable(data, options = {}) {
     console.log('Generating summary table for', data?.length || 0, 'items');
     
     if (!Array.isArray(data)) {
@@ -228,8 +225,7 @@ function generateSummaryTable(data, options = {}) {
     }
 }
 
-// === Export manquant : renderReportingSection ===
-function renderReportingSection(containerId, projectId = null) {
+export function renderReportingSection(containerId, projectId = null) {
     console.log('Rendering reporting section for project:', projectId);
     
     const container = document.getElementById(containerId) || document.querySelector(containerId);
@@ -356,7 +352,7 @@ function renderReportingSection(containerId, projectId = null) {
     }
 }
 
-function savePrismaChecklist(checklistData, projectId = null) {
+export function savePrismaChecklist(checklistData, projectId = null) {
     console.log('Saving PRISMA checklist for project:', projectId, 'with data:', checklistData);
     
     if (!checklistData || typeof checklistData !== 'object') {
@@ -504,8 +500,7 @@ function savePrismaChecklist(checklistData, projectId = null) {
     }
 }
 
-// === Export manquant final : handleGeneratePrisma ===
-async function handleGeneratePrisma() {
+export async function handleGeneratePrisma() {
     const currentProjectId = appState.currentProjectId;
     if (!currentProjectId) {
         showError("Veuillez d'abord sélectionner un projet.");
@@ -533,25 +528,3 @@ async function handleGeneratePrisma() {
         showError('Une erreur est survenue lors du lancement de la génération PRISMA.');
     }
 }
-
-// Export final de TOUTES les fonctions du module
-export { 
-    exportSummaryTableExcel,
-    generateBibliography,
-    generateSummaryTable,
-    renderReportingSection,
-    savePrismaChecklist,
-    handleGeneratePrisma // <-- LA FONCTION MANQUANTE
-};
-
-// Mise à jour de la compatibilité globale pour le débogage
-if (typeof window !== 'undefined') {
-    window.exportSummaryTableExcel = exportSummaryTableExcel;
-    window.generateBibliography = generateBibliography;
-    window.generateSummaryTable = generateSummaryTable;
-    window.renderReportingSection = renderReportingSection;
-    window.savePrismaChecklist = savePrismaChecklist;
-    window.handleGeneratePrisma = handleGeneratePrisma;
-}
-
-

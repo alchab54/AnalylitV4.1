@@ -1,10 +1,10 @@
-import { appState, elements } from './app-improved.js';
+import { appState, elements } from './app-improved.js'; // Read from state
 import { fetchAPI } from './api.js';
-import { setAnalysisResults } from './state.js';
-import { showLoadingOverlay, escapeHtml, showModal, closeModal, openModal } from './ui-improved.js';
-import { showToast } from './toast.js';
+import { setAnalysisResults, setQueuesStatus } from './state.js';
+import { showLoadingOverlay, escapeHtml, showModal, closeModal, openModal, showToast } from './ui-improved.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
+// This function is called by refreshCurrentSection in core.js
 export async function loadProjectAnalyses() {
     if (!appState.currentProject) {
         if (elements.analysisContainer) {
@@ -14,9 +14,8 @@ export async function loadProjectAnalyses() {
     }
 
     try {
-        // TODO: Backend route for getting analyses is missing.
-        // const analyses = await fetchAPI(`/projects/${appState.currentProject.id}/analyses`);
-        // setAnalysisResults(analyses);
+        const analyses = await fetchAPI(API_ENDPOINTS.projectAnalyses(appState.currentProject.id));
+        setAnalysisResults(analyses); // Update state via setAnalysisResults
         renderAnalysesSection();
     } catch (e) {
         console.error('Erreur chargement analyses:', e);
@@ -25,7 +24,7 @@ export async function loadProjectAnalyses() {
 }
 
 export function renderAnalysesSection() {
-    if (!elements.analysisContainer) return;
+    if (!elements.analysesSection()) return; // Use elements getter
     const project = appState.currentProject;
 
     if (!project) {
@@ -33,7 +32,7 @@ export function renderAnalysesSection() {
         return;
     }
 
-    const analysisResults = appState.analysisResults || {};
+    const analysisResults = appState.analysisResults || {}; // Read from state
 
     // Déterminer si chaque analyse a été effectuée
     const hasAtnAnalysis = !!analysisResults.atn_metrics;
@@ -41,7 +40,7 @@ export function renderAnalysesSection() {
     const hasKnowledgeGraph = !!analysisResults.knowledge_graph;
 
     elements.analysisContainer.innerHTML = `
-        <div class="analysis-actions">
+        <div class="analysis-actions"> 
             <button class="btn btn--secondary" data-action="export-analyses">Exporter toutes les analyses</button>
             <button class="btn btn--primary" data-action="show-advanced-analysis-modal">Lancer une analyse avancée</button>
         </div>
@@ -133,13 +132,13 @@ export function renderAnalysesSection() {
 
 // NOUVELLE FONCTION : pour afficher les résultats de l analyse ATN
 function renderATNResults(analysisData) {
-    const container = document.querySelector(SELECTORS.analysisResultContainer);
+    const container = document.querySelector(SELECTORS.analysisResultContainer); // Use SELECTORS
     if (!container) return '';
 
     const metrics = analysisData.atn_metrics || {};
     const tech = analysisData.technology_analysis || {};
     const ethical = analysisData.ethical_regulatory || {};
-
+    
     const empathyMetrics = metrics.empathy_analysis || {};
     const allianceMetrics = metrics.alliance_metrics || {};
 
@@ -180,7 +179,7 @@ function renderATNResults(analysisData) {
 }
 
 
-export function showPRISMAModal() {
+export function showPRISMAModal() { // This function is called by core.js
     openModal('prismaModal');
     // La logique de rendu et de sauvegarde est déjà dans le HTML/core.js
 }
@@ -217,7 +216,7 @@ export function exportPRISMAReport() {
 }
 
 export async function handleRunATNAnalysis() {
-    const projectId = appState.currentProject?.id;
+    const projectId = appState.currentProject?.id; // Read from state
     if (!projectId) {
         showToast(MESSAGES.noProjectSelected, 'warning');
         return;
@@ -246,7 +245,7 @@ export async function handleRunATNAnalysis() {
 
 // MODIFICATION : runProjectAnalysis est maintenant déclenché par les boutons sur les cartes
 export async function runProjectAnalysis(analysisType) {
-    if (!appState.currentProject?.id) {
+    if (!appState.currentProject?.id) { // Read from state
         showToast(MESSAGES.selectProjectFirst, 'warning');
         return;
     }
@@ -268,7 +267,7 @@ export async function runProjectAnalysis(analysisType) {
     }
 
     try {
-        const projectId = appState.currentProject.id;
+        const projectId = appState.currentProject.id; // Read from state
         const validTypes = ['discussion', 'knowledge_graph', 'prisma_flow', 'meta_analysis', 'descriptive_stats'];
         if (!validTypes.includes(analysisType)) {
             showToast(MESSAGES.unknownAnalysisType, 'error');
@@ -368,7 +367,7 @@ export function renderKnowledgeGraph(graphData) {
 }
 
 export function initializeKnowledgeGraph(data) {
-    const container = document.querySelector(SELECTORS.knowledgeGraphContainer);
+    const container = document.querySelector(SELECTORS.knowledgeGraphContainer); // Use SELECTORS
     if (!container || typeof vis === 'undefined') return;
 
     const nodes = new vis.DataSet(data.nodes);
@@ -445,7 +444,7 @@ export function renderGenericAnalysisResult(title, analysis) {
 
 
 export async function handleRunPrismaFlow(event) {
-    if (!appState.currentProject?.id) return;
+    if (!appState.currentProject?.id) return; // Read from state
     const card = event.target.closest('.analysis-card');
     if (card) card.classList.add('analysis-card--loading');
 
@@ -460,7 +459,7 @@ export async function handleRunPrismaFlow(event) {
 }
 
 export async function handleRunMetaAnalysis() {
-    if (!appState.currentProject?.id) return;
+    if (!appState.currentProject?.id) return; // Read from state
     showLoadingOverlay(true, MESSAGES.startingMetaAnalysis);
     try {
         await fetchAPI(API_ENDPOINTS.projectRunAnalysis(appState.currentProject.id), { method: 'POST', body: { type: 'meta_analysis' } });
@@ -473,7 +472,7 @@ export async function handleRunMetaAnalysis() {
 
 
 export async function handleRunDescriptiveStats() {
-    if (!appState.currentProject?.id) return;
+    if (!appState.currentProject?.id) return; // Read from state
     showLoadingOverlay(true, MESSAGES.startingDescriptiveStats);
     try {
         await fetchAPI(API_ENDPOINTS.projectRunAnalysis(appState.currentProject.id), { method: 'POST', body: { type: 'descriptive_stats' } });
@@ -485,7 +484,7 @@ export async function handleRunDescriptiveStats() {
 }
 
 export async function handleDeleteAnalysis(analysisType) {
-    if (!appState.currentProject?.id) {
+    if (!appState.currentProject?.id) { // Read from state
         showToast(MESSAGES.noProjectSelected, 'warning');
         return;
     }
@@ -516,7 +515,7 @@ export async function handleDeleteAnalysis(analysisType) {
  * Exporte les résultats d analyse (données brutes et graphiques).
  */
 export async function exportAnalyses() {
-    if (!appState.currentProject?.id) {
+    if (!appState.currentProject?.id) { // Read from state
         showToast(MESSAGES.selectProjectToExportAnalyses, 'warning');
         return;
     }

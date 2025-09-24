@@ -2,9 +2,9 @@
 
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
-import { showToast, showLoadingOverlay, escapeHtml } from './ui-improved.js';
+import { showToast, showLoadingOverlay, escapeHtml } from './ui-improved.js'; // Use ui-improved.js for toast
 import { API_ENDPOINTS, MESSAGES } from './constants.js';
-import { setScreeningDecisions } from './state.js'; // Supposant que cette fonction existe dans state.js
+import { setScreeningDecisions } from './state.js';
 
 /**
  * Charge les décisions de screening pour le projet actuel.
@@ -15,7 +15,7 @@ async function loadScreeningDecisions() {
     try {
         const decisions = await fetchAPI(API_ENDPOINTS.projectScreeningDecisions(appState.currentProject.id));
         setScreeningDecisions(decisions || []);
-        renderScreeningView();
+        renderScreeningView(appState.screeningDecisions);
     } catch (error) {
         showToast(`${MESSAGES.errorLoadingScreening}: ${error.message}`, 'error');
     } finally {
@@ -26,16 +26,15 @@ async function loadScreeningDecisions() {
 /**
  * Affiche la vue de screening.
  */
-export function renderScreeningView() {
-    const container = elements.screeningContainer; // Supposant que elements.screeningContainer existe
+export function renderScreeningView(decisions = appState.screeningDecisions) {
+    const container = elements.screeningContainer(); // Use elements getter
     if (!container) return;
 
     if (!appState.currentProject) {
         container.innerHTML = `<div class="placeholder">${MESSAGES.selectProjectForScreening}</div>`;
         return;
     }
-
-    const decisions = appState.screeningDecisions || [];
+    
     if (decisions.length === 0) {
         container.innerHTML = `<div class="placeholder">${MESSAGES.noArticlesToScreen}</div>`;
         return;
