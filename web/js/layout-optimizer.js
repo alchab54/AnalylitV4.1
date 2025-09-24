@@ -362,6 +362,25 @@ export class LayoutOptimizer {
     }
 
     /**
+     * Automatically enables compact mode on high zoom levels.
+     */
+    setupZoomBasedCompactMode() {
+        const evaluateCompactMode = () => {
+            const bodyWidth = document.body.offsetWidth;
+            const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+            // Force compact mode if zoom makes content wider than viewport or on low pixel ratio
+            if ((vw > 0 && bodyWidth / vw > 1.2) || window.devicePixelRatio < 1) {
+                document.body.classList.add('compact');
+            } else {
+                document.body.classList.remove('compact');
+            }
+        };
+
+        window.addEventListener('resize', this.debounce(evaluateCompactMode, 150));
+        evaluateCompactMode();
+    }
+
+    /**
      * API publique pour optimisation manuelle
      */
     forceOptimize() {
@@ -397,6 +416,7 @@ export const layoutOptimizer = new LayoutOptimizer();
 if (typeof window !== 'undefined') {
     window.layoutOptimizer = layoutOptimizer;
     layoutOptimizer.init();
+    layoutOptimizer.setupZoomBasedCompactMode();
 }
 
 // Interface de debug
