@@ -350,7 +350,7 @@ export function renderReportingSection(containerId, projectId = null) {
     }
 }
 
-export function savePrismaChecklist(checklistData, projectId = null) {
+function savePrismaChecklist(checklistData, projectId = null) {
     console.log('Saving PRISMA checklist for project:', projectId, 'with data:', checklistData);
     
     if (!checklistData || typeof checklistData !== 'object') {
@@ -498,7 +498,7 @@ export function savePrismaChecklist(checklistData, projectId = null) {
     }
 }
 
-export async function handleGeneratePrisma() {
+async function handleGeneratePrisma() {
     const currentProjectId = appState.currentProjectId;
     if (!currentProjectId) {
         showError("Veuillez d'abord sélectionner un projet.");

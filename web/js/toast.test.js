@@ -64,7 +64,7 @@ describe('Module Toast - Notifications', () => {
       expect(toastElement.classList.contains('toast--success')).toBe(true);
     });
 
-    test('showError() devrait créer un toast d'erreur', () => {
+    test("showError() devrait créer un toast d'erreur", () => {
       const toastElement = showError('Erreur !');
       
       expect(toastElement.classList.contains('toast--error')).toBe(true);
