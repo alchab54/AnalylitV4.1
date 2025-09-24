@@ -356,18 +356,170 @@ function renderReportingSection(containerId, projectId = null) {
     }
 }
 
+// === Export manquant : savePrismaChecklist ===
+function savePrismaChecklist(checklistData, projectId = null) {
+    console.log('Saving PRISMA checklist for project:', projectId, 'with data:', checklistData);
+    
+    if (!checklistData || typeof checklistData !== 'object') {
+        console.warn('savePrismaChecklist: invalid checklist data');
+        return { success: false, error: 'Invalid checklist data' };
+    }
+    
+    try {
+        // Validation des données PRISMA
+        const requiredFields = [
+            'title', 'abstract', 'introduction', 'methods', 
+            'results', 'discussion', 'funding'
+        ];
+        
+        const prismaData = {
+            projectId: projectId,
+            timestamp: new Date().toISOString(),
+            checklist: {
+                // Section 1: Title
+                title: checklistData.title || '',
+                
+                // Section 2: Abstract
+                abstract: {
+                    structured_summary: checklistData.abstract?.structured_summary || '',
+                    objectives: checklistData.abstract?.objectives || '',
+                    data_sources: checklistData.abstract?.data_sources || '',
+                    study_selection: checklistData.abstract?.study_selection || '',
+                    data_extraction: checklistData.abstract?.data_extraction || '',
+                    data_synthesis: checklistData.abstract?.data_synthesis || '',
+                    results: checklistData.abstract?.results || '',
+                    conclusions: checklistData.abstract?.conclusions || '',
+                    registration: checklistData.abstract?.registration || ''
+                },
+                
+                // Section 3: Introduction
+                introduction: {
+                    rationale: checklistData.introduction?.rationale || '',
+                    objectives: checklistData.introduction?.objectives || ''
+                },
+                
+                // Section 4: Methods
+                methods: {
+                    protocol_registration: checklistData.methods?.protocol_registration || '',
+                    eligibility_criteria: checklistData.methods?.eligibility_criteria || '',
+                    information_sources: checklistData.methods?.information_sources || '',
+                    search_strategy: checklistData.methods?.search_strategy || '',
+                    study_selection: checklistData.methods?.study_selection || '',
+                    data_collection: checklistData.methods?.data_collection || '',
+                    risk_of_bias: checklistData.methods?.risk_of_bias || '',
+                    summary_measures: checklistData.methods?.summary_measures || '',
+                    synthesis_methods: checklistData.methods?.synthesis_methods || '',
+                    confidence_intervals: checklistData.methods?.confidence_intervals || '',
+                    additional_analyses: checklistData.methods?.additional_analyses || ''
+                },
+                
+                // Section 5: Results
+                results: {
+                    study_selection: checklistData.results?.study_selection || '',
+                    study_characteristics: checklistData.results?.study_characteristics || '',
+                    risk_of_bias: checklistData.results?.risk_of_bias || '',
+                    individual_studies: checklistData.results?.individual_studies || '',
+                    synthesis_results: checklistData.results?.synthesis_results || '',
+                    confidence_intervals: checklistData.results?.confidence_intervals || '',
+                    additional_analyses: checklistData.results?.additional_analyses || ''
+                },
+                
+                // Section 6: Discussion
+                discussion: {
+                    summary_evidence: checklistData.discussion?.summary_evidence || '',
+                    limitations: checklistData.discussion?.limitations || '',
+                    conclusions: checklistData.discussion?.conclusions || ''
+                },
+                
+                // Section 7: Funding
+                funding: checklistData.funding || ''
+            },
+            
+            // Métadonnées
+            completed_items: 0,
+            total_items: 27, // Nombre standard d'items PRISMA
+            completion_percentage: 0
+        };
+        
+        // Calculer le taux de completion
+        let completedCount = 0;
+        const countCompletion = (obj) => {
+            for (const key in obj) {
+                if (typeof obj[key] === 'string' && obj[key].trim() !== '') {
+                    completedCount++;
+                } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+                    countCompletion(obj[key]);
+                }
+            }
+        };
+        
+        countCompletion(prismaData.checklist);
+        prismaData.completed_items = completedCount;
+        prismaData.completion_percentage = Math.round((completedCount / prismaData.total_items) * 100);
+        
+        // Sauvegarder dans localStorage (ou envoyer au serveur)
+        const storageKey = `prisma_checklist_${projectId || 'default'}`;
+        
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem(storageKey, JSON.stringify(prismaData));
+            console.log('PRISMA checklist saved to localStorage:', storageKey);
+        }
+        
+        // Optionnel : Envoyer au serveur si projectId existe
+        if (projectId && typeof fetchAPI === 'function') {
+            // fetchAPI('/api/projects/' + projectId + '/prisma-checklist', {
+            //     method: 'POST',
+            //     body: JSON.stringify(prismaData)
+            // }).catch(err => console.warn('Failed to sync PRISMA checklist to server:', err));
+        }
+        
+        // Notification de succès
+        if (typeof showToast === 'function') {
+            showToast(
+                `Checklist PRISMA sauvegardée (${prismaData.completion_percentage}% complétée)`, 
+                'success'
+            );
+        }
+        
+        console.log('PRISMA checklist saved successfully:', prismaData.completion_percentage + '% completed');
+        
+        return {
+            success: true,
+            data: prismaData,
+            completion: prismaData.completion_percentage,
+            message: `Checklist sauvegardée avec succès (${prismaData.completion_percentage}% complétée)`
+        };
+        
+    } catch (error) {
+        console.error('Erreur lors de la sauvegarde du checklist PRISMA:', error);
+        
+        if (typeof showToast === 'function') {
+            showToast('Erreur lors de la sauvegarde du checklist PRISMA', 'error');
+        }
+        
+        return {
+            success: false,
+            error: error.message,
+            message: 'Erreur lors de la sauvegarde'
+        };
+    }
+}
+
 // Export final
 export { 
     exportSummaryTableExcel,
     generateBibliography,
     generateSummaryTable,
-    renderReportingSection
+    renderReportingSection,
+    savePrismaChecklist
 };
 
-
+// Compatibilité globale
 if (typeof window !== 'undefined') {
     window.exportSummaryTableExcel = exportSummaryTableExcel;
+    window.generateBibliography = generateBibliography;
     window.generateSummaryTable = generateSummaryTable;
     window.renderReportingSection = renderReportingSection;
+    window.savePrismaChecklist = savePrismaChecklist;
 }
 
