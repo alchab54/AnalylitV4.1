@@ -356,7 +356,6 @@ function renderReportingSection(containerId, projectId = null) {
     }
 }
 
-// === Export manquant : savePrismaChecklist ===
 function savePrismaChecklist(checklistData, projectId = null) {
     console.log('Saving PRISMA checklist for project:', projectId, 'with data:', checklistData);
     
@@ -505,21 +504,54 @@ function savePrismaChecklist(checklistData, projectId = null) {
     }
 }
 
-// Export final
+// === Export manquant final : handleGeneratePrisma ===
+async function handleGeneratePrisma() {
+    const currentProjectId = appState.currentProjectId;
+    if (!currentProjectId) {
+        showError("Veuillez d'abord sélectionner un projet.");
+        return;
+    }
+    
+    console.log('Handling PRISMA generation for project:', currentProjectId);
+    
+    try {
+        showToast('Lancement de la génération du diagramme PRISMA...', 'info');
+        
+        const response = await fetchAPI(API_ENDPOINTS.runAnalysis(currentProjectId), {
+            method: 'POST',
+            body: JSON.stringify({ type: 'prisma_flow' })
+        });
+        
+        if (response && response.task_id) {
+            showToast(`Tâche de génération PRISMA lancée (ID: ${response.task_id}).`, 'success');
+            // Ici, vous pourriez implémenter un polling pour suivre le statut de la tâche
+        } else {
+            showError('La génération du diagramme PRISMA a échoué.');
+        }
+    } catch (error) {
+        console.error('Error generating PRISMA flow:', error);
+        showError('Une erreur est survenue lors du lancement de la génération PRISMA.');
+    }
+}
+
+// Export final de TOUTES les fonctions du module
 export { 
     exportSummaryTableExcel,
     generateBibliography,
     generateSummaryTable,
     renderReportingSection,
-    savePrismaChecklist
+    savePrismaChecklist,
+    handleGeneratePrisma // <-- LA FONCTION MANQUANTE
 };
 
-// Compatibilité globale
+// Mise à jour de la compatibilité globale pour le débogage
 if (typeof window !== 'undefined') {
     window.exportSummaryTableExcel = exportSummaryTableExcel;
     window.generateBibliography = generateBibliography;
     window.generateSummaryTable = generateSummaryTable;
     window.renderReportingSection = renderReportingSection;
     window.savePrismaChecklist = savePrismaChecklist;
+    window.handleGeneratePrisma = handleGeneratePrisma;
 }
+
 
