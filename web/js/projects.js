@@ -60,7 +60,7 @@ async function handleCreateProject(event) {
     const form = event.target;
     const name = form.querySelector('#projectName').value.trim();
     const description = form.querySelector('#projectDescription').value.trim();
-    const mode = form.querySelector('#analysisMode').value;
+    const mode = form.querySelector('#projectAnalysisMode').value;
 
     if (!name) {
         showToast(MESSAGES.projectNameRequired, 'warning');
@@ -75,12 +75,15 @@ async function handleCreateProject(event) {
             body: { name, description, mode }
         });
 
+        // AFFICHER LE SUCCÈS D'ABORD pour éviter les race conditions
+        showSuccess(MESSAGES.projectCreated);
+        closeModal('newProjectModal');
+
+        // ENSUITE, mettre à jour les données en arrière-plan
         await loadProjects();
         if (newProject?.id) {
             await selectProject(newProject.id);
         }
-        showSuccess(MESSAGES.projectCreated);
-        closeModal('newProjectModal');
     } catch (e) {
         showError(`Erreur: ${e.message}`);
     } finally {
@@ -114,17 +117,11 @@ async function selectProject(projectId) {
  */
 function deleteProject(projectId, projectName) {
     if (!projectId) return;
-    
-    appState.projectToDelete = { id: projectId, name: projectName };
-    const modalContent = `
-        <p>${MESSAGES.confirmDeleteProjectBody(escapeHtml(projectName))}</p> 
-        <p>Cette action est irréversible.</p>
-        <div class="modal-actions">
-            <button class="btn btn--secondary" data-action="close-modal">Annuler</button>
-            <button class="btn btn--danger" data-action="confirm-delete-project">Supprimer</button>
-        </div>
-    `;
-    showModal(MESSAGES.confirmDeleteProjectTitle, modalContent);
+
+    const confirmMessage = `Êtes-vous sûr de vouloir supprimer le projet "${projectName}" ? Cette action est irréversible.`;
+    if (window.confirm(confirmMessage)) {
+        confirmDeleteProject(projectId);
+    }
 }
 
 /**

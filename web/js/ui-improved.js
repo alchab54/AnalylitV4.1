@@ -506,7 +506,30 @@ export function closeModal(modalId) {
 /**
  * Crée une modale générique avec contenu dynamique
  */
+function ensureGenericModalExists() {
+    if (document.getElementById('genericModal')) {
+        return;
+    }
+
+    const modalHTML = `
+    <div id="genericModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-backdrop" data-action="close-modal"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="genericModalTitle" class="modal-title"></h3>
+                <button class="modal-close" data-action="close-modal" aria-label="Fermer">×</button>
+            </div>
+            <div id="genericModalBody" class="modal-body"></div>
+            <div id="genericModalActions" class="modal-actions"></div>
+        </div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
 export function showModal(title, contentHtml, options = {}) {
+    ensureGenericModalExists(); // Ensure the modal is in the DOM
+
     const {
         modalClass = '',
         actions = [],
@@ -520,7 +543,7 @@ export function showModal(title, contentHtml, options = {}) {
     const modalActions = document.getElementById('genericModalActions');
 
     if (!modal || !modalTitle || !modalBody || !modalContent || !modalActions) {
-        console.error('Generic modal elements not found');
+        console.error('Failed to find or create generic modal elements');
         return false;
     }
 

@@ -14,8 +14,10 @@ export async function loadProjectAnalyses() {
     }
 
     try {
-        const analyses = await fetchAPI(API_ENDPOINTS.projectAnalyses(appState.currentProject.id));
-        setAnalysisResults(analyses); // Update state via setAnalysisResults
+        // FIX: The analysis results are part of the main project object.
+        // No need for a separate API call.
+        const analyses = appState.currentProject; 
+        setAnalysisResults(analyses); // Update state with the project data
         renderAnalysesSection();
     } catch (e) {
         console.error('Erreur chargement analyses:', e);

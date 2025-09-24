@@ -12,7 +12,7 @@ describe('Workflow de Gestion des Analyses', () => {
         cy.get('#projectAnalysisMode').select('screening');
         cy.get('form[data-form="create-project"]').submit();
         cy.wait(1000);
-        cy.contains('.toast-success', 'Projet créé avec succès').should('be.visible');
+        cy.contains('.toast--success', 'Projet créé avec succès').should('be.visible');
       }
     });
     cy.get('.project-card').first().click({ force: true }); // Sélectionne le premier projet disponible
@@ -32,7 +32,7 @@ describe('Workflow de Gestion des Analyses', () => {
     cy.get('.analysis-card').contains('h4', 'Analyse ATN Multipartite').parents('.analysis-card').within(() => {
       cy.get('[data-action="run-atn-analysis"]').click();
     });
-    cy.contains('.toast-success', 'Analyse ATN lancée').should('be.visible');
+    cy.contains('.toast--success', 'Analyse ATN lancée').should('be.visible');
     // Vérifier l'état de chargement de la carte
     cy.get('.analysis-card').contains('h4', 'Analyse ATN Multipartite').parents('.analysis-card').should('have.class', 'analysis-card--loading');
   });
@@ -41,7 +41,7 @@ describe('Workflow de Gestion des Analyses', () => {
     cy.get('.analysis-card').contains('h4', 'Discussion académique').parents('.analysis-card').within(() => {
       cy.get('[data-action="run-analysis"][data-analysis-type="discussion"]').click();
     });
-    cy.contains('.toast-success', 'Tâche de génération du brouillon de discussion lancée').should('be.visible');
+    cy.contains('.toast--success', 'Tâche de génération du brouillon de discussion lancée').should('be.visible');
     cy.get('.analysis-card').contains('h4', 'Discussion académique').parents('.analysis-card').should('have.class', 'analysis-card--loading');
   });
 
@@ -49,7 +49,7 @@ describe('Workflow de Gestion des Analyses', () => {
     cy.get('.analysis-card').contains('h4', 'Graphe de connaissances').parents('.analysis-card').within(() => {
       cy.get('[data-action="run-analysis"][data-analysis-type="knowledge_graph"]').click();
     });
-    cy.contains('.toast-success', 'Tâche de génération du graphe de connaissances lancée').should('be.visible');
+    cy.contains('.toast--success', 'Tâche de génération du graphe de connaissances lancée').should('be.visible');
     cy.get('.analysis-card').contains('h4', 'Graphe de connaissances').parents('.analysis-card').should('have.class', 'analysis-card--loading');
   });
 
@@ -84,7 +84,7 @@ describe('Workflow de Gestion des Analyses', () => {
 
     // Sauvegarder la progression PRISMA
     cy.get('[data-action="save-prisma-progress"]').click();
-    cy.contains('.toast-success', 'Checklist PRISMA sauvegardée').should('be.visible');
+    cy.contains('.toast--success', 'Checklist PRISMA sauvegardée').should('be.visible');
 
     // Exporter le rapport PRISMA
     cy.get('[data-action="export-prisma-report"]').click();
@@ -101,7 +101,7 @@ describe('Workflow de Gestion des Analyses', () => {
 
     // Lancer une Méta-analyse
     cy.get('.analysis-option[data-analysis-type="meta_analysis"]').click();
-    cy.contains('.toast-success', 'Tâche de méta-analyse lancée').should('be.visible');
+    cy.contains('.toast--success', 'Tâche de méta-analyse lancée').should('be.visible');
     cy.get('.modal-content').should('not.exist'); // La modale devrait se fermer
 
     // Réouvrir la modale pour les autres tests
@@ -110,7 +110,7 @@ describe('Workflow de Gestion des Analyses', () => {
 
     // Lancer un Diagramme PRISMA
     cy.get('.analysis-option[data-analysis-type="prisma_flow"]').click();
-    cy.contains('.toast-success', 'Tâche de génération du diagramme PRISMA lancée').should('be.visible');
+    cy.contains('.toast--success', 'Tâche de génération du diagramme PRISMA lancée').should('be.visible');
     cy.get('.modal-content').should('not.exist');
 
     // Réouvrir la modale pour les autres tests
@@ -119,7 +119,7 @@ describe('Workflow de Gestion des Analyses', () => {
 
     // Lancer des Statistiques Descriptives
     cy.get('.analysis-option[data-analysis-type="descriptive_stats"]').click();
-    cy.contains('.toast-success', 'Tâche de statistiques descriptives lancée').should('be.visible');
+    cy.contains('.toast--success', 'Tâche de statistiques descriptives lancée').should('be.visible');
     cy.get('.modal-content').should('not.exist');
   });
 
@@ -158,7 +158,7 @@ describe('Workflow de Gestion des Analyses', () => {
     cy.get('.analysis-card').contains('h4', 'Analyse ATN Multipartite').parents('.analysis-card').within(() => {
       cy.get('[data-action="run-atn-analysis"]').click();
     });
-    cy.contains('.toast-success', 'Analyse ATN lancée').should('be.visible');
+    cy.contains('.toast--success', 'Analyse ATN lancée').should('be.visible');
 
     // Cliquer sur le bouton de suppression de l'analyse ATN
     cy.get('.analysis-card').contains('h4', 'Analyse ATN Multipartite').parents('.analysis-card').within(() => {
@@ -171,7 +171,7 @@ describe('Workflow de Gestion des Analyses', () => {
       return true; // Confirmer l'action
     });
 
-    cy.contains('.toast-success', `Résultats de l'analyse atn_scores supprimés avec succès.`).should('be.visible');
+    cy.contains('.toast--success', `Résultats de l'analyse atn_scores supprimés avec succès.`).should('be.visible');
     // Vérifier que la carte d'analyse ATN n'est plus marquée comme 'done' ou que le bouton est revenu à 'Lancer'
     cy.get('.analysis-card').contains('h4', 'Analyse ATN Multipartite').parents('.analysis-card').find('[data-action="run-atn-analysis"]').should('be.visible');
   });

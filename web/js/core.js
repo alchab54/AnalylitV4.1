@@ -444,7 +444,7 @@ function handleSectionChange(event) {
     const navButtons = document.querySelectorAll('.app-nav__button');
 
     sections.forEach(section => {
-        section.classList.toggle('app-section--active', section.id === currentSection);
+        section.classList.toggle('section--active', section.id === currentSection);
         section.setAttribute('aria-hidden', section.id === currentSection ? 'false' : 'true');
     });
 

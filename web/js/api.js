@@ -13,6 +13,11 @@ export async function fetchAPI(endpoint, options = {}) {
         ...options,
     };
 
+    // FIX: Body must be stringified for fetch API
+    if (defaultOptions.body && typeof defaultOptions.body === 'object') {
+        defaultOptions.body = JSON.stringify(defaultOptions.body);
+    }
+
     console.log(`🔗 API Request: ${defaultOptions.method || 'GET'} ${url}`);
 
     try {

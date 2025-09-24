@@ -53,7 +53,7 @@ export const SELECTORS = {
 // URLs API centralisées
 export const API_ENDPOINTS = {
     // Projects
-    projects: '/projects',
+    projects: '/projects/',
     projectById: (id) => `/projects/${id}`,
     projectFiles: (id) => `/projects/${id}/files`, // Added missing endpoint
     projectExport: (id) => `/projects/${id}/export`,

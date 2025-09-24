@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AnalyLit v4.1 - Plateforme IA</title>
-    <link rel="stylesheet" href="css/style-compact.css">
+    <link rel="stylesheet" href="css/style-improved.css">
 </head>
 <body>
     <!-- Header Compact -->
@@ -27,18 +27,18 @@
     </header>
 
     <!-- Navigation Compacte -->
-    <nav class="app-nav">
-        <ul class="app-nav__list">
-            <li><button class="app-nav__button app-nav__button--active" data-action="show-section" data-section="projects">Projets</button></li>
-            <li><button class="app-nav__button" data-action="show-section" data-section="search">Recherche</button></li>
-            <li><button class="app-nav__button" data-action="show-section" data-section="results">Résultats</button></li>
-            <li><button class="app-nav__button" data-action="show-section" data-section="validation">Validation</button></li>
-            <li><button class="app-nav__button" data-action="show-section" data-section="grids">Grilles</button></li>
-            <li><button class="app-nav__button" data-action="show-section" data-section="analyses">Analyses</button></li>
-            <li><button class="app-nav__button" data-action="show-section" data-section="import">Import</button></li>
-            <li><button class="app-nav__button" data-action="show-section" data-section="chat">Chat IA</button></li>
-            <li><button class="app-nav__button" data-action="show-section" data-section="settings">Paramètres</button></li>
-        </ul>
+    <nav class="app-nav" role="navigation" aria-label="Navigation principale">
+        <div class="container">
+            <button class="app-nav__button app-nav__button--active" data-action="show-section" data-section-id="projects">Projets</button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="search">Recherche</button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="results">Résultats</button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="validation">Validation</button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="grids">Grilles</button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="analyses">Analyses</button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="import">Import</button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="chat">Chat IA</button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="settings">Paramètres</button>
+        </div>
     </nav>
 
     <!-- Contenu Principal Compact -->
@@ -187,8 +187,53 @@
         </div>
     </main>
 
-    <!-- Modales -->
-    <div id="modalsContainer"></div>
+    <!-- Modale de création de projet - UNE SEULE -->
+    <div id="newProjectModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-backdrop" data-action="close-modal"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Créer un Nouveau Projet</h3>
+                <button class="modal-close" data-action="close-modal" aria-label="Fermer">×</button>
+            </div>
+            <form id="createProjectForm" data-action="create-project">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="projectName">Nom du projet</label>
+                        <input type="text" id="projectName" name="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectDescription">Description</label>
+                        <textarea id="projectDescription" name="description" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectAnalysisMode">Mode d'analyse</label>
+                        <select id="projectAnalysisMode" name="mode" class="form-control">
+                            <option value="full">Analyse Complète</option>
+                            <option value="screening">Screening Seul</option>
+                            <option value="extraction">Extraction Seule</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" data-action="close-modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Créer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modale générique - UNE SEULE -->
+    <div id="genericModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-backdrop" data-action="close-modal"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="genericModalTitle" class="modal-title"></h3>
+                <button class="modal-close" data-action="close-modal" aria-label="Fermer">×</button>
+            </div>
+            <div id="genericModalBody" class="modal-body"></div>
+            <div id="genericModalActions" class="modal-actions"></div>
+        </div>
+    </div>
 
     <!-- Overlay de chargement -->
     <div id="loadingOverlay" class="loading-overlay">
