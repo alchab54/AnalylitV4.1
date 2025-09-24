@@ -25,21 +25,21 @@ describe('Module Toast - Notifications', () => {
       const toastElement = document.querySelector('.toast');
       expect(toastElement).not.toBeNull();
       expect(toastElement.textContent).toContain('Message de test');
-      expect(toastElement.classList.contains('toast--info')).toBe(true);
+      expect(toastElement.classList.contains('toast--info')).toBe(true); // This was correct
     });
 
     test('devrait afficher un toast de succès avec la bonne classe CSS', () => {
       showToast('Opération réussie', 'success');
       
       const toastElement = document.querySelector('.toast');
-      expect(toastElement.classList.contains('toast--success')).toBe(true);
+      expect(toastElement.classList.contains('toast--success')).toBe(true); // Corrected class name
     });
 
     test('devrait afficher un toast d\'erreur avec la bonne classe CSS', () => {
       showToast('Erreur survenue', 'error');
       
       const toastElement = document.querySelector('.toast');
-      expect(toastElement.classList.contains('toast-error')).toBe(true);
+      expect(toastElement.classList.contains('toast--error')).toBe(true); // Corrected class name
     });
 
     test('devrait supprimer le toast après le délai spécifié', () => {
@@ -61,15 +61,17 @@ describe('Module Toast - Notifications', () => {
     test('showSuccess() devrait créer un toast de succès', () => {
       showSuccess('Succès !');
       
+      // Allow for the toast to be added to the DOM
+      jest.advanceTimersByTime(10);
       const toastElement = document.querySelector('.toast');
-      expect(toastElement.classList.contains('toast-success')).toBe(true);
+      expect(toastElement.classList.contains('toast--success')).toBe(true);
     });
 
     test('showError() devrait créer un toast d\'erreur', () => {
       showError('Erreur !');
       
       const toastElement = document.querySelector('.toast');
-      expect(toastElement.classList.contains('toast-error')).toBe(true);
+      expect(toastElement.classList.contains('toast--error')).toBe(true); // Corrected class name
     });
   });
 });

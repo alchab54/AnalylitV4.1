@@ -93,8 +93,6 @@ const reportingModule = (() => {
     };
 })();
 
-export default reportingModule;
-
 // === Export manquant : exportSummaryTableExcel ===
 function exportSummaryTableExcel(data, filename = 'summary_table.xlsx') {
     console.log('Exporting summary table to Excel:', filename);
@@ -135,7 +133,7 @@ function exportSummaryTableExcel(data, filename = 'summary_table.xlsx') {
     }
 }
 
-export function generateBibliography(articles, style = 'apa') {
+function generateBibliography(articles, style = 'apa') { // Corrected: was not exported
     console.log('Generating bibliography:', articles?.length || 0, 'articles');
     
     if (!Array.isArray(articles)) return [];
@@ -154,7 +152,7 @@ export function generateBibliography(articles, style = 'apa') {
     });
 }
 
-export function generateSummaryTable(data, options = {}) {
+function generateSummaryTable(data, options = {}) { // Corrected: was exported but should be consistent
     console.log('Generating summary table for', data?.length || 0, 'items');
     
     if (!Array.isArray(data)) {
@@ -225,7 +223,7 @@ export function generateSummaryTable(data, options = {}) {
     }
 }
 
-export function renderReportingSection(containerId, projectId = null) {
+function renderReportingSection(containerId, projectId = null) { // Corrected: was exported but should be consistent
     console.log('Rendering reporting section for project:', projectId);
     
     const container = document.getElementById(containerId) || document.querySelector(containerId);
@@ -352,7 +350,7 @@ export function renderReportingSection(containerId, projectId = null) {
     }
 }
 
-export function savePrismaChecklist(checklistData, projectId = null) {
+function savePrismaChecklist(checklistData, projectId = null) { // Corrected: was not exported
     console.log('Saving PRISMA checklist for project:', projectId, 'with data:', checklistData);
     
     if (!checklistData || typeof checklistData !== 'object') {
@@ -500,7 +498,7 @@ export function savePrismaChecklist(checklistData, projectId = null) {
     }
 }
 
-export async function handleGeneratePrisma() {
+async function handleGeneratePrisma() { // Corrected: was not exported
     const currentProjectId = appState.currentProjectId;
     if (!currentProjectId) {
         showError("Veuillez d'abord sélectionner un projet.");

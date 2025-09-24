@@ -165,6 +165,22 @@ export function removeBackgroundTask(taskId) {
 }
 
 /**
+ * Met à jour les tâches de fond dans l'état
+ * @param {Array} tasks - Un tableau d'objets de tâches
+ */
+export function setBackgroundTasks(tasks = []) {
+    const taskMap = new Map();
+    tasks.forEach(task => taskMap.set(task.job_id, task));
+    appState.backgroundTasks = taskMap;
+    
+    console.log(`⏳ Tâches de fond mises à jour: ${appState.backgroundTasks.size} tâches actives.`);
+    
+    window.dispatchEvent(new CustomEvent('background-tasks-updated', {
+        detail: { tasks: Array.from(appState.backgroundTasks.values()) }
+    }));
+}
+
+/**
  * Met à jour les paramètres utilisateur
  * @param {Object} newSettings - Nouveaux paramètres
  */
@@ -847,6 +863,7 @@ if (typeof window !== 'undefined') {
         setOllamaModels,
         setSelectedProfileId,
         setAvailableDatabases,
+        setBackgroundTasks,
         setActiveEvaluator,
         setScreeningDecisions,
         setQueuesStatus,
