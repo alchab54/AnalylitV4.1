@@ -20,32 +20,29 @@ describe('Module Toast - Notifications', () => {
 
   describe('showToast()', () => {
     test('devrait créer et afficher un toast avec message simple', () => {
-      showToast('Message de test');
+      const toastElement = showToast('Message de test');
       
-      const toastElement = document.querySelector('.toast');
       expect(toastElement).not.toBeNull();
       expect(toastElement.textContent).toContain('Message de test');
-      expect(toastElement.classList.contains('toast-info')).toBe(true); // This was correct
+      expect(toastElement.classList.contains('toast--info')).toBe(true);
     });
 
     test('devrait afficher un toast de succès avec la bonne classe CSS', () => {
-      showToast('Opération réussie', 'success');
+      const toastElement = showToast('Opération réussie', 'success');
       
-      const toastElement = document.querySelector('.toast');
-      expect(toastElement.classList.contains('toast-success')).toBe(true); // Corrected class name
+      expect(toastElement.classList.contains('toast--success')).toBe(true);
     });
 
     test('devrait afficher un toast d\'erreur avec la bonne classe CSS', () => {
-      showToast('Erreur survenue', 'error');
+      const toastElement = showToast('Erreur survenue', 'error');
       
-      const toastElement = document.querySelector('.toast');
-      expect(toastElement.classList.contains('toast-error')).toBe(true); // Corrected class name
+      expect(toastElement.classList.contains('toast--error')).toBe(true);
     });
 
     test('devrait supprimer le toast après le délai spécifié', () => {
-      showToast('Message temporaire', 'info', { duration: 1000 });
+      const toastElement = showToast('Message temporaire', 'info', { duration: 1000 });
       
-      expect(document.querySelector('.toast')).not.toBeNull();
+      expect(toastElement).not.toBeNull();
       
       // Avance le temps de 1000ms
       jest.advanceTimersByTime(1000);
@@ -53,26 +50,24 @@ describe('Module Toast - Notifications', () => {
       // Avance encore de 300ms pour l'animation de fade-out et le retour au pool
       jest.advanceTimersByTime(300);
       
-      expect(document.querySelector('.toast').classList.contains('toast--hidden')).toBe(true);
+      expect(toastElement.classList.contains('toast--hidden')).toBe(true);
     });
   });
 
   describe('Fonctions de raccourci', () => {
     test('showSuccess() devrait créer un toast de succès', () => {
-      showSuccess('Succès !');
+      const toastElement = showSuccess('Succès !');
       
       // Attendre que le toast soit ajouté au DOM
       jest.advanceTimersByTime(10);
 
-      const toastElement = document.querySelector('.toast');
-      expect(toastElement.classList.contains('toast-success')).toBe(true);
+      expect(toastElement.classList.contains('toast--success')).toBe(true);
     });
 
-    test('showError() devrait créer un toast d\'erreur', () => {
-      showError('Erreur !');
+    test('showError() devrait créer un toast d'erreur', () => {
+      const toastElement = showError('Erreur !');
       
-      const toastElement = document.querySelector('.toast');
-      expect(toastElement.classList.contains('toast-error')).toBe(true); // Corrected class name
+      expect(toastElement.classList.contains('toast--error')).toBe(true);
     });
   });
 });

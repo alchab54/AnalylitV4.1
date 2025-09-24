@@ -530,9 +530,6 @@ export async function handleGeneratePrisma() {
 // Export final de TOUTES les fonctions du module
 export {
     exportSummaryTableExcel,
-    generateBibliography,
-    generateSummaryTable,
-    renderReportingSection,
     savePrismaChecklist,
     handleGeneratePrisma,
 };
