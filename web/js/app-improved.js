@@ -2,12 +2,10 @@
 
 import { appState, initializeState } from './state.js';
 import { API_ENDPOINTS, SELECTORS, MESSAGES } from './constants.js';
-import { loadProjects } from './projects.js';
-import { renderProjectCards } from './ui-improved.js';
 import { showSection } from './core.js';
 
 // ============================
-// Objet elements - CRITIQUE POUR LES IMPORTS
+// Objet elements - UNIQUE EXPORT
 // ============================
 
 export const elements = {
@@ -52,42 +50,8 @@ export const elements = {
 let isInitialized = false;
 
 // ============================
-// Initialisation principale
+// Fonctions principales
 // ============================
-
-/**
- * Point d'entrée principal de l'application
- */
-document.addEventListener('DOMContentLoaded', async () => {
-    if (isInitialized) return;
-    
-    console.log('🚀 Démarrage de AnalyLit V4.1 Frontend (Version améliorée)...');
-    
-    try {
-        const startTime = performance.now();
-        
-        // Initialisation de l'état
-        initializeState();
-        
-        // Initialisation des gestionnaires d'événements
-        initializeEventHandlers();
-        
-        // Chargement des données initiales
-        await loadInitialData();
-        
-        // Affichage de la section par défaut
-        await showSection('projects');
-        
-        const endTime = performance.now();
-        console.log(`✅ Application initialisée en ${(endTime - startTime).toFixed(2)}ms`);
-        
-        isInitialized = true;
-        
-    } catch (error) {
-        console.error('❌ Erreur lors de l\'initialisation:', error);
-        showError('Erreur lors de l\'initialisation de l\'application');
-    }
-});
 
 /**
  * Initialise tous les gestionnaires d'événements
@@ -194,6 +158,9 @@ async function loadInitialData() {
     const startTime = performance.now();
     
     try {
+        // Import dynamique pour éviter les dépendances circulaires
+        const { loadProjects } = await import('./projects.js');
+        
         // Chargement en parallèle des données essentielles
         const promises = [
             loadProjects(),
@@ -236,6 +203,46 @@ function showError(message) {
     });
 }
 
+/**
+ * Point d'entrée principal de l'application
+ */
+async function initializeApplication() {
+    if (isInitialized) return;
+    
+    console.log('🚀 Démarrage de AnalyLit V4.1 Frontend (Version améliorée)...');
+    
+    try {
+        const startTime = performance.now();
+        
+        // Initialisation de l'état
+        initializeState();
+        
+        // Initialisation des gestionnaires d'événements
+        initializeEventHandlers();
+        
+        // Chargement des données initiales
+        await loadInitialData();
+        
+        // Affichage de la section par défaut
+        await showSection('projects');
+        
+        const endTime = performance.now();
+        console.log(`✅ Application initialisée en ${(endTime - startTime).toFixed(2)}ms`);
+        
+        isInitialized = true;
+        
+    } catch (error) {
+        console.error('❌ Erreur lors de l\'initialisation:', error);
+        showError('Erreur lors de l\'initialisation de l\'application');
+    }
+}
+
+// ============================
+// Initialisation automatique
+// ============================
+
+document.addEventListener('DOMContentLoaded', initializeApplication);
+
 // ============================
 // Interface de debug globale
 // ============================
@@ -250,8 +257,9 @@ window.AnalyLit = {
     debug: {
         showState: () => console.log('État actuel:', appState),
         showProjects: () => console.log('Projets:', appState.projects),
-        forceRender: () => {
+        forceRender: async () => {
             if (appState.projects) {
+                const { renderProjectCards } = await import('./ui-improved.js');
                 renderProjectCards(appState.projects);
             }
         },
@@ -266,5 +274,5 @@ window.AnalyLit = {
 
 console.log('🎯 Interface de debug disponible: window.AnalyLit');
 
-// Export pour les modules qui en ont besoin
-export { appState, elements, loadInitialData, initializeEventHandlers };
+// EXPORT UNIQUE - Pas de duplication !
+export { appState, loadInitialData, initializeEventHandlers };
