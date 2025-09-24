@@ -94,3 +94,54 @@ const reportingModule = (() => {
 })();
 
 export default reportingModule;
+
+// === Export manquant : exportSummaryTableExcel ===
+function exportSummaryTableExcel(data, filename = 'summary_table.xlsx') {
+    console.log('Exporting summary table to Excel:', filename);
+    
+    try {
+        if (typeof XLSX !== 'undefined') {
+            // Export Excel avec librairie XLSX
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Summary");
+            XLSX.writeFile(wb, filename);
+            
+            if (typeof showToast === 'function') {
+                showToast('Fichier Excel exporté avec succès', 'success');
+            }
+        } else {
+            // Fallback JSON
+            const jsonStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename.replace('.xlsx', '.json');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            if (typeof showToast === 'function') {
+                showToast('Données exportées en JSON', 'info');
+            }
+        }
+        return { success: true };
+    } catch (error) {
+        console.error('Erreur export Excel:', error);
+        if (typeof showToast === 'function') {
+            showToast('Erreur lors de l\'export', 'error');
+        }
+        return { success: false, error: error.message };
+    }
+}
+
+// Export ES6
+export { exportSummaryTableExcel };
+
+// Compatibilité globale
+if (typeof window !== 'undefined') {
+    window.exportSummaryTableExcel = exportSummaryTableExcel;
+}
+
