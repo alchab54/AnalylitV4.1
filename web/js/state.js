@@ -276,6 +276,98 @@ export function getStateDebugInfo() {
     };
 }
 
+// web/js/state.js - À ajouter avant les exports finaux
+
+/**
+ * Met à jour les grilles du projet actuel
+ * @param {Array} grids - Nouvelles grilles du projet
+ */
+export function setCurrentProjectGrids(grids) {
+    if (appState.currentProject) {
+        appState.currentProject.grids = grids || [];
+        console.log(`📋 Grilles mises à jour pour le projet: ${appState.currentProject.name}`, grids);
+        
+        // Émettre un événement de changement
+        window.dispatchEvent(new CustomEvent('project-grids-updated', {
+            detail: { project: appState.currentProject, grids }
+        }));
+    }
+}
+
+/**
+ * Ajoute une grille au projet actuel
+ * @param {Object} grid - Nouvelle grille à ajouter
+ */
+export function addCurrentProjectGrid(grid) {
+    if (appState.currentProject) {
+        if (!appState.currentProject.grids) {
+            appState.currentProject.grids = [];
+        }
+        appState.currentProject.grids.push(grid);
+        console.log(`📋 Grille ajoutée au projet: ${appState.currentProject.name}`, grid);
+    }
+}
+
+/**
+ * Supprime une grille du projet actuel
+ * @param {string|number} gridId - ID de la grille à supprimer
+ */
+export function removeCurrentProjectGrid(gridId) {
+    if (appState.currentProject && appState.currentProject.grids) {
+        const index = appState.currentProject.grids.findIndex(g => g.id === gridId);
+        if (index !== -1) {
+            const removed = appState.currentProject.grids.splice(index, 1)[0];
+            console.log(`📋 Grille supprimée du projet: ${appState.currentProject.name}`, removed);
+        }
+    }
+}
+
+/**
+ * Met à jour les articles du projet actuel
+ * @param {Array} articles - Nouveaux articles du projet
+ */
+export function setCurrentProjectArticles(articles) {
+    if (appState.currentProject) {
+        appState.currentProject.articles = articles || [];
+        console.log(`📄 Articles mis à jour pour le projet: ${appState.currentProject.name}`, articles.length);
+    }
+}
+
+/**
+ * Met à jour les analyses du projet actuel
+ * @param {Array} analyses - Nouvelles analyses du projet
+ */
+export function setCurrentProjectAnalyses(analyses) {
+    if (appState.currentProject) {
+        appState.currentProject.analyses = analyses || [];
+        console.log(`📊 Analyses mises à jour pour le projet: ${appState.currentProject.name}`, analyses.length);
+    }
+}
+
+/**
+ * Obtient les grilles du projet actuel
+ * @returns {Array} Grilles du projet actuel ou tableau vide
+ */
+export function getCurrentProjectGrids() {
+    return appState.currentProject?.grids || [];
+}
+
+/**
+ * Obtient les articles du projet actuel
+ * @returns {Array} Articles du projet actuel ou tableau vide
+ */
+export function getCurrentProjectArticles() {
+    return appState.currentProject?.articles || [];
+}
+
+/**
+ * Obtient les analyses du projet actuel
+ * @returns {Array} Analyses du projet actuel ou tableau vide
+ */
+export function getCurrentProjectAnalyses() {
+    return appState.currentProject?.analyses || [];
+}
+
 // ============================
 // Initialisation automatique
 // ============================
@@ -298,7 +390,15 @@ if (typeof window !== 'undefined') {
         markNotificationAsRead,
         setCurrentProject,
         clearState,
-        getStateDebugInfo
+        getStateDebugInfo,
+        setCurrentProjectGrids,
+        addCurrentProjectGrid,
+        removeCurrentProjectGrid,
+        setCurrentProjectArticles,
+        setCurrentProjectAnalyses,
+        getCurrentProjectGrids,
+        getCurrentProjectArticles,
+        getCurrentProjectAnalyses
     };
     
     console.log('🔍 Interface de debug disponible: window.AnalyLitState');
