@@ -4,6 +4,7 @@
  * Système d'optimisation automatique de l'interface
  * Élimine les espaces inutiles et améliore la compacité
  */
+import { debounce } from './utils.js';
 
 export class LayoutOptimizer {
     constructor() {
@@ -376,8 +377,9 @@ export class LayoutOptimizer {
             }
         };
 
-        window.addEventListener('resize', this.debounce(evaluateCompactMode, 150));
-        evaluateCompactMode();
+        window.addEventListener('resize', debounce(this.checkCompactMode.bind(this), 150));
+        window.addEventListener('zoom', debounce(this.checkCompactMode.bind(this), 150));
+
     }
 
     /**
