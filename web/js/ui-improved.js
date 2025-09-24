@@ -2,7 +2,9 @@
 /**
  * Module UI amélioré avec animations, accessibilité et gestion d'erreurs
  */
-
+import { MESSAGES, SELECTORS } from './constants.js';
+import { selectProject } from './projects.js'; // Importez la fonction pour gérer le clic
+import { escapeHtml } from './utils.js'; // Importez la fonction de sécurité
 // ============================
 // Utilitaires de base
 // ============================
@@ -38,6 +40,71 @@ export function debounce(func, wait, immediate = false) {
         timeout = setTimeout(later, wait);
         if (callNow) func.apply(this, args);
     };
+}
+
+/**
+ * Affiche la liste des projets sous forme de cartes interactives.
+ * C'est la fonction clé qui traduit les données de l'API en éléments HTML.
+ * @param {Array<Object>} projects - Le tableau d'objets projet venant de l'API.
+ */
+export function renderProjectCards(projects) {
+    // 1. Cible le conteneur où les cartes doivent être insérées.
+    const container = document.querySelector(SELECTORS.projectsList);
+
+    // 2. Sécurité : Si le conteneur n'existe pas, on arrête tout pour éviter une erreur.
+    if (!container) {
+        console.error("Le conteneur de la liste des projets n'a pas été trouvé. Sélecteur attendu:", SELECTORS.projectsList);
+        return;
+    }
+
+    // 3. Vider le conteneur pour éviter d'ajouter des doublons lors des rechargements.
+    container.innerHTML = '';
+
+    // 4. Gérer le cas où il n'y a aucun projet à afficher.
+    if (!projects || projects.length === 0) {
+        container.innerHTML = `<p class="empty-state">${MESSAGES.noProjectsFound}</p>`;
+        return;
+    }
+
+    // 5. Créer et ajouter une carte pour chaque projet.
+    projects.forEach(project => {
+        // Crée un nouvel élément div pour la carte.
+        const card = document.createElement('div');
+        card.className = 'project-card'; // La classe que Cypress recherche !
+        card.dataset.projectId = project.id; // Stocke l'ID du projet pour un accès facile.
+
+        // Utilise la fonction escapeHtml pour se protéger contre les attaques XSS.
+        const safeName = escapeHtml(project.name);
+        const safeDescription = escapeHtml(project.description || 'Aucune description fournie.');
+        const creationDate = new Date(project.created_at).toLocaleDateString('fr-FR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+
+        // Remplit la carte avec le HTML structuré.
+        card.innerHTML = `
+            <div class="project-card__header">
+                <h3 class="project-card__title">${safeName}</h3>
+            </div>
+            <div class="project-card__body">
+                <p class="project-card__description">${safeDescription}</p>
+            </div>
+            <div class="project-card__footer">
+                <span class="project-card__date">Créé le: ${creationDate}</span>
+                <span class="project-card__articles">Articles: ${project.article_count || 0}</span>
+            </div>
+        `;
+
+        // Ajoute un écouteur d'événement pour rendre la carte cliquable.
+        // Au clic, la fonction selectProject est appelée avec l'ID du projet.
+        card.addEventListener('click', () => {
+            selectProject(project.id);
+        });
+
+        // Ajoute la carte nouvellement créée au conteneur.
+        container.appendChild(card);
+    });
 }
 
 /**
