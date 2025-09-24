@@ -1,5 +1,4 @@
 // web/js/projects.js
-
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { showLoadingOverlay, closeModal, escapeHtml, showModal, renderProjectCards } from './ui-improved.js'; 

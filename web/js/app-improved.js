@@ -7,6 +7,45 @@ import { renderProjectCards } from './ui-improved.js';
 import { showSection } from './core.js';
 
 // ============================
+// Objet elements - CRITIQUE POUR LES IMPORTS
+// ============================
+
+export const elements = {
+    // Éléments de navigation
+    header: () => document.querySelector('.app-header'),
+    nav: () => document.querySelector('.app-nav'),
+    main: () => document.querySelector('.app-main'),
+    container: () => document.querySelector('.container'),
+    
+    // Éléments de projet
+    projectsList: () => document.querySelector('#projects-list'),
+    projectDetail: () => document.querySelector('#projectDetail'),
+    projectPlaceholder: () => document.querySelector('#projectPlaceholder'),
+    createProjectBtn: () => document.querySelector('#create-project-btn'),
+    
+    // Modales
+    newProjectModal: () => document.getElementById('newProjectModal'),
+    genericModal: () => document.getElementById('genericModal'),
+    
+    // Overlays et interfaces
+    loadingOverlay: () => document.getElementById('loadingOverlay'),
+    toastContainer: () => document.getElementById('toastContainer'),
+    connectionStatus: () => document.getElementById('connection-status'),
+    
+    // Sections
+    projectsSection: () => document.getElementById('projects'),
+    articlesSection: () => document.getElementById('articles'),
+    analysesSection: () => document.getElementById('analyses'),
+    settingsSection: () => document.getElementById('settings'),
+    
+    // Formulaires
+    createProjectForm: () => document.getElementById('createProjectForm'),
+    projectNameInput: () => document.getElementById('projectName'),
+    projectDescriptionInput: () => document.getElementById('projectDescription'),
+    analysisMode: () => document.getElementById('analysisMode')
+};
+
+// ============================
 // Variables globales
 // ============================
 
@@ -203,6 +242,7 @@ function showError(message) {
 
 window.AnalyLit = {
     appState,
+    elements,
     reinitialize: () => {
         isInitialized = false;
         location.reload();
@@ -214,6 +254,12 @@ window.AnalyLit = {
             if (appState.projects) {
                 renderProjectCards(appState.projects);
             }
+        },
+        checkElements: () => {
+            Object.entries(elements).forEach(([key, getter]) => {
+                const element = getter();
+                console.log(`${key}:`, element ? '✅ Trouvé' : '❌ Manquant', element);
+            });
         }
     }
 };
@@ -221,4 +267,4 @@ window.AnalyLit = {
 console.log('🎯 Interface de debug disponible: window.AnalyLit');
 
 // Export pour les modules qui en ont besoin
-export { appState, loadInitialData, initializeEventHandlers };
+export { appState, elements, loadInitialData, initializeEventHandlers };
