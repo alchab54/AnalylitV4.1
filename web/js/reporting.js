@@ -133,7 +133,7 @@ function exportSummaryTableExcel(data, filename = 'summary_table.xlsx') {
     }
 }
 
-function generateBibliography(articles, style = 'apa') { // Corrected: was not exported
+export function generateBibliography(articles, style = 'apa') {
     console.log('Generating bibliography:', articles?.length || 0, 'articles');
     
     if (!Array.isArray(articles)) return [];
@@ -152,7 +152,7 @@ function generateBibliography(articles, style = 'apa') { // Corrected: was not e
     });
 }
 
-function generateSummaryTable(data, options = {}) { // Corrected: was exported but should be consistent
+export function generateSummaryTable(data, options = {}) {
     console.log('Generating summary table for', data?.length || 0, 'items');
     
     if (!Array.isArray(data)) {
@@ -223,7 +223,7 @@ function generateSummaryTable(data, options = {}) { // Corrected: was exported b
     }
 }
 
-function renderReportingSection(containerId, projectId = null) { // Corrected: was exported but should be consistent
+export function renderReportingSection(containerId, projectId = null) {
     console.log('Rendering reporting section for project:', projectId);
     
     const container = document.getElementById(containerId) || document.querySelector(containerId);
@@ -350,7 +350,7 @@ function renderReportingSection(containerId, projectId = null) { // Corrected: w
     }
 }
 
-function savePrismaChecklist(checklistData, projectId = null) { // Corrected: was not exported
+export function savePrismaChecklist(checklistData, projectId = null) {
     console.log('Saving PRISMA checklist for project:', projectId, 'with data:', checklistData);
     
     if (!checklistData || typeof checklistData !== 'object') {
@@ -498,7 +498,7 @@ function savePrismaChecklist(checklistData, projectId = null) { // Corrected: wa
     }
 }
 
-async function handleGeneratePrisma() { // Corrected: was not exported
+export async function handleGeneratePrisma() {
     const currentProjectId = appState.currentProjectId;
     if (!currentProjectId) {
         showError("Veuillez d'abord sélectionner un projet.");
@@ -526,3 +526,14 @@ async function handleGeneratePrisma() { // Corrected: was not exported
         showError('Une erreur est survenue lors du lancement de la génération PRISMA.');
     }
 }
+
+// Export final de TOUTES les fonctions du module
+export {
+    exportSummaryTableExcel,
+    generateBibliography,
+    generateSummaryTable,
+    renderReportingSection,
+    savePrismaChecklist,
+    handleGeneratePrisma,
+};
+export default reportingModule;
