@@ -2,6 +2,8 @@
 // ================================================================
 // AnalyLit V4.1 - Application Frontend (Version améliorée)
 // ================================================================
+import { API_ENDPOINTS, SELECTORS, MESSAGES } from './constants.js';
+import CONFIG from './config.js';
 import { layoutOptimizer } from './layout-optimizer.js';
 import { showLoadingOverlay, closeModal, openModal } from './ui-improved.js';
 import { showToast, showSuccess, showError } from './toast.js';

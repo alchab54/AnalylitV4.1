@@ -487,16 +487,6 @@
         </div>
     </div>
 
-    <!-- Scripts JavaScript -->
-    <!-- Migration script for data-task-id to data-job-id -->
-    <script type="module" src="/js/migration-fix.js"></script>
-    <script type="module">
-        import { migrateTaskReferences } from './js/migration-fix.js';
-        document.addEventListener('DOMContentLoaded', migrateTaskReferences);
-    </script>
-
-    
-
     <!-- Main application entry point -->
     <script type="module" src="/js/app-improved.js"></script>
 
