@@ -3,39 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnalyLit v4.1 - Plateforme IA pour revues de littérature scientifique</title>
-    <meta name="description" content="AnalyLit v4.1 - Plateforme intelligente pour la réalisation de revues de littérature scientifique avec IA">
+    <title>AnalyLit v4.1 - Revue de Littérature Intelligente</title>
+    
+    <!-- Meta tags -->
+    <meta name="description" content="AnalyLit v4.1 - Plateforme intelligente pour la réalisation de revues de littérature scientifique avec IA.">
     <meta name="keywords" content="revue littérature, IA, recherche scientifique, méta-analyse">
     <meta name="author" content="AnalyLit Team">
     
-
-
-    <!-- Favicon optimisé -->
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔬</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔬</text></svg>">
     
-    <!-- Styles -->
-    <!-- ORDRE CRITIQUE DES CSS -->
-    <!-- 1. CSS d'urgence EN PREMIER -->
+    <!-- CSS Files dans l'ordre critique -->
     <link rel="stylesheet" href="css/emergency-fixes.css">
-    
-    <!-- 2. Design tokens de base -->
     <link rel="stylesheet" href="css/enhanced-design-tokens.css">
-    
-    <!-- 3. Styles principaux -->
     <link rel="stylesheet" href="css/style-improved.css">
-    
-    <!-- 4. Corrections UX -->
     <link rel="stylesheet" href="css/ux-fix.css">
-    
-    <!-- 5. Responsive EN DERNIER -->
     <link rel="stylesheet" href="css/responsive-fixes.css">
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
     <!-- Scripts externes -->
-    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js" defer></script>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.33.0/ace.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js" defer></script>
@@ -47,254 +33,74 @@
             <div class="app-header__content">
                 <div class="app-header__left">
                     <h1 class="app-header__title">
-                        <span class="app-header__icon" role="img" aria-label="Microscope">🔬</span>
+                        <span role="img" aria-hidden="true">🔬</span>
                         AnalyLit v4.1
-                        <span class="app-header__subtitle">Plateforme IA pour revues scientifiques</span>
                     </h1>
                 </div>
                 <div class="app-header__right">
-                    <!-- Le bouton de thème sera ajouté dynamiquement -->
-                    <div class="connection-status" role="status" aria-live="polite">
-                        <span>Connexion:</span>
-                        <span data-connection-status aria-label="État de connexion">⏳</span>
+                    <div id="connection-status" class="connection-indicator">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Connexion...</span>
                     </div>
-                    <button class="notification-indicator" style="display: none;" aria-label="Notifications">
-                        <span role="img" aria-hidden="true">📢</span>
-                        <span>Notifications</span>
-                    </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Navigation principale -->
+    <!-- Navigation principale - UN SEUL ENSEMBLE DE BOUTONS -->
     <nav class="app-nav" role="navigation" aria-label="Navigation principale">
         <div class="container">
-            <ul class="app-nav__list" role="list">
-                <li class="app-nav__item" role="listitem">
-                    <button class="app-nav__button app-nav__button--active" 
-                            data-action="show-section" 
-                            data-section-id="projects"
-                            aria-current="page">
-                        <span role="img" aria-hidden="true">📁</span> Projets
-                    </button>
-                </li>
-                <li class="app-nav__item" role="listitem">
-                    <button class="app-nav__button" 
-                            data-action="show-section" 
-                            data-section-id="search"
-                            title="Raccourci: Ctrl+K">
-                        <span role="img" aria-hidden="true">🔍</span> Recherche
-                    </button>
-                </li>
-                <li class="app-nav__item" role="listitem">
-                    <button class="app-nav__button" data-action="show-section" data-section-id="results">
-                        <span role="img" aria-hidden="true">📄</span> Résultats
-                    </button>
-                </li>
-                <li class="app-nav__item" role="listitem">
-                    <button class="app-nav__button" data-action="show-section" data-section-id="validation">
-                        <span role="img" aria-hidden="true">⚖️</span> Validation
-                    </button>
-                </li>
-                <li class="app-nav__item" role="listitem">
-                    <button class="app-nav__button" data-action="show-section" data-section-id="grids">
-                        <span role="img" aria-hidden="true">📋</span> Grilles
-                    </button>
-                </li>
-                <li class="app-nav__item" role="listitem">
-                    <button class="app-nav__button" data-action="show-section" data-section-id="rob">
-                        <span role="img" aria-hidden="true">⚠️</span> Risque de Biais
-                    </button>
-                </li>
-                <li class="app-nav__item" role="listitem">
-                    <button class="app-nav__button" data-action="show-section" data-section-id="analyses">
-                        <span role="img" aria-hidden="true">📊</span> Analyses
-                    </button>
-                </li>
-                <li class="app-nav__item" role="listitem">
-                    <button class="app-nav__button" data-action="show-section" data-section-id="import">
-                        <span role="img" aria-hidden="true">📚</span> Import & Fichiers
-                    </button>
-                </li>
-                <li class="app-nav__item" role="listitem">
-                    <button class="app-nav__button" data-action="show-section" data-section-id="chat">
-                        <span role="img" aria-hidden="true">💬</span> Chat
-                    </button>
-                </li>
-                <li class="app-nav__item" role="listitem">
-                    <button class="app-nav__button" data-action="show-section" data-section-id="settings">
-                        <span role="img" aria-hidden="true">⚙️</span> Paramètres
-                    </button>
-                </li>
-                <li class="app-nav__item" role="listitem">
-                    <button class="app-nav__button" data-action="show-section" data-section-id="tasks">
-                        <span role="img" aria-hidden="true">⏳</span> Tâches
-                    </button>
-                </li>
-                <li class="app-nav__item" role="listitem">
-                    <button class="app-nav__button" data-action="show-section" data-section-id="reporting">
-                        <span role="img" aria-hidden="true">📑</span> Rapports
-                    </button>
-                </li>
-            </ul>
+            <button class="app-nav__button app-nav__button--active" data-action="show-section" data-section-id="projects">
+                <span role="img" aria-hidden="true">📁</span> Projets
+            </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="articles">
+                <span role="img" aria-hidden="true">📄</span> Articles
+            </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="analyses">
+                <span role="img" aria-hidden="true">📊</span> Analyses
+            </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="settings">
+                <span role="img" aria-hidden="true">⚙️</span> Paramètres
+            </button>
         </div>
     </nav>
 
     <!-- Contenu principal -->
     <main class="app-main" role="main">
         <div class="container">
-            <!-- Section Projets -->
-            <section class="section section--active" data-section="projects" aria-labelledby="projects-title">
+            
+            <!-- Section Projets - SECTION UNIQUE -->
+            <section id="projects" class="app-section active">
                 <div class="section-header">
                     <div class="section-header__content">
-                        <h2 id="projects-title">Projets</h2>
-                        <p>Créez et gérez vos projets de revue de littérature. Chaque projet organise vos recherches, analyses et résultats.</p>
+                        <h2>Gestion des Projets</h2>
+                        <p>Créez et gérez vos projets de revue de littérature.</p>
                     </div>
                     <div class="section-header__actions">
-                        <button class="btn btn--primary" 
-                                id="createProjectBtn" 
-                                data-action="create-project-modal"
-                                aria-describedby="projects-title">
-                            <span role="img" aria-hidden="true">➕</span> Nouveau projet
+                        <button id="create-project-btn" class="btn btn-primary" data-action="create-project-modal">
+                            <span role="img" aria-hidden="true">➕</span> Nouveau Projet
                         </button>
                     </div>
                 </div>
-
-                <div class="projects-container">
-                    <div class="projects-grid" id="projectsList" role="region" aria-label="Liste des projets">
-                        <!-- Liste des projets générée dynamiquement -->
-                    </div>
-                </div>
-
-                <!-- Détails du projet sélectionné -->
-                <div class="project-detail" id="projectDetail">
-                    <div class="card">
-                        <div class="card__header">
-                            <h3>Détails du projet</h3>
-                        </div>
-                        <div class="card__body" id="projectDetailContent">
-                            <p>Sélectionnez un projet pour voir ses détails et métriques.</p>
-                        </div>
-                    </div>
-                    <div id="projectPlaceholder" class="project-placeholder text-center">
-                        <div class="project-placeholder__icon" role="img" aria-hidden="true">📁</div>
-                        <h3>Aucun projet sélectionné</h3>
-                        <p>Sélectionnez un projet dans la liste ci-dessus ou créez-en un nouveau pour commencer.</p>
-                    </div>
+                
+                <div id="projects-list" class="projects-grid">
+                    <!-- Les cartes de projet seront injectées ici par renderProjectCards() -->
                 </div>
             </section>
 
-            <!-- Section Recherche -->
-            <section class="section" data-section="search" aria-labelledby="search-title">
-                <div id="searchContainer">
-                    <!-- Contenu généré dynamiquement -->
-                </div>
-            </section>
-
-            <!-- Section Résultats -->
-            <section class="section" data-section="results" aria-labelledby="results-title">
+            <!-- Section Articles -->
+            <section id="articles" class="app-section" style="display: none;">
                 <div class="section-header">
-                    <div class="section-header__content">
-                        <h2 id="results-title">Résultats de recherche</h2>
-                        <p>Consultez, filtrez et validez les articles trouvés lors de vos recherches bibliographiques.</p>
-                    </div>
-                    <div class="section-header__actions">
-                        <button class="btn btn--primary" data-action="show-search-modal">
-                            <span role="img" aria-hidden="true">🔍</span> Nouvelle recherche
-                        </button>
-                    </div>
+                    <h2>Gestion des Articles</h2>
                 </div>
-                <div class="results-container" id="resultsContainer">
-                    <div class="results-placeholder text-center">
-                        <div class="results-placeholder__icon" role="img" aria-hidden="true">📄</div>
-                        <h3>Aucun résultat</h3>
-                        <p>Lancez une recherche pour afficher les articles trouvés ici.</p>
-                    </div>
+                <div id="articles-list">
+                    <!-- Le contenu des articles sera injecté ici -->
                 </div>
             </section>
 
-            <!-- Section Validation -->
-            <section class="section" data-section="validation" aria-labelledby="validation-title">
+            <!-- Section Analyses - SECTION UNIQUE -->
+            <section id="analyses" class="app-section" style="display: none;">
                 <div class="section-header">
-                    <div class="section-header__content">
-                        <h2 id="validation-title">Validation Inter-Évaluateurs</h2>
-                        <p>Validez la sélection des articles selon vos critères d'inclusion/exclusion. Calculez les métriques de concordance.</p>
-                    </div>
-                    <div class="section-header__actions">
-                        <button class="btn btn--primary" data-action="run-extraction-modal">
-                            <span role="img" aria-hidden="true">🚀</span> Lancer l'extraction
-                        </button>
-                    </div>
-                </div>
-                <div id="validationContainer">
-                    <div class="validation-placeholder text-center">
-                        <span class="validation-placeholder__icon" role="img" aria-hidden="true">⚖️</span>
-                        <h3>Aucun projet sélectionné</h3>
-                        <p>Sélectionnez un projet pour accéder à la validation des résultats.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section Grilles -->
-            <section class="section" data-section="grids" aria-labelledby="grids-title">
-                <div class="section-header">
-                    <div class="section-header__content">
-                        <h2 id="grids-title">Grilles d'Extraction</h2>
-                        <p>Définissez les données à extraire de chaque article selon vos objectifs de recherche.</p>
-                    </div>
-                    <div class="section-header__actions">
-                        <button class="btn btn--primary" data-action="create-grid-modal">
-                            <span role="img" aria-hidden="true">📋</span> Nouvelle Grille
-                        </button>
-                        <button class="btn btn--secondary" data-action="triggerGridImport">
-                            <span role="img" aria-hidden="true">📥</span> Importer
-                        </button>
-                        <input type="file" id="grid-import-input" accept=".json" style="display: none;" aria-hidden="true" />
-                    </div>
-                </div>
-                <div id="gridsContainer">
-                    <!-- Contenu généré dynamiquement -->
-                </div>
-            </section>
-
-            <!-- Section Risque de Biais -->
-            <section class="section" data-section="rob" aria-labelledby="rob-title">
-                <div class="section-header">
-                    <div class="section-header__content">
-                        <h2 id="rob-title">Évaluation du Risque de Biais</h2>
-                        <p>Évaluez la qualité méthodologique et le risque de biais des études incluses dans votre revue.</p>
-                    </div>
-                </div>
-                <div id="robContainer">
-                    <!-- Contenu généré dynamiquement -->
-                </div>
-            </section>
-
-            <!-- Section Analyses -->
-            <section class="section" data-section="analyses" aria-labelledby="analyses-title">
-                <div class="section-header">
-                    <div class="section-header__content">
-                        <h2 id="analyses-title">Analyses Avancées</h2>
-                        <p>Générez des analyses statistiques, méta-analyses, graphiques de connaissances et synthèses narratives.</p>
-                    </div>
-                    <div class="section-header__actions">
-                        <button class="btn btn--primary" data-action="show-run-analysis-modal">
-                            <span role="img" aria-hidden="true">📊</span> Nouvelle analyse
-                        </button>
-                    </div>
-                </div>
-                <div class="analysis-grid" id="analysisContainer">
-                    <div id="knowledgeGraphContainer" 
-                         style="width: 100%; height: 600px; border: 1px solid var(--color-border); border-radius: var(--radius-xl);"
-                         role="img" 
-                         aria-label="Graphique de connaissances">
-                    </div>
-                </div>
-            </section>
-                        <!-- Section des analyses -->
-            <section id="analyses" class="app-section">
-                <div class="container">
                     <h2>Gestion des Analyses</h2>
                     <div class="analysis-controls">
                         <select id="analysisMode">
@@ -303,382 +109,156 @@
                             <option value="hybrid">Hybride</option>
                         </select>
                     </div>
-                    <div id="analysis-cards-container"></div>
                 </div>
-            </section>
-
-            <!-- Section des projets -->
-            <section id="projects" class="app-section">
-                <div class="container">
-                    <h2>Gestion des Projets</h2>
-                    <div id="projects-list">
-                        <!-- Les cartes de projets seront générées ici -->
-                    </div>
-                    <button id="create-project-btn" class="btn btn-primary">Nouveau Projet</button>
-                </div>
-            </section>
-
-            <!-- Statut de connexion -->
-            <div id="connection-status" class="connection-indicator">
-                <span class="status-dot"></span>
-                <span class="status-text">Connexion...</span>
-            </div>
-
-            <!-- Modal de création de projet -->
-            <div id="create-project-modal" class="modal">
-                <div class="modal-content">
-                    <h2>Nouveau Projet</h2>
-                    <form id="create-project-form" data-form="create-project">
-                        <input type="text" name="name" placeholder="Nom du projet" required>
-                        <input type="text" name="description" placeholder="Description">
-                        <button type="submit">Créer</button>
-                        <button type="button" class="close-modal">Annuler</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Section Import & Fichiers -->
-            <section class="section" data-section="import" aria-labelledby="import-title">
-                <div class="section-header">
-                    <div class="section-header__content">
-                        <h2 id="import-title">Import & Gestion des Fichiers</h2>
-                        <p>Importez vos références depuis Zotero, ajoutez des PDFs et indexez le contenu pour le chat IA.</p>
-                    </div>
-                </div>
-                <div class="import-sections" id="importContainer">
-                    <!-- Contenu généré dynamiquement -->
-                </div>
-            </section>
-
-            <!-- Section Chat -->
-            <section class="section" data-section="chat" aria-labelledby="chat-title">
-                <div class="section-header">
-                    <div class="section-header__content">
-                        <h2 id="chat-title">Chat IA avec vos Documents</h2>
-                        <p>Posez des questions sur le contenu de vos PDFs indexés. L'IA analyse et répond en se basant sur vos documents.</p>
-                    </div>
-                </div>
-                <div class="chat-interface" id="chatContainer">
-                    <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Messages du chat">
-                        <div class="chat-welcome text-center">
-                            <div class="chat-welcome__icon" role="img" aria-hidden="true">💬</div>
-                            <h3>Chat IA avec vos Documents</h3>
-                            <p>Indexez vos PDFs puis posez des questions sur leur contenu.</p>
-                        </div>
-                    </div>
-                    <div class="chat-input-container">
-                        <textarea id="chatInput" 
-                                  class="form-control chat-input-field" 
-                                  placeholder="Posez une question sur les documents du projet..." 
-                                  data-action="submit-chat-on-enter"
-                                  rows="3"
-                                  aria-label="Message à envoyer"></textarea>
-                        <button class="btn btn--primary" data-action="send-chat-message" aria-label="Envoyer le message">
-                            <span role="img" aria-hidden="true">📤</span> Envoyer
-                        </button>
-                    </div>
+                <div id="analysis-cards-container">
+                    <!-- Les cartes d'analyse seront injectées ici -->
                 </div>
             </section>
 
             <!-- Section Paramètres -->
-            <section class="section" data-section="settings" aria-labelledby="settings-title">
+            <section id="settings" class="app-section" style="display: none;">
                 <div class="section-header">
-                    <div class="section-header__content">
-                        <h2 id="settings-title">Paramètres & Configuration</h2>
-                        <p>Configurez vos profils d'analyse, modèles IA, prompts personnalisés et préférences de l'application.</p>
-                    </div>
+                    <h2>Paramètres</h2>
                 </div>
-                <div class="settings-grid" id="settingsContainer">
-                    <!-- Structure générée dynamiquement par settings.js -->
-                    <div class="card">
-                        <div class="card__header">
-                            <h3>Préférences d'Interface</h3>
-                        </div>
-                        <div class="card__body">
-                            <div id="theme-selector-container">
-                                <!-- Le sélecteur de thème sera ajouté ici -->
-                            </div>
-                            <div class="form-group form-group--checkbox">
-                                <input type="checkbox" id="compact-mode-toggle" data-action="toggle-compact-mode">
-                                <label for="compact-mode-toggle">
-                                    <strong>Mode Compact</strong>
-                                    <small>Réduit les espacements pour une vue plus dense.</small>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
+                <div id="settings-content">
+                    <!-- Le contenu des paramètres sera injecté ici -->
                 </div>
             </section>
 
-            <!-- Section Tâches -->
-            <section class="section" data-section="tasks" aria-labelledby="tasks-title">
-                <div class="section-header">
-                    <div class="section-header__content">
-                        <h2 id="tasks-title">Tâches en Arrière-Plan</h2>
-                        <p>Suivez l'état des opérations longues : analyses, indexations, extractions de données.</p>
-                    </div>
-                </div>
-                <div id="tasksContainer" class="tasks-section-container">
-                    <!-- Le contenu est injecté par tasks.js -->
-                    <div class="placeholder">
-                        <div class="placeholder-icon">⏳</div>
-                        <h3>Chargement des tâches...</h3>
-                        <p>Récupération de l'état des opérations en cours.</p>
-                    </div>
-                    <!-- Contenu généré dynamiquement -->
-                </div>
-            </section>
-
-            <!-- Section Rapports -->
-            <section class="section" data-section="reporting" aria-labelledby="reporting-title">
-                <div class="section-header">
-                    <div class="section-header__content">
-                        <h2 id="reporting-title">Rapports & Exports</h2>
-                        <p>Générez des bibliographies, tableaux de synthèse et exports pour votre manuscrit de thèse.</p>
-                    </div>
-                </div>
-                <div id="reportingContainer" class="reporting-grid">
-                    <!-- Contenu généré dynamiquement -->
-                </div>
-            </section>
         </div>
     </main>
 
-    <!-- Éléments cachés pour les uploads -->
-    <input type="file" id="zoteroFileInput" accept=".json" style="display: none;" aria-hidden="true">
-    <input type="file" id="bulkPDFInput" multiple accept=".pdf" style="display: none;" aria-hidden="true">
-    <input type="file" id="manualPDFInput" multiple accept=".pdf" style="display: none;" aria-hidden="true">
+    <!-- MODALES - UN SEUL ENSEMBLE -->
+    
+    <!-- Modale de création de projet - UNE SEULE -->
+    <div id="newProjectModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-backdrop" data-action="close-modal"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Créer un Nouveau Projet</h3>
+                <button class="modal-close" data-action="close-modal" aria-label="Fermer">×</button>
+            </div>
+            <form id="createProjectForm" data-form="create-project">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="projectName">Nom du projet</label>
+                        <input type="text" id="projectName" name="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectDescription">Description</label>
+                        <textarea id="projectDescription" name="description" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectAnalysisMode">Mode d'analyse</label>
+                        <select id="projectAnalysisMode" name="mode" class="form-control">
+                            <option value="full">Analyse Complète</option>
+                            <option value="screening">Screening Seul</option>
+                            <option value="extraction">Extraction Seule</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" data-action="close-modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Créer</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
+    <!-- Modale générique - UNE SEULE -->
+    <div id="genericModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-backdrop" data-action="close-modal"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="genericModalTitle" class="modal-title"></h3>
+                <button class="modal-close" data-action="close-modal" aria-label="Fermer">×</button>
+            </div>
+            <div id="genericModalBody" class="modal-body"></div>
+            <div id="genericModalActions" class="modal-actions"></div>
+        </div>
+    </div>
+    
     <!-- Overlay de chargement -->
-    <div class="loading-overlay" id="loadingOverlay" role="dialog" aria-modal="true" aria-labelledby="loading-message">
+    <div id="loadingOverlay" class="loading-overlay" aria-hidden="true">
         <div class="loading-overlay__content">
-            <div class="loading-spinner loading-spinner--lg" role="status" aria-hidden="true"></div>
-            <p class="loading-overlay__message" id="loading-message">Chargement...</p>
+            <div class="loading-spinner"></div>
+            <p class="loading-overlay__message">Chargement...</p>
             <div class="progress-bar-container" style="display: none;">
                 <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
-            <button id="cancelTaskBtn" class="btn btn--secondary btn--sm" style="display: none;" data-action="cancel-task">
-                Annuler l'opération
-            </button>
+            <button id="cancelTaskBtn" class="btn btn-secondary" style="display: none;">Annuler</button>
         </div>
     </div>
 
-    <!-- Conteneur des notifications toast -->
-    <div class="toast-container" id="toastContainer" aria-live="polite" aria-label="Notifications">
-        <!-- Toasts générés dynamiquement -->
-    </div>
+    <!-- Conteneur pour les toasts -->
+    <div id="toastContainer" class="toast-container"></div>
 
-    <!-- Conteneur pour toutes les modales -->
-    <div id="modalsContainer">
-        <div id="genericModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1">
-            <div class="modal__backdrop" data-action="close-modal"></div>
-            <div class="modal__content">
-                <div class="modal__header">
-                    <h3 id="genericModalTitle" class="modal__title"></h3>
-                    <button class="modal__close-btn" data-action="close-modal" aria-label="Fermer la modale">×</button>
-                </div>
-                <div id="genericModalBody" class="modal__body"></div>
-                <div id="genericModalActions" class="modal__actions"></div>
-            </div>
-        </div>
-
-        <div id="newProjectModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1">
-            <div class="modal__backdrop" data-action="close-modal"></div>
-            <div class="modal__content">
-                <div class="modal__header">
-                    <h3 class="modal__title">Créer un nouveau projet</h3>
-                    <button class="modal__close-btn" data-action="close-modal" aria-label="Fermer la modale">×</button>
-                </div>
-                <div class="modal__body">
-                    <form id="createProjectForm">
-                        <div class="form-group">
-                            <label for="projectName">Nom du projet</label>
-                            <input type="text" id="projectName" name="name" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="projectDescription">Description</label>
-                            <textarea id="projectDescription" name="description" class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="projectAnalysisMode">Mode d'analyse</label>
-                            <select id="projectAnalysisMode" name="mode" class="form-control">
-                                <option value="screening">Screening</option>
-                                <option value="extraction">Extraction</option>
-                                <option value="full">Full Analysis</option>
-                            </select>
-                        </div>
-                        <div class="modal__actions">
-                            <button type="button" class="btn btn--secondary" data-action="close-modal">Annuler</button>
-                            <button type="submit" class="btn btn--primary" data-action="create-project">Créer le projet</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <!-- Modales générées dynamiquement par les modules JS -->
-    </div>
-
-    <!-- CORRECTION : Mise à jour des data-attributes -->
-    <div class="task-monitor" id="task-monitor">
-        <div class="task-counter">
-            <span id="jobs-count">0</span> tâches actives
-        </div>
-        <div class="task-progress" id="job-progress" style="display:none;">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress-fill"></div>
-            </div>
-            <span class="progress-text" id="progress-text">0%</span>
-        </div>
-    </div>
-
-    <!-- Main application entry point -->
+    <!-- Scripts d'initialisation -->
+    <script type="module" src="/js/layout-optimizer.js"></script>
     <script type="module" src="/js/app-improved.js"></script>
 
-    <!-- Service Worker pour PWA (optionnel) -->
+    <!-- Script de debug intégré -->
     <script>
-        // if ('serviceWorker' in navigator) {
-        //     window.addEventListener('load', function() {
-        //         navigator.serviceWorker.register('/sw.js').then(function(registration) {
-        //             console.log('SW registered: ', registration);
-        //         }).catch(function(registrationError) {
-        //             console.log('SW registration failed: ', registrationError);
-        //         });
-        //     });
-        // }
-    </script>
-
-    <!-- Schema.org structured data pour SEO -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "AnalyLit v4.1",
-        "description": "Plateforme intelligente pour la réalisation de revues de littérature scientifique avec IA",
-        "applicationCategory": "ThesisApplication",
-        "operatingSystem": "Web Browser",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        }
-    }
-    </script>
-    <!-- Layout Optimizer -->
-    <script type="module" src="/js/layout-optimizer.js"></script>
-    <script type="module">
-        import { layoutOptimizer } from './js/layout-optimizer.js';
-        document.addEventListener('DOMContentLoaded', () => {
-            layoutOptimizer.init();
-            layoutOptimizer.setupResponsiveOptimization();
-        });
-    </script>
-        <!-- Script de debug d'urgence -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🔧 Debug AnalyLit Interface');
+        console.log('🛠️ Script de debug chargé. Utilisez fixInterface() en cas de problème.');
         
-        // Vérifier les éléments critiques
-        const critical = {
-            header: document.querySelector('.app-header'),
-            nav: document.querySelector('.app-nav'),
-            main: document.querySelector('.app-main'),
-            container: document.querySelector('.container')
-        };
-        
-        Object.entries(critical).forEach(([name, el]) => {
-            if (!el) {
-                console.error(`❌ Élément manquant: ${name}`);
-            } else {
-                console.log(`✅ Élément trouvé: ${name}`, el);
-                // Forcer l'affichage
-                el.style.display = 'block';
-                el.style.visibility = 'visible';
-            }
-        });
-        
-        // Forcer l'affichage de l'en-tête
-        const header = document.querySelector('.app-header');
-        if (header) {
-            header.style.cssText = `
-                display: block !important;
-                visibility: visible !important;
-                position: relative !important;
-                background: #ffffff !important;
-                border-bottom: 1px solid #e5e7eb !important;
-                padding: 12px 0 !important;
-                z-index: 1000 !important;
-            `;
-            console.log('🔧 En-tête forcé');
-        }
-        
-        // Vérifier les styles CSS
-        const stylesheets = Array.from(document.styleSheets);
-        console.log('📄 CSS chargés:', stylesheets.length);
-        stylesheets.forEach((sheet, i) => {
-            try {
-                console.log(`CSS ${i}:`, sheet.href || 'inline');
-            } catch(e) {
-                console.log(`CSS ${i}: (CORS protégé)`);
-            }
-        });
-        
-        // Auto-diagnostic
-        setTimeout(() => {
-            const headerVisible = header && header.offsetHeight > 0;
-            const navVisible = critical.nav && critical.nav.offsetHeight > 0;
+        // Interface de debug globale
+        window.fixInterface = function() {
+            const elements = {
+                header: document.querySelector('.app-header'),
+                nav: document.querySelector('.app-nav'),
+                main: document.querySelector('.app-main'),
+                container: document.querySelector('.container')
+            };
             
-            console.log('📊 Diagnostic:', {
-                headerVisible,
-                navVisible,
-                headerHeight: header ? header.offsetHeight : 0,
-                navHeight: critical.nav ? critical.nav.offsetHeight : 0
+            Object.entries(elements).forEach(([name, el]) => {
+                if (el) {
+                    el.style.cssText += `
+                        display: block !important;
+                        visibility: visible !important;
+                        position: relative !important;
+                    `;
+                    console.log(`✅ Élément ${name} corrigé:`, el);
+                } else {
+                    console.error(`❌ Élément ${name} introuvable`);
+                }
             });
             
-            if (!headerVisible) {
-                alert('⚠️ PROBLÈME: En-tête invisible - Vérifiez les CSS');
-            }
-        }, 1000);
-    });
-
-    // Fonction de réparation d'urgence
-    window.fixInterface = function() {
-        console.log('🚨 Réparation d\'urgence...');
-        
-        // Réinitialiser tous les styles
-        document.documentElement.style.cssText = '';
-        document.body.style.cssText = 'margin:0;padding:0;font-family:system-ui;';
-        
-        // Recréer l'en-tête si nécessaire
-        let header = document.querySelector('.app-header');
-        if (!header || header.offsetHeight === 0) {
-            console.log('🔨 Reconstruction de l\'en-tête...');
-            const newHeader = document.createElement('header');
-            newHeader.className = 'app-header';
-            newHeader.innerHTML = `
-                <div class="container">
-                    <div class="app-header__content">
-                        <h1 class="app-header__title">
-                            🔬 AnalyLit v4.1
-                            <span class="app-header__subtitle">Plateforme IA pour revues scientifiques</span>
-                        </h1>
-                    </div>
-                </div>
-            `;
-            newHeader.style.cssText = `
-                display: block !important;
-                background: #ffffff !important;
-                border-bottom: 1px solid #e5e7eb !important;
-                padding: 12px 0 !important;
-            `;
+            // Correction spécifique pour la navigation
+            const navButtons = document.querySelectorAll('.app-nav__button');
+            navButtons.forEach((btn, index) => {
+                btn.style.cssText += `
+                    position: relative !important;
+                    z-index: ${1001 + index} !important;
+                    visibility: visible !important;
+                    pointer-events: auto !important;
+                `;
+            });
             
-            const body = document.body;
-            body.insertBefore(newHeader, body.firstChild);
-        }
+            console.log(`🔧 ${navButtons.length} boutons de navigation corrigés`);
+            
+            // Diagnostic complet
+            const diagnostic = {
+                headerVisible: elements.header && elements.header.offsetHeight > 0,
+                navVisible: elements.nav && elements.nav.offsetHeight > 0,
+                headerHeight: elements.header ? elements.header.offsetHeight : 0,
+                navHeight: elements.nav ? elements.nav.offsetHeight : 0,
+                buttonsCount: navButtons.length
+            };
+            
+            console.log('📊 Diagnostic final:', diagnostic);
+        };
         
-        console.log('✅ Réparation terminée');
-    };
-
-    console.log('🛠️ Script de debug chargé. Utilisez fixInterface() en cas de problème.');
+        // Auto-correction au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(window.fixInterface, 100);
+        });
+        
+        // Auto-correction sur interaction
+        document.addEventListener('click', (e) => {
+            if (e.target.matches('[data-action]')) {
+                setTimeout(window.fixInterface, 50);
+            }
+        });
     </script>
 </body>
 </html>
