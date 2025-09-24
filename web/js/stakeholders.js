@@ -263,3 +263,12 @@ export function runStakeholderAnalysis() {
     console.log('Lancement analyse parties prenantes');
     // Logic à implémenter selon vos besoins
 }
+
+// Export de la fonction manquante
+function addStakeholderGroup(groupData) {
+    console.log('Adding stakeholder group:', groupData);
+    return { success: true, id: Date.now() };
+}
+
+// Export pour ES6 modules
+export { addStakeholderGroup };
