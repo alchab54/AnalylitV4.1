@@ -2,7 +2,7 @@
 // ================================================================
 // AnalyLit V4.1 - Application Frontend (Version améliorée)
 // ================================================================
-
+import { layoutOptimizer } from './layout-optimizer.js';
 import { showLoadingOverlay, closeModal, openModal } from './ui-improved.js';
 import { showToast, showSuccess, showError } from './toast.js';
 import { loadProjects, selectProject, handleCreateProject, confirmDeleteProject, deleteProject } from './projects.js';
@@ -111,6 +111,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     initializeApplication();
+
+     // Initialiser l'optimiseur de layout
+    layoutOptimizer.init();
+    layoutOptimizer.setupResponsiveOptimization();
+    
+    // Auto-optimisation sur changement de section
+    document.addEventListener('click', (e) => {
+        if (e.target.matches('.app-nav__button')) {
+            setTimeout(() => layoutOptimizer.optimizeCurrentSection(), 200);
+        }
+    });
 });
 
 async function initializeApplication() {

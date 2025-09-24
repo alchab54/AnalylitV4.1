@@ -21,6 +21,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
+    <!-- Corrections responsive -->
+    <link rel="stylesheet" href="css/responsive-fixes.css">
+    
     <!-- Scripts externes -->
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.33.0/ace.js" defer></script>
@@ -516,5 +519,15 @@
         }
     }
     </script>
+    <!-- Layout Optimizer -->
+    <script type="module" src="/js/layout-optimizer.js"></script>
+    <script type="module">
+        import { layoutOptimizer } from './js/layout-optimizer.js';
+        document.addEventListener('DOMContentLoaded', () => {
+            layoutOptimizer.init();
+            layoutOptimizer.setupResponsiveOptimization();
+        });
+    </script>
+
 </body>
 </html>
