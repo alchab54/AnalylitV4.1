@@ -201,9 +201,52 @@ const stakeholdersModule = (() => {
         }
     };
 
+    const addStakeholderGroup = async (projectId, groupData) => {
+        if (!projectId) {
+            showError('ID du projet requis pour ajouter un groupe de parties prenantes.');
+            return null;
+        }
+
+        try {
+            const newGroup = await fetchAPI(API_ENDPOINTS.projectStakeholderGroups(projectId), {
+                method: 'POST',
+                body: JSON.stringify(groupData)
+            });
+            showToast('Groupe de parties prenantes créé avec succès.', 'success');
+            return newGroup;
+        } catch (error) {
+            showError('Erreur lors de la création du groupe.');
+            console.error('Error creating stakeholder group:', error);
+            return null;
+        }
+    };
+
+    const removeStakeholderGroup = async (projectId, groupId) => {
+        if (!projectId || !groupId) {
+            showError('ID du projet et du groupe requis.');
+            return false;
+        }
+
+        if (!confirm('Supprimer ce groupe de parties prenantes ?')) return false;
+
+        try {
+            await fetchAPI(API_ENDPOINTS.stakeholderGroupById(projectId, groupId), {
+                method: 'DELETE'
+            });
+            showToast('Groupe supprimé avec succès.', 'success');
+            return true;
+        } catch (error) {
+            showError('Erreur lors de la suppression du groupe.');
+            console.error('Error deleting stakeholder group:', error);
+            return false;
+        }
+    };
+
     return {
         init,
-        loadStakeholders
+        loadStakeholders,
+        addStakeholderGroup,        
+        removeStakeholderGroup
     };
 })();
 

@@ -73,7 +73,8 @@ export const API_ENDPOINTS = {
     // Stakeholders
     projectStakeholders: (projectId) => `/projects/${projectId}/stakeholders`,
     stakeholderById: (projectId, stakeholderId) => `/projects/${projectId}/stakeholders/${stakeholderId}`,
-
+    projectStakeholderGroups: (projectId) => `/projects/${projectId}/stakeholder-groups`,
+    stakeholderGroupById: (projectId, groupId) => `/projects/${projectId}/stakeholder-groups/${groupId}`,
     // Reporting
     reportBibliography: (projectId) => `/projects/${projectId}/reports/bibliography`,
     reportSummaryTable: (projectId) => `/projects/${projectId}/reports/summary-table`,
