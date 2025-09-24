@@ -133,7 +133,7 @@ function exportSummaryTableExcel(data, filename = 'summary_table.xlsx') {
     }
 }
 
-export function generateBibliography(articles, style = 'apa') {
+function generateBibliography(articles, style = 'apa') {
     console.log('Generating bibliography:', articles?.length || 0, 'articles');
     
     if (!Array.isArray(articles)) return [];
@@ -152,7 +152,7 @@ export function generateBibliography(articles, style = 'apa') {
     });
 }
 
-export function generateSummaryTable(data, options = {}) {
+function generateSummaryTable(data, options = {}) {
     console.log('Generating summary table for', data?.length || 0, 'items');
     
     if (!Array.isArray(data)) {
@@ -223,7 +223,7 @@ export function generateSummaryTable(data, options = {}) {
     }
 }
 
-export function renderReportingSection(containerId, projectId = null) {
+function renderReportingSection(containerId, projectId = null) {
     console.log('Rendering reporting section for project:', projectId);
     
     const container = document.getElementById(containerId) || document.querySelector(containerId);
@@ -532,5 +532,8 @@ export {
     exportSummaryTableExcel,
     savePrismaChecklist,
     handleGeneratePrisma,
+    generateBibliography,
+    generateSummaryTable,
+    renderReportingSection
 };
 export default reportingModule;

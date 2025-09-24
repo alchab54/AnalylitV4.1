@@ -11,18 +11,19 @@ import { MESSAGES, SELECTORS } from './constants.js';
 /**
  * Échappe le HTML pour éviter les injections XSS avec validation améliorée
  */
-export function escapeHtml(unsafe) {
-    if (unsafe === null || unsafe === undefined) {
-        return '';
-    }
-    
-    return String(unsafe)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+export function escapeHtml(str) {
+    if (typeof str !== 'string') return '';
+    return str.replace(/[&<>"'']/g, function(match) {
+        return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[match];
+    });
 }
+
 
 /**
  * Debounce pour limiter les appels de fonction
@@ -72,7 +73,8 @@ export function throttle(func, limit) {
  * C'est la fonction clé qui traduit les données de l'API en éléments HTML.
  * @param {Array<Object>} projects - Le tableau d'objets projet venant de l'API.
  */
-export function renderProjectCards(projects) {
+
+    export function renderProjectCards(projects) {
     // 1. Cible le conteneur où les cartes doivent être insérées.
     const container = document.querySelector(SELECTORS.projectsList);
 

@@ -322,8 +322,8 @@ export function showStakeholderManagementModal() { // This function is called by
     showModal('Gestion des Parties Prenantes', 'Contenu de la modale de gestion des parties prenantes.');
 }
 
-export const deleteStakeholderGroup = (groupId) => stakeholdersModule.removeStakeholderGroup(appState.currentProject?.id, groupId); // This was already correct
-export const addStakeholderGroup = (groupData) => stakeholdersModule.addStakeholderGroup(appState.currentProject?.id, groupData); // This was already correct
+export const deleteStakeholderGroup = (groupId) => stakeholdersModule.removeStakeholderGroup(appState.currentProject?.id, groupId);
+export const addStakeholderGroup = (projectId, groupData) => stakeholdersModule.addStakeholderGroup(projectId || appState.currentProject?.id, groupData);
 export function runStakeholderAnalysis() { /* Logic to run stakeholder analysis */ } // This was already correct
 export const renderStakeholdersSection = stakeholdersModule.renderStakeholdersSection; // Export the render function
 export const init = stakeholdersModule.init;
