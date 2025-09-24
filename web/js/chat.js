@@ -1,6 +1,6 @@
 // web/js/chat.js
 import { escapeHtml } from './ui-improved.js';
-import { showToast } from './ui-improved.js'; // Use ui-improved.js for toast
+import { showToast } from './ui-improved.js';
 import { appState } from './app-improved.js'; // Read from state
 import { fetchAPI } from './api.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';

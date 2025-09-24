@@ -1,7 +1,7 @@
 import { appState, elements } from './app-improved.js'; // Read from state
 import { fetchAPI } from './api.js';
 import { setAnalysisResults, setQueuesStatus } from './state.js';
-import { showLoadingOverlay, escapeHtml, showModal, closeModal, openModal, showToast } from './ui-improved.js';
+import { showLoadingOverlay, escapeHtml, showModal, closeModal, openModal, showToast } from './ui-improved.js'; // Corrected import
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 // This function is called by refreshCurrentSection in core.js

@@ -4,7 +4,7 @@ import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { setCurrentProjectGrids } from './state.js';
 import { escapeHtml } from './ui-improved.js';
-import { showToast } from './ui-improved.js'; // Use ui-improved.js for toast
+import { showToast } from './ui-improved.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 // CORRECTION : Ajout de la fonction manquante `loadProjectGrids`

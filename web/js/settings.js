@@ -2,10 +2,9 @@
 // --- MODIFIÉ POUR LE RENDU DYNAMIQUE ---
 
 import { fetchAPI } from './api.js';
-import { appState } from './app-improved.js'; // Assurez-vous que c'est le bon chemin
-import { setQueuesStatus, setAnalysisResults, setAnalysisProfiles, setPrompts, setOllamaModels, setSelectedProfileId } from './state.js'; // Corrected import
-import { showConfirmModal } from './ui-improved.js';
-import { showToast } from './ui-improved.js';
+import { appState } from './app-improved.js';
+import { setQueuesStatus, setAnalysisResults, setAnalysisProfiles, setPrompts, setOllamaModels, setSelectedProfileId } from './state.js';
+import { showConfirmModal, showToast } from './ui-improved.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 let editors = {}; // Stocke les instances d'Ace Editor

@@ -1,7 +1,7 @@
 // web/js/import.js
 import { appState } from './app-improved.js'; // Read from state
 import { fetchAPI } from './api.js';         // La fonction API vient de son module dédié
-import { showLoadingOverlay, showModal, closeModal, updateLoadingProgress, showToast } from './ui-improved.js';
+import { showLoadingOverlay, showModal, closeModal, updateLoadingProgress, showToast } from './ui-improved.js'; // Corrected import
 import { loadSearchResults } from './articles.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 

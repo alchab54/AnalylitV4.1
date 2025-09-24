@@ -2,7 +2,7 @@
 
 import { API_ENDPOINTS, SELECTORS, MESSAGES } from './constants.js';
 import { fetchAPI } from './api.js';
-import { showToast, showError } from './ui-improved.js'; // Use ui-improved.js for toast
+import { showToast, showError } from './ui-improved.js';
 import { appState } from './app-improved.js';
 
 const reportingModule = (() => {

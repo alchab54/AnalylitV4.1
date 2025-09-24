@@ -36,6 +36,7 @@ export const appState = {
     ollamaModels: [], // Added
     selectedProfileId: null, // Added
     availableDatabases: [], // Added
+    unreadNotifications: 0, // Added
 
     // Paramètres et configuration
     settings: {
@@ -54,7 +55,6 @@ export const appState = {
 
     // État des notifications
     notifications: [],
-    toasts: [],
 
     // Gestion des tâches en arrière-plan
     backgroundTasks: new Map(),
@@ -66,8 +66,7 @@ export const appState = {
     currentProjectExtractions: [],
     currentValidations: [],
     chatMessages: [], // Added
-    screeningDecisions: [], // Added
-    notifications: [], // Added
+    screeningDecisions: [],
     activeEvaluator: 'evaluator1', // Added default evaluator
 };
 
@@ -275,6 +274,21 @@ export function setStakeholderGroups(groups) {
         detail: { groups }
     }));
 }
+
+/**
+ * Met à jour la liste des bases de données disponibles
+ * @param {Array} databases - La nouvelle liste de bases de données
+ */
+export function setAvailableDatabases(databases) {
+    appState.availableDatabases = databases || [];
+    console.log(`🗄️ Bases de données disponibles mises à jour: ${databases.length} bases`);
+
+    // Émettre un événement pour que l'UI puisse réagir
+    window.dispatchEvent(new CustomEvent('available-databases-updated', {
+        detail: { databases }
+    }));
+}
+
 
 /**
  * Met à jour les fichiers du projet actuel (Set de noms de fichiers)
@@ -819,7 +833,6 @@ if (typeof window !== 'undefined') {
         setOllamaModels,
         setSelectedProfileId,
         setAvailableDatabases,
-        setChatMessages,
         setActiveEvaluator,
         setScreeningDecisions,
         setQueuesStatus,

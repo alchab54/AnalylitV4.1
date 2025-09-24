@@ -434,7 +434,6 @@ if (typeof window !== 'undefined') {
         generateUniqueId,
         formatDate,
         formatNumber,
-        escapeHtml,
         isValidEmail,
         isValidDoi,
         truncateText,

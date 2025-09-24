@@ -1,8 +1,7 @@
 // web/js/validation.js
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
-import { showLoadingOverlay, escapeHtml } from './ui-improved.js';
-import { showToast } from './ui-improved.js'; // Use ui-improved.js for toast
+import { showLoadingOverlay, escapeHtml, showToast } from './ui-improved.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 import { loadProjectGrids } from './grids.js';
 import { setCurrentValidations, setActiveEvaluator } from './state.js';

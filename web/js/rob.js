@@ -1,7 +1,6 @@
 import { appState, elements } from './app-improved.js'; // Read from state
 import { fetchAPI } from './api.js'; // Already correct
-import { showLoadingOverlay, escapeHtml } from './ui-improved.js'; // Already correct
-import { showToast } from './ui-improved.js'; // Use ui-improved.js for toast
+import { showLoadingOverlay, escapeHtml, showToast } from './ui-improved.js';
 import { API_ENDPOINTS, MESSAGES } from './constants.js';
 
 export async function loadRobSection() {

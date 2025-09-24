@@ -124,9 +124,7 @@ async function loadAvailableDatabases() {
  * Affiche un message d'erreur
  */
 function showError(message) {
-    import('./toast.js').then(({ showError }) => {
-        showError(message);
-    });
+    import('./ui-improved.js').then(ui => ui.showError(message));
 }
 
 /**
