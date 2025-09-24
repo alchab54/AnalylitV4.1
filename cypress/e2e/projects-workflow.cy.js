@@ -7,7 +7,7 @@ describe('Workflow de Gestion des Projets', () => {
 
   it('Devrait ouvrir et fermer la modale de création de projet', () => {
     // Ouvrir la modale
-    cy.get('[data-action="create-project-modal"]').click();
+    cy.get('#create-project-btn').click();
     cy.get('#newProjectModal').should('be.visible');
     cy.contains('h3', 'Créer un Nouveau Projet').should('be.visible');
     
@@ -18,7 +18,7 @@ describe('Workflow de Gestion des Projets', () => {
 
   it('Devrait créer un nouveau projet avec succès', () => {
     // Ouvrir la modale de création
-    cy.get('[data-action="create-project-modal"]').click();
+    cy.get('#create-project-btn').click();
     
     // Remplir le formulaire
     cy.get('#projectName').type('Projet Test E2E');
@@ -27,6 +27,7 @@ describe('Workflow de Gestion des Projets', () => {
     
     // Soumettre le formulaire
     cy.get('form[data-form="create-project"]').submit();
+    cy.wait(500);
     
     // Vérifier la notification de succès
     cy.contains('.toast-success', 'Projet créé avec succès').should('be.visible');
@@ -47,10 +48,11 @@ describe('Workflow de Gestion des Projets', () => {
 
   it("Devrait permettre la suppression d'un projet", () => {
     // Créer d'abord un projet pour le supprimer
-    cy.get('[data-action="create-project-modal"]').click();
+    cy.get('#create-project-btn').click();
     cy.get('#projectName').type('Projet à Supprimer');
     cy.get('#projectDescription').type('Ce projet sera supprimé');
     cy.get('form[data-form="create-project"]').submit();
+    cy.wait(500);
     
     // Attendre la création
     cy.contains('.toast-success', 'Projet créé avec succès');

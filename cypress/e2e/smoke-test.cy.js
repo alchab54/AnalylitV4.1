@@ -29,7 +29,7 @@ describe('Tests de Smoke - Vérifications de base AnalyLit', () => {
     cy.wait(1000); // Attendre que l'interface se stabilise
     // Tester la navigation vers Articles
     cy.get('[data-section-id="articles"]').click({ force: true });
-    cy.get('#articlesContainer').should('be.visible');
+    cy.get('#articles').should('be.visible');
     
     // Tester la navigation vers Résultats
     cy.get('[data-section-id="results"]').click({ force: true });
