@@ -510,7 +510,7 @@ def test_import_pdfs_from_zotero_task(db_session, mocker):
     mock_zotero_instance.children.assert_called_once_with('ZOTERO_KEY')
     
     # Vérifier que le téléchargement (dump) a été appelé avec le bon chemin
-    expected_path = str(config.PROJECTS_DIR / project_id / "test.pdf")
+    expected_path = str(PROJECTS_DIR / project_id / "test.pdf")
     mock_zotero_instance.dump.assert_called_once_with('ATTACH_KEY', expected_path)
     mock_notify.assert_called_once_with(project_id, 'import_completed', '1 PDF(s) importé(s) depuis Zotero.')
 
@@ -590,6 +590,7 @@ def test_run_knowledge_graph_task(db_session, mocker):
 
     # ACT
     run_knowledge_graph_task.__wrapped__(db_session, project_id)
+    db_session.commit() # Commit the changes made by the task
     
     # ASSERT
     mock_ollama.assert_called_once_with(mocker.ANY, model="test-kg-model", output_format="json")

@@ -1,8 +1,4 @@
 import logging
-import gevent.monkey
-# Le monkey-patching doit être fait le plus tôt possible, avant que d'autres
-# modules (comme socket, ssl, etc.) ne soient importés.
-gevent.monkey.patch_all()
 
 import feedparser
 
@@ -1012,23 +1008,13 @@ def create_app(config=None):
         return jsonify(prompt.to_dict()), 200
 
     # ==================== ROUTES API OLLAMA & ADMIN ====================
-    def pull_model_task(model_name):
-        # Caller la commande système pour lancer ollama pull
-        try:
-            res = subprocess.run(
-                ['ollama', 'pull', model_name], capture_output=True, text=True, check=True
-            )
-            return {'status': 'success', 'message': res.stdout}
-        except subprocess.CalledProcessError as e:
-            return {'status': 'error', 'message': e.stderr}
-
     @app.route('/api/ollama/pull', methods=['POST'])
     def api_pull_model():
         data = request.json
         model_name = data.get('model')
         if not model_name:
             return jsonify({'success': False, 'error': 'Model name required'}), 400
-        job = models_queue.enqueue(pull_model_task, model_name, job_timeout='30m')
+        job = models_queue.enqueue(pull_ollama_model_task, model_name, job_timeout='30m')
         return jsonify({'task_id': job.get_id(), 'message': f'Downloading {model_name}'}), 200
 
     @app.route('/api/ollama/models', methods=['GET'])
@@ -1146,9 +1132,11 @@ def create_app(config=None):
             q = queues[queue_name]
             q.empty()
             # Vider aussi les registres associés
-            FailedJobRegistry(queue=q).empty()
-            FinishedJobRegistry(queue=q).empty()
-            StartedJobRegistry(queue=q).empty()
+            for registry_class in [FailedJobRegistry, FinishedJobRegistry, StartedJobRegistry]:
+                registry = registry_class(queue=q)
+                for job_id in registry.get_job_ids():
+                    job = Job.fetch(job_id, connection=redis_conn)
+                    job.delete()
             return jsonify({"message": f"File '{queue_name}' et ses registres ont été vidés."} ), 200
         return jsonify({"error": "File non trouvée"}), 404
 
@@ -1215,6 +1203,11 @@ def post_fork(server, worker):
     db.init_app(app)
 
 if __name__ == "__main__":
+    # Le monkey-patching doit être fait le plus tôt possible, mais SEULEMENT
+    # lors de l'exécution directe, pas lors de l'import par Gunicorn ou Pytest.
+    import gevent.monkey
+    gevent.monkey.patch_all()
+
     # Ce bloc est pour le développement local UNIQUEMENT
     # Initialiser la base de données pour le serveur de développement
     with app.app_context():

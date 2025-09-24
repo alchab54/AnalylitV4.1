@@ -165,7 +165,7 @@ def test_api_admin_endpoints(client):
         mock_enqueue.assert_called_once_with(
             pull_ollama_model_task,
             'test-model:latest',
-            job_timeout=7200
+            job_timeout='30m'
         )
 
     # --- 2. POST apiqueuesclear (Vérifie l'appel .empty()) ---
@@ -174,7 +174,7 @@ def test_api_admin_endpoints(client):
         response_clear = client.post('/api/queues/clear', json={'queue_name': 'analylit_processing_v4'})
         
         assert response_clear.status_code == 200
-        assert "vidée" in response_clear.json['message']
+        assert "vidés" in response_clear.json['message']
         mock_queue_empty.assert_called_once() # Vérifie que la file a bien été vidée
 
     # --- 3. POST apiqueuesclear (Test échec) ---
