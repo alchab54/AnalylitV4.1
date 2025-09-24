@@ -479,7 +479,7 @@ Titres:
     graph = call_ollama_api(prompt, model=model_to_use, output_format="json")
     
     if graph and isinstance(graph, dict) and 'nodes' in graph and 'edges' in graph:
-        update_project_status(session, project_id, status='completed', graph=graph)
+        update_project_status(session, project_id, status='completed', graph=graph) # This line was missing
         send_project_notification(project_id, 'analysis_completed', 'Le graphe de connaissances est prêt.', {'analysis_type': 'knowledge_graph'})
     else:
         update_project_status(session, project_id, status='analysis_failed')

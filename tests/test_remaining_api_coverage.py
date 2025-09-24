@@ -152,7 +152,7 @@ def test_api_admin_endpoints(client):
     # --- 1. POST apiollamapull (Vérifie la mise en file) ---
     with patch('server_v4_complete.models_queue.enqueue') as mock_enqueue:
         mock_job = MagicMock()
-        mock_job.id = "mock_pull_task_id"
+        mock_job.get_id.return_value = "mock_pull_task_id"
         mock_enqueue.return_value = mock_job
         
         response_pull = client.post('/api/ollama/pull', json={'model': 'test-model:latest'})
@@ -160,7 +160,7 @@ def test_api_admin_endpoints(client):
         assert response_pull.status_code == 200
         response_data = response_pull.json
         assert 'task_id' in response_data
-        assert isinstance(response_data['task_id'], str)
+        assert response_data['task_id'] == "mock_pull_task_id"
         # Vérifie que la bonne tâche a été appelée avec le bon argument
         mock_enqueue.assert_called_once_with(
             pull_ollama_model_task,
