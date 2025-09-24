@@ -1496,6 +1496,7 @@ select.form-control {
   transition: all var(--transition-fast);
   white-space: nowrap;
   position: relative;
+  z-index: 1; 
 }
 
 .app-nav__button:hover:not(.app-nav__button--active) {
@@ -2627,4 +2628,30 @@ select.form-control {
     border-radius: 8px;
     max-width: 500px;
     width: 90%;
+}
+
+/* Rend la modale visible lorsqu'elle a la classe .show */
+.modal.show {
+    display: flex !important; /* Utiliser !important pour forcer la visibilité */
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Style de base pour la modale */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050; /* Doit être supérieur à la barre de navigation */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    outline: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s linear;
 }

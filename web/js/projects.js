@@ -359,6 +359,24 @@ export function renderProjectCards(projects) {
     });
 }
 
+export async function loadProjects() {
+    try {
+        const projects = await fetchAPI(API_ENDPOINTS.projects);
+        appState.projects = projects;
+        
+        // LIGNE CRUCIALE MANQUANTE : Appeler la fonction de rendu ici !
+        renderProjectCards(projects); // Cette ligne va afficher les cartes
+        
+        return projects;
+    } catch (error) {
+        console.error("Erreur lors du chargement des projets:", error);
+        showError("Impossible de charger les projets.");
+        // Affichez un état vide en cas d'erreur
+        renderProjectCards([]); 
+        return [];
+    }
+}
+
 // --- CORRECTION : Bloc d'exportation unifié ---
 export {
     loadProjects,

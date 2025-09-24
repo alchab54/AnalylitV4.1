@@ -1,40 +1,83 @@
 // web/js/tasks.js
-import { fetchAPI } from './api.js';
-import { API_ENDPOINTS } from './constants.js';
 
+import { fetchAPI } from './api.js';
+import { API_ENDPOINTS, MESSAGES } from './constants.js';
+
+/**
+ * Récupère l'état des tâches en cours depuis le backend et met à jour l'interface utilisateur.
+ * Cette fonction est conçue pour être appelée périodiquement.
+ */
 export async function fetchTasks() {
     try {
-        // Le garde est bon, mais le bloc doit être complet
-        if (!API_ENDPOINTS?.tasks) {
-            console.warn('API_ENDPOINTS.tasks not defined yet');
+        // 1. Vérifier que l'endpoint des tâches est disponible avant de faire l'appel.
+        //    Ceci évite les erreurs si la fonction est appelée avant que la configuration soit chargée.
+        if (!API_ENDPOINTS?.tasksStatus) {
+            console.warn("API_ENDPOINTS.tasksStatus n'est pas encore défini. L'appel est reporté.");
             return;
         }
-        const tasks = await fetchAPI(API_ENDPOINTS.tasks);
-    try {
+
+        // 2. Faire l'appel API pour obtenir le statut des tâches.
         const response = await fetchAPI(API_ENDPOINTS.tasksStatus);
         
-        // CORRECTION : Traite les tâches avec job_id
+        // 3. S'assurer que la réponse contient un tableau de tâches, même s'il est vide.
+        //    La notation `|| []` est une sécurité pour éviter les erreurs si `response.tasks` est `undefined`.
         const tasks = response.tasks || [];
-        const tasksHtml = tasks.map(task => `
-            <div class="task-item" data-job-id="${task.job_id}">
-                <div class="task-header">
-                    <strong>Job ID:</strong> ${task.job_id}
-                    <span class="task-status ${task.status}">${task.status}</span>
-                </div>
-                <div class="task-details">
-                    <p><strong>Type:</strong> ${task.type || 'N/A'}</p>
-                    <p><strong>Progression:</strong> ${task.progress || 0}%</p>
-                    <p><strong>Créé:</strong> ${new Date(task.created_at).toLocaleString()}</p>
-                </div>
-            </div>
-        `).join('');
+        
+        // 4. Mettre à jour l'interface utilisateur avec les tâches récupérées.
+        renderTasks(tasks);
 
+    } catch (error) {
+        // 5. Capturer et logger toute erreur survenant pendant le processus.
+        //    Ceci empêche l'application de planter en cas de problème réseau ou serveur.
+        console.error("Erreur lors de la récupération du statut des tâches:", error);
+        
+        // Optionnel : Afficher un message d'erreur discret dans l'UI.
         const tasksContainer = document.getElementById('tasks-list');
         if (tasksContainer) {
-            tasksContainer.innerHTML = tasksHtml || `<p>${MESSAGES.noTasksInProgress}</p>`;
+            tasksContainer.innerHTML = `<p class="error">${MESSAGES.errorFetchingTasks}</p>`;
         }
-    } catch (error) {
-
-        console.error("Erreur lors de la récupération des tâches:", error);
     }
 }
+
+/**
+ * Gère le rendu HTML de la liste des tâches dans le conteneur approprié.
+ * @param {Array} tasks - Un tableau d'objets représentant les tâches.
+ */
+function renderTasks(tasks) {
+    const tasksContainer = document.getElementById('tasks-list');
+
+    // Si le conteneur n'existe pas dans le DOM, on ne peut rien faire.
+    if (!tasksContainer) {
+        console.warn("Le conteneur de tâches avec l'ID 'tasks-list' n'a pas été trouvé.");
+        return;
+    }
+
+    // Si le tableau de tâches est vide, afficher un message informatif.
+    if (tasks.length === 0) {
+        tasksContainer.innerHTML = `<p>${MESSAGES.noTasksInProgress}</p>`;
+        return;
+    }
+
+    // Construire le HTML pour chaque tâche en utilisant les données reçues.
+    // L'utilisation de `data-job-id` permet d'identifier facilement les éléments plus tard.
+    const tasksHtml = tasks.map(task => `
+        <div class="task-item" data-job-id="${task.job_id}">
+            <div class="task-header">
+                <strong>Job ID:</strong> ${task.job_id}
+                <span class="task-status ${task.status.toLowerCase()}">${task.status}</span>
+            </div>
+            <div class="task-details">
+                <p><strong>Type:</strong> ${task.type || 'N/A'}</p>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: ${task.progress || 0}%;"></div>
+                    <span>${task.progress || 0}%</span>
+                </div>
+                <p class="task-timestamp"><strong>Créé le:</strong> ${new Date(task.created_at).toLocaleString('fr-FR')}</p>
+            </div>
+        </div>
+    `).join('');
+
+    // Injecter le HTML généré dans le conteneur.
+    tasksContainer.innerHTML = tasksHtml;
+}
+
