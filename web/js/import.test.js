@@ -3,10 +3,10 @@
  */
 
 import { handleIndexPdfs } from './import.js';
-import { appState } from './app-improved.js'; // Corrected import path
+import { appState } from './app-improved.js';
 import * as api from './api.js';
-import * as uiImproved from './ui-improved.js'; // Renamed import to avoid conflict
-import * as toast from './toast.js'; // Import toast.js for mocking
+import * as uiImproved from './ui-improved.js';
+import * as state from './state.js';
 
 // Mocker les modules dépendants
 jest.mock('./app-improved.js', () => ({
@@ -14,18 +14,21 @@ jest.mock('./app-improved.js', () => ({
     currentProject: null,
   },
 }));
-
 jest.mock('./api.js', () => ({
   fetchAPI: jest.fn(),
 }));
-
 jest.mock('./ui-improved.js', () => ({
   showLoadingOverlay: jest.fn(),
   updateLoadingProgress: jest.fn(),
+  showToast: jest.fn(), // Mock showToast from ui-improved.js
 }));
-
-jest.mock('./toast.js', () => ({
-  showToast: jest.fn(),
+jest.mock('./state.js', () => ({
+  // Mock all functions from state.js that might be used
+  setSearchResults: jest.fn(),
+  setCurrentProjectExtractions: jest.fn(),
+  setLoadingState: jest.fn(),
+  setCurrentSection: jest.fn(),
+  // Add other state functions as needed by the modules being tested
 }));
 
 describe('Fonctions d\'importation', () => {
@@ -63,7 +66,7 @@ describe('Fonctions d\'importation', () => {
       expect(uiImproved.showLoadingOverlay).toHaveBeenCalledWith(true, 'Indexation en cours...', 'task-abc');
 
       // 5. Vérifie qu\'une notification de succès est affichée
-      expect(toast.showToast).toHaveBeenCalledWith('Indexation lancée en arrière-plan.', 'info'); // Assert on toast.showToast
+      expect(uiImproved.showToast).toHaveBeenCalledWith('Indexation lancée en arrière-plan.', 'info');
     });
 
   });

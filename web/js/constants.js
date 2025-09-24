@@ -4,7 +4,7 @@
 export const SELECTORS = {
     // General UI
     sections: '.section',
-    navButtons: '.app-nav__button',
+    navButtons: '.app-nav__button', // This was already correct
     connectionStatus: '[data-connection-status]',
     loadingOverlay: '#loadingOverlay',
     toastContainer: '#toastContainer',
@@ -13,10 +13,10 @@ export const SELECTORS = {
     // Projets
     projectsList: '#projectsList',
     createProjectBtn: '#createProjectBtn',
-    projectDetail: '#projectDetail',
+    projectDetail: '#projectDetail', // This was already correct
     projectDetailContent: '#projectDetailContent',
     projectPlaceholder: '#projectPlaceholder',
-    newProjectForm: '#newProjectForm',
+    newProjectForm: '#newProjectForm', // This was already correct
     projectContainer: '#projectContainer', // Added missing constant
 
     // Articles / Résultats
@@ -36,6 +36,7 @@ export const SELECTORS = {
     stakeholdersContainer: '#stakeholdersContainer',
     stakeholdersList: '#stakeholdersList',
     createStakeholderBtn: '#createStakeholderBtn',
+    showCreateStakeholderModalBtn: '[data-action="show-create-stakeholder-modal"]', // Added missing constant
     newStakeholderForm: '#newStakeholderForm',
 
     // Paramètres
@@ -148,6 +149,8 @@ export const MESSAGES = {
     confirmDeleteProjectBody: (name) => `Êtes-vous sûr de vouloir supprimer le projet "<strong>${name}</strong>" ?`,
     noProjects: 'Aucun projet. Créez-en un pour commencer.',
     
+    // Stakeholders
+    selectProjectToViewStakeholders: 'Sélectionnez un projet pour gérer les parties prenantes.',
     // Articles
     loadingResults: 'Chargement des résultats...', 
     noProjectSelected: 'Aucun projet sélectionné',

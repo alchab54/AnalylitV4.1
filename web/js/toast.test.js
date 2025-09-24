@@ -1,7 +1,7 @@
 /**
  * <!-- Import failed: jest-environment - ENOENT: no such file or directory, access 'c:\Users\alich\Downloads\exported-assets (1)\docs\jest-environment' --> jsdom
  */
-import { showToast, showSuccess, showError } from './toast.js';
+import { showToast, showSuccess, showError } from './ui-improved.js';
 
 describe('Module Toast - Notifications', () => {
   

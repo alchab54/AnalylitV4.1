@@ -30,6 +30,8 @@ export const appState = {
     // Données des analyses
     analysisResults: null,
     analysisProfiles: [],
+    stakeholders: [], // Added
+    stakeholderGroups: [], // Added
     prompts: [], // Added
     ollamaModels: [], // Added
     selectedProfileId: null, // Added
@@ -64,6 +66,8 @@ export const appState = {
     currentProjectExtractions: [],
     currentValidations: [],
     chatMessages: [], // Added
+    screeningDecisions: [], // Added
+    notifications: [], // Added
     activeEvaluator: 'evaluator1', // Added default evaluator
 };
 
@@ -256,6 +260,20 @@ export function setCurrentProject(project) {
             detail: { project }
         }));
     }
+}
+
+/**
+ * Met à jour la liste des groupes de parties prenantes
+ * @param {Array} groups - La nouvelle liste de groupes de parties prenantes
+ */
+export function setStakeholderGroups(groups) {
+    appState.stakeholderGroups = groups || [];
+    console.log(`👥 Groupes de parties prenantes mis à jour: ${groups.length} groupes`);
+
+    // Émettre un événement
+    window.dispatchEvent(new CustomEvent('stakeholder-groups-updated', {
+        detail: { groups }
+    }));
 }
 
 /**
@@ -773,6 +791,8 @@ if (typeof window !== 'undefined') {
         setCurrentProjectArticles,
         setCurrentProjectAnalyses,
         setCurrentProjectExtractions,
+        setStakeholders, // Added
+        setStakeholderGroups, // Added
         getCurrentProjectGrids,
         
         // Articles selection

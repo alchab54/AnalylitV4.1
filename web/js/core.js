@@ -27,7 +27,7 @@ import { sendChatMessage, loadChatMessages, renderChatInterface } from './chat.j
 import {
     handleCreateProject,
     deleteProject, // This was already correct, but I'm confirming it.
-    selectProject, // This was already correct
+    selectProject,
     confirmDeleteProject, // This was already correct
     handleExportProject,
     loadProjects,
@@ -35,7 +35,7 @@ import {
 } from './projects.js';
 import { handleRunRobAnalysis, fetchAndDisplayRob, loadRobSection, handleSaveRobAssessment } from './rob.js';
 import { showSearchModal, handleMultiDatabaseSearch, renderSearchSection } from './search.js';
-import { handleValidateExtraction, resetValidationStatus, filterValidationList, loadValidationSection, renderValidationSection, calculateKappa } from './validation.js';
+import { handleValidateExtraction, resetValidationStatus, filterValidationList, loadValidationSection, renderValidationSection, calculateKappa } from './validation.js'; // Corrected import
 import {
     closeModal, toggleSidebar, showCreateProjectModal, showToast, showLoadingOverlay, showSuccess, showError } from './ui-improved.js';
 import { clearNotifications, updateNotificationIndicator, handleWebSocketNotification } from './notifications.js';
@@ -53,7 +53,7 @@ import {
     handleUploadPdfs,
     processPmidImport
 } from './import.js';
-import { showStakeholderManagementModal, addStakeholderGroup, deleteStakeholderGroup, runStakeholderAnalysis, init as initStakeholdersModule } from './stakeholders.js';
+import { showStakeholderManagementModal, addStakeholderGroup, deleteStakeholderGroup, runStakeholderAnalysis, init as initStakeholdersModule, renderStakeholdersSection } from './stakeholders.js'; // Corrected import
 import { fetchTasks, renderTasks } from './tasks.js';
 import {
     renderSettings,
@@ -159,7 +159,7 @@ const analysisActions = {
     'delete-analysis': (target) => handleDeleteAnalysis(target.dataset.analysisType),
 };
 
-const robActions = {
+const robActions = { // This was already correct
     'run-rob-analysis': handleRunRobAnalysis,
     'edit-rob': (target) => fetchAndDisplayRob(target.dataset.articleId, true),
     'cancel-edit-rob': (target) => fetchAndDisplayRob(target.dataset.articleId, false)
@@ -199,7 +199,7 @@ const importExportActions = {
 
 const stakeholderActions = {
     'manage-stakeholders': showStakeholderManagementModal,
-    'add-stakeholder-group': addStakeholderGroup,
+    'add-stakeholder-group': addStakeholderGroup, // This was already correct
     'run-stakeholder-analysis': runStakeholderAnalysis,
     'delete-stakeholder-group': (target) => deleteStakeholderGroup(target.dataset.groupId),
 };
@@ -315,7 +315,7 @@ export function initializeWebSocket() {
             console.log(MESSAGES.websocketConnected);
             setConnectionStatus('connected');
             if (elements.connectionStatus()) elements.connectionStatus().textContent = '✅';
-            if (appState.currentProject) {
+            if (appState.currentProject?.id) { // Check if currentProject and its ID exist
                 appState.socket.emit('join_room', { room: appState.currentProject.id });
             }
         });
@@ -404,7 +404,7 @@ export function refreshCurrentSection() {
             renderChatInterface();
             break;
         case 'stakeholders':
-            initStakeholdersModule(); // Initialize and load stakeholders for the current project
+            renderStakeholdersSection(appState.currentProject); // Use render function
             break;
         default:
             break;

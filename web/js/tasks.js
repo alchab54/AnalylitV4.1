@@ -25,7 +25,7 @@ export async function fetchTasks() {
         setBackgroundTasks(response.tasks || []);
         
         // 4. Mettre à jour l'interface utilisateur avec les tâches récupérées.
-        renderTasks(tasks);
+        renderTasks(appState.backgroundTasks.values()); // Pass the iterable from appState
 
     } catch (error) {
         // 5. Capturer et logger toute erreur survenant pendant le processus.
@@ -55,7 +55,7 @@ export function renderTasks(tasksIterable) {
     }
 
     // Si le tableau de tâches est vide, afficher un message informatif.
-    if (tasks.length === 0) {
+    if (Array.from(tasksIterable).length === 0) { // Check length of iterable
         tasksContainer.innerHTML = `<p>${MESSAGES.noTasksInProgress}</p>`; // Correction: tasks.length est 0 ici, mais tasksIterable peut être vide
         return;
     }

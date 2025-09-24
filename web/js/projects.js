@@ -2,7 +2,7 @@
 import { appState, elements } from './app-improved.js';
 import { fetchAPI } from './api.js';
 import { showLoadingOverlay, closeModal, escapeHtml, showModal, renderProjectCards } from './ui-improved.js';
-import { showToast, showSuccess, showError } from './toast.js';
+import { showToast, showSuccess, showError } from './ui-improved.js'; // Corrected import
 import { setProjects, setCurrentProject, setCurrentSection, setCurrentProjectFiles } from './state.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 

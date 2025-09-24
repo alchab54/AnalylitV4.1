@@ -204,4 +204,4 @@ window.AnalyLit = {
 console.log('🎯 Interface de debug disponible: window.AnalyLit');
 
 // EXPORT UNIQUE - Pas de duplication !
-export { appState, loadInitialData, initializeEventHandlers, elements };
+export { appState, loadInitialData, initializeEventHandlers };

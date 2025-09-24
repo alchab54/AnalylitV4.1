@@ -206,6 +206,16 @@ export function showToast(message, type = 'info', options = {}) {
     return toast;
 }
 
+/**
+ * Fonctions de raccourci pour les toasts
+ */
+export function showSuccess(message, options = {}) {
+    return showToast(message, 'success', options);
+}
+export function showError(message, options = {}) {
+    return showToast(message, 'error', options);
+}
+
 function createToastMessage(message, type) {
     const messageElement = document.createElement('div');
     messageElement.className = 'toast__message';

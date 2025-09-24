@@ -19,6 +19,9 @@ module.exports = {
   transform: {
     '^.+\\.js$': 'babel-jest',
   },
+  moduleNameMapper: {
+    '^./toast.js$': '<rootDir>/web/js/ui-improved.js', // Redirect toast.js imports to ui-improved.js
+  },
   moduleFileExtensions: ['js', 'mjs'], // Add mjs for ES modules
   
   
