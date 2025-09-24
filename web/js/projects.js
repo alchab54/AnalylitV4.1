@@ -5,6 +5,7 @@ import { fetchAPI } from './api.js';
 import { showLoadingOverlay, closeModal, escapeHtml, showModal } from './ui-improved.js'; 
 import { showToast, showSuccess, showError } from './toast.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
+import { renderProjectCards } from './ui-improved.js';
 
 // Fonctions utilitaires locales ou importées d'autres modules si nécessaire
 
