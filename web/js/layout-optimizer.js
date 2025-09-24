@@ -43,6 +43,8 @@ export class LayoutOptimizer {
         }
         
         this.initialized = true;
+
+        this.debounceTimeout = null;
     }
 
     /**
@@ -363,6 +365,42 @@ export class LayoutOptimizer {
     }
 
     /**
+     * Vérifie et applique le mode compact selon les conditions actuelles
+     */
+    checkCompactMode() {
+        if (!this.isInitialized) return;
+        
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const zoomLevel = window.devicePixelRatio || 1;
+        
+        // Seuils pour activer le mode compact
+        const compactWidthThreshold = 1024;
+        const compactHeightThreshold = 600;
+        const compactZoomThreshold = 1.2;
+        
+        const shouldBeCompact = 
+            viewportWidth < compactWidthThreshold ||
+            viewportHeight < compactHeightThreshold ||
+            zoomLevel > compactZoomThreshold ||
+            this.forceCompactMode;
+            
+        if (shouldBeCompact && !this.isCompactMode) {
+            this.enableCompactMode();
+        } else if (!shouldBeCompact && this.isCompactMode && !this.forceCompactMode) {
+            this.disableCompactMode();
+        }
+    }
+
+    /**
+     * Fonction utilitaire debounce intégrée à la classe
+     */
+    debounce(func, wait) {
+        clearTimeout(this.debounceTimeout);
+        this.debounceTimeout = setTimeout(func, wait);
+    }
+
+    /**
      * Automatically enables compact mode on high zoom levels.
      */
     setupZoomBasedCompactMode() {
@@ -377,9 +415,9 @@ export class LayoutOptimizer {
             }
         };
 
-        window.addEventListener('resize', debounce(this.checkCompactMode.bind(this), 150));
-        window.addEventListener('zoom', debounce(this.checkCompactMode.bind(this), 150));
-
+        window.addEventListener('resize', () => this.debounce(this.checkCompactMode.bind(this), 150));
+        // Note: 'zoom' n'est pas un événement standard, utilisez 'orientationchange' ou supprimez-le
+        window.addEventListener('orientationchange', () => this.debounce(this.checkCompactMode.bind(this), 150));
     }
 
     /**
