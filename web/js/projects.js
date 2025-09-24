@@ -23,6 +23,20 @@ async function loadProjects() {
     renderProjectsList();
   }
   autoSelectFirstProject();
+  try {
+        const projects = await fetchAPI(API_ENDPOINTS.projects);
+        appState.projects = projects;
+        
+        // CET APPEL EST CRUCIAL !
+        renderProjectCards(projects);
+        
+        return projects;
+    } catch (error) {
+        console.error("Erreur lors du chargement des projets:", error);
+        showError("Impossible de charger les projets.");
+        renderProjectCards([]); // Affiche un état vide en cas d'erreur
+        return [];
+    }
 }
 
 /**
