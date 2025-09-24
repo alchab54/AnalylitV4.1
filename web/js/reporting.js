@@ -137,12 +137,11 @@ function exportSummaryTableExcel(data, filename = 'summary_table.xlsx') {
     }
 }
 
-// Export manquant : generateBibliography
 function generateBibliography(articles, style = 'apa') {
     console.log('Generating bibliography:', articles?.length || 0, 'articles');
     
     if (!Array.isArray(articles)) return [];
-    
+
     return articles.map((article, index) => {
         const authors = article.authors || 'Unknown Author';
         const title = article.title || 'Untitled';
@@ -157,12 +156,87 @@ function generateBibliography(articles, style = 'apa') {
     });
 }
 
+// === Export manquant : generateSummaryTable ===
+function generateSummaryTable(data, options = {}) {
+    console.log('Generating summary table for', data?.length || 0, 'items');
+    
+    if (!Array.isArray(data)) {
+        console.warn('generateSummaryTable: data should be an array');
+        return { headers: [], rows: [], total: 0 };
+    }
+    
+    try {
+        // Configuration par défaut
+        const config = {
+            includeStats: options.includeStats !== false,
+            groupBy: options.groupBy || null,
+            sortBy: options.sortBy || 'title',
+            maxRows: options.maxRows || 1000,
+            ...options
+        };
+        
+        // Génération des en-têtes
+        const headers = [
+            'ID', 'Titre', 'Auteurs', 'Journal', 
+            'Année', 'Type', 'Statut'
+        ];
+        
+        if (config.includeStats) {
+            headers.push('Score', 'Citations');
+        }
+        
+        // Génération des lignes
+        const rows = data.slice(0, config.maxRows).map((item, index) => {
+            const row = [
+                item.id || index + 1,
+                item.title || 'Sans titre',
+                item.authors || 'Auteur inconnu',
+                item.journal || 'Journal inconnu',
+                item.year || item.publication_date || 'N/A',
+                item.type || 'Article',
+                item.status || 'Non évalué'
+            ];
+            
+            if (config.includeStats) {
+                row.push(item.score || 0);
+                row.push(item.citations || 0);
+            }
+            
+            return row;
+        });
+        
+        // Statistiques
+        const summary = {
+            headers,
+            rows,
+            total: data.length,
+            displayed: rows.length,
+            truncated: data.length > config.maxRows
+        };
+        
+        console.log('Summary table generated:', summary.displayed, 'rows displayed,', summary.total, 'total items');
+        return summary;
+        
+    } catch (error) {
+        console.error('Erreur génération tableau résumé:', error);
+        return { 
+            headers: ['Erreur'], 
+            rows: [['Erreur lors de la génération du tableau']], 
+            total: 0,
+            error: error.message 
+        };
+    }
+}
+
+
 // Export final
 export { 
     exportSummaryTableExcel,
-    generateBibliography 
+    generateBibliography,
+    generateSummaryTable
 };
 
 if (typeof window !== 'undefined') {
     window.exportSummaryTableExcel = exportSummaryTableExcel;
+    window.generateSummaryTable = generateSummaryTable;
 }
