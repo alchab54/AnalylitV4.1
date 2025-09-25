@@ -32,7 +32,7 @@ describe('Workflow de Gestion des Articles', () => {
         
         // ✅ MAINTENANT, vérifier que les boutons sont actifs
         cy.get('[data-action="delete-selected-articles"]').should('not.be.disabled');
-        cy.get('[data-action="batch-screening"]').should('not.be.disabled');
+        cy.get('[data-action="batch-process-modal"]').should('not.be.disabled');
       } else {
         cy.log('Aucun article à sélectionner, test ignoré.');
       }
@@ -44,14 +44,14 @@ describe('Workflow de Gestion des Articles', () => {
     cy.get('body').then($body => {
       if ($body.find('.article-row').length > 0) {
         // Cliquer sur le premier article
-        cy.get('.article-row').first().find('.article-title').click({ force: true });
+        cy.get('.article-row').first().find('[data-action="view-details"]').click({ force: true });
         
         // Vérifier l'ouverture de la modale de détails
         cy.get('#articleDetailModal').should('be.visible');
-        cy.contains('h2', "Détails de l'article").should('be.visible');
+        cy.contains('.modal-title', "Détails de l'article").should('be.visible');
         
         // Fermer la modale
-        cy.closeModal('#articleDetailModal');
+        cy.get('#articleDetailModal .modal-close').click();
         cy.get('#articleDetailModal').should('not.exist');
       } else {
         cy.log('Aucun article à ouvrir, test ignoré.');
@@ -67,11 +67,11 @@ describe('Workflow de Gestion des Articles', () => {
         cy.get('.article-checkbox').eq(1).check({ force: true });
         
         // Lancer le screening par lot
-        cy.get('[data-action="batch-screening"]').click({ force: true });
+        cy.get('[data-action="batch-process-modal"]').click({ force: true });
         
         // Vérifier l'ouverture de la modale et lancer le screening
         cy.get('#batchProcessModal').should('be.visible');
-        cy.get('[data-action="start-batch-screening"]').click({ force: true });
+        cy.get('#batchProcessModal [data-action="start-batch-process"]').click({ force: true });
         
         // Vérifier la notification de lancement
         cy.waitForToast('success', 'Tâche de screening lancée');

@@ -258,7 +258,10 @@ export async function viewArticleDetails(articleId) {
             ${extractionDetails}
         </div>`;
 
-    showModal(MESSAGES.articleDetailsTitle, content);
+    // Utiliser la modale dédiée #articleDetailModal
+    const modalContent = document.getElementById('articleDetailContent');
+    if (modalContent) modalContent.innerHTML = content;
+    openModal('articleDetailModal');
 }
 
 export async function handleDeleteSelectedArticles() {
@@ -323,7 +326,10 @@ export function showBatchProcessModal() {
             </div>
         </div>`;
 
-    showModal(MESSAGES.batchProcessModalTitle, content);
+    // Utiliser la modale dédiée #batchProcessModal
+    const modal = document.getElementById('batchProcessModal');
+    if (modal) modal.querySelector('.modal-body').innerHTML = content;
+    openModal('batchProcessModal');
 }
 
 export async function startBatchProcessing() {

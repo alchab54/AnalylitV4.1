@@ -76,7 +76,7 @@ describe('Workflow de Gestion des Analyses', () => {
     cy.get('[data-action="export-prisma-report"]').click({ force: true });
     cy.waitForToast('info', 'Exportation PRISMA non implémentée');
 
-    cy.closeModal('#prismaModal');
+    cy.get('#prismaModal .modal-close').click();
     cy.get('#prismaModal').should('not.exist');
   });
 

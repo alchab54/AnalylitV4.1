@@ -47,9 +47,14 @@ describe('Workflow de Gestion des Projets', () => {
     // ✅ CORRECTION LIGNE 74 : Navigation + force click
     cy.navigateToSection('projects'); // ✅ S'assurer qu'on voit la section
     
-    // ✅ CONFIGURER le stub AVANT le clic et lui donner un alias
+    // ✅ SOLUTION AMÉLIORÉE : Configurer le stub AVANT le clic,
+    // vérifier le message et lui donner un alias.
     cy.window().then((win) => {
-      cy.stub(win, 'confirm').as('confirmDialog').returns(true);
+      cy.stub(win, 'confirm').callsFake((message) => {
+        // Vérifier que le message de confirmation est correct
+        expect(message).to.include('supprimer le projet "Projet à Supprimer"');
+        return true; // Simuler le clic sur "OK"
+      }).as('confirmStub');
     });
 
     // Cliquer sur le bouton de suppression
@@ -57,10 +62,10 @@ describe('Workflow de Gestion des Projets', () => {
       .find('[data-action="delete-project"]')
       .click({ force: true }); // ✅ FORCE AJOUTÉ
 
-    // ✅ VÉRIFIER que la boîte de dialogue de confirmation a bien été appelée
-    cy.get('@confirmDialog').should('have.been.called');
+    // Vérifier que la boîte de dialogue de confirmation a bien été appelée
+    cy.get('@confirmStub').should('have.been.calledOnce');
 
-    // ✅ ATTENDRE la disparition de l'élément du DOM
+    // Attendre la disparition de l'élément du DOM, ce qui est la meilleure assertion
     cy.contains('.project-card', 'Projet à Supprimer').should('not.exist');
   });
 });
