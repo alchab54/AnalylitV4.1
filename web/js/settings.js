@@ -58,11 +58,12 @@ async function loadPrompts() {
 export async function loadOllamaModels() {
     try {
         const models = await fetchAPI(API_ENDPOINTS.ollamaModels);
-        setOllamaModels(models.models || []); // Assuming response.models contains the array
+        setOllamaModels(models.models || []);
+        return true; // Indiquer le succès
     } catch (error) {
         console.error('Erreur chargement modèles Ollama:', error);
-        displayOllamaConnectionError();
         setOllamaModels([]);
+        return false; // Indiquer l'échec
     }
 }
 
@@ -70,14 +71,21 @@ export async function loadOllamaModels() {
  * Affiche une alerte dans l'interface si la connexion à Ollama échoue.
  */
 function displayOllamaConnectionError() {
-    const container = document.querySelector(SELECTORS.settingsContainer);
-    if (container && !container.querySelector('.ollama-error-alert')) {
+    const modelsSection = document.getElementById('models-section');
+    if (modelsSection) {
         const errorHtml = `
-            <div class="alert alert--warning ollama-error-alert" style="margin-bottom: 1rem;">
-                <h4>Connexion à Ollama échouée</h4>
-                <p>Impossible de joindre le service Ollama. Assurez-vous qu'il est bien démarré sur votre machine (commande: <code>ollama serve</code>) et accessible par le backend.</p>
+            <div class="settings-card">
+                <div class="settings-card__header">
+                    <h3 class="settings-card__title">Erreur de Connexion</h3>
+                </div>
+                <div class="settings-card__body">
+                    <div class="alert alert--error">
+                        <h4>Impossible de joindre le service Ollama</h4>
+                        <p>Assurez-vous qu'Ollama est bien démarré sur votre machine (commande: <code>ollama serve</code>) et que le backend de l'application peut y accéder sur <code>localhost:11434</code>.</p>
+                    </div>
+                </div>
             </div>`;
-        container.insertAdjacentHTML('afterbegin', errorHtml);
+        modelsSection.innerHTML = errorHtml;
     }
 }
 
@@ -113,11 +121,9 @@ export async function renderSettings() {
     await loadSettingsData();
 
     const profiles = appState.analysisProfiles; // Read from state
-    const prompts = appState.prompts; // Read from state
-    const models = appState.ollamaModels; // Read from state
-    const queueStatus = appState.queuesInfo;
 
-    if (!profiles || !prompts || !models || !queueStatus) { // This check remains as a safeguard
+    // Vérification que les données critiques sont là
+    if (!profiles || !appState.prompts || !appState.queuesInfo) {
         container.innerHTML = `<div class="placeholder">${MESSAGES.loadingSettingsData}</div>`; // Already correct
         console.warn(MESSAGES.settingsDataNotReady); // Already correct
         return; 
@@ -127,11 +133,17 @@ export async function renderSettings() {
     container.innerHTML = createSettingsLayout();
 
     // 2. Remplir les conteneurs maintenant qu'ils existent dans le DOM (read from appState)
-    renderAnalysisProfilesList(appState.analysisProfiles, document.querySelector('#profile-list-container'));
-    populateModelSelects(appState.ollamaModels);
+    renderAnalysisProfilesList(profiles, document.querySelector('#profile-list-container'));
     renderPromptTemplates(appState.prompts, document.querySelector('#prompt-templates-list'));
     renderQueueStatus(appState.queuesInfo, document.querySelector('#queue-status-container'));
-    loadInstalledModels();
+
+    // Gérer la section des modèles en fonction de la connexion Ollama
+    if (appState.ollamaModels.length > 0 || (await loadOllamaModels())) {
+        populateModelSelects(appState.ollamaModels);
+        loadInstalledModels();
+    } else {
+        displayOllamaConnectionError();
+    }
 
     // 3. Initialiser les composants interactifs
     initializeAllEditors();
@@ -377,7 +389,7 @@ function createModelsSection() {
         <div class="settings-card">
             <div class="settings-card__header">
                 <h3 class="settings-card__title">Modèles Installés</h3>
-                <span class="status-indicator status-indicator--success">
+                <span id="ollama-status-indicator" class="status-indicator status-indicator--success">
                     <span class="status-dot"></span>
                     Connecté à Ollama
                 </span>
@@ -1160,16 +1172,23 @@ export async function downloadModel(modelName) {
 export async function loadInstalledModels() {
     try {
         const response = await fetchAPI(API_ENDPOINTS.ollamaModels);
-        const modelsList = document.querySelector('#installed-models-list'); 
+        const modelsList = document.querySelector('#installed-models-list');
+        if (!modelsList) return;
         modelsList.innerHTML = response.models
             .map(
                 (model) =>
                 `<li>${model.name} <span class="model-size">${model.size || ''}</span></li>`
             )
             .join('');
+        document.querySelector('#ollama-status-indicator')?.classList.replace('status-indicator--error', 'status-indicator--success');
+        document.querySelector('#ollama-status-indicator span:last-child').textContent = 'Connecté à Ollama';
     } catch (error) {
         console.error('Erreur chargement modèles installés :', error);
-        // L'erreur est déjà gérée et affichée par loadOllamaModels, pas besoin de la dupliquer ici.
+        const indicator = document.querySelector('#ollama-status-indicator');
+        if (indicator) {
+            indicator.classList.replace('status-indicator--success', 'status-indicator--error');
+            indicator.querySelector('span:last-child').textContent = 'Connexion échouée';
+        }
     }
 }
 

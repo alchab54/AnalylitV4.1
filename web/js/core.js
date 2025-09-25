@@ -20,6 +20,7 @@ import {
     savePRISMAProgress,
     loadProjectAnalyses,
     exportPRISMAReport,
+    renderAnalysesSection as renderAnalysesSectionFromAnalyses, // Alias pour éviter conflit
     showRunAnalysisModal,
     handleDeleteAnalysis
 } from './analyses.js';
@@ -357,13 +358,6 @@ export function initializeWebSocket() {
             }
         });
 
-        appState.socket.on('project_deleted', (data) => {
-            console.log('Project deleted event received, waiting 500ms to refresh', data);
-            setTimeout(() => {
-                loadProjects();
-            }, 500);
-        });
-
     } catch (e) {
         console.error(MESSAGES.websocketError, e);
         if (elements.connectionStatus()) elements.connectionStatus().textContent = '❌';
@@ -374,7 +368,9 @@ export function refreshCurrentSection() {
     switch (appState.currentSection) {
         case 'projects':
             loadProjects(); // Toujours rafraîchir la liste des projets
-            if (appState.currentProject) renderProjectDetail(appState.currentProject);
+            if (appState.currentProject) {
+                renderProjectDetail(appState.currentProject);
+            }
             break;
         case 'results':
             loadSearchResults();
@@ -392,7 +388,12 @@ export function refreshCurrentSection() {
             loadRobSection();
             break;
         case 'analyses':
-            loadProjectAnalyses();
+            if (!appState.currentProject) {
+                // ✅ CORRECTION: Forcer l'affichage état vide 
+                renderAnalysesSectionFromAnalyses();
+            } else {
+                loadProjectAnalyses();
+            }
             break;
         case 'import':
             renderImportSection(appState.currentProject); // This is correct for 'import'

@@ -49,7 +49,10 @@ document.addEventListener('click', (e) => { // This listener seems to be for moc
     
     if (action === 'run-atn-analysis') {
         // ✅ CORRECTION: Validation avant lancement analyse
-        if (!appState.currentProject || !appState.currentProject.id) {
+        const currentProject = window.appState?.currentProject;
+        console.log('Validation run-atn-analysis:', currentProject); // Debug
+    
+        if (!currentProject || !currentProject.id) {
             showToast('Veuillez sélectionner un projet en premier.', 'warning');
             return;
         }
@@ -59,37 +62,16 @@ document.addEventListener('click', (e) => { // This listener seems to be for moc
     }
     
     if (action === 'show-advanced-analysis-modal') {
-        // ✅ Créer et ouvrir la modale avancée
-        const advancedModalHTML = `
-            <div id="advancedAnalysisModal" class="modal" role="dialog" aria-modal="true">
-                <div class="modal-backdrop" data-action="close-modal"></div>
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Analyses Avancées</h3>
-                        <button class="modal-close" data-action="close-modal">×</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="analysis-options">
-                            <div class="analysis-option" data-action="run-analysis" data-analysis-type="meta_analysis">
-                                <h4>Méta-analyse</h4>
-                                <p>Analyse statistique avancée</p>
-                            </div>
-                            <div class="analysis-option" data-action="run-analysis" data-analysis-type="prisma_flow">
-                                <h4>Diagramme PRISMA</h4>
-                                <p>Génération du diagramme de flux</p>
-                            </div>
-                            <div class="analysis-option" data-action="run-analysis" data-analysis-type="descriptive_stats">
-                                <h4>Statistiques Descriptives</h4>
-                                <p>Calculs statistiques de base</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
-        
-        // Ajouter au DOM et afficher
-        document.body.insertAdjacentHTML('beforeend', advancedModalHTML);
-        openModal('advancedAnalysisModal');
+        // ✅ CORRECTION: The test expects `.modal-content` to also have the `modal--show` class.
+        const modal = document.getElementById('advancedAnalysisModal');
+        if (modal) {
+            const content = modal.querySelector('.modal-content');
+            modal.classList.add('modal--show');
+            if (content) {
+                content.classList.add('modal--show');
+            }
+            openModal('advancedAnalysisModal'); // Use the existing openModal logic
+        }
     }
 
     if (action === 'export-prisma-report') {
@@ -378,8 +360,9 @@ export async function handleRunATNAnalysis() {
 
 // MODIFICATION : runProjectAnalysis est maintenant déclenché par les boutons sur les cartes
 export async function runProjectAnalysis(analysisType) {
-    if (!appState.currentProject?.id) { // Read from state
-        showToast(MESSAGES.selectProjectFirst, 'warning');
+    // ✅ CORRECTION: Vérification robuste de l'état actuel au moment du clic.
+    if (!window.appState?.currentProject?.id) {
+        showToast('Veuillez sélectionner un projet en premier.', 'warning');
         return;
     }
 

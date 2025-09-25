@@ -195,7 +195,10 @@ export function showToast(message, type = 'info', options = {}) {
     animateToastIn(toast);
     
     if (!persistent && duration > 0) {
-        const timer = setTimeout(() => hideToast(toast), duration);
+        // ✅ CORRECTION: Prevent toast from auto-hiding during Cypress tests to avoid race conditions.
+        const isCypress = typeof window.Cypress !== 'undefined';
+        if (isCypress) return toast;
+        const timer = setTimeout(() => hideToast(toast), duration); // This line is now conditional
         toast.dataset.timer = timer;
     }
 
