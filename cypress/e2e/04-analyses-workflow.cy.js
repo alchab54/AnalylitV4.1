@@ -17,29 +17,25 @@ describe('Workflow de Gestion des Analyses', () => {
     cy.get('.analysis-card').should('have.length.at.least', 4); // Au moins ATN, Discussion, Graphe, PRISMA
   });
 
-  it("Devrait lancer l'Analyse ATN Multipartite", () => {
-    cy.get('.analysis-card').contains('h4', 'Analyse ATN Multipartite').parents('.analysis-card').within(() => {
-      cy.get('[data-action="run-atn-analysis"]').click({ force: true });
-    });
-    cy.waitForToast('success', 'Analyse ATN lancée');
-    // Vérifier l'état de chargement de la carte
-    cy.get('.analysis-card').contains('h4', 'Analyse ATN Multipartite').parents('.analysis-card').should('have.class', 'analysis-card--loading');
-  });
+  it('Devrait lancer les analyses principales depuis leurs cartes respectives', () => {
+    const mainAnalyses = [
+      { cardTitle: 'Analyse ATN Multipartite', buttonSelector: '[data-action="run-atn-analysis"]', toastMessage: 'Analyse ATN lancée' },
+      { cardTitle: 'Discussion académique', buttonSelector: '[data-action="run-analysis"][data-analysis-type="discussion"]', toastMessage: 'Tâche de génération du brouillon de discussion lancée' },
+      { cardTitle: 'Graphe de connaissances', buttonSelector: '[data-action="run-analysis"][data-analysis-type="knowledge_graph"]', toastMessage: 'Tâche de génération du graphe de connaissances lancée' }
+    ];
 
-  it('Devrait lancer une Discussion académique', () => {
-    cy.get('.analysis-card').contains('h4', 'Discussion académique').parents('.analysis-card').within(() => {
-      cy.get('[data-action="run-analysis"][data-analysis-type="discussion"]').click({ force: true });
-    });
-    cy.waitForToast('success', 'Tâche de génération du brouillon de discussion lancée');
-    cy.get('.analysis-card').contains('h4', 'Discussion académique').parents('.analysis-card').should('have.class', 'analysis-card--loading');
-  });
+    mainAnalyses.forEach(analysis => {
+      // Trouver la carte, cliquer sur le bouton d'analyse
+      cy.get('.analysis-card').contains('h4', analysis.cardTitle).parents('.analysis-card').within(() => {
+        cy.get(analysis.buttonSelector).click({ force: true });
+      });
 
-  it('Devrait lancer un Graphe de connaissances', () => {
-    cy.get('.analysis-card').contains('h4', 'Graphe de connaissances').parents('.analysis-card').within(() => {
-      cy.get('[data-action="run-analysis"][data-analysis-type="knowledge_graph"]').click({ force: true });
+      // Vérifier la notification de succès
+      cy.waitForToast('success', analysis.toastMessage);
+
+      // Vérifier que la carte passe en état de chargement
+      cy.get('.analysis-card').contains('h4', analysis.cardTitle).parents('.analysis-card').should('have.class', 'analysis-card--loading');
     });
-    cy.waitForToast('success', 'Tâche de génération du graphe de connaissances lancée');
-    cy.get('.analysis-card').contains('h4', 'Graphe de connaissances').parents('.analysis-card').should('have.class', 'analysis-card--loading');
   });
 
   it(`Devrait afficher les résultats d'une analyse terminée (si disponible)`, () => {
@@ -80,28 +76,23 @@ describe('Workflow de Gestion des Analyses', () => {
   });
 
   it(`Devrait ouvrir la modale d'analyses avancées et lancer diverses analyses`, () => {
-    cy.openModal('[data-action="show-advanced-analysis-modal"]', '.modal-content');
+    const advancedAnalyses = [
+      { type: 'meta_analysis', toastMessage: 'Tâche de méta-analyse lancée' },
+      { type: 'prisma_flow', toastMessage: 'Tâche de génération du diagramme PRISMA lancée' },
+      { type: 'descriptive_stats', toastMessage: 'Tâche de statistiques descriptives lancée' }
+    ];
 
-    // Lancer une Méta-analyse
-    cy.get('.analysis-option[data-analysis-type="meta_analysis"]').click({ force: true });
-    cy.waitForToast('success', 'Tâche de méta-analyse lancée');
-    cy.get('.modal-content').should('not.be.visible');
+    advancedAnalyses.forEach(analysis => {
+      // Ouvrir la modale avant chaque lancement
+      cy.openModal('[data-action="show-advanced-analysis-modal"]', '.modal-content');
 
-    // Réouvrir la modale pour les autres tests
-    cy.openModal('[data-action="show-advanced-analysis-modal"]', '.modal-content');
-
-    // Lancer un Diagramme PRISMA
-    cy.get('.analysis-option[data-analysis-type="prisma_flow"]').click({ force: true });
-    cy.waitForToast('success', 'Tâche de génération du diagramme PRISMA lancée');
-    cy.get('.modal-content').should('not.be.visible');
-
-    // Réouvrir la modale pour les autres tests
-    cy.openModal('[data-action="show-advanced-analysis-modal"]', '.modal-content');
-
-    // Lancer des Statistiques Descriptives
-    cy.get('.analysis-option[data-analysis-type="descriptive_stats"]').click({ force: true });
-    cy.waitForToast('success', 'Tâche de statistiques descriptives lancée');
-    cy.get('.modal-content').should('not.be.visible');
+      // Lancer l'analyse
+      cy.get(`.analysis-option[data-analysis-type="${analysis.type}"]`).click({ force: true });
+      
+      // Vérifier le toast et la fermeture de la modale
+      cy.waitForToast('success', analysis.toastMessage);
+      cy.get('.modal-content').should('not.be.visible');
+    });
   });
 
   it(`Devrait permettre d'exporter les analyses`, () => {

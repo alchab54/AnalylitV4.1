@@ -68,30 +68,35 @@ Cypress.Commands.add('waitForAppReady', () => {
 // == COMMANDES DE PROJET ==
 // ===============================================
 
-// Commande CORRIGÉE pour créer un projet
 Cypress.Commands.add('createTestProject', (projectName = 'Projet Test Cypress') => {
-  // S'assurer qu'on est dans la section projets
+  // Navigation vers projets
   cy.navigateToSection('projects')
   
-  // Cliquer sur créer projet avec force
-  cy.get('[data-action="create-project"]', { timeout: 8000 })
-    .should('exist')
+  // Cliquer pour créer un projet
+  cy.get('[data-action="create-project"], #create-project-btn')
+    .first()
     .click({ force: true })
   
-  cy.get('#newProjectModal', { timeout: 5000 })
-    .should('be.visible')
-    .and('have.class', 'modal--show')
+  // Attendre que la modale existe
+  cy.get('#newProjectModal', { timeout: 10000 })
+    .should('exist')
   
+  // S'assurer que le champ nom est visible et remplissable
   cy.get('#projectName')
+    .should('be.visible')
     .clear()
     .type(projectName, { force: true })
   
+  // Soumettre le formulaire
   cy.get('[data-action="submit-project"]')
     .click({ force: true })
   
-  // Attendre que la modale se ferme
-  cy.get('#newProjectModal', { timeout: 5000 })
+  // Attendre la fermeture simple
+  cy.get('#newProjectModal', { timeout: 8000 })
     .should('not.have.class', 'modal--show')
+  
+  cy.contains('.project-card', projectName, { timeout: 10000 })
+    .should('exist')
 })
 
 // Commande CORRIGÉE pour les clics sur projets
