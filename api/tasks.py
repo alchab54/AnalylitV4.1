@@ -1,4 +1,3 @@
-
 import logging
 from flask import Blueprint, jsonify
 from rq.job import Job
@@ -21,13 +20,19 @@ def get_task_status(task_id):
         logger.error(f"Erreur en récupérant la tâche {task_id} depuis Redis: {e}", exc_info=True)
         return jsonify({"error": "Erreur interne du serveur"}), 500
 
+    exc_string = None
+    if job.is_failed:
+        latest_res = job.latest_result()
+        if latest_res:
+            exc_string = latest_res.exc_string
+
     response = {
         'task_id': job.get_id(),
         'status': job.get_status(),
-        'result': job.result,
+        'result': job.return_value(),  # CORRECTION FINALE
         'enqueued_at': job.enqueued_at.isoformat() if job.enqueued_at else None,
         'started_at': job.started_at.isoformat() if job.started_at else None,
         'ended_at': job.ended_at.isoformat() if job.ended_at else None,
-        'exc_info': str(job.exc_info) if job.exc_info else None
+        'exc_info': exc_string
     }
     return jsonify(response)

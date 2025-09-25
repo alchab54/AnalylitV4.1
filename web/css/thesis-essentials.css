@@ -1108,10 +1108,16 @@
    ================================ */
 
 .admin-only {
-    display: none !important;
+    display: none !important; /* Caché par défaut */
 }
 
-[data-user-role="admin"] .admin-only {
+/* Affiche le BOUTON admin si l'utilisateur est admin */
+[data-user-role="admin"] .app-nav__button.admin-only {
+    display: inline-flex !important;
+}
+
+/* Affiche la SECTION admin si l'utilisateur est admin ET que la section est active */
+[data-user-role="admin"] section#admin.app-section.active {
     display: block !important;
 }
 

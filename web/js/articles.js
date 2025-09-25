@@ -3,7 +3,6 @@ import { fetchAPI } from './api.js';
 import { appState, elements } from './app-improved.js';
 import { showLoadingOverlay, showModal, closeModal, escapeHtml, showToast } from './ui-improved.js'; // Corrected import
 import { loadProjectFilesSet } from './projects.js';
-import { showSearchModal } from './search.js'; // Assuming this is correct
 import { setSearchResults, clearSelectedArticles, addSelectedArticle, removeSelectedArticle, getSelectedArticles, toggleAllArticles, setCurrentProjectExtractions, setCurrentSection } from './state.js';
 import { loadProjectGrids } from './grids.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
