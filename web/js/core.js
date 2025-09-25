@@ -20,12 +20,13 @@ import {
     savePRISMAProgress,
     loadProjectAnalyses,
     exportPRISMAReport,
-    renderAnalysesSection as renderAnalysesSectionFromAnalyses, // Alias pour éviter conflit
+    renderAnalysesSection as renderAnalysesSectionFromAnalyses,
+    handleRunATNAnalysis, // Alias pour éviter conflit
     showRunAnalysisModal,
     handleDeleteAnalysis
 } from './analyses.js';
 import { sendChatMessage, loadChatMessages, renderChatInterface } from './chat.js';
-import {
+import { 
     handleCreateProject,
     deleteProject, // This was already correct, but I'm confirming it.
     selectProject,
@@ -34,8 +35,8 @@ import {
     loadProjects,
     renderProjectDetail
 } from './projects.js';
-import { handleRunRobAnalysis, fetchAndDisplayRob, loadRobSection, handleSaveRobAssessment } from './rob.js';
-import { showSearchModal, handleMultiDatabaseSearch, renderSearchSection } from './search.js';
+import { handleRunRobAnalysis, fetchAndDisplayRob, loadRobSection, handleSaveRobAssessment } from './rob.js'; 
+import { showSearchModal, handleMultiDatabaseSearch, handleExpertSearch, renderSearchSection } from './search.js';
 import { handleValidateExtraction, resetValidationStatus, filterValidationList, loadValidationSection, renderValidationSection, calculateKappa } from './validation.js'; // Corrected import
 import {
     closeModal, toggleSidebar, showCreateProjectModal, showToast, showLoadingOverlay, showSuccess, showError } from './ui-improved.js';
@@ -155,12 +156,13 @@ const validationActions = {
 
 const analysisActions = {
     'run-analysis': (target) => runProjectAnalysis(target.dataset.analysisType),
+    'run-atn-analysis': handleRunATNAnalysis,
     'show-prisma-modal': () => showPRISMAModal(),
     'save-prisma-progress': savePRISMAProgress,
     'export-prisma-report': exportPRISMAReport,
     'export-analyses': exportAnalyses,
     'show-advanced-analysis-modal': showRunAnalysisModal,
-    'delete-analysis': (target) => handleDeleteAnalysis(target.dataset.analysisType),
+    'delete-analysis': (target) => handleDeleteAnalysis(target.dataset.analysisType)
 };
 
 const robActions = { // This was already correct
@@ -267,8 +269,9 @@ export function setupDelegatedEventListeners() {
             'save-grid': handleSaveGrid,
             'save-rob-assessment': (event) => handleSaveRobAssessment(event),
             'save-profile-form': handleSaveProfile, // Assurez-vous que votre formulaire a data-action="save-profile-form"
-            'save-zotero-settings': (event) => import('./settings.js').then(settings => settings.handleSaveZoteroSettings(event)), // This dynamic import is fine
-            'run-multi-search': (event) => handleMultiDatabaseSearch(event)
+            'save-zotero-settings': (event) => import('./settings.js').then(settings => settings.handleSaveZoteroSettings(event)),
+            'run-multi-search': (event) => handleMultiDatabaseSearch(event),
+            'run-expert-search': (event) => handleExpertSearch(event)
         };
 const action = submitActions[actionName];
         if (action) {
@@ -351,11 +354,9 @@ export function initializeWebSocket() {
         });
 
         appState.socket.on('search_completed', (data) => {
-            showSuccess(MESSAGES.searchComplete(data.total_results));
-            if (appState.currentSection === 'results') {
-                console.log(MESSAGES.refreshingResults);
-                loadSearchResults();
-            }
+            showSuccess(MESSAGES.searchComplete(data.total_results || 0));
+            // Rediriger automatiquement vers la section des résultats
+            showSection('results');
         });
 
     } catch (e) {
@@ -445,18 +446,18 @@ export function getStatusClass(status) {
  * @param {CustomEvent} event - L'événement 'section-changed'
  */
 function handleSectionChange(event) {
-    const { currentSection } = event.detail;
-    const sections = document.querySelectorAll('.app-section'); // Correct
-    const navButtons = document.querySelectorAll('.app-nav__btn'); // CORRECTION: Utiliser la nouvelle classe .app-nav__btn
+    const { currentSection } = event.detail; // Correction: Assurer que la variable est déclarée
+    const sections = document.querySelectorAll('.app-section'); 
+    const navButtons = document.querySelectorAll('.app-nav__button');
 
     sections.forEach(section => {
-        // Laisser le CSS gérer l'affichage via la classe .hidden
-        section.classList.toggle('hidden', section.id !== currentSection);
+        // Utiliser la classe 'active' comme défini dans frontend-fix.css
+        section.classList.toggle('active', section.id === currentSection); 
     });
 
     navButtons.forEach(btn => {
-        // CORRECTION: Utiliser la bonne classe et le bon dataset
-        btn.classList.toggle('app-nav__btn--active', btn.dataset.section === currentSection);
+        // Utiliser la bonne classe et le bon dataset
+        btn.classList.toggle('app-nav__button--active', btn.dataset.sectionId === currentSection); 
     });
     
     refreshCurrentSection();

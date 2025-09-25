@@ -107,6 +107,9 @@ async function selectProject(projectId) {
 
         // NE PAS CHANGER DE SECTION AUTOMATIQUEMENT.
         // L'utilisateur doit cliquer sur la section "Résultats" pour voir les articles.
+        
+        // ✅ CORRECTION: Afficher les détails du projet sélectionné.
+        renderProjectDetail(projectToSelect);
         // setCurrentSection('articles');
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
@@ -298,16 +301,19 @@ function updateProjectListSelection() {
  * Rendu du panneau de détails du projet (colonne droite).
  */
 function renderProjectDetail(project) {
+    const detailWrapper = document.querySelector(SELECTORS.projectDetail); // Get the main wrapper
     const detailContainer = document.querySelector(SELECTORS.projectDetailContent);
     const placeholder = document.querySelector(SELECTORS.projectPlaceholder);
-    if (!detailContainer || !placeholder) return;
+    if (!detailWrapper || !detailContainer || !placeholder) return;
 
     if (!project) {
         detailContainer.innerHTML = '';
         placeholder.style.display = 'block';
+        detailWrapper.style.display = 'none'; // Hide the wrapper if no project
         return;
     }
 
+    detailWrapper.style.display = 'block'; // ✅ CORRECTION: Make the wrapper visible
     placeholder.style.display = 'none';
     
     // Métriques

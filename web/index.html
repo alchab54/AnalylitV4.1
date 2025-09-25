@@ -1,43 +1,16 @@
 <!DOCTYPE html>
-<html lang="fr" data-color-scheme="light">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AnalyLit v4.1 - Plateforme IA pour Revues de Littérature</title>
     
-    <!-- Meta tags -->
-    <meta name="description" content="AnalyLit v4.1 - Plateforme intelligente pour la réalisation de revues de littérature scientifique avec IA.">
-    <meta name="keywords" content="revue littérature, IA, recherche scientifique, méta-analyse">
-    <meta name="author" content="AnalyLit Team">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔬</text></svg>">
-    
-    <!-- CSS Files -->
-    <link rel="stylesheet" href="css/emergency-fixes.css">
-    <link rel="stylesheet" href="css/enhanced-design-tokens.css">
-    <link rel="stylesheet" href="css/style-improved.css">
-    <link rel="stylesheet" href="css/ux-fix.css">
-    <link rel="stylesheet" href="css/responsive-fixes.css">
-    <link rel="stylesheet" href="css/settings-redesign.css"> <!-- NOUVELLE LIGNE -->
-    
-    <!-- Scripts externes -->
-    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.33.0/ace.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js" defer></script>
-   <link rel="stylesheet" href="css/navigation-fix.css">
-   <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/thesis-essentials.css">
+    <!-- CSS UNIQUE -->
+    <link rel="stylesheet" href="css/frontend-fix.css">
 </head>
-<body>
-    <script type="module">
-        import './js/analyses.js'; // Les fonctions seront disponibles globalement
-    </script>
-<body>
-    <!-- En-tête principal FIXE -->
-    <header class="app-header">
+<body data-user-role="user" id="app-body">
+    <!-- En-tête principal -->
+    <header class="app-header" id="main-header">
         <div class="container">
             <div class="app-header__content">
                 <div class="app-header__left">
@@ -59,8 +32,8 @@
         </div>
     </header>
 
-    <!-- Navigation HORIZONTALE - NAVIGATION UNIQUE -->
-    <nav class="app-nav" role="navigation" aria-label="Navigation principale">
+    <!-- Navigation FIXE -->
+    <nav class="app-nav" id="main-navigation" role="navigation" aria-label="Navigation principale">
         <div class="container">
             <button class="app-nav__button app-nav__button--active" data-action="show-section" data-section-id="projects">
                 <span role="img" aria-hidden="true">📁</span> Projets
@@ -74,17 +47,17 @@
             <button class="app-nav__button" data-action="show-section" data-section-id="validation">
                 <span role="img" aria-hidden="true">✅</span> Validation
             </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="rob">
+                <span role="img" aria-hidden="true">⚖️</span> Risk of Bias
+            </button>
             <button class="app-nav__button" data-action="show-section" data-section-id="grids">
                 <span role="img" aria-hidden="true">📋</span> Grilles
             </button>
             <button class="app-nav__button" data-action="show-section" data-section-id="analyses">
                 <span role="img" aria-hidden="true">📊</span> Analyses
             </button>
-            <button class="app-nav__button" data-section="atn-analysis">
-    🧠 Analyses ATN
-</button>
-            <button class="app-nav__button" data-action="show-section" data-section-id="rob">
-                ⚖️ Risk of Bias
+            <button class="app-nav__button" data-action="show-section" data-section-id="atn-analysis">
+                <span role="img" aria-hidden="true">🧠</span> Analyses ATN
             </button>
             <button class="app-nav__button" data-action="show-section" data-section-id="import">
                 <span role="img" aria-hidden="true">📥</span> Import
@@ -99,10 +72,10 @@
     </nav>
 
     <!-- Contenu principal -->
-    <main class="app-main" role="main">
+    <main class="app-main" id="main-content" role="main">
         <div class="container">
             
-            <!-- Section Projets - SECTION ACTIVE PAR DÉFAUT -->
+            <!-- Section Projets -->
             <section id="projects" class="app-section active">
                 <div class="section-header">
                     <div class="section-header__content">
@@ -111,7 +84,7 @@
                     </div>
                     <div class="section-header__actions">
                         <button id="create-project-btn" class="btn btn-primary" data-action="create-project-modal">
-                            <span role="img" aria-hidden="true">➕</span> Nouveau Projet
+                            ➕ Nouveau Projet
                         </button>
                     </div>
                 </div>
@@ -137,17 +110,19 @@
 
             <!-- Section Recherche -->
             <section id="search" class="app-section" style="display: none;">
-    <div id="searchContainer">
-        <form id="search-form">
-            <!-- Contenu injecté par thesis-workflow.js -->
-        </form>
-        <div id="search-results"></div>
-    </div>
-</section>
+                <div id="searchContainer">
+                    <form id="search-form">
+                        <!-- Contenu injecté par thesis-workflow.js -->
+                    </form>
+                    <div id="search-results"></div>
+                </div>
+            </section>
 
             <!-- Section Résultats -->
             <section id="results" class="app-section" style="display:none">
-                <h2>Sélection</h2>
+                <div class="section-header">
+                    <h2>Résultats de Recherche</h2>
+                </div>
                 <div id="results-list"></div>
             </section>
 
@@ -178,49 +153,48 @@
                 </div>
             </section>
 
-            <!-- Section Analyses - ESSENTIEL POUR CYPRESS -->
+            <!-- Section Analyses -->
             <section id="analyses" class="app-section" style="display: none;">
-                 <div class="section-header">
-                     <h2>Analyses du Projet</h2>
-                     <div class="analysis-controls">
-                         <button data-action="atn-analysis" class="btn btn--primary">
-                             🧠 Analyse ATN
-                         </button>
-                         <button data-action="discussion-generation" class="btn btn--secondary">
-                             💬 Discussion
-                         </button>
-                         <button data-action="knowledge-graph" class="btn btn--info">
-                             🕸️ Graphe
-                         </button>
-                         <button data-action="export-analyses" class="btn btn--success">
-                             📊 Export
-                         </button>
-                         <button data-action="show-prisma-modal" class="btn btn--info">
-                             📋 PRISMA
-                         </button>
-                         <button data-action="show-advanced-analysis-modal" class="btn btn--warning">
-                             🔬 Analyses Avancées
-                         </button>
-                     </div>
-                 </div>
+                <div class="section-header">
+                    <h2>Analyses du Projet</h2>
+                    <div class="analysis-controls">
+                        <button data-action="atn-analysis" class="btn btn--primary">
+                            🧠 Analyse ATN
+                        </button>
+                        <button data-action="discussion-generation" class="btn btn--secondary">
+                            💬 Discussion
+                        </button>
+                        <button data-action="knowledge-graph" class="btn btn--info">
+                            🕸️ Graphe
+                        </button>
+                        <button data-action="export-analyses" class="btn btn--success">
+                            📊 Export
+                        </button>
+                        <button data-action="show-prisma-modal" class="btn btn--info">
+                            📋 PRISMA
+                        </button>
+                        <button data-action="show-advanced-analysis-modal" class="btn btn--warning">
+                            🔬 Analyses Avancées
+                        </button>
+                    </div>
+                </div>
                 
                 <div id="analysisContainer">
-                    <div class="analysis-grid"> <!-- ✅ CLASSE ATTENDUE PAR LES TESTS -->
-                        <!-- Cartes d'analyse avec contenu exact attendu par les tests -->
+                    <div class="analysis-grid">
                         <div class="analysis-card analysis-card--ready">
-                            <h4>Analyse ATN Multipartite</h4> <!-- ✅ TITRE EXACT ATTENDU -->
+                            <h4>Analyse ATN Multipartite</h4>
                             <p>Génération d'scores ATN automatisés</p>
                             <button data-action="run-atn-analysis" class="btn btn-primary">Lancer</button>
                         </div>
                         
                         <div class="analysis-card analysis-card--ready">
-                            <h4>Discussion académique</h4> <!-- ✅ TITRE EXACT ATTENDU -->
+                            <h4>Discussion académique</h4>
                             <p>Génération automatique de discussion</p>
                             <button data-action="run-analysis" data-analysis-type="discussion" class="btn btn-primary">Lancer</button>
                         </div>
                         
                         <div class="analysis-card analysis-card--ready">
-                            <h4>Graphe de connaissances</h4> <!-- ✅ TITRE EXACT ATTENDU -->
+                            <h4>Graphe de connaissances</h4>
                             <p>Visualisation des relations conceptuelles</p>
                             <button data-action="run-analysis" data-analysis-type="knowledge_graph" class="btn btn-primary">Lancer</button>
                         </div>
@@ -234,23 +208,22 @@
                     </div>
                 </div>
                 
-                <!-- Conteneurs pour résultats d'analyses -->
                 <div id="atn-results" class="analysis-results" style="display: none;">
                     <h3>Résultats Analyse ATN</h3>
                     <p>Résultats de l'analyse ATN multipartite...</p>
                 </div>
 
-                <!-- État vide analyses -->
                 <div class="analysis-empty" style="display: none;">
                     <p>Veuillez sélectionner un projet pour visualiser les analyses.</p>
                 </div>
-
             </section>
-<section id="atn-analysis" class="app-section">
-    <div id="atn-analysis-container" class="atn-container">
-        <!-- Interface ATN injectée par atn-analyzer.js -->
-    </div>
-</section>
+
+            <!-- Section Analyses ATN Spécialisées -->
+            <section id="atn-analysis" class="app-section" style="display: none;">
+                <div id="atn-analysis-container" class="atn-container">
+                    <!-- Interface ATN injectée par atn-analyzer.js -->
+                </div>
+            </section>
 
             <!-- Section Import -->
             <section id="import" class="app-section" style="display: none;">
@@ -285,7 +258,7 @@
         </div>
     </main>
 
-    <!-- MODALES - ENSEMBLE UNIQUE ET COMPLET -->
+    <!-- MODALES -->
     
     <!-- Modale création de projet -->
     <div id="newProjectModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
@@ -334,8 +307,8 @@
             <div id="genericModalActions" class="modal-actions"></div>
         </div>
     </div>
-    
-    <!-- Modale détails article -->
+
+    <!-- Autres modales existantes... -->
     <div id="articleDetailModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" style="display: none;">
         <div class="modal-backdrop" data-action="close-modal"></div>
         <div class="modal-content">
@@ -352,7 +325,6 @@
         </div>
     </div>
 
-    <!-- Modale traitement par lot -->
     <div id="batchProcessModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" style="display: none;">
         <div class="modal-backdrop" data-action="close-modal"></div>
         <div class="modal-content">
@@ -363,7 +335,6 @@
             <div class="modal-body">
                 <!-- Contenu dynamique injecté par JS -->
             </div>
-            <!-- Les actions sont généralement générées par JS aussi, mais on peut en laisser pour la structure -->
             <div class="modal-actions">
                 <button type="button" class="btn btn-secondary" data-action="close-modal">Annuler</button>
                 <button type="button" class="btn btn-primary" data-action="start-batch-process">Lancer le traitement</button>
@@ -371,7 +342,6 @@
         </div>
     </div>
 
-    <!-- Modale PRISMA -->
     <div id="prismaModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
         <div class="modal-backdrop" data-action="close-modal"></div>
         <div class="modal-content modal-content--large">
@@ -387,7 +357,6 @@
                     </label>
                     <textarea class="form-control" placeholder="Notes pour cet élément..."></textarea>
                 </div>
-                <!-- Autres éléments PRISMA... -->
             </div>
             <div class="modal-actions">
                 <button type="button" class="btn btn-secondary" data-action="close-modal">Fermer</button>
@@ -397,7 +366,6 @@
         </div>
     </div>
 
-    <!-- Modale analyses avancées -->
     <div id="advancedAnalysisModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
         <div class="modal-backdrop" data-action="close-modal"></div>
         <div class="modal-content">
@@ -439,32 +407,53 @@
     <!-- Conteneur pour les toasts -->
     <div id="toastContainer" class="toast-container"></div>
 
-    <!-- Scripts d'initialisation -->
-    <script type="module" src="js/layout-optimizer.js"></script>
-    <script type="module" src="js/app-improved.js"></script>
+    <!-- Scripts d'initialisation - ORDRE CRITIQUE -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js" defer></script>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.33.0/ace.js" defer></script>
 
-    <script type="module" src="js/api-client.js"></script>
-    <script type="module" src="js/search.js"></script>
-    <script type="module" src="js/selection.js"></script>
-<!-- SCRIPT DE DIAGNOSTIC TEMPORAIRE -->
-<script>
-setTimeout(() => {
-    console.log('🔍 DIAGNOSTIC');
-    console.log('Navigation:', document.getElementById('mainNav'));
-    console.log('Boutons nav:', document.querySelectorAll('.app-nav__btn').length);
-    console.log('Sections:', document.querySelectorAll('.app-section').length);
-    console.log('Section projects visible:', !document.getElementById('projects')?.classList.contains('hidden'));
-    console.log('CSS chargés:', document.querySelectorAll('link[href*="css/"]').length);
+    <script type="module" src="js/constants.js"></script>
+    <script type="module" src="js/state.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/ui-improved.js"></script>
+    <script type="module" src="js/core.js"></script> <!-- Gère la navigation et les actions -->
+    <script type="module" src="js/projects.js"></script>
+    <script type="module" src="js/thesis-workflow.js"></script>
+    <script type="module" src="js/rob-manager.js"></script>
+    <script type="module" src="js/atn-analyzer.js"></script>
+
+    <!-- Le script principal qui lance tout -->
+    <script type="module" src="js/app-improved.js"></script>
     
-    // Forcer l'affichage de la section projects
-    const projectsSection = document.getElementById('projects');
-    if (projectsSection) {
-        projectsSection.classList.remove('hidden');
-        console.log('✅ Section projects forcée visible');
-    }
-}, 2000);
-</script>
-<script type="module" src="js/thesis-workflow.js"></script>
-<script type="module" src="js/rob-manager.js"></script>
+    <!-- Script de diagnostic final -->
+    <script>
+    // Diagnostic final après chargement
+    setTimeout(() => {
+        console.log('🔍 DIAGNOSTIC FINAL FRONTEND');
+        console.log('Header visible:', !!document.querySelector('.app-header'));
+        console.log('Navigation visible:', !!document.querySelector('.app-nav'));
+        console.log('Main visible:', !!document.querySelector('.app-main'));
+        console.log('Boutons nav:', document.querySelectorAll('.app-nav__button').length);
+        console.log('Sections:', document.querySelectorAll('.app-section').length);
+        console.log('CSS chargés:', document.querySelectorAll('link[href*="css/"]').length);
+        console.log('JS modules chargés:', document.querySelectorAll('script[type="module"]').length);
+        
+        // Vérifier que la section projets est active
+        const projectsSection = document.getElementById('projects');
+        if (projectsSection && !projectsSection.classList.contains('active')) {
+            projectsSection.classList.add('active');
+            console.log('✅ Section projects forcée active');
+        }
+        
+        // Vérifier navigation
+        const navButtons = document.querySelectorAll('.app-nav__button');
+        console.log('Boutons navigation trouvés:', navButtons.length);
+        navButtons.forEach((btn, i) => console.log(`Bouton ${i}:`, btn.textContent.trim()));
+        
+        console.log('🎯 Diagnostic terminé - Vérifiez l\'affichage');
+    }, 2000);
+    </script>
+
 </body>
 </html>

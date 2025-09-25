@@ -52,37 +52,48 @@ export const SELECTORS = {
 
 // URLs API centralisées
 export const API_ENDPOINTS = {
-    // Projects - CORRIGÉ pour correspondre au backend
-    projects: '/api/projects/',
-    projectById: (id) => `/api/projects/${id}`,
-    projectFiles: (id) => `/api/projects/${id}/files`,
-    projectExport: (id) => `/api/projects/${id}/export`,
-    projectExportThesis: (id) => `/api/projects/${id}/export/thesis`,
+    // Projects
+    projects: '/projects/',
+    projectById: (id) => `/projects/${id}`,
+    projectFiles: (id) => `/projects/${id}/files`,
+    projectExport: (id) => `/projects/${id}/export`,
+    projectExportThesis: (id) => `/projects/${id}/export/thesis`,
+    projectIndexPdfs: (id) => `/projects/${id}/index-pdfs`, // Ajout du endpoint manquant
     
-    // Search - CORRIGÉ
+    // Search
     search: '/api/search',
-    projectSearchResults: (id) => `/api/projects/${id}/search-results`,
+    projectSearchResults: (id) => `/projects/${id}/search-results`,
     
-    // Articles - CORRIGÉ
-    projectArticles: (id) => `/api/projects/${id}/articles`,
+    // Articles
+    projectArticles: (id) => `/projects/${id}/articles`,
     articlesBatchDelete: '/api/articles/batch-delete',
     
-    // Validation - NOUVEAU pour votre thèse
-    projectExtractions: (id) => `/api/projects/${id}/extractions`,
-    projectExtractionDecision: (projectId, extractionId) => `/api/projects/${projectId}/extractions/${extractionId}/decision`,
-    projectCalculateKappa: (id) => `/api/projects/${id}/calculate-kappa`,
+    // Validation
+    projectExtractions: (id) => `/projects/${id}/extractions`,
+    projectExtractionDecision: (projectId, extractionId) => `/projects/${projectId}/extractions/${extractionId}/decision`,
+    projectCalculateKappa: (id) => `/projects/${id}/calculate-kappa`,
     
-    // Grids - ESSENTIEL pour extraction
-    grids: (projectId) => `/api/projects/${projectId}/grids`,
-    gridById: (projectId, gridId) => `/api/projects/${projectId}/grids/${gridId}`,
+    // Grids
+    grids: (projectId) => `/projects/${projectId}/grids`,
+    gridById: (projectId, gridId) => `/projects/${projectId}/grids/${gridId}`,
+    gridsImport: (projectId) => `/projects/${projectId}/grids/import`, // Ajout du endpoint manquant
     
-    // Analyses - CRITIQUE pour thèse
-    projectAnalyses: (id) => `/api/projects/${id}/analyses`,
-    projectRunAnalysis: (id) => `/api/projects/${id}/run-analysis`,
-    projectExportAnalyses: (id) => `/api/projects/${id}/export/analyses`,
+    // Analyses
+    projectAnalyses: (id) => `/projects/${id}/analyses`,
+    projectRunAnalysis: (id) => `/projects/${id}/run-analysis`,
+    projectExportAnalyses: (id) => `/projects/${id}/export/analyses`,
     
+    // Chat
+    projectChatHistory: (id) => `/api/projects/${id}/chat-history`,
+    projectChat: (id) => `/api/projects/${id}/chat`,
+
     // Settings
     analysisProfiles: '/api/analysis-profiles',
+    analysisProfileById: (id) => `/api/analysis-profiles/${id}`,
+    prompts: '/api/prompts',
+    promptById: (id) => `/api/prompts/${id}`,
+    ollamaModels: '/api/ollama/models',
+    ollamaPull: '/api/ollama/pull',
     databases: '/api/databases',
     
     // Queues

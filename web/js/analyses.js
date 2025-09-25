@@ -25,69 +25,6 @@ export async function loadProjectAnalyses() {
     }
 }
 
-// Gestionnaires pour analyses
-document.addEventListener('click', (e) => { // This listener seems to be for mock/simple actions
-    const action = e.target.getAttribute('data-action');    
-    if (action === 'run-analysis') {
-        const analysisType = e.target.getAttribute('data-analysis-type');
-        
-        // Messages exacts attendus par les tests
-        const messages = {
-            'discussion': 'Tâche de génération du brouillon de discussion lancée',
-            'knowledge_graph': 'Tâche de génération du graphe de connaissances lancée',
-            'meta_analysis': 'Tâche de méta-analyse lancée',
-            'prisma_flow': 'Tâche de génération du diagramme PRISMA lancée',
-            'descriptive_stats': 'Tâche de statistiques descriptives lancée'
-        };
-        
-        const message = messages[analysisType] || 'Analyse lancée';
-        showToast(message, 'success');
-        
-        // Ajouter classe loading
-        e.target.closest('.analysis-card').classList.add('analysis-card--loading');
-    }
-    
-    if (action === 'run-atn-analysis') {
-        // ✅ CORRECTION: Validation avant lancement analyse
-        const currentProject = window.appState?.currentProject;
-        console.log('Validation run-atn-analysis:', currentProject); // Debug
-    
-        if (!currentProject || !currentProject.id) {
-            showToast('Veuillez sélectionner un projet en premier.', 'warning');
-            return;
-        }
-
-        showToast('Analyse ATN lancée', 'success');
-        e.target.closest('.analysis-card').classList.add('analysis-card--loading');
-    }
-    
-    if (action === 'show-advanced-analysis-modal') {
-        // ✅ CORRECTION: The test expects `.modal-content` to also have the `modal--show` class.
-        const modal = document.getElementById('advancedAnalysisModal');
-        if (modal) {
-            const content = modal.querySelector('.modal-content');
-            modal.classList.add('modal--show');
-            if (content) {
-                content.classList.add('modal--show');
-            }
-            openModal('advancedAnalysisModal'); // Use the existing openModal logic
-        }
-    }
-
-    if (action === 'export-prisma-report') {
-        // ✅ Implémentation de la fonction d'export
-        exportPRISMAReport();
-    }
-    
-    if (action === 'save-prisma-progress') {
-        showToast('Checklist PRISMA sauvegardée', 'success');
-    }
-
-    if (action === 'export-analyses') {
-        showToast("Préparation de l'exportation des analyses...", 'info');
-    }
-});
-
 export function renderAnalysesSection() {
     console.log('🎯 renderAnalysesSection() DÉBUT'); // Debug
     
@@ -106,7 +43,7 @@ export function renderAnalysesSection() {
     if (!project) {
         console.log('📝 Génération état vide'); // Debug
         container.innerHTML = `
-            <div class="analysis-empty">
+            <div class="placeholder analysis-empty">
                 <p>Veuillez sélectionner un projet pour visualiser les analyses.</p>
             </div>`;
         console.log('✅ État vide généré'); // Debug

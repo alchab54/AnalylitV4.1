@@ -2,8 +2,8 @@
 import { fetchAPI } from './api.js';
 import { appState, elements } from './app-improved.js';
 import { showLoadingOverlay, showModal, closeModal, escapeHtml, showToast } from './ui-improved.js'; // Corrected import
-import { loadProjectFilesSet } from './projects.js';
-import { setSearchResults, clearSelectedArticles, addSelectedArticle, removeSelectedArticle, getSelectedArticles, toggleAllArticles, setCurrentProjectExtractions, setCurrentSection } from './state.js';
+import { loadProjectFilesSet } from './projects.js'; 
+import { setSearchResults, clearSelectedArticles, addSelectedArticle, removeSelectedArticle, getSelectedArticles, toggleAllArticles, setCurrentProjectExtractions, setCurrentSection, isArticleSelected } from './state.js';
 import { loadProjectGrids } from './grids.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
@@ -26,7 +26,7 @@ export async function loadSearchResults(page = 1) {
 
     try {
         const results = await fetchAPI(API_ENDPOINTS.projectSearchResults(appState.currentProject.id) + `?page=${page}`);
-        setSearchResults(results.articles || [], results.meta || {});
+        setSearchResults(results.articles || [], results.meta || {}); // This is correct
         
         const extractions = await fetchAPI(API_ENDPOINTS.projectExtractions(appState.currentProject.id)); // This endpoint needs to be defined in constants.js
         setCurrentProjectExtractions(extractions);
@@ -45,7 +45,8 @@ export async function loadSearchResults(page = 1) {
 }
 
 export function renderSearchResultsTable() {
-    const container = document.querySelector(SELECTORS.resultsContainer);
+    // ✅ CORRECTION: The test fails because the articles are rendered in the wrong container.
+    const container = document.getElementById('results-list');
     if (!container) return;
     
     // ✅ CORRECTION : Utiliser le même sélecteur que ci-dessus
@@ -60,10 +61,13 @@ export function renderSearchResultsTable() {
 
     if (!appState.searchResults || appState.searchResults.length === 0) {
     container.innerHTML = `
-        <div class="results-empty">
-            <i class="fas fa-search fa-3x text-muted mb-3"></i>
-            <h4>Aucun article trouvé</h4>
-            <p>Lancez une recherche pour commencer à collecter des articles.</p>
+        <div class="placeholder" style="text-align: center; padding: 4rem 1rem;">
+            <div class="placeholder-icon" style="font-size: 3rem; margin-bottom: 1rem;">🤷</div>
+            <h3>Aucun résultat trouvé</h3>
+            <p style="max-width: 450px; margin: auto;">
+                Votre recherche s'est terminée sans trouver d'article. Essayez de modifier vos mots-clés ou d'utiliser le mode de recherche "Experte" pour plus de précision.
+            </p>
+            <button class="btn btn-primary" data-action="show-section" data-section-id="search" style="margin-top: 1.5rem;">Retourner à la recherche</button>
         </div>
     `;
         return;
@@ -193,10 +197,11 @@ export function updateAllRowSelections() {
 export function toggleArticleSelection(articleId) {
     // La logique de l'état est maintenant centrale, cette fonction est appelée par le listener
     // et va déclencher l'événement 'articles-selection-changed'
-    if (isArticleSelected(articleId)) removeSelectedArticle(articleId);
-    else addSelectedArticle(articleId);
-    // FIX: Appeler manuellement la mise à jour de l'UI après modification de la sélection
-    // pour activer/désactiver les boutons de traitement par lot.
+    if (isArticleSelected(articleId)) {
+        removeSelectedArticle(articleId);
+    } else {
+        addSelectedArticle(articleId);
+    }
     updateSelectionCounter();
 }
 

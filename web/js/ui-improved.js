@@ -205,11 +205,10 @@ export function showToast(message, type = 'info', duration = 5000) {
     
     // Auto-suppression
     setTimeout(() => {
-        if (toast.parentNode) {
-            toast.remove();
-            console.log('🗑️ Toast supprimé après délai'); // Debug
-        }
+        hideToast(toast); // Utiliser la fonction hideToast attendue par les tests
     }, duration);
+
+    return toast;
 }
 
 /**
