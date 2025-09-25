@@ -519,7 +519,7 @@ select.form-control, select {
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.5);
-  display: none !important; /* Assurer que les modales sont bien cachées par défaut */
+  display: none; /* Assurer que les modales sont bien cachées par défaut */
   align-items: center;
   justify-content: center;
   padding: var(--space-4);
