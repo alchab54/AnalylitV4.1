@@ -1,12 +1,12 @@
 # gunicorn.conf.py
 
+# Configuration optimisée pour 16GB RAM
 bind = "0.0.0.0:5000"
-workers = 2
-threads = 2
-worker_class = "geventwebsocket.gunicorn.workers.GeventWebSocketWorker"
-
-# Import the post_fork hook from your application
-def post_fork(server, worker):
-    # Plus besoin d'initialiser SQLAlchemy ici
-    # L'initialisation se fait déjà dans create_app()
-    pass
+workers = 2              # RÉDUIT pour éviter l'OOM
+worker_class = "gevent"  # Plus efficace en mémoire
+worker_connections = 100 # RÉDUIT de 1000 à 100
+timeout = 120           # Timeout réduit
+keepalive = 2
+max_requests = 500      # Recycler workers plus souvent
+max_requests_jitter = 50
+preload_app = True      # Partage mémoire entre workers

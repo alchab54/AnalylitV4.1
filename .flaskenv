@@ -3,18 +3,20 @@
 # NE COMMITEZ JAMAIS votre fichier .env dans Git.
 
 # --- Configuration Flask ---
-SECRET_KEY= # Générez une clé sécurisée, par exemple avec: python -c "import secrets; print(secrets.token_hex(32))"
+SECRET_KEY=a_secure_secret_key_for_development_only
 FLASK_ENV=development
+LOG_LEVEL=INFO
 
 # --- Connexions aux services Docker ---
 # Ces valeurs correspondent à celles dans docker-compose-complete.yml
-DATABASE_URL=postgresql+psycopg2://analylit_user:strong_password@db:5432/analylit_db
-REDIS_URL=redis://redis:6379/0
+DATABASE_URL=postgresql://postgres:password@localhost:5432/analylit
+REDIS_URL=redis://localhost:6379
 
 # Configuration Ollama
-OLLAMA_BASE_URL=http://ollama:11434
-OLLAMA_HOST=ollama
-OLLAMA_PORT=11434
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODELS_PATH=/tmp/ollama_models
+OLLAMA_MAX_LOADED_MODELS=1
+CUDA_VISIBLE_DEVICES=0
 
 # --- Clés API et Identifiants (à remplir) ---
 UNPAYWALL_EMAIL=
@@ -27,6 +29,21 @@ ZOTERO_GROUP_ID=
 # Clés optionnelles pour étendre la recherche
 IEEE_API_KEY=
 PUBMED_API_KEY=
+
+# --- Performance & Optimisations ---
+# Backend Performance (Ryzen 8-cores)
+WORKERS=8
+MAX_WORKERS=12
+WORKER_CONNECTIONS=1000
+WORKER_CLASS=sync
+# Python/ML Optimisations
+PYTHONPATH=/app
+NUMBA_NUM_THREADS=8
+OMP_NUM_THREADS=8
+OPENBLAS_NUM_THREADS=4
+# Node.js/NPM (16GB RAM)
+NODE_OPTIONS="--max-old-space-size=4096"
+UV_THREADPOOL_SIZE=8
 
 # ====================================================================
 # ANALYLIT v4.1 - CONFIGURATION AWS GPU g4dn.2xlarge

@@ -19,29 +19,31 @@ services:
       - ./database/postgres.conf:/usr/share/postgresql/postgresql.conf.sample
     ports:
       - "5433:5432"
-    deploy:
-      resources:
-        limits:
-          memory: 3500M # Limite stricte
-        reservations:
-          memory: 2500M # Mémoire réservée
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 1500M
+        reservations:
+          cpus: '1.0'
+          memory: 1000M
 
   redis:
     image: redis:7-alpine
     container_name: analylit_redis
-    command: redis-server --maxmemory 2gb --maxmemory-policy allkeys-lru --save 300 10
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
     deploy:
       resources:
         limits:
-          cpus: '0.50'
-          memory: 2200M
+          cpus: '0.5'
+          memory: 512M
         reservations:
-          memory: 1500M
+          cpus: '0.25'
+          memory: 256M
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -58,11 +60,12 @@ services:
       - "8080:5000"
     environment:
       - FLASK_ENV=production
-      - WAIT_HOSTS=db:5432,redis:6379
-      - WAIT_TIMEOUT=300
-      - GUNICORN_WORKERS=6    # Adapté à votre CPU (supposé 6 cœurs)
-      - GUNICORN_THREADS=4    # Plus de threads par worker
-      - GUNICORN_TIMEOUT=300  # Timeout de 5min pour les tâches longues
+      - WAIT_HOSTS=db:5432,redis:6379,ollama:11434
+      - WAIT_TIMEOUT=60
+      - WAIT_HOSTS_TIMEOUT=10
+      - GUNICORN_WORKERS=2
+      - GUNICORN_THREADS=2
+      - GUNICORN_TIMEOUT=120
       - PYTHONPATH=/home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
       - TEST_DATABASE_URL=
     env_file:
@@ -75,9 +78,10 @@ services:
         window: 120s
       resources:
         limits:
-          memory: 24000M
+          memory: 4000M
         reservations:
-          memory: 12000M
+          cpus: '1.5'
+          memory: 2000M
     # La commande est maintenant dans entrypoint.sh
     depends_on:
       base:
@@ -86,8 +90,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-      ollama:  # AJOUTER cette dépendance
-        condition: service_healthy
     
     volumes:
       # Monter les logs et les projets pour la persistance et l'accès depuis l'hôte
@@ -111,7 +113,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1000M
+          memory: 800M
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -129,7 +131,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1500M
+          memory: 1000M
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -157,7 +159,7 @@ services:
               count: 1
               capabilities: [gpu]
         limits:
-          memory: 2000M
+          memory: 1500M
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -174,23 +176,30 @@ services:
     environment:
       - OLLAMA_HOST=0.0.0.0
       - OLLAMA_ORIGINS=*
+      - CUDA_VISIBLE_DEVICES=0
+      - OLLAMA_FLASH_ATTENTION=true
+      - OLLAMA_NUM_PARALLEL=2
+      - OLLAMA_MAX_LOADED_MODELS=1
+    runtime: nvidia
     deploy:
       resources:
         limits:
-          memory: 4000M
-        reservations:
           memory: 2000M
+        reservations:
+          cpus: '1.0'
+          memory: 1000M
       restart_policy:
         condition: on-failure
         delay: 10s
-        max_attempts: 3
+        max_attempts: 5
+        window: 300s
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:11434/api/tags || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
+      interval: 45s
+      timeout: 20s
+      retries: 10
+      start_period: 120s
 
 volumes:
   postgres_data:
-  ollama_data:  # AJOUTER ce volume
+  ollama_data:
