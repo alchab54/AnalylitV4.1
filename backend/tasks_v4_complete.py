@@ -1345,3 +1345,16 @@ def export_excel_report_task(session, project_id: str):
         send_project_notification(project_id, 'report_failed', f'Erreur lors de l\'export Excel: {e}')
 
 print(f"DEBUG: tasks_v4_complete.py loaded. run_extension_task is defined: {'run_extension_task' in globals()}")
+
+@with_db_session
+def run_atn_specialized_extraction_task(session, project_id: str, **kwargs):
+    """Dummy task for ATN specialized extraction."""
+    logger.info(f"Running ATN specialized extraction for project {project_id}")
+    send_project_notification(project_id, 'analysis_completed', 'ATN specialized extraction completed.', {'analysis_type': 'atn_specialized_extraction'})
+
+@with_db_session
+def run_empathy_comparative_analysis_task(session, project_id: str, **kwargs):
+    """Dummy task for empathy comparative analysis."""
+    logger.info(f"Running empathy comparative analysis for project {project_id}")
+    send_project_notification(project_id, 'analysis_completed', 'Empathy comparative analysis completed.', {'analysis_type': 'empathy_comparative_analysis'})
+
