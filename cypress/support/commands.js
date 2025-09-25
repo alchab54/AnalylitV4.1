@@ -87,9 +87,8 @@ Cypress.Commands.add('createTestProject', (projectName = 'Projet Test Cypress') 
     .clear()
     .type(projectName, { force: true })
   
-  // Soumettre le formulaire
-  cy.get('[data-action="submit-project"]')
-    .click({ force: true })
+  // Soumettre le formulaire - utilise la méthode native du formulaire (plus robuste)
+  cy.get('#createProjectForm').submit()
   
   // Attendre la fermeture simple
   cy.get('#newProjectModal', { timeout: 8000 })
