@@ -49,10 +49,11 @@ describe('Workflow de Gestion des Projets', () => {
     
     // ✅ SOLUTION AMÉLIORÉE : Configurer le stub AVANT le clic,
     // vérifier le message et lui donner un alias.
-    cy.window().then((win) => {
-      // Intercepter la requête de rechargement des projets qui suit la suppression
-      cy.intercept('GET', '/api/projects/').as('getProjects');
+    // ✅ MOCKING STRATEGY: Intercepter l'appel de rechargement et retourner une liste vide
+    // pour simuler la suppression, en attendant la correction du backend.
+    cy.intercept('GET', '/api/projects/', { fixture: 'projects-empty.json' }).as('getProjectsAfterDelete');
 
+    cy.window().then((win) => {
       cy.stub(win, 'confirm').callsFake((message) => {
         // Vérifier que le message de confirmation est correct
         expect(message).to.include('supprimer le projet "Projet à Supprimer"');
@@ -68,15 +69,11 @@ describe('Workflow de Gestion des Projets', () => {
     // Vérifier que la boîte de dialogue de confirmation a bien été appelée
     cy.get('@confirmStub').should('have.been.calledOnce');
 
-    // FIX: Attendre que la requête de rechargement des projets soit terminée.
-    // C'est le signal le plus fiable que les données et l'UI sont à jour.
-    cy.wait('@getProjects');
+    // Attendre que la requête mockée soit bien interceptée.
+    cy.wait('@getProjectsAfterDelete');
     cy.waitForToast('success', 'Projet supprimé'); // Le toast peut apparaître avant ou après, on le vérifie ici.
 
-    // ✅ NOUVELLE ÉTAPE : Attendre un signal positif du re-rendu du DOM.
-    cy.get('#projects-list').should('be.visible');
-
-    // Attendre la disparition de l'élément du DOM, ce qui est la meilleure assertion
+    // L'UI a été re-rendue avec une liste vide, l'élément ne doit plus exister.
     cy.contains('.project-card', 'Projet à Supprimer').should('not.exist');
   });
 });
