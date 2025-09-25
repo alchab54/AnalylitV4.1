@@ -10,7 +10,11 @@ FLASK_ENV=development
 # Ces valeurs correspondent à celles dans docker-compose-complete.yml
 DATABASE_URL=postgresql+psycopg2://analylit_user:strong_password@db:5432/analylit_db
 REDIS_URL=redis://redis:6379/0
+
+# Configuration Ollama
 OLLAMA_BASE_URL=http://ollama:11434
+OLLAMA_HOST=ollama
+OLLAMA_PORT=11434
 
 # --- Clés API et Identifiants (à remplir) ---
 UNPAYWALL_EMAIL=

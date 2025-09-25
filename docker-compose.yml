@@ -86,6 +86,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      ollama:  # AJOUTER cette dépendance
+        condition: service_healthy
     
     volumes:
       # Monter les logs et les projets pour la persistance et l'accès depuis l'hôte
@@ -162,5 +164,33 @@ services:
     depends_on:
       - base
 
+  ollama:
+    image: ollama/ollama
+    container_name: analylit_ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_ORIGINS=*
+    deploy:
+      resources:
+        limits:
+          memory: 4000M
+        reservations:
+          memory: 2000M
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:11434/api/tags || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
 volumes:
   postgres_data:
+  ollama_data:  # AJOUTER ce volume
