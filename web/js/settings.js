@@ -17,7 +17,7 @@ const promptTypes = ['preprocess', 'extract', 'synthesis', 'discussion', 'rob', 
  * Appelé par app.js lors de l'initialisation.
  */
 export async function loadSettingsData() {
-    await Promise.all([
+    await Promise.allSettled([
         loadAnalysisProfiles(),
         loadPrompts(),
         loadOllamaModels(),
@@ -89,16 +89,19 @@ export function showPullModelModal() {}
  * Fonction principale pour afficher la page des paramètres.
  * --- REFACTORISÉE POUR LE RENDU DYNAMIQUE ---
  */
-export function renderSettings() {
+export async function renderSettings() {
     const container = document.querySelector(SELECTORS.settingsContainer); // Already correct
     if (!container) return;
     
+    // S'assurer que les données sont chargées avant de continuer
+    await loadSettingsData();
+
     const profiles = appState.analysisProfiles; // Read from state
     const prompts = appState.prompts; // Read from state
     const models = appState.ollamaModels; // Read from state
     const queueStatus = appState.queuesInfo;
 
-    if (!profiles || !prompts || !models || !queueStatus) {
+    if (!profiles || !prompts || !models || !queueStatus) { // This check remains as a safeguard
         container.innerHTML = `<div class="placeholder">${MESSAGES.loadingSettingsData}</div>`; // Already correct
         console.warn(MESSAGES.settingsDataNotReady); // Already correct
         return; 

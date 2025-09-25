@@ -276,7 +276,7 @@ export async function runProjectAnalysis(analysisType) {
 
     try {
         const projectId = appState.currentProject.id; // Read from state
-        const validTypes = ['discussion', 'knowledge_graph', 'prisma_flow', 'meta_analysis', 'descriptive_stats'];
+        const validTypes = ['discussion', 'knowledge_graph', 'prisma_flow', 'meta_analysis', 'descriptive_stats', 'atn_scores'];
         if (!validTypes.includes(analysisType)) {
             showToast(MESSAGES.unknownAnalysisType, 'error');
             if (card) card.classList.remove('analysis-card--loading');

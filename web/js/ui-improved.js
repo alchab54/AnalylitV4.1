@@ -539,7 +539,7 @@ export function showModal(title, contentHtml, options = {}) {
     const modal = document.getElementById('genericModal');
     const modalTitle = document.getElementById('genericModalTitle');
     const modalBody = document.getElementById('genericModalBody');
-    const modalContent = modal?.querySelector('.modal__content');
+    const modalContent = modal?.querySelector('.modal-content');
     const modalActions = document.getElementById('genericModalActions');
 
     if (!modal || !modalTitle || !modalBody || !modalContent || !modalActions) {
@@ -550,7 +550,7 @@ export function showModal(title, contentHtml, options = {}) {
     // Configurer le contenu
     modalTitle.textContent = title;
     modalBody.innerHTML = contentHtml;
-
+    
     // Classes CSS
     modalContent.className = `modal__content ${size === 'large' ? 'modal__content--large' : ''}`;
     if (modalClass) modalContent.classList.add(modalClass);
