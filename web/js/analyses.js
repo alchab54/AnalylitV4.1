@@ -89,6 +89,9 @@ document.addEventListener('click', (e) => { // This listener seems to be for moc
 });
 
 export function renderAnalysesSection() {
+    console.log('🎯 renderAnalysesSection() APPELÉE !'); // Debug
+    console.log('🎯 Projet actuel:', window.appState?.currentProject); // Debug
+    
     const container = document.getElementById('analysisContainer');
     if (!container) {
         console.error('analysisContainer not found!');

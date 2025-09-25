@@ -388,11 +388,10 @@ export function refreshCurrentSection() {
             loadRobSection();
             break;
         case 'analyses':
-            // ✅ CORRECTION: Forcer le rendu immédiatement
+            // ✅ CORRECTION CRITIQUE: Appeler renderAnalysesSection() 
+            console.log('🔧 Refreshing analyses section'); // Debug
             const { renderAnalysesSection } = await import('./analyses.js');
-            setTimeout(() => {
-                renderAnalysesSection();
-            }, 50);
+            renderAnalysesSection(); // APPEL MANQUANT !
             break;
         case 'import':
             renderImportSection(appState.currentProject); // This is correct for 'import'
