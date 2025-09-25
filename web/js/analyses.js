@@ -91,9 +91,10 @@ document.addEventListener('click', (e) => { // This listener seems to be for moc
 export function renderAnalysesSection() {
     if (!elements.analysesSection()) return; // Use elements getter
     const container = document.getElementById('analysisContainer');
-    const project = appState.currentProject;
+    if (!container) return;
 
     // ✅ CORRECTION: Afficher immédiatement l'état vide
+    const project = window.appState?.currentProject;
     if (!project) {
         container.innerHTML = `
             <div class="analysis-empty">

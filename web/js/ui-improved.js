@@ -161,54 +161,32 @@ const TOAST_DURATION = {
 /**
  * Affiche un toast avec animations et accessibilité améliorées
  */
-export function showToast(message, type = 'info', options = {}) {
-    const {
-        duration = TOAST_DURATION[type],
-        persistent = false,
-        actionLabel,
-        actionCallback,
-        id = `toast-${++toastId}`
-    } = options;
-
-    const toast = getToastFromPool();
-    toast.id = id;
-    toast.className = `toast toast--${type}`;
-    toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
-    toast.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
-
-    // Contenu principal
-    const messageElement = createToastMessage(message, type);
-    toast.innerHTML = '';
-    toast.appendChild(messageElement);
-
-    // Bouton d'action optionnel
-    if (actionLabel && actionCallback) {
-        const actionBtn = createToastAction(actionLabel, actionCallback, toast);
-        toast.appendChild(actionBtn);
-    }
-
-    // Bouton de fermeture
-    const closeButton = createToastCloseButton(toast);
-    toast.appendChild(closeButton);
-
-    // Animations et auto-fermeture
-    animateToastIn(toast);
+export function showToast(message, type = 'info', duration = 5000) {
+    // ✅ CORRECTION: Supprimer tous les toasts existants d'abord
+    const existingToasts = document.querySelectorAll('.toast');
+    existingToasts.forEach(toast => toast.remove());
     
-    if (!persistent && duration > 0) {
-        // ✅ CORRECTION: Prevent toast from auto-hiding during Cypress tests to avoid race conditions.
-        const isCypress = typeof window.Cypress !== 'undefined';
-        if (isCypress) return toast;
-        const timer = setTimeout(() => hideToast(toast), duration); // This line is now conditional
-        toast.dataset.timer = timer;
-    }
-
-    // Focus management pour l'accessibilité
-    if (type === 'error') {
-        toast.setAttribute('tabindex', '-1');
-        toast.focus();
-    }
-
-    return toast;
+    const toastId = `toast-${Date.now()}`;
+    const toast = document.createElement('div');
+    toast.id = toastId;
+    toast.className = `toast toast--${type} toast--show`;
+    
+    // ✅ Message exact - pas d'emojis ou texte supplémentaire
+    toast.innerHTML = `
+        <div class="toast-content">
+            ${message}
+        </div>
+        <button class="toast-close">×</button>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto-suppression
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    }, duration);
 }
 
 /**
