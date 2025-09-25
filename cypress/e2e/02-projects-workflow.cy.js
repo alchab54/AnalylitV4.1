@@ -2,7 +2,12 @@ describe('Workflow de Gestion des Projets', () => {
   
   beforeEach(() => {
     cy.visit('/');
+    cy.wait(1000);
+    
+    // S'assurer que la section projets est visible
     cy.get('[data-section-id="projects"]').click({ force: true });
+    cy.wait(500);
+    cy.get('#projects').should('be.visible');
   });
 
   it('Devrait ouvrir et fermer la modale de création de projet', () => {

@@ -138,6 +138,15 @@
                     <p>Consultez et filtrez les articles trouvés</p>
                 </div>
                 <div id="resultsContainer">
+                    <div class="article-actions">
+                        <button data-action="delete-selected-articles" class="btn btn--danger" disabled>
+                            🗑️ Supprimer la sélection
+                        </button>
+                        <button data-action="batch-screening" class="btn btn--primary" disabled>
+                            📋 Lancer le Screening par Lot
+                        </button>
+                    </div>
+
                     <div id="articles-list" class="articles-list">
                         <!-- Articles mockés pour les tests Cypress -->
                         <div class="article-row">
@@ -188,16 +197,29 @@
                 <div class="section-header">
                     <h2>Gestion des Analyses</h2>
                     <div class="analysis-controls">
-                        <select id="analysisMode">
-                            <option value="automatic">Automatique</option>
-                            <option value="manual">Manuel</option>
-                            <option value="hybrid">Hybride</option>
-                        </select>
+                        <button data-action="atn-analysis" class="btn btn--primary">
+                            🧠 Analyse ATN
+                        </button>
+                        <button data-action="discussion-generation" class="btn btn--secondary">
+                            💬 Discussion
+                        </button>
+                        <button data-action="knowledge-graph" class="btn btn--info">
+                            🕸️ Graphe
+                        </button>
+                        <button data-action="export-analyses" class="btn btn--success">
+                            📊 Export
+                        </button>
                     </div>
                 </div>
+                
                 <div id="analysisContainer">
                     <div id="analysis-cards-container">
-                        <!-- Cartes d'analyse seront injectées ici -->
+                        <!-- Carte d'analyse mockée -->
+                        <div class="analysis-card analysis-card--done">
+                            <h4>Analyse ATN Terminée</h4>
+                            <p>Résultats disponibles</p>
+                            <button data-action="view-analysis">Voir résultats</button>
+                        </div>
                     </div>
                 </div>
             </section>
