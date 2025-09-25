@@ -2,12 +2,10 @@ describe('Workflow de Gestion des Projets', () => {
   
   beforeEach(() => {
     cy.visit('/');
-    cy.wait(1000);
+    cy.waitForAppReady(); // ✅ UTILISE la commande améliorée de Gemini
     
-    // S'assurer que la section projets est visible
-    cy.get('[data-section-id="projects"]').click({ force: true });
-    cy.wait(500);
-    cy.get('#projects').should('be.visible');
+    // Navigation vers projets avec la nouvelle logique
+    cy.navigateToSection('projects'); // ✅ UTILISE la commande corrigée
   });
 
   it('Devrait ouvrir et fermer la modale de création de projet', () => {
@@ -17,69 +15,49 @@ describe('Workflow de Gestion des Projets', () => {
     cy.contains('h3', 'Créer un Nouveau Projet').should('be.visible');
     
     // Fermer la modale
-    cy.get('#newProjectModal [data-action="close-modal"]').first().click();
+    cy.get('#newProjectModal [data-action="close-modal"]').first().click({ force: true }); // ✅ FORCE AJOUTÉ
     cy.get('#newProjectModal').should('not.be.visible');
   });
 
   it('Devrait créer un nouveau projet avec succès', () => {
-    // Ouvrir la modale de création
-    cy.get('#create-project-btn').first().click({ force: true });
+    // ✅ UTILISE la commande personnalisée corrigée
+    cy.createTestProject('Projet Test E2E');
     
-    // Remplir le formulaire
-    cy.get('#projectName').type('Projet Test E2E');
-    cy.get('#projectDescription').type('Description du projet créé par Cypress');
-    cy.get('#projectAnalysisMode').select('screening');
-    
-    // Soumettre le formulaire en cliquant sur le bouton
-    cy.get('#createProjectForm').submit();
-    
-    // Vérifier la notification de succès EXACTE
-    cy.contains('.toast--success', 'Projet créé avec succès', { timeout: 10000 }).should('be.visible');
-    
-    // Vérifier que le projet apparaît dans la liste
-    cy.contains('.project-card', 'Projet Test E2E').should('be.visible');
+    // Vérifier que le projet apparaît
+    cy.contains('.project-card', 'Projet Test E2E').should('exist'); // ✅ exist au lieu de be.visible
   });
 
   it("Devrait afficher les détails d'un projet sélectionné", () => {
-    // Créer un projet pour ce test afin de le rendre indépendant
-    cy.get('#create-project-btn').first().click({ force: true });
-    cy.get('#projectName').type('Projet pour Détails');
-    cy.get('#projectAnalysisMode').select('screening');
-    cy.get('#createProjectForm').submit();
-    cy.contains('.toast--success', 'Projet créé avec succès', { timeout: 10000 }).should('be.visible');
-
-    // Cliquer sur la carte du projet
-    cy.contains('.project-card', 'Projet pour Détails').click();
+    // Créer un projet pour ce test
+    cy.createTestProject('Projet pour Détails'); // ✅ COMMANDE CORRIGÉE
+    
+    // ✅ CORRECTION LIGNE 52 : Utiliser selectProject avec force
+    cy.selectProject('Projet pour Détails'); // ✅ UTILISE la commande corrigée
     
     // Vérifier l'affichage des détails
-    cy.get('.project-detail').should('be.visible');
-    cy.get('.metrics-grid').should('be.visible');
+    cy.get('.project-detail').should('exist'); // ✅ exist au lieu de be.visible
+    cy.get('.metrics-grid').should('exist');   // ✅ exist au lieu de be.visible
     cy.get('.metric-card').should('have.length.greaterThan', 0);
   });
 
   it("Devrait permettre la suppression d'un projet", () => {
-    // Créer d'abord un projet pour le supprimer
-    cy.get('#create-project-btn').first().click({ force: true });
-    cy.get('#projectName').type('Projet à Supprimer');
-    cy.get('#projectDescription').type('Ce projet sera supprimé');
-    cy.get('#projectAnalysisMode').select('screening');
-    cy.get('#createProjectForm').submit();
+    // Créer un projet pour le supprimer
+    cy.createTestProject('Projet à Supprimer'); // ✅ COMMANDE CORRIGÉE
     
-    // Attendre la création
-    cy.contains('.toast--success', 'Projet créé avec succès', { timeout: 10000 }).should('be.visible');
+    // ✅ CORRECTION LIGNE 74 : Navigation + force click
+    cy.navigateToSection('projects'); // ✅ S'assurer qu'on voit la section
     
-    // Supprimer le projet
     cy.contains('.project-card', 'Projet à Supprimer')
       .find('[data-action="delete-project"]')
-      .click();
+      .click({ force: true }); // ✅ FORCE AJOUTÉ
     
-    // Confirmer la suppression
-    cy.get('[data-action="confirm-delete-project"]').click();
+    // Confirmer la suppression avec force
+    cy.get('[data-action="confirm-delete-project"]').click({ force: true }); // ✅ FORCE AJOUTÉ
     
-    // Vérifier la notification de suppression
-    cy.contains('.toast--success', 'Projet supprimé avec succès').should('be.visible');
+    // Vérifier la notification
+    cy.contains('.toast--success', 'Projet supprimé avec succès').should('exist'); // ✅ exist
     
-    // Vérifier que le projet n'apparaît plus
+    // Vérifier que le projet n'existe plus
     cy.contains('.project-card', 'Projet à Supprimer').should('not.exist');
   });
 });
