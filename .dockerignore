@@ -1,11 +1,11 @@
 # ===================================================================
-# == ANALYLIT V4.1 - DOCKERIGNORE OPTIMISÉ CYPRESS ==
+# == .dockerignore ULTRA-SÉCURISÉ - ANALYLIT v4.1 ==
 # ===================================================================
 
 # ===============================================
 # == EXCLUSIONS DE SÉCURITÉ CRITIQUES ==
 # ===============================================
-# Secrets et configurations sensibles
+# --- SECRETS CRITIQUES ---
 .env
 .env.*
 !.env.example
@@ -15,7 +15,7 @@
 *.crt
 *.csr
 
-# Données utilisateur et projets
+# --- DONNÉES UTILISATEUR ---
 projects/
 user_data/
 uploads/
@@ -25,6 +25,7 @@ backups/
 # ===============================================
 # == CACHE ET TEMPORAIRES PYTHON ==
 # ===============================================
+# --- CACHE PYTHON ---
 __pycache__/
 *.py[cod]
 *$py.class
@@ -47,7 +48,7 @@ wheels/
 *.egg
 MANIFEST
 
-# Environnements virtuels
+# --- ENVIRONNEMENTS ---
 venv/
 .venv/
 env/
@@ -56,13 +57,11 @@ ENV/
 # ===============================================
 # == OUTILS DE DÉVELOPPEMENT ==
 # ===============================================
-# Contrôle de version
+# --- OUTILS DÉVELOPPEMENT ---
 .git/
 .gitignore
 .gitattributes
 .github/
-
-# IDE et éditeurs
 .vscode/
 .idea/
 *.swp
@@ -74,38 +73,25 @@ Thumbs.db
 # ===============================================
 # == TESTS - CONFIGURATION CYPRESS OPTIMISÉE ==
 # ===============================================
-# GARDER les fichiers de configuration Cypress
-!cypress.config.js
-!cypress/
-!cypress/e2e/
-!cypress/support/
-
-# EXCLURE seulement les résultats de tests (pas la structure)
+# --- RÉSULTATS DE TESTS SEULEMENT ---
 cypress/videos/
 cypress/screenshots/
 cypress/downloads/
 reports/generated/
 test-results/
-
-# Pytest et couverture backend
-.pytest_cache/
+htmlcov/
 .coverage
 .coverage.*
-htmlcov/
+.pytest_cache/
 .tox/
 .nox/
 coverage.xml
 *.cover
 .hypothesis/
 
-# ===============================================
-# == FICHIERS VOLUMINEUX (ANTI-GB) ==
-# ===============================================
-# Documents et médias (GARDER pour les tests)
-# *.pdf     # COMMENTÉ - nécessaire pour tests
-# *.docx    # COMMENTÉ - nécessaire pour tests
+# --- FICHIERS VOLUMINEUX ---
 *.jpg
-*.jpeg  
+*.jpeg
 *.png
 *.gif
 *.bmp
@@ -119,15 +105,11 @@ coverage.xml
 *.wmv
 *.flv
 *.mkv
-
-# Audio
 *.mp3
 *.wav
 *.flac
 *.aac
 *.ogg
-
-# Archives
 *.zip
 *.tar.gz
 *.tar.xz
@@ -137,8 +119,6 @@ coverage.xml
 *.gz
 *.bz2
 *.xz
-
-# Bases de données locales
 *.sqlite
 *.sqlite3
 *.db
@@ -149,7 +129,7 @@ database/data/
 # ===============================================
 # == LOGS ET DONNÉES TEMPORAIRES ==
 # ===============================================
-# Logs application
+# --- LOGS ---
 *.log
 logs/
 log/
@@ -157,51 +137,37 @@ tmp/
 temp/
 .tmp/
 
-# Cache modèles IA
+# --- CACHE MODÈLES ---
 model_cache/
 .ollama/
 huggingface_cache/
 transformers_cache/
-
-# Cache système
 .cache/
-__pycache__/
 .mypy_cache/
 .ruff_cache/
 
 # ===============================================
 # == EXCEPTIONS IMPORTANTES ==
 # ===============================================
-# Garder les fichiers Docker essentiels
+# --- GARDER LES ESSENTIELS ---
 !docker/
 !Dockerfile*
 !docker-compose*
-
-# Garder les configurations essentielles
 !requirements.txt
 !package.json
 !package-lock.json
-
-# Garder la documentation critique
 !README.md
 !docs/
-
-# Garder les configurations de profils IA
 !backend/config/profiles.json
 !backend/config/grille-ATN.json
-
-# Garder les migrations de base de données
 !migrations/
 !database/init-user-db.sql
+!backend/config/
 
-# === CYPRESS CONFIGURATION COMPLÈTE ===
-# Garder TOUS les fichiers de test Cypress
-!cypress/e2e/**/*.cy.js
-!cypress/support/e2e.js
-!cypress/support/commands.js
+# --- GARDER CYPRESS STRUCTURE ---
 !cypress.config.js
+!cypress/support/
+!cypress/e2e/
+!cypress/fixtures/
 !jest.config.cjs
-
-# Garder les tests Jest
 !web/js/**/*.test.js
-!web/js/tests/
