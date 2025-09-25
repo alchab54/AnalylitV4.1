@@ -44,8 +44,8 @@ Cypress.Commands.add('waitForAppReady', () => {
   cy.get('.app-header', { timeout: 8000 }).should('be.visible')
   cy.get('.app-nav', { timeout: 8000 }).should('be.visible')
 
-  // Remplacer l'attente statique par une attente d'un élément clé dans le contenu.
-  // Par exemple, attendre que la liste des projets ou un message "aucun projet" apparaisse.
+  // Optimisation : Attendre que le contenu principal (liste de projets ou état vide) soit chargé,
+  // ce qui est plus fiable qu'une attente statique ou une simple vérification de visibilité.
   cy.get('.app-content', { timeout: 15000 }).within(() => {
     cy.get('.project-list-container, .empty-state').should('exist');
   });
