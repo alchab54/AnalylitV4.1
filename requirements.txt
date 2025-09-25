@@ -1,64 +1,74 @@
-#--- Framework Web ---
+# ===================================================================
+# == ANALYLIT V4.1 - REQUIREMENTS CORRIGÉ ==
+# ===================================================================
+
+# --- Framework Web ---
 Flask==3.0.0
 Flask-SQLAlchemy==3.1.1
 Flask-Migrate>=3.1.0
-pytest-cov
-Flask-Cors
+Flask-Cors==4.0.0
 Flask-SocketIO==5.3.6
 gunicorn==21.2.0
 gevent==23.7.0
 gevent-websocket==0.10.1
 
-#--- Base de Données & Tâches de Fond ---
+# --- Base de Données & Tâches de Fond ---
 redis==5.0.1
 rq==1.16.1
 SQLAlchemy==2.0.23
 psycopg2-binary==2.9.9
 
-#--- Stack Scientifique & Analyse de Données ---
+# --- Stack Scientifique & Analyse de Données ---
 numpy==1.26.4
 pandas==2.2.2
 scipy==1.13.0
 matplotlib==3.7.2
 scikit-learn==1.3.2
-seaborn
-openpyxl # <-- AJOUTÉ (Requis pour l'export Excel de la thèse)
+seaborn==0.13.2
+openpyxl==3.1.2
 
-#--- IA & NLP ---
+# --- IA & NLP ---
 sentence-transformers==2.7.0
 chromadb==0.4.22
 onnxruntime==1.17.1
 pydantic==2.5.3
 
-#--- Utilitaires ---
+# --- Utilitaires ---
 PyPDF2==3.0.1
 requests==2.31.0
 python-dotenv==1.0.0
 beautifulsoup4==4.12.2
 lxml==5.2.2
-Pillow==10.3.0 # Requis par pdf2image
-PyMuPDF==1.24.1 # Pour fitz
-pdfplumber==0.11.0 # Pour l'analyse de layout
-pdf2image==1.17.0 # Pour l'OCR
+Pillow==10.3.0
+PyMuPDF==1.24.1
+pdfplumber==0.11.0
+pdf2image==1.17.0
 blinker==1.7.0
 pydantic-settings==2.1.0
 pytesseract==0.3.10
 werkzeug==3.0.1
-pyzotero 
-click 
-#--- Outils de Build & Dépendances Correctives ---
+pyzotero==1.5.18
+click==8.1.7
 setuptools>=65.0.0
 wheel>=0.38.0
-async_timeout
+async_timeout==4.0.3
 feedparser==6.0.11
 
-#--- Testing ---
+# --- Testing CRITIQUE ---
 pytest==7.4.3
-pytest-mock==3.10.0
+pytest-mock==3.10.0        # ✅ FIXTURE mocker
+pytest-cov==4.1.0          # ✅ Coverage
+pytest-asyncio==0.21.1     # ✅ Async support
 
-# === DÉPENDANCES AJOUTÉES POUR LES TESTS AVANCÉS ===
+# --- Tests Avancés ---
 selenium==4.21.0
 locust==2.27.0
 
-# --- PyTorch (version CPU-only pour compatibilité) ---
-torch==2.3.1
+# --- PyTorch CPU CORRIGÉ ---
+torch==2.3.1              # ✅ SYNTAXE RÉPARÉE !
+torchvision==0.18.1       # ✅ AJOUTÉ pour compatibilité
+torchaudio==2.3.1         # ✅ AJOUTÉ pour compatibilité
+
+# --- Configuration PyTest ---
+pytest-xdist==3.5.0       # ✅ Tests parallèles
+pytest-timeout==2.2.0     # ✅ Timeout des tests
