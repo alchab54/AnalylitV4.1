@@ -125,24 +125,33 @@ describe('Workflow de Gestion des Analyses', () => {
   });
 
   it('Devrait permettre de supprimer une analyse', () => {
-    // Lancer une analyse pour avoir quelque chose à supprimer
-    cy.get('.analysis-card').contains('h4', 'Analyse ATN Multipartite').parents('.analysis-card').within(() => {
-      cy.get('[data-action="run-atn-analysis"]').click({ force: true });
-    });
-    cy.waitForToast('success', 'Analyse ATN lancée');
+    const analysisCardSelector = '.analysis-card:has([data-action="delete-analysis"])';
+    const analysisToDelete = {
+      cardTitle: 'Analyse ATN Multipartite',
+      deleteSelector: '[data-action="delete-analysis"][data-analysis-type="atn_scores"]',
+      analysisType: 'atn_scores'
+    };
 
-    // Cliquer sur le bouton de suppression de l'analyse ATN
-    cy.get('.analysis-card').contains('h4', 'Analyse ATN Multipartite').parents('.analysis-card').within(() => {
-      cy.get('[data-action="delete-analysis"][data-analysis-type="atn_scores"]').click({ force: true });
-    });
+    cy.get('body').then($body => {
+      // Si aucune analyse n'est déjà prête à être supprimée, on en lance une.
+      if ($body.find(analysisCardSelector).length === 0) {
+        cy.log('Aucune analyse à supprimer. Lancement de l\'analyse ATN pour le test.');
+        cy.get('.analysis-card').contains('h4', analysisToDelete.cardTitle).parents('.analysis-card').within(() => {
+          cy.get('[data-action="run-atn-analysis"]').click({ force: true });
+        });
+        cy.waitForToast('success', 'Analyse ATN lancée');
+        // Attendre que la carte soit en état de chargement/terminé pour que le bouton de suppression apparaisse
+        cy.get('.analysis-card').contains('h4', analysisToDelete.cardTitle).parents('.analysis-card').should('have.class', 'analysis-card--loading');
+      }
 
-    // Confirmer la suppression (Cypress gère les alertes/confirms natifs)
-    cy.on('window:confirm', (str) => {
-      expect(str).to.include(`Êtes-vous sûr de vouloir supprimer les résultats de l'analyse atn_scores`);
-      return true;
-    });
+      // Cliquer sur le bouton de suppression
+      cy.get('.analysis-card').contains('h4', analysisToDelete.cardTitle).parents('.analysis-card').find(analysisToDelete.deleteSelector).click({ force: true });
 
-    cy.waitForToast('success', `Résultats de l'analyse atn_scores supprimés avec succès.`);
-    cy.get('.analysis-card').contains('h4', 'Analyse ATN Multipartite').parents('.analysis-card').find('[data-action="run-atn-analysis"]').should('be.visible');
+      // Confirmer la suppression
+      cy.on('window:confirm', (str) => expect(str).to.include(`supprimer les résultats de l'analyse ${analysisToDelete.analysisType}`));
+
+      cy.waitForToast('success', `Résultats de l'analyse ${analysisToDelete.analysisType} supprimés avec succès.`);
+      cy.get('.analysis-card').contains('h4', analysisToDelete.cardTitle).parents('.analysis-card').find('[data-action="run-atn-analysis"]').should('be.visible');
+    });
   });
 });
