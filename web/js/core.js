@@ -440,12 +440,12 @@ export function getStatusClass(status) {
  */
 function handleSectionChange(event) {
     const { currentSection } = event.detail;
-    const sections = document.querySelectorAll('.section');
+    const sections = document.querySelectorAll('.app-section');
     const navButtons = document.querySelectorAll('.app-nav__button');
 
     sections.forEach(section => {
-        section.classList.toggle('section--active', section.id === currentSection);
-        section.setAttribute('aria-hidden', section.id === currentSection ? 'false' : 'true');
+        section.style.display = section.id === currentSection ? 'block' : 'none';
+        section.classList.toggle('active', section.id === currentSection);
     });
 
     navButtons.forEach(btn => {

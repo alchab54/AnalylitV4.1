@@ -2,21 +2,24 @@ describe('Workflow de Gestion des Articles', () => {
   
   beforeEach(() => {
     cy.visit('/');
+    cy.wait(1000); // Attendre le chargement complet
     
     // S'assurer qu'un projet est sélectionné
-    cy.get('[data-section-id="projects"]').click({ force: true });
-    cy.window().then((win) => {
-      cy.log('appState.projects length:', win.AnalyLit.appState.projects.length);
-    });
-    cy.get('.project-card').first().click({ force: true });
+    cy.get('.project-card').first().click();
+    cy.wait(500);
     
-    // Naviguer vers les résultats
+    // Utiliser force: true pour éviter les conflits de superposition
     cy.get('[data-section-id="results"]').click({ force: true });
+    cy.wait(500);
+    
+    cy.get('#resultsContainer').should('be.visible');
   });
 
   it('Devrait afficher la liste des articles du projet sélectionné', () => {
     cy.get('#resultsContainer').should('be.visible');
-    cy.get('#article-table-body').should('be.visible');
+    // Le test doit maintenant vérifier la nouvelle structure avec .article-row
+    cy.get('#articles-list').should('be.visible');
+    cy.get('.article-row').should('have.length.greaterThan', 0);
   });
 
   it("Devrait permettre la sélection multiple d'articles", () => {
