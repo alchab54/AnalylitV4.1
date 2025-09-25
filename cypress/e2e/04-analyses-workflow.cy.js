@@ -9,14 +9,14 @@ describe('Workflow de Gestion des Analyses', () => {
         cy.get('[data-action="create-project-modal"]').click({ force: true });
         cy.get('#projectName').type('Projet pour Analyses E2E');
         cy.get('#projectDescription').type("Description du projet pour les tests d'analyses");
-        cy.get('#projectAnalysisMode').select('screening');
-        cy.get('form[data-form="create-project"]').submit();
+        cy.get('#projectAnalysisMode').select('full');
+        cy.get('#createProjectForm').submit();
         cy.wait(1000);
         cy.contains('.toast--success', 'Projet créé avec succès').should('be.visible');
       }
     });
     cy.get('.project-card').first().click({ force: true }); // Sélectionne le premier projet disponible
-    
+
     // Naviguer vers la section Analyses
     cy.get('[data-section-id="analyses"]').click({ force: true });
     cy.get('#analysisContainer').should('be.visible');

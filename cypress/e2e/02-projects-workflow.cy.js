@@ -26,7 +26,7 @@ describe('Workflow de Gestion des Projets', () => {
     cy.get('#projectAnalysisMode').select('screening');
     
     // Soumettre le formulaire en cliquant sur le bouton
-    cy.get('form[data-action="create-project"]').find('button[type="submit"]').click();
+    cy.get('#createProjectForm').submit();
     
     // Vérifier la notification de succès EXACTE
     cy.contains('.toast--success', 'Projet créé avec succès', { timeout: 10000 }).should('be.visible');
@@ -40,7 +40,7 @@ describe('Workflow de Gestion des Projets', () => {
     cy.get('#create-project-btn').first().click({ force: true });
     cy.get('#projectName').type('Projet pour Détails');
     cy.get('#projectAnalysisMode').select('screening');
-    cy.get('form[data-action="create-project"]').find('button[type="submit"]').click();
+    cy.get('#createProjectForm').submit();
     cy.contains('.toast--success', 'Projet créé avec succès', { timeout: 10000 }).should('be.visible');
 
     // Cliquer sur la carte du projet
@@ -58,7 +58,7 @@ describe('Workflow de Gestion des Projets', () => {
     cy.get('#projectName').type('Projet à Supprimer');
     cy.get('#projectDescription').type('Ce projet sera supprimé');
     cy.get('#projectAnalysisMode').select('screening');
-    cy.get('form[data-action="create-project"]').find('button[type="submit"]').click();
+    cy.get('#createProjectForm').submit();
     
     // Attendre la création
     cy.contains('.toast--success', 'Projet créé avec succès', { timeout: 10000 }).should('be.visible');

@@ -138,8 +138,28 @@
                 </div>
                 <div id="resultsContainer">
                     <div id="articles-list" class="articles-list">
-                        <!-- Articles avec checkboxes pour Cypress -->
+                        <!-- Articles mockés pour les tests Cypress -->
+                        <div class="article-row" data-article-id="1">
+                            <input type="checkbox" class="article-checkbox" value="1">
+                            <span class="article-title">Intelligence Artificielle en Santé - Revue Systématique</span>
+                            <span class="article-authors">Dupont, J. et al. (2024)</span>
+                        </div>
+                        <div class="article-row" data-article-id="2">
+                            <input type="checkbox" class="article-checkbox" value="2">
+                            <span class="article-title">Méthodologie ATN pour Revues de Littérature</span>
+                            <span class="article-authors">Martin, A. et al. (2024)</span>
+                        </div>
+                        <div class="article-row" data-article-id="3">
+                            <input type="checkbox" class="article-checkbox" value="3">
+                            <span class="article-title">Applications IA dans la Recherche Médicale</span>
+                            <span class="article-authors">Bernard, C. et al. (2023)</span>
+                        </div>
                     </div>
+                    <div class="empty-state" style="display: none;">
+                        <h3>Aucun article trouvé</h3>
+                        <p>Lancez une recherche pour afficher des résultats.</p>
+                    </div>
+                    <table id="article-table-body"></table> <!-- Gardé pour la compatibilité avec le test existant -->
                     <div class="empty-state" style="display: none;">
                         <h3>Aucun article trouvé</h3>
                         <p>Lancez une recherche pour afficher des résultats.</p>
