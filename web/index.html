@@ -29,6 +29,7 @@
    <link rel="stylesheet" href="css/navigation-fix.css">
    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/thesis-essentials.css">
 </head>
 <body>
     <script type="module">
@@ -129,13 +130,14 @@
             </section>
 
             <!-- Section Recherche -->
-            <section id="search" class="app-section" style="display:none">
-                <form id="search-form">
-                    <input name="query" placeholder="Mots-clés, DOI, PMID..." required />
-                    <button type="submit">Chercher</button>
-                </form>
-                <div id="search-results"></div>
-            </section>
+            <section id="search" class="app-section" style="display: none;">
+    <div id="searchContainer">
+        <form id="search-form">
+            <!-- Contenu injecté par thesis-workflow.js -->
+        </form>
+        <div id="search-results"></div>
+    </div>
+</section>
 
             <!-- Section Résultats -->
             <section id="results" class="app-section" style="display:none">
@@ -446,5 +448,6 @@ setTimeout(() => {
     }
 }, 2000);
 </script>
+<script type="module" src="js/thesis-workflow.js"></script>
 </body>
 </html>

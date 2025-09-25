@@ -150,8 +150,28 @@ async function initializeApplication() {
         // Chargement des données initiales
         await loadInitialData();
         
-        // Laisser app-nav.js gérer l'affichage des sections
-console.log('🎯 Sections gérées par app-nav.js');
+        // Affichage de la section par défaut - CORRECTION CRITIQUE
+        try {
+            // Forcer l'affichage de la section projets au démarrage
+            const projectsSection = document.getElementById('projects');
+            const navButtons = document.querySelectorAll('.app-nav__button');
+            
+            if (projectsSection) {
+                projectsSection.style.display = 'block';
+                projectsSection.classList.add('active');
+            }
+            
+            // Activer le bouton projets
+            navButtons.forEach(btn => {
+                if (btn.dataset.sectionId === 'projects') {
+                    btn.classList.add('app-nav__button--active');
+                }
+            });
+            
+            console.log('🎯 Section projets activée par défaut');
+        } catch (error) {
+            console.error('Erreur initialisation section:', error);
+        }
         
         const endTime = performance.now();
         console.log(`✅ Application initialisée en ${(endTime - startTime).toFixed(2)}ms`);
