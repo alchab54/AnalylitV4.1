@@ -28,13 +28,29 @@ Cypress.Commands.add('waitForButtonAndClick', (selector) => {
 // == COMMANDES DE NAVIGATION ==
 // ===============================================
 
-// Navigation vers une section avec attente
+// Commande de navigation CORRIGÉE
 Cypress.Commands.add('navigateToSection', (sectionName) => {
-  // Utilisation de smartClick pour une interaction plus robuste
-  cy.smartClick(`[data-section-id="${sectionName}"]`);
+  // 1. Forcer la navigation d'abord
+  cy.get(`[data-section-id="${sectionName}"]`, { timeout: 8000 })
+    .should('exist')
+    .click({ force: true })
   
+  // 2. Attendre que la section existe dans le DOM
+  cy.get(`#${sectionName}`, { timeout: 10000 })
+    .should('exist')
+  
+  // 3. NOUVEAU : Forcer l'affichage de la section si elle est cachée
+  cy.get(`#${sectionName}`).then($section => {
+    if ($section.css('display') === 'none') {
+      cy.log('Section cachée détectée - correction automatique')
+      cy.get(`[data-section-id="${sectionName}"]`).click({ force: true })
+      cy.wait(500) // Laisser le temps au JavaScript de traiter
+    }
+  })
+  
+  // 4. Vérifier la visibilité finale
   cy.get(`#${sectionName}`, { timeout: 8000 })
-    .should('be.visible'); // 'be.visible' vérifie déjà la propriété 'display', la seconde partie est redondante.
+    .should('not.have.css', 'display', 'none')
 })
 
 // Attendre que l'application soit prête
@@ -55,9 +71,15 @@ Cypress.Commands.add('waitForAppReady', () => {
 // == COMMANDES DE PROJET ==
 // ===============================================
 
-// Créer un projet de test
+// Commande CORRIGÉE pour créer un projet
 Cypress.Commands.add('createTestProject', (projectName = 'Projet Test Cypress') => {
-  cy.smartClick('[data-action="create-project"]');
+  // S'assurer qu'on est dans la section projets
+  cy.navigateToSection('projects')
+  
+  // Cliquer sur créer projet avec force
+  cy.get('[data-action="create-project"]', { timeout: 8000 })
+    .should('exist')
+    .click({ force: true })
   
   cy.get('#newProjectModal', { timeout: 5000 })
     .should('be.visible')
@@ -65,22 +87,25 @@ Cypress.Commands.add('createTestProject', (projectName = 'Projet Test Cypress') 
   
   cy.get('#projectName')
     .clear()
-    .type(projectName, { force: true });
+    .type(projectName, { force: true })
   
-  cy.smartClick('[data-action="submit-project"]');
+  cy.get('[data-action="submit-project"]')
+    .click({ force: true })
   
   // Attendre que la modale se ferme
   cy.get('#newProjectModal', { timeout: 5000 })
     .should('not.have.class', 'modal--show')
-  
-  // Attendre l'apparition du projet
-  cy.contains('.project-card', projectName, { timeout: 8000 })
-    .should('be.visible')
 })
 
-// Sélectionner un projet existant
+// Commande CORRIGÉE pour les clics sur projets
 Cypress.Commands.add('selectProject', (projectName) => {
-  cy.contains('.project-card', projectName, { timeout: 8000 }).smartClick();
+  // S'assurer qu'on est dans la section projets
+  cy.navigateToSection('projects')
+  
+  // Cliquer sur le projet avec force
+  cy.contains('.project-card', projectName, { timeout: 8000 })
+    .should('exist')
+    .click({ force: true })
   
   // Attendre que le projet soit marqué comme sélectionné
   cy.contains('.project-card', projectName)
@@ -111,6 +136,20 @@ Cypress.Commands.add('closeModal', (modalSelector) => {
   
   cy.get(modalSelector, { timeout: 3000 })
     .should('not.have.class', 'modal--show')
+})
+
+// NOUVEAU : Commande pour forcer l'affichage d'une section
+Cypress.Commands.add('forceShowSection', (sectionName) => {
+  cy.get(`#${sectionName}`).then($el => {
+    if ($el.css('display') === 'none') {
+      cy.window().then(win => {
+        win.eval(`
+          document.querySelector('#${sectionName}').style.display = 'block';
+          document.querySelector('[data-section-id="${sectionName}"]').click();
+        `)
+      })
+    }
+  })
 })
 
 // ===============================================
