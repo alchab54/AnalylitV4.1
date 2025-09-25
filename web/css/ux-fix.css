@@ -3,6 +3,7 @@
 
 /* ==========================================================================
    🔥 CORRECTIONS CRITIQUES - TRANSFORMATION IMMÉDIATE
+   CORRECTION VISIBILITÉ MODALES
    ========================================================================== */
 
 /* Base Font Scaling - DOUBLE LA TAILLE DU TEXTE */
@@ -163,13 +164,10 @@ body, p, .card__body, .section-header p {
 @media (max-width: 768px) {
   /* Navigation scroll hint */
   .app-nav::after {
-    content: "← Faire défiler →";
-    display: block;
+    content: "← Faire défiler le menu →";
     text-align: center;
     font-size: 0.75rem;
     color: var(--color-text-muted, #94a3b8);
-    padding: 0.25rem;
-    background: var(--color-background-tertiary, #f1f5f9);
   }
   
   /* Section headers stack */
@@ -391,3 +389,7 @@ th, td {
   }
 }
 
+/* Règle corrigée et simplifiée pour afficher les modales */
+.modal.modal--show {
+    display: block;
+}

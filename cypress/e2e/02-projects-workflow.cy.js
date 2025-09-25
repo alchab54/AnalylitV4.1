@@ -50,6 +50,9 @@ describe('Workflow de Gestion des Projets', () => {
     // ✅ SOLUTION AMÉLIORÉE : Configurer le stub AVANT le clic,
     // vérifier le message et lui donner un alias.
     cy.window().then((win) => {
+      // Intercepter la requête de rechargement des projets qui suit la suppression
+      cy.intercept('GET', '/api/projects/').as('getProjects');
+
       cy.stub(win, 'confirm').callsFake((message) => {
         // Vérifier que le message de confirmation est correct
         expect(message).to.include('supprimer le projet "Projet à Supprimer"');
@@ -64,6 +67,11 @@ describe('Workflow de Gestion des Projets', () => {
 
     // Vérifier que la boîte de dialogue de confirmation a bien été appelée
     cy.get('@confirmStub').should('have.been.calledOnce');
+
+    // FIX: Attendre que la requête de rechargement des projets soit terminée.
+    // C'est le signal le plus fiable que les données et l'UI sont à jour.
+    cy.wait('@getProjects');
+    cy.waitForToast('success', 'Projet supprimé'); // Le toast peut apparaître avant ou après, on le vérifie ici.
 
     // Attendre la disparition de l'élément du DOM, ce qui est la meilleure assertion
     cy.contains('.project-card', 'Projet à Supprimer').should('not.exist');

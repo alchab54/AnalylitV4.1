@@ -184,11 +184,10 @@ services:
     runtime: nvidia
     deploy:
       resources:
-        limits:
-          memory: 2000M
         reservations:
+          # FIX: Augmenter la mémoire réservée pour Ollama pour éviter les crashs en mode VRAM faible.
+          memory: 4000M
           cpus: '1.0'
-          memory: 1000M
       restart_policy:
         condition: on-failure
         delay: 10s

@@ -115,12 +115,14 @@ async function selectProject(projectId) {
 /**
  * Supprime un projet.
  */
-function deleteProject(projectId, projectName) {
+async function deleteProject(projectId, projectName) {
     if (!projectId) return;
 
     const confirmMessage = `Êtes-vous sûr de vouloir supprimer le projet "${projectName}" ? Cette action est irréversible.`;
     if (window.confirm(confirmMessage)) {
-        confirmDeleteProject(projectId);
+        // FIX: Await the confirmation logic to ensure the test waits correctly.
+        // The API call and UI refresh will now happen *after* the confirm dialog is handled.
+        await confirmDeleteProject(projectId);
     }
 }
 
@@ -132,19 +134,14 @@ async function confirmDeleteProject(projectId) {
     closeModal(); // Ferme la modale de confirmation
     
     try {
+        // Perform the API call first.
         await fetchAPI(API_ENDPOINTS.projectById(projectId), { method: 'DELETE' });
+
+        // Now show the toast.
         showToast(MESSAGES.projectDeleted, 'success');
         
-        // Mettre à jour l'état localement pour une UI plus réactive
-        const updatedProjects = appState.projects.filter(p => p.id !== projectId);
-        setProjects(updatedProjects);
-
-        if (appState.currentProject?.id === projectId) {
-            setCurrentProject(null);
-        }
-        
-        renderProjectsList();
-        renderProjectDetail(appState.currentProject);
+        // Finally, reload the project list to update the UI.
+        await loadProjects();
     } catch (e) {
         showError(`Erreur lors de la suppression: ${e.message}`);
     } finally {

@@ -383,6 +383,7 @@ def create_app(config=None):
         session.query(RiskOfBias).filter_by(project_id=project_id).delete()
         session.delete(project)
         session.commit()
+        socketio.emit('project_deleted', {'project_id': project_id})
         return jsonify({"message": "Projet supprimé"}), 200
 
     # ==================== ROUTES API SEARCH ====================

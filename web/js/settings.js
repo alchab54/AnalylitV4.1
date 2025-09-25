@@ -60,8 +60,24 @@ export async function loadOllamaModels() {
         const models = await fetchAPI(API_ENDPOINTS.ollamaModels);
         setOllamaModels(models.models || []); // Assuming response.models contains the array
     } catch (error) {
-        console.error('Erreur chargement modèles:', error);
+        console.error('Erreur chargement modèles Ollama:', error);
+        displayOllamaConnectionError();
         setOllamaModels([]);
+    }
+}
+
+/**
+ * Affiche une alerte dans l'interface si la connexion à Ollama échoue.
+ */
+function displayOllamaConnectionError() {
+    const container = document.querySelector(SELECTORS.settingsContainer);
+    if (container && !container.querySelector('.ollama-error-alert')) {
+        const errorHtml = `
+            <div class="alert alert--warning ollama-error-alert" style="margin-bottom: 1rem;">
+                <h4>Connexion à Ollama échouée</h4>
+                <p>Impossible de joindre le service Ollama. Assurez-vous qu'il est bien démarré sur votre machine (commande: <code>ollama serve</code>) et accessible par le backend.</p>
+            </div>`;
+        container.insertAdjacentHTML('afterbegin', errorHtml);
     }
 }
 
@@ -876,7 +892,8 @@ export async function loadInstalledModels() {
             )
             .join('');
     } catch (error) {
-        console.error('Erreur chargement modèles :', error);
+        console.error('Erreur chargement modèles installés :', error);
+        // L'erreur est déjà gérée et affichée par loadOllamaModels, pas besoin de la dupliquer ici.
     }
 }
 

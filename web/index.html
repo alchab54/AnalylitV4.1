@@ -138,13 +138,17 @@
                     <p>Consultez et filtrez les articles trouvés</p>
                 </div>
                 <div id="resultsContainer">
-                    <div class="article-actions">
-                        <button data-action="delete-selected-articles" class="btn btn--danger" disabled>
-                            🗑️ Supprimer la sélection
+                    <div class="results-actions">
+                        <button class="btn btn--secondary" id="selectAllBtn" data-action="select-all-articles">Tout sélectionner</button>
+                        <button class="btn btn--primary" 
+                                data-action="batch-process-modal"
+                                disabled>
+                            Traiter la sélection
                         </button>
-                        <!-- CORRECTION: data-action mis à jour pour correspondre aux tests et au JS dynamique -->
-                        <button data-action="batch-process-modal" class="btn btn--primary" disabled>
-                            📋 Traitement par Lot
+                        <button class="btn btn--danger" 
+                                data-action="delete-selected-articles"
+                                disabled>
+                            Supprimer sélection
                         </button>
                     </div>
 

@@ -208,6 +208,9 @@ export function toggleArticleSelection(articleId) {
     // et va déclencher l'événement 'articles-selection-changed'
     if (isArticleSelected(articleId)) removeSelectedArticle(articleId);
     else addSelectedArticle(articleId);
+    // FIX: Appeler manuellement la mise à jour de l'UI après modification de la sélection
+    // pour activer/désactiver les boutons de traitement par lot.
+    updateSelectionCounter();
 }
 
 export function selectAllArticles(shouldSelect) {
@@ -261,7 +264,7 @@ export async function viewArticleDetails(articleId) {
     // Utiliser la modale dédiée #articleDetailModal
     const modalContent = document.getElementById('articleDetailContent');
     if (modalContent) modalContent.innerHTML = content;
-    openModal('articleDetailModal');
+    showModal('articleDetailModal'); // FIX: Use showModal to correctly add the --show class
 }
 
 export async function handleDeleteSelectedArticles() {
@@ -328,8 +331,8 @@ export function showBatchProcessModal() {
 
     // Utiliser la modale dédiée #batchProcessModal
     const modal = document.getElementById('batchProcessModal');
-    if (modal) modal.querySelector('.modal-body').innerHTML = content;
-    openModal('batchProcessModal');
+    if (modal) modal.querySelector('.modal-body').innerHTML = content; // Keep this for content injection
+    showModal('batchProcessModal'); // FIX: Use showModal to correctly add the --show class
 }
 
 export async function startBatchProcessing() {
@@ -457,5 +460,11 @@ document.addEventListener('click', (e) => {
     if (e.target.getAttribute('data-action') === 'start-batch-screening') {
         document.getElementById('batchProcessModal').classList.remove('modal--show');
         showToast('Tâche de screening lancée avec succès', 'success');
+    }
+
+    // Gestionnaire pour afficher les détails de l'article
+    if (e.target.getAttribute('data-action') === 'view-details') {
+        const articleId = e.target.getAttribute('data-article-id');
+        if (articleId) viewArticleDetails(articleId);
     }
 });

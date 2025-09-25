@@ -357,6 +357,13 @@ export function initializeWebSocket() {
             }
         });
 
+        appState.socket.on('project_deleted', (data) => {
+            console.log('Project deleted event received, waiting 500ms to refresh', data);
+            setTimeout(() => {
+                loadProjects();
+            }, 500);
+        });
+
     } catch (e) {
         console.error(MESSAGES.websocketError, e);
         if (elements.connectionStatus()) elements.connectionStatus().textContent = '❌';
