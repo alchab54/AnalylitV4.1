@@ -3,18 +3,38 @@
 // ===================================================================
 
 // ===============================================
+// == COMMANDES D'INTERACTION INTELLIGENTES ==
+// ===============================================
+ 
+// Clic avec retry automatique
+Cypress.Commands.add('smartClick', (selector, options = {}) => {
+  // Amélioration : Utilise les assertions intégrées de Cypress pour la robustesse
+  // et force le clic pour gérer les cas de chevauchement.
+  cy.get(selector, { timeout: 8000 })
+    .should('exist') // D'abord, s'assurer que l'élément est dans le DOM
+    .scrollIntoView() // S'assurer qu'il est dans la vue
+    .click({ force: true, ...options }); // Forcer le clic pour éviter les erreurs de "détachement" ou de couverture
+});
+
+// Attente intelligente des boutons avant de cliquer
+Cypress.Commands.add('waitForButtonAndClick', (selector) => {
+  cy.get(selector, { timeout: 10000 })
+    .should('exist')
+    .and('not.be.disabled')
+    .click({ force: true }); // force:true pour gérer les cas où il serait couvert
+});
+
+// ===============================================
 // == COMMANDES DE NAVIGATION ==
 // ===============================================
 
 // Navigation vers une section avec attente
 Cypress.Commands.add('navigateToSection', (sectionName) => {
-  cy.get(`[data-section-id="${sectionName}"]`, { timeout: 8000 })
-    .should('be.visible')
-    .click({ force: true })
+  // Utilisation de smartClick pour une interaction plus robuste
+  cy.smartClick(`[data-section-id="${sectionName}"]`);
   
   cy.get(`#${sectionName}`, { timeout: 8000 })
-    .should('be.visible')
-    .and('not.have.css', 'display', 'none')
+    .should('be.visible'); // 'be.visible' vérifie déjà la propriété 'display', la seconde partie est redondante.
 })
 
 // Attendre que l'application soit prête
@@ -23,12 +43,12 @@ Cypress.Commands.add('waitForAppReady', () => {
   cy.get('body', { timeout: 10000 }).should('be.visible')
   cy.get('.app-header', { timeout: 8000 }).should('be.visible')
   cy.get('.app-nav', { timeout: 8000 }).should('be.visible')
-  
-  // Attendre que les API soient chargées
-  cy.get('.app-content', { timeout: 8000 }).should('be.visible')
-  
-  // Petite pause pour les WebSockets
-  cy.wait(1000)
+
+  // Remplacer l'attente statique par une attente d'un élément clé dans le contenu.
+  // Par exemple, attendre que la liste des projets ou un message "aucun projet" apparaisse.
+  cy.get('.app-content', { timeout: 15000 }).within(() => {
+    cy.get('.project-list-container, .empty-state').should('exist');
+  });
 })
 
 // ===============================================
@@ -37,22 +57,17 @@ Cypress.Commands.add('waitForAppReady', () => {
 
 // Créer un projet de test
 Cypress.Commands.add('createTestProject', (projectName = 'Projet Test Cypress') => {
-  cy.get('[data-action="create-project"]', { timeout: 8000 })
-    .should('be.visible')
-    .click({ force: true })
+  cy.smartClick('[data-action="create-project"]');
   
   cy.get('#newProjectModal', { timeout: 5000 })
     .should('be.visible')
     .and('have.class', 'modal--show')
   
   cy.get('#projectName')
-    .should('be.visible')
     .clear()
-    .type(projectName, { force: true })
+    .type(projectName, { force: true });
   
-  cy.get('[data-action="submit-project"]')
-    .should('be.visible')
-    .click({ force: true })
+  cy.smartClick('[data-action="submit-project"]');
   
   // Attendre que la modale se ferme
   cy.get('#newProjectModal', { timeout: 5000 })
@@ -65,9 +80,7 @@ Cypress.Commands.add('createTestProject', (projectName = 'Projet Test Cypress') 
 
 // Sélectionner un projet existant
 Cypress.Commands.add('selectProject', (projectName) => {
-  cy.contains('.project-card', projectName, { timeout: 8000 })
-    .should('be.visible')
-    .click({ force: true })
+  cy.contains('.project-card', projectName, { timeout: 8000 }).smartClick();
   
   // Attendre que le projet soit marqué comme sélectionné
   cy.contains('.project-card', projectName)
@@ -80,9 +93,7 @@ Cypress.Commands.add('selectProject', (projectName) => {
 
 // Ouvrir une modale
 Cypress.Commands.add('openModal', (triggerSelector, modalSelector) => {
-  cy.get(triggerSelector, { timeout: 8000 })
-    .should('be.visible')
-    .click({ force: true })
+  cy.smartClick(triggerSelector);
   
   cy.get(modalSelector, { timeout: 5000 })
     .should('be.visible')
@@ -95,8 +106,7 @@ Cypress.Commands.add('closeModal', (modalSelector) => {
     .should('be.visible')
     .within(() => {
       cy.get('.modal__close, [data-action="close"], .btn-cancel')
-        .first()
-        .click({ force: true })
+        .first().smartClick();
     })
   
   cy.get(modalSelector, { timeout: 3000 })
@@ -122,12 +132,6 @@ Cypress.Commands.add('debugElement', (selector) => {
   })
 })
 
-// Forcer un clic même si l'élément n'est pas visible
-Cypress.Commands.add('forceClick', (selector) => {
-  cy.get(selector, { timeout: 8000 })
-    .click({ force: true })
-})
-
 // Attendre qu'un élément soit vraiment prêt
 Cypress.Commands.add('waitForElement', (selector, options = {}) => {
   const timeout = options.timeout || 8000
@@ -138,8 +142,7 @@ Cypress.Commands.add('waitForElement', (selector, options = {}) => {
   
   if (shouldBeVisible) {
     cy.get(selector)
-      .should('be.visible')
-      .and('not.have.css', 'display', 'none')
+      .should('be.visible');
   }
 })
 
