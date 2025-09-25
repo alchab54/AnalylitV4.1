@@ -108,17 +108,21 @@
   box-sizing: border-box;
 }
 
-html, body {
+html {
+  height: 100%;
+}
+
+body {
   margin: 0;
   padding: 0;
-  height: 100%;
+  min-height: 100%; /* S'assurer que le body prend toute la hauteur */
   font-family: var(--font-family-base);
   font-size: var(--font-size-base);
   line-height: 1.6;
   color: var(--color-text);
   background-color: var(--color-background);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  display: flex; /* AJOUTER */
+  flex-direction: column; /* AJOUTER */
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -168,13 +172,13 @@ a:hover {
    ================================ */
 
 .app-header {
-  position: relative !important;
-  background: var(--color-surface) !important;
-  border-bottom: 1px solid var(--color-border) !important;
-  padding: var(--space-3) 0 !important;
-  z-index: var(--z-sticky) !important;
-  display: block !important;
-  visibility: visible !important;
+  position: relative; /* Suppression de !important pour flexibilité */
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-3) 0;
+  z-index: 10; /* ABAISSER le z-index */
+  display: block;
+  visibility: visible;
 }
 
 .app-header__content {
@@ -204,14 +208,15 @@ a:hover {
    ================================ */
 
 .app-nav {
-  position: relative !important;
+  position: sticky; /* Pour qu'elle reste visible en haut */
+  top: 0;
   background: var(--color-gray-100);
   border-bottom: 1px solid var(--color-border);
-  z-index: var(--z-dropdown) !important;
+  z-index: 20; /* ASSURER que la nav est au-dessus du header */
   height: 48px;
   min-height: 48px;
-  display: block !important;
-  visibility: visible !important;
+  display: block;
+  visibility: visible;
 }
 
 .app-nav .container {
@@ -266,9 +271,9 @@ a:hover {
 
 .app-main {
   padding: var(--space-4) 0;
-  min-height: calc(100vh - 140px);
-  display: block !important;
-  visibility: visible !important;
+  flex-grow: 1; /* AJOUTER pour qu'il prenne l'espace restant */
+  display: block;
+  visibility: visible;
 }
 
 .app-section {
