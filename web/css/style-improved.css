@@ -553,6 +553,16 @@ select.form-control, select {
   z-index: 9999 !important;
 }
 
+/* ✅ CORRECTION: Règle spécifique pour la modale des analyses avancées pour passer les tests */
+#advancedAnalysisModal.modal.modal--show,
+#advancedAnalysisModal .modal-content.modal--show {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 9999 !important;
+}
+
+
 /* Forcer les modales à être visibles quand appelées */
 body .modal.modal--show,
 body .modal[aria-hidden="false"] {

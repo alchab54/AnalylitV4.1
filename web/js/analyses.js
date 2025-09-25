@@ -49,7 +49,7 @@ document.addEventListener('click', (e) => { // This listener seems to be for moc
     
     if (action === 'run-atn-analysis') {
         // ✅ CORRECTION: Validation avant lancement analyse
-        if (!appState.currentProject) {
+        if (!appState.currentProject || !appState.currentProject.id) {
             showToast('Veuillez sélectionner un projet en premier.', 'warning');
             return;
         }
