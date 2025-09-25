@@ -14,6 +14,10 @@ export async function loadSearchResults(page = 1) {
     if (!appState.currentProject?.id) {
         if (elements.resultsContainer) {
             elements.resultsContainer.innerHTML = `
+        // ✅ CORRECTION : Utiliser querySelector et vérifier l'existence de l'élément
+        const container = document.querySelector(SELECTORS.resultsContainer);
+        if (container) {
+            container.innerHTML = `
                 <div class="results-empty">
                     <h3>${MESSAGES.noProjectSelected}</h3> 
                     <p>${MESSAGES.selectProjectToViewResults}</p> 
@@ -35,6 +39,10 @@ export async function loadSearchResults(page = 1) {
         showToast(`Erreur: ${error.message}`, 'error');
         if (elements.resultsContainer) {
             elements.resultsContainer.innerHTML = `<div class="error-state">Erreur de chargement des résultats.</div>`;
+        // ✅ CORRECTION : Utiliser querySelector et vérifier l'existence de l'élément
+        const container = document.querySelector(SELECTORS.resultsContainer);
+        if (container) {
+            container.innerHTML = `<div class="error-state">Erreur de chargement des résultats.</div>`;
         }
     } finally {
         showLoadingOverlay(false);
@@ -45,8 +53,10 @@ export function renderSearchResultsTable() {
     const container = document.querySelector(SELECTORS.resultsContainer);
     if (!container) return;
     
+    // ✅ CORRECTION : Utiliser le même sélecteur que ci-dessus
     if (!appState.currentProject) {
         elements.resultsContainer.innerHTML = `
+        container.innerHTML = `
             <div class="results-empty">
                 <h3>${MESSAGES.noProjectSelected}</h3> 
                 <p>${MESSAGES.selectProjectToViewResults}</p> 
@@ -57,6 +67,7 @@ export function renderSearchResultsTable() {
     if (!appState.searchResults || appState.searchResults.length === 0) {
     if (!container) return;
     elements.resultsContainer.innerHTML = `
+    container.innerHTML = `
         <div class="results-empty">
             <i class="fas fa-search fa-3x text-muted mb-3"></i>
             <h4>Aucun article trouvé</h4>
