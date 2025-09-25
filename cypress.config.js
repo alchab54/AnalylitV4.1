@@ -1,35 +1,84 @@
+// ===================================================================
+// == ANALYLIT V4.1 - CONFIGURATION CYPRESS CORRIGÉE ==
+// ===================================================================
+
 import { defineConfig } from 'cypress';
 
 export default defineConfig({
-  projectId: 'tn6aw5',
+  // ===============================================
+  // == TESTS E2E SEULEMENT (Désactiver Component) ==
+  // ===============================================
   e2e: {
+    // Configuration de base
     baseUrl: 'http://localhost:8080',
-    supportFile: 'cypress/support/e2e.js',
+    viewportWidth: 1280,
+    viewportHeight: 720,
+    
+    // Chemins des fichiers
     specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
-    video: true,
-    videoCompression: 32,
-    screenshotOnRunFailure: true,
+    supportFile: 'cypress/support/e2e.js',
+    fixturesFolder: 'cypress/fixtures',
+    
+    // Résultats et rapports
     screenshotsFolder: 'reports/cypress/screenshots',
-    videosFolder: 'reports/cypress/videos',
-    viewportWidth: 1920,
-    viewportHeight: 1080,
-    defaultCommandTimeout: 6000,
-    pageLoadTimeout: 8000,
-    requestTimeout: 5000,
-    responseTimeout: 5000,
-    taskTimeout: 8000,
-    numTestsKeptInMemory: 20,
-    experimentalMemoryManagement: true,
+    videosFolder: 'reports/cypress/videos', 
+    downloadsFolder: 'cypress/downloads',
+    
+    // Timeouts optimisés Ryzen 3700X
+    defaultCommandTimeout: 8000,
+    requestTimeout: 10000,
+    responseTimeout: 10000,
+    pageLoadTimeout: 30000,
+    taskTimeout: 60000,
+    
+    // Options d'exécution
+    video: true,
+    screenshotOnRunFailure: true,
+    trashAssetsBeforeRuns: true,
+    watchForFileChanges: false,
+    
+    // Retries intelligents
+    retries: {
+      runMode: 2,      // CI/CD
+      openMode: 0,     // Développement
+    },
+    
+    // Variables d'environnement
+    env: {
+      apiUrl: 'http://localhost:5000/api',
+      coverage: false,
+    },
+    
+    // Exclusions
+    excludeSpecPattern: [
+      '**/examples/*',
+      '**/node_modules/*',
+      '**/*.hot-update.js'
+    ],
+    
+    // Configuration navigateur
     chromeWebSecurity: false,
-    experimentalStudio: true,
+    modifyObstructiveCode: false,
+    
     setupNodeEvents(on, config) {
-      // Plugin events here
+      // Tâches personnalisées
+      on('task', {
+        log(message) {
+          console.log(message)
+          return null
+        }
+      })
+      
+      return config
     },
   },
-  component: {
-    devServer: {
-      framework: 'vanilla',
-      bundler: 'webpack',
-    },
-  }
+
+  // ===============================================
+  // == DÉSACTIVER COMPLÈTEMENT LES TESTS COMPONENT ==
+  // ===============================================
+  // ❌ PAS DE TESTS DE COMPOSANTS pour AnalyLit v4.1
+  // Ceci résout l'erreur "supportFile component missing"
+  
+  // NE PAS inclure de section "component" du tout
+  // Cypress ne cherchera plus de supportFile component
 });

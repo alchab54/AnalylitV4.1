@@ -1,5 +1,5 @@
 # ===================================================================
-# == ANALYLIT V4.1 - DOCKERIGNORE ULTRA-OPTIMISÉ ==
+# == ANALYLIT V4.1 - DOCKERIGNORE OPTIMISÉ CYPRESS ==
 # ===================================================================
 
 # ===============================================
@@ -72,9 +72,22 @@ ENV/
 Thumbs.db
 
 # ===============================================
-# == TESTS ET RAPPORTS ==
+# == TESTS - CONFIGURATION CYPRESS OPTIMISÉE ==
 # ===============================================
-# Pytest et couverture
+# GARDER les fichiers de configuration Cypress
+!cypress.config.js
+!cypress/
+!cypress/e2e/
+!cypress/support/
+
+# EXCLURE seulement les résultats de tests (pas la structure)
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+reports/generated/
+test-results/
+
+# Pytest et couverture backend
 .pytest_cache/
 .coverage
 .coverage.*
@@ -85,29 +98,14 @@ coverage.xml
 *.cover
 .hypothesis/
 
-# Tests frontend
-cypress/
-node_modules/
-reports/
-.nyc_output/
-
 # ===============================================
 # == FICHIERS VOLUMINEUX (ANTI-GB) ==
 # ===============================================
-# Documents et médias
-*.pdf
-*.docx
-*.doc
-*.pptx
-*.ppt
-*.xlsx
-*.xls
-*.odt
-*.rtf
-
-# Images et vidéos
+# Documents et médias (GARDER pour les tests)
+# *.pdf     # COMMENTÉ - nécessaire pour tests
+# *.docx    # COMMENTÉ - nécessaire pour tests
 *.jpg
-*.jpeg
+*.jpeg  
 *.png
 *.gif
 *.bmp
@@ -196,6 +194,14 @@ __pycache__/
 !migrations/
 !database/init-user-db.sql
 
-# Garder les fichiers de test structure
+# === CYPRESS CONFIGURATION COMPLÈTE ===
+# Garder TOUS les fichiers de test Cypress
+!cypress/e2e/**/*.cy.js
+!cypress/support/e2e.js
+!cypress/support/commands.js
 !cypress.config.js
 !jest.config.cjs
+
+# Garder les tests Jest
+!web/js/**/*.test.js
+!web/js/tests/
