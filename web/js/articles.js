@@ -12,8 +12,6 @@ export async function loadSearchResults(page = 1) {
     showLoadingOverlay(true, MESSAGES.loadingResults);
     
     if (!appState.currentProject?.id) {
-        if (elements.resultsContainer) {
-            elements.resultsContainer.innerHTML = `
         // ✅ CORRECTION : Utiliser querySelector et vérifier l'existence de l'élément
         const container = document.querySelector(SELECTORS.resultsContainer);
         if (container) {
@@ -37,8 +35,6 @@ export async function loadSearchResults(page = 1) {
         renderSearchResultsTable();
     } catch (error) {
         showToast(`Erreur: ${error.message}`, 'error');
-        if (elements.resultsContainer) {
-            elements.resultsContainer.innerHTML = `<div class="error-state">Erreur de chargement des résultats.</div>`;
         // ✅ CORRECTION : Utiliser querySelector et vérifier l'existence de l'élément
         const container = document.querySelector(SELECTORS.resultsContainer);
         if (container) {
@@ -55,7 +51,6 @@ export function renderSearchResultsTable() {
     
     // ✅ CORRECTION : Utiliser le même sélecteur que ci-dessus
     if (!appState.currentProject) {
-        elements.resultsContainer.innerHTML = `
         container.innerHTML = `
             <div class="results-empty">
                 <h3>${MESSAGES.noProjectSelected}</h3> 
@@ -65,8 +60,6 @@ export function renderSearchResultsTable() {
     }
 
     if (!appState.searchResults || appState.searchResults.length === 0) {
-    if (!container) return;
-    elements.resultsContainer.innerHTML = `
     container.innerHTML = `
         <div class="results-empty">
             <i class="fas fa-search fa-3x text-muted mb-3"></i>

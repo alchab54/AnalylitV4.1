@@ -137,12 +137,14 @@ export async function renderSettings() {
     renderPromptTemplates(appState.prompts, document.querySelector('#prompt-templates-list'));
     renderQueueStatus(appState.queuesInfo, document.querySelector('#queue-status-container'));
 
-    // Gérer la section des modèles en fonction de la connexion Ollama
-    if (appState.ollamaModels.length > 0 || (await loadOllamaModels())) {
+    // ✅ CORRECTION : Gestion plus robuste de l'échec de connexion à Ollama.
+    // On tente de charger les modèles une seule fois.
+    const ollamaConnected = await loadOllamaModels();
+    if (ollamaConnected) {
         populateModelSelects(appState.ollamaModels);
         loadInstalledModels();
     } else {
-        displayOllamaConnectionError();
+        displayOllamaConnectionError(); // Affiche un message d'erreur clair.
     }
 
     // 3. Initialiser les composants interactifs
@@ -510,15 +512,69 @@ function renderAnalysisProfilesList(profiles, container) {
     });
 }
 
+/**
+ * Gère le rendu du contenu de la section Paramètres en fonction de l'onglet actif.
+ * @param {string} tabId - L'ID de l'onglet à afficher ('profiles', 'models', etc.).
+ */
+function renderSettingsSection(tabId) {
+    const contentContainer = document.getElementById('settingsContent');
+    if (!contentContainer) return;
+
+    let html = '';
+    switch (tabId) {
+        case 'profiles':
+            html = createProfilesSection();
+            break;
+        case 'models':
+            html = createModelsSection();
+            break;
+        case 'templates':
+            html = createTemplatesSection();
+            break;
+        case 'queues':
+            html = createQueuesSection();
+            break;
+        case 'prefs':
+            html = createPreferencesSection();
+            break;
+        default:
+            html = '<div class="text-muted">Sélectionnez une catégorie à gauche.</div>';
+    }
+    contentContainer.innerHTML = html;
+
+    // Après avoir injecté le HTML, il faut réinitialiser les composants et écouteurs
+    // qui dépendent de ce contenu.
+    if (tabId === 'profiles') {
+        renderAnalysisProfilesList(appState.analysisProfiles, document.querySelector('#profile-list-container'));
+        populateModelSelects(appState.ollamaModels);
+        initializeAllEditors();
+        const defaultProfile = appState.analysisProfiles.find(p => p.is_default) || appState.analysisProfiles[0];
+        if (defaultProfile) selectProfile(defaultProfile.id);
+    } else if (tabId === 'models') {
+        loadInstalledModels();
+        populateModelSelects(appState.ollamaModels); // Pour le sélecteur de téléchargement
+    } else if (tabId === 'templates') {
+        renderPromptTemplates(appState.prompts, document.querySelector('#prompt-templates-list'));
+    } else if (tabId === 'queues') {
+        renderQueueStatus(appState.queuesInfo, document.querySelector('#queue-status-container'));
+    }
+
+    // Ré-attacher les écouteurs d'événements globaux de la section
+    setupSettingsEventListeners();
+}
+
 function initSettingsTabs() {
   const tabBtns = document.querySelectorAll('.tab-btn');
   const title = document.getElementById('settingsTitle');
+  const contentContainer = document.getElementById('settingsContent');
+
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       tabBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const tab = btn.dataset.tab;
-      // Mets à jour le titre et le contenu (appelle tes fonctions existantes)
+      
+      // ✅ CORRECTION : Mettre à jour le titre et appeler la fonction de rendu de section.
       const titles = {
         profiles: "Profils d’analyse",
         models: "Modèles IA",
@@ -527,7 +583,7 @@ function initSettingsTabs() {
         prefs: "Préférences"
       };
       title.textContent = titles[tab] || "Paramètres";
-      // renderSettingsSection(tab); // -> implémente cette fonction pour injecter la section correspondante
+      renderSettingsSection(tab);
     });
   });
 }

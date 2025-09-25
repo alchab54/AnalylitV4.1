@@ -98,7 +98,8 @@ export function renderAnalysesSection() {
     }
     console.log('✅ Container trouvé:', container); // Debug
 
-    const project = window.appState?.currentProject;
+    // ✅ CORRECTION: Utiliser l'état importé (appState) au lieu de l'objet global (window.appState)
+    const project = appState?.currentProject;
     console.log('✅ Projet actuel:', project); // Debug
     
     // ✅ CORRECTION: État vide d'abord

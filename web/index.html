@@ -26,6 +26,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.33.0/ace.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js" defer></script>
+   <link rel="stylesheet" href="css/navigation-fix.css">
+   <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
 </head>
 <body>
     <script type="module">
@@ -126,64 +129,18 @@
             </section>
 
             <!-- Section Recherche -->
-            <section id="search" class="app-section" style="display: none;">
-                <div class="section-header">
-                    <h2>Recherche Multi-Bases</h2>
-                    <p>Lancez des recherches sur PubMed, arXiv, CrossRef</p>
-                </div>
-                <div id="searchContainer">
-                    <!-- Contenu recherche -->
-                </div>
+            <section id="search" class="app-section" style="display:none">
+                <form id="search-form">
+                    <input name="query" placeholder="Mots-clés, DOI, PMID..." required />
+                    <button type="submit">Chercher</button>
+                </form>
+                <div id="search-results"></div>
             </section>
 
-            <!-- Section Résultats - ESSENTIEL POUR CYPRESS -->
-            <section id="results" class="app-section" style="display: none;">
-                <div class="section-header">
-                    <h2>Articles du Projet</h2>
-                    <p>Consultez et filtrez les articles trouvés</p>
-                </div>
-                <div id="resultsContainer">
-                    <div class="results-actions">
-                        <button class="btn btn--secondary" id="selectAllBtn" data-action="select-all-articles">Tout sélectionner</button>
-                        <button class="btn btn--primary" 
-                                data-action="batch-process-modal"
-                                disabled>
-                            Traiter la sélection
-                        </button>
-                        <button class="btn btn--danger" 
-                                data-action="delete-selected-articles"
-                                disabled>
-                            Supprimer sélection
-                        </button>
-                    </div>
-
-                    <div id="articles-list" class="articles-list">
-                        <!-- Articles mockés pour les tests Cypress -->
-                        <div class="article-row">
-                            <input type="checkbox" class="article-checkbox" value="1">
-                            <span class="article-title">Intelligence Artificielle en Santé</span>
-                            <span class="article-authors">Dupont, J. et al. (2024)</span>
-                            <!-- AJOUT: Bouton Détails pour les tests -->
-                            <button data-action="view-details" class="btn btn--sm btn--info">Détails</button>
-                        </div>
-                        <div class="article-row">
-                            <input type="checkbox" class="article-checkbox" value="2">
-                            <span class="article-title">Méthodologie ATN pour Revues de Littérature</span>
-                            <span class="article-authors">Martin, A. et al. (2024)</span>
-                            <button data-action="view-details" class="btn btn--sm btn--info">Détails</button>
-                        </div>
-                        <div class="article-row">
-                            <input type="checkbox" class="article-checkbox" value="3">
-                            <span class="article-title">Applications IA dans la Recherche Médicale</span>
-                            <span class="article-authors">Bernard, C. et al. (2023)</span>
-                            <button data-action="view-details" class="btn btn--sm btn--info">Détails</button>
-                        </div>
-                    </div>
-                    <div class="empty-state" style="display: none;">
-                        <h3>Aucun article trouvé</h3>
-                        <p>Lancez une recherche pour afficher des résultats.</p>
-                    </div>
-                </div>
+            <!-- Section Résultats -->
+            <section id="results" class="app-section" style="display:none">
+                <h2>Sélection</h2>
+                <div id="results-list"></div>
             </section>
 
             <!-- Section Validation -->
@@ -468,5 +425,26 @@
     <!-- NOUVELLE LIGNE - Script de correction navigation -->
     <script src="js/navigation-fix.js"></script>
 
+    <script type="module" src="js/api-client.js"></script>
+    <script type="module" src="js/search.js"></script>
+    <script type="module" src="js/selection.js"></script>
+<!-- SCRIPT DE DIAGNOSTIC TEMPORAIRE -->
+<script>
+setTimeout(() => {
+    console.log('🔍 DIAGNOSTIC');
+    console.log('Navigation:', document.getElementById('mainNav'));
+    console.log('Boutons nav:', document.querySelectorAll('.app-nav__btn').length);
+    console.log('Sections:', document.querySelectorAll('.app-section').length);
+    console.log('Section projects visible:', !document.getElementById('projects')?.classList.contains('hidden'));
+    console.log('CSS chargés:', document.querySelectorAll('link[href*="css/"]').length);
+    
+    // Forcer l'affichage de la section projects
+    const projectsSection = document.getElementById('projects');
+    if (projectsSection) {
+        projectsSection.classList.remove('hidden');
+        console.log('✅ Section projects forcée visible');
+    }
+}, 2000);
+</script>
 </body>
 </html>

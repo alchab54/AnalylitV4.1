@@ -19,9 +19,10 @@ import pandas as pd
 import rq
 import subprocess
 import requests
-from flask import Flask, request, jsonify, send_from_directory, abort, send_file, Blueprint
+from flask import Flask, request, jsonify, send_from_directory, abort, send_file, Blueprint, current_app
 from api.reporting import reporting_bp
 from api.stakeholders import stakeholders_bp
+from api.selection import selection_bp
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from sqlalchemy.exc import IntegrityError
@@ -71,13 +72,27 @@ socketio = SocketIO()
 migrate = Migrate()
 models_queue = rq.Queue('models', connection=redis_conn)
 
-def create_app(config=None):
+
+def create_app(config_override=None):
     """Factory pour créer et configurer l'application Flask."""
     # Configure Flask pour qu'il trouve les fichiers statiques dans le dossier 'web'
     app = Flask(__name__, static_folder='web', static_url_path='')
 
-    if config:
-        app.config.update(config)
+    # --- Configuration Loading ---
+    try:
+        from backend.config.config_v4 import get_config
+        app.config['APP_CONFIG'] = get_config()
+        logging.info(f"Configuration loaded. OLLAMA_BASE_URL is {app.config['APP_CONFIG'].OLLAMA_BASE_URL}")
+    except (ImportError, ModuleNotFoundError) as e:
+        logging.error(f"Failed to import config: {e}")
+        class FallbackConfig:
+            OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://ollama:11434") # Corrected fallback
+            REQUEST_TIMEOUT = int(os.getenv("REQUEST_TIMEOUT", 900))
+        app.config['APP_CONFIG'] = FallbackConfig()
+        logging.warning(f"Using fallback config. OLLAMA_BASE_URL is {app.config['APP_CONFIG'].OLLAMA_BASE_URL}")
+
+    if config_override:
+        app.config.update(config_override)
         
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -1022,11 +1037,14 @@ def create_app(config=None):
     def api_list_models():
         # Appeler Ollama API locale pour récupérer la liste des modèles installés
         import requests
+        app_config = current_app.config['APP_CONFIG']
         try:
-            response = requests.get('http://localhost:11434/api/tags')  # Adapter URL
+            # Utiliser l'URL de base depuis la configuration
+            response = requests.get(f'{app_config.OLLAMA_BASE_URL}/api/tags')
             response.raise_for_status()
             return jsonify({'success': True, 'models': response.json().get('models', [])})
         except requests.RequestException as e:
+            logging.error(f"Impossible de contacter le serveur Ollama à l'adresse {app_config.OLLAMA_BASE_URL}. Erreur: {e}")
             return jsonify({'success': False, 'error': str(e)}), 500
 
     @app.route("/api/databases", methods=["GET"])
@@ -1168,10 +1186,28 @@ def create_app(config=None):
         """Sert les autres fichiers statiques (CSS, JS, images)."""
         return send_from_directory(app.static_folder, path)
     
+    # ==================== NEW SEARCH ROUTE ====================
+    @app.route("/api/search", methods=["GET"])
+    @with_db_session
+    def new_search(session):
+        query = request.args.get("q", "")
+        if not query:
+            return jsonify([])
+
+        # This is a simple search on title and abstract.
+        # It's not project-specific, as per the user's frontend code.
+        results = session.query(SearchResult).filter(
+            (SearchResult.title.ilike(f"%{query}%")) |
+            (SearchResult.abstract.ilike(f"%{query}%"))
+        ).limit(50).all()
+        
+        return jsonify([r.to_dict() for r in results])
+
     # Enregistrement des Blueprints
     #app.register_blueprint(projects_bp, url_prefix='/api')
     app.register_blueprint(reporting_bp, url_prefix='/api')
     app.register_blueprint(stakeholders_bp, url_prefix='/api')
+    app.register_blueprint(selection_bp, url_prefix='/api')
 
     # La factory DOIT retourner l'objet app
     return app

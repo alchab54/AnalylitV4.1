@@ -1,8 +1,7 @@
-const BASE_URL = '/api';
-
+// Client API CORRIGÉ pour éviter les doubles /api/
 export async function fetchAPI(endpoint, options = {}) {
-    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-    const url = `${BASE_URL}${cleanEndpoint}`;
+    // Ne pas ajouter /api si déjà présent
+    const url = endpoint.startsWith('/api/') ? endpoint : `/api${endpoint}`;
 
     const defaultOptions = {
         headers: {
@@ -13,7 +12,6 @@ export async function fetchAPI(endpoint, options = {}) {
         ...options,
     };
 
-    // FIX: Body must be stringified for fetch API
     if (defaultOptions.body && typeof defaultOptions.body === 'object') {
         defaultOptions.body = JSON.stringify(defaultOptions.body);
     }
@@ -24,19 +22,19 @@ export async function fetchAPI(endpoint, options = {}) {
         const response = await fetch(url, defaultOptions);
 
         if (!response.ok) {
-            let errorMsg = `Erreur interne du serveur`;
+            let errorMsg = `Erreur ${response.status}`;
             try {
                 const errorData = await response.json();
-                errorMsg = errorData.error || errorData.message || `Route non trouvée: ${defaultOptions.method || 'GET'} ${url}`;
-            } catch (e) { /* Pas de JSON dans la réponse, on garde le message par défaut */ }
+                errorMsg = errorData.error || errorData.message || errorMsg;
+            } catch (e) { 
+                errorMsg = `Erreur HTTP ${response.status}: ${response.statusText}`;
+            }
             throw new Error(errorMsg);
         }
         
         const text = await response.text();
-        // Gère le cas où la réponse est vide
         if (!text) {
-            // Si l'endpoint est une collection (ex: /results, /articles), retourne un tableau vide
-            if (endpoint.includes('/results') || endpoint.includes('/articles')) {
+            if (endpoint.includes('/articles') || endpoint.includes('/results')) {
                 return [];
             }
             return {};

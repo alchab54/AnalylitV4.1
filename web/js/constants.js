@@ -52,71 +52,42 @@ export const SELECTORS = {
 
 // URLs API centralisées
 export const API_ENDPOINTS = {
-    // Projects
-    projects: '/projects/',
-    projectById: (id) => `/projects/${id}`,
-    projectFiles: (id) => `/projects/${id}/files`, // Added missing endpoint
-    projectExport: (id) => `/projects/${id}/export`,
+    // Projects - CORRIGÉ pour correspondre au backend
+    projects: '/api/projects/',
+    projectById: (id) => `/api/projects/${id}`,
+    projectFiles: (id) => `/api/projects/${id}/files`,
+    projectExport: (id) => `/api/projects/${id}/export`,
     projectExportThesis: (id) => `/api/projects/${id}/export/thesis`,
-    projectRun: (id) => `/projects/${id}/run`,
-    projectRunAnalysis: (id) => `/projects/${id}/run-analysis`,
-    projectIndexPdfs: (id) => `/projects/${id}/index-pdfs`,
-    projectBulkPdfDownload: (id) => `/projects/${id}/bulk-pdf-download`,
-    projectImportZotero: (id) => `/projects/${id}/import-zotero`,
-    projectAddManualArticles: (id) => `/projects/${id}/add-manual-articles`,
-    projectUploadPdfs: (id) => `/projects/${id}/upload-pdfs-bulk`,
-    projectChatHistory: (id) => `/api/projects/${id}/chat-history`,
-    projectChat: (id) => `/projects/${id}/chat`,
-    projectRunRobAnalysis: (id) => `/projects/${id}/run-rob-analysis`,
-    projectRobAnalysis: (id) => `/projects/${id}/rob-analysis`, // Added missing endpoint
-    projectRob: (id, articleId) => `/projects/${id}/risk-of-bias/${articleId}`,
-    projectPrismaChecklist: (id) => `/projects/${id}/prisma-checklist`,
-    projectExportAnalyses: (id) => `/projects/${id}/export/analyses`,
-
-    // Stakeholders
-    projectStakeholders: (projectId) => `/projects/${projectId}/stakeholders`,
-    stakeholderById: (projectId, stakeholderId) => `/projects/${projectId}/stakeholders/${stakeholderId}`,
-    projectStakeholderGroups: (projectId) => `/projects/${projectId}/stakeholder-groups`,
-    stakeholderGroupById: (projectId, groupId) => `/projects/${projectId}/stakeholder-groups/${groupId}`,
-    // Reporting
-    reportBibliography: (projectId) => `/projects/${projectId}/reports/bibliography`,
-    reportSummaryTable: (projectId) => `/projects/${projectId}/reports/summary-table`,
-    reportExcelExport: (projectId) => `/projects/${projectId}/reports/excel-export`,
-
-    // Grids
-    grids: (projectId) => `/projects/${projectId}/grids`,
-    gridById: (projectId, gridId) => `/projects/${projectId}/grids/${gridId}`,
-    gridsImport: (projectId) => `/projects/${projectId}/grids/import`,
-
-    // Articles
-    articlesBatchDelete: '/articles/batch-delete',
-    projectArticles: (id) => `/projects/${id}/articles`, // Added missing endpoint
-    projectSearchResults: (id) => `/projects/${id}/search-results`,
-    projectExtractions: (id) => `/projects/${id}/extractions`,
+    
+    // Search - CORRIGÉ
+    search: '/api/search',
+    projectSearchResults: (id) => `/api/projects/${id}/search-results`,
+    
+    // Articles - CORRIGÉ
+    projectArticles: (id) => `/api/projects/${id}/articles`,
+    articlesBatchDelete: '/api/articles/batch-delete',
+    
+    // Validation - NOUVEAU pour votre thèse
+    projectExtractions: (id) => `/api/projects/${id}/extractions`,
+    projectExtractionDecision: (projectId, extractionId) => `/api/projects/${projectId}/extractions/${extractionId}/decision`,
+    projectCalculateKappa: (id) => `/api/projects/${id}/calculate-kappa`,
+    
+    // Grids - ESSENTIEL pour extraction
+    grids: (projectId) => `/api/projects/${projectId}/grids`,
+    gridById: (projectId, gridId) => `/api/projects/${projectId}/grids/${gridId}`,
+    
+    // Analyses - CRITIQUE pour thèse
+    projectAnalyses: (id) => `/api/projects/${id}/analyses`,
+    projectRunAnalysis: (id) => `/api/projects/${id}/run-analysis`,
+    projectExportAnalyses: (id) => `/api/projects/${id}/export/analyses`,
     
     // Settings
-    analysisProfiles: '/analysis-profiles',
-    analysisProfileById: (id) => `/analysis-profiles/${id}`,
-    prompts: '/prompts',
-    promptById: (id) => `/prompts/${id}`,
-    ollamaModels: '/ollama/models',
-    ollamaModelsList: '/ollama/models/list', // Added missing endpoint
-    ollamaPull: '/api/ollama/pull',
-    zoteroSettings: '/settings/zotero',
+    analysisProfiles: '/api/analysis-profiles',
+    databases: '/api/databases',
     
     // Queues
-    queuesInfo: '/queues/info',
-    queuesClear: '/queues/clear',
-
-    // Databases
-    databases: '/databases',
-
-    // Search
-    search: '/search',
-
-    // Analyses
-    projectAnalyses: (id) => `/projects/${id}/analyses`, // Added missing endpoint
-    projectDeleteAnalysis: (projectId, analysisType) => `/projects/${projectId}/analyses/${analysisType}`, // Added missing endpoint
+    queuesInfo: '/api/queues/info',
+    queuesClear: '/api/queues/clear'
 };
 
 // Messages d'état
@@ -300,6 +271,38 @@ export const MESSAGES = {
     errorSendingQuestion: "Erreur lors de l'envoi de la question",
     selectProjectForIndexing: "Veuillez sélectionner un projet pour lancer l'indexation.",
     errorStartingIndexing: "Erreur lors du lancement de l'indexation",
+
+    // Validation - AJOUT pour thèse
+noProjectSelectedValidation: 'Aucun projet sélectionné',
+selectProjectForValidation: 'Sélectionnez un projet pour commencer la validation.',
+loadingValidations: 'Chargement des validations...',
+validationSectionTitle: 'Validation Inter-Évaluateurs',
+calculateKappaButton: 'Calculer Kappa Cohen',
+activeEvaluator: 'Évaluateur actif',
+evaluator1: 'Évaluateur 1',
+evaluator2: 'Évaluateur 2',
+included: 'Inclus',
+excluded: 'Exclus', 
+pending: 'En attente',
+all: 'Tous',
+justification: 'Justification IA :',
+none: 'Aucune',
+includeButton: 'Inclure',
+excludeButton: 'Exclure',
+resetButton: 'Réinitialiser',
+titleUnavailable: 'Titre non disponible',
+launchFullExtraction: 'Extraction Complète',
+launchFullExtractionDescription: (count) => `Lancer l\'extraction complète sur ${count} article(s) inclus.`,
+launchExtractionButton: 'Lancer l\'extraction',
+validationErrorTitle: 'Erreur de Validation',
+errorDisplayingValidation: 'Impossible d\'afficher les validations.',
+decisionUpdated: 'Décision mise à jour',
+validationError: 'Erreur de validation',
+calculatingKappa: 'Calcul du Kappa en cours...',
+selectProjectForKappa: 'Sélectionnez un projet pour calculer le Kappa.',
+kappaCalculationStarted: (taskId) => `Calcul Kappa lancé (Task: ${taskId})`,
+errorCalculatingKappa: (message) => `Erreur calcul Kappa: ${message}`,
+errorApiKappa: (message) => `Erreur API Kappa: ${message}`,
 };
 
 // Configuration de l'application
