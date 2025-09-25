@@ -58,6 +58,40 @@ document.addEventListener('click', (e) => { // This listener seems to be for moc
         e.target.closest('.analysis-card').classList.add('analysis-card--loading');
     }
     
+    if (action === 'show-advanced-analysis-modal') {
+        // ✅ Créer et ouvrir la modale avancée
+        const advancedModalHTML = `
+            <div id="advancedAnalysisModal" class="modal" role="dialog" aria-modal="true">
+                <div class="modal-backdrop" data-action="close-modal"></div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Analyses Avancées</h3>
+                        <button class="modal-close" data-action="close-modal">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="analysis-options">
+                            <div class="analysis-option" data-action="run-analysis" data-analysis-type="meta_analysis">
+                                <h4>Méta-analyse</h4>
+                                <p>Analyse statistique avancée</p>
+                            </div>
+                            <div class="analysis-option" data-action="run-analysis" data-analysis-type="prisma_flow">
+                                <h4>Diagramme PRISMA</h4>
+                                <p>Génération du diagramme de flux</p>
+                            </div>
+                            <div class="analysis-option" data-action="run-analysis" data-analysis-type="descriptive_stats">
+                                <h4>Statistiques Descriptives</h4>
+                                <p>Calculs statistiques de base</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        
+        // Ajouter au DOM et afficher
+        document.body.insertAdjacentHTML('beforeend', advancedModalHTML);
+        openModal('advancedAnalysisModal');
+    }
+
     if (action === 'export-prisma-report') {
         // ✅ Implémentation de la fonction d'export
         exportPRISMAReport();
@@ -77,7 +111,7 @@ export function renderAnalysesSection() {
     const container = document.getElementById('analysisContainer');
     const project = appState.currentProject;
 
-    // ✅ CORRECTION: Gestion état vide analyses
+    // ✅ CORRECTION: Afficher immédiatement l'état vide
     if (!project) {
         container.innerHTML = `
             <div class="analysis-empty">
