@@ -75,7 +75,7 @@ models_queue = rq.Queue('models', connection=redis_conn)
 
 
 def create_app(config_override=None):
-    """Factory pour créer et configurer l'application Flask."""
+    """Factory pour créer et configurer l_application Flask."""
     # Configure Flask pour qu'il trouve les fichiers statiques dans le dossier 'web'
     app = Flask(__name__, static_folder='web', static_url_path='')
 
@@ -114,7 +114,7 @@ def create_app(config_override=None):
     db.init_app(app)
 
     # --- NOUVEAU : INITIALISER FLASK-MIGRATE ---
-    migrate.init_app(app, db)  # <-- 2. BRANCHER MIGRATE À L'APP ET À LA DB
+    migrate.init_app(app, db)  # <-- 2. BRANCHER MIGRATE À L_APP ET À LA DB
 
 
     # Import et initialisation forcés - BON ORDRE :
@@ -128,17 +128,17 @@ def create_app(config_override=None):
          origins=[
              "http://localhost:8080", 
              "http://127.0.0.1:8080",
-             "chrome-extension://*",  # Pour l'extension Chrome/Edge
+             "chrome-extension://*",  # Pour l_extension Chrome/Edge
              "moz-extension://*",    # Pour un futur support Firefox
-             "http://localhost:*",   # Pour le développement local de l'extension
-             "https://*.zotero.org"  # Pour l'injection de script
+             "http://localhost:*",   # Pour le développement local de l_extension
+             "https://*.zotero.org"  # Pour l_injection de script
          ],
          expose_headers=["Content-Disposition"],
-         supports_credentials=True) 
+         supports_credentials=True)
 
     socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent')
 
-    # --- Fonctions utilitaires internes à l'app ---
+    # --- Fonctions utilitaires internes à l_app ---
     def first_or_404(query):
         result = query.first()
         if result is None:
@@ -146,12 +146,12 @@ def create_app(config_override=None):
         return result
 
 
-    # --- NOUVEAUX ENDPOINTS POUR L'EXTENSION ZOTERO ---
+    # --- NOUVEAUX ENDPOINTS POUR L_EXTENSION ZOTERO ---
 
     @with_db_session
     def get_validated_articles_data(session, project_id, status='include'):
         """
-        Récupère tous les articles d'un projet ayant un statut de validation spécifique.
+        Récupère tous les articles d_un projet ayant un statut de validation spécifique.
         (Version non-simulée)
         """
         logger.info(f"Récupération des articles (statut: {status}) pour le projet {project_id}")
@@ -166,7 +166,7 @@ def create_app(config_override=None):
             )
             
             articles = articles_query.all()
-            logger.info(f"{len(articles)} articles récupérés pour l'export Zotero.")
+            logger.info(f"{len(articles)} articles récupérés pour l_export Zotero.")
             
             # Retourne une liste de dictionnaires complets des articles
             return [a.to_dict() for a in articles]
@@ -177,7 +177,7 @@ def create_app(config_override=None):
 
     def convert_to_zotero_format(articles_data: list[dict]) -> list[dict]:
         """
-        Convertit une liste de dictionnaires d'articles au format Zotero JSON standard.
+        Convertit une liste de dictionnaires d_articles au format Zotero JSON standard.
         (Version non-simulée)
         """
         logger.info(f"Conversion de {len(articles_data)} articles au format Zotero JSON.")
@@ -233,12 +233,12 @@ def create_app(config_override=None):
         from sqlalchemy import insert
         
         if not articles_data:
-            logger.warning(f"Tentative d'insertion en masse de 0 article pour le projet {project_id}.")
+            logger.warning(f"Tentative d_insertion en masse de 0 article pour le projet {project_id}.")
             return 0
 
         prepared_records = []
         for record in articles_data:
-            # S'assurer que les champs obligatoires ont des valeurs
+            # S_assurer que les champs obligatoires ont des valeurs
             record['project_id'] = project_id
             if 'id' not in record:
                 record['id'] = str(uuid.uuid4())
@@ -250,8 +250,8 @@ def create_app(config_override=None):
             
             prepared_records.append(record)
 
-        # Utiliser l'instruction 'ON CONFLICT' de PostgreSQL
-        # Assure l'existence de l'index UNIQUE (project_id, article_id) dans votre modèle
+        # Utiliser l_instruction 'ON CONFLICT' de PostgreSQL
+        # Assure l_existence de l_index UNIQUE (project_id, article_id) dans votre modèle
         stmt = insert(SearchResult).values(prepared_records)
         stmt = stmt.on_conflict_do_nothing(
             index_elements=['project_id', 'article_id']
@@ -261,11 +261,11 @@ def create_app(config_override=None):
             result = session.execute(stmt)
             return result.rowcount
         except IntegrityError as e:
-            logger.error(f"Erreur d'intégrité lors de l'insertion en masse (l'index unique manque ?): {e}")
+            logger.error(f"Erreur d_intégrité lors de l_insertion en masse (l_index unique manque ?): {e}")
             session.rollback()
             return 0
         except Exception as e:
-            logger.error(f"Erreur inattendue lors de l'insertion en masse: {e}")
+            logger.error(f"Erreur inattendue lors de l_insertion en masse: {e}")
             session.rollback()
             return 0
 
@@ -274,7 +274,7 @@ def create_app(config_override=None):
         """
         Logique métier pour traiter et insérer les items Zotero dans la BDD.
         """
-        logger.info(f"Début de l'import (extension) pour le projet {project_id}. {len(items)} items reçus.")
+        logger.info(f"Début de l_import (extension) pour le projet {project_id}. {len(items)} items reçus.")
         
         # 1. Traiter et dédupliquer les items
         processed_records = process_zotero_item_list(items)
@@ -285,13 +285,13 @@ def create_app(config_override=None):
         
         # 2. Insérer dans la base de données
         try:
-            # Utilise la fonction d'insertion en masse qui gère les conflits
+            # Utilise la fonction d_insertion en masse qui gère les conflits
             inserted_count = add_articles_to_project_bulk(session, project_id, processed_records)
             logger.info(f"{inserted_count} nouveaux articles insérés pour le projet {project_id}.")
             return inserted_count
         
         except Exception as e:
-            logger.error(f"Erreur lors de l'insertion BDD pour l'import Zotero: {e}")
+            logger.error(f"Erreur lors de l_insertion BDD pour l_import Zotero: {e}")
             session.rollback()
             return 0
 
@@ -299,20 +299,20 @@ def create_app(config_override=None):
     @with_db_session
     def import_from_extension(session, project_id):
         """
-        Import des données Zotero via l'extension (payload JSON).
+        Import des données Zotero via l_extension (payload JSON).
         Cette route est NOUVELLE et distincte de '/import-zotero'.
         """
         try:
             data = request.get_json()
             if not data:
-                return jsonify({"success": False, "message": "Payload JSON manquant."}), 400
-                
+                return jsonify({"success": False, "message": "Payload JSON manquant."}),
+            
             items = data.get('items', [])
             import_type = data.get('importType', 'manual') # 'selected', 'collection', 'library'
             
             logger.info(f"Import Zotero (extension) type '{import_type}' pour projet {project_id}")
             
-            # Utiliser votre logique d'import (nouvellement créée)
+            # Utiliser votre logique d_import (nouvellement créée)
             imported_count = process_zotero_import(session, project_id, items) # Passe la session
             
             return jsonify({
@@ -322,12 +322,12 @@ def create_app(config_override=None):
             })
         except Exception as e:
             logger.error(f"Erreur API /import-from-extension: {e}")
-            return jsonify({"success": False, "message": str(e)}), 500
+            return jsonify({"success": False, "message": str(e)}),
 
     @app.route('/api/projects/<project_id>/export-validated-results', methods=['GET'])
     @with_db_session
     def export_validated_results(session, project_id):
-        """Export des résultats validés pour l'extension"""
+        """Export des résultats validés pour l_extension"""
         try:
             # 1. Récupérer les articles validés
             validated_articles = get_validated_articles_data(session, project_id, status='include')
@@ -339,9 +339,9 @@ def create_app(config_override=None):
             
         except Exception as e:
             logger.error(f"Erreur API /export-validated-results: {e}")
-            return jsonify({"success": False, "message": str(e)}), 500
+            return jsonify({"success": False, "message": str(e)}),
 
-    # --- FIN DES AJOUTS POUR L'EXTENSION ZOTERO ---
+    # --- FIN DES AJOUTS POUR L_EXTENSION ZOTERO ---
 
     # --- Enregistrement des routes (Blueprints ou routes directes) ---
 
@@ -428,7 +428,7 @@ def create_app(config_override=None):
         custom_grid_id = data.get('custom_grid_id')
         profile = session.query(AnalysisProfile).filter_by(id=profile_id).first()
         if not profile:
-            return jsonify({"error": "Profil d'analyse non trouvé"}), 404
+            return jsonify({"error": "Profil d_analyse non trouvé"}), 404
         task_ids = []
         for article_id in article_ids:
             job = processing_queue.enqueue(process_single_article_task, project_id=project_id, article_id=article_id, profile=profile.to_dict(), analysis_mode=analysis_mode, custom_grid_id=custom_grid_id, job_timeout='30m')
@@ -443,7 +443,7 @@ def create_app(config_override=None):
         profile_id = data.get('profile')
         profile = session.query(AnalysisProfile).filter_by(id=profile_id).first()
         if not profile:
-            return jsonify({"error": "Profil d'analyse non trouvé"}), 404
+            return jsonify({"error": "Profil d_analyse non trouvé"}), 404
         job = synthesis_queue.enqueue(run_synthesis_task, project_id=project_id, profile=profile.to_dict(), job_timeout='1h')
         return jsonify({"message": "Synthèse lancée", "task_id": job.id}), 202
 
@@ -467,7 +467,7 @@ def create_app(config_override=None):
             session.commit()
             return jsonify(new_grid.to_dict()), 201
         except Exception as e:
-            logging.error(f"Erreur lors de l'import de grille: {e}")
+            logging.error(f"Erreur lors de l_import de grille: {e}")
             return jsonify({"error": str(e)}), 500
 
     @app.route("/api/projects/<project_id>/grids", methods=["GET"])
@@ -589,7 +589,7 @@ def create_app(config_override=None):
                 extraction.validations = json.dumps(validations)
                 count += 1
         session.commit()
-        return jsonify({"message": f"{count} validations ont été importées pour l'évaluateur {evaluator_name}."}), 200
+        return jsonify({"message": f"{count} validations ont été importées pour l_évaluateur {evaluator_name}."}), 200
 
     @app.route('/api/projects/<project_id>/import-zotero', methods=['POST'], strict_slashes=False) # <-- Ajoutez strict_slashes
     @with_db_session
@@ -616,7 +616,7 @@ def create_app(config_override=None):
             )
             return jsonify({"message": "Zotero PDF import started", "task_id": str(job.id)}), 202
         except Exception as e:
-            logging.error(f"Erreur d'enqueue pour import Zotero: {e}")
+            logging.error(f"Erreur d_enqueue pour import Zotero: {e}")
             return jsonify({"error": f"Erreur de traitement: {str(e)}"}), 500   
              
     @app.route("/api/projects/<project_id>/upload-zotero", methods=["POST"])
@@ -685,14 +685,14 @@ def create_app(config_override=None):
     @with_db_session
     def upload_pdfs_bulk(session, project_id):
         """
-        Gère l'upload en masse de fichiers PDF pour un projet.
+        Gère l_upload en masse de fichiers PDF pour un projet.
         Sauvegarde chaque fichier et lance une tâche de fond pour son traitement.
         """
         if 'files' not in request.files:
-            return jsonify({"error": "Aucun fichier n'a été envoyé."} ), 400
+            return jsonify({"error": "Aucun fichier n_a été envoyé."} ), 400
         files = request.files.getlist('files')
         if not files or all(f.filename == '' for f in files):
-            return jsonify({"error": "Aucun fichier sélectionné pour l'upload."} ), 400
+            return jsonify({"error": "Aucun fichier sélectionné pour l_upload."} ), 400
         project = session.query(Project).filter_by(id=project_id).first()
         if not project:
             return jsonify({"error": "Projet non trouvé"}), 404
@@ -702,7 +702,7 @@ def create_app(config_override=None):
                 # 1. Nettoyer le nom de fichier pour enlever les caractères dangereux (Path Traversal)
                 filename = secure_filename(file.filename)
 
-                # 2. Vérifier si le nom de fichier est valide ET s'il a la bonne extension (.pdf)
+                # 2. Vérifier si le nom de fichier est valide ET s_il a la bonne extension (.pdf)
                 if filename and filename.lower().endswith('.pdf'):
                     try:
                         file_path = save_file_to_project_dir(file, project_id, filename, PROJECTS_DIR)
@@ -714,7 +714,7 @@ def create_app(config_override=None):
                         logging.error(f"Erreur lors de la sauvegarde du fichier {filename}: {e}")
                         failed_uploads.append(filename)
                 else:
-                    # Le nom de fichier est soit vide, soit n'est pas un PDF. On le rejette.
+                    # Le nom de fichier est soit vide, soit n_est pas un PDF. On le rejette.
                     failed_uploads.append(file.filename)
         response_message = f"{len(successful_uploads)} PDF(s) mis en file pour traitement."
         if failed_uploads:
@@ -768,8 +768,8 @@ def create_app(config_override=None):
                 mimetype='application/zip'
             )
         except Exception as e:
-            logging.error(f"Erreur lors de l'export de la thèse: {e}")
-            return jsonify({"error": "Erreur lors de la génération de l'export"}), 500
+            logging.error(f"Erreur lors de l_export de la thèse: {e}")
+            return jsonify({"error": "Erreur lors de la génération de l_export"}), 500
 
     # ==================== ROUTES API ADVANCED ANALYSIS ====================
     @app.route("/api/projects/<project_id>/run-discussion-draft", methods=["POST"])
@@ -785,15 +785,15 @@ def create_app(config_override=None):
     @app.route('/api/projects/<project_id>/run-analysis', methods=['POST'])
     @with_db_session
     def run_advanced_analysis(session, project_id):
-        """Route unifiée pour tous les types d'analyse avancée"""
+        """Route unifiée pour tous les types d_analyse avancée"""
         try:
             data = request.get_json()
             analysis_type = data.get('type')
 
-            # Validation du type d'analyse
+            # Validation du type d_analyse
             valid_types = ['meta_analysis', 'atn_scores', 'knowledge_graph', 'prisma_flow']
             if analysis_type not in valid_types:
-                return jsonify({"error": f"Type d'analyse non supporté: {analysis_type}"}), 400
+                return jsonify({"error": f"Type d_analyse non supporté: {analysis_type}"}), 400
                 
             # Vérification existence du projet
             project = session.query(Project).filter_by(id=project_id).first()
@@ -835,7 +835,7 @@ def create_app(config_override=None):
         data = request.get_json()
         items = data.get("items", [])
         if not items:
-            return jsonify({"error": "La liste 'items' d'identifiants est requise"}), 400
+            return jsonify({"error": "La liste 'items' d_identifiants est requise"}), 400
         job = background_queue.enqueue(add_manual_articles_task, project_id=project_id, identifiers=items, job_timeout='10m')
         return jsonify({"message": f"Ajout de {len(items)} article(s) en cours...", "task_id": job.id}), 202
 
@@ -844,10 +844,10 @@ def create_app(config_override=None):
         """Ajoute manuellement des articles à un projet via une tâche de fond."""
         data = request.get_json()
         if not data or not data.get("items"):
-            return jsonify({"error": "La liste 'items' d'identifiants est requise"}), 400
+            return jsonify({"error": "La liste 'items' d_identifiants est requise"}), 400
         
         items = data["items"]
-        # L'endpoint de test attend un message spécifique pour 2 articles.
+        # L_endpoint de test attend un message spécifique pour 2 articles.
         message = f"Ajout de {len(items)} article(s) en cours..."
         job = background_queue.enqueue(add_manual_articles_task, project_id=project_id, identifiers=items, job_timeout='10m')
         return jsonify({"message": message, "task_id": str(job.id)}), 202
@@ -900,12 +900,12 @@ def create_app(config_override=None):
                 question=data['question'],
             job_timeout='15m'
             )
-            # Assurez-vous de retourner l'ID du job
+            # Assurez-vous de retourner l_ID du job
             task_id = str(job.id) if job and job.id else "unknown"
             logging.debug(f"Chat endpoint returning: {{'message': 'Question soumise', 'task_id': {task_id}}}")
             return jsonify({"message": "Question soumise", "task_id": task_id}), 202
         except Exception as e:
-            logging.error(f"Erreur lors de l'enqueue du chat: {e}")
+            logging.error(f"Erreur lors de l_enqueue du chat: {e}")
             return jsonify({"error": "Erreur interne du serveur"}), 500
     
     @app.route("/api/projects/<project_id>/chat-history", methods=["GET"])
@@ -1040,12 +1040,12 @@ def create_app(config_override=None):
         import requests
         app_config = current_app.config['APP_CONFIG']
         try:
-            # Utiliser l'URL de base depuis la configuration
+            # Utiliser l_URL de base depuis la configuration
             response = requests.get(f'{app_config.OLLAMA_BASE_URL}/api/tags')
             response.raise_for_status()
             return jsonify({'success': True, 'models': response.json().get('models', [])})
         except requests.RequestException as e:
-            logging.error(f"Impossible de contacter le serveur Ollama à l'adresse {app_config.OLLAMA_BASE_URL}. Erreur: {e}")
+            logging.error(f"Impossible de contacter le serveur Ollama à l_adresse {app_config.OLLAMA_BASE_URL}. Erreur: {e}")
             return jsonify({'success': False, 'error': str(e)}), 500
 
     @app.route("/api/databases", methods=["GET"])
@@ -1120,9 +1120,9 @@ def create_app(config_override=None):
             from rq.job import Job
             job = Job.fetch(task_id, connection=redis_conn)
             job.cancel()
-            return jsonify({"message": "Demande d'annulation envoyée."} ), 200
+            return jsonify({"message": "Demande d_annulation envoyée."} ), 200
         except Exception as e:
-            return jsonify({"error": f"Impossible d'annuler la tâche: {e}"} ), 400
+            return jsonify({"error": f"Impossible d_annuler la tâche: {e}"} ), 400
 
     @app.route('/api/queues/status', methods=['GET'])
     def get_queues_status():
@@ -1160,7 +1160,7 @@ def create_app(config_override=None):
             return jsonify({"message": f"File '{queue_name}' et ses registres ont été vidés."} ), 200
         return jsonify({"error": "File non trouvée"}), 404
 
-    # --- ROUTES POUR SERVIR L'INTERFACE UTILISATEUR (FRONTEND) ---
+    # --- ROUTES POUR SERVIR L_INTERFACE UTILISATEUR (FRONTEND) ---
     # Ces routes doivent être DÉFINIES AVANT les routes API génériques comme /<path:path>
     # si vous en aviez, mais après les routes API spécifiques comme /api/....
 
@@ -1176,7 +1176,7 @@ def create_app(config_override=None):
 
     @app.route('/')
     def serve_index():
-        """Sert le fichier principal de l'interface (index.html)."""
+        """Sert le fichier principal de l_interface (index.html)."""
         # Ne pas intercepter les appels API
         if request.path.startswith('/api/'):
             return not_found(None)
@@ -1209,8 +1209,9 @@ def create_app(config_override=None):
     app.register_blueprint(reporting_bp, url_prefix='/api')
     app.register_blueprint(stakeholders_bp, url_prefix='/api')
     app.register_blueprint(selection_bp, url_prefix='/api')
+    app.register_blueprint(tasks_bp, url_prefix='/api')
 
-    # La factory DOIT retourner l'objet app
+    # La factory DOIT retourner l_objet app
     return app
 
 def format_bibliography(articles):
@@ -1223,18 +1224,18 @@ def format_bibliography(articles):
     return bibliography
 
 def register_models():
-    """Force l'enregistrement de tous les modèles."""
-    pass  # Juste le fait d'importer ce module enregistre les modèles
+    """Force l_enregistrement de tous les modèles."""
+    pass  # Juste le fait d_importer ce module enregistre les modèles
 
 
-# --- Point d'entrée pour Gunicorn et développement local ---
+# --- Point d_entrée pour Gunicorn et développement local ---
 # Gunicorn va chercher cette variable 'app'
 app = create_app()
 
 # --- GUNICORN HOOK ---
 def post_fork(server, worker):
     """
-    Hook Gunicorn pour s'assurer que chaque worker a sa propre initialisation de DB.
+    Hook Gunicorn pour s_assurer que chaque worker a sa propre initialisation de DB.
     Cela évite les problèmes de partage de connexion entre les processus.
     """
     server.log.info("Worker %s forked.", worker.pid)
@@ -1242,7 +1243,7 @@ def post_fork(server, worker):
 
 if __name__ == "__main__":
     # Le monkey-patching doit être fait le plus tôt possible, mais SEULEMENT
-    # lors de l'exécution directe, pas lors de l'import par Gunicorn ou Pytest.
+    # lors de l_exécution directe, pas lors de l_import par Gunicorn ou Pytest.
     import gevent.monkey
     gevent.monkey.patch_all()
 
@@ -1260,6 +1261,6 @@ if __name__ == "__main__":
     socketio.run(app, host="0.0.0.0", port=5000, debug=True, allow_unsafe_werkzeug=True)
 else:
     # Pour Gunicorn/production, Gunicorn appellera create_app()
-    # Gunicorn appellera create_app() via le fichier d'entrypoint.
-    # init_database() est appelé dans create_app ou par le script d'entrypoint.
+    # Gunicorn appellera create_app() via le fichier d_entrypoint.
+    # init_database() est appelé dans create_app ou par le script d_entrypoint.
     pass
