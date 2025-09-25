@@ -161,85 +161,30 @@ export async function renderSettings() {
  * @returns {string} Le HTML de la grille des paramètres.
  */
 function createSettingsLayout() {
-    return `
-        <div class="settings-grid">
-            <!-- Sidebar de navigation -->
-            <aside class="settings-sidebar">
-                <h3>Paramètres</h3>
-                <nav>
-                    <ul class="settings-nav-list">
-                        <li class="settings-nav-item">
-                            <a href="#profiles" class="settings-nav-link active" data-section="profiles">
-                                <span class="settings-nav-icon">👤</span>
-                                Profils d'Analyse
-                            </a>
-                        </li>
-                        <li class="settings-nav-item">
-                            <a href="#models" class="settings-nav-link" data-section="models">
-                                <span class="settings-nav-icon">🤖</span>
-                                Modèles IA
-                            </a>
-                        </li>
-                        <li class="settings-nav-item">
-                            <a href="#templates" class="settings-nav-link" data-section="templates">
-                                <span class="settings-nav-icon">📝</span>
-                                Templates de Prompts
-                            </a>
-                        </li>
-                        <li class="settings-nav-item">
-                            <a href="#queues" class="settings-nav-link" data-section="queues">
-                                <span class="settings-nav-icon">⚡</span>
-                                Files de Tâches
-                            </a>
-                        </li>
-                        <li class="settings-nav-item">
-                            <a href="#preferences" class="settings-nav-link" data-section="preferences">
-                                <span class="settings-nav-icon">⚙️</span>
-                                Préférences
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </aside>
-
-            <!-- Header principal -->
-            <header class="settings-header">
-                <h2 id="settings-title">
-                    <span class="settings-nav-icon">👤</span>
-                    Profils d'Analyse
-                </h2>
-                <p id="settings-description">Gérez vos profils d'analyse et configurez les modèles de prompts.</p>
-            </header>
-
-            <!-- Contenu principal -->
-            <main class="settings-main">
-                <!-- Section Profils -->
-                <section id="profiles-section" class="settings-section active">
-                    ${createProfilesSection()}
-                </section>
-
-                <!-- Section Modèles -->
-                <section id="models-section" class="settings-section">
-                    ${createModelsSection()}
-                </section>
-
-                <!-- Section Templates -->
-                <section id="templates-section" class="settings-section">
-                    ${createTemplatesSection()}
-                </section>
-
-                <!-- Section Queues -->
-                <section id="queues-section" class="settings-section">
-                    ${createQueuesSection()}
-                </section>
-
-                <!-- Section Préférences -->
-                <section id="preferences-section" class="settings-section">
-                    ${createPreferencesSection()}
-                </section>
-            </main>
+  return `
+    <div class="grid-2">
+      <aside class="card">
+        <div class="card__header"><div class="h3">Paramètres</div></div>
+        <div class="card__body">
+          <div class="tabs">
+            <div class="tab-list">
+              <button class="tab-btn active" data-tab="profiles">Profils</button>
+              <button class="tab-btn" data-tab="models">Modèles</button>
+              <button class="tab-btn" data-tab="templates">Templates</button>
+              <button class="tab-btn" data-tab="queues">Files</button>
+              <button class="tab-btn" data-tab="prefs">Préférences</button>
+            </div>
+          </div>
         </div>
-    `;
+      </aside>
+      <section class="card">
+        <div class="card__header"><div class="h3" id="settingsTitle">Profils d’analyse</div></div>
+        <div class="card__body" id="settingsContent">
+          <!-- contenu dynamique -->
+        </div>
+      </section>
+    </div>
+  `;
 }
 
 /**
@@ -584,6 +529,28 @@ function renderAnalysisProfilesList(profiles, container) {
     });
 }
 
+function initSettingsTabs() {
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const title = document.getElementById('settingsTitle');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const tab = btn.dataset.tab;
+      // Mets à jour le titre et le contenu (appelle tes fonctions existantes)
+      const titles = {
+        profiles: "Profils d’analyse",
+        models: "Modèles IA",
+        templates: "Templates de prompts",
+        queues: "Files de tâches",
+        prefs: "Préférences"
+      };
+      title.textContent = titles[tab] || "Paramètres";
+      // renderSettingsSection(tab); // -> implémente cette fonction pour injecter la section correspondante
+    });
+  });
+}
+
 /**
  * Configure tous les écouteurs d'événements pour la page des paramètres.
  * NOTE: Cette fonction est maintenant appelée APRÈS la création du DOM.
@@ -610,56 +577,11 @@ function setupSettingsEventListeners() {
         profileEditForm.addEventListener('submit', handleSaveProfile);
     }
 
-    // Navigation entre sections
-    document.querySelectorAll('.settings-nav-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const section = e.currentTarget.dataset.section;
-            
-            // Mettre à jour la navigation active
-            document.querySelectorAll('.settings-nav-link').forEach(l => l.classList.remove('active'));
-            e.currentTarget.classList.add('active');
-            
-            // Mettre à jour les sections
-            document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
-            document.getElementById(`${section}-section`).classList.add('active');
-            
-            // Mettre à jour le header
-            const titles = {
-                profiles: { title: 'Profils d\'Analyse', desc: 'Gérez vos profils d\'analyse et configurez les modèles de prompts.' },
-                models: { title: 'Modèles IA', desc: 'Téléchargez et gérez vos modèles de langage Ollama.' },
-                templates: { title: 'Templates de Prompts', desc: 'Créez et modifiez vos templates de prompts réutilisables.' },
-                queues: { title: 'Files de Tâches', desc: 'Surveillez l\'état des tâches en cours d\'exécution.' },
-                preferences: { title: 'Préférences', desc: 'Configurez les paramètres généraux de l\'application.' }
-            };
-            
-            const info = titles[section];
-            document.getElementById('settings-title').innerHTML = `<span class="settings-nav-icon">${e.currentTarget.querySelector('.settings-nav-icon').textContent}</span> ${info.title}`;
-            document.getElementById('settings-description').textContent = info.desc;
-        });
-    });
+    initSettingsTabs();
 
-    // Navigation moderne des onglets
-    document.querySelectorAll('.tab-link-modern').forEach(link => {
-        link.addEventListener('click', (e) => {
-            const tabId = e.currentTarget.dataset.tab;
-            
-            // Mettre à jour les onglets actifs
-            const parentTabs = e.currentTarget.closest('.modern-tabs');
-            parentTabs.querySelectorAll('.tab-link-modern').forEach(l => l.classList.remove('active'));
-            parentTabs.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            
-            e.currentTarget.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
-        });
-    });
-    
-    // Écouteurs pour les anciens onglets (au cas où)
-    const tabContainer = document.querySelector('.tabs');
-    if (tabContainer) {
-        const tabLinks = tabContainer.querySelectorAll('.tab-link');
-        const tabContents = tabContainer.querySelectorAll('.tab-content');
-
+    const tabContainer = document.querySelector('.tab-list');
+    if(tabContainer) {
+        const tabLinks = tabContainer.querySelectorAll('.tab-btn');
         tabLinks.forEach(link => {
             link.addEventListener('click', () => {
                 const tabId = link.dataset.tab;

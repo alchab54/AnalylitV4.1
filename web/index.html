@@ -14,12 +14,9 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔬</text></svg>">
     
     <!-- CSS Files -->
-    <link rel="stylesheet" href="css/emergency-fixes.css">
-    <link rel="stylesheet" href="css/enhanced-design-tokens.css">
-    <link rel="stylesheet" href="css/style-improved.css">
-    <link rel="stylesheet" href="css/ux-fix.css">
-    <link rel="stylesheet" href="css/responsive-fixes.css">
-    <link rel="stylesheet" href="css/settings-redesign.css"> <!-- NOUVELLE LIGNE -->
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
     
     <!-- Scripts externes -->
     <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js" defer></script>
@@ -34,66 +31,53 @@
 <body>
     <!-- En-tête principal FIXE -->
     <header class="app-header">
-        <div class="container">
-            <div class="app-header__content">
-                <div class="app-header__left">
-                    <h1 class="app-header__title">
-                        <span role="img" aria-hidden="true">🧬</span>
-                        AnalyLit v4.1
-                    </h1>
-                </div>
-                <div class="app-header__right">
-                    <div id="connection-status" class="connection-indicator">
-                        <span class="status-dot connected"></span>
-                        <span class="status-text">Connecté</span>
-                    </div>
-                    <button class="btn btn--ghost" data-action="toggle-theme" title="Changer de thème">
-                        🌙
-                    </button>
-                </div>
-            </div>
+      <div class="container app-header__inner">
+        <div class="brand">AnalyLit</div>
+        <div class="header-actions">
+          <!-- Actions éventuelles -->
         </div>
+      </div>
     </header>
 
     <!-- Navigation HORIZONTALE - NAVIGATION UNIQUE -->
     <nav class="app-nav" role="navigation" aria-label="Navigation principale">
-        <div class="container">
-            <button class="app-nav__button app-nav__button--active" data-action="show-section" data-section-id="projects">
-                <span role="img" aria-hidden="true">📁</span> Projets
+        <div class="container app-nav__wrap" id="mainNav">
+            <button class="app-nav__btn" data-section="projects">
+                Projets
             </button>
-            <button class="app-nav__button" data-action="show-section" data-section-id="search">
-                <span role="img" aria-hidden="true">🔍</span> Recherche
+            <button class="app-nav__btn" data-section="search">
+                Recherche
             </button>
-            <button class="app-nav__button" data-action="show-section" data-section-id="results">
-                <span role="img" aria-hidden="true">📄</span> Résultats
+            <button class="app-nav__btn" data-section="results">
+                Résultats
             </button>
-            <button class="app-nav__button" data-action="show-section" data-section-id="validation">
-                <span role="img" aria-hidden="true">✅</span> Validation
+            <button class="app-nav__btn" data-section="validation">
+                Validation
             </button>
-            <button class="app-nav__button" data-action="show-section" data-section-id="grids">
-                <span role="img" aria-hidden="true">📋</span> Grilles
+            <button class="app-nav__btn" data-section="grids">
+                Grilles
             </button>
-            <button class="app-nav__button" data-action="show-section" data-section-id="analyses">
-                <span role="img" aria-hidden="true">📊</span> Analyses
+            <button class="app-nav__btn" data-section="analyses">
+                Analyses
             </button>
-            <button class="app-nav__button" data-action="show-section" data-section-id="import">
-                <span role="img" aria-hidden="true">📥</span> Import
+            <button class="app-nav__btn" data-section="import">
+                Import
             </button>
-            <button class="app-nav__button" data-action="show-section" data-section-id="chat">
-                <span role="img" aria-hidden="true">💬</span> Chat IA
+            <button class="app-nav__btn" data-section="chat">
+                Chat IA
             </button>
-            <button class="app-nav__button" data-action="show-section" data-section-id="settings">
-                <span role="img" aria-hidden="true">⚙️</span> Paramètres
+            <button class="app-nav__btn" data-section="settings">
+                Paramètres
             </button>
         </div>
     </nav>
 
     <!-- Contenu principal -->
     <main class="app-main" role="main">
-        <div class="container">
+        <div class="container app-main__inner">
             
             <!-- Section Projets - SECTION ACTIVE PAR DÉFAUT -->
-            <section id="projects" class="app-section active">
+            <section id="projects" class="app-section">
                 <div class="section-header">
                     <div class="section-header__content">
                         <h2>Gestion des Projets</h2>
@@ -126,7 +110,7 @@
             </section>
 
             <!-- Section Recherche -->
-            <section id="search" class="app-section" style="display: none;">
+            <section id="search" class="app-section hidden">
                 <div class="section-header">
                     <h2>Recherche Multi-Bases</h2>
                     <p>Lancez des recherches sur PubMed, arXiv, CrossRef</p>
@@ -137,7 +121,7 @@
             </section>
 
             <!-- Section Résultats - ESSENTIEL POUR CYPRESS -->
-            <section id="results" class="app-section" style="display: none;">
+            <section id="results" class="app-section hidden">
                 <div class="section-header">
                     <h2>Articles du Projet</h2>
                     <p>Consultez et filtrez les articles trouvés</p>
@@ -187,7 +171,7 @@
             </section>
 
             <!-- Section Validation -->
-            <section id="validation" class="app-section" style="display: none;">
+            <section id="validation" class="app-section hidden">
                 <div class="section-header">
                     <h2>Validation Inter-Évaluateurs</h2>
                 </div>
@@ -197,7 +181,7 @@
             </section>
 
             <!-- Section Grilles -->
-            <section id="grids" class="app-section" style="display: none;">
+            <section id="grids" class="app-section hidden">
                 <div class="section-header">
                     <h2>Grilles d'Extraction</h2>
                 </div>
@@ -207,7 +191,7 @@
             </section>
 
             <!-- Section Analyses - ESSENTIEL POUR CYPRESS -->
-            <section id="analyses" class="app-section" style="display: none;">
+            <section id="analyses" class="app-section hidden">
                  <div class="section-header">
                      <h2>Analyses du Projet</h2>
                      <div class="analysis-controls">
@@ -276,7 +260,7 @@
             </section>
 
             <!-- Section Import -->
-            <section id="import" class="app-section" style="display: none;">
+            <section id="import" class="app-section hidden">
                 <div class="section-header">
                     <h2>Import & Gestion des Fichiers</h2>
                 </div>
@@ -286,7 +270,7 @@
             </section>
 
             <!-- Section Chat IA -->
-            <section id="chat" class="app-section" style="display: none;">
+            <section id="chat" class="app-section hidden">
                 <div class="section-header">
                     <h2>Chat IA avec Documents</h2>
                 </div>
@@ -296,7 +280,7 @@
             </section>
 
             <!-- Section Paramètres -->
-            <section id="settings" class="app-section" style="display: none;">
+            <section id="settings" class="app-section hidden">
                 <div class="section-header">
                     <h2>Paramètres & Configuration</h2>
                 </div>
@@ -465,8 +449,7 @@
     <!-- Scripts d'initialisation -->
     <script type="module" src="js/layout-optimizer.js"></script>
     <script type="module" src="js/app-improved.js"></script>
-    <!-- NOUVELLE LIGNE - Script de correction navigation -->
-    <script src="js/navigation-fix.js"></script>
+    <script src="js/app-nav.js"></script>
 
 </body>
 </html>
