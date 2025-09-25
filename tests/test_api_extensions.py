@@ -138,7 +138,7 @@ def test_api_full_validation_workflow(client: FlaskClient, db_session: Session, 
         content_type='multipart/form-data'
     )
     assert response_eval_2.status_code == 200
-    assert response_eval_2.json['message'] == "1 validations ont été importées pour l'évaluateur evaluator2."
+    assert response_eval_2.json['message'] == "1 validations ont été importées pour l_évaluateur evaluator2."
 
     # 5. Assert 2
     db_session.refresh(extraction)

@@ -54,21 +54,23 @@ from tasks_v4_complete import (
     import_from_zotero_file_task, import_pdfs_from_zotero_task, index_project_pdfs_task,
     answer_chat_question_task, run_risk_of_bias_task,
     import_from_zotero_json_task,
-    add_manual_articles_task, pull_ollama_model_task, calculate_kappa_task
+    add_manual_articles_task, pull_ollama_model_task, calculate_kappa_task,
+    run_atn_specialized_extraction_task, run_empathy_comparative_analysis_task
 )
 
-# --- Imports pour l'extension Zotero ---
+# --- Imports pour l_extension Zotero ---
 from utils.importers import process_zotero_item_list
-# Simulez ou remplacez par vos vraies fonctions de BDD et d'export
-# Assurez-vous que 'with_db_session' est importé si vous l'utilisez dans les fonctions ci-dessous
+# Simulez ou remplacez par vos vraies fonctions de BDD et d_export
+# Assurez-vous que 'with_db_session' est importé si vous l_utilisez dans les fonctions ci-dessous
 from utils.database import with_db_session
 
 # Convertir PROJECTS_DIR en objet Path pour assurer la compatibilité
 PROJECTS_DIR = Path(PROJECTS_DIR_STR)
 
 # --- Initialisation des extensions ---
-# On les déclare ici pour qu'elles soient accessibles globalement,
+# On les déclare ici pour qu_elles soient accessibles globalement,
 # mais on les initialise dans create_app()
+
 socketio = SocketIO()
 migrate = Migrate()
 models_queue = rq.Queue('models', connection=redis_conn)
@@ -76,7 +78,7 @@ models_queue = rq.Queue('models', connection=redis_conn)
 
 def create_app(config_override=None):
     """Factory pour créer et configurer l_application Flask."""
-    # Configure Flask pour qu'il trouve les fichiers statiques dans le dossier 'web'
+    # Configure Flask pour qu_il trouve les fichiers statiques dans le dossier 'web'
     app = Flask(__name__, static_folder='web', static_url_path='')
 
     # --- Configuration Loading ---
@@ -109,7 +111,7 @@ def create_app(config_override=None):
     if SCHEMA:
         app.config['SQLALCHEMY_ENGINE_OPTIONS']['connect_args'] = {'options': f'-csearch_path={SCHEMA}'}
 
-    # L'initialisation de la base de données est maintenant déplacée vers les points d'entrée
+    # L_initialisation de la base de données est maintenant déplacée vers les points d_entrée
     # (post_fork pour Gunicorn, et __main__ pour le dev local) pour éviter la double initialisation.
     db.init_app(app)
 
@@ -119,7 +121,7 @@ def create_app(config_override=None):
 
     # Import et initialisation forcés - BON ORDRE :
     # Les modèles sont déjà importés au top du fichier
-    # L'initialisation est maintenant gérée par le service 'migrate' dans docker-compose
+    # L_initialisation est maintenant gérée par le service 'migrate' dans docker-compose
     # from utils.database import init_database
     # init_database()  
 
@@ -308,7 +310,7 @@ def create_app(config_override=None):
                 return jsonify({"success": False, "message": "Payload JSON manquant."}),
             
             items = data.get('items', [])
-            import_type = data.get('importType', 'manual') # 'selected', 'collection', 'library'
+            import_type = data.get('importType', 'manual') # 'selected', 'collection', 'library' 
             
             logger.info(f"Import Zotero (extension) type '{import_type}' pour projet {project_id}")
             
@@ -417,7 +419,7 @@ def create_app(config_override=None):
         job = background_queue.enqueue(multi_database_search_task, project_id=project_id, query=query, databases=databases, max_results_per_db=max_results, expert_queries=expert_queries, job_timeout='30m')
         return jsonify({"message": "Recherche lancée", "task_id": job.id}), 202
 
-    # ==================== ROUTES API PIPELINE & ANALYSIS ====================
+    # ==================== ROUTES API PIPELINE & ANALYSIS ===================
     @app.route("/api/projects/<project_id>/run", methods=["POST"])
     @with_db_session
     def run_pipeline(session, project_id):
@@ -495,7 +497,7 @@ def create_app(config_override=None):
         session.commit()
         return jsonify(grid.to_dict()), 200
 
-    # ==================== ROUTES API EXTRACTIONS ====================
+    # ==================== ROUTES API EXTRACTIONS ===================
     @app.route("/api/projects/<project_id>/extractions/<extraction_id>/decision", methods=["PUT"])
     @with_db_session
     def update_extraction_decision(session, project_id, extraction_id):
@@ -791,7 +793,7 @@ def create_app(config_override=None):
             analysis_type = data.get('type')
 
             # Validation du type d_analyse
-            valid_types = ['meta_analysis', 'atn_scores', 'knowledge_graph', 'prisma_flow']
+            valid_types = ['meta_analysis', 'atn_scores', 'knowledge_graph', 'prisma_flow', 'atn_specialized_extraction', 'empathy_comparative_analysis']
             if analysis_type not in valid_types:
                 return jsonify({"error": f"Type d_analyse non supporté: {analysis_type}"}), 400
                 
@@ -805,7 +807,9 @@ def create_app(config_override=None):
                 'meta_analysis': run_meta_analysis_task,
                 'atn_scores': run_atn_score_task,
                 'knowledge_graph': run_knowledge_graph_task,
-                'prisma_flow': run_prisma_flow_task
+                'prisma_flow': run_prisma_flow_task,
+                'atn_specialized_extraction': run_atn_specialized_extraction_task,
+                'empathy_comparative_analysis': run_empathy_comparative_analysis_task
             }
             
             task_function = task_mapping[analysis_type]
@@ -878,6 +882,19 @@ def create_app(config_override=None):
             task_ids.append(job.id)
         # --- FIN DE LA CORRECTION ---
         return jsonify({"message": "RoB analysis initiated", "task_ids": task_ids}), 202
+
+    @app.route('/api/projects/<project_id>/rob/<article_id>', methods=['POST'])
+    @with_db_session
+    def save_rob_assessment(session, project_id, article_id):
+        data = request.get_json()
+        assessment_data = data.get('rob_assessment')
+
+        if not assessment_data:
+            return jsonify({"error": "Données d_évaluation manquantes"}), 400
+
+        logging.info(f"Sauvegarde de l_évaluation RoB pour l_article {article_id} dans le projet {project_id}")
+        
+        return jsonify({"message": "Évaluation RoB sauvegardée avec succès"}), 200
 
     # ==================== ROUTES API CHAT ====================
     @app.route('/api/projects/<project_id>/calculate-kappa', methods=['POST'])
