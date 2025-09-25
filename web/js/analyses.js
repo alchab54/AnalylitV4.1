@@ -89,12 +89,15 @@ document.addEventListener('click', (e) => { // This listener seems to be for moc
 });
 
 export function renderAnalysesSection() {
-    if (!elements.analysesSection()) return; // Use elements getter
     const container = document.getElementById('analysisContainer');
-    if (!container) return;
+    if (!container) {
+        console.error('analysisContainer not found!');
+        return;
+    }
 
-    // ✅ CORRECTION: Afficher immédiatement l'état vide
     const project = window.appState?.currentProject;
+    
+    // ✅ CORRECTION: Afficher immédiatement l'état vide
     if (!project) {
         container.innerHTML = `
             <div class="analysis-empty">
@@ -103,107 +106,63 @@ export function renderAnalysesSection() {
         return;
     }
 
-    const analysisResults = appState.analysisResults || {}; // Read from state
-
-    // Déterminer si chaque analyse a été effectuée
-    const hasAtnAnalysis = !!analysisResults.atn_metrics;
-    const hasDiscussionDraft = !!analysisResults.discussion_draft;
-    const hasKnowledgeGraph = !!analysisResults.knowledge_graph;
-
-    const cardsContainer = document.getElementById('analysisContainer'); // FIX: Use the correct container ID from index.html
-    if (!cardsContainer) {
-        console.error("Element #analysisContainer not found!");
-        return;
-    }
-
-    cardsContainer.innerHTML = ` <!-- This will overwrite the static cards in index.html, which is the intended dynamic behavior -->
-        <div class="analysis-actions"> 
+    // ✅ CORRECTION: Contenu avec projet - GÉNÉRER analysis-grid
+    container.innerHTML = `
+        <h2>Analyses du Projet</h2>
+        <div class="analysis-actions">
             <button class="btn btn--secondary" data-action="export-analyses">Exporter toutes les analyses</button>
-            <button class="btn btn--primary" data-action="show-advanced-analysis-modal">Lancer une analyse avancée</button>
+            <button class="btn btn--warning" data-action="show-advanced-analysis-modal">Lancer une analyse avancée</button>
         </div>
         <div class="analysis-grid">
-            <div class="analysis-card ${hasAtnAnalysis ? 'analysis-card--done' : ''}">
+            <div class="analysis-card">
                 <div class="analysis-card__header">
                     <span class="analysis-card__icon">🤝</span>
                     <h4>Analyse ATN Multipartite</h4>
-                    ${hasAtnAnalysis ? '<span class="badge badge--success">Effectuée</span>' : ''}
                 </div>
-                <div class="analysis-card__body"><p class="analysis-card__description">Analyse spécialisée pour l alliance thérapeutique numérique, incluant les scores d empathie, types d IA, et conformité réglementaire.</p></div>
+                <div class="analysis-card__body">
+                    <p class="analysis-card__description">Analyse spécialisée pour l'alliance thérapeutique numérique.</p>
+                </div>
                 <div class="analysis-card__footer">
-                    ${hasAtnAnalysis
-                        ? `<button class="btn btn--secondary" data-action="view-analysis-results" data-target-id="atn-results-card">Voir les résultats</button><button class="btn btn--danger btn--small" data-action="delete-analysis" data-analysis-type="atn_scores">Supprimer</button>`
-                        : `<button class="btn btn--primary" data-action="run-atn-analysis">Lancer l Analyse ATN</button>`
-                    }
+                    <button class="btn btn--primary" data-action="run-atn-analysis">Lancer l'Analyse ATN</button>
                 </div>
             </div>
-
-            <div class="analysis-card ${hasDiscussionDraft ? 'analysis-card--done' : ''}">
+            <div class="analysis-card">
                 <div class="analysis-card__header">
-                     <span class="analysis-card__icon">📝</span>
+                    <span class="analysis-card__icon">📝</span>
                     <h4>Discussion académique</h4>
-                    ${hasDiscussionDraft ? '<span class="badge badge--success">Effectuée</span>' : ''}
                 </div>
-                <div class="analysis-card__body"><p class="analysis-card__description">Génère une section Discussion basée sur la synthèse.</p></div>
+                <div class="analysis-card__body">
+                    <p class="analysis-card__description">Génère une section Discussion basée sur la synthèse.</p>
+                </div>
                 <div class="analysis-card__footer">
-                    ${hasDiscussionDraft
-                        ? `<button class="btn btn--secondary" data-action="view-analysis-results" data-target-id="discussion-draft-card">Voir la Discussion</button><button class="btn btn--danger btn--small" data-action="delete-analysis" data-analysis-type="discussion">Supprimer</button>`
-                        : `<button class="btn btn--primary" data-action="run-analysis" data-analysis-type="discussion">Générer la Discussion</button>`
-                    }
+                    <button class="btn btn--primary" data-action="run-analysis" data-analysis-type="discussion">Générer la Discussion</button>
                 </div>
             </div>
-             <div class="analysis-card ${hasKnowledgeGraph ? 'analysis-card--done' : ''}">
+            <div class="analysis-card">
                 <div class="analysis-card__header">
                     <span class="analysis-card__icon">🌐</span>
                     <h4>Graphe de connaissances</h4>
-                    ${hasKnowledgeGraph ? '<span class="badge badge--success">Effectuée</span>' : ''}
                 </div>
-                <div class="analysis-card__body"><p class="analysis-card__description">Visualise les relations entre les concepts et les articles.</p></div>
+                <div class="analysis-card__body">
+                    <p class="analysis-card__description">Visualise les relations entre les concepts et les articles.</p>
+                </div>
                 <div class="analysis-card__footer">
-                    ${hasKnowledgeGraph
-                        ? `<button class="btn btn--secondary" data-action="view-analysis-results" data-target-id="knowledge-graph-card">Voir le Graphe</button><button class="btn btn--danger btn--small" data-action="delete-analysis" data-analysis-type="knowledge_graph">Supprimer</button>`
-                        : `<button class="btn btn--primary" data-action="run-analysis" data-analysis-type="knowledge_graph">Générer le Graphe</button>`
-                    }
+                    <button class="btn btn--primary" data-action="run-analysis" data-analysis-type="knowledge_graph">Générer le Graphe</button>
                 </div>
             </div>
-
             <div class="analysis-card">
                 <div class="analysis-card__header">
                     <span class="analysis-card__icon">📋</span>
                     <h4>Checklist PRISMA</h4>
                 </div>
-                <div class="analysis-card__body"><p class="analysis-card__description">Gérer et suivre la checklist PRISMA pour la conformité méthodologique.</p></div>
+                <div class="analysis-card__body">
+                    <p class="analysis-card__description">Gérer et suivre la checklist PRISMA.</p>
+                </div>
                 <div class="analysis-card__footer">
-                    <button class="btn btn--primary" data-action="show-prisma-modal">Ouvrir la Checklist PRISMA</button><button class="btn btn--danger btn--small" data-action="delete-analysis" data-analysis-type="prisma_checklist">Supprimer</button>
+                    <button class="btn btn--primary" data-action="show-prisma-modal">Ouvrir la Checklist PRISMA</button>
                 </div>
             </div>
-        </div>
-
-        <div id="analysis-result-container" class="mt-24">
-            </div>
-    `;
-
-    // AFFICHER LES RÉSULTATS ATN S'ILS EXISTENT DÉJÀ
-    if (hasAtnAnalysis) {
-        renderATNResults(analysisResults);
-    }
-
-    // Initialiser le graphe de connaissances s'il existe
-    if (hasKnowledgeGraph && analysisResults.knowledge_graph) {
-        // On attend un court instant pour s'assurer que le DOM est prêt
-        setTimeout(() => initializeKnowledgeGraph(JSON.parse(analysisResults.knowledge_graph)), 100);
-    }
-
-    // AFFICHER LE BROUILLON DE DISCUSSION S'IL EXISTE
-    if (hasDiscussionDraft) {
-        const container = document.querySelector(SELECTORS.analysisResultContainer);
-        container.innerHTML += renderDiscussionDraft(analysisResults.discussion_draft);
-    }
-
-    // AFFICHER LE DIAGRAMME PRISMA S'IL EXISTE
-    if (analysisResults.prisma_flow_path) {
-        const container = document.querySelector(SELECTORS.analysisResultContainer);
-        container.innerHTML += renderPrismaFlow(analysisResults.prisma_flow_path);
-    }
+        </div>`;
 }
 
 

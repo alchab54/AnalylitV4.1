@@ -173,13 +173,23 @@ export function showToast(message, type = 'info', duration = 5000) {
     
     // ✅ Message exact - pas d'emojis ou texte supplémentaire
     toast.innerHTML = `
-        <div class="toast-content">
-            ${message}
-        </div>
+        <div class="toast-content">${message}</div>
         <button class="toast-close">×</button>
     `;
     
+    // ✅ CORRECTION: Ajouter au body
     document.body.appendChild(toast);
+    
+    // Style inline pour garantir visibilité
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        display: block;
+        visibility: visible;
+        opacity: 1;
+    `;
     
     // Auto-suppression
     setTimeout(() => {

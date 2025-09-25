@@ -388,12 +388,11 @@ export function refreshCurrentSection() {
             loadRobSection();
             break;
         case 'analyses':
-            if (!appState.currentProject) {
-                // ✅ CORRECTION: Forcer l'affichage état vide 
-                renderAnalysesSectionFromAnalyses();
-            } else {
-                loadProjectAnalyses();
-            }
+            // ✅ CORRECTION: Forcer le rendu immédiatement
+            const { renderAnalysesSection } = await import('./analyses.js');
+            setTimeout(() => {
+                renderAnalysesSection();
+            }, 50);
             break;
         case 'import':
             renderImportSection(appState.currentProject); // This is correct for 'import'
