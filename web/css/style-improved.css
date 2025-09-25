@@ -528,10 +528,12 @@ select.form-control, select {
   overflow-y: auto;
 }
 
-.modal--show, .modal.show {
-  display: block !important; /* FIX: Utiliser block pour assurer la visibilité selon la demande */
-  opacity: 1 !important;
+.modal.modal--show,
+.modal--show {
+  display: block !important;
   visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 9999 !important;
 }
 
 .modal-backdrop {

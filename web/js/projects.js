@@ -131,7 +131,6 @@ async function deleteProject(projectId, projectName) {
  */
 async function confirmDeleteProject(projectId) {
     showLoadingOverlay(true, MESSAGES.deletingProject);
-    closeModal(); // Ferme la modale de confirmation
     
     try {
         // Perform the API call first.

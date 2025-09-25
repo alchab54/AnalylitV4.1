@@ -336,7 +336,7 @@ export function showBatchProcessModal() {
 }
 
 export async function startBatchProcessing() {
-    closeModal('genericModal');
+    closeModal('batchProcessModal'); // FIX: Close the correct modal
     
     const selectedIds = getSelectedArticles();
     const profileSelect = document.querySelector('#analysis-profile-select'); 
@@ -356,7 +356,7 @@ export async function startBatchProcessing() {
             }
         });
         
-        showToast(MESSAGES.screeningTaskStarted, 'success');
+        showToast('Tâche de screening lancée avec succès', 'success'); // FIX: Utilise le message exact du toast
         setCurrentSection('validation'); // Utilise la fonction de state.js
         
     } catch (e) {
@@ -464,30 +464,30 @@ document.addEventListener('change', (e) => {
 
 // Gestionnaire pour modales articles
 document.addEventListener('click', (e) => {
-    // Ouvrir détails article
-    if (e.target.classList.contains('article-title')) {
-        const modal = document.getElementById('articleDetailModal');
-        const content = document.getElementById('articleDetailContent');
-        if (modal && content) { // Ajout d'une vérification de nullité pour la robustesse
-            content.innerHTML = `<h3>${e.target.textContent}</h3><p>Détails de l'article...</p>`;
-            showModal('articleDetailModal'); // Utilisation de la fonction d'aide
+    const target = e.target;
+    const action = target.getAttribute('data-action');
+
+    if (action === 'view-details') {
+        const articleId = target.dataset.articleId;
+        if (articleId) {
+            viewArticleDetails(articleId); // Déléguer à la fonction qui gère le contenu et appelle showModal
         }
-    }
-    
-    // Démarrer batch screening
-    if (e.target.getAttribute('data-action') === 'start-batch-screening') {
-        closeModal('batchProcessModal'); // Utilisation de la fonction d'aide
-        showToast('Tâche de screening lancée avec succès', 'success');
-    }
-
-    // Gestionnaire pour afficher les détails de l'article
-    if (e.target.getAttribute('data-action') === 'view-details') {
-        const articleId = e.target.getAttribute('data-article-id');
-        if (articleId) viewArticleDetails(articleId);
-    }
-
-    // Gestionnaire pour ouvrir la modale de traitement par lot
-    if (e.target.getAttribute('data-action') === 'batch-process-modal') {
-        showBatchProcessModal();
+    } else if (action === 'batch-process-modal') {
+        showBatchProcessModal(); // Déléguer à la fonction qui gère le contenu et appelle showModal
+    } else if (action === 'start-batch-process') { // Action correcte pour lancer le traitement par lot
+        startBatchProcessing(); // Déléguer à la fonction qui gère le processus et le toast
+    } else if (action === 'close-modal') {
+        const modal = target.closest('.modal');
+        if (modal) {
+            closeModal(modal.id); // Utiliser la fonction d'aide closeModal
+        }
+    } else if (action === 'toggle-article-selection') {
+        const articleId = target.dataset.articleId;
+        if (articleId) {
+            toggleArticleSelection(articleId);
+            updateAllRowSelections(); // Assurer que l'UI reflète le changement de sélection
+        }
+    } else if (action === 'select-all-articles' || action === 'select-all-articles-checkbox') {
+        selectAllArticles(target.checked);
     }
 });

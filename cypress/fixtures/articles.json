@@ -1,0 +1,29 @@
+[
+  {
+    "article_id": "PMID:1",
+    "title": "Intelligence Artificielle en Santé",
+    "authors": "Dupont, J. et al.",
+    "journal": "Journal de Santé IA",
+    "publication_date": "2024",
+    "doi": "10.1000/1",
+    "abstract": "Résumé de l'article sur l'IA en santé."
+  },
+  {
+    "article_id": "PMID:2",
+    "title": "Méthodologie ATN pour Revues de Littérature",
+    "authors": "Martin, A. et al.",
+    "journal": "Revue de Méthodologie",
+    "publication_date": "2024",
+    "doi": "10.1000/2",
+    "abstract": "Résumé de l'article sur la méthodologie ATN."
+  },
+  {
+    "article_id": "PMID:3",
+    "title": "Applications IA dans la Recherche Médicale",
+    "authors": "Bernard, C. et al.",
+    "journal": "Médecine et IA",
+    "publication_date": "2023",
+    "doi": "10.1000/3",
+    "abstract": "Résumé de l'article sur les applications IA."
+  }
+]
