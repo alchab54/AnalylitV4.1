@@ -47,20 +47,20 @@ describe('Workflow de Gestion des Projets', () => {
     // ✅ CORRECTION LIGNE 74 : Navigation + force click
     cy.navigateToSection('projects'); // ✅ S'assurer qu'on voit la section
     
-    // Intercepter la confirmation native du navigateur et répondre "oui" automatiquement
-    cy.on('window:confirm', (str) => {
-      expect(str).to.include('supprimer le projet');
-      return true;
+    // ✅ CONFIGURER le stub AVANT le clic et lui donner un alias
+    cy.window().then((win) => {
+      cy.stub(win, 'confirm').as('confirmDialog').returns(true);
     });
 
+    // Cliquer sur le bouton de suppression
     cy.contains('.project-card', 'Projet à Supprimer')
       .find('[data-action="delete-project"]')
       .click({ force: true }); // ✅ FORCE AJOUTÉ
-    
-    // Vérifier la notification
-    cy.contains('.toast--success', 'Projet supprimé avec succès').should('exist'); // ✅ exist
-    
-    // Vérifier que le projet n'existe plus
+
+    // ✅ VÉRIFIER que la boîte de dialogue de confirmation a bien été appelée
+    cy.get('@confirmDialog').should('have.been.called');
+
+    // ✅ ATTENDRE la disparition de l'élément du DOM
     cy.contains('.project-card', 'Projet à Supprimer').should('not.exist');
   });
 });

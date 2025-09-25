@@ -3,15 +3,20 @@ describe('Workflow de Gestion des Analyses', () => {
     cy.visit('/');
     cy.waitForAppReady();
     
-    // Créer et sélectionner un projet pour la plupart des tests
+    // Créer ET sélectionner le projet en séparant les étapes pour plus de stabilité
     cy.createTestProject('Projet Analyses Test');
-    cy.selectProject('Projet Analyses Test');
+
+    // Attendre un peu avant la sélection pour éviter les race conditions
+    cy.wait(500);
     
-    // Naviguer vers la section Analyses
-    cy.navigateToSection('analyses');
+    // Sélectionner avec la commande corrigée
+    cy.selectProject('Projet Analyses Test');
   });
 
   it("Devrait afficher la section des analyses et les cartes d'analyse", () => {
+    // ✅ Naviguer vers la section pour s'assurer que le contenu est rendu
+    cy.navigateToSection('analyses');
+
     cy.contains('h2', 'Analyses du Projet').should('exist');
     cy.get('.analysis-grid').should('exist');
     cy.get('.analysis-card').should('have.length.at.least', 4); // Au moins ATN, Discussion, Graphe, PRISMA

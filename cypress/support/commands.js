@@ -104,13 +104,13 @@ Cypress.Commands.add('selectProject', (projectName) => {
   cy.navigateToSection('projects')
   
   // Cliquer sur le projet avec force
-  cy.contains('.project-card', projectName, { timeout: 10000 })
+  cy.contains('.project-card', projectName, { timeout: 8000 })
     .should('exist')
     .click({ force: true })
-    .should('have.class', 'project-card--active'); // Vérifier immédiatement l'activation
   
-  // Attendre que le JavaScript termine la sélection et les rendus associés
-  cy.wait(300);
+  // Vérifier l'activation dans une nouvelle chaîne pour éviter le "detached from DOM"
+  cy.contains('.project-card', projectName)
+    .should('have.class', 'project-card--active');
 })
 
 // ===============================================

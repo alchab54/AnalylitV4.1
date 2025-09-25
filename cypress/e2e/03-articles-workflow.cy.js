@@ -5,12 +5,14 @@ describe('Workflow de Gestion des Articles', () => {
     cy.visit('/');
     cy.waitForAppReady();
     
-    // Créer et sélectionner un projet pour isoler les tests
+    // Créer ET sélectionner le projet en séparant les étapes pour plus de stabilité
     cy.createTestProject('Projet Articles Test');
-    cy.selectProject('Projet Articles Test');
     
-    // Naviguer vers la section des articles (résultats)
-    cy.navigateToSection('results');
+    // Attendre un peu avant la sélection pour éviter les race conditions
+    cy.wait(500);
+    
+    // Sélectionner avec la commande corrigée
+    cy.selectProject('Projet Articles Test');
   });
 
   it('Devrait afficher la liste des articles du projet sélectionné', () => {
@@ -25,10 +27,10 @@ describe('Workflow de Gestion des Articles', () => {
     // Ce test ne s'exécute que si des articles sont présents
     cy.get('body').then($body => {
       if ($body.find('.article-checkbox').length > 0) {
-        // Sélectionner le premier article et vérifier que les boutons s'activent
+        // ✅ SÉLECTIONNER d'abord un article pour activer les boutons
         cy.get('.article-checkbox').first().check({ force: true });
         
-        // Vérifier que les boutons d'action sont activés
+        // ✅ MAINTENANT, vérifier que les boutons sont actifs
         cy.get('[data-action="delete-selected-articles"]').should('not.be.disabled');
         cy.get('[data-action="batch-screening"]').should('not.be.disabled');
       } else {
