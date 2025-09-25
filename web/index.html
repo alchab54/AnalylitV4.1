@@ -256,6 +256,18 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Conteneurs pour résultats d'analyses -->
+                <div id="atn-results" class="analysis-results" style="display: none;">
+                    <h3>Résultats Analyse ATN</h3>
+                    <p>Résultats de l'analyse ATN multipartite...</p>
+                </div>
+
+                <!-- État vide analyses -->
+                <div class="analysis-empty" style="display: none;">
+                    <p>Veuillez sélectionner un projet pour visualiser les analyses.</p>
+                </div>
+
             </section>
 
             <!-- Section Import -->
@@ -385,7 +397,7 @@
                 <h2 class="modal-title">Checklist PRISMA</h2>
                 <button class="modal-close" data-action="close-modal" aria-label="Fermer">×</button>
             </div>
-            <div class="modal-body">
+            <div id="prisma-checklist-content" class="modal-body">
                 <div class="prisma-item">
                     <label>
                         <input type="checkbox" class="prisma-checkbox">
