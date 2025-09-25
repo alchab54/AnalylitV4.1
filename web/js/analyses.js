@@ -60,6 +60,10 @@ document.addEventListener('click', (e) => { // This listener seems to be for moc
     if (action === 'save-prisma-progress') {
         showToast('Checklist PRISMA sauvegardée', 'success');
     }
+
+    if (action === 'export-analyses') {
+        showToast("Préparation de l'exportation des analyses...", 'info');
+    }
 });
 
 export function renderAnalysesSection() {

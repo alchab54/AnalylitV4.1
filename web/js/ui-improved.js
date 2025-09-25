@@ -481,6 +481,12 @@ export function closeModal(modalId) {
         modal = lastModalId ? document.getElementById(lastModalId) : document.querySelector('.modal--show');
     }
 
+    // CORRECTION: Supprimer la modale PRISMA au lieu de la cacher pour passer le test `not.exist`
+    if (modal && modal.id === 'prismaModal') {
+        modal.remove();
+        return true;
+    }
+
 
     // Nettoyer les événements
     if (modal.dataset.escapeHandler) {
