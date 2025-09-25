@@ -149,118 +149,350 @@ export async function renderSettings() {
  * @returns {string} Le HTML de la grille des paramètres.
  */
 function createSettingsLayout() {
-    const prompts = appState.prompts || [];
-    const promptOptions = prompts.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
-
     return `
-        <div class="settings-col" id="settings-col-1">
-            <div class="settings-card">
-                <div class="settings-card__header">
-                    <h3>Profils d'Analyse</h3>
-                    <button id="new-profile-btn" class="btn btn--sm btn--primary">
-                        <span class="icon">＋</span> Nouveau Profil
-                    </button>
+        <div class="settings-grid">
+            <!-- Sidebar de navigation -->
+            <aside class="settings-sidebar">
+                <h3>Paramètres</h3>
+                <nav>
+                    <ul class="settings-nav-list">
+                        <li class="settings-nav-item">
+                            <a href="#profiles" class="settings-nav-link active" data-section="profiles">
+                                <span class="settings-nav-icon">👤</span>
+                                Profils d'Analyse
+                            </a>
+                        </li>
+                        <li class="settings-nav-item">
+                            <a href="#models" class="settings-nav-link" data-section="models">
+                                <span class="settings-nav-icon">🤖</span>
+                                Modèles IA
+                            </a>
+                        </li>
+                        <li class="settings-nav-item">
+                            <a href="#templates" class="settings-nav-link" data-section="templates">
+                                <span class="settings-nav-icon">📝</span>
+                                Templates de Prompts
+                            </a>
+                        </li>
+                        <li class="settings-nav-item">
+                            <a href="#queues" class="settings-nav-link" data-section="queues">
+                                <span class="settings-nav-icon">⚡</span>
+                                Files de Tâches
+                            </a>
+                        </li>
+                        <li class="settings-nav-item">
+                            <a href="#preferences" class="settings-nav-link" data-section="preferences">
+                                <span class="settings-nav-icon">⚙️</span>
+                                Préférences
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Header principal -->
+            <header class="settings-header">
+                <h2 id="settings-title">
+                    <span class="settings-nav-icon">👤</span>
+                    Profils d'Analyse
+                </h2>
+                <p id="settings-description">Gérez vos profils d'analyse et configurez les modèles de prompts.</p>
+            </header>
+
+            <!-- Contenu principal -->
+            <main class="settings-main">
+                <!-- Section Profils -->
+                <section id="profiles-section" class="settings-section active">
+                    ${createProfilesSection()}
+                </section>
+
+                <!-- Section Modèles -->
+                <section id="models-section" class="settings-section">
+                    ${createModelsSection()}
+                </section>
+
+                <!-- Section Templates -->
+                <section id="templates-section" class="settings-section">
+                    ${createTemplatesSection()}
+                </section>
+
+                <!-- Section Queues -->
+                <section id="queues-section" class="settings-section">
+                    ${createQueuesSection()}
+                </section>
+
+                <!-- Section Préférences -->
+                <section id="preferences-section" class="settings-section">
+                    ${createPreferencesSection()}
+                </section>
+            </main>
+        </div>
+    `;
+}
+
+/**
+ * NOUVELLE FONCTION: Crée le HTML pour la section des profils.
+ * @returns {string} Le HTML de la section.
+ */
+function createProfilesSection() {
+    return `
+        <div class="settings-card">
+            <div class="settings-card__header">
+                <h3 class="settings-card__title">Mes Profils</h3>
+                <button id="new-profile-btn" class="btn btn--primary">
+                    <span class="icon">＋</span> Nouveau Profil
+                </button>
+            </div>
+            <div class="settings-card__body">
+                <div id="profile-list-container" class="enhanced-list">
+                    <!-- Profils injectés ici -->
                 </div>
-                <div class="settings-card__body" id="profile-list-container">
-                    </div>
             </div>
         </div>
 
-        <div class="settings-col" id="settings-col-2">
-            <form id="profile-edit-form" class="settings-card">
-                <input type="hidden" id="profile-id" name="id">
-                
-                <div class="settings-card__header">
-                    <h3>Éditer le Profil</h3>
-                    <div class="form-actions">
-                        <button id="delete-profile-btn" type="button" class="btn btn--sm btn--danger" disabled>
-                            <span class="icon">🗑️</span> Supprimer
-                        </button>
-                        <button type="submit" class="btn btn--sm btn--primary">
-                            <span class="icon">💾</span> Sauvegarder
-                        </button>
-                    </div>
-                </div>
-
-                <div class="settings-card__body">
-                    <div class="form-group">
-                        <label for="profile-name">Nom du Profil</label>
-                        <input type="text" id="profile-name" name="name" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="profile-description">Description</label>
-                        <textarea id="profile-description" name="description" class="form-control" rows="2"></textarea>
-                    </div>
-                    <div class="form-group form-group--checkbox">
-                        <input type="checkbox" id="profile-is_default" name="is_default">
-                        <label for="profile-is_default">Définir comme profil par défaut</label>
-                    </div>
+        <div class="settings-card">
+            <div class="settings-card__header">
+                <h3 class="settings-card__title">Édition du Profil</h3>
+            </div>
+            <div class="settings-card__body">
+                <form id="profile-edit-form">
+                    <input type="hidden" id="profile-id" name="id">
                     
-                    <hr class="separator">
-                    
-                    <div class="form-group">
-                        <label for="prompt-template-select">Appliquer un modèle de prompt :</label>
-                        <div class="input-group">
-                            <select id="prompt-template-select" class="form-control">
-                                <option value="">Choisir un modèle...</option>
-                                ${promptOptions}
-                            </select>
-                            <button type="button" class="btn btn--secondary" id="apply-template-btn">Appliquer</button>
+                    <div class="form-section">
+                        <h4 class="form-section-title">
+                            <span class="icon">📋</span>
+                            Informations Générales
+                        </h4>
+                        <div class="form-row">
+                            <div class="form-group--enhanced">
+                                <label for="profile-name">Nom du Profil</label>
+                                <input type="text" id="profile-name" name="name" class="form-control--enhanced" required>
+                            </div>
+                            <div class="form-group--enhanced">
+                                <label for="profile-is_default">
+                                    <input type="checkbox" id="profile-is_default" name="is_default">
+                                    Profil par défaut
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-row form-row--single">
+                            <div class="form-group--enhanced">
+                                <label for="profile-description">Description</label>
+                                <textarea id="profile-description" name="description" class="form-control--enhanced" rows="3"></textarea>
+                            </div>
                         </div>
                     </div>
 
-                    ${createPromptEditorTabs()}
-                </div>
-            </form>
-        </div>
+                    <div class="form-section">
+                        <h4 class="form-section-title">
+                            <span class="icon">🤖</span>
+                            Configuration des Prompts
+                        </h4>
+                        <div class="modern-tabs">
+                            <div class="tab-header-modern">
+                                ${promptTypes.map((type, index) => `
+                                    <button type="button" class="tab-link-modern ${index === 0 ? 'active' : ''}" data-tab="tab-prompt-${type}">
+                                        ${type.charAt(0).toUpperCase() + type.slice(1)}
+                                    </button>
+                                `).join('')}
+                            </div>
+                            <div class="tab-content-modern">
+                                ${promptTypes.map((type, index) => `
+                                    <div id="tab-prompt-${type}" class="tab-panel ${index === 0 ? 'active' : ''}">
+                                        <div class="form-row">
+                                            <div class="form-group--enhanced">
+                                                <label for="profile-${type}-model">Modèle LLM</label>
+                                                <select id="profile-${type}-model" name="${type}_model" class="form-control--enhanced model-select">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-row form-row--single">
+                                            <div class="form-group--enhanced">
+                                                <label for="${type}-prompt-system">Prompt Système</label>
+                                                <div id="${type}-prompt-system" class="ace-editor"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-row form-row--single">
+                                            <div class="form-group--enhanced">
+                                                <label for="${type}-prompt-user">Template Utilisateur</label>
+                                                <div id="${type}-prompt-user" class="ace-editor"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="settings-col" id="settings-col-3">
-            <div class="settings-card">
-                <div class="settings-card__header">
-                    <h3>Modèles de Prompts (Templates)</h3>
+                    <div class="form-actions">
+                        <button id="delete-profile-btn" type="button" class="btn btn--danger" disabled>
+                            <span class="icon">🗑️</span> Supprimer
+                        </button>
+                        <button type="submit" class="btn btn--primary">
+                            <span class="icon">💾</span> Sauvegarder
+                        </button>
                     </div>
-                <div class="settings-card__body" id="prompt-templates-list">
+                </form>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * NOUVELLE FONCTION: Crée le HTML pour la section des modèles IA.
+ * @returns {string} Le HTML de la section.
+ */
+function createModelsSection() {
+    return `
+        <div class="settings-card">
+            <div class="settings-card__header">
+                <h3 class="settings-card__title">Télécharger un Modèle</h3>
+            </div>
+            <div class="settings-card__body">
+                <div class="form-row">
+                    <div class="form-group--enhanced">
+                        <label for="available-models-select">Modèles Disponibles</label>
+                        <select id="available-models-select" class="form-control--enhanced">
+                            <option value="llama3:8b">Llama 3 8B (Recommandé)</option>
+                            <option value="llama3.2:3b">Llama 3.2 3B (Rapide)</option>
+                            <option value="mistral:7b-instruct">Mistral 7B (Analyse)</option>
+                            <option value="qwen2:7b">Qwen2 7B (Code)</option>
+                            <option value="tinyllama:1.1b">TinyLlama 1.1B (Tests)</option>
+                        </select>
                     </div>
+                    <div class="form-group--enhanced">
+                        <label>&nbsp;</label>
+                        <button data-action="download-selected-model" class="btn btn--primary">
+                            <span class="icon">⬇️</span> Télécharger
+                        </button>
+                    </div>
+                </div>
+                <div id="download-progress" class="progress-container" style="display:none;">
+                    <div class="progress-bar" id="download-progress-bar"></div>
+                    <span id="download-status">Téléchargement en cours...</span>
+                </div>
             </div>
         </div>
 
-        <div class="settings-col" id="settings-col-4">
-            <div class="settings-card">
-                <div class="settings-card__header">
-                    <h3>Statut des Tâches (Queues)</h3>
-                    <button id="refresh-queues-btn" class="btn btn--sm btn--secondary">
-                        <span class="icon">🔄</span> Rafraîchir
-                    </button>
-                </div>
-                <div class="settings-card__body" id="queue-status-container">
-                    </div>
+        <div class="settings-card">
+            <div class="settings-card__header">
+                <h3 class="settings-card__title">Modèles Installés</h3>
+                <span class="status-indicator status-indicator--success">
+                    <span class="status-dot"></span>
+                    Connecté à Ollama
+                </span>
             </div>
-            
-            <div id="models-management" class="settings-card">
-                <div class="settings-card__header">
-                    <h3>Gestion des Modèles IA</h3>
-                </div>
-                <div class="settings-card__body">
-                    <select id="available-models-select" class="form-control">
-                        <option value="llama3:8b">Llama 3 8B (Principal)</option>
-                        <option value="llama3.2:3b">Llama 3.2 3B (Rapide)</option>
-                        <option value="mistral:7b-instruct">Mistral 7B (Analyse)</option>
-                        <option value="qwen2:7b">Qwen2 7B (Code)</option>
-                        <option value="llama3.1:8b-instruct-q4_0">Llama 3.1 8B Q4 (Optimal)</option>
-                        <option value="tinyllama:1.1b">TinyLlama 1.1B (Tests)</option>
-                    </select>
-                    <button data-action="download-selected-model" class="btn btn-primary">Télécharger le Modèle</button>
-                    <div id="download-progress" class="progress-container" style="display:none;">
-                        <div class="progress-bar" id="download-progress-bar"></div>
-                        <span id="download-status">Téléchargement en cours...</span>
-                    </div>
-                    <h4>Modèles Installés</h4> 
-                    <ul id="installed-models-list"></ul>
+            <div class="settings-card__body">
+                <div id="installed-models-list" class="enhanced-list">
+                    <!-- Modèles installés injectés ici -->
                 </div>
             </div>
         </div>
     `;
 }
+
+/**
+ * NOUVELLE FONCTION: Crée le HTML pour la section des templates.
+ * @returns {string} Le HTML de la section.
+ */
+function createTemplatesSection() {
+    return `
+        <div class="settings-card">
+            <div class="settings-card__header">
+                <h3 class="settings-card__title">Templates de Prompts</h3>
+                <button class="btn btn--primary">
+                    <span class="icon">＋</span> Nouveau Template
+                </button>
+            </div>
+            <div class="settings-card__body">
+                <div id="prompt-templates-list" class="enhanced-list">
+                    <!-- Templates injectés ici -->
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * NOUVELLE FONCTION: Crée le HTML pour la section des files d'attente.
+ * @returns {string} Le HTML de la section.
+ */
+function createQueuesSection() {
+    return `
+        <div class="settings-card">
+            <div class="settings-card__header">
+                <h3 class="settings-card__title">Statut des Files</h3>
+                <button id="refresh-queues-btn" class="btn btn--secondary">
+                    <span class="icon">🔄</span> Actualiser
+                </button>
+            </div>
+            <div class="settings-card__body">
+                <div id="queue-status-container">
+                    <!-- Statut des files injecté ici -->
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * NOUVELLE FONCTION: Crée le HTML pour la section des préférences.
+ * @returns {string} Le HTML de la section.
+ */
+function createPreferencesSection() {
+    return `
+        <div class="settings-card">
+            <div class="settings-card__header">
+                <h3 class="settings-card__title">Préférences Générales</h3>
+            </div>
+            <div class="settings-card__body">
+                <div class="form-section">
+                    <h4 class="form-section-title">
+                        <span class="icon">🎨</span>
+                        Interface
+                    </h4>
+                    <div class="form-row">
+                        <div class="form-group--enhanced">
+                            <label for="theme-select">Thème</label>
+                            <select id="theme-select" class="form-control--enhanced">
+                                <option value="light">Clair</option>
+                                <option value="dark">Sombre</option>
+                                <option value="auto">Automatique</option>
+                            </select>
+                        </div>
+                        <div class="form-group--enhanced">
+                            <label for="language-select">Langue</label>
+                            <select id="language-select" class="form-control--enhanced">
+                                <option value="fr">Français</option>
+                                <option value="en">English</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="form-section-title">
+                        <span class="icon">🔔</span>
+                        Notifications
+                    </h4>
+                    <div class="form-group--enhanced">
+                        <label>
+                            <input type="checkbox" id="notifications-enabled">
+                            Activer les notifications
+                        </label>
+                    </div>
+                    <div class="form-group--enhanced">
+                        <label>
+                            <input type="checkbox" id="email-notifications">
+                            Notifications par email
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 
 /**
  * NOUVELLE FONCTION: Crée le HTML pour les onglets des éditeurs Ace.
@@ -350,14 +582,14 @@ function setupSettingsEventListeners() {
     document.querySelector('#delete-profile-btn')?.addEventListener('click', handleDeleteProfile); 
     document.querySelector('#apply-template-btn')?.addEventListener('click', () => {
         const select = document.querySelector('#prompt-template-select'); 
-        if (select.value) {
+        if (select && select.value) {
             applyPromptTemplate(select.value);
         }
     });
     document.querySelector(SELECTORS.refreshQueuesBtn)?.addEventListener('click', async () => {
         showToast(MESSAGES.refreshingQueuesStatus, 'info');
         await loadQueuesStatus();
-        renderQueueStatus(appState.queuesInfo, document.querySelector('#queue-status-container'));
+        renderQueueStatus(appState.queuesInfo, document.querySelector('#queue-status-container')); // Rerender only the queue status part
     });
 
     // Écouteur pour le formulaire
@@ -365,9 +597,53 @@ function setupSettingsEventListeners() {
     if (profileEditForm) {
         profileEditForm.addEventListener('submit', handleSaveProfile);
     }
+
+    // Navigation entre sections
+    document.querySelectorAll('.settings-nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const section = e.currentTarget.dataset.section;
+            
+            // Mettre à jour la navigation active
+            document.querySelectorAll('.settings-nav-link').forEach(l => l.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            
+            // Mettre à jour les sections
+            document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`${section}-section`).classList.add('active');
+            
+            // Mettre à jour le header
+            const titles = {
+                profiles: { title: 'Profils d\'Analyse', desc: 'Gérez vos profils d\'analyse et configurez les modèles de prompts.' },
+                models: { title: 'Modèles IA', desc: 'Téléchargez et gérez vos modèles de langage Ollama.' },
+                templates: { title: 'Templates de Prompts', desc: 'Créez et modifiez vos templates de prompts réutilisables.' },
+                queues: { title: 'Files de Tâches', desc: 'Surveillez l\'état des tâches en cours d\'exécution.' },
+                preferences: { title: 'Préférences', desc: 'Configurez les paramètres généraux de l\'application.' }
+            };
+            
+            const info = titles[section];
+            document.getElementById('settings-title').innerHTML = `<span class="settings-nav-icon">${e.currentTarget.querySelector('.settings-nav-icon').textContent}</span> ${info.title}`;
+            document.getElementById('settings-description').textContent = info.desc;
+        });
+    });
+
+    // Navigation moderne des onglets
+    document.querySelectorAll('.tab-link-modern').forEach(link => {
+        link.addEventListener('click', (e) => {
+            const tabId = e.currentTarget.dataset.tab;
+            
+            // Mettre à jour les onglets actifs
+            const parentTabs = e.currentTarget.closest('.modern-tabs');
+            parentTabs.querySelectorAll('.tab-link-modern').forEach(l => l.classList.remove('active'));
+            parentTabs.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            
+            e.currentTarget.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
     
-    // Écouteurs pour les onglets de prompts
-    const tabContainer = profileEditForm.querySelector('.tabs');
+    // Écouteurs pour les anciens onglets (au cas où)
+    const tabContainer = document.querySelector('.tabs');
     if (tabContainer) {
         const tabLinks = tabContainer.querySelectorAll('.tab-link');
         const tabContents = tabContainer.querySelectorAll('.tab-content');

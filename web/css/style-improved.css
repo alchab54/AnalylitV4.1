@@ -204,17 +204,17 @@ a:hover {
 }
 
 /* ================================
-   NAVIGATION - CRITIQUE POUR CYPRESS
+   NAVIGATION - VERSION HORIZONTALE AMÉLIORÉE
    ================================ */
 
 .app-nav {
-  position: sticky; /* Pour qu'elle reste visible en haut */
+  position: sticky;
   top: 0;
-  background: var(--color-gray-100);
-  border-bottom: 1px solid var(--color-border);
-  z-index: 20; /* ASSURER que la nav est au-dessus du header */
-  height: 48px;
-  min-height: 48px;
+  background: var(--color-surface);
+  border-bottom: 2px solid var(--color-border);
+  z-index: 20;
+  min-height: 60px;
+  box-shadow: var(--shadow-sm);
   display: block;
   visibility: visible;
 }
@@ -225,6 +225,13 @@ a:hover {
   align-items: center;
   justify-content: flex-start;
   gap: var(--space-1);
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE */
+}
+
+.app-nav .container::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
 .app-nav__button {
@@ -233,9 +240,10 @@ a:hover {
   visibility: visible !important;
   display: inline-flex !important;
   align-items: center;
+  justify-content: center;
   background: transparent;
   border: none;
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-4);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
@@ -243,13 +251,17 @@ a:hover {
   transition: all var(--transition-fast);
   border-radius: var(--radius-base);
   white-space: nowrap;
-  height: 36px;
-  min-width: max-content;
+  min-height: 48px;
+  min-width: 120px;
+  text-align: center;
+  flex-shrink: 0;
+  border-bottom: 3px solid transparent;
 }
 
 .app-nav__button:hover:not(.app-nav__button--active) {
-  background: var(--color-gray-200);
+  background: var(--color-gray-100);
   color: var(--color-text);
+  transform: translateY(-2px);
 }
 
 .app-nav__button--active {
@@ -258,6 +270,8 @@ a:hover {
   background: var(--color-primary) !important;
   color: var(--color-white) !important;
   visibility: visible !important;
+  border-bottom-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-md);
 }
 
 .app-nav__button:focus-visible {
@@ -1035,6 +1049,15 @@ body .modal[aria-hidden="false"] {
   
   .modal-actions .btn {
     width: 100%;
+  }
+}
+
+/* Responsive pour mobile */
+@media (max-width: 768px) {
+  .app-nav__button {
+    min-width: 100px;
+    font-size: var(--font-size-xs);
+    padding: var(--space-2) var(--space-3);
   }
 }
 
