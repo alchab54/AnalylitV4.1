@@ -61,7 +61,7 @@ describe('Workflow de Gestion des Articles', () => {
     cy.get('[data-action="start-batch-screening"]').click();
     
     // Vérifier la notification de lancement
-    cy.contains('.toast-success', 'Tâche de screening lancée').should('be.visible');
+    cy.contains('.toast--success', 'Tâche de screening lancée').should('be.visible');
   });
 
   it("Devrait gérer l'état vide quand aucun article n'est présent", () => {

@@ -72,7 +72,7 @@ describe('Workflow de Gestion des Projets', () => {
     cy.get('[data-action="confirm-delete-project"]').click();
     
     // Vérifier la notification de suppression
-    cy.contains('.toast--success', 'Projet supprimé').should('be.visible');
+    cy.contains('.toast--success', 'Projet supprimé avec succès').should('be.visible');
     
     // Vérifier que le projet n'apparaît plus
     cy.contains('.project-card', 'Projet à Supprimer').should('not.exist');

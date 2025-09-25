@@ -88,7 +88,7 @@ describe('Workflow de Gestion des Analyses', () => {
 
     // Exporter le rapport PRISMA
     cy.get('[data-action="export-prisma-report"]').click();
-    cy.contains('.toast-info', 'Exportation PRISMA non implémentée').should('be.visible'); // Message d'info attendu
+    cy.contains('.toast--info', 'Exportation PRISMA non implémentée').should('be.visible'); // Message d'info attendu
 
     cy.get('[data-action="close-modal"]').click();
     cy.get('#prismaModal').should('not.exist');
@@ -125,7 +125,7 @@ describe('Workflow de Gestion des Analyses', () => {
 
   it(`Devrait permettre d'exporter les analyses`, () => {
     cy.get('[data-action="export-analyses"]').click();
-    cy.contains('.toast-info', `Préparation de l'exportation des analyses...`).should('be.visible');
+    cy.contains('.toast--info', `Préparation de l'exportation des analyses...`).should('be.visible');
     // On ne peut pas tester le téléchargement de fichier directement avec Cypress sans plugins spécifiques
     // Mais on peut vérifier que l'action est déclenchée et la notification affichée.
   });
@@ -150,7 +150,7 @@ describe('Workflow de Gestion des Analyses', () => {
     cy.get('.analysis-card').contains('h4', 'Analyse ATN Multipartite').parents('.analysis-card').within(() => {
       cy.get('[data-action="run-atn-analysis"]').click();
     });
-    cy.contains('.toast-warning', 'Veuillez sélectionner un projet en premier.').should('be.visible');
+    cy.contains('.toast--warning', 'Veuillez sélectionner un projet en premier.').should('be.visible');
   });
 
   it('Devrait permettre de supprimer une analyse', () => {

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-color-scheme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnalyLit v4.1 - Revue de Littérature Intelligente</title>
+    <title>AnalyLit v4.1 - Plateforme IA pour Revues de Littérature</title>
     
     <!-- Meta tags -->
     <meta name="description" content="AnalyLit v4.1 - Plateforme intelligente pour la réalisation de revues de littérature scientifique avec IA.">
@@ -13,7 +13,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔬</text></svg>">
     
-    <!-- CSS Files dans l'ordre critique -->
+    <!-- CSS Files -->
     <link rel="stylesheet" href="css/emergency-fixes.css">
     <link rel="stylesheet" href="css/enhanced-design-tokens.css">
     <link rel="stylesheet" href="css/style-improved.css">
@@ -22,45 +22,59 @@
     
     <!-- Scripts externes -->
     <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.33.0/ace.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js" defer></script>
 </head>
 <body>
-    <!-- En-tête principal -->
+    <!-- En-tête principal FIXE -->
     <header class="app-header">
         <div class="container">
             <div class="app-header__content">
                 <div class="app-header__left">
                     <h1 class="app-header__title">
-                        <span role="img" aria-hidden="true">🔬</span>
+                        <span role="img" aria-hidden="true">🧬</span>
                         AnalyLit v4.1
                     </h1>
                 </div>
                 <div class="app-header__right">
                     <div id="connection-status" class="connection-indicator">
-                        <span class="status-dot"></span>
-                        <span class="status-text">Connexion...</span>
+                        <span class="status-dot connected"></span>
+                        <span class="status-text">Connecté</span>
                     </div>
+                    <button class="btn btn--ghost" data-action="toggle-theme" title="Changer de thème">
+                        🌙
+                    </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Navigation principale - UN SEUL ENSEMBLE DE BOUTONS -->
+    <!-- Navigation HORIZONTALE - NAVIGATION UNIQUE -->
     <nav class="app-nav" role="navigation" aria-label="Navigation principale">
         <div class="container">
             <button class="app-nav__button app-nav__button--active" data-action="show-section" data-section-id="projects">
                 <span role="img" aria-hidden="true">📁</span> Projets
             </button>
-            <button class="app-nav__button" data-action="show-section" data-section-id="articles">
-                <span role="img" aria-hidden="true">📄</span> Articles
+            <button class="app-nav__button" data-action="show-section" data-section-id="search">
+                <span role="img" aria-hidden="true">🔍</span> Recherche
             </button>
             <button class="app-nav__button" data-action="show-section" data-section-id="results">
                 <span role="img" aria-hidden="true">📄</span> Résultats
             </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="validation">
+                <span role="img" aria-hidden="true">✅</span> Validation
+            </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="grids">
+                <span role="img" aria-hidden="true">📋</span> Grilles
+            </button>
             <button class="app-nav__button" data-action="show-section" data-section-id="analyses">
                 <span role="img" aria-hidden="true">📊</span> Analyses
+            </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="import">
+                <span role="img" aria-hidden="true">📥</span> Import
+            </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="chat">
+                <span role="img" aria-hidden="true">💬</span> Chat IA
             </button>
             <button class="app-nav__button" data-action="show-section" data-section-id="settings">
                 <span role="img" aria-hidden="true">⚙️</span> Paramètres
@@ -72,7 +86,7 @@
     <main class="app-main" role="main">
         <div class="container">
             
-            <!-- Section Projets - SECTION UNIQUE -->
+            <!-- Section Projets - SECTION ACTIVE PAR DÉFAUT -->
             <section id="projects" class="app-section active">
                 <div class="section-header">
                     <div class="section-header__content">
@@ -87,21 +101,73 @@
                 </div>
                 
                 <div id="projects-list" class="projects-grid">
-                    <!-- Les cartes de projet seront injectées ici par renderProjectCards() -->
+                    <!-- Les cartes de projet seront injectées ici -->
+                </div>
+                
+                <!-- Détails du projet sélectionné -->
+                <div id="projectDetail" class="project-detail" style="display: none;">
+                    <div id="projectDetailContent" class="project-detail-content">
+                        <!-- Contenu dynamique -->
+                    </div>
+                </div>
+                
+                <!-- État vide -->
+                <div id="projectPlaceholder" class="placeholder" style="display: none;">
+                    <div class="placeholder-icon">📁</div>
+                    <h3>Aucun projet sélectionné</h3>
+                    <p>Sélectionnez un projet pour voir ses détails</p>
                 </div>
             </section>
 
-            <!-- Section Articles -->
-            <section id="articles" class="app-section" style="display: none;">
+            <!-- Section Recherche -->
+            <section id="search" class="app-section" style="display: none;">
                 <div class="section-header">
-                    <h2>Gestion des Articles</h2>
+                    <h2>Recherche Multi-Bases</h2>
+                    <p>Lancez des recherches sur PubMed, arXiv, CrossRef</p>
                 </div>
-                <div id="articles-list">
-                    <!-- Le contenu des articles sera injecté ici -->
+                <div id="searchContainer">
+                    <!-- Contenu recherche -->
                 </div>
             </section>
 
-            <!-- Section Analyses - SECTION UNIQUE -->
+            <!-- Section Résultats - ESSENTIEL POUR CYPRESS -->
+            <section id="results" class="app-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Résultats de Recherche</h2>
+                    <p>Consultez et filtrez les articles trouvés</p>
+                </div>
+                <div id="resultsContainer">
+                    <div id="articles-list" class="articles-list">
+                        <!-- Articles avec checkboxes pour Cypress -->
+                    </div>
+                    <div class="empty-state" style="display: none;">
+                        <h3>Aucun article trouvé</h3>
+                        <p>Lancez une recherche pour afficher des résultats.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Validation -->
+            <section id="validation" class="app-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Validation Inter-Évaluateurs</h2>
+                </div>
+                <div id="validationContainer">
+                    <!-- Contenu validation -->
+                </div>
+            </section>
+
+            <!-- Section Grilles -->
+            <section id="grids" class="app-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Grilles d'Extraction</h2>
+                </div>
+                <div id="gridsContainer">
+                    <!-- Contenu grilles -->
+                </div>
+            </section>
+
+            <!-- Section Analyses - ESSENTIEL POUR CYPRESS -->
             <section id="analyses" class="app-section" style="display: none;">
                 <div class="section-header">
                     <h2>Gestion des Analyses</h2>
@@ -114,60 +180,48 @@
                     </div>
                 </div>
                 <div id="analysisContainer">
-                    <!-- Les cartes d'analyse seront injectées ici -->
+                    <div id="analysis-cards-container">
+                        <!-- Cartes d'analyse pour Cypress -->
+                    </div>
                 </div>
             </section>
 
-            <!-- Section Stakeholders -->
-            <section id="stakeholders" class="app-section" style="display: none;">
+            <!-- Section Import -->
+            <section id="import" class="app-section" style="display: none;">
                 <div class="section-header">
-                    <h2>Gestion des Parties Prenantes</h2>
+                    <h2>Import & Gestion des Fichiers</h2>
                 </div>
-                <div id="stakeholders-list"></div>
+                <div id="importContainer">
+                    <!-- Contenu import -->
+                </div>
+            </section>
+
+            <!-- Section Chat IA -->
+            <section id="chat" class="app-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Chat IA avec Documents</h2>
+                </div>
+                <div id="chatContainer">
+                    <!-- Interface chat -->
+                </div>
             </section>
 
             <!-- Section Paramètres -->
             <section id="settings" class="app-section" style="display: none;">
                 <div class="section-header">
-                    <h2>Paramètres</h2>
+                    <h2>Paramètres & Configuration</h2>
                 </div>
-                <div id="settings-content">
-                    <!-- Le contenu des paramètres sera injecté ici -->
-                </div>
-            </section>
-
-            <!-- Section Results pour les articles -->
-            <section id="results" class="app-section" style="display: none;">
-                <div class="section-header">
-                    <h2>Résultats de Recherche</h2>
-                </div>
-                <div id="resultsContainer">
-                    <div class="articles-list">
-                        <!-- Articles seront injectés ici -->
-                    </div>
-                    <div class="empty-state" style="display: none;">
-                        <h3>Aucun article trouvé</h3>
-                        <p>Lancez une recherche pour afficher des résultats.</p>
-                    </div>
+                <div id="settingsContainer">
+                    <!-- Interface paramètres -->
                 </div>
             </section>
-
-            <!-- Détails projet manquant -->
-            <div class="project-detail" style="display: none;">
-                <div class="project-detail-content">
-                    <h3>Détails du Projet</h3>
-                    <div class="project-metrics">
-                        <!-- Métriques du projet -->
-                    </div>
-                </div>
-            </div>
 
         </div>
     </main>
 
-    <!-- MODALES - UN SEUL ENSEMBLE -->
+    <!-- MODALES - ENSEMBLE UNIQUE ET COMPLET -->
     
-    <!-- Modale de création de projet - UNE SEULE -->
+    <!-- Modale création de projet -->
     <div id="newProjectModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
         <div class="modal-backdrop" data-action="close-modal"></div>
         <div class="modal-content">
@@ -186,8 +240,8 @@
                         <textarea id="projectDescription" name="description" class="form-control" rows="3"></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="projectAnalysisMode">Mode d'analyse</label>
-                        <select id="projectAnalysisMode" name="mode" class="form-control">
+                        <label for="analysisMode">Mode d'analyse</label>
+                        <select id="analysisMode" name="mode" class="form-control">
                             <option value="full">Analyse Complète</option>
                             <option value="screening">Screening Seul</option>
                             <option value="extraction">Extraction Seule</option>
@@ -202,7 +256,7 @@
         </div>
     </div>
 
-    <!-- Modale générique - UNE SEULE -->
+    <!-- Modale générique -->
     <div id="genericModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
         <div class="modal-backdrop" data-action="close-modal"></div>
         <div class="modal-content">
@@ -231,71 +285,8 @@
     <div id="toastContainer" class="toast-container"></div>
 
     <!-- Scripts d'initialisation -->
-    <script type="module" src="/js/layout-optimizer.js"></script>
-    <script type="module" src="/js/app-improved.js"></script>
+    <script type="module" src="js/layout-optimizer.js"></script>
+    <script type="module" src="js/app-improved.js"></script>
 
-    <!-- Script de debug intégré -->
-    <script>
-        console.log('🛠️ Script de debug chargé. Utilisez fixInterface() en cas de problème.');
-        
-        // Interface de debug globale
-        window.fixInterface = function() {
-            const elements = {
-                header: document.querySelector('.app-header'),
-                nav: document.querySelector('.app-nav'),
-                main: document.querySelector('.app-main'),
-                container: document.querySelector('.container')
-            };
-            
-            Object.entries(elements).forEach(([name, el]) => {
-                if (el) {
-                    el.style.cssText += `
-                        display: block !important;
-                        visibility: visible !important;
-                        position: relative !important;
-                    `;
-                    console.log(`✅ Élément ${name} corrigé:`, el);
-                } else {
-                    console.error(`❌ Élément ${name} introuvable`);
-                }
-            });
-            
-            // Correction spécifique pour la navigation
-            const navButtons = document.querySelectorAll('.app-nav__button');
-            navButtons.forEach((btn, index) => {
-                btn.style.cssText += `
-                    position: relative !important;
-                    z-index: ${1001 + index} !important;
-                    visibility: visible !important;
-                    pointer-events: auto !important;
-                `;
-            });
-            
-            console.log(`🔧 ${navButtons.length} boutons de navigation corrigés`);
-            
-            // Diagnostic complet
-            const diagnostic = {
-                headerVisible: elements.header && elements.header.offsetHeight > 0,
-                navVisible: elements.nav && elements.nav.offsetHeight > 0,
-                headerHeight: elements.header ? elements.header.offsetHeight : 0,
-                navHeight: elements.nav ? elements.nav.offsetHeight : 0,
-                buttonsCount: navButtons.length
-            };
-            
-            console.log('📊 Diagnostic final:', diagnostic);
-        };
-        
-        // Auto-correction au chargement
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(window.fixInterface, 100);
-        });
-        
-        // Auto-correction sur interaction
-        document.addEventListener('click', (e) => {
-            if (e.target.matches('[data-action]')) {
-                setTimeout(window.fixInterface, 50);
-            }
-        });
-    </script>
 </body>
 </html>
