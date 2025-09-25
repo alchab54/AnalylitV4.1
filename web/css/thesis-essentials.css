@@ -646,3 +646,459 @@
         grid-template-columns: 1fr;
     }
 }
+/* ================================
+   RISK OF BIAS INTERFACE
+   ================================ */
+
+.rob-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-radius: 12px;
+}
+
+.rob-subtitle {
+    margin: 10px 0 0 0;
+    opacity: 0.9;
+}
+
+.rob-navigation {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    background: #f8fafc;
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.rob-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #64748b;
+}
+
+.rob-tab:hover {
+    background: #e2e8f0;
+    color: #334155;
+}
+
+.rob-tab.active {
+    background: #ef4444;
+    color: white;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.rob-content {
+    position: relative;
+    min-height: 500px;
+}
+
+.rob-panel {
+    display: none;
+}
+
+.rob-panel.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Assessment Interface */
+.rob-assessment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+}
+
+.assessment-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-load-articles {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-auto-rob {
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-save-all {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Articles Selector */
+.rob-articles-selector {
+    margin-bottom: 30px;
+}
+
+.articles-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.article-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.article-item:hover {
+    border-color: #ef4444;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.article-item.has-rob {
+    border-left: 4px solid #10b981;
+    background: #f0fdf4;
+}
+
+.article-info {
+    flex: 1;
+}
+
+.article-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #374151;
+}
+
+.article-meta {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.rob-status {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.has-rob .rob-status {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.btn-assess {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Assessment Form */
+.rob-assessment-form {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.assessment-form-header {
+    padding: 20px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.assessment-form-header h4 {
+    margin: 0 0 8px 0;
+    color: #374151;
+}
+
+.assessment-info {
+    display: flex;
+    gap: 16px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.rob-form {
+    padding: 20px;
+}
+
+.rob-domain {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid #f3f4f6;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.domain-header h5 {
+    margin: 0 0 8px 0;
+    color: #374151;
+    font-size: 16px;
+}
+
+.domain-description {
+    margin: 0 0 15px 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.risk-assessment {
+    display: grid;
+    gap: 15px;
+}
+
+.risk-options {
+    display: grid;
+    gap: 10px;
+}
+
+.risk-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.risk-option:hover {
+    border-color: #d1d5db;
+    background: #f9fafb;
+}
+
+.risk-option.risk-low {
+    border-left: 4px solid #10b981;
+}
+
+.risk-option.risk-high {
+    border-left: 4px solid #ef4444;
+}
+
+.risk-option.risk-unclear {
+    border-left: 4px solid #f59e0b;
+}
+
+.risk-option input[type="radio"] {
+    margin: 0;
+    width: 16px;
+    height: 16px;
+}
+
+.risk-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-top: 2px;
+}
+
+.risk-low .risk-indicator {
+    background: #10b981;
+}
+
+.risk-high .risk-indicator {
+    background: #ef4444;
+}
+
+.risk-unclear .risk-indicator {
+    background: #f59e0b;
+}
+
+.risk-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+.risk-criteria {
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
+.domain-notes textarea {
+    width: 100%;
+    min-height: 80px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 14px;
+    resize: vertical;
+}
+
+.assessment-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.btn-save {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-clear {
+    background: #6b7280;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-next {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Visualizations */
+.rob-visualizations {
+    display: grid;
+    gap: 20px;
+}
+
+.rob-chart {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+
+.rob-chart h4 {
+    margin: 0 0 15px 0;
+    color: #374151;
+}
+
+.rob-chart-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.chart-actions {
+    margin-top: 15px;
+}
+
+.btn-download {
+    background: #3b82f6;
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    display: inline-block;
+}
+
+/* Export Cards */
+.rob-export-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.export-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.export-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.export-card h4 {
+    margin: 0 0 8px 0;
+    color: #374151;
+}
+
+.export-card p {
+    margin: 0 0 15px 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.btn-export {
+    background: #059669;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .rob-navigation {
+        flex-direction: column;
+    }
+    
+    .assessment-controls {
+        flex-direction: column;
+    }
+    
+    .assessment-actions {
+        flex-direction: column;
+    }
+    
+    .rob-export-options {
+        grid-template-columns: 1fr;
+    }
+}

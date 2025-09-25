@@ -83,6 +83,9 @@
             <button class="app-nav__button" data-section="atn-analysis">
     🧠 Analyses ATN
 </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="rob">
+                ⚖️ Risk of Bias
+            </button>
             <button class="app-nav__button" data-action="show-section" data-section-id="import">
                 <span role="img" aria-hidden="true">📥</span> Import
             </button>
@@ -155,6 +158,13 @@
                 </div>
                 <div id="validationContainer">
                     <!-- Contenu validation -->
+                </div>
+            </section>
+
+            <!-- Section Risk of Bias -->
+            <section id="rob" class="app-section" style="display: none;">
+                <div id="robContainer" class="rob-container">
+                    <!-- Interface RoB injectée par rob-manager.js -->
                 </div>
             </section>
 
@@ -457,5 +467,6 @@ setTimeout(() => {
 }, 2000);
 </script>
 <script type="module" src="js/thesis-workflow.js"></script>
+<script type="module" src="js/rob-manager.js"></script>
 </body>
 </html>

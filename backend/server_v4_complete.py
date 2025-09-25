@@ -23,6 +23,7 @@ from flask import Flask, request, jsonify, send_from_directory, abort, send_file
 from api.reporting import reporting_bp
 from api.stakeholders import stakeholders_bp
 from api.selection import selection_bp
+from api.tasks import tasks_bp
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from sqlalchemy.exc import IntegrityError

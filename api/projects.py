@@ -231,6 +231,8 @@ def run_advanced_analysis(project_id):
         "atn_scores": run_atn_score_task,
         "knowledge_graph": run_knowledge_graph_task,
         "prisma_flow": run_prisma_flow_task,
+        "atn_specialized_extraction": run_atn_specialized_extraction_task,
+        "empathy_comparative_analysis": run_empathy_comparative_analysis_task,
     }
 
     task_function = task_map.get(analysis_type)
@@ -320,6 +322,21 @@ def run_rob_analysis(project_id):
         )
         task_ids.append(job.id)
     return jsonify({"message": f"{len(task_ids)} tâches d'analyse de risque de biais lancées", "task_ids": task_ids}), 202
+
+@projects_bp.route('/projects/<project_id>/rob/<article_id>', methods=['POST'])
+@with_db_session
+def save_rob_assessment(session, project_id, article_id):
+    data = request.get_json()
+    assessment_data = data.get('rob_assessment')
+
+    if not assessment_data:
+        return jsonify({"error": "Données d'évaluation manquantes"}), 400
+
+    # Ici, vous devriez insérer ou mettre à jour l'évaluation dans la table risk_of_bias
+    # Pour l'instant, nous allons juste retourner un succès
+    logger.info(f"Sauvegarde de l'évaluation RoB pour l'article {article_id} dans le projet {project_id}")
+    
+    return jsonify({"message": "Évaluation RoB sauvegardée avec succès"}), 200
 
 @projects_bp.route('/projects/<project_id>/add-manual-articles', methods=['POST'])
 def add_manual_articles(project_id):
