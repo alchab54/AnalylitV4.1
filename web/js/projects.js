@@ -18,12 +18,12 @@ export async function loadProjects() {
     try {
         const projects = await fetchAPI(API_ENDPOINTS.projects);
         setProjects(projects || []);
-        
-        // Appeler le rendu des cartes pour Cypress
-        renderProjectCards(projects);
-        
+
         // Rendu de la liste pour l'interface principale
+        // CETTE FONCTION CRÉE LE CONTENEUR #projects-list
         renderProjectsList();
+        // MAINTENANT, on peut remplir le conteneur avec les cartes
+        renderProjectCards(projects);
         
         // Sélection automatique du premier projet si nécessaire
         autoSelectFirstProject();
@@ -105,8 +105,9 @@ async function selectProject(projectId) {
         setCurrentProject(projectToSelect);
         renderProjectsList();
 
-        // Change de section via le state manager au lieu de simuler un clic
-        setCurrentSection('articles');
+        // NE PAS CHANGER DE SECTION AUTOMATIQUEMENT.
+        // L'utilisateur doit cliquer sur la section "Résultats" pour voir les articles.
+        // setCurrentSection('articles');
     } catch (e) {
         showToast(`Erreur: ${e.message}`, 'error');
     }
@@ -191,6 +192,38 @@ async function loadProjectFilesSet(projectId) {
  * Rendu de la liste des projets (colonne gauche).
  */
 function renderProjectsList() {
+    const sectionContainer = document.getElementById('projects');
+    if (!sectionContainer) return;
+
+    // Injecte la structure de base de la section si elle n'existe pas
+    if (!sectionContainer.querySelector('.card')) {
+        sectionContainer.innerHTML = `
+            <div class="card">
+                <div class="card__header">
+                    <div class="section-header">
+                        <div class="section-header__content">
+                            <h2 class="h2">Gestion des Projets</h2>
+                            <p class="text-muted">Créez et gérez vos projets de revue de littérature.</p>
+                        </div>
+                        <div class="section-header__actions">
+                            <button id="create-project-btn" class="btn btn--primary" data-action="create-project-modal">
+                                <span role="img" aria-hidden="true">➕</span> Nouveau Projet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card__body">
+                    <div id="projects-list" class="projects-grid">
+                        <!-- Les cartes de projet seront injectées ici -->
+                    </div>
+                    <div id="projectDetail" class="project-detail" style="display: none;">
+                        <div id="projectDetailContent" class="project-detail-content"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
     const container = document.querySelector(SELECTORS.projectsList);
     if (!container) return;
 

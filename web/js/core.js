@@ -115,7 +115,7 @@ const uiActions = {
     'close-modal': (target) => closeModal(target.closest('.modal')?.id),
     'clear-notifications': () => clearNotifications(),
     'create-project-modal': showCreateProjectModal, // CORRIGÉ: La fonction est bien showCreateProjectModal
-    'retry-task': handleRetryTask,
+    'retry-task': handleRetryTask, // Correction du nom de la fonction
     'cancel-task': handleCancelTask,
     'set-active-evaluator': (target) => setActiveEvaluator(target.value),
     'show-section': (target) => showSection(target.dataset.sectionId),
@@ -250,7 +250,7 @@ export function setupDelegatedEventListeners() {
         const action = clickActions[actionName];
 
         if (action) {
-            event.preventDefault();
+            // event.preventDefault(); // Peut causer des problèmes, laissons le comportement par défaut
             action(target, event);
         }
     });
@@ -446,16 +446,17 @@ export function getStatusClass(status) {
  */
 function handleSectionChange(event) {
     const { currentSection } = event.detail;
-    const sections = document.querySelectorAll('.app-section');
-    const navButtons = document.querySelectorAll('.app-nav__button');
+    const sections = document.querySelectorAll('.app-section'); // Correct
+    const navButtons = document.querySelectorAll('.app-nav__btn'); // CORRECTION: Utiliser la nouvelle classe .app-nav__btn
 
     sections.forEach(section => {
-        section.style.display = section.id === currentSection ? 'block' : 'none';
-        section.classList.toggle('active', section.id === currentSection);
+        // Laisser le CSS gérer l'affichage via la classe .hidden
+        section.classList.toggle('hidden', section.id !== currentSection);
     });
 
     navButtons.forEach(btn => {
-        btn.classList.toggle('app-nav__button--active', btn.dataset.sectionId === currentSection);
+        // CORRECTION: Utiliser la bonne classe et le bon dataset
+        btn.classList.toggle('app-nav__btn--active', btn.dataset.section === currentSection);
     });
     
     refreshCurrentSection();

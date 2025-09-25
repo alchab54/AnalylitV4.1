@@ -14,65 +14,65 @@ function forceNavigationDisplay() {
     const nav = document.querySelector('.app-nav');
     if (nav) {
         console.log('Navigation trouvée, application des styles...');
-        // nav.style.display = 'block';
-        // nav.style.visibility = 'visible';
-        // nav.style.opacity = '1';
-        // nav.style.position = 'sticky';
-        // nav.style.top = '0';
-        // nav.style.zIndex = '1000';
-        // nav.style.background = 'white';
-        // nav.style.borderBottom = '2px solid #3b82f6';
-        // nav.style.minHeight = '60px';
-        // nav.style.width = '100%';
-        // nav.style.left = '0';
-        // nav.style.right = '0';
+        nav.style.display = 'block';
+        nav.style.visibility = 'visible';
+        nav.style.opacity = '1';
+        nav.style.position = 'sticky';
+        nav.style.top = '0';
+        nav.style.zIndex = '1000';
+        nav.style.background = 'white';
+        nav.style.borderBottom = '2px solid #3b82f6';
+        nav.style.minHeight = '60px';
+        nav.style.width = '100%';
+        nav.style.left = '0';
+        nav.style.right = '0';
         
         // Forcer l'affichage du container
         const container = nav.querySelector('.container');
         if (container) {
-            // container.style.display = 'flex';
-            // container.style.alignItems = 'center';
-            // container.style.height = '60px';
-            // container.style.width = '100%';
-            // container.style.maxWidth = '1200px';
-            // container.style.margin = '0 auto';
-            // container.style.padding = '0 1rem';
+            container.style.display = 'flex';
+            container.style.alignItems = 'center';
+            container.style.height = '60px';
+            container.style.width = '100%';
+            container.style.maxWidth = '1200px';
+            container.style.margin = '0 auto';
+            container.style.padding = '0 1rem';
         }
 
         // Forcer l'affichage des boutons
         const buttons = nav.querySelectorAll('.app-nav__button');
         buttons.forEach((btn, index) => {
-            // btn.style.display = 'inline-flex';
-            // btn.style.visibility = 'visible';
-            // btn.style.opacity = '1';
-            // btn.style.alignItems = 'center';
-            // btn.style.justifyContent = 'center';
-            // btn.style.padding = '0.75rem 1rem';
-            // btn.style.marginRight = '0.5rem';
-            // btn.style.background = index === 0 ? '#3b82f6' : '#f3f4f6';
-            // btn.style.color = index === 0 ? 'white' : '#374151';
-            // btn.style.border = '1px solid #d1d5db';
-            // btn.style.borderRadius = '0.5rem';
-            // btn.style.minWidth = '100px';
-            // btn.style.height = '40px';
-            // btn.style.cursor = 'pointer';
-            // btn.style.fontSize = '0.875rem';
-            // btn.style.fontWeight = '600';
-            // btn.style.whiteSpace = 'nowrap';
+            btn.style.display = 'inline-flex';
+            btn.style.visibility = 'visible';
+            btn.style.opacity = '1';
+            btn.style.alignItems = 'center';
+            btn.style.justifyContent = 'center';
+            btn.style.padding = '0.75rem 1rem';
+            btn.style.marginRight = '0.5rem';
+            btn.style.background = index === 0 ? '#3b82f6' : '#f3f4f6';
+            btn.style.color = index === 0 ? 'white' : '#374151';
+            btn.style.border = '1px solid #d1d5db';
+            btn.style.borderRadius = '0.5rem';
+            btn.style.minWidth = '100px';
+            btn.style.height = '40px';
+            btn.style.cursor = 'pointer';
+            btn.style.fontSize = '0.875rem';
+            btn.style.fontWeight = '600';
+            btn.style.whiteSpace = 'nowrap';
             
             // Ajouter les événements de clic
             btn.addEventListener('click', function() {
                 // Retirer la classe active de tous les boutons
                 buttons.forEach(b => {
                     b.classList.remove('app-nav__button--active');
-                    // b.style.background = '#f3f4f6';
-                    // b.style.color = '#374151';
+                    b.style.background = '#f3f4f6';
+                    b.style.color = '#374151';
                 });
                 
                 // Ajouter la classe active au bouton cliqué
                 this.classList.add('app-nav__button--active');
-                // this.style.background = '#3b82f6';
-                // this.style.color = 'white';
+                this.style.background = '#3b82f6';
+                this.style.color = 'white';
                 
                 // Afficher la section correspondante
                 const sectionId = this.getAttribute('data-section-id');

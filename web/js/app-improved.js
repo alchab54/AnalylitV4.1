@@ -151,7 +151,9 @@ async function initializeApplication() {
         await loadInitialData();
         
         // Affichage de la section par défaut
-        await showSection('projects');
+        // await showSection('projects');  // ← CETTE LIGNE VIDE TOUT !
+        // Laisser app-nav.js gérer l'affichage des sections
+        console.log('🎯 Sections gérées par app-nav.js');
         
         const endTime = performance.now();
         console.log(`✅ Application initialisée en ${(endTime - startTime).toFixed(2)}ms`);
