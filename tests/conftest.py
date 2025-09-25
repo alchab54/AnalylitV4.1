@@ -1,8 +1,22 @@
 # tests/conftest.py - VERSION CORRIGÉE
 import pytest
 import os
+import sys
+from pathlib import Path
 from sqlalchemy import create_engine
 import uuid # Added import for uuid
+
+# Ajouter le répertoire racine au PATH pour les imports
+root_dir = Path(__file__).parent.parent
+sys.path.insert(0, str(root_dir))
+
+# --- ACTIVATION DES PLUGINS PYTEST ---
+# C'est la correction clé suggérée par gemini.md
+pytest_plugins = [
+    "pytest_mock",        # ✅ Active la fixture 'mocker'
+    "pytest_cov",
+    "pytest_asyncio",
+]
 
 # Set TESTING environment variable for models.py
 os.environ['TESTING'] = 'true'
