@@ -401,6 +401,21 @@ function resetProgressBar(overlay) {
 let modalStack = [];
 let focusBeforeModal = null;
 
+export function showModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        // Multiple méthodes pour garantir la visibilité
+        modal.classList.add('modal--show', 'show', 'modal-show');
+        modal.style.display = 'block';
+        modal.style.visibility = 'visible'; 
+        modal.style.opacity = '1';
+        modal.setAttribute('aria-hidden', 'false');
+        
+        console.log(`Modal ${modalId} affichée`); // Debug
+    }
+}
+
+
 /**
  * Ouvre une modale avec gestion du focus et de l'accessibilité
  */
@@ -452,10 +467,12 @@ export function openModal(modalId, options = {}) {
  * Ferme une modale ou la modale active
  */
 export function closeModal(modalId) {
-    let modal;
+    const modal = document.getElementById(modalId);
     
-    if (modalId) {
-        modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('modal--show', 'show', 'modal-show');
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
         const index = modalStack.indexOf(modalId);
         if (index > -1) modalStack.splice(index, 1);
     } else {
@@ -464,11 +481,6 @@ export function closeModal(modalId) {
         modal = lastModalId ? document.getElementById(lastModalId) : document.querySelector('.modal--show');
     }
 
-    if (!modal) return false;
-
-    // Animations de fermeture
-    modal.classList.remove('modal--show');
-    modal.setAttribute('aria-hidden', 'true');
 
     // Nettoyer les événements
     if (modal.dataset.escapeHandler) {
@@ -527,7 +539,7 @@ function ensureGenericModalExists() {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
-export function showModal(title, contentHtml, options = {}) {
+export function showModalWithContent(title, contentHtml, options = {}) {
     ensureGenericModalExists(); // Ensure the modal is in the DOM
 
     const {
