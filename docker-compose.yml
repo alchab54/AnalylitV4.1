@@ -165,7 +165,7 @@ services:
       - base
 
   ollama:
-    image: ollama/ollama
+    image: ollama/ollama:latest
     container_name: analylit_ollama
     ports:
       - "11434:11434"
