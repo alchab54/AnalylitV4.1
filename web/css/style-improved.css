@@ -207,69 +207,6 @@ a:hover {
    NAVIGATION - VERSION CRITIQUE DE DÉBOGAGE
    ================================ */
 
-.app-nav {
-  position: sticky !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  width: 100% !important;
-  background: #ffffff !important;
-  border-bottom: 3px solid #3b82f6 !important;
-  z-index: 9999 !important;
-  min-height: 60px !important;
-  height: auto !important;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* Version d'urgence au cas où les variables CSS ne fonctionnent pas */
-.app-nav, .app-nav * {
-  box-sizing: border-box !important;
-}
-
-.app-nav .container {
-  display: flex !important;
-  height: 60px !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 8px !important;
-  overflow-x: auto !important;
-  width: 100% !important;
-  max-width: 1200px !important;
-  margin: 0 auto !important;
-  padding: 0 16px !important;
-  background: transparent !important;
-}
-
-.app-nav__button {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background: #f3f4f6 !important;
-  border: 1px solid #d1d5db !important;
-  padding: 12px 16px !important; /* était 12px 16px */
-  font-size: 14px !important; /* était 14px */
-  font-weight: 600 !important; /* était 600 */
-  color: #374151 !important; /* était #374151 */
-  cursor: pointer !important;
-  border-radius: 6px !important; /* était 6px */
-  white-space: nowrap !important;
-  min-height: 40px !important;
-  min-width: 100px !important;
-  text-align: center !important;
-  flex-shrink: 0 !important;
-  margin: 0 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  position: relative !important;
-  z-index: 10000 !important;
-  transition: all 0.2s ease !important;
-}
-
 .app-nav__button:hover {
   background: #e5e7eb !important;
   transform: translateY(-1px) !important;
@@ -282,6 +219,8 @@ a:hover {
   border-color: #2563eb !important;
   box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3) !important;
 }
+
+/* Les styles de base de .app-nav et .app-nav__button sont maintenant dans thesis-essentials.css */
 
 .app-nav__button:focus-visible {
   outline: 2px solid var(--color-primary);
@@ -1479,90 +1418,11 @@ button,
   padding-top: var(--space-4) !important;
 }
 
-/* Debug : bordure rouge temporaire pour voir la navigation */
-.app-nav {
-  border: 3px solid red !important;
-}
-
 /* ================================
    CORRECTION NAVIGATION MANQUANTE
    ================================ */
 
-/* FORCER l'affichage de la navigation */
-.app-nav {
-  position: sticky !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  width: 100% !important;
-  background: var(--color-surface) !important;
-  border-bottom: 2px solid var(--color-primary) !important;
-  z-index: 1000 !important;
-  min-height: 60px !important;
-  height: auto !important;
-  box-shadow: var(--shadow-lg) !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.app-nav * {
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-.app-nav .container {
-  display: flex !important;
-  height: 60px !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: var(--space-1) !important;
-  overflow-x: auto !important;
-  width: 100% !important;
-  max-width: 1200px !important;
-  margin: 0 auto !important;
-  padding: 0 var(--space-4) !important;
-}
-
-.app-nav__button {
-  position: relative !important;
-  z-index: 1010 !important;
-  visibility: visible !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background: var(--color-gray-100) !important;
-  border: 2px solid var(--color-border) !important;
-  padding: var(--space-3) var(--space-4) !important;
-  font-size: var(--font-size-sm) !important;
-  font-weight: var(--font-weight-semibold) !important;
-  color: var(--color-text) !important;
-  cursor: pointer !important;
-  transition: all var(--transition-fast) !important;
-  border-radius: var(--radius-base) !important;
-  white-space: nowrap !important;
-  min-height: 40px !important;
-  min-width: 100px !important;
-  text-align: center !important;
-  flex-shrink: 0 !important;
-  margin-right: var(--space-2) !important;
-  opacity: 1 !important;
-}
-
-.app-nav__button:hover {
-  background: var(--color-gray-200) !important;
-  color: var(--color-text) !important;
-  transform: translateY(-1px) !important;
-}
-
-.app-nav__button--active {
-  background: var(--color-primary) !important;
-  color: var(--color-white) !important;
-  border-color: var(--color-primary) !important;
-  box-shadow: var(--shadow-md) !important;
-}
+/* Cette section est maintenant gérée par thesis-essentials.css */
 
 /* Ajustement du main pour éviter le chevauchement */
 .app-main {
@@ -1570,7 +1430,4 @@ button,
   padding-top: var(--space-4) !important;
 }
 
-/* Debug : bordure rouge temporaire pour voir la navigation */
-.app-nav {
-  border: 3px solid red !important;
-}
+/* La bordure de debug a été retirée */

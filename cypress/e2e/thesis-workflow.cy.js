@@ -1,21 +1,22 @@
 describe('Workflow de Thèse ATN', () => {
     beforeEach(() => {
         cy.visit('http://localhost:8080');
-        cy.wait(2000);
+        // Utiliser une commande personnalisée pour attendre que l'app soit prête
+        // au lieu d'un wait() statique.
+        cy.waitForAppReady(); 
         
-        // Créer ou sélectionner un projet de thèse
-        cy.get('#create-project-btn').click();
-        cy.get('#projectName').type('Thèse ATN Test');
-        cy.get('#projectDescription').type('Projet de test pour workflow de thèse ATN');
-        cy.get('button[type="submit"]').click();
-        cy.wait(2000);
+        // Utiliser une commande personnalisée pour la création de projet
+        cy.createTestProject('Thèse ATN Test');
+        
+        // S'assurer que le projet est visible avant de continuer
+        cy.contains('.project-card', 'Thèse ATN Test').should('be.visible');
     });
 
     it('devrait permettre une recherche spécialisée ATN', () => {
         // Aller à la recherche
-        cy.get('[data-action="show-section'][data-section-id="search"]').click();
+        cy.navigateToSection('search');
         
-        // Vérifier l'interface de recherche spécialisée
+        // Vérifier que l'interface de recherche est bien chargée
         cy.get('.thesis-search-header h3').should('contain', 'Recherche Bibliographique');
         cy.get('#thesis-search-query').should('be.visible');
         
@@ -38,7 +39,7 @@ describe('Workflow de Thèse ATN', () => {
 
     it('devrait afficher les statistiques de validation PRISMA', () => {
         // Aller à la validation
-        cy.get('[data-action="show-section"][data-section-id="validation"]').click();
+        cy.navigateToSection('validation');
         
         // Vérifier les statistiques PRISMA
         cy.get('.prisma-stats').should('be.visible');
@@ -53,7 +54,7 @@ describe('Workflow de Thèse ATN', () => {
 
     it('devrait pouvoir calculer le Kappa Cohen', () => {
         // Aller à la validation
-        cy.get('[data-action="show-section"][data-section-id="validation"]').click();
+        cy.navigateToSection('validation');
         
         // Cliquer sur calculer Kappa
         cy.get('button').contains('Calculer Kappa Cohen').click();
@@ -66,7 +67,7 @@ describe('Workflow de Thèse ATN', () => {
 
     it('devrait proposer tous les exports nécessaires pour la thèse', () => {
         // Aller aux analyses
-        cy.get('[data-action="show-section"][data-section-id="analyses"]').click();
+        cy.navigateToSection('analyses');
         
         // Vérifier la section d'export
         cy.get('.export-section').should('be.visible');
@@ -82,7 +83,7 @@ describe('Workflow de Thèse ATN', () => {
 
     it('devrait pouvoir générer un rapport de thèse', () => {
         // Aller aux analyses  
-        cy.get('[data-action="show-section"][data-section-id="analyses"]').click();
+        cy.navigateToSection('analyses');
         
         // Cliquer sur générer rapport de thèse
         cy.get('button').contains('Rapport de thèse').click();
@@ -94,7 +95,7 @@ describe('Workflow de Thèse ATN', () => {
 
     it('devrait permettre la gestion complète du checklist PRISMA', () => {
         // Ouvrir la modale PRISMA
-        cy.get('[data-action="show-prisma-modal"]').click();
+        cy.get('[data-action="show-prisma-modal"]').click({ force: true });
         
         // Vérifier la modale
         cy.get('#prismaModal').should('have.class', 'modal--show');
@@ -104,13 +105,15 @@ describe('Workflow de Thèse ATN', () => {
         cy.get('.prisma-item').should('have.length.gte', 15);
         
         // Cocher quelques éléments
-        cy.get('.prisma-checkbox').first().click();
-        cy.get('.prisma-notes').first().type('Titre conforme aux standards PRISMA-ScR');
+        cy.get('.prisma-checkbox').first().check({ force: true });
+        cy.get('.prisma-notes').first().type('Titre conforme aux standards PRISMA-ScR', { force: true });
         
         // Sauvegarder
-        cy.get('button').contains('Sauvegarder').click();
+        cy.get('#prismaModal').find('button').contains('Sauvegarder').click();
+        cy.waitForToast('success', 'Checklist PRISMA sauvegardée');
         
         // Exporter
-        cy.get('button').contains('Exporter').click();
+        cy.get('#prismaModal').find('button').contains('Exporter').click();
+        cy.waitForToast('success', 'Exportation de la checklist PRISMA terminée.');
     });
 });

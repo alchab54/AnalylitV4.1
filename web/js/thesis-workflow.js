@@ -49,50 +49,50 @@ class ThesisWorkflow {
         const searchForm = document.getElementById('search-form');
         if (!searchForm) return;
 
-        searchForm.innerHTML = "
-            <div class=\"thesis-search-header\">
+        searchForm.innerHTML = `
+            <div class="thesis-search-header">
                 <h3>🔍 Recherche Bibliographique</h3>
                 <p>Recherchez dans PubMed, CrossRef et d'autres bases pour votre thèse ATN</p>
             </div>
             
-            <div class=\"search-input-group\">
+            <div class="search-input-group">
                 <input 
-                    id=\"thesis-search-query\" 
-                    type=\"text\" 
-                    placeholder=\"alliance thérapeutique numérique, thérapie digitale, intelligence artificielle santé...\"
-                    class=\"search-input\"
+                    id="thesis-search-query" 
+                    type="text" 
+                    placeholder="alliance thérapeutique numérique, thérapie digitale, intelligence artificielle santé..."
+                    class="search-input"
                     required
                 >
-                <button type=\"submit\" class=\"btn-primary search-btn\">
+                <button type="submit" class="btn-primary search-btn">
                     🔍 Lancer la recherche
                 </button>
             </div>
 
-            <div class=\"search-databases\">
-                <label class=\"db-checkbox\">
-                    <input type=\"checkbox\" name=\"databases\" value=\"pubmed\" checked>
-                    <span class=\"db-name\">PubMed</span>
-                    <span class=\"db-desc\">Base médicale principale</span>
+            <div class="search-databases">
+                <label class="db-checkbox">
+                    <input type="checkbox" name="databases" value="pubmed" checked>
+                    <span class="db-name">PubMed</span>
+                    <span class="db-desc">Base médicale principale</span>
                 </label>
-                <label class=\"db-checkbox\">
-                    <input type=\"checkbox\" name=\"databases\" value=\"crossref\" checked>
-                    <span class=\"db-name\">CrossRef</span>
-                    <span class=\"db-desc\">DOI et journaux</span>
+                <label class="db-checkbox">
+                    <input type="checkbox" name="databases" value="crossref" checked>
+                    <span class="db-name">CrossRef</span>
+                    <span class="db-desc">DOI et journaux</span>
                 </label>
-                <label class=\"db-checkbox\">
-                    <input type=\"checkbox\" name=\"databases\" value=\"semantic_scholar">
-                    <span class=\"db-name\">Semantic Scholar</span>
-                    <span class=\"db-desc\">IA et recherche</span>
+                <label class="db-checkbox">
+                    <input type="checkbox" name="databases" value="semantic_scholar">
+                    <span class="db-name">Semantic Scholar</span>
+                    <span class="db-desc">IA et recherche</span>
                 </label>
             </div>
 
-            <div class=\"search-options-advanced\">
+            <div class="search-options-advanced">
                 <label>
-                    <input type=\"number\" name=\"max_results\" value=\"100\" min=\"10\" max=\"500">
+                    <input type="number" name="max_results" value="100" min="10" max="500">
                     Résultats max par base
                 </label>
             </div>
-        ";
+        `;
 
         searchForm.addEventListener('submit', (e) => this.handleThesisSearch(e));
     }
@@ -147,11 +147,11 @@ class ThesisWorkflow {
     showSearchProgress(message, isError = false) {
         const container = document.getElementById('search-results') || document.getElementById('searchContainer');
         if (container) {
-            container.innerHTML = " 
-                <div class=\"search-status ${""} ${isError ? 'error' : 'loading'} ${""}">
-                    ${""} ${isError ? '❌' : '⏳'} ${message}
+            container.innerHTML = `
+                <div class="search-status ${isError ? 'error' : 'loading'}">
+                    ${isError ? '❌' : '⏳'} ${message}
                 </div>
-            ";
+            `;
         }
     }
 
@@ -184,84 +184,84 @@ class ThesisWorkflow {
         if (!container) return;
 
         if (this.searchResults.length === 0) {
-            container.innerHTML = "
-                <div class=\"no-results\">
+            container.innerHTML = `
+                <div class="no-results">
                     <h3>Aucun résultat trouvé</h3>
                     <p>Essayez avec d'autres mots-clés ou élargissez votre recherche</p>
                 </div>
-            ";
+            `;
             return;
         }
 
-        container.innerHTML = "
-            <div class=\"search-results-header\">
+        container.innerHTML = `
+            <div class="search-results-header">
                 <h3>${this.searchResults.length} articles trouvés</h3>
-                <button class=\"btn-export-results\" onclick=\"window.thesisWorkflow.exportSearchResults()\">
+                <button class="btn-export-results" onclick="window.thesisWorkflow.exportSearchResults()">
                     📊 Exporter résultats
                 </button>
             </div>
-            <div class=\"search-results-list\">
+            <div class="search-results-list">
                 ${this.searchResults.map(article => this.renderSearchResultItem(article)).join('')}
             </div>
-        ";
+        `;
     }
 
     renderSearchResultItem(article) {
-        return "
-            <div class=\"search-result-item\" data-id="${article.id}">
-                <div class=\"result-header\">
-                    <h4 class=\"result-title">${article.title || 'Titre non disponible'}</h4>
-                    <div class=\"result-source">${article.database_source || 'Source inconnue'}</div>
+        return `
+            <div class="search-result-item" data-id="${article.id}">
+                <div class="result-header">
+                    <h4 class="result-title">${article.title || 'Titre non disponible'}</h4>
+                    <div class="result-source">${article.database_source || 'Source inconnue'}</div>
                 </div>
-                <div class=\"result-meta\">
-                    <span class=\"authors">${article.authors || 'Auteurs non spécifiés'}</span>
-                    ${article.publication_date ? `<span class=\"year\">(${new Date(article.publication_date).getFullYear()})</span>` : ''}
-                    ${article.journal ? `<span class=\"journal\">${article.journal}</span>` : ''}
+                <div class="result-meta">
+                    <span class="authors">${article.authors || 'Auteurs non spécifiés'}</span>
+                    ${article.publication_date ? `<span class="year">(${new Date(article.publication_date).getFullYear()})</span>` : ''}
+                    ${article.journal ? `<span class="journal">${article.journal}</span>` : ''}
                 </div>
-                ${article.abstract ? `<p class=\"result-abstract\">${article.abstract.substring(0, 200)}...</p>` : ''}
-                <div class=\"result-actions\">
-                    <button onclick=\"window.thesisWorkflow.addToValidation('${article.article_id}')" 
-                            class=\"btn-add-validation\">
+                ${article.abstract ? `<p class="result-abstract">${article.abstract.substring(0, 200)}...</p>` : ''}
+                <div class="result-actions">
+                    <button onclick="window.thesisWorkflow.addToValidation('${article.article_id}')" 
+                            class="btn-add-validation">
                         ✅ Ajouter à la validation
                     </button>
-                    ${article.doi ? `<a href=\"https://doi.org/${article.doi}\" target=\"_blank\" class=\"btn-view-doi\">DOI</a>` : ''}
+                    ${article.doi ? `<a href="https://doi.org/${article.doi}" target="_blank" class="btn-view-doi">DOI</a>` : ''}
                 </div>
             </div>
-        ";
+        `;
     }
 
     setupValidationInterface() {
         const validationContainer = document.getElementById('validationContainer');
         if (!validationContainer) return;
 
-        validationContainer.innerHTML = "
-            <div class=\"thesis-validation-header\">
+        validationContainer.innerHTML = `
+            <div class="thesis-validation-header">
                 <h3>✅ Validation Inter-Évaluateurs</h3>
-                <div class=\"validation-controls\">
-                    <button onclick=\"window.thesisWorkflow.calculateKappa()\" class=\"btn-calculate-kappa\">
+                <div class="validation-controls">
+                    <button onclick="window.thesisWorkflow.calculateKappa()" class="btn-calculate-kappa">
                         📊 Calculer Kappa Cohen
                     </button>
-                    <button onclick=\"window.thesisWorkflow.exportValidations()\" class=\"btn-export-validations\">
+                    <button onclick="window.thesisWorkflow.exportValidations()" class="btn-export-validations">
                         📤 Exporter validations
                     </button>
                 </div>
             </div>
 
-            <div id=\"validation-stats\" class=\"validation-stats\">
+            <div id="validation-stats" class="validation-stats">
                 <!-- Stats injectées dynamiquement -->
             </div>
 
-            <div class=\"validation-filters\">
-                <button class=\"filter-btn active\" data-filter=\"all\">Tous</button>
-                <button class=\"filter-btn\" data-filter=\"include\">Inclus</button>
-                <button class=\"filter-btn\" data-filter=\"exclude\">Exclus</button>
-                <button class=\"filter-btn\" data-filter=\"pending\">En attente</button>
+            <div class="validation-filters">
+                <button class="filter-btn active" data-filter="all">Tous</button>
+                <button class="filter-btn" data-filter="include">Inclus</button>
+                <button class="filter-btn" data-filter="exclude">Exclus</button>
+                <button class="filter-btn" data-filter="pending">En attente</button>
             </div>
 
-            <div id=\"validation-list\" class=\"validation-list\">
+            <div id="validation-list" class="validation-list">
                 <!-- Articles à valider -->
             </div>
-        ";
+        `;
 
         // Event listeners pour les filtres
         validationContainer.querySelectorAll('.filter-btn').forEach(btn => {
@@ -289,46 +289,46 @@ class ThesisWorkflow {
         if (!container) return;
 
         if (extractions.length === 0) {
-            container.innerHTML = "
-                <div class=\"no-validations\">
+            container.innerHTML = `
+                <div class="no-validations">
                     <h3>Aucun article à valider</h3>
                     <p>Lancez d'abord une recherche pour avoir des articles à valider</p>
                 </div>
-            ";
+            `;
             return;
         }
 
-        container.innerHTML = extractions.map(extraction => "
-            <div class=\"validation-item status-${extraction.user_validation_status || 'pending'}" 
+        container.innerHTML = extractions.map(extraction => `
+            <div class="validation-item status-${extraction.user_validation_status || 'pending'}" 
                  data-status="${extraction.user_validation_status || 'pending'}"
                  data-id="${extraction.id}">
-                <div class=\"validation-header\">
+                <div class="validation-header">
                     <h4>${extraction.title || 'Titre non disponible'}</h4>
-                    <div class=\"ai-score\">Score IA: ${(extraction.relevance_score * 10).toFixed(1)}/10</div>
+                    <div class="ai-score">Score IA: ${(extraction.relevance_score * 10).toFixed(1)}/10</div>
                 </div>
                 
-                <div class=\"validation-content\">
-                    <p class=\"ai-justification\">
+                <div class="validation-content">
+                    <p class="ai-justification">
                         <strong>Justification IA :</strong> ${extraction.relevance_justification || 'Aucune justification'}
                     </p>
                     
-                    <div class=\"validation-actions\">
-                        <button onclick=\"window.thesisWorkflow.validateArticle('${extraction.id}', 'include')" 
-                                class=\"btn-include ${extraction.user_validation_status === 'include' ? 'active' : ''}">
+                    <div class="validation-actions">
+                        <button onclick="window.thesisWorkflow.validateArticle('${extraction.id}', 'include')" 
+                                class="btn-include ${extraction.user_validation_status === 'include' ? 'active' : ''}">
                             ✅ Inclure
                         </button>
-                        <button onclick=\"window.thesisWorkflow.validateArticle('${extraction.id}', 'exclude')" 
-                                class=\"btn-exclude ${extraction.user_validation_status === 'exclude' ? 'active' : ''}">
+                        <button onclick="window.thesisWorkflow.validateArticle('${extraction.id}', 'exclude')" 
+                                class="btn-exclude ${extraction.user_validation_status === 'exclude' ? 'active' : ''}">
                             ❌ Exclure
                         </button>
-                        <button onclick=\"window.thesisWorkflow.validateArticle('${extraction.id}', '')" 
-                                class=\"btn-reset ${!extraction.user_validation_status ? 'active' : ''}">
+                        <button onclick="window.thesisWorkflow.validateArticle('${extraction.id}', '')" 
+                                class="btn-reset ${!extraction.user_validation_status ? 'active' : ''}">
                             ↺ Réinitialiser
                         </button>
                     </div>
                 </div>
             </div>
-        ").join('');
+        `).join('');
     }
 
     async validateArticle(extractionId, decision) {
@@ -365,30 +365,30 @@ class ThesisWorkflow {
         if (!container) return;
 
         const stats = this.validationStats;
-        container.innerHTML = "
-            <div class=\"prisma-stats\">
-                <div class=\"stat-card stat-total\">
-                    <span class=\"stat-number">${stats.total}</span>
-                    <span class=\"stat-label\">Total Articles</span>
+        container.innerHTML = `
+            <div class="prisma-stats">
+                <div class="stat-card stat-total">
+                    <span class="stat-number">${stats.total}</span>
+                    <span class="stat-label">Total Articles</span>
                 </div>
-                <div class=\"stat-card stat-included\">
-                    <span class=\"stat-number">${stats.included}</span>
-                    <span class=\"stat-label\">Inclus</span>
+                <div class="stat-card stat-included">
+                    <span class="stat-number">${stats.included}</span>
+                    <span class="stat-label">Inclus</span>
                 </div>
-                <div class=\"stat-card stat-excluded\">
-                    <span class=\"stat-number">${stats.excluded}</span>
-                    <span class=\"stat-label\">Exclus</span>
+                <div class="stat-card stat-excluded">
+                    <span class="stat-number">${stats.excluded}</span>
+                    <span class="stat-label">Exclus</span>
                 </div>
-                <div class=\"stat-card stat-pending\">
-                    <span class=\"stat-number">${stats.pending}</span>
-                    <span class=\"stat-label\">En attente</span>
+                <div class="stat-card stat-pending">
+                    <span class="stat-number">${stats.pending}</span>
+                    <span class="stat-label">En attente</span>
                 </div>
-                <div class=\"stat-card stat-progress\">
-                    <span class=\"stat-number">${stats.total > 0 ? Math.round(((stats.included + stats.excluded) / stats.total) * 100) : 0}%</span>
-                    <span class=\"stat-label\">Progression</span>
+                <div class="stat-card stat-progress">
+                    <span class="stat-number">${stats.total > 0 ? Math.round(((stats.included + stats.excluded) / stats.total) * 100) : 0}%</span>
+                    <span class="stat-label">Progression</span>
                 </div>
             </div>
-        ";
+        `;
     }
 
     setupExportInterface() {
@@ -398,28 +398,28 @@ class ThesisWorkflow {
         // Ajouter section d'export en bas du container d'analyses
         const exportSection = document.createElement('div');
         exportSection.className = 'export-section';
-        exportSection.innerHTML = "
+        exportSection.innerHTML = `
             <h3>📊 Exports pour Thèse</h3>
             <p>Générez tous les éléments nécessaires pour votre manuscrit de thèse</p>
             
-            <div class=\"export-buttons\">
-                <button onclick=\"window.thesisWorkflow.exportPRISMAFlow()\" class=\"export-btn\">
+            <div class="export-buttons">
+                <button onclick="window.thesisWorkflow.exportPRISMAFlow()" class="export-btn">
                     📋 Diagramme PRISMA
                 </button>
-                <button onclick=\"window.thesisWorkflow.exportDataTable()\" class=\"export-btn\">
+                <button onclick="window.thesisWorkflow.exportDataTable()" class="export-btn">
                     📊 Tableau de données
                 </button>
-                <button onclick=\"window.thesisWorkflow.exportBibliography()\" class=\"export-btn\">
+                <button onclick="window.thesisWorkflow.exportBibliography()" class="export-btn">
                     📚 Bibliographie
                 </button>
-                <button onclick=\"window.thesisWorkflow.exportCompleteThesis()\" class=\"export-btn\">
+                <button onclick="window.thesisWorkflow.exportCompleteThesis()" class="export-btn">
                     📄 Export complet thèse
                 </button>
-                <button onclick=\"window.thesisWorkflow.generateThesisReport()\" class=\"export-btn\">
+                <button onclick="window.thesisWorkflow.generateThesisReport()" class="export-btn">
                     🎯 Rapport de thèse
                 </button>
             </div>
-        ";
+        `;
 
         analysesContainer.appendChild(exportSection);
     }
@@ -457,15 +457,15 @@ class ThesisWorkflow {
             { id: 'funding', text: 'Sources de financement rapportées' }
         ];
 
-        return prismaItems.map(item => "
-            <div class=\"prisma-item\" data-item-id="${item.id}">
-                <label class=\"prisma-label\">
-                    <input type=\"checkbox\" class=\"prisma-checkbox\" data-item-id="${item.id}">
-                    <span class=\"prisma-text">${item.text}</span>
+        return prismaItems.map(item => `
+            <div class="prisma-item" data-item-id="${item.id}">
+                <label class="prisma-label">
+                    <input type="checkbox" class="prisma-checkbox" data-item-id="${item.id}">
+                    <span class="prisma-text">${item.text}</span>
                 </label>
-                <textarea class=\"prisma-notes\" placeholder=\"Notes et détails pour cet élément..."></textarea>
+                <textarea class="prisma-notes" placeholder="Notes et détails pour cet élément..."></textarea>
             </div>
-        ").join('');
+        `).join('');
     }
 
     // NOUVELLES FONCTIONS D'EXPORT POUR THÈSE
@@ -539,4 +539,93 @@ class ThesisWorkflow {
     generateCSV(articles) {
         const headers = ['Titre', 'Auteurs', 'Année', 'Journal', 'DOI', 'Score_Relevance', 'Statut'];
         const rows = articles.map(article => [
-            `"${(article.title || '').replace(/
+            `"${(article.title || '').replace(/"/g, "''")}"`, 
+            `"${(article.authors || '').replace(/"/g, "''")}"`, 
+            article.publication_date ? new Date(article.publication_date).getFullYear() : '', 
+            `"${(article.journal || '').replace(/"/g, "''")}"`, 
+            article.doi || '', 
+            article.relevance_score || '', 
+            article.user_validation_status || 'pending'
+        ]);
+
+        return headers.join(',') + '\n' + rows.map(row => row.join(',')).join('\n');
+    }
+
+    generateBibliography(articles) {
+        return articles.map((article, index) => {
+            const year = article.publication_date ? new Date(article.publication_date).getFullYear() : 'n.d.';
+            const authors = article.authors || 'Auteur inconnu';
+            const title = article.title || 'Titre non disponible';
+            const journal = article.journal || 'Journal non spécifié';
+            
+            return `${index + 1}. ${authors}. (${year}). ${title}. ${journal}.`;
+        }).join('\n\n');
+    }
+
+    downloadFile(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    filterValidationList(filter) {
+        const items = document.querySelectorAll('.validation-item');
+        items.forEach(item => {
+            const status = item.dataset.status;
+            if (filter === 'all' || status === filter) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    async generateThesisReport() {
+        try {
+            const stats = this.validationStats;
+            const reportContent = `
+# Rapport de Thèse - ${this.currentProject.name}
+
+## Statistiques de Sélection
+
+- **Total d'articles identifiés :** ${stats.total}
+- **Articles inclus :** ${stats.included}
+- **Articles exclus :** ${stats.excluded}
+- **Articles en attente :** ${stats.pending}
+- **Taux de progression :** ${stats.total > 0 ? Math.round(((stats.included + stats.excluded) / stats.total) * 100) : 0}%
+
+## Méthodologie
+
+Cette scoping review a été réalisée selon les guidelines PRISMA-ScR et JBI.
+
+## Prochaines Étapes
+
+1. Finaliser la validation des ${stats.pending} articles en attente
+2. Lancer l'analyse ATN multipartite sur les ${stats.included} articles inclus
+3. Générer le diagramme PRISMA final
+4. Rédiger la section Discussion
+
+---
+Généré automatiquement par AnalyLit v4.1
+Date: ${new Date().toLocaleDateString('fr-FR')}
+            `;
+
+            this.downloadFile(reportContent, `rapport_these_${this.currentProject.name}.md`, 'text/markdown');
+        } catch (error) {
+            alert(`Erreur génération rapport: ${error.message}`);
+        }
+    }
+}
+
+// Initialiser le workflow de thèse
+document.addEventListener('DOMContentLoaded', () => {
+    window.thesisWorkflow = new ThesisWorkflow();
+});
+
+export default ThesisWorkflow;

@@ -147,28 +147,18 @@ async function initializeApplication() {
         // Initialisation du WebSocket
         initializeWebSocket();
 
-        // Chargement des données initiales
-        await loadInitialData();
-        
-        // Affichage de la section par défaut - CORRECTION CRITIQUE
         try {
-            // Forcer l'affichage de la section projets au démarrage
-            const projectsSection = document.getElementById('projects');
-            const navButtons = document.querySelectorAll('.app-nav__button');
+            // Chargement des données initiales
+            await loadInitialData();
             
-            if (projectsSection) {
-                projectsSection.style.display = 'block';
-                projectsSection.classList.add('active');
+            // Affichage de la section par défaut (projets)
+            const projectsButton = document.querySelector('.app-nav__button[data-section-id="projects"]');
+            if (projectsButton) {
+                showSection('projects');
+                document.querySelectorAll('.app-nav__button').forEach(btn => btn.classList.remove('app-nav__button--active'));
+                projectsButton.classList.add('app-nav__button--active');
+                console.log('🎯 Section projets activée par défaut via app-improved.js');
             }
-            
-            // Activer le bouton projets
-            navButtons.forEach(btn => {
-                if (btn.dataset.sectionId === 'projects') {
-                    btn.classList.add('app-nav__button--active');
-                }
-            });
-            
-            console.log('🎯 Section projets activée par défaut');
         } catch (error) {
             console.error('Erreur initialisation section:', error);
         }
