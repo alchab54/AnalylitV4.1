@@ -48,6 +48,12 @@ document.addEventListener('click', (e) => { // This listener seems to be for moc
     }
     
     if (action === 'run-atn-analysis') {
+        // ✅ CORRECTION: Validation avant lancement analyse
+        if (!appState.currentProject) {
+            showToast('Veuillez sélectionner un projet en premier.', 'warning');
+            return;
+        }
+
         showToast('Analyse ATN lancée', 'success');
         e.target.closest('.analysis-card').classList.add('analysis-card--loading');
     }
@@ -68,10 +74,15 @@ document.addEventListener('click', (e) => { // This listener seems to be for moc
 
 export function renderAnalysesSection() {
     if (!elements.analysesSection()) return; // Use elements getter
+    const container = document.getElementById('analysisContainer');
     const project = appState.currentProject;
 
+    // ✅ CORRECTION: Gestion état vide analyses
     if (!project) {
-        elements.analysisContainer.innerHTML = `<div class="empty-state"><p>${MESSAGES.selectProjectToViewAnalyses}</p></div>`;
+        container.innerHTML = `
+            <div class="analysis-empty">
+                <p>Veuillez sélectionner un projet pour visualiser les analyses.</p>
+            </div>`;
         return;
     }
 
