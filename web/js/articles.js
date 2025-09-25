@@ -68,48 +68,46 @@ export function renderSearchResultsTable() {
 
     const { currentProjectExtractions, currentProjectFiles, searchResults } = appState;
 
-    const tableRows = appState.searchResults.map(article => {
+    const articleRows = appState.searchResults.map(article => {
         const isSelected = isArticleSelected(article.article_id);
         const extraction = currentProjectExtractions.find(e => e.pmid === article.article_id);
         
         // Vérifier si le PDF existe
         const pdfExists = currentProjectFiles?.has(article.article_id.replace(/^PMID:/, '').toLowerCase());
         
+        // ✅ CORRECTION: Générer des DIVs avec la classe .result-row au lieu de TRs
         return `
-            <tr class="result-row ${isSelected ? 'result-row--selected' : ''}" data-article-id="${article.article_id}">
-                <td>
-                    <input type="checkbox" 
-                           data-action="toggle-article-selection" 
-                           data-article-id="${article.article_id}"
-                           ${isSelected ? 'checked' : ''}>
-                </td>
-                <td>
-                    <div class="article-title">
-                        <strong>${escapeHtml(article.title)}</strong>
-                        ${pdfExists ? '<span class="pdf-badge">📄 PDF</span>' : ''}
-                    </div>
+            <div class="result-row ${isSelected ? 'result-row--selected' : ''}" data-article-id="${article.article_id}">
+                <div class="result-row__selection">
+                    <input type="checkbox" class="article-checkbox"
+                           data-action="toggle-article-selection"
+                           data-article-id="${article.article_id}" ${isSelected ? 'checked' : ''}>
+                </div>
+                <div class="result-row__content">
+                    <strong class="article-title">${escapeHtml(article.title)}</strong>
                     <div class="article-meta">
-                        <span>${escapeHtml(article.authors)}</span> • 
-                        <em>${escapeHtml(article.journal)}</em> • 
+                        <span>${escapeHtml(article.authors)}</span>
+                        <em>${escapeHtml(article.journal || '')}</em>
                         <span>${escapeHtml(article.publication_date)}</span>
                     </div>
-                </td>
-                <td class="score-column">
+                </div>
+                <div class="result-row__score">
                     ${extraction ? 
                         `<span class="relevance-score">${extraction.relevance_score || 'N/A'}</span>` : 
                         '<span class="no-analysis">-</span>'
                     }
-                </td>
-                <td class="actions-column">
+                </div>
+                <div class="result-row__actions">
                     <button class="btn btn--sm btn--secondary" 
                             data-action="view-details" 
                             data-article-id="${article.article_id}">
                         Détails
                     </button>
-                </td>
-            </tr>`;
+                </div>
+            </div>`;
     }).join('');
 
+    // ✅ CORRECTION: Utiliser la nouvelle structure HTML avec des DIVs
     container.innerHTML = `
         <div class="results-header">
             <div class="results-stats">
@@ -135,22 +133,8 @@ export function renderSearchResultsTable() {
             </div>
         </div>
         
-        <div class="results-table-container">
-            <table class="results-table">
-                <thead>
-                    <tr>
-                        <th width="40">
-                            <input type="checkbox" id="selectAllCheckbox" data-action="select-all-articles-checkbox">
-                        </th>
-                        <th>Article</th>
-                        <th width="80">Score IA</th>
-                        <th width="100">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableRows}
-                </tbody>
-            </table>
+        <div id="results-list" class="results-list-container">
+            ${articleRows}
         </div>`;
 
     updateSelectionCounter();
