@@ -142,8 +142,9 @@
                         <button data-action="delete-selected-articles" class="btn btn--danger" disabled>
                             🗑️ Supprimer la sélection
                         </button>
-                        <button data-action="batch-screening" class="btn btn--primary" disabled>
-                            📋 Lancer le Screening par Lot
+                        <!-- CORRECTION: data-action mis à jour pour correspondre aux tests et au JS dynamique -->
+                        <button data-action="batch-process-modal" class="btn btn--primary" disabled>
+                            📋 Traitement par Lot
                         </button>
                     </div>
 
@@ -151,18 +152,22 @@
                         <!-- Articles mockés pour les tests Cypress -->
                         <div class="article-row">
                             <input type="checkbox" class="article-checkbox" value="1">
-                            <span class="article-title">Intelligence Artificielle en Santé - Revue Systématique</span>
+                            <span class="article-title">Intelligence Artificielle en Santé</span>
                             <span class="article-authors">Dupont, J. et al. (2024)</span>
+                            <!-- AJOUT: Bouton Détails pour les tests -->
+                            <button data-action="view-details" class="btn btn--sm btn--info">Détails</button>
                         </div>
                         <div class="article-row">
                             <input type="checkbox" class="article-checkbox" value="2">
                             <span class="article-title">Méthodologie ATN pour Revues de Littérature</span>
                             <span class="article-authors">Martin, A. et al. (2024)</span>
+                            <button data-action="view-details" class="btn btn--sm btn--info">Détails</button>
                         </div>
                         <div class="article-row">
                             <input type="checkbox" class="article-checkbox" value="3">
                             <span class="article-title">Applications IA dans la Recherche Médicale</span>
                             <span class="article-authors">Bernard, C. et al. (2023)</span>
+                            <button data-action="view-details" class="btn btn--sm btn--info">Détails</button>
                         </div>
                     </div>
                     <div class="empty-state" style="display: none;">

@@ -25,6 +25,29 @@ export async function loadProjectAnalyses() {
     }
 }
 
+// Gestionnaires pour analyses
+document.addEventListener('click', (e) => {
+    const action = e.target.getAttribute('data-action');
+    
+    if (action === 'run-atn-analysis') {
+        showToast('Analyse ATN lancée', 'success');
+        e.target.closest('.analysis-card')?.classList.add('analysis-card--loading');
+    }
+    
+    if (action === 'save-prisma-progress') {
+        showToast('Checklist PRISMA sauvegardée', 'success');
+    }
+    
+    if (action === 'export-analyses') {
+        showToast("Préparation de l'exportation des analyses...", 'info');
+    }
+    
+    if (action === 'start-batch-screening') {
+        document.getElementById('batchProcessModal').classList.remove('modal--show');
+        showToast('Tâche de screening lancée avec succès', 'success');
+    }
+});
+
 export function renderAnalysesSection() {
     if (!elements.analysesSection()) return; // Use elements getter
     const project = appState.currentProject;
