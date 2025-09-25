@@ -1,8 +1,30 @@
-# =================================================
-# === .dockerignore ULTRA-OPTIMISÉ - AnalyLit v4.1 ===
-# =================================================
+# ===================================================================
+# == ANALYLIT V4.1 - DOCKERIGNORE ULTRA-OPTIMISÉ ==
+# ===================================================================
 
-# --- Cache et fichiers temporaires Python ---
+# ===============================================
+# == EXCLUSIONS DE SÉCURITÉ CRITIQUES ==
+# ===============================================
+# Secrets et configurations sensibles
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.crt
+*.csr
+
+# Données utilisateur et projets
+projects/
+user_data/
+uploads/
+exports/
+backups/
+
+# ===============================================
+# == CACHE ET TEMPORAIRES PYTHON ==
+# ===============================================
 __pycache__/
 *.py[cod]
 *$py.class
@@ -23,46 +45,56 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
-# --- Environnement et secrets ---
-.env
-.env.*
-!.env.example
+# Environnements virtuels
+venv/
+.venv/
+env/
+ENV/
 
-# --- Contrôle de version et IDE ---
+# ===============================================
+# == OUTILS DE DÉVELOPPEMENT ==
+# ===============================================
+# Contrôle de version
 .git/
 .gitignore
+.gitattributes
+.github/
+
+# IDE et éditeurs
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
 
-# Ignorer les fichiers Markdown sauf ceux qui sont essentiels (README, docs)
-*.md
-!README.md
-!/docs/**/*.md
-
-# --- Tests et couverture ---
+# ===============================================
+# == TESTS ET RAPPORTS ==
+# ===============================================
+# Pytest et couverture
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
 .tox/
 .nox/
+coverage.xml
+*.cover
+.hypothesis/
 
-# --- Logs et données générées ---
-*.log
-logs/
-projects/
-!migrations/
-model_cache/
+# Tests frontend
+cypress/
+node_modules/
 reports/
-exports/
-temp/
-tmp/
+.nyc_output/
 
-# =================================================
-# === NOUVEAU - SECTION ANTI-GB (CRITIQUE) ===
-# =================================================
-
-# --- Documents Office et PDFs ---
+# ===============================================
+# == FICHIERS VOLUMINEUX (ANTI-GB) ==
+# ===============================================
+# Documents et médias
 *.pdf
 *.docx
 *.doc
@@ -70,50 +102,100 @@ tmp/
 *.ppt
 *.xlsx
 *.xls
+*.odt
+*.rtf
 
-# --- Images et Médias ---
+# Images et vidéos
 *.jpg
 *.jpeg
 *.png
 *.gif
-*.svg
 *.bmp
 *.tiff
 *.webp
+*.svg
 *.ico
 *.mp4
 *.avi
 *.mov
-*.mp3
+*.wmv
+*.flv
+*.mkv
 
-# --- Archives et Backups ---
+# Audio
+*.mp3
+*.wav
+*.flac
+*.aac
+*.ogg
+
+# Archives
 *.zip
 *.tar.gz
-*.tar
+*.tar.xz
+*.tar.bz2
 *.rar
 *.7z
-*.bak
-*.backup
+*.gz
+*.bz2
+*.xz
 
-# --- Données locales ---
-database/data/
+# Bases de données locales
 *.sqlite
+*.sqlite3
 *.db
+database/data/
+*.dump
+*.sql.gz
 
-# --- Fichiers système ---
-.DS_Store
-Thumbs.db
-*.swp
-*~
+# ===============================================
+# == LOGS ET DONNÉES TEMPORAIRES ==
+# ===============================================
+# Logs application
+*.log
+logs/
+log/
+tmp/
+temp/
+.tmp/
 
-# --- Node modules ---
-node_modules/
+# Cache modèles IA
+model_cache/
+.ollama/
+huggingface_cache/
+transformers_cache/
 
-# =================================================
-# === Exceptions (pour ne pas tout casser) ===
-# =================================================
+# Cache système
+.cache/
+__pycache__/
+.mypy_cache/
+.ruff_cache/
+
+# ===============================================
+# == EXCEPTIONS IMPORTANTES ==
+# ===============================================
 # Garder les fichiers Docker essentiels
 !docker/
 !Dockerfile*
 !docker-compose*
+
+# Garder les configurations essentielles
 !requirements.txt
+!package.json
+!package-lock.json
+
+# Garder la documentation critique
+!README.md
+!docs/
+
+# Garder les configurations de profils IA
+!backend/config/profiles.json
+!backend/config/grille-ATN.json
+
+# Garder les migrations de base de données
+!migrations/
+!database/init-user-db.sql
+
+# Garder les fichiers de test structure
+!cypress.config.js
+!jest.config.cjs

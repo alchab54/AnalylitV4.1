@@ -1,98 +1,87 @@
-# AnalyLit V4.1 - Fichier d'environnement d'exemple
-# Copiez ce fichier en .env et remplissez les valeurs.
-# NE COMMITEZ JAMAIS votre fichier .env dans Git.
+# ===================================================================
+# == ANALYLIT V4.1 - VARIABLES FLASK (Non-Sensibles) ==
+# ===================================================================
 
-# --- Configuration Flask ---
-SECRET_KEY=a_secure_secret_key_for_development_only
+# Configuration Flask de base
+FLASK_APP=backend.server_v4_complete:app
 FLASK_ENV=development
+FLASK_DEBUG=1
+FLASK_RUN_HOST=0.0.0.0
+FLASK_RUN_PORT=5000
+
+# ===============================================
+# == Configuration Développement Local ==
+# ===============================================
+# Performance et debugging
+WERKZEUG_DEBUG_PIN=off
+WERKZEUG_RUN_MAIN=true
+
+# Logging optimisé
 LOG_LEVEL=INFO
+PYTHONUNBUFFERED=1
+PYTHONDONTWRITEBYTECODE=1
 
-# --- Connexions aux services Docker ---
-# Ces valeurs correspondent à celles dans docker-compose-complete.yml
-DATABASE_URL=postgresql://postgres:password@localhost:5432/analylit
-REDIS_URL=redis://localhost:6379
+# ===============================================
+# == Connexions Services (Non-Docker) ==
+# ===============================================
+# Pour tests locaux sans Docker
+LOCAL_DATABASE_URL=postgresql://postgres:password@localhost:5432/analylit
+LOCAL_REDIS_URL=redis://localhost:6379
+LOCAL_OLLAMA_BASE_URL=http://localhost:11434
 
-# Configuration Ollama
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODELS_PATH=/tmp/ollama_models
-OLLAMA_MAX_LOADED_MODELS=1
-CUDA_VISIBLE_DEVICES=0
+# ===============================================
+# == Configuration Tests et CI/CD ==
+# ===============================================
+# Variables pour les tests automatisés
+TESTING=false
+PYTEST_CURRENT_TEST=""
+CYPRESS_baseUrl=http://localhost:8080
 
-# --- Clés API et Identifiants (à remplir) ---
-UNPAYWALL_EMAIL=
+# ===============================================
+# == Performance Ryzen 3700X Optimisée ==
+# ===============================================
+# Gunicorn optimisé 16GB RAM
+WORKERS=4
+MAX_WORKERS=6
+WORKER_CONNECTIONS=200
+WORKER_CLASS=gevent
+TIMEOUT=120
 
-# Identifiants Zotero
-ZOTERO_USER_ID=
-ZOTERO_API_KEY=
-ZOTERO_GROUP_ID=
-
-# Clés optionnelles pour étendre la recherche
-IEEE_API_KEY=
-PUBMED_API_KEY=
-
-# --- Performance & Optimisations ---
-# Backend Performance (Ryzen 8-cores)
-WORKERS=8
-MAX_WORKERS=12
-WORKER_CONNECTIONS=1000
-WORKER_CLASS=sync
-# Python/ML Optimisations
+# Python optimisations mémoire
 PYTHONPATH=/app
-NUMBA_NUM_THREADS=8
-OMP_NUM_THREADS=8
-OPENBLAS_NUM_THREADS=4
-# Node.js/NPM (16GB RAM)
-NODE_OPTIONS="--max-old-space-size=4096"
-UV_THREADPOOL_SIZE=8
+PYTHON_MALLOC_STATS=1
+PYTHONMALLOC=malloc
 
-# ====================================================================
-# ANALYLIT v4.1 - CONFIGURATION AWS GPU g4dn.2xlarge
-# ====================================================================
+# Threading optimisé
+OMP_NUM_THREADS=4
+NUMBA_NUM_THREADS=4
+OPENBLAS_NUM_THREADS=2
+MKL_NUM_THREADS=2
 
-# --- Configuration des modèles IA HAUTE PERFORMANCE ---
-# Le modèle d'embedding reste le même, il tourne sur CPU
-EMBEDDING_MODEL=all-MiniLM-L6-v2
+# ===============================================
+# == Node.js et Frontend ==
+# ===============================================
+NODE_OPTIONS="--max-old-space-size=2048"
+UV_THREADPOOL_SIZE=4
+NPM_CONFIG_CACHE=/tmp/.npm
 
-# --- Configuration Ollama sur GPU AWS ---
-# Indique à l'application d'utiliser le GPU
-OLLAMA_GPU_ENABLED=true
-# (Optionnel) Si vous avez plusieurs GPU
-CUDA_VISIBLE_DEVICES=0
-# (Optionnel) Limite le nombre de modèles chargés en RAM GPU
-OLLAMA_MAX_LOADED_MODELS=2
+# ===============================================
+# == Modèles IA RTX 2060 SUPER ==
+# ===============================================
+# Modèles par défaut (référence pour l'équipe)
+DEFAULT_EMBEDDING_MODEL=all-MiniLM-L6-v2
+DEFAULT_LLM_MODEL=llama3:8b
+DEFAULT_FAST_MODEL=llama3.2:3b
+DEFAULT_ANALYSIS_MODEL=mistral:7b-instruct
 
-# --- SÉLECTION STRATÉGIQUE DES MODÈLES ---
-# Modèles standards pour les tâches courantes (rapides et efficaces)
-DEFAULT_LLM_MODEL=mistral:7b-instruct-v0.2-q4_0
-FAST_LLM_MODEL=llama3.2:3b-instruct-q4_0
-ANALYSIS_LLM_MODEL=llama3.1:8b-instruct-q4_0
+# ===============================================
+# == Monitoring et Debugging ==
+# ===============================================
+# Interface de debugging
+DEBUG_MODE=1
+PROFILE_REQUESTS=false
+MEMORY_PROFILING=false
 
-# GROS MODÈLES pour les analyses critiques et démos (à utiliser ponctuellement)
-HEAVY_LLM_MODEL=llama3.1:70b-instruct-q4_0
-RESEARCH_LLM_MODEL=mixtral:8x7b-instruct-v0.1-q4_0
-
-# --- Optimisations performance GPU (recommandé) ---
-PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
-OMP_NUM_THREADS=8
-OLLAMA_FLASH_ATTENTION=true
-
-# --- Connexion à la base de données (fournie par AWS RDS) ---
-DATABASE_URL=postgresql://user:password@<URL_RDS_POSTGRES>:5432/dbname
-
-# --- Connexion au cache (fourni par AWS ElastiCache) ---
-REDIS_URL=redis://<URL_ELASTICACHE_REDIS>:6379
-
-# --- Configuration du modèle d'embedding (NE CHANGE PAS) ---
-# Ce modèle reste avec l'application, il est rapide et ne nécessite pas de GPU.
-EMBEDDING_MODEL=all-MiniLM-L6-v2
-
-# --- CONFIGURATION CRITIQUE : LE GROS MODÈLE SUR AWS ---
-# L'application contactera Ollama sur l'instance GPU via cette URL.
-# C'est la seule ligne qui change pour pointer vers le cloud.
-OLLAMA_HOST=http://<IP_DE_VOTRE_INSTANCE_GPU>:11434
-
-# Modèle LLM à utiliser par défaut pour les tâches d'analyse.
-# Vous pourrez le changer dans l'interface, mais c'est une bonne base.
-LLM_MODEL=llama3:8b
-# Ou pour les grosses analyses :
-# LLM_MODEL=mistral:latest
+# Métriques système
+TRACK_RESOURCE_USAGE=true
+LOG_SQL_QUERIES=false

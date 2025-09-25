@@ -226,10 +226,12 @@ function createSettingsLayout() {
                 </div>
                 <div class="settings-card__body">
                     <select id="available-models-select" class="form-control">
-                        <option value="llama3.1:8b">Llama 3.1 8B</option>
-                        <option value="llama3.1:70b">Llama 3.1 70B</option>
-                        <option value="phi3:mini">Phi-3 Mini</option>
-                        <option value="mistral:8x7b">Mistral 8x7B</option>
+                        <option value="llama3:8b">Llama 3 8B (Principal)</option>
+                        <option value="llama3.2:3b">Llama 3.2 3B (Rapide)</option>
+                        <option value="mistral:7b-instruct">Mistral 7B (Analyse)</option>
+                        <option value="qwen2:7b">Qwen2 7B (Code)</option>
+                        <option value="llama3.1:8b-instruct-q4_0">Llama 3.1 8B Q4 (Optimal)</option>
+                        <option value="tinyllama:1.1b">TinyLlama 1.1B (Tests)</option>
                     </select>
                     <button data-action="download-selected-model" class="btn btn-primary">Télécharger le Modèle</button>
                     <div id="download-progress" class="progress-container" style="display:none;">

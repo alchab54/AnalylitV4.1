@@ -1,58 +1,192 @@
-# Fichier .gitignore pour le projet AnalyLit
+# ===================================================================
+# == ANALYLIT V4.1 - GITIGNORE COMPLET ET SÉCURISÉ ==
+# ===================================================================
 
-# --- Dépendances et environnements locaux ---
-# Ne jamais versionner les dépendances, elles sont réinstallées à partir des fichiers manifestes.
-node_modules/
+# ===============================================
+# == SÉCURITÉ ABSOLUE - SECRETS ==
+# ===============================================
+# Variables d'environnement (CRITIQUE)
+.env
+.env.*
+!.env.example
+!.flaskenv
+
+# Clés et certificats
+*.key
+*.pem
+*.p12
+*.crt
+*.csr
+secrets/
+credentials/
+
+# ===============================================
+# == ENVIRONNEMENTS ET DÉPENDANCES ==
+# ===============================================
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
 venv/
 .venv/
 env/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
 
-# --- Fichiers de configuration locaux et secrets ---
-# Le fichier .env contient des secrets (clés API, mots de passe DB) et ne DOIT JAMAIS être sur GitHub.
-# Seul le fichier `env.example` (s'il existe) doit être versionné.
-.env
-.env.*
-!/.env.example
-
-# --- Fichiers de cache et artefacts de build ---
-# Cache Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.egg-info
-
-# Cache et rapports de tests
-.pytest_cache/
-htmlcov/
-.tox/
-.nox/
-.coverage
-
-# --- Fichiers générés par l'application ---
-# Les données des projets (PDFs, images, etc.) ne doivent pas être dans le dépôt Git.
-# Ils sont gérés par des volumes Docker en production.
-projects/
-model_cache/
-reports/
-exports/
-
-# --- Fichiers de données et de configuration ---
-# Ignorer tous les fichiers JSON, sauf ceux qui sont explicitement nécessaires.
-*.json
-!profiles.json
-
-# --- Logs ---
-# Les fichiers de log sont spécifiques à une exécution et ne doivent pas être versionnés.
-*.log
-logs/
+# Node.js
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
+package-lock.json  # Peut varier selon les environnements
 
-# --- Fichiers système et IDE ---
-.DS_Store
-.idea/
+# ===============================================
+# == DONNÉES ET CONTENU UTILISATEUR ==
+# ===============================================
+# Projets et données utilisateur (CRITIQUE)
+projects/
+user_data/
+uploads/
+exports/
+temp_files/
+extracted_data/
+
+# Cache et modèles
+model_cache/
+.ollama/
+huggingface_cache/
+transformers_cache/
+.cache/
+
+# ===============================================
+# == TESTS ET RAPPORTS ==
+# ===============================================
+# Python testing
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+test-results/
+
+# Frontend testing
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+reports/
+.nyc_output/
+junit.xml
+
+# ===============================================
+# == BUILDS ET ARTEFACTS ==
+# ===============================================
+# Python builds
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Docker et CI/CD
+docker-compose.override.yml
+.dockerignore.local
+
+# ===============================================
+# == LOGS ET MONITORING ==
+# ===============================================
+# Application logs
+*.log
+logs/
+log/
+gunicorn.log
+celery.log
+worker.log
+
+# System logs
+*.out
+*.err
+
+# ===============================================
+# == OUTILS DE DÉVELOPPEMENT ==
+# ===============================================
+# Contrôle de version
+.git/
+.gitattributes.local
+
+# IDEs et éditeurs
 .vscode/
+.idea/
 *.swp
+*.swo
 *~
+.vim/
+.netrwhist
+
+# Système d'exploitation
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ===============================================
+# == EXCLUSIONS DÉVELOPPEMENT ==
+# ===============================================
+# Analyse et profiling
+.mypy_cache/
+.ruff_cache/
+.pylint.d/
+prof/
+
+# Documentation générée
+_build/
+site/
+
+# ===============================================
+# == EXCEPTIONS IMPORTANTES ==
+# ===============================================
+# Garder les configurations essentielles
+!backend/config/profiles.json
+!backend/config/grille-ATN.json
+!migrations/
+!docker/
+!scripts/
+
+# Garder la documentation
+!README*.md
+!docs/
+!*.md
+
+# Garder les tests structure (pas les résultats)
+!cypress/e2e/
+!cypress/support/
+!tests/
+!jest.config.cjs
+!cypress.config.js
+
+# Garder les fichiers Docker
+!Dockerfile*
+!docker-compose*.yml
+!requirements.txt
