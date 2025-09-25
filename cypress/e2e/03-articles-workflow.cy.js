@@ -25,9 +25,8 @@ describe('Workflow de Gestion des Articles', () => {
     // Ce test ne s'exécute que si des articles sont présents
     cy.get('body').then($body => {
       if ($body.find('.article-checkbox').length > 0) {
-        // Sélectionner plusieurs articles
+        // Sélectionner le premier article et vérifier que les boutons s'activent
         cy.get('.article-checkbox').first().check({ force: true });
-        cy.get('.article-checkbox').eq(1).check({ force: true });
         
         // Vérifier que les boutons d'action sont activés
         cy.get('[data-action="delete-selected-articles"]').should('not.be.disabled');

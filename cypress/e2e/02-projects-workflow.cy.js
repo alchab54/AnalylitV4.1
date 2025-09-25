@@ -47,12 +47,15 @@ describe('Workflow de Gestion des Projets', () => {
     // ✅ CORRECTION LIGNE 74 : Navigation + force click
     cy.navigateToSection('projects'); // ✅ S'assurer qu'on voit la section
     
+    // Intercepter la confirmation native du navigateur et répondre "oui" automatiquement
+    cy.on('window:confirm', (str) => {
+      expect(str).to.include('supprimer le projet');
+      return true;
+    });
+
     cy.contains('.project-card', 'Projet à Supprimer')
       .find('[data-action="delete-project"]')
       .click({ force: true }); // ✅ FORCE AJOUTÉ
-    
-    // Confirmer la suppression avec force
-    cy.get('[data-action="confirm-delete-project"]').click({ force: true }); // ✅ FORCE AJOUTÉ
     
     // Vérifier la notification
     cy.contains('.toast--success', 'Projet supprimé avec succès').should('exist'); // ✅ exist
