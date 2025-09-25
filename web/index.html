@@ -13,7 +13,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔬</text></svg>">
     
-    <!-- CSS Files -->
+    <!-- CSS Files - UNIQUEMENT CES 3 -->
     <link rel="stylesheet" href="css/tokens.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
@@ -25,49 +25,51 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js" defer></script>
 </head>
 <body>
-    <script type="module">
-        import './js/analyses.js'; // Les fonctions seront disponibles globalement
-    </script>
-<body>
-    <!-- En-tête principal FIXE -->
+    <!-- Header principal -->
     <header class="app-header">
-      <div class="container app-header__inner">
-        <div class="brand">AnalyLit</div>
-        <div class="header-actions">
-          <!-- Placeholders: actions à droite si besoin -->
+        <div class="container app-header__inner">
+            <div class="brand">🧬 AnalyLit v4.1</div>
+            <div class="header-actions">
+                <div id="connection-status" class="connection-indicator">
+                    <span class="status-dot connected"></span>
+                    <span class="status-text">Connecté</span>
+                </div>
+                <button class="btn btn--ghost" data-action="toggle-theme" title="Changer de thème">
+                    🌙
+                </button>
+            </div>
         </div>
-      </div>
     </header>
 
-    <!-- Navigation HORIZONTALE - NAVIGATION UNIQUE -->
+    <!-- Navigation horizontale -->
     <nav class="app-nav" role="navigation" aria-label="Navigation principale">
         <div class="container app-nav__wrap" id="mainNav">
             <button class="app-nav__btn app-nav__btn--active" data-section="projects">
-                Projets
+                <span role="img" aria-hidden="true">📁</span> Projets
             </button>
             <button class="app-nav__btn" data-section="search">
-                Recherche
+                <span role="img" aria-hidden="true">🔍</span> Recherche
             </button>
             <button class="app-nav__btn" data-section="results">
-                Résultats
+                <span role="img" aria-hidden="true">📄</span> Résultats
             </button>
             <button class="app-nav__btn" data-section="validation">
-                Validation
+                <span role="img" aria-hidden="true">✅</span> Validation
             </button>
             <button class="app-nav__btn" data-section="grids">
-                Grilles
+                <span role="img" aria-hidden="true">📋</span> Grilles
             </button>
             <button class="app-nav__btn" data-section="analyses">
-                Analyses
+                <span role="img" aria-hidden="true">📊</span> Analyses
             </button>
             <button class="app-nav__btn" data-section="import">
-                Import
+                <span role="img" aria-hidden="true">📥</span> Import
             </button>
             <button class="app-nav__btn" data-section="chat">
-                Chat IA
+                <span role="img" aria-hidden="true">💬</span> Chat IA
             </button>
             <button class="app-nav__btn" data-section="settings">
-                Paramètres
+                <span role="img" aria-hidden="true">⚙️</span> Paramètres
             </button>
         </div>
     </nav>
@@ -76,364 +78,419 @@
     <main class="app-main" role="main">
         <div class="container app-main__inner">
             
-            <!-- Section Projets - SECTION ACTIVE PAR DÉFAUT -->
+            <!-- Section Projets - ACTIVE PAR DÉFAUT -->
             <section id="projects" class="app-section">
-      <!-- contenu actuel des projets -->
-                <div class="section-header">
-                    <div class="section-header__content">
-                        <h2>Gestion des Projets</h2>
-                        <p>Créez et gérez vos projets de revue de littérature.</p>
+                <div class="card">
+                    <div class="card__header">
+                        <div class="section-header">
+                            <div class="section-header__content">
+                                <h2 class="h2">Gestion des Projets</h2>
+                                <p class="text-muted">Créez et gérez vos projets de revue de littérature.</p>
+                            </div>
+                            <div class="section-header__actions">
+                                <button id="create-project-btn" class="btn btn--primary" data-action="create-project-modal">
+                                    <span role="img" aria-hidden="true">➕</span> Nouveau Projet
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="section-header__actions">
-                        <button id="create-project-btn" class="btn btn-primary" data-action="create-project-modal">
-                            <span role="img" aria-hidden="true">➕</span> Nouveau Projet
-                        </button>
+                    <div class="card__body">
+                        <div id="projects-list" class="projects-grid">
+                            <!-- Les cartes de projet seront injectées ici par JS -->
+                        </div>
+                        
+                        <!-- Détails du projet sélectionné -->
+                        <div id="projectDetail" class="project-detail" style="display: none;">
+                            <div id="projectDetailContent" class="project-detail-content">
+                                <!-- Contenu dynamique -->
+                            </div>
+                        </div>
+                        
+                        <!-- État vide -->
+                        <div id="projectPlaceholder" class="placeholder" style="display: none;">
+                            <div class="placeholder-icon">📁</div>
+                            <h3>Aucun projet sélectionné</h3>
+                            <p>Sélectionnez un projet pour voir ses détails</p>
+                        </div>
                     </div>
-                </div>
-                
-                <div id="projects-list" class="projects-grid">
-                    <!-- Les cartes de projet seront injectées ici -->
-                </div>
-                
-                <!-- Détails du projet sélectionné -->
-                <div id="projectDetail" class="project-detail" style="display: none;">
-                    <div id="projectDetailContent" class="project-detail-content">
-                        <!-- Contenu dynamique -->
-                    </div>
-                </div>
-                
-                <!-- État vide -->
-                <div id="projectPlaceholder" class="placeholder" style="display: none;">
-                    <div class="placeholder-icon">📁</div>
-                    <h3>Aucun projet sélectionné</h3>
-                    <p>Sélectionnez un projet pour voir ses détails</p>
                 </div>
             </section>
 
             <!-- Section Recherche -->
-            <section id="search" class="app-section hidden"></section>
-            <section id="results" class="app-section hidden"></section>
-            <section id="validation" class="app-section hidden"></section>
-            <section id="grids" class="app-section hidden"></section>
-            <section id="analyses" class="app-section hidden"></section>
-            <section id="import" class="app-section hidden"></section>
-            <section id="chat" class="app-section hidden"></section>
-            <section id="settings" class="app-section hidden"></section>
             <section id="search" class="app-section hidden">
-                <div class="section-header">
-                    <h2>Recherche Multi-Bases</h2>
-                    <p>Lancez des recherches sur PubMed, arXiv, CrossRef</p>
-                </div>
-                <div id="searchContainer">
-                    <!-- Contenu recherche -->
+                <div class="card">
+                    <div class="card__header">
+                        <h2 class="h2">Recherche Multi-Bases</h2>
+                        <p class="text-muted">Lancez des recherches sur PubMed, arXiv, CrossRef</p>
+                    </div>
+                    <div class="card__body">
+                        <div id="searchContainer">
+                            <!-- Contenu recherche injecté par JS -->
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <!-- Section Résultats - ESSENTIEL POUR CYPRESS -->
+            <!-- Section Résultats -->
             <section id="results" class="app-section hidden">
-                <div class="section-header">
-                    <h2>Articles du Projet</h2>
-                    <p>Consultez et filtrez les articles trouvés</p>
-                </div>
-                <div id="resultsContainer">
-                    <div class="results-actions">
-                        <button class="btn btn--secondary" id="selectAllBtn" data-action="select-all-articles">Tout sélectionner</button>
-                        <button class="btn btn--primary" 
-                                data-action="batch-process-modal"
-                                disabled>
-                            Traiter la sélection
-                        </button>
-                        <button class="btn btn--danger" 
-                                data-action="delete-selected-articles"
-                                disabled>
-                            Supprimer sélection
-                        </button>
+                <div class="card">
+                    <div class="card__header">
+                        <h2 class="h2">Articles du Projet</h2>
+                        <p class="text-muted">Consultez et filtrez les articles trouvés</p>
                     </div>
+                    <div class="card__body">
+                        <div id="resultsContainer">
+                            <div class="results-actions mb-4">
+                                <button class="btn btn--secondary" id="selectAllBtn" data-action="select-all-articles">
+                                    Tout sélectionner
+                                </button>
+                                <button class="btn btn--primary" data-action="batch-process-modal" disabled>
+                                    Traiter la sélection
+                                </button>
+                                <button class="btn btn--danger" data-action="delete-selected-articles" disabled>
+                                    Supprimer sélection
+                                </button>
+                            </div>
 
-                    <div id="articles-list" class="articles-list">
-                        <!-- Articles mockés pour les tests Cypress -->
-                        <div class="article-row">
-                            <input type="checkbox" class="article-checkbox" value="1">
-                            <span class="article-title">Intelligence Artificielle en Santé</span>
-                            <span class="article-authors">Dupont, J. et al. (2024)</span>
-                            <!-- AJOUT: Bouton Détails pour les tests -->
-                            <button data-action="view-details" class="btn btn--sm btn--info">Détails</button>
+                            <div id="articles-list" class="articles-list">
+                                <!-- Articles mockés pour les tests -->
+                                <div class="card mb-4">
+                                    <div class="card__body">
+                                        <div class="article-row">
+                                            <input type="checkbox" class="article-checkbox" value="1">
+                                            <div class="article-content">
+                                                <h4 class="article-title">Intelligence Artificielle en Santé</h4>
+                                                <p class="article-authors text-muted">Dupont, J. et al. (2024)</p>
+                                            </div>
+                                            <button data-action="view-details" class="btn btn--secondary">Détails</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card mb-4">
+                                    <div class="card__body">
+                                        <div class="article-row">
+                                            <input type="checkbox" class="article-checkbox" value="2">
+                                            <div class="article-content">
+                                                <h4 class="article-title">Méthodologie ATN pour Revues de Littérature</h4>
+                                                <p class="article-authors text-muted">Martin, A. et al. (2024)</p>
+                                            </div>
+                                            <button data-action="view-details" class="btn btn--secondary">Détails</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card mb-4">
+                                    <div class="card__body">
+                                        <div class="article-row">
+                                            <input type="checkbox" class="article-checkbox" value="3">
+                                            <div class="article-content">
+                                                <h4 class="article-title">Applications IA dans la Recherche Médicale</h4>
+                                                <p class="article-authors text-muted">Bernard, C. et al. (2023)</p>
+                                            </div>
+                                            <button data-action="view-details" class="btn btn--secondary">Détails</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="empty-state" style="display: none;">
+                                <h3>Aucun article trouvé</h3>
+                                <p>Lancez une recherche pour afficher des résultats.</p>
+                            </div>
                         </div>
-                        <div class="article-row">
-                            <input type="checkbox" class="article-checkbox" value="2">
-                            <span class="article-title">Méthodologie ATN pour Revues de Littérature</span>
-                            <span class="article-authors">Martin, A. et al. (2024)</span>
-                            <button data-action="view-details" class="btn btn--sm btn--info">Détails</button>
-                        </div>
-                        <div class="article-row">
-                            <input type="checkbox" class="article-checkbox" value="3">
-                            <span class="article-title">Applications IA dans la Recherche Médicale</span>
-                            <span class="article-authors">Bernard, C. et al. (2023)</span>
-                            <button data-action="view-details" class="btn btn--sm btn--info">Détails</button>
-                        </div>
-                    </div>
-                    <div class="empty-state" style="display: none;">
-                        <h3>Aucun article trouvé</h3>
-                        <p>Lancez une recherche pour afficher des résultats.</p>
                     </div>
                 </div>
             </section>
 
             <!-- Section Validation -->
             <section id="validation" class="app-section hidden">
-                <div class="section-header">
-                    <h2>Validation Inter-Évaluateurs</h2>
-                </div>
-                <div id="validationContainer">
-                    <!-- Contenu validation -->
+                <div class="card">
+                    <div class="card__header">
+                        <h2 class="h2">Validation Inter-Évaluateurs</h2>
+                        <p class="text-muted">Validez les articles sélectionnés</p>
+                    </div>
+                    <div class="card__body">
+                        <div id="validationContainer">
+                            <!-- Contenu validation injecté par JS -->
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <!-- Section Grilles -->
             <section id="grids" class="app-section hidden">
-                <div class="section-header">
-                    <h2>Grilles d'Extraction</h2>
-                </div>
-                <div id="gridsContainer">
-                    <!-- Contenu grilles -->
-                </div>
-            </section>
-
-            <!-- Section Analyses - ESSENTIEL POUR CYPRESS -->
-            <section id="analyses" class="app-section hidden">
-                 <div class="section-header">
-                     <h2>Analyses du Projet</h2>
-                     <div class="analysis-controls">
-                         <button data-action="atn-analysis" class="btn btn--primary">
-                             🧠 Analyse ATN
-                         </button>
-                         <button data-action="discussion-generation" class="btn btn--secondary">
-                             💬 Discussion
-                         </button>
-                         <button data-action="knowledge-graph" class="btn btn--info">
-                             🕸️ Graphe
-                         </button>
-                         <button data-action="export-analyses" class="btn btn--success">
-                             📊 Export
-                         </button>
-                         <button data-action="show-prisma-modal" class="btn btn--info">
-                             📋 PRISMA
-                         </button>
-                         <button data-action="show-advanced-analysis-modal" class="btn btn--warning">
-                             🔬 Analyses Avancées
-                         </button>
-                     </div>
-                 </div>
-                
-                <div id="analysisContainer">
-                    <div class="analysis-grid"> <!-- ✅ CLASSE ATTENDUE PAR LES TESTS -->
-                        <!-- Cartes d'analyse avec contenu exact attendu par les tests -->
-                        <div class="analysis-card analysis-card--ready">
-                            <h4>Analyse ATN Multipartite</h4> <!-- ✅ TITRE EXACT ATTENDU -->
-                            <p>Génération d'scores ATN automatisés</p>
-                            <button data-action="run-atn-analysis" class="btn btn-primary">Lancer</button>
-                        </div>
-                        
-                        <div class="analysis-card analysis-card--ready">
-                            <h4>Discussion académique</h4> <!-- ✅ TITRE EXACT ATTENDU -->
-                            <p>Génération automatique de discussion</p>
-                            <button data-action="run-analysis" data-analysis-type="discussion" class="btn btn-primary">Lancer</button>
-                        </div>
-                        
-                        <div class="analysis-card analysis-card--ready">
-                            <h4>Graphe de connaissances</h4> <!-- ✅ TITRE EXACT ATTENDU -->
-                            <p>Visualisation des relations conceptuelles</p>
-                            <button data-action="run-analysis" data-analysis-type="knowledge_graph" class="btn btn-primary">Lancer</button>
-                        </div>
-                        
-                        <div class="analysis-card analysis-card--done">
-                            <h4>Analyse ATN Terminée</h4>
-                            <p>Résultats disponibles</p>
-                            <button data-action="view-analysis-results" data-target-id="atn-results">Voir résultats</button>
-                            <button data-action="delete-analysis" data-analysis-type="atn_scores" class="btn btn--danger btn--sm">Supprimer</button>
+                <div class="card">
+                    <div class="card__header">
+                        <h2 class="h2">Grilles d'Extraction</h2>
+                        <p class="text-muted">Configurez vos grilles d'extraction de données</p>
+                    </div>
+                    <div class="card__body">
+                        <div id="gridsContainer">
+                            <!-- Contenu grilles injecté par JS -->
                         </div>
                     </div>
                 </div>
-                
-                <!-- Conteneurs pour résultats d'analyses -->
-                <div id="atn-results" class="analysis-results" style="display: none;">
-                    <h3>Résultats Analyse ATN</h3>
-                    <p>Résultats de l'analyse ATN multipartite...</p>
-                </div>
+            </section>
 
-                <!-- État vide analyses -->
-                <div class="analysis-empty" style="display: none;">
-                    <p>Veuillez sélectionner un projet pour visualiser les analyses.</p>
-                </div>
+            <!-- Section Analyses -->
+            <section id="analyses" class="app-section hidden">
+                <div class="card">
+                    <div class="card__header">
+                        <div class="section-header">
+                            <div class="section-header__content">
+                                <h2 class="h2">Analyses du Projet</h2>
+                                <p class="text-muted">Générez vos analyses statistiques et rapports</p>
+                            </div>
+                            <div class="analysis-controls">
+                                <button data-action="atn-analysis" class="btn btn--primary">
+                                    🧠 Analyse ATN
+                                </button>
+                                <button data-action="discussion-generation" class="btn btn--secondary">
+                                    💬 Discussion
+                                </button>
+                                <button data-action="knowledge-graph" class="btn btn--secondary">
+                                    🕸️ Graphe
+                                </button>
+                                <button data-action="export-analyses" class="btn btn--secondary">
+                                    📊 Export
+                                </button>
+                                <button data-action="show-prisma-modal" class="btn btn--secondary">
+                                    📋 PRISMA
+                                </button>
+                                <button data-action="show-advanced-analysis-modal" class="btn btn--secondary">
+                                    🔬 Analyses Avancées
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <div id="analysisContainer">
+                            <div class="analysis-grid">
+                                <!-- Cartes d'analyse -->
+                                <div class="card analysis-card analysis-card--ready">
+                                    <div class="card__body">
+                                        <h4>Analyse ATN Multipartite</h4>
+                                        <p class="text-muted">Génération d'scores ATN automatisés</p>
+                                        <button data-action="run-atn-analysis" class="btn btn--primary">Lancer</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="card analysis-card analysis-card--ready">
+                                    <div class="card__body">
+                                        <h4>Discussion académique</h4>
+                                        <p class="text-muted">Génération automatique de discussion</p>
+                                        <button data-action="run-analysis" data-analysis-type="discussion" class="btn btn--primary">Lancer</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="card analysis-card analysis-card--ready">
+                                    <div class="card__body">
+                                        <h4>Graphe de connaissances</h4>
+                                        <p class="text-muted">Visualisation des relations conceptuelles</p>
+                                        <button data-action="run-analysis" data-analysis-type="knowledge_graph" class="btn btn--primary">Lancer</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="card analysis-card analysis-card--done">
+                                    <div class="card__body">
+                                        <h4>Analyse ATN Terminée</h4>
+                                        <p class="text-muted">Résultats disponibles</p>
+                                        <button data-action="view-analysis-results" data-target-id="atn-results" class="btn btn--secondary">Voir résultats</button>
+                                        <button data-action="delete-analysis" data-analysis-type="atn_scores" class="btn btn--danger">Supprimer</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Conteneurs pour résultats d'analyses -->
+                        <div id="atn-results" class="analysis-results" style="display: none;">
+                            <h3>Résultats Analyse ATN</h3>
+                            <p>Résultats de l'analyse ATN multipartite...</p>
+                        </div>
 
+                        <!-- État vide analyses -->
+                        <div class="analysis-empty" style="display: none;">
+                            <p>Veuillez sélectionner un projet pour visualiser les analyses.</p>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <!-- Section Import -->
             <section id="import" class="app-section hidden">
-                <div class="section-header">
-                    <h2>Import & Gestion des Fichiers</h2>
-                </div>
-                <div id="importContainer">
-                    <!-- Contenu import -->
+                <div class="card">
+                    <div class="card__header">
+                        <h2 class="h2">Import & Gestion des Fichiers</h2>
+                        <p class="text-muted">Importez vos données et gérez vos fichiers</p>
+                    </div>
+                    <div class="card__body">
+                        <div id="importContainer">
+                            <!-- Contenu import injecté par JS -->
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <!-- Section Chat IA -->
             <section id="chat" class="app-section hidden">
-                <div class="section-header">
-                    <h2>Chat IA avec Documents</h2>
-                </div>
-                <div id="chatContainer">
-                    <!-- Interface chat -->
+                <div class="card">
+                    <div class="card__header">
+                        <h2 class="h2">Chat IA avec Documents</h2>
+                        <p class="text-muted">Interagissez avec vos documents via IA</p>
+                    </div>
+                    <div class="card__body">
+                        <div id="chatContainer">
+                            <!-- Interface chat injectée par JS -->
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <!-- Section Paramètres -->
             <section id="settings" class="app-section hidden">
-                <div class="section-header">
-                    <h2>Paramètres & Configuration</h2>
-                </div>
                 <div id="settingsContainer">
-                    <!-- Interface paramètres -->
+                    <!-- Interface paramètres injectée par JS avec grid-2 -->
                 </div>
             </section>
 
         </div>
     </main>
 
-    <!-- MODALES - ENSEMBLE UNIQUE ET COMPLET -->
+    <!-- MODALES -->
     
     <!-- Modale création de projet -->
-    <div id="newProjectModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
-        <div class="modal-backdrop" data-action="close-modal"></div>
-        <div class="modal-content">
-            <div class="modal-header">
+    <div id="newProjectModal" class="modal-backdrop" style="display: none;">
+        <div class="modal" role="dialog" aria-modal="true">
+            <div class="modal__header">
                 <h3 class="modal-title">Créer un Nouveau Projet</h3>
-                <button class="modal-close" data-action="close-modal" aria-label="Fermer">×</button>
+                <button class="btn btn--ghost modal-close" data-action="close-modal" aria-label="Fermer">×</button>
             </div>
             <form id="createProjectForm" data-action="create-project">
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="projectName">Nom du projet</label>
-                        <input type="text" id="projectName" name="name" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="projectDescription">Description</label>
-                        <textarea id="projectDescription" name="description" class="form-control" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="projectAnalysisMode">Mode d'analyse</label>
-                        <select id="projectAnalysisMode" name="mode" class="form-control">
-                            <option value="full">Analyse Complète</option>
-                            <option value="screening">Screening Seul</option>
-                            <option value="extraction">Extraction Seule</option>
-                        </select>
+                <div class="modal__body">
+                    <div class="form-grid--single">
+                        <div class="form-group">
+                            <label for="projectName">Nom du projet</label>
+                            <input type="text" id="projectName" name="name" class="input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="projectDescription">Description</label>
+                            <textarea id="projectDescription" name="description" class="textarea" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="projectAnalysisMode">Mode d'analyse</label>
+                            <select id="projectAnalysisMode" name="mode" class="select">
+                                <option value="full">Analyse Complète</option>
+                                <option value="screening">Screening Seul</option>
+                                <option value="extraction">Extraction Seule</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" data-action="close-modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Créer</button>
+                <div class="modal__footer">
+                    <button type="button" class="btn btn--secondary" data-action="close-modal">Annuler</button>
+                    <button type="submit" class="btn btn--primary">Créer</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Modale générique -->
-    <div id="genericModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
-        <div class="modal-backdrop" data-action="close-modal"></div>
-        <div class="modal-content">
-            <div class="modal-header">
+    <div id="genericModal" class="modal-backdrop" style="display: none;">
+        <div class="modal" role="dialog" aria-modal="true">
+            <div class="modal__header">
                 <h3 id="genericModalTitle" class="modal-title"></h3>
-                <button class="modal-close" data-action="close-modal" aria-label="Fermer">×</button>
+                <button class="btn btn--ghost modal-close" data-action="close-modal" aria-label="Fermer">×</button>
             </div>
-            <div id="genericModalBody" class="modal-body"></div>
-            <div id="genericModalActions" class="modal-actions"></div>
+            <div id="genericModalBody" class="modal__body"></div>
+            <div id="genericModalActions" class="modal__footer"></div>
         </div>
     </div>
     
     <!-- Modale détails article -->
-    <div id="articleDetailModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" style="display: none;">
-        <div class="modal-backdrop" data-action="close-modal"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Détails de l'article</h2>
-                <button class="modal-close" data-action="close-modal" aria-label="Fermer">×</button>
+    <div id="articleDetailModal" class="modal-backdrop" style="display: none;">
+        <div class="modal" role="dialog" aria-modal="true">
+            <div class="modal__header">
+                <h3 class="modal-title">Détails de l'article</h3>
+                <button class="btn btn--ghost modal-close" data-action="close-modal" aria-label="Fermer">×</button>
             </div>
-            <div id="articleDetailContent" class="modal-body">
+            <div id="articleDetailContent" class="modal__body">
                 <!-- Contenu dynamique injecté par JS -->
             </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" data-action="close-modal">Fermer</button>
+            <div class="modal__footer">
+                <button type="button" class="btn btn--secondary" data-action="close-modal">Fermer</button>
             </div>
         </div>
     </div>
 
     <!-- Modale traitement par lot -->
-    <div id="batchProcessModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" style="display: none;">
-        <div class="modal-backdrop" data-action="close-modal"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Traitement par Lot</h2>
-                <button class="modal-close" data-action="close-modal" aria-label="Fermer">×</button>
+    <div id="batchProcessModal" class="modal-backdrop" style="display: none;">
+        <div class="modal" role="dialog" aria-modal="true">
+            <div class="modal__header">
+                <h3 class="modal-title">Traitement par Lot</h3>
+                <button class="btn btn--ghost modal-close" data-action="close-modal" aria-label="Fermer">×</button>
             </div>
-            <div class="modal-body">
+            <div class="modal__body">
                 <!-- Contenu dynamique injecté par JS -->
             </div>
-            <!-- Les actions sont généralement générées par JS aussi, mais on peut en laisser pour la structure -->
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" data-action="close-modal">Annuler</button>
-                <button type="button" class="btn btn-primary" data-action="start-batch-process">Lancer le traitement</button>
+            <div class="modal__footer">
+                <button type="button" class="btn btn--secondary" data-action="close-modal">Annuler</button>
+                <button type="button" class="btn btn--primary" data-action="start-batch-process">Lancer le traitement</button>
             </div>
         </div>
     </div>
 
     <!-- Modale PRISMA -->
-    <div id="prismaModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
-        <div class="modal-backdrop" data-action="close-modal"></div>
-        <div class="modal-content modal-content--large">
-            <div class="modal-header">
-                <h2 class="modal-title">Checklist PRISMA</h2>
-                <button class="modal-close" data-action="close-modal" aria-label="Fermer">×</button>
+    <div id="prismaModal" class="modal-backdrop" style="display: none;">
+        <div class="modal" role="dialog" aria-modal="true" style="width: min(900px, 95vw);">
+            <div class="modal__header">
+                <h3 class="modal-title">Checklist PRISMA</h3>
+                <button class="btn btn--ghost modal-close" data-action="close-modal" aria-label="Fermer">×</button>
             </div>
-            <div id="prisma-checklist-content" class="modal-body">
+            <div id="prisma-checklist-content" class="modal__body">
                 <div class="prisma-item">
-                    <label>
+                    <div class="inline">
                         <input type="checkbox" class="prisma-checkbox">
-                        Titre et résumé structuré
-                    </label>
-                    <textarea class="form-control" placeholder="Notes pour cet élément..."></textarea>
+                        <label>Titre et résumé structuré</label>
+                    </div>
+                    <textarea class="textarea" placeholder="Notes pour cet élément..."></textarea>
                 </div>
-                <!-- Autres éléments PRISMA... -->
+                <!-- Autres éléments PRISMA ajoutés par JS -->
             </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" data-action="close-modal">Fermer</button>
-                <button type="button" class="btn btn-primary" data-action="save-prisma-progress">Sauvegarder</button>
-                <button type="button" class="btn btn-info" data-action="export-prisma-report">Exporter</button>
+            <div class="modal__footer">
+                <button type="button" class="btn btn--secondary" data-action="close-modal">Fermer</button>
+                <button type="button" class="btn btn--primary" data-action="save-prisma-progress">Sauvegarder</button>
+                <button type="button" class="btn btn--secondary" data-action="export-prisma-report">Exporter</button>
             </div>
         </div>
     </div>
 
     <!-- Modale analyses avancées -->
-    <div id="advancedAnalysisModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
-        <div class="modal-backdrop" data-action="close-modal"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Analyses Avancées</h2>
-                <button class="modal-close" data-action="close-modal" aria-label="Fermer">×</button>
+    <div id="advancedAnalysisModal" class="modal-backdrop" style="display: none;">
+        <div class="modal" role="dialog" aria-modal="true">
+            <div class="modal__header">
+                <h3 class="modal-title">Analyses Avancées</h3>
+                <button class="btn btn--ghost modal-close" data-action="close-modal" aria-label="Fermer">×</button>
             </div>
-            <div class="modal-body">
+            <div class="modal__body">
                 <div class="analysis-options">
-                    <div class="analysis-option" data-analysis-type="meta_analysis">
-                        <h4>Méta-analyse</h4>
-                        <p>Analyse statistique combinée</p>
+                    <div class="card analysis-option" data-analysis-type="meta_analysis">
+                        <div class="card__body">
+                            <h4>Méta-analyse</h4>
+                            <p class="text-muted">Analyse statistique combinée</p>
+                        </div>
                     </div>
-                    <div class="analysis-option" data-analysis-type="prisma_flow">
-                        <h4>Diagramme PRISMA</h4>
-                        <p>Génération du flux PRISMA</p>
+                    <div class="card analysis-option" data-analysis-type="prisma_flow">
+                        <div class="card__body">
+                            <h4>Diagramme PRISMA</h4>
+                            <p class="text-muted">Génération du flux PRISMA</p>
+                        </div>
                     </div>
-                    <div class="analysis-option" data-analysis-type="descriptive_stats">
-                        <h4>Statistiques Descriptives</h4>
-                        <p>Analyse descriptive des données</p>
+                    <div class="card analysis-option" data-analysis-type="descriptive_stats">
+                        <div class="card__body">
+                            <h4>Statistiques Descriptives</h4>
+                            <p class="text-muted">Analyse descriptive des données</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -441,23 +498,25 @@
     </div>
 
     <!-- Overlay de chargement -->
-    <div id="loadingOverlay" class="loading-overlay" aria-hidden="true">
+    <div id="loadingOverlay" class="loading-overlay" aria-hidden="true" style="display: none;">
         <div class="loading-overlay__content">
             <div class="loading-spinner"></div>
             <p class="loading-overlay__message">Chargement...</p>
             <div class="progress-bar-container" style="display: none;">
                 <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
-            <button id="cancelTaskBtn" class="btn btn-secondary" style="display: none;">Annuler</button>
+            <button id="cancelTaskBtn" class="btn btn--secondary" style="display: none;">Annuler</button>
         </div>
     </div>
 
     <!-- Conteneur pour les toasts -->
     <div id="toastContainer" class="toast-container"></div>
 
-    <!-- Scripts d'initialisation -->
+    <!-- Scripts d'initialisation - ORDRE IMPORTANT -->
     <script type="module" src="js/layout-optimizer.js"></script>
     <script type="module" src="js/app-improved.js"></script>
+    
+    <!-- Script de navigation - DOIT ÊTRE EN DERNIER -->
     <script src="js/app-nav.js"></script>
 
 </body>
