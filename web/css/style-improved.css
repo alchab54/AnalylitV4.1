@@ -529,7 +529,7 @@ select.form-control, select {
 }
 
 .modal--show, .modal.show {
-  display: flex !important;
+  display: block !important; /* FIX: Utiliser block pour assurer la visibilité selon la demande */
   opacity: 1 !important;
   visibility: visible !important;
 }

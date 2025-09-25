@@ -264,7 +264,7 @@ export async function viewArticleDetails(articleId) {
     // Utiliser la modale dédiée #articleDetailModal
     const modalContent = document.getElementById('articleDetailContent');
     if (modalContent) modalContent.innerHTML = content;
-    showModal('articleDetailModal'); // FIX: Use showModal to correctly add the --show class
+    showModal('articleDetailModal');
 }
 
 export async function handleDeleteSelectedArticles() {
@@ -332,7 +332,7 @@ export function showBatchProcessModal() {
     // Utiliser la modale dédiée #batchProcessModal
     const modal = document.getElementById('batchProcessModal');
     if (modal) modal.querySelector('.modal-body').innerHTML = content; // Keep this for content injection
-    showModal('batchProcessModal'); // FIX: Use showModal to correctly add the --show class
+    showModal('batchProcessModal');
 }
 
 export async function startBatchProcessing() {
@@ -446,19 +446,37 @@ export async function startFullExtraction() {
     }
 }
 
+// Gestionnaire pour activer les boutons quand articles sélectionnés
+document.addEventListener('change', (e) => {
+    if (e.target.classList.contains('article-checkbox')) {
+        const checkedBoxes = document.querySelectorAll('.article-checkbox:checked');
+        const deleteBtn = document.querySelector('[data-action="delete-selected-articles"]');
+        const batchBtn = document.querySelector('[data-action="batch-process-modal"]');
+        
+        if (deleteBtn) {
+            deleteBtn.disabled = checkedBoxes.length === 0;
+        }
+        if (batchBtn) {
+            batchBtn.disabled = checkedBoxes.length === 0;
+        }
+    }
+});
+
 // Gestionnaire pour modales articles
 document.addEventListener('click', (e) => {
     // Ouvrir détails article
     if (e.target.classList.contains('article-title')) {
         const modal = document.getElementById('articleDetailModal');
         const content = document.getElementById('articleDetailContent');
-        content.innerHTML = `<h3>${e.target.textContent}</h3><p>Détails de l'article...</p>`;
-        modal.classList.add('modal--show');
+        if (modal && content) { // Ajout d'une vérification de nullité pour la robustesse
+            content.innerHTML = `<h3>${e.target.textContent}</h3><p>Détails de l'article...</p>`;
+            showModal('articleDetailModal'); // Utilisation de la fonction d'aide
+        }
     }
     
     // Démarrer batch screening
     if (e.target.getAttribute('data-action') === 'start-batch-screening') {
-        document.getElementById('batchProcessModal').classList.remove('modal--show');
+        closeModal('batchProcessModal'); // Utilisation de la fonction d'aide
         showToast('Tâche de screening lancée avec succès', 'success');
     }
 
@@ -466,5 +484,10 @@ document.addEventListener('click', (e) => {
     if (e.target.getAttribute('data-action') === 'view-details') {
         const articleId = e.target.getAttribute('data-article-id');
         if (articleId) viewArticleDetails(articleId);
+    }
+
+    // Gestionnaire pour ouvrir la modale de traitement par lot
+    if (e.target.getAttribute('data-action') === 'batch-process-modal') {
+        showBatchProcessModal();
     }
 });
