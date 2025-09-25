@@ -41,7 +41,13 @@ export function renderAnalysesSection() {
     const hasDiscussionDraft = !!analysisResults.discussion_draft;
     const hasKnowledgeGraph = !!analysisResults.knowledge_graph;
 
-    elements.analysisContainer.innerHTML = `
+    const cardsContainer = document.getElementById('analysis-cards-container');
+    if (!cardsContainer) {
+        console.error("Element #analysis-cards-container not found!");
+        return;
+    }
+
+    cardsContainer.innerHTML = `
         <div class="analysis-actions"> 
             <button class="btn btn--secondary" data-action="export-analyses">Exporter toutes les analyses</button>
             <button class="btn btn--primary" data-action="show-advanced-analysis-modal">Lancer une analyse avancée</button>
