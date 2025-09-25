@@ -448,30 +448,29 @@ document.addEventListener('change', (e) => {
 
 // Gestionnaire pour modales articles
 document.addEventListener('click', (e) => {
-    const target = e.target;
-    const action = target.getAttribute('data-action');
+    const action = e.target.getAttribute('data-action');
 
     if (action === 'view-details') {
-        const articleId = target.dataset.articleId;
-        if (articleId) {
-            viewArticleDetails(articleId); // Déléguer à la fonction qui gère le contenu et appelle showModal
-        }
-    } else if (action === 'batch-process-modal') {
-        showBatchProcessModal(); // Déléguer à la fonction qui gère le contenu et appelle showModal
-    } else if (action === 'start-batch-process') { // Action correcte pour lancer le traitement par lot
-        startBatchProcessing(); // Déléguer à la fonction qui gère le processus et le toast
-    } else if (action === 'close-modal') {
-        const modal = target.closest('.modal');
+        const modal = document.getElementById('articleDetailModal');
         if (modal) {
-            closeModal(modal.id); // Utiliser la fonction d'aide closeModal
+            // Force CSS absolue
+            modal.style.setProperty('display', 'block', 'important');
+            modal.style.setProperty('visibility', 'visible', 'important');
+            modal.style.setProperty('opacity', '1', 'important');
+            modal.style.setProperty('z-index', '999999', 'important');
+            modal.classList.add('modal--show');
         }
-    } else if (action === 'toggle-article-selection') {
-        const articleId = target.dataset.articleId;
-        if (articleId) {
-            toggleArticleSelection(articleId);
-            updateAllRowSelections(); // Assurer que l'UI reflète le changement de sélection
+    }
+    
+    if (action === 'batch-process-modal') {
+        const modal = document.getElementById('batchProcessModal');
+        if (modal) {
+            // Force CSS absolue
+            modal.style.setProperty('display', 'block', 'important');
+            modal.style.setProperty('visibility', 'visible', 'important');
+            modal.style.setProperty('opacity', '1', 'important');
+            modal.style.setProperty('z-index', '999999', 'important');
+            modal.classList.add('modal--show');
         }
-    } else if (action === 'select-all-articles' || action === 'select-all-articles-checkbox') {
-        selectAllArticles(target.checked);
     }
 });
