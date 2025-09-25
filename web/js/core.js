@@ -364,7 +364,7 @@ export function initializeWebSocket() {
     }
 }
 
-export function refreshCurrentSection() {
+export async function refreshCurrentSection() {
     switch (appState.currentSection) {
         case 'projects':
             loadProjects(); // Toujours rafraîchir la liste des projets
