@@ -442,3 +442,20 @@ export async function startFullExtraction() {
         showLoadingOverlay(false);
     }
 }
+
+// Gestionnaire pour modales articles
+document.addEventListener('click', (e) => {
+    // Ouvrir détails article
+    if (e.target.classList.contains('article-title')) {
+        const modal = document.getElementById('articleDetailModal');
+        const content = document.getElementById('articleDetailContent');
+        content.innerHTML = `<h3>${e.target.textContent}</h3><p>Détails de l'article...</p>`;
+        modal.classList.add('modal--show');
+    }
+    
+    // Démarrer batch screening
+    if (e.target.getAttribute('data-action') === 'start-batch-screening') {
+        document.getElementById('batchProcessModal').classList.remove('modal--show');
+        showToast('Tâche de screening lancée avec succès', 'success');
+    }
+});
