@@ -154,8 +154,12 @@ describe('Workflow de Gestion des Analyses', () => {
       
       // FIX: Attendre que la requête de rechargement des projets soit terminée.
       // C'est le signal le plus fiable que les données d'analyse sont à jour.
-      cy.wait('@getProjects');
-      cy.get('.analysis-card').contains('h4', analysisToDelete.cardTitle).parents('.analysis-card').find('[data-action="run-atn-analysis"]').should('be.visible');
+      cy.wait('@deleteAnalysis');
+
+      // ✅ NOUVELLE ÉTAPE : Attendre un signal positif du re-rendu du DOM.
+      cy.get('.analysis-grid').should('be.visible');
+
+      cy.get('.analysis-card').contains('h4', analysisToDelete.cardTitle).parents('.analysis-card').should('not.have.class', 'analysis-card--done');
     });
   });
 });

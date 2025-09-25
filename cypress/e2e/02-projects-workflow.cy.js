@@ -73,6 +73,9 @@ describe('Workflow de Gestion des Projets', () => {
     cy.wait('@getProjects');
     cy.waitForToast('success', 'Projet supprimé'); // Le toast peut apparaître avant ou après, on le vérifie ici.
 
+    // ✅ NOUVELLE ÉTAPE : Attendre un signal positif du re-rendu du DOM.
+    cy.get('#projects-list').should('be.visible');
+
     // Attendre la disparition de l'élément du DOM, ce qui est la meilleure assertion
     cy.contains('.project-card', 'Projet à Supprimer').should('not.exist');
   });
