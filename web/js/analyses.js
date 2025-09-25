@@ -89,83 +89,96 @@ document.addEventListener('click', (e) => { // This listener seems to be for moc
 });
 
 export function renderAnalysesSection() {
-    console.log('🎯 renderAnalysesSection() APPELÉE !'); // Debug
-    console.log('🎯 Projet actuel:', window.appState?.currentProject); // Debug
+    console.log('🎯 renderAnalysesSection() DÉBUT'); // Debug
     
     const container = document.getElementById('analysisContainer');
     if (!container) {
-        console.error('analysisContainer not found!');
+        console.error('❌ analysisContainer not found!');
         return;
     }
+    console.log('✅ Container trouvé:', container); // Debug
 
     const project = window.appState?.currentProject;
+    console.log('✅ Projet actuel:', project); // Debug
     
-    // ✅ CORRECTION: Afficher immédiatement l'état vide
+    // ✅ CORRECTION: État vide d'abord
     if (!project) {
+        console.log('📝 Génération état vide'); // Debug
         container.innerHTML = `
             <div class="analysis-empty">
                 <p>Veuillez sélectionner un projet pour visualiser les analyses.</p>
             </div>`;
+        console.log('✅ État vide généré'); // Debug
         return;
     }
 
-    // ✅ CORRECTION: Contenu avec projet - GÉNÉRER analysis-grid
-    container.innerHTML = `
-        <h2>Analyses du Projet</h2>
-        <div class="analysis-actions">
-            <button class="btn btn--secondary" data-action="export-analyses">Exporter toutes les analyses</button>
-            <button class="btn btn--warning" data-action="show-advanced-analysis-modal">Lancer une analyse avancée</button>
-        </div>
-        <div class="analysis-grid">
-            <div class="analysis-card">
-                <div class="analysis-card__header">
-                    <span class="analysis-card__icon">🤝</span>
-                    <h4>Analyse ATN Multipartite</h4>
-                </div>
-                <div class="analysis-card__body">
-                    <p class="analysis-card__description">Analyse spécialisée pour l'alliance thérapeutique numérique.</p>
-                </div>
-                <div class="analysis-card__footer">
-                    <button class="btn btn--primary" data-action="run-atn-analysis">Lancer l'Analyse ATN</button>
-                </div>
+    console.log('📝 Génération contenu avec projet'); // Debug
+    
+    // ✅ CORRECTION: Encapsuler dans try/catch pour capturer les erreurs
+    try {
+        container.innerHTML = `
+            <h2>Analyses du Projet</h2>
+            <div class="analysis-actions">
+                <button class="btn btn--secondary" data-action="export-analyses">Exporter toutes les analyses</button>
+                <button class="btn btn--warning" data-action="show-advanced-analysis-modal">Lancer une analyse avancée</button>
             </div>
-            <div class="analysis-card">
-                <div class="analysis-card__header">
-                    <span class="analysis-card__icon">📝</span>
-                    <h4>Discussion académique</h4>
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <div class="analysis-card__header">
+                        <span class="analysis-card__icon">🤝</span>
+                        <h4>Analyse ATN Multipartite</h4>
+                    </div>
+                    <div class="analysis-card__body">
+                        <p class="analysis-card__description">Analyse spécialisée pour l'alliance thérapeutique numérique.</p>
+                    </div>
+                    <div class="analysis-card__footer">
+                        <button class="btn btn--primary" data-action="run-atn-analysis">Lancer l'Analyse ATN</button>
+                    </div>
                 </div>
-                <div class="analysis-card__body">
-                    <p class="analysis-card__description">Génère une section Discussion basée sur la synthèse.</p>
+                <div class="analysis-card">
+                    <div class="analysis-card__header">
+                        <span class="analysis-card__icon">📝</span>
+                        <h4>Discussion académique</h4>
+                    </div>
+                    <div class="analysis-card__body">
+                        <p class="analysis-card__description">Génère une section Discussion basée sur la synthèse.</p>
+                    </div>
+                    <div class="analysis-card__footer">
+                        <button class="btn btn--primary" data-action="run-analysis" data-analysis-type="discussion">Générer la Discussion</button>
+                    </div>
                 </div>
-                <div class="analysis-card__footer">
-                    <button class="btn btn--primary" data-action="run-analysis" data-analysis-type="discussion">Générer la Discussion</button>
+                <div class="analysis-card">
+                    <div class="analysis-card__header">
+                        <span class="analysis-card__icon">🌐</span>
+                        <h4>Graphe de connaissances</h4>
+                    </div>
+                    <div class="analysis-card__body">
+                        <p class="analysis-card__description">Visualise les relations entre les concepts et les articles.</p>
+                    </div>
+                    <div class="analysis-card__footer">
+                        <button class="btn btn--primary" data-action="run-analysis" data-analysis-type="knowledge_graph">Générer le Graphe</button>
+                    </div>
                 </div>
-            </div>
-            <div class="analysis-card">
-                <div class="analysis-card__header">
-                    <span class="analysis-card__icon">🌐</span>
-                    <h4>Graphe de connaissances</h4>
+                <div class="analysis-card">
+                    <div class="analysis-card__header">
+                        <span class="analysis-card__icon">📋</span>
+                        <h4>Checklist PRISMA</h4>
+                    </div>
+                    <div class="analysis-card__body">
+                        <p class="analysis-card__description">Gérer et suivre la checklist PRISMA.</p>
+                    </div>
+                    <div class="analysis-card__footer">
+                        <button class="btn btn--primary" data-action="show-prisma-modal">Ouvrir la Checklist PRISMA</button>
+                    </div>
                 </div>
-                <div class="analysis-card__body">
-                    <p class="analysis-card__description">Visualise les relations entre les concepts et les articles.</p>
-                </div>
-                <div class="analysis-card__footer">
-                    <button class="btn btn--primary" data-action="run-analysis" data-analysis-type="knowledge_graph">Générer le Graphe</button>
-                </div>
-            </div>
-            <div class="analysis-card">
-                <div class="analysis-card__header">
-                    <span class="analysis-card__icon">📋</span>
-                    <h4>Checklist PRISMA</h4>
-                </div>
-                <div class="analysis-card__body">
-                    <p class="analysis-card__description">Gérer et suivre la checklist PRISMA.</p>
-                </div>
-                <div class="analysis-card__footer">
-                    <button class="btn btn--primary" data-action="show-prisma-modal">Ouvrir la Checklist PRISMA</button>
-                </div>
-            </div>
-        </div>`;
+            </div>`;
+        
+        console.log('✅ HTML généré avec succès'); // Debug
+        console.log('✅ analysis-grid créé'); // Debug
+        
+    } catch (error) {
+        console.error('❌ Erreur dans génération HTML:', error); // Debug
+    }
 }
 
 

@@ -162,14 +162,19 @@ const TOAST_DURATION = {
  * Affiche un toast avec animations et accessibilité améliorées
  */
 export function showToast(message, type = 'info', duration = 5000) {
+    console.log('🎯 showToast() appelé:', message, type); // Debug
+    
     // ✅ CORRECTION: Supprimer tous les toasts existants d'abord
     const existingToasts = document.querySelectorAll('.toast');
+    console.log('🧹 Suppression toasts existants:', existingToasts.length); // Debug
     existingToasts.forEach(toast => toast.remove());
     
     const toastId = `toast-${Date.now()}`;
     const toast = document.createElement('div');
     toast.id = toastId;
     toast.className = `toast toast--${type} toast--show`;
+    
+    console.log('📝 Création toast avec classe:', toast.className); // Debug
     
     // ✅ Message exact - pas d'emojis ou texte supplémentaire
     toast.innerHTML = `
@@ -179,6 +184,7 @@ export function showToast(message, type = 'info', duration = 5000) {
     
     // ✅ CORRECTION: Ajouter au body
     document.body.appendChild(toast);
+    console.log('✅ Toast ajouté au DOM:', toast); // Debug
     
     // Style inline pour garantir visibilité
     toast.style.cssText = `
@@ -189,12 +195,19 @@ export function showToast(message, type = 'info', duration = 5000) {
         display: block;
         visibility: visible;
         opacity: 1;
+        background: var(--color-${type});
+        color: white;
+        padding: 12px 16px;
+        border-radius: 4px;
     `;
+    
+    console.log('✅ Styles appliqués au toast'); // Debug
     
     // Auto-suppression
     setTimeout(() => {
         if (toast.parentNode) {
             toast.remove();
+            console.log('🗑️ Toast supprimé après délai'); // Debug
         }
     }, duration);
 }

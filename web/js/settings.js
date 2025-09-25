@@ -161,7 +161,9 @@ export async function renderSettings() {
  * @returns {string} Le HTML de la grille des paramètres.
  */
 function createSettingsLayout() {
-  return `
+    const mount = document.getElementById('settings');
+    if (mount) {
+      mount.innerHTML = `
     <div class="grid-2">
       <aside class="card">
         <div class="card__header"><div class="h3">Paramètres</div></div>
@@ -185,6 +187,7 @@ function createSettingsLayout() {
       </section>
     </div>
   `;
+    }
 }
 
 /**

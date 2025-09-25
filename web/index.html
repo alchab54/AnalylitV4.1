@@ -34,7 +34,7 @@
       <div class="container app-header__inner">
         <div class="brand">AnalyLit</div>
         <div class="header-actions">
-          <!-- Actions éventuelles -->
+          <!-- Placeholders: actions à droite si besoin -->
         </div>
       </div>
     </header>
@@ -42,7 +42,7 @@
     <!-- Navigation HORIZONTALE - NAVIGATION UNIQUE -->
     <nav class="app-nav" role="navigation" aria-label="Navigation principale">
         <div class="container app-nav__wrap" id="mainNav">
-            <button class="app-nav__btn" data-section="projects">
+            <button class="app-nav__btn app-nav__btn--active" data-section="projects">
                 Projets
             </button>
             <button class="app-nav__btn" data-section="search">
@@ -78,6 +78,7 @@
             
             <!-- Section Projets - SECTION ACTIVE PAR DÉFAUT -->
             <section id="projects" class="app-section">
+      <!-- contenu actuel des projets -->
                 <div class="section-header">
                     <div class="section-header__content">
                         <h2>Gestion des Projets</h2>
@@ -110,6 +111,14 @@
             </section>
 
             <!-- Section Recherche -->
+            <section id="search" class="app-section hidden"></section>
+            <section id="results" class="app-section hidden"></section>
+            <section id="validation" class="app-section hidden"></section>
+            <section id="grids" class="app-section hidden"></section>
+            <section id="analyses" class="app-section hidden"></section>
+            <section id="import" class="app-section hidden"></section>
+            <section id="chat" class="app-section hidden"></section>
+            <section id="settings" class="app-section hidden"></section>
             <section id="search" class="app-section hidden">
                 <div class="section-header">
                     <h2>Recherche Multi-Bases</h2>
