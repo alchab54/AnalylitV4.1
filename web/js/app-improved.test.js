@@ -44,7 +44,7 @@ describe('Module App Improved - Initialisation', () => {
   describe('initializeApplication', () => {
     // Increase timeout for this test to handle async operations
     it("devrait appeler toutes les fonctions d'initialisation dans le bon ordre", async () => {
-      initializeApplication();
+      await initializeApplication();
       // Wait for all promises in the event loop to resolve
       await new Promise(resolve => setTimeout(resolve, 0));
 
@@ -66,7 +66,7 @@ describe('Module App Improved - Initialisation', () => {
       // Simuler un échec lors du chargement des projets
       projects.loadProjects.mockRejectedValue(new Error('Failed to load projects'));
 
-      initializeApplication();
+      await initializeApplication();
       // ✅ CORRECTION: Utiliser setTimeout pour attendre que la boucle d'événements traite la promesse rejetée
       await new Promise(resolve => setTimeout(resolve, 0));
       // Vérifier qu'une erreur est loggée et affichée à l'utilisateur
@@ -87,7 +87,7 @@ describe('Module App Improved - Initialisation', () => {
         return Promise.resolve([]);
       });
 
-      initializeApplication();
+      await initializeApplication();
       // ✅ CORRECTION: Attendre la résolution des promesses
       await new Promise(resolve => setTimeout(resolve, 0));
       expect(projects.loadProjects).toHaveBeenCalled();

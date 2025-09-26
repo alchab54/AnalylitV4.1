@@ -74,6 +74,19 @@ import { API_ENDPOINTS, MESSAGES, CONFIG } from './constants.js';
 
 export function showSection(sectionId) {
     setCurrentSection(sectionId);
+    try {
+      const event = new CustomEvent('section-changed', {
+        detail: { currentSection: sectionId }
+      });
+      window.dispatchEvent(event);
+    } catch (e) {
+      const evt = document.createEvent ? document.createEvent('Event') : null;
+      if (evt) {
+        evt.initEvent('section-changed', true, true);
+        evt.detail = { currentSection: sectionId };
+        window.dispatchEvent(evt);
+      }
+    }
 }
 
 async function handleCancelTask(target) {

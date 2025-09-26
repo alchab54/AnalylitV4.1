@@ -71,7 +71,7 @@ describe('Core - Coverage Boost', () => {
         window.addEventListener('section-changed', eventListener);
 
         // Call the function that dispatches the event
-        state.setCurrentSection('projects');
+        core.showSection('projects');
 
         expect(eventListener).toHaveBeenCalled();
         
