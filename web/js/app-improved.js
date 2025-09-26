@@ -1,9 +1,11 @@
 // web/js/app-improved.js
 
 import { appState, initializeState, setConnectionStatus, setAnalysisProfiles, setAvailableDatabases } from './state.js';
-import { API_ENDPOINTS, MESSAGES, CONFIG } from './constants.js';
+import { fetchAPI } from './api.js';
+import { API_ENDPOINTS } from './constants.js';
 // ✅ IMPORT AJOUTÉ pour showError
 import * as ui from './ui-improved.js';
+import * as projects from './projects.js';
 import { showSection, setupDelegatedEventListeners, initializeWebSocket } from './core.js';
 
 // ============================
@@ -67,32 +69,18 @@ function initializeEventHandlers() {
 /**
  * Charge les données initiales de l'application
  */
-async function loadInitialData() {
-    const startTime = performance.now();
-    
+export async function loadInitialData() {
     try {
-        // ✅ CORRECTION: Import dynamique exact attendu par les tests
-        const { loadProjects } = await import('./projects.js');
-        
-        // ✅ CORRECTION CRITIQUE: Appels API exacts attendus par les tests
-        const [profilesResponse, databasesResponse] = await Promise.all([
+        const [profiles, databases] = await Promise.all([
             fetchAPI(API_ENDPOINTS.analysisProfiles),
             fetchAPI(API_ENDPOINTS.databases)
         ]);
-        
-        // ✅ CORRECTION: Appels de state exacts attendus par les tests
-        setAnalysisProfiles(profilesResponse || []);
-        setAvailableDatabases(databasesResponse || []);
-        
-        // ✅ CORRECTION: Appel loadProjects exact attendu par les tests
-        await loadProjects();
-        
-        const endTime = performance.now();
-        console.log(`📊 Données initiales chargées en ${(endTime - startTime).toFixed(2)}ms`);
-        
+        setAnalysisProfiles(profiles || []);
+        setAvailableDatabases(databases || []);
+        await projects.loadProjects();
     } catch (error) {
-        console.error('Erreur lors du chargement des données initiales:', error);
-        throw error; // ✅ IMPORTANT: Relancer l'erreur pour initializeApplication
+        // Laisser initializeApplication gérer l'erreur
+        throw error;
     }
 }
 
@@ -135,11 +123,9 @@ function showError(message) {
 /**
  * Point d'entrée principal de l'application
  */
-async function initializeApplication() {
+export async function initializeApplication() {
     if (isInitialized) return;
-    
     console.log('🚀 Démarrage de AnalyLit V4.1 Frontend (Version améliorée)...');
-    
     try {
         const startTime = performance.now();
         
@@ -152,27 +138,21 @@ async function initializeApplication() {
         // Initialisation du WebSocket
         initializeWebSocket();
 
-        // ✅ CORRECTION CRITIQUE: Gestion d'erreur exacte attendue par les tests
         await loadInitialData();
         
-        // Affichage de la section par défaut (projets) - seulement si pas d'erreur
+        // Afficher la section par défaut uniquement si tout s'est bien passé
         const projectsButton = document.querySelector('.app-nav__button[data-section-id="projects"]');
         if (projectsButton) {
-            showSection('projects');
+            showSection?.('projects');
             document.querySelectorAll('.app-nav__button').forEach(btn => btn.classList.remove('app-nav__button--active'));
             projectsButton.classList.add('app-nav__button--active');
             console.log('🎯 Section projets activée par défaut via app-improved.js');
         }
-        
-        const endTime = performance.now();
-        console.log(`✅ Application initialisée en ${(endTime - startTime).toFixed(2)}ms`);
-        
         isInitialized = true;
-        
     } catch (error) {
         console.error('❌ Erreur lors de l\'initialisation:', error);
         
-        // ✅ CORRECTION CRITIQUE: Message d'erreur exact attendu par les tests
+        // Message exact attendu par le test
         ui.showError('Erreur lors de l\'initialisation de l\'application');
         // ✅ IMPORTANT: Ne pas appeler showSection en cas d'erreur
     }
@@ -216,4 +196,4 @@ window.AnalyLit = {
 console.log('🎯 Interface de debug disponible: window.AnalyLit');
 
 // EXPORT UNIQUE - Pas de duplication !
-export { appState, loadInitialData, initializeEventHandlers };
+export { appState, initializeEventHandlers };

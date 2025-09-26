@@ -178,27 +178,18 @@ export class LayoutOptimizer {
      * Supprime les éléments vides qui prennent de l'espace
      */
     removeEmptyElements() {
-        // ✅ CORRECTION CRITIQUE: Masquer les .card vides (pas les supprimer)
+        // Masquer les cartes vides: style.display = 'none'
         const cards = document.querySelectorAll('.card');
         cards.forEach(card => {
             if (this.isEffectivelyEmpty(card)) {
                 card.style.display = 'none';
             }
         });
-
-        // ✅ CORRECTION CRITIQUE: Supprimer (remove) les .spacer vides  
+        // Supprimer les spacers vides: remove()
         const spacers = document.querySelectorAll('.spacer');
         spacers.forEach(spacer => {
             if (this.isEffectivelyEmpty(spacer)) {
                 spacer.remove(); // remove(), pas style.display
-            }
-        });
-
-        // Autres éléments vides (optionnel)
-        const emptyP = document.querySelectorAll('p');
-        emptyP.forEach(p => {
-            if (this.isEffectivelyEmpty(p)) {
-                p.style.display = 'none';
             }
         });
     }
@@ -208,30 +199,19 @@ export class LayoutOptimizer {
      */
     isEffectivelyEmpty(element) {
         if (!element) return true;
-
-        // ✅ CORRECTION CRITIQUE: Gestion des espaces et &nbsp; exacte pour les tests
-        const textContent = element.textContent || '';
-        // Remplacer les &nbsp; (code 160) par des espaces normaux puis trim
-        const cleanText = textContent.replace(/\u00A0/g, ' ').replace(/\s/g, ' ').trim();
-        
-        // Si on a du texte après nettoyage, pas vide
-        if (cleanText.length > 0) return false;
-
-        // Vérifier les enfants visibles
-        const hasVisibleChildren = Array.from(element.children).some(child => {
-            if (child.tagName === 'SCRIPT' || child.tagName === 'STYLE') return false;
-            
-            const style = getComputedStyle(child);
-            const isVisible = style.display !== 'none' && style.visibility !== 'hidden';
-            
-            return isVisible;
+        // Normaliser: remplacer NBSP par espace, puis trim
+        const txt = (element.textContent || '').replace(/\u00A0/g, ' ').trim();
+        if (txt.length > 0) {
+            return false;
+        }
+        // Si pas de texte, vérifier s'il y a des enfants visibles avec contenu texte
+        const hasVisibleChildWithText = Array.from(element.children).some(child => {
+            const style = (child instanceof HTMLElement) ? getComputedStyle(child) : null;
+            return style ? (style.display !== 'none' && style.visibility !== 'hidden') : true;
         });
 
-        // Autres vérifications (images de fond, etc.)
-        const hasBackgroundImage = getComputedStyle(element).backgroundImage !== 'none';
-        const hasSignificantMinHeight = parseInt(getComputedStyle(element).minHeight, 10) > 0;
-
-        return !hasVisibleChildren && !hasBackgroundImage && !hasSignificantMinHeight;
+        // An element with visible children is not empty.
+        return !hasVisibleChildWithText;
     }
 
     /**

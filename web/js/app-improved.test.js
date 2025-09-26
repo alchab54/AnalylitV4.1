@@ -58,8 +58,8 @@ describe('Module App Improved - Initialisation', () => {
       projects.loadProjects.mockRejectedValue(new Error('Failed to load projects'));
 
       await initializeApplication();
-      // Allow the rejected promise to be processed by the catch block
-      await new Promise(process.nextTick);
+      // Attendre que la promesse rejetée soit traitée par le bloc catch
+      await new Promise(resolve => setImmediate(resolve));
 
 
       // Vérifier qu'une erreur est loggée et affichée à l'utilisateur
@@ -74,8 +74,8 @@ describe('Module App Improved - Initialisation', () => {
       // Configurer les mocks pour retourner des données spécifiques
       projects.loadProjects.mockResolvedValue([{ id: 'p1' }]);
       // Use mockImplementation to handle different API calls
-      api.fetchAPI.mockImplementation(url => {
-        if (url.includes('analysis-profiles')) return Promise.resolve({ profiles: [{ id: 'ap1' }] });
+      api.fetchAPI.mockImplementation((url) => {
+        if (url.includes('analysis-profiles')) return Promise.resolve([{ id: 'ap1' }]);
         if (url.includes('databases')) return Promise.resolve([{ id: 'db1' }]);
         return Promise.resolve([]);
       });
