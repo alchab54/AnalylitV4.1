@@ -58,6 +58,10 @@ def test_app(app_config):
         db.session.commit() # Commit deletions before creating all tables
 
         db.create_all()
+        # CORRECTION: Appeler le seeding pour s'assurer que les données par défaut existent.
+        from utils.database import seed_default_data
+        seed_default_data(db.session)
+
         yield app
         # Removed db.drop_all() from here. clean_db will handle it.
         db.session.remove() # Ensure session is removed after each test
@@ -103,11 +107,12 @@ def clean_db(db_session, test_app):
     """Assure une base de données vide en supprimant toutes les données des tables clés."""
     with test_app.app_context(): # Ensure we are in the correct app context
         print("\n--- Cleaning database (deleting data) ---")
-        from utils.models import Project, Extraction, SearchResult, Grid, ChatMessage # Import models here
+        from utils.models import Project, Extraction, SearchResult, Grid, ChatMessage, AnalysisProfile # Import models here
         db_session.query(Extraction).delete()
         db_session.query(SearchResult).delete()
         db_session.query(Grid).delete()
         db_session.query(ChatMessage).delete()
+        db_session.query(AnalysisProfile).delete()
         db_session.query(Project).delete()
         db_session.commit()
         print("--- Database cleaned (deleting data) ---")

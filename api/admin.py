@@ -9,9 +9,9 @@ from utils.app_globals import (
     redis_conn, processing_queue, synthesis_queue, analysis_queue,
     background_queue
 )
-
-admin_bp = Blueprint('admin_bp', __name__)
-
+ 
+admin_bp = Blueprint('admin_bp', __name__, url_prefix='/api/admin')
+ 
 @admin_bp.route('/queues/info', methods=['GET'])
 def get_queues_info():
     """Retourne le statut des files RQ."""

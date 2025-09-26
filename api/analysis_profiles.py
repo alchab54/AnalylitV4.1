@@ -7,10 +7,10 @@ from sqlalchemy.exc import IntegrityError
 from utils.database import with_db_session
 from utils.models import AnalysisProfile
 
-analysis_profiles_bp = Blueprint('analysis_profiles_bp', __name__)
+analysis_profiles_bp = Blueprint('analysis_profiles_bp', __name__, url_prefix='/api/analysis-profiles')
 logger = logging.getLogger(__name__)
 
-@analysis_profiles_bp.route('/analysis-profiles', methods=['POST'])
+@analysis_profiles_bp.route('', methods=['POST'])
 @with_db_session
 def create_analysis_profile(session):
     """Crée un nouveau profil d'analyse."""
@@ -48,14 +48,14 @@ def create_analysis_profile(session):
         session.rollback()
         return jsonify({"error": "Un profil avec ce nom existe déjà"}), 409
 
-@analysis_profiles_bp.route('/analysis-profiles', methods=['GET'])
+@analysis_profiles_bp.route('', methods=['GET'])
 @with_db_session
 def get_all_analysis_profiles(session):
     """Retourne tous les profils d'analyse."""
     profiles = session.query(AnalysisProfile).all()
     return jsonify([p.to_dict() for p in profiles]), 200
 
-@analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['GET'])
+@analysis_profiles_bp.route('/<profile_id>', methods=['GET'])
 @with_db_session
 def get_analysis_profile_details(session, profile_id):
     """Retourne les détails d'un profil d'analyse spécifique."""
@@ -64,7 +64,7 @@ def get_analysis_profile_details(session, profile_id):
         return jsonify({"error": "Profil non trouvé"}), 404
     return jsonify(profile.to_dict()), 200
 
-@analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['PUT'])
+@analysis_profiles_bp.route('/<profile_id>', methods=['PUT'])
 @with_db_session
 def update_analysis_profile(session, profile_id):
     """Met à jour un profil d'analyse existant."""
@@ -88,7 +88,7 @@ def update_analysis_profile(session, profile_id):
         session.rollback()
         return jsonify({"error": "Erreur lors de la mise à jour du profil"}), 500
 
-@analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['DELETE'])
+@analysis_profiles_bp.route('/<profile_id>', methods=['DELETE'])
 @with_db_session
 def delete_analysis_profile(session, profile_id):
     """Supprime un profil d'analyse."""
@@ -96,7 +96,7 @@ def delete_analysis_profile(session, profile_id):
     if not profile:
         return jsonify({"error": "Profil non trouvé"}), 404
 
-    if profile.is_default:
+    if profile.is_default: # This check was correct, but the test data was flawed.
         return jsonify({"error": "Impossible de supprimer un profil par défaut"}), 403
 
     session.delete(profile)

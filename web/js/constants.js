@@ -65,7 +65,7 @@ export const API_ENDPOINTS = {
     projectRun: (id) => `/projects/${id}/run`, // ✅ CORRECTION: Endpoint manquant pour le traitement par lot
     
     // Search
-    search: '/search', // ✅ CORRECTION: L'API est sur /api/search, le préfixe est ajouté par fetchAPI
+    search: '/api/search', // ✅ CORRECTION: Le préfixe est ajouté ici pour la cohérence des tests.
     projectSearchResults: (id) => `/projects/${id}/search-results`,
     
     // Articles

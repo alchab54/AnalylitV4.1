@@ -4,10 +4,10 @@ from rq.job import Job
 from rq.exceptions import NoSuchJobError
 from utils.app_globals import redis_conn
 
-tasks_bp = Blueprint('tasks_bp', __name__)
+tasks_bp = Blueprint('tasks_bp', __name__, url_prefix='/api/tasks')
 logger = logging.getLogger(__name__)
 
-@tasks_bp.route('/tasks/<task_id>/status', methods=['GET'])
+@tasks_bp.route('/<task_id>/status', methods=['GET'])
 def get_task_status(task_id):
     """
     Récupère le statut d'une tâche spécifique à partir de son ID.

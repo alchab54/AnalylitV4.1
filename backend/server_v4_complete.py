@@ -20,16 +20,20 @@ import rq
 import subprocess
 import requests
 from flask import Flask, request, jsonify, send_from_directory, abort, send_file, Blueprint, current_app
-from api.reporting import reporting_bp
-from api.stakeholders import stakeholders_bp
-from api.selection import selection_bp
-from api.tasks import tasks_bp
+
+# --- Import des Blueprints API ---
+from api.admin import admin_bp
+from api.analysis_profiles import analysis_profiles_bp
+from api.extensions import extensions_bp
+from api.projects import projects_bp
+from api.search import search_bp
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from sqlalchemy.exc import IntegrityError
 from rq.worker import Worker 
 from werkzeug.utils import secure_filename
 from flask_migrate import Migrate # <-- 1. IMPORTER MIGRATE
+
 
 # --- Imports des utilitaires et de la configuration ---
 from utils.database import with_db_session, db # Import db here
@@ -38,6 +42,7 @@ from utils.app_globals import (
     extension_queue, redis_conn
 )
 from utils.models import Project, Grid, Extraction, Prompt, AnalysisProfile, SearchResult, ChatMessage, RiskOfBias
+from api.tasks import tasks_bp
 from utils.file_handlers import save_file_to_project_dir
 from utils.app_globals import PROJECTS_DIR as PROJECTS_DIR_STR
 from utils.prisma_scr import get_base_prisma_checklist
@@ -373,13 +378,6 @@ def create_app(config_override=None):
         except IntegrityError:
             session.rollback()
             return jsonify({"error": "Un projet avec ce nom existe déjà"}), 409
-
-    @app.route("/api/projects/", methods=["GET"])
-    @with_db_session
-    def get_all_projects(session):
-        projects = session.query(Project).all()
-        return jsonify([p.to_dict() for p in projects]), 200
-
     @app.route("/api/projects/<project_id>", methods=["GET"])
     @with_db_session
     def get_project_details(session, project_id):
@@ -387,37 +385,6 @@ def create_app(config_override=None):
         if not project:
             return jsonify({"error": "Projet non trouvé"}), 404
         return jsonify(project.to_dict()), 200
-
-    @app.route("/api/projects/<project_id>", methods=["DELETE"])
-    @with_db_session
-    def delete_project(session, project_id):
-        project = session.query(Project).filter_by(id=project_id).first()
-        if not project:
-            return jsonify({"error": "Projet non trouvé"}), 404
-        session.query(Extraction).filter_by(project_id=project_id).delete()
-        session.query(SearchResult).filter_by(project_id=project_id).delete()
-        session.query(Grid).filter_by(project_id=project_id).delete()
-        session.query(ChatMessage).filter_by(project_id=project_id).delete()
-        session.query(RiskOfBias).filter_by(project_id=project_id).delete()
-        session.delete(project)
-        session.commit()
-        socketio.emit('project_deleted', {'project_id': project_id})
-        return jsonify({"message": "Projet supprimé"}), 200
-
-    # ==================== ROUTES API SEARCH ====================
-    @app.route("/api/search", methods=["POST"])
-    @with_db_session
-    def search_databases(session):
-        data = request.get_json()
-        project_id = data.get('project_id')
-        query = data.get('query')
-        expert_queries = data.get('expert_queries')
-        databases = data.get('databases', ['pubmed'])
-        max_results = data.get('max_results_per_db', 50)
-        if not project_id:
-            return jsonify({"error": "project_id est requis"}), 400
-        job = background_queue.enqueue(multi_database_search_task, project_id=project_id, query=query, databases=databases, max_results_per_db=max_results, expert_queries=expert_queries, job_timeout='30m')
-        return jsonify({"message": "Recherche lancée", "task_id": job.id}), 202
 
     # ==================== ROUTES API PIPELINE & ANALYSIS ===================
     @app.route("/api/projects/<project_id>/run", methods=["POST"])
@@ -449,44 +416,6 @@ def create_app(config_override=None):
         job = synthesis_queue.enqueue(run_synthesis_task, project_id=project_id, profile=profile.to_dict(), job_timeout='1h')
         return jsonify({"message": "Synthèse lancée", "task_id": job.id}), 202
 
-    # ==================== ROUTES API GRIDS ====================
-    @app.route("/api/projects/<project_id>/grids/import", methods=["POST"])
-    @with_db_session
-    def import_grid(session, project_id):
-        if 'file' not in request.files:
-            return jsonify({"error": "Aucun fichier fourni"}), 400
-        file = request.files['file']
-        try:
-            file_content = file.read().decode('utf-8')
-            grid_data = json.loads(file_content)
-            fields_data = grid_data.get("fields", [])
-            if fields_data and isinstance(fields_data[0], str):
-                fields = [{"name": f, "type": "text"} for f in fields_data]
-            else:
-                fields = fields_data
-            new_grid = Grid(project_id=project_id, name=grid_data.get("name", "Grille importée"), fields=json.dumps(fields))
-            session.add(new_grid)
-            session.commit()
-            return jsonify(new_grid.to_dict()), 201
-        except Exception as e:
-            logging.error(f"Erreur lors de l_import de grille: {e}")
-            return jsonify({"error": str(e)}), 500
-
-    @app.route("/api/projects/<project_id>/grids", methods=["GET"])
-    @with_db_session
-    def get_project_grids(session, project_id):
-        grids = session.query(Grid).filter_by(project_id=project_id).all()
-        return jsonify([g.to_dict() for g in grids]), 200
-
-    @app.route("/api/projects/<project_id>/grids", methods=["POST"])
-    @with_db_session
-    def create_grid(session, project_id):
-        data = request.get_json()
-        new_grid = Grid(project_id=project_id, name=data['name'], fields=json.dumps(data['fields']))
-        session.add(new_grid)
-        session.commit()
-        return jsonify(new_grid.to_dict()), 201
-
     @app.route("/api/projects/<project_id>/grids/<grid_id>", methods=["PUT"])
     @with_db_session
     def update_grid(session, project_id, grid_id):
@@ -496,26 +425,6 @@ def create_app(config_override=None):
         grid.fields = json.dumps(data['fields'])
         session.commit()
         return jsonify(grid.to_dict()), 200
-
-    # ==================== ROUTES API EXTRACTIONS ===================
-    @app.route("/api/projects/<project_id>/extractions/<extraction_id>/decision", methods=["PUT"])
-    @with_db_session
-    def update_extraction_decision(session, project_id, extraction_id):
-        data = request.get_json()
-        if not data:
-            return jsonify({"error": "Données requises"}), 400
-        extraction = first_or_404(session.query(Extraction).filter_by(id=extraction_id, project_id=project_id))
-        decision = data.get("decision")
-        evaluator = data.get("evaluator")
-        if not decision or not evaluator:
-            return jsonify({"error": "decision et evaluator requis"}), 400
-        validations = json.loads(extraction.validations) if extraction.validations else {}
-        validations[evaluator] = decision
-        extraction.validations = json.dumps(validations)
-        if len(validations) == 1:
-            extraction.user_validation_status = decision
-        session.commit()
-        return jsonify(extraction.to_dict()), 200
 
     @app.route("/api/projects/<project_id>/extractions", methods=["GET"])
     @with_db_session
@@ -556,24 +465,6 @@ def create_app(config_override=None):
             "per_page": per_page,
             "total_pages": (total + per_page - 1) // per_page
         }), 200
-
-    # ==================== ROUTES API PRISMA ====================
-    @app.route("/api/projects/<project_id>/prisma-checklist", methods=["GET"])
-    @with_db_session
-    def get_prisma_checklist(session, project_id):
-        project = first_or_404(session.query(Project).filter_by(id=project_id))
-        if project.prisma_checklist:
-            return jsonify(json.loads(project.prisma_checklist))
-        return jsonify(get_base_prisma_checklist())
-
-    @app.route("/api/projects/<project_id>/prisma-checklist", methods=["POST"])
-    @with_db_session
-    def save_prisma_checklist(session, project_id):
-        project = first_or_404(session.query(Project).filter_by(id=project_id))
-        data = request.get_json()
-        project.prisma_checklist = json.dumps(data.get('checklist'))
-        session.commit()
-        return jsonify({"message": "Checklist PRISMA sauvegardée"}), 200
 
     @app.route('/api/projects/<project_id>/import-validations', methods=['POST'])
     @with_db_session
@@ -773,76 +664,6 @@ def create_app(config_override=None):
             logging.error(f"Erreur lors de l_export de la thèse: {e}")
             return jsonify({"error": "Erreur lors de la génération de l_export"}), 500
 
-    # ==================== ROUTES API ADVANCED ANALYSIS ====================
-    @app.route("/api/projects/<project_id>/run-discussion-draft", methods=["POST"])
-    def run_discussion_draft(project_id): # noqa
-        job = analysis_queue.enqueue(run_discussion_generation_task, project_id=project_id, job_timeout='1h')
-        return jsonify({"message": "Génération du brouillon de discussion lancée", "task_id": job.id}), 202
-
-    @app.route("/api/projects/<project_id>/run-knowledge-graph", methods=["POST"])
-    def run_knowledge_graph(project_id):
-        job = analysis_queue.enqueue(run_knowledge_graph_task, project_id=project_id, job_timeout='30m')
-        return jsonify({"message": "Génération du graphe de connaissances lancée", "task_id": job.id}), 202
-
-    @app.route('/api/projects/<project_id>/run-analysis', methods=['POST'])
-    @with_db_session
-    def run_advanced_analysis(session, project_id):
-        """Route unifiée pour tous les types d_analyse avancée"""
-        try:
-            data = request.get_json()
-            analysis_type = data.get('type')
-
-            # Validation du type d_analyse
-            valid_types = ['meta_analysis', 'atn_scores', 'knowledge_graph', 'prisma_flow', 'atn_specialized_extraction', 'empathy_comparative_analysis']
-            if analysis_type not in valid_types:
-                return jsonify({"error": f"Type d_analyse non supporté: {analysis_type}"}), 400
-                
-            # Vérification existence du projet
-            project = session.query(Project).filter_by(id=project_id).first()
-            if not project:
-                return jsonify({"error": "Projet non trouvé"}), 404
-                
-            # Mapping des tâches selon le type
-            task_mapping = {
-                'meta_analysis': run_meta_analysis_task,
-                'atn_scores': run_atn_score_task,
-                'knowledge_graph': run_knowledge_graph_task,
-                'prisma_flow': run_prisma_flow_task,
-                'atn_specialized_extraction': run_atn_specialized_extraction_task,
-                'empathy_comparative_analysis': run_empathy_comparative_analysis_task
-            }
-            
-            task_function = task_mapping[analysis_type]
-            
-            # Lancement de la tâche
-            job = analysis_queue.enqueue(
-                task_function,
-                project_id=project_id,
-                job_timeout='30m',  # <-- AJOUTEZ CETTE LIGNE
-                **data.get('parameters', {}) # type: ignore
-            )
-            
-            job_id = str(job.id) if hasattr(job, 'id') else str(uuid.uuid4())
-            
-            return jsonify({
-                "message": f"Analyse {analysis_type} lancée",
-                "task_id": job_id,
-                "type": analysis_type
-            }), 202
-            
-        except Exception as e:
-            logging.error(f"Erreur analyse {analysis_type}: {str(e)}")
-            return jsonify({"error": str(e)}), 500
-
-    @app.route("/api/projects/<project_id>/add-manual-articles", methods=["POST"])
-    def add_manual_articles(project_id):
-        data = request.get_json()
-        items = data.get("items", [])
-        if not items:
-            return jsonify({"error": "La liste 'items' d_identifiants est requise"}), 400
-        job = background_queue.enqueue(add_manual_articles_task, project_id=project_id, identifiers=items, job_timeout='10m')
-        return jsonify({"message": f"Ajout de {len(items)} article(s) en cours...", "task_id": job.id}), 202
-
     @with_db_session
     def add_manual_articles_route(session, project_id):
         """Ajoute manuellement des articles à un projet via une tâche de fond."""
@@ -931,21 +752,6 @@ def create_app(config_override=None):
         messages = session.query(ChatMessage).filter_by(project_id=project_id).order_by(ChatMessage.timestamp).all()
         return jsonify([m.to_dict() for m in messages])
 
-    # ==================== ROUTES API EXTENSIONS ====================
-    @app.route("/api/extensions", methods=["POST"])
-    @with_db_session
-    def post_extension(session):
-        data = request.get_json(silent=True) or {}
-        project_id = data.get("project_id")
-        extension_name = data.get("extension_name")
-        if not project_id or not extension_name:
-            logging.warning("Payload invalide: %s", data)
-            return jsonify({"error": "project_id et extension_name requis"}), 400
-        logging.info("Enqueue extension: project_id=%s, extension=%s", project_id, extension_name)
-        job = extension_queue.enqueue(run_extension_task, project_id=project_id, extension_name=extension_name, job_timeout=1800, result_ttl=3600)
-        logging.info("Job enqueued: %s", job.id)
-        return jsonify({"task_id": job.id, "message": "Extension lancée"}), 202
-
     # ==================== ROUTES API SETTINGS ====================
     @app.route("/api/settings/profiles", methods=["GET"])
     def handle_profiles():
@@ -967,32 +773,6 @@ def create_app(config_override=None):
             {"id": "phi3:mini", "name": "Phi3 Mini"}
         ]
         return jsonify({"models": models}), 200
-
-    @app.route("/api/analysis-profiles", methods=["GET"])
-    @with_db_session
-    def get_analysis_profiles(session):
-        profiles = session.query(AnalysisProfile).all()
-        return jsonify([p.to_dict() for p in profiles])
-
-    @app.route("/api/analysis-profiles", methods=["POST"])
-    @with_db_session
-    def create_analysis_profile(session):
-        data = request.get_json()
-        new_profile = AnalysisProfile(**data)
-        session.add(new_profile)
-        session.commit()
-        return jsonify(new_profile.to_dict()), 201
-
-    @app.route("/api/analysis-profiles/<profile_id>", methods=["PUT"])
-    @with_db_session
-    def update_analysis_profile(session, profile_id):
-        profile = first_or_404(session.query(AnalysisProfile).filter_by(id=profile_id))
-        data = request.get_json()
-        for key, value in data.items():
-            setattr(profile, key, value)
-        session.commit()
-        return jsonify(profile.to_dict()), 200
-
     @app.route("/api/analysis-profiles/<profile_id>", methods=["DELETE"])
     @with_db_session
     def delete_analysis_profile(session, profile_id):
@@ -1041,16 +821,6 @@ def create_app(config_override=None):
         session.commit()
         return jsonify(prompt.to_dict()), 200
 
-    # ==================== ROUTES API OLLAMA & ADMIN ====================
-    @app.route('/api/ollama/pull', methods=['POST'])
-    def api_pull_model():
-        data = request.json
-        model_name = data.get('model')
-        if not model_name:
-            return jsonify({'success': False, 'error': 'Model name required'}), 400
-        job = models_queue.enqueue(pull_ollama_model_task, model_name, job_timeout='30m')
-        return jsonify({'task_id': job.get_id(), 'message': f'Downloading {model_name}'}), 200
-
     @app.route('/api/ollama/models', methods=['GET'])
     def api_list_models():
         # Appeler Ollama API locale pour récupérer la liste des modèles installés
@@ -1064,16 +834,6 @@ def create_app(config_override=None):
         except requests.RequestException as e:
             logging.error(f"Impossible de contacter le serveur Ollama à l_adresse {app_config.OLLAMA_BASE_URL}. Erreur: {e}")
             return jsonify({'success': False, 'error': str(e)}), 500
-
-    @app.route("/api/databases", methods=["GET"])
-    def get_available_databases():
-        """Retourne la liste des bases de données disponibles pour la recherche."""
-        databases = [
-            {"id": "pubmed", "name": "PubMed", "description": "MEDLINE/PubMed database"},
-            {"id": "arxiv", "name": "arXiv", "description": "arXiv preprint server"},
-            {"id": "crossref", "name": "CrossRef", "description": "DOI-based search"}
-        ]
-        return jsonify(databases), 200
 
     @app.route('/api/tasks/status', methods=['GET'])
     @with_db_session
@@ -1129,18 +889,6 @@ def create_app(config_override=None):
         all_tasks.sort(key=lambda x: x['created_at'] or datetime.min.isoformat(), reverse=True)
         
         return jsonify(all_tasks)
-
-    @app.route("/api/tasks/<task_id>/cancel", methods=["POST"])
-    def cancel_task(task_id):
-        """Annule une tâche RQ en cours."""
-        try:
-            from rq.job import Job
-            job = Job.fetch(task_id, connection=redis_conn)
-            job.cancel()
-            return jsonify({"message": "Demande d_annulation envoyée."} ), 200
-        except Exception as e:
-            return jsonify({"error": f"Impossible d_annuler la tâche: {e}"} ), 400
-
     @app.route('/api/queues/status', methods=['GET'])
     def get_queues_status():
         all_queues = [processing_queue, synthesis_queue, analysis_queue, background_queue]
@@ -1150,10 +898,6 @@ def create_app(config_override=None):
             worker_count = sum(1 for w in workers if q.name in w.queue_names())
             response_data.append({"name": q.name, "size": len(q), "workers": worker_count})
         return jsonify({"queues": response_data})
-
-    @app.route('/api/queues/info', methods=['GET'])
-    def get_queues_info():
-        return get_queues_status()
 
     @app.route('/api/queues/clear', methods=['POST'])
     def clear_queue():
@@ -1222,11 +966,11 @@ def create_app(config_override=None):
         return jsonify([r.to_dict() for r in results])
 
     # Enregistrement des Blueprints
-    #app.register_blueprint(projects_bp, url_prefix='/api')
-    app.register_blueprint(reporting_bp, url_prefix='/api')
-    app.register_blueprint(stakeholders_bp, url_prefix='/api')
-    app.register_blueprint(selection_bp, url_prefix='/api')
-    app.register_blueprint(tasks_bp, url_prefix='/api')
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(analysis_profiles_bp)
+    app.register_blueprint(projects_bp)
+    app.register_blueprint(search_bp)
+    app.register_blueprint(tasks_bp)
 
     # La factory DOIT retourner l_objet app
     return app

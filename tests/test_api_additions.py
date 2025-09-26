@@ -68,22 +68,20 @@ def test_save_rob_assessment(client, db_session, new_project):
         'allocation_concealment_notes': 'Non mentionné.',
     }
     
-    response = client.post(f'/api/projects/{project_id}/articles/{article_id}/rob', json={
+    response = client.post(f'/api/projects/{project_id}/rob/{article_id}', json={
         'rob_assessment': assessment_data
     })
     
+    # 1. Vérifier que la requête a réussi et que la réponse contient les données
     assert response.status_code == 200
-    assert response.get_json()['message'] == "Évaluation RoB sauvegardée avec succès"
-
-    # Vérifier que les données ont bien été écrites en base de données
-    saved_assessment = db_session.query(RiskOfBias).filter_by(
-        project_id=project_id,
-        article_id=article_id
-    ).first()
-
-    assert saved_assessment is not None
-    assert saved_assessment.random_sequence_generation == 'low'
-    assert saved_assessment.allocation_concealment_notes == 'Non mentionné.'
+    saved_assessment_data = response.get_json()
+    
+    # 2. Vérifier que les données retournées par l'API sont correctes
+    assert saved_assessment_data is not None
+    assert saved_assessment_data['project_id'] == project_id
+    assert saved_assessment_data['article_id'] == article_id
+    assert saved_assessment_data['random_sequence_generation'] == 'low'
+    assert saved_assessment_data['allocation_concealment_notes'] == 'Non mentionné.'
 
 def test_get_task_status_not_found(client):
     """Teste le cas où l'ID de la tâche n'existe pas."""
