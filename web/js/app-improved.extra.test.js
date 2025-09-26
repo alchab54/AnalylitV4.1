@@ -12,7 +12,12 @@ import * as ui from './ui-improved.js';
 jest.mock('./api.js');
 jest.mock('./projects.js');
 jest.mock('./state.js');
-jest.mock('./core.js');
+jest.mock('./core.js', () => ({
+    initializeState: jest.fn(),
+    setupDelegatedEventListeners: jest.fn(),
+    initializeWebSocket: jest.fn(),
+    showSection: jest.fn(),
+}));
 jest.mock('./ui-improved.js', () => ({ 
     showError: jest.fn(),
     showToast: jest.fn()
@@ -70,7 +75,7 @@ describe('App Improved - Extra Coverage', () => {
 
         await initializeApplication();
 
-        expect(core.initializeState).toHaveBeenCalledTimes(1);
+        expect(state.initializeState).toHaveBeenCalledTimes(1);
         expect(core.setupDelegatedEventListeners).toHaveBeenCalledTimes(1);
         expect(core.initializeWebSocket).toHaveBeenCalledTimes(1);
         expect(core.showSection).toHaveBeenCalledWith('projects');
@@ -88,7 +93,7 @@ describe('App Improved - Extra Coverage', () => {
         await initializeApplication();
 
         // Aucune fonction ne devrait être appelée la deuxième fois
-        expect(core.initializeState).not.toHaveBeenCalled();
+        expect(state.initializeState).not.toHaveBeenCalled();
         expect(projects.loadProjects).not.toHaveBeenCalled();
     });
 });

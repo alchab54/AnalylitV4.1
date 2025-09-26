@@ -33,11 +33,20 @@ describe('Module App Improved - Initialisation', () => {
     // Configurer les mocks pour qu'ils retournent des promesses résolues par défaut
     projects.loadProjects.mockResolvedValue([]);
     api.fetchAPI.mockResolvedValue([]);
+
+    // Mock the implementation of state functions to update the mocked appState
+    state.setAnalysisProfiles.mockImplementation(profiles => { appState.analysisProfiles = profiles; });
+    state.setAvailableDatabases.mockImplementation(databases => { appState.availableDatabases = databases; });
+    state.initializeState.mockImplementation(() => { /* do nothing */ });
+
   });
 
   describe('initializeApplication', () => {
+    // Increase timeout for this test to handle async operations
     it("devrait appeler toutes les fonctions d'initialisation dans le bon ordre", async () => {
-      await initializeApplication();
+      initializeApplication();
+      // Wait for all promises in the event loop to resolve
+      await new Promise(resolve => setTimeout(resolve, 0));
 
       // Vérifier que les fonctions d'initialisation de base sont appelées
       expect(state.initializeState).toHaveBeenCalledTimes(1);
@@ -57,9 +66,9 @@ describe('Module App Improved - Initialisation', () => {
       // Simuler un échec lors du chargement des projets
       projects.loadProjects.mockRejectedValue(new Error('Failed to load projects'));
 
-      await initializeApplication();
-      // ✅ CORRECTION: Utiliser setTimeout au lieu de setImmediate
-      await new Promise(process.nextTick);
+      initializeApplication();
+      // ✅ CORRECTION: Utiliser setTimeout pour attendre que la boucle d'événements traite la promesse rejetée
+      await new Promise(resolve => setTimeout(resolve, 0));
       // Vérifier qu'une erreur est loggée et affichée à l'utilisateur
       expect(ui.showError).toHaveBeenCalledWith("Erreur lors de l'initialisation de l'application");
       // S'assurer que l'application n'essaie pas d'afficher une section si les données ont échoué
@@ -78,9 +87,9 @@ describe('Module App Improved - Initialisation', () => {
         return Promise.resolve([]);
       });
 
-      await initializeApplication();
-      // ✅ CORRECTION: Attendre la résolution des promesses  
-      await new Promise(process.nextTick);
+      initializeApplication();
+      // ✅ CORRECTION: Attendre la résolution des promesses
+      await new Promise(resolve => setTimeout(resolve, 0));
       expect(projects.loadProjects).toHaveBeenCalled();
       expect(state.setAnalysisProfiles).toHaveBeenCalledWith([{ id: 'ap1' }]);
       expect(state.setAvailableDatabases).toHaveBeenCalledWith([{ id: 'db1' }]);

@@ -300,7 +300,7 @@ export async function runProjectAnalysis(analysisType) {
 
         const response = await fetchAPI(API_ENDPOINTS.projectRunAnalysis(projectId), { // Corrected endpoint
             method: 'POST',
-            body: { analysis_type: analysisType } // Corrected body key
+            body: { type: analysisType } // Corrected body key
         });
 
         const jobId = response.job_id;
