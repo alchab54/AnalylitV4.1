@@ -156,8 +156,7 @@ async function processZoteroFile(file) {
   try {
     const formData = new FormData();
     formData.append('file', file[0]); // 'file' est le nom attendu par le backend
-    // CORRECTION : Utilisation de fetchAPI qui gère correctement les FormData
-    const result = await fetchAPI(API_ENDPOINTS.projectImportZotero(appState.currentProject.id), { method: 'POST', body: formData });
+    const result = await fetchAPI(API_ENDPOINTS.projectImportZotero(appState.currentProject.id), { method: 'POST', body: formData }); // Corrected endpoint usage
     showToast(MESSAGES.zoteroImportSuccess(result.imported || 0), 'success');
     await loadSearchResults(); // Refresh results to show new articles
   } catch (e) {
@@ -193,7 +192,7 @@ export async function processPmidImport(event) {
   }
   showLoadingOverlay(true, MESSAGES.importingIds(ids.length));
   try {
-    await fetchAPI(API_ENDPOINTS.projectAddManualArticles(appState.currentProject.id), { method: 'POST', body: { identifiers: ids } });
+    await fetchAPI(API_ENDPOINTS.projectAddManualArticles(appState.currentProject.id), { method: 'POST', body: { identifiers: ids } }); // Corrected endpoint usage
     showToast(MESSAGES.importStartedForIds(ids.length), 'success');
     await loadSearchResults();
   } catch (e) {
@@ -240,7 +239,7 @@ async function processPdfUpload(files) {
   try {
     const formData = new FormData();
     [...files].forEach(f => formData.append('files', f));
-    const result = await fetchAPI(API_ENDPOINTS.projectUploadPdfs(appState.currentProject.id), { method: 'POST', body: formData });
+    const result = await fetchAPI(API_ENDPOINTS.projectUploadPdfs(appState.currentProject.id), { method: 'POST', body: formData }); // Corrected endpoint usage
     showToast(MESSAGES.pdfsUploadedSuccess(result.successful_uploads?.length || 0), 'success');
     document.getElementById('bulkPDFInput').value = ''; // Reset file input
   } catch (e) {

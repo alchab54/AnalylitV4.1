@@ -64,6 +64,20 @@ describe('State - Coverage Boost', () => {
         expect(state.appState.isConnected).toBe(true);
     });
 
+    it('toggleAllArticles devrait sélectionner ou désélectionner tous les articles', () => {
+        const articleIds = ['art1', 'art2', 'art3'];
+
+        // Sélectionner tout
+        state.toggleAllArticles(articleIds, true);
+        expect(state.appState.selectedSearchResults.size).toBe(3);
+        expect(state.isArticleSelected('art2')).toBe(true);
+
+        // Désélectionner tout
+        state.toggleAllArticles(articleIds, false);
+        expect(state.appState.selectedSearchResults.size).toBe(0);
+        expect(state.isArticleSelected('art2')).toBe(false);
+    });
+
     it('setCurrentProjectExtractions devrait mettre à jour les extractions', () => {
         const extractions = [{ id: 'ext1', data: 'test' }];
         state.setCurrentProjectExtractions(extractions);
