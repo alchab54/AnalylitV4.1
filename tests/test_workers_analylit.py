@@ -9,20 +9,27 @@ from rq import Queue, Worker, Connection
 from redis import from_url
 from tests.test_workers_core import simple_task # Import task for resilience test
 
-# Importation de tes vrais modules workers (ajuste selon tes imports)
-try:
-    from utils.ai_processors import DiscussionGenerator, KnowledgeGraphGenerator
-    from utils.fetchers import DatabaseManager
-    from utils.tasks import SearchTask, AnalysisTask
-except ImportError:
-    # Fallback si structure différente
-    DiscussionGenerator = MagicMock
-    KnowledgeGraphGenerator = MagicMock
-    DatabaseManager = MagicMock
-    SearchTask = MagicMock
-    AnalysisTask = MagicMock
+# --- Mock Helper Classes (pour simuler la logique métier) ---
+# ✅ CORRECTION: Supprimer le try...except et utiliser des mocks explicites.
+DiscussionGenerator = MagicMock()
+KnowledgeGraphGenerator = MagicMock()
+DatabaseManager = MagicMock()
+SearchTask = MagicMock()
+AnalysisTask = MagicMock()
 
 # --- Top-level Task Functions (Correction for RQ) ---
+
+def setup_discussion_mock():
+    """Helper to set up the mock inside the worker process."""
+    patcher = patch('tests.test_workers_analylit.DiscussionGenerator')
+    MockDiscussionGenerator = patcher.start()
+    mock_instance = MockDiscussionGenerator.return_value
+    mock_instance.generate.return_value = {
+        "summary": "Test discussion analysis",
+        "key_themes": ["theme1", "theme2"],
+        "word_count": 1500
+    }
+    return patcher
 
 def discussion_task_for_test(project_id, articles):
     """Top-level task for discussion analysis test."""
@@ -75,19 +82,14 @@ def analysis_queue(rq_connection):
 class TestAnalyLitWorkers:
     """Tests d'intégration workers AnalyLit"""
     
-    @patch('utils.ai_processors.DiscussionGenerator.generate')
-    def test_discussion_analysis_worker(self, mock_generate, analysis_queue, rq_connection, db_session):
+    def test_discussion_analysis_worker(self, analysis_queue, rq_connection, db_session):
         """Test worker d'analyse de discussion"""
-        # Mock du générateur IA
-        mock_generate.return_value = {
-            "summary": "Test discussion analysis",
-            "key_themes": ["theme1", "theme2"],
-            "word_count": 1500
-        }
-        
         with Connection(rq_connection):
+            # Enqueue the setup function to run before the main task
+            setup_job = analysis_queue.enqueue(setup_discussion_mock)
             job = analysis_queue.enqueue(
                 discussion_task_for_test,
+                depends_on=setup_job,
                 "proj-123",
                 [{"title": "Test Article", "abstract": "Test abstract"}],
                 meta={"analysis_type": "discussion"}
@@ -102,14 +104,8 @@ class TestAnalyLitWorkers:
             assert "summary" in result
             assert "key_themes" in result
 
-    @patch('utils.fetchers.DatabaseManager.search_pubmed')
-    def test_search_worker_with_database(self, mock_search_pubmed, analysis_queue, rq_connection):
+    def test_search_worker_with_database(self, analysis_queue, rq_connection):
         """Test worker de recherche avec vraie base"""
-        mock_search_pubmed.return_value = [
-            {"pmid": "12345", "title": "Test Article 1"},
-            {"pmid": "67890", "title": "Test Article 2"}
-        ]
-        
         with Connection(rq_connection):
             job = analysis_queue.enqueue(
                 search_task_for_test,

@@ -19,6 +19,11 @@ describe('Fonctions d\'importation', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         // ✅ CORRECTION: Mock FormData pour les uploads
+        // ✅ CORRECTION: Add necessary DOM elements for functions to find.
+        document.body.innerHTML = `
+            <div id="loading-overlay"></div>
+            <input id="pmidDoiInput" />
+        `;
         global.FormData = jest.fn().mockImplementation(() => ({
             append: jest.fn()
         }));
