@@ -58,10 +58,8 @@ describe('Module App Improved - Initialisation', () => {
       projects.loadProjects.mockRejectedValue(new Error('Failed to load projects'));
 
       await initializeApplication();
-      // Attendre que la promesse rejetée soit traitée par le bloc catch
-      await new Promise(resolve => setImmediate(resolve));
-
-
+      // Allow the promise rejection to be processed by the catch block
+      await new Promise(process.nextTick);
       // Vérifier qu'une erreur est loggée et affichée à l'utilisateur
       expect(ui.showError).toHaveBeenCalledWith("Erreur lors de l'initialisation de l'application");
       // S'assurer que l'application n'essaie pas d'afficher une section si les données ont échoué
@@ -81,8 +79,8 @@ describe('Module App Improved - Initialisation', () => {
       });
 
       await initializeApplication();
-      await new Promise(process.nextTick); // Allow promises to resolve
-
+      // Allow all promises to resolve before making assertions
+      await new Promise(process.nextTick);
       expect(projects.loadProjects).toHaveBeenCalled();
       expect(state.setAnalysisProfiles).toHaveBeenCalledWith([{ id: 'ap1' }]);
       expect(state.setAvailableDatabases).toHaveBeenCalledWith([{ id: 'db1' }]);

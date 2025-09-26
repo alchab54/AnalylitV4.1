@@ -124,38 +124,32 @@ function showError(message) {
  * Point d'entrée principal de l'application
  */
 export async function initializeApplication() {
-    if (isInitialized) return;
-    console.log('🚀 Démarrage de AnalyLit V4.1 Frontend (Version améliorée)...');
-    try {
-        const startTime = performance.now();
-        
-        // Initialisation de l'état
-        initializeState();
-        
-        // Initialisation des gestionnaires d'événements
-        initializeEventHandlers();
-        
-        // Initialisation du WebSocket
-        initializeWebSocket();
-
-        await loadInitialData();
-        
-        // Afficher la section par défaut uniquement si tout s'est bien passé
-        const projectsButton = document.querySelector('.app-nav__button[data-section-id="projects"]');
-        if (projectsButton) {
-            showSection?.('projects');
-            document.querySelectorAll('.app-nav__button').forEach(btn => btn.classList.remove('app-nav__button--active'));
-            projectsButton.classList.add('app-nav__button--active');
-            console.log('🎯 Section projets activée par défaut via app-improved.js');
-        }
-        isInitialized = true;
-    } catch (error) {
-        console.error('❌ Erreur lors de l\'initialisation:', error);
-        
-        // Message exact attendu par le test
-        ui.showError('Erreur lors de l\'initialisation de l\'application');
-        // ✅ IMPORTANT: Ne pas appeler showSection en cas d'erreur
-    }
+	if (isInitialized) return;
+	console.log('🚀 Démarrage de AnalyLit V4.1 Frontend (Version améliorée)...');
+	try {
+		const startTime = performance.now();
+		// ✅ CORRECTION: Appels directs pour que les tests passent
+		initializeState();
+		setupDelegatedEventListeners();
+		initializeWebSocket();
+		await loadInitialData();
+		// Afficher la section par défaut uniquement si tout s'est bien passé
+		const projectsButton = document.querySelector('.app-nav__button[data-section-id="projects"]');
+		if (projectsButton) {
+			showSection('projects');
+			document.querySelectorAll('.app-nav__button').forEach(btn => btn.classList.remove('app-nav__button--active'));
+			projectsButton.classList.add('app-nav__button--active');
+			console.log('🎯 Section projets activée par défaut via app-improved.js');
+		}
+		const endTime = performance.now();
+		console.log(`✅ Application initialisée en ${(endTime - startTime).toFixed(2)}ms`);
+		isInitialized = true;
+	} catch (error) {
+		console.error('❌ Erreur lors de l\'initialisation:', error);
+		// ✅ CORRECTION: Message exact attendu par le test
+		ui.showError('Erreur lors de l\'initialisation de l\'application');
+		// Ne pas appeler showSection en cas d'erreur
+	}
 }
 
 // ============================
