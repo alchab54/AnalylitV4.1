@@ -59,6 +59,7 @@ export const API_ENDPOINTS = {
     projectExport: (id) => `/projects/${id}/export`,
     projectExportThesis: (id) => `/projects/${id}/export/thesis`,
     projectIndexPdfs: (id) => `/projects/${id}/index-pdfs`, // Ajout du endpoint manquant
+    projectRun: (id) => `/projects/${id}/run`, // ✅ CORRECTION: Endpoint manquant pour le traitement par lot
     
     // Search
     search: '/api/search',
@@ -83,6 +84,7 @@ export const API_ENDPOINTS = {
     projectRunAnalysis: (id) => `/projects/${id}/run-analysis`,
     projectExportAnalyses: (id) => `/projects/${id}/export/analyses`,
     projectDeleteAnalysis: (projectId, analysisType) => `/projects/${projectId}/analyses/${analysisType}`,
+    projectPrismaChecklist: (id) => `/projects/${id}/prisma-checklist`, // ✅ CORRECTION: Endpoint manquant
     
     // Chat
     projectChatHistory: (id) => `/api/projects/${id}/chat-history`,
@@ -131,6 +133,7 @@ export const MESSAGES = {
     confirmDeleteProjectTitle: 'Confirmer la suppression',
     confirmDeleteProjectBody: (name) => `Êtes-vous sûr de vouloir supprimer le projet "<strong>${name}</strong>" ?`,
     noProjects: 'Aucun projet. Créez-en un pour commencer.',
+    noProjectsFound: 'Aucun projet trouvé', // ✅ CORRECTION: Ajout du message manquant.
     
     // Stakeholders
     selectProjectToViewStakeholders: 'Sélectionnez un projet pour gérer les parties prenantes.',

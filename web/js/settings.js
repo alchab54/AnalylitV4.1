@@ -130,7 +130,8 @@ export async function renderSettings() {
     }
 
     // 1. Générer le layout HTML dynamique
-    container.innerHTML = createSettingsLayout();
+    // ✅ CORRECTION: createSettingsLayout modifie le DOM directement, il ne retourne rien.
+    createSettingsLayout();
 
     // 2. Remplir les conteneurs maintenant qu'ils existent dans le DOM (read from appState)
     renderAnalysisProfilesList(profiles, document.querySelector('#profile-list-container'));
@@ -163,7 +164,7 @@ export async function renderSettings() {
  * @returns {string} Le HTML de la grille des paramètres.
  */
 function createSettingsLayout() {
-    const mount = document.getElementById('settings');
+    const mount = document.querySelector(SELECTORS.settingsContainer);
     if (mount && !mount.dataset.initialized) {
     mount.dataset.initialized = '1';
     mount.innerHTML = `<div class="grid-2"> <aside class="card"> <div class="card__header"><div class="h3">Paramètres</div></div> <div class="card__body"> <div class="tabs"> <div class="tab-list"> <button class="tab-btn active" data-tab="profiles">Profils</button> <button class="tab-btn" data-tab="models">Modèles</button> <button class="tab-btn" data-tab="templates">Templates</button> <button class="tab-btn" data-tab="queues">Files</button> <button class="tab-btn" data-tab="prefs">Préférences</button> </div> </div> </div> </aside> <section class="card"> <div class="card__header"><div class="h3" id="settingsTitle">Profils d’analyse</div></div> <div class="card__body" id="settingsContent"> <div class="text-muted">Sélectionnez une catégorie à gauche.</div> </div> </section> </div>` ;

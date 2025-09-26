@@ -115,34 +115,32 @@ export function renderSearchResultsTable() {
     }).join('');
 
     // ✅ CORRECTION: Utiliser la nouvelle structure HTML avec des DIVs
-    container.innerHTML = `
-        <div class="results-header">
-            <div class="results-stats">
-                <strong>${appState.searchResults.length}</strong> articles trouvés
-                <span class="selection-counter">
-                    <strong id="selectedCount">${getSelectedArticles().length}</strong> sélectionnés
-                </span>
+    const parentContainer = document.querySelector(SELECTORS.resultsContainer);
+    if (parentContainer) {
+        parentContainer.innerHTML = `
+            <div class="results-header">
+                <div class="results-stats">
+                    <strong>${appState.searchResults.length}</strong> articles trouvés
+                    <span class="selection-counter">
+                        <strong id="selectedCount">${getSelectedArticles().length}</strong> sélectionnés
+                    </span>
+                </div>
+                <div class="results-actions">
+                    <button class="btn btn--secondary" id="selectAllBtn" data-action="select-all-articles">
+                        Tout sélectionner
+                    </button>
+                    <button class="btn btn--primary" data-action="batch-process-modal" ${getSelectedArticles().length === 0 ? 'disabled' : ''}>
+                        Traiter la sélection
+                    </button>
+                    <button class="btn btn--danger" data-action="delete-selected-articles" ${getSelectedArticles().length === 0 ? 'disabled' : ''}>
+                        Supprimer sélection
+                    </button>
+                </div>
             </div>
-            <div class="results-actions">
-                <button class="btn btn--secondary" id="selectAllBtn" data-action="select-all-articles">
-                    Tout sélectionner
-                </button>
-                <button class="btn btn--primary" 
-                        data-action="batch-process-modal"
-                        ${getSelectedArticles().length === 0 ? 'disabled' : ''}>
-                    Traiter la sélection
-                </button>
-                <button class="btn btn--danger" 
-                        data-action="delete-selected-articles"
-                        ${getSelectedArticles().length === 0 ? 'disabled' : ''}>
-                    Supprimer sélection
-                </button>
-            </div>
-        </div>
-        
-        <div id="results-list" class="results-list-container">
-            ${articleRows}
-        </div>`;
+            <div id="results-list" class="results-list-container">
+                ${articleRows}
+            </div>`;
+    }
 
     updateSelectionCounter();
 }

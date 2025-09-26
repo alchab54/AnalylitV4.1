@@ -7,8 +7,8 @@ import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 // This function is called by refreshCurrentSection in core.js
 export async function loadProjectAnalyses() {
     if (!appState.currentProject) {
-        if (elements.analysisContainer) {
-            elements.analysisContainer.innerHTML = `<p>${MESSAGES.selectProjectToViewAnalyses}</p>`;
+        if (elements.analysisContainer()) {
+            elements.analysisContainer().innerHTML = `<p>${MESSAGES.selectProjectToViewAnalyses}</p>`;
         }
         return;
     }
@@ -180,7 +180,7 @@ export async function savePRISMAProgress() {
 
     showLoadingOverlay(true, MESSAGES.savingPrisma);
     try {
-        await fetchAPI(API_ENDPOINTS.projectPrismaChecklist(appState.currentProject.id), {
+        await fetchAPI(API_ENDPOINTS.projectPrismaChecklist(appState.currentProject.id), { // This endpoint was missing
             method: 'POST',
             body: { checklist: { ...appState.prismaChecklist, items } }
         });
@@ -266,7 +266,7 @@ export async function handleRunATNAnalysis() {
 // MODIFICATION : runProjectAnalysis est maintenant déclenché par les boutons sur les cartes
 export async function runProjectAnalysis(analysisType) {
     // ✅ CORRECTION: Vérification robuste de l'état actuel au moment du clic.
-    if (!window.appState?.currentProject?.id) {
+    if (!appState?.currentProject?.id) {
         showToast('Veuillez sélectionner un projet en premier.', 'warning');
         return;
     }

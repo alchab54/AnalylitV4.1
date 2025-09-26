@@ -1,8 +1,6 @@
-global.CONFIG = {
-  API_BASE_URL: 'http://localhost:5000/api',
-  WEBSOCKET_URL: 'ws://localhost:5000/ws'
-};
+// web/js/tests/jest.setup.js
 
-global.MESSAGES = {
-  debugInterface: 'Debug Interface Message'
-};
+// Désactive les logs de console pendant les tests pour un output plus propre.
+global.console.log = jest.fn();
+global.console.error = jest.fn();
+global.console.warn = jest.fn();

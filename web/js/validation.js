@@ -72,6 +72,7 @@ async function loadProjectExtractions(projectId) {
     
     const extractions = await fetchAPI(API_ENDPOINTS.projectExtractions(projectId));
     setCurrentValidations(extractions);
+    renderValidationSection(appState.currentProject); // ✅ CORRECTION: Appeler le rendu après le chargement des données.
 }
 
 export async function renderValidationSection(project) { // This function is called by core.js

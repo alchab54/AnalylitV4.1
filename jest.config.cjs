@@ -13,8 +13,9 @@ module.exports = {
     '!**/node_modules/**'
   ],
   coverageDirectory: 'reports/coverage-frontend',
-  coverageReporters: ['text', 'lcov', 'html'],
-  setupFilesAfterEnv: ['@testing-library/jest-dom'],
+  coverageReporters: ['text', 'lcov', 'html'], // This was already correct
+  // ✅ CORRECTION: Utiliser le fichier de setup pour nettoyer les logs
+  setupFilesAfterEnv: ['@testing-library/jest-dom', '<rootDir>/web/js/tests/jest.setup.js'],
   verbose: true,
   transform: {
     '^.+\\.js$': 'babel-jest',

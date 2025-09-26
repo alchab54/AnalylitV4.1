@@ -196,73 +196,10 @@ async function loadProjectFilesSet(projectId) {
  * Rendu de la liste des projets (colonne gauche).
  */
 function renderProjectsList() {
-    const sectionContainer = document.getElementById('projects');
-    if (!sectionContainer) return;
-
-    // Injecte la structure de base de la section si elle n'existe pas
-    if (!sectionContainer.querySelector('.card')) {
-        sectionContainer.innerHTML = `
-            <div class="card">
-                <div class="card__header">
-                    <div class="section-header">
-                        <div class="section-header__content">
-                            <h2 class="h2">Gestion des Projets</h2>
-                            <p class="text-muted">Créez et gérez vos projets de revue de littérature.</p>
-                        </div>
-                        <div class="section-header__actions">
-                            <button id="create-project-btn" class="btn btn--primary" data-action="create-project-modal">
-                                <span role="img" aria-hidden="true">➕</span> Nouveau Projet
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="card__body">
-                    <div id="projects-list" class="projects-grid">
-                        <!-- Les cartes de projet seront injectées ici -->
-                    </div>
-                    <div id="projectDetail" class="project-detail" style="display: none;">
-                        <div id="projectDetailContent" class="project-detail-content"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    const container = document.querySelector(SELECTORS.projectsList);
-    if (!container) return;
-
-    const projects = Array.isArray(appState.projects) ? appState.projects : [];
-
-    if (projects.length === 0) {
-        displayEmptyProjectsState();
-        return;
-    }
-
-    const projectsHtml = projects.map(project => {
-        const isActive = appState.currentProject?.id === project.id;
-        return `
-            <div class="project-card ${isActive ? 'project-card--active' : ''}" 
-                 data-action="select-project" 
-                 data-project-id="${project.id}">
-                <div class="project-card__header">
-                    <h3 class="project-title">${escapeHtml(project.name)}</h3>
-                    <span class="status ${getStatusClass(project.status)}">${getStatusText(project.status)}</span>
-                </div>
-                <p class="project-description">${escapeHtml(project.description || 'Pas de description.')}</p>
-                <div class="project-footer">
-                    <small>Modifié le: ${new Date(project.updated_at).toLocaleString('fr-FR')}</small>
-                    <button class="btn btn--danger btn--sm" 
-                            data-action="delete-project" 
-                            data-project-id="${project.id}" 
-                            data-project-name="${escapeHtml(project.name)}">
-                        🗑️ Supprimer
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    container.innerHTML = projectsHtml;
+    // ✅ CORRECTION: Utiliser la fonction de rendu centralisée de ui-improved.js
+    // pour assurer la cohérence et permettre des tests unitaires plus simples.
+    renderProjectCards(appState.projects);
+    updateProjectListSelection();
 }
 
 /**
