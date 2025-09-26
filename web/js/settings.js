@@ -617,21 +617,6 @@ function setupSettingsEventListeners() {
 
     initSettingsTabs();
 
-    const tabContainer = document.querySelector('.tab-list');
-    if(tabContainer) {
-        const tabLinks = tabContainer.querySelectorAll('.tab-btn');
-        tabLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                const tabId = link.dataset.tab;
-
-                tabLinks.forEach(tl => tl.classList.remove('active'));
-                tabContents.forEach(tc => tc.classList.remove('active'));
-
-                link.classList.add('active');
-                document.querySelector(`#${tabId}`)?.classList.add('active'); 
-            });
-        });
-    }
 }
 
 /**

@@ -35,6 +35,7 @@ export const elements = {
     articlesSection: () => document.getElementById('articles'),
     analysesSection: () => document.getElementById('analyses'),
     settingsSection: () => document.getElementById('settings'),
+    robContainer: () => document.getElementById('robContainer'),
     
     // Formulaires
     createProjectForm: () => document.getElementById('createProjectForm'),
@@ -72,12 +73,12 @@ async function loadInitialData() {
         const { loadProjects } = await import('./projects.js');
         
         // Chargement en parallèle des données essentielles
-        const [projects, profiles, databases] = await Promise.all([
+        const [, profiles, ] = await Promise.all([
             loadProjects(), // This updates appState.projects
             loadAnalysisProfiles(), // This updates appState.analysisProfiles
             loadAvailableDatabases() // This updates appState.availableDatabases
         ]);
-        
+        setAnalysisProfiles(profiles);
         console.log('appState after initial load:', appState);
         
         const endTime = performance.now();
@@ -96,7 +97,6 @@ async function loadAnalysisProfiles() {
     try {
         const { fetchAPI } = await import('./api.js');
         const response = await fetchAPI(API_ENDPOINTS.analysisProfiles);
-        setAnalysisProfiles(response || []);
         return response || [];
     } catch (error) {
         console.error('Erreur lors du chargement des profils d\'analyse:', error);
@@ -161,7 +161,7 @@ export async function initializeApplication() {
 
     } catch (error) {
         console.error('❌ Erreur lors de l\'initialisation:', error);
-        showError("Erreur lors de l'initialisation de l'application");
+        showError("Erreur lors de l'initialisation de l'application"); // Ensure this is called on error
     }
 }
 

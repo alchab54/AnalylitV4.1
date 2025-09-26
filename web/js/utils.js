@@ -291,7 +291,7 @@ export async function copyToClipboard(text) {
         if (navigator.clipboard && window.isSecureContext) { // Modern async clipboard API
             await navigator.clipboard.writeText(text); // This returns a promise that resolves to undefined on success.
             return true;
-        } else {
+        } else { // Fallback for older browsers
             // Fallback pour les anciens navigateurs
             const textArea = document.createElement('textarea');
             textArea.value = text;

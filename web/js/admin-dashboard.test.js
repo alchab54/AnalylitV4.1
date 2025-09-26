@@ -52,7 +52,7 @@ describe('Module AdminDashboard', () => {
 
     // Avancer le temps de 10 secondes pour déclencher setInterval
     jest.advanceTimersByTime(10000);
-    await new Promise(process.nextTick); // Allow promises triggered by the timer to resolve
+    await Promise.resolve(); // Allow promises triggered by the timer to resolve
 
     expect(fetchAPI).toHaveBeenCalledTimes(4); // Devrait avoir été appelé à nouveau
   });

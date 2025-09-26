@@ -209,7 +209,7 @@ export class LayoutOptimizer {
     isEffectivelyEmpty(element) {
         if (!element) return true;
 
-        const hasText = (element.textContent || '').replace(/\s|&nbsp;|\u00A0/g, '').length > 0; // Use regex to remove all whitespace including non-breaking spaces
+        const hasText = (element.textContent || '').replace(/&nbsp;/g, ' ').trim().length > 0;
         
         const hasVisibleChildren = Array.from(element.children).some(child => {
             return child.tagName !== 'SCRIPT' && child.tagName !== 'STYLE' && getComputedStyle(child).display !== 'none';
