@@ -115,6 +115,17 @@ describe('Module Projects', () => {
       expect(ui.showToast).toHaveBeenCalledWith('Le nom du projet est requis.', 'warning');
       expect(api.fetchAPI).not.toHaveBeenCalled();
     });
+
+    it("devrait gérer une erreur de l'API lors de la création", async () => {
+      api.fetchAPI.mockRejectedValue(new Error('Creation Failed'));
+      const mockEvent = { preventDefault: jest.fn(), target: document.getElementById('createProjectForm') };
+
+      await projects.handleCreateProject(mockEvent);
+
+      expect(ui.showLoadingOverlay).toHaveBeenCalledWith(true, 'Création du projet...');
+      expect(ui.showError).toHaveBeenCalledWith('Erreur: Creation Failed');
+      expect(ui.showLoadingOverlay).toHaveBeenCalledWith(false, '');
+    });
   });
 
   describe('selectProject', () => {
@@ -132,6 +143,13 @@ describe('Module Projects', () => {
       const detailContainer = document.querySelector('#projectDetailContent');
       expect(detailContainer.innerHTML).toContain('Projet 1');
       expect(document.querySelector('#projectDetail').style.display).toBe('block');
+    });
+
+    it("ne devrait rien faire si l'ID du projet est invalide", async () => {
+      appState.projects = [{ id: '1', name: 'Projet 1' }];
+      await projects.selectProject('invalid-id');
+
+      expect(state.setCurrentProject).not.toHaveBeenCalled();
     });
   });
 
@@ -157,6 +175,44 @@ describe('Module Projects', () => {
       expect(api.fetchAPI).toHaveBeenCalledWith('/projects/1', { method: 'DELETE' });
       expect(ui.showToast).toHaveBeenCalledWith('Projet supprimé', 'success');
       expect(ui.showLoadingOverlay).toHaveBeenCalledWith(false);
+    });
+
+    it("devrait gérer une erreur de l'API lors de la suppression", async () => {
+      api.fetchAPI.mockRejectedValue(new Error('Delete Failed'));
+
+      await projects.confirmDeleteProject('1');
+
+      expect(ui.showLoadingOverlay).toHaveBeenCalledWith(true, 'Suppression du projet...');
+      expect(api.fetchAPI).toHaveBeenCalledWith('/projects/1', { method: 'DELETE' });
+      expect(ui.showError).toHaveBeenCalledWith('Erreur lors de la suppression: Delete Failed');
+      expect(ui.showLoadingOverlay).toHaveBeenCalledWith(false);
+    });
+  });
+
+  describe('handleExportProject', () => {
+    it("devrait ouvrir une nouvelle fenêtre avec l'URL d'export", () => {
+      global.open = jest.fn();
+      projects.handleExportProject('proj-export');
+      expect(global.open).toHaveBeenCalledWith('/projects/proj-export/export', '_blank');
+      expect(ui.showToast).toHaveBeenCalledWith("L'exportation du projet a commencé...", 'info');
+    });
+  });
+
+  describe('loadProjectFilesSet', () => {
+    it('devrait charger les fichiers du projet et mettre à jour l\'état', async () => {
+      const mockFiles = [{ filename: 'file1.pdf' }, { filename: 'file2.pdf' }];
+      api.fetchAPI.mockResolvedValue(mockFiles);
+
+      await projects.loadProjectFilesSet('proj-1');
+
+      expect(api.fetchAPI).toHaveBeenCalledWith('/projects/proj-1/files');
+      expect(state.setCurrentProjectFiles).toHaveBeenCalledWith(new Set(['file1', 'file2']));
+    });
+
+    it("devrait gérer une erreur lors du chargement des fichiers", async () => {
+      api.fetchAPI.mockRejectedValue(new Error('Files API Error'));
+      await projects.loadProjectFilesSet('proj-1');
+      expect(state.setCurrentProjectFiles).not.toHaveBeenCalled();
     });
   });
 });

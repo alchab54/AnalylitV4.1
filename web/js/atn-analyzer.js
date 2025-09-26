@@ -66,7 +66,7 @@ class ATNAnalyzer {
         
         // Auto-load si projet sélectionné
         if (appState.currentProject) {
-            this.loadProject(appState.currentProject);
+            this.loadATNArticles();
         }
     }
 
@@ -412,7 +412,7 @@ class ATNAnalyzer {
         try {
             this.updateExtractionProgress('Lancement de l\'extraction ATN spécialisée...');
 
-            const response = await fetchAPI(API_ENDPOINTS.projectRunAnalysis.replace('{project_id}', appState.currentProject.id), {
+            const response = await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, {
                 method: 'POST',
                 body: {
                     type: 'atn_specialized_extraction',

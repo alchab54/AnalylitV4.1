@@ -208,13 +208,18 @@ export class LayoutOptimizer {
      */
     isEffectivelyEmpty(element) {
         if (!element) return true;
-        
-        const hasText = element.textContent.trim().length > 0;
-        const hasVisibleChildren = element.querySelectorAll('*').length > this.config.emptyContainerThreshold;
+
+        // Replace non-breaking spaces and trim to check for actual text content.
+        const textContent = (element.textContent || '').replace(/\u00A0/g, ' ').trim();
+        const hasText = textContent.length > 0;
+        // ✅ CORRECTION: Ne compter que les éléments enfants qui ne sont pas des scripts ou des styles.
+        const hasVisibleChildren = element.children.length > 0 && Array.from(element.children).some(child => child.tagName !== 'SCRIPT' && child.tagName !== 'STYLE');
+
         const hasBackgroundImage = getComputedStyle(element).backgroundImage !== 'none';
-        const hasMinHeight = parseInt(getComputedStyle(element).minHeight) > this.config.minContentHeight;
-        
-        return !hasText && !hasVisibleChildren && !hasBackgroundImage && !hasMinHeight;
+        // ✅ CORRECTION: Un min-height de 0 est considéré comme non contraignant.
+        const hasSignificantMinHeight = parseInt(getComputedStyle(element).minHeight, 10) > 0;
+
+        return !hasText && !hasVisibleChildren && !hasBackgroundImage && !hasSignificantMinHeight;
     }
 
     /**

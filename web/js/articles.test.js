@@ -90,6 +90,13 @@ describe('Module Articles', () => {
       await articles.loadSearchResults();
       expect(document.querySelector('#resultsContainer').innerHTML).toContain('Aucun projet sélectionné');
     });
+
+    it("devrait gérer une erreur lors du chargement des résultats", async () => {
+      api.fetchAPI.mockRejectedValue(new Error('API Failure'));
+      await articles.loadSearchResults();
+      expect(uiImproved.showToast).toHaveBeenCalledWith('Erreur: API Failure', 'error');
+      expect(document.querySelector('#resultsContainer').innerHTML).toContain('Erreur de chargement des résultats.');
+    });
   });
 
   describe('renderSearchResultsTable', () => {
@@ -110,6 +117,12 @@ describe('Module Articles', () => {
       await articles.viewArticleDetails('1');
       expect(uiImproved.showModal).toHaveBeenCalledWith('articleDetailModal');
       expect(document.querySelector('#articleDetailContent').innerHTML).toContain('Article Détaillé');
+    });
+
+    it("devrait afficher une erreur si l'article n'est pas trouvé", async () => {
+      appState.searchResults = [];
+      await articles.viewArticleDetails('non-existent-id');
+      expect(uiImproved.showToast).toHaveBeenCalledWith("Article introuvable", 'error');
     });
   });
 
@@ -133,6 +146,29 @@ describe('Module Articles', () => {
       state.getSelectedArticles.mockReturnValue([]);
       await articles.handleDeleteSelectedArticles();
       expect(uiImproved.showToast).toHaveBeenCalledWith('Aucun article sélectionné', 'warning');
+      expect(api.fetchAPI).not.toHaveBeenCalled();
+    });
+
+    it('devrait appeler l\'API de suppression après confirmation', async () => {
+      state.getSelectedArticles.mockReturnValue(['1']);
+      window.confirm = jest.fn(() => true);
+      api.fetchAPI.mockResolvedValue({ job_id: 'job-delete' });
+
+      await articles.handleDeleteSelectedArticles();
+
+      expect(window.confirm).toHaveBeenCalled();
+      expect(api.fetchAPI).toHaveBeenCalledWith('/api/articles/batch-delete', expect.any(Object));
+      expect(uiImproved.showToast).toHaveBeenCalledWith('Suppression lancée (Job ID: job-delete)', 'success');
+    });
+  });
+
+  describe('startFullExtraction', () => {
+    it("devrait afficher une erreur si aucune grille n'est sélectionnée", async () => {
+      document.body.innerHTML += `<select id="extraction-grid-select"><option value=""></option></select>`;
+      
+      await articles.startFullExtraction();
+
+      expect(uiImproved.showToast).toHaveBeenCalledWith("Veuillez sélectionner une grille d'extraction", 'warning');
       expect(api.fetchAPI).not.toHaveBeenCalled();
     });
   });

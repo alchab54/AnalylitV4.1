@@ -130,7 +130,7 @@ function showError(message) {
 /**
  * Point d'entrée principal de l'application
  */
-async function initializeApplication() {
+export async function initializeApplication() {
     if (isInitialized) return;
     
     console.log('🚀 Démarrage de AnalyLit V4.1 Frontend (Version améliorée)...');

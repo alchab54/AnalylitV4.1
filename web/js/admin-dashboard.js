@@ -164,6 +164,12 @@ class AdminDashboard {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    window.adminDashboard = new AdminDashboard();
-});
+// Exporter la classe pour qu'elle soit importable
+export default AdminDashboard;
+
+// Initialisation si le script est chargé directement
+if (typeof window !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.adminDashboard = new AdminDashboard();
+    });
+}

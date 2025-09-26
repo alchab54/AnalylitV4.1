@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-// Simuler l'environnement global d'un Service Worker
+// Simuler l'environnement global d'un Service Worker avec toutes les fonctions nécessaires
 const mockClients = {
   claim: jest.fn(),
 };
@@ -16,11 +16,12 @@ const mockCache = {
 const mockCaches = {
   open: jest.fn().mockResolvedValue(mockCache),
   keys: jest.fn().mockResolvedValue(['analylit-v0-cache', 'analylit-v1-cache']),
+  delete: jest.fn().mockResolvedValue(true), // Mock the delete method on caches
 };
 
 global.self = {
   addEventListener: jest.fn(),
-  skipWaiting: jest.fn(),
+  skipWaiting: jest.fn(), // This was the missing mock
   clients: mockClients,
 };
 
@@ -36,7 +37,12 @@ describe('Service Worker', () => {
   beforeEach(() => {
     // Capturer les listeners pour les simuler dans les tests
     eventListeners = {};
-    global.self.addEventListener.mockImplementation((event, listener) => {
+    // Re-mock the necessary properties on global.self before each test
+    global.self.skipWaiting = jest.fn();
+    global.self.clients = {
+      claim: jest.fn(),
+    };
+    jest.spyOn(global.self, 'addEventListener').mockImplementation((event, listener) => {
       eventListeners[event] = listener;
     });
     // Réimporter pour ré-attacher les listeners
@@ -46,20 +52,24 @@ describe('Service Worker', () => {
     jest.clearAllMocks();
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it("devrait s'installer et appeler skipWaiting", () => {
     const installEvent = { waitUntil: jest.fn() };
     eventListeners.install(installEvent);
     expect(global.self.skipWaiting).toHaveBeenCalled();
   });
 
-  it("devrait s'activer et supprimer les anciens caches", () => {
+  it("devrait s'activer et supprimer les anciens caches", async () => {
     const activateEvent = { waitUntil: jest.fn() };
     eventListeners.activate(activateEvent);
-    expect(mockCaches.keys).toHaveBeenCalled();
+    await activateEvent.waitUntil.mock.calls[0][0]; // Wait for the promise inside waitUntil
     // Le mock de `keys` retourne ['analylit-v0-cache', 'analylit-v1-cache']
-    // 'analylit-v1-cache' est le nom du cache actuel, donc seul 'analylit-v0-cache' doit être supprimé.
-    expect(mockCache.delete).toHaveBeenCalledWith('analylit-v0-cache');
-    expect(mockCache.delete).not.toHaveBeenCalledWith('analylit-v1-cache');
+    // 'analylit-v1-cache' est le nom du cache actuel, donc seul 'analylit-v0-cache' doit être supprimé.    
+    expect(mockCaches.delete).toHaveBeenCalledWith('analylit-v0-cache');
+    expect(mockCaches.delete).not.toHaveBeenCalledWith('analylit-v1-cache');
     expect(global.self.clients.claim).toHaveBeenCalled();
   });
 

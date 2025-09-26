@@ -48,9 +48,11 @@ describe('Module Analyses', () => {
 
   describe('loadProjectAnalyses', () => {
     it('devrait charger les analyses et rendre la section', async () => {
+      // ✅ CORRECTION: Ensure the mock returns the data the function expects.
+      api.fetchAPI.mockResolvedValue(appState.currentProject);
       await analyses.loadProjectAnalyses();
 
-      expect(state.setAnalysisResults).toHaveBeenCalledWith(appState.currentProject);
+      expect(state.setAnalysisResults).toHaveBeenCalledWith(appState.currentProject); // Now this will pass
       expect(document.querySelector('.analysis-grid')).not.toBeNull();
       expect(document.body.innerHTML).toContain('Analyse ATN Multipartite');
     });
@@ -59,6 +61,14 @@ describe('Module Analyses', () => {
       appState.currentProject = null;
       await analyses.loadProjectAnalyses();
       expect(elements.analysisContainer().innerHTML).toContain('Sélectionnez un projet pour voir les analyses.');
+    });
+
+    it("devrait gérer une erreur de l'API", async () => {
+      // Simuler un échec de l'API en utilisant un mock qui rejette la promesse
+      api.fetchAPI.mockRejectedValue(new Error('API Error'));
+      jest.spyOn(console, 'error').mockImplementation(() => {}); // Masquer le console.error pour ce test      
+      await analyses.loadProjectAnalyses();
+      expect(ui.showToast).toHaveBeenCalledWith('Erreur lors du chargement des analyses', 'error');
     });
   });
 
@@ -85,6 +95,13 @@ describe('Module Analyses', () => {
       expect(api.fetchAPI).not.toHaveBeenCalled();
       expect(ui.showToast).toHaveBeenCalledWith('Veuillez sélectionner un projet en premier.', 'warning');
     });
+
+    it("devrait gérer une erreur de l'API lors du lancement", async () => {
+      api.fetchAPI.mockRejectedValue(new Error('API Failure'));
+      await analyses.runProjectAnalysis('discussion');
+      expect(api.fetchAPI).toHaveBeenCalled();
+      expect(ui.showToast).toHaveBeenCalledWith('Erreur lors du lancement de l\'analyse: API Failure', 'error');
+    });
   });
 
   describe('handleDeleteAnalysis', () => {
@@ -97,6 +114,15 @@ describe('Module Analyses', () => {
       expect(window.confirm).toHaveBeenCalled();
       expect(api.fetchAPI).toHaveBeenCalledWith('/projects/proj-1/analyses/atn_scores', { method: 'DELETE' });
       expect(ui.showToast).toHaveBeenCalledWith('Résultats de l\'analyse atn_scores supprimés avec succès.', 'success');
+    });
+
+    it("ne devrait rien faire si l'utilisateur annule", async () => {
+      window.confirm = jest.fn(() => false); // Simuler le clic sur "Annuler"
+
+      await analyses.handleDeleteAnalysis('atn_scores');
+
+      expect(window.confirm).toHaveBeenCalled();
+      expect(api.fetchAPI).not.toHaveBeenCalled();
     });
   });
 
@@ -116,6 +142,31 @@ describe('Module Analyses', () => {
         })
       );
       expect(ui.showToast).toHaveBeenCalledWith('Progression PRISMA sauvegardée.', 'success');
+    });
+
+    it("devrait gérer une erreur de l'API lors de la sauvegarde", async () => {
+      api.fetchAPI.mockRejectedValue(new Error('Save Failed'));
+
+      await analyses.savePRISMAProgress();
+
+      expect(api.fetchAPI).toHaveBeenCalled();
+      expect(ui.showToast).toHaveBeenCalledWith('Erreur: Save Failed', 'error');
+    });
+  });
+
+  describe('exportPRISMAReport', () => {
+    it("devrait créer et cliquer sur un lien de téléchargement", () => {
+      // Simuler la création du lien et le clic
+      const link = { setAttribute: jest.fn(), click: jest.fn() };
+      jest.spyOn(document, 'createElement').mockReturnValue(link);
+      jest.spyOn(document.body, 'appendChild').mockImplementation(() => {});
+      jest.spyOn(document.body, 'removeChild').mockImplementation(() => {});
+
+      analyses.exportPRISMAReport();
+
+      expect(document.createElement).toHaveBeenCalledWith('a');
+      expect(link.setAttribute).toHaveBeenCalledWith('download', expect.stringContaining('export_prisma_Projet_Analyse.csv'));
+      expect(link.click).toHaveBeenCalled();
     });
   });
 });

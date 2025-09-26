@@ -46,7 +46,7 @@ describe('Module Constants - Configuration centralisée', () => {
 
     test('les fonctions de messages dynamiques devraient fonctionner', () => {
       const projectName = 'Test Project';
-      const confirmMessage = MESSAGES.confirmDeleteProjectBody(projectName);
+      const confirmMessage = MESSAGES.confirmDeleteBody('le projet', projectName);
       expect(confirmMessage).toContain(projectName);
       expect(confirmMessage).toContain('strong'); // HTML markup présent
     });

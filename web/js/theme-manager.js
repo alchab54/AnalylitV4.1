@@ -1,4 +1,6 @@
 // web/js/theme-manager.js
+import { CONFIG } from './constants.js';
+
 export class ThemeManager {
     // No direct appState access, uses localStorage and constants
     constructor() {

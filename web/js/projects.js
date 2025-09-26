@@ -122,7 +122,7 @@ async function deleteProject(projectId, projectName) {
     const { showConfirmModal } = await import('./ui-improved.js');
     showConfirmModal(
         MESSAGES.confirmDeleteProjectTitle,
-        MESSAGES.confirmDeleteProjectBody(projectName),
+        MESSAGES.confirmDeleteBody('le projet', projectName),
         {
             confirmText: MESSAGES.deleteButton,
             confirmClass: 'btn--danger',

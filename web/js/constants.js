@@ -72,6 +72,7 @@ export const API_ENDPOINTS = {
     // Validation
     projectExtractions: (id) => `/projects/${id}/extractions`,
     projectExtractionDecision: (projectId, extractionId) => `/projects/${projectId}/extractions/${extractionId}/decision`,
+    projectScreeningDecisions: (id) => `/projects/${id}/screening-decisions`, // Ajout du endpoint manquant
     projectCalculateKappa: (id) => `/projects/${id}/calculate-kappa`,
     
     // Grids
@@ -104,6 +105,11 @@ export const API_ENDPOINTS = {
     queuesClear: '/api/queues/clear'
 };
 
+API_ENDPOINTS.tasksStatus = '/api/tasks/status';
+API_ENDPOINTS.projectStakeholders = (projectId) => `/projects/${projectId}/stakeholders`;
+API_ENDPOINTS.projectStakeholderGroups = (projectId) => `/projects/${projectId}/stakeholder-groups`;
+API_ENDPOINTS.stakeholderGroupById = (projectId, groupId) => `/projects/${projectId}/stakeholder-groups/${groupId}`;
+
 // Messages d'état
 export const MESSAGES = {
     // App
@@ -131,7 +137,7 @@ export const MESSAGES = {
     projectIdMissingForExport: "ID du projet manquant pour l'exportation.",
     projectExportStarted: "L'exportation du projet a commencé...",
     confirmDeleteProjectTitle: 'Confirmer la suppression',
-    confirmDeleteProjectBody: (name) => `Êtes-vous sûr de vouloir supprimer le projet "<strong>${name}</strong>" ?`,
+    confirmDeleteBody: (type, name) => `Êtes-vous sûr de vouloir supprimer ${type} "<strong>${name}</strong>" ?`,
     noProjects: 'Aucun projet. Créez-en un pour commencer.',
     noProjectsFound: 'Aucun projet trouvé', // ✅ CORRECTION: Ajout du message manquant.
     
@@ -198,13 +204,11 @@ export const MESSAGES = {
     cannotDeleteDefaultProfile: "Impossible de supprimer le profil par défaut.",
     deleteThisProfile: "Supprimer ce profil",
     templateApplied: (name, type) => `Modèle '${name}' appliqué aux éditeurs '${type}'.`,
-    cannotApplyTemplate: `Impossible de déterminer à quel éditeur ce modèle s'applique. Veuillez sélectionner un onglet.`, 
     saving: 'Sauvegarde...', 
     profileSaved: (name) => `Profil '${name}' sauvegardé.`, 
     errorSavingProfile: "Erreur lors de la sauvegarde du profil:",
     cannotDeleteProfile: "Impossible de supprimer ce profil (défaut ou non sélectionné).",
     confirmProfileDeleteTitle: 'Confirmer la suppression',
-    confirmDeleteProjectBody: (name) => `Êtes-vous sûr de vouloir supprimer le projet "<strong>${name}</strong>" ?`,
     deleteButton: 'Supprimer',
     profileDeleted: (name) => `Profil "${name}" supprimé.`, 
     errorDeletingProfile: "Erreur lors de la suppression du profil:",
@@ -220,6 +224,7 @@ export const MESSAGES = {
     downloadingModel: (name) => `Téléchargement de ${name}...`,
 
     // Screening
+    errorLoadingScreening: 'Erreur lors du chargement des décisions de screening',
     loadingScreening: 'Chargement des décisions de screening...',
     noArticlesToScreen: 'Aucun article à screener pour le moment.',
     selectProjectForScreening: 'Sélectionnez un projet pour commencer le screening.',
@@ -318,6 +323,11 @@ selectProjectForKappa: 'Sélectionnez un projet pour calculer le Kappa.',
 kappaCalculationStarted: (taskId) => `Calcul Kappa lancé (Task: ${taskId})`,
 errorCalculatingKappa: (message) => `Erreur calcul Kappa: ${message}`,
 errorApiKappa: (message) => `Erreur API Kappa: ${message}`,
+
+// Tasks
+errorFetchingTasks: 'Erreur lors de la récupération des tâches',
+noTasksInProgress: 'Aucune tâche en cours.',
+
 };
 
 // Configuration de l'application

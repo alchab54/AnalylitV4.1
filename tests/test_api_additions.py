@@ -12,12 +12,13 @@ def test_client():
         'WTF_CSRF_ENABLED': False,
     })
 
-    with app.app_context():
-        db.create_all()
-        with app.test_client() as client:
+    with app.test_client() as client:
+        with app.app_context():
+            # S'assurer que les tables sont créées dans le bon contexte d'application
+            db.create_all()
             yield client
-        db.session.remove()
-        db.drop_all()
+            db.session.remove()
+            db.drop_all()
 
 @pytest.fixture(scope='function')
 def new_project(test_client):

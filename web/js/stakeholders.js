@@ -2,18 +2,18 @@
 
 import { API_ENDPOINTS, SELECTORS, MESSAGES } from './constants.js';
 import { fetchAPI } from './api.js';
-import { showToast, showError, showModal, closeModal } from './ui-improved.js'; // Use ui-improved.js for toast
+import { showToast, showError, showModal, closeModal, escapeHtml } from './ui-improved.js'; // Use ui-improved.js for toast
 import { appState } from './app-improved.js';
 import { setStakeholders, setStakeholderGroups, setCurrentSection } from './state.js';
 
-const stakeholdersModule = (() => {
+export function showStakeholderManagementModal() { // This function is called by core.js delegated event listener
+    showModal('Gestion des Parties Prenantes', 'Contenu de la modale de gestion des parties prenantes.');
+}
 
-    const getStakeholdersContainer = () => document.querySelector(SELECTORS.stakeholdersContainer);
-    const getStakeholdersList = () => document.querySelector(SELECTORS.stakeholdersList);
-    const getCreateStakeholderBtn = () => document.querySelector(SELECTORS.createStakeholderBtn);
-    const getNewStakeholderForm = () => document.querySelector(SELECTORS.newStakeholderForm);
+const getStakeholdersContainer = () => document.querySelector(SELECTORS.stakeholdersContainer);
+const getStakeholdersList = () => document.querySelector(SELECTORS.stakeholdersList);
 
-    const init = () => {
+export function init() {
         // Event listeners are now handled by core.js delegated event listeners
         // We only need to ensure the section is rendered when the project changes
         window.addEventListener('current-project-changed', () => {
@@ -21,10 +21,10 @@ const stakeholdersModule = (() => {
                 renderStakeholdersSection(appState.currentProject);
             }
         });
-    };
+};
 
     // This function is called by core.js when the section is changed
-    const renderStakeholdersSection = (project) => {
+export const renderStakeholdersSection = async (project) => {
         const container = getStakeholdersContainer();
         if (!container) return;
 
@@ -51,33 +51,23 @@ const stakeholdersModule = (() => {
             </div>
         `;
         container.classList.remove('hidden');
-        loadStakeholders(project.id);
-    };
+        await loadStakeholders(project.id);
+};
 
-    const handleProjectChanged = () => { // This function is now internal and called by renderStakeholdersSection
-        const projectId = appState.currentProject?.id;
-        if (projectId) {
-            loadStakeholders(projectId);
-            getStakeholdersContainer().classList.remove('hidden');
-        } else {
-            getStakeholdersContainer().classList.add('hidden');
-        }
-    };
-
-    const loadStakeholders = async (projectId) => {
+export const loadStakeholders = async (projectId) => {
         try {
             const stakeholders = await fetchAPI(API_ENDPOINTS.projectStakeholders(projectId));
-            setStakeholders(stakeholders || []); // Update state via setStakeholders
-            renderStakeholders(stakeholders);
+            setStakeholders(stakeholders || []);
+            renderStakeholders(stakeholders || []);
         } catch (error) {
             showError('Erreur lors du chargement des parties prenantes.');
             console.error('Error loading stakeholders:', error);
         }
-    };
+};
 
-    const renderStakeholders = (stakeholders) => {
-        const listElement = getStakeholdersList();
-        if (!listElement) return;
+const renderStakeholders = (stakeholders) => {
+    const listElement = getStakeholdersList();
+    if (!listElement) return;
 
         listElement.innerHTML = ''; // Clear existing list
 
@@ -107,9 +97,9 @@ const stakeholdersModule = (() => {
         listElement.querySelectorAll('[data-action="delete-stakeholder"]').forEach(button => {
             button.addEventListener('click', (e) => handleDeleteStakeholder(appState.currentProject?.id, e.target.dataset.id));
         });
-    };
+};
 
-    const showCreateStakeholderModal = (projectId) => { // This function is called by core.js
+const showCreateStakeholderModal = (projectId) => { // This function is called by core.js
         if (!projectId) {
             showError(MESSAGES.selectProjectFirst);
             return;
@@ -139,9 +129,9 @@ const stakeholdersModule = (() => {
             </form>
         `;
         showModal('Créer une nouvelle partie prenante', content);
-    };
+};
 
-    const handleCreateStakeholder = async (event, projectId) => { // This function is called by core.js
+const handleCreateStakeholder = async (event, projectId) => { // This function is called by core.js
         event.preventDefault();
         if (!projectId) {
             showError('Veuillez sélectionner un projet d\'abord.');
@@ -168,9 +158,9 @@ const stakeholdersModule = (() => {
         } finally {
             closeModal();
         }
-    };
+};
 
-    const showEditStakeholderModal = async (projectId, stakeholderId) => {
+const showEditStakeholderModal = async (projectId, stakeholderId) => {
         if (!projectId) {
             showError('Veuillez sélectionner un projet d\'abord.');
             return;
@@ -216,9 +206,9 @@ const stakeholdersModule = (() => {
             showError('Erreur lors du chargement des détails de la partie prenante.');
             console.error('Error loading stakeholder details:', error);
         }
-    };
+};
 
-    const handleUpdateStakeholder = async (event, projectId, stakeholderId) => {
+const handleUpdateStakeholder = async (event, projectId, stakeholderId) => {
         event.preventDefault();
         if (!projectId) {
             showError('Veuillez sélectionner un projet d\'abord.');
@@ -245,9 +235,9 @@ const stakeholdersModule = (() => {
         } finally {
             closeModal();
         }
-    };
+};
 
-    const handleDeleteStakeholder = async (projectId, stakeholderId) => {
+const handleDeleteStakeholder = async (projectId, stakeholderId) => {
         if (!projectId) {
             showError('Veuillez sélectionner un projet d\'abord.');
             return;
@@ -264,9 +254,9 @@ const stakeholdersModule = (() => {
             showError('Erreur lors de la suppression de la partie prenante.');
             console.error('Error deleting stakeholder:', error);
         }
-    };
+};
 
-    const addStakeholderGroup = async (projectId, groupData) => {
+export const addStakeholderGroup = async (projectId, groupData) => {
         if (!projectId) { // Check if projectId is valid
             showError('ID du projet requis pour ajouter un groupe de parties prenantes.');
             return null;
@@ -285,9 +275,9 @@ const stakeholdersModule = (() => {
             console.error('Error creating stakeholder group:', error);
             return null;
         }
-    };
+};
 
-    const removeStakeholderGroup = async (projectId, groupId) => {
+const removeStakeholderGroup = async (projectId, groupId) => {
         if (!projectId || !groupId) { // Check if projectId and groupId are valid
             showError('ID du projet et du groupe requis.');
             return false;
@@ -307,26 +297,7 @@ const stakeholdersModule = (() => {
             console.error('Error deleting stakeholder group:', error);
             return false;
         }
-    };
+};
 
-    return {
-        init,
-        loadStakeholders,
-        renderStakeholdersSection, // Export the render function
-        addStakeholderGroup,        
-        removeStakeholderGroup
-    };
-})();
-
-export function showStakeholderManagementModal() { // This function is called by core.js delegated event listener
-    showModal('Gestion des Parties Prenantes', 'Contenu de la modale de gestion des parties prenantes.');
-}
-
-export const deleteStakeholderGroup = (groupId) => stakeholdersModule.removeStakeholderGroup(appState.currentProject?.id, groupId);
-export const addStakeholderGroup = (projectId, groupData) => stakeholdersModule.addStakeholderGroup(projectId || appState.currentProject?.id, groupData);
+export const deleteStakeholderGroup = (groupId) => removeStakeholderGroup(appState.currentProject?.id, groupId);
 export function runStakeholderAnalysis() { /* Logic to run stakeholder analysis */ } // This was already correct
-export const renderStakeholdersSection = stakeholdersModule.renderStakeholdersSection; // Export the render function
-export const init = stakeholdersModule.init;
-
-export { stakeholdersModule };
-export default stakeholdersModule;

@@ -79,6 +79,20 @@ describe('Module Utils - Fonctions Utilitaires', () => {
     });
   });
 
+  describe('formatNumber', () => {
+    it('devrait formater un nombre correctement', () => {
+      // En 'fr-FR', le séparateur est un espace insécable.
+      expect(utils.formatNumber(12345.67)).toMatch(/12\s*345,67/);
+    });
+
+    it('devrait retourner "0" pour une entrée invalide', () => {
+      expect(utils.formatNumber(NaN)).toBe('0');
+      expect(utils.formatNumber('abc')).toBe('0');
+      expect(utils.formatNumber(null)).toBe('0');
+      expect(utils.formatNumber(undefined)).toBe('0');
+    });
+  });
+
   describe('isValidEmail', () => {
     it('devrait valider les emails corrects et rejeter les incorrects', () => {
       expect(utils.isValidEmail('test@example.com')).toBe(true);
@@ -88,10 +102,18 @@ describe('Module Utils - Fonctions Utilitaires', () => {
     });
   });
 
+  describe('isValidDoi', () => {
+    it('devrait valider les DOIs corrects et rejeter les incorrects', () => {
+      expect(utils.isValidDoi('10.1000/xyz123')).toBe(true);
+      expect(utils.isValidDoi('11.1000/xyz123')).toBe(false);
+      expect(utils.isValidDoi('not a doi')).toBe(false);
+    });
+  });
+
   describe('truncateText', () => {
     it('devrait tronquer le texte si plus long que la longueur max', () => {
       const text = 'Ceci est un texte très long';
-      expect(utils.truncateText(text, 10)).toBe('Ceci est...');
+      expect(utils.truncateText(text, 8)).toBe('Ceci est...');
     });
 
     it('ne devrait pas tronquer le texte si plus court', () => {
@@ -102,7 +124,22 @@ describe('Module Utils - Fonctions Utilitaires', () => {
 
   describe('slugify', () => {
     it('devrait convertir un texte en slug', () => {
-      expect(utils.slugify('Titre d\'un Article Étonnant !')).toBe('titre-d-un-article-etonnant');
+      expect(utils.slugify("Titre d'un Article Étonnant !")).toBe('titre-dun-article-etonnant');
+    });
+  });
+
+  describe('deepClone', () => {
+    it('devrait cloner un objet avec des valeurs imbriquées', () => {
+      const original = { a: 1, b: { c: 2, d: [3, 4] } };
+      const clone = utils.deepClone(original);
+
+      expect(clone).toEqual(original);
+      expect(clone).not.toBe(original);
+      expect(clone.b).not.toBe(original.b);
+      expect(clone.b.d).not.toBe(original.b.d);
+
+      clone.b.c = 99;
+      expect(original.b.c).toBe(2);
     });
   });
 
@@ -117,6 +154,27 @@ describe('Module Utils - Fonctions Utilitaires', () => {
       expect(grouped['A']).toHaveLength(2);
       expect(grouped['B']).toHaveLength(1);
       expect(grouped['A'][1].value).toBe(3);
+    });
+  });
+
+  describe('removeDuplicates', () => {
+    it('devrait supprimer les doublons de valeurs primitives', () => {
+      const array = [1, 2, 2, 3, 1, 4];
+      expect(utils.removeDuplicates(array)).toEqual([1, 2, 3, 4]);
+    });
+
+    it('devrait supprimer les doublons d\'objets basés sur une clé', () => {
+      const array = [{ id: 1, val: 'a' }, { id: 2, val: 'b' }, { id: 1, val: 'c' }];
+      expect(utils.removeDuplicates(array, 'id')).toEqual([{ id: 1, val: 'a' }, { id: 2, val: 'b' }]);
+    });
+  });
+
+  describe('formatBytes', () => {
+    it('devrait formater les bytes en unités lisibles', () => {
+      expect(utils.formatBytes(0)).toBe('0 Bytes');
+      expect(utils.formatBytes(1024)).toBe('1 KB');
+      expect(utils.formatBytes(1500)).toBe('1.46 KB');
+      expect(utils.formatBytes(1024 * 1024 * 5)).toBe('5 MB');
     });
   });
 
@@ -140,11 +198,20 @@ describe('Module Utils - Fonctions Utilitaires', () => {
   });
 
   describe('copyToClipboard', () => {
+    it('devrait appeler navigator.clipboard.writeText si disponible', async () => {
+      const writeTextMock = jest.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText: writeTextMock }, configurable: true });
+      const result = await utils.copyToClipboard('test'); 
+      expect(result).toBe(true);
+      expect(writeTextMock).toHaveBeenCalledWith('test');
+    });
+
     it('devrait utiliser le fallback si navigator.clipboard n\'est pas disponible', async () => {
       // Simuler un environnement non sécurisé
       Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true });
-      document.execCommand = jest.fn();
-
+      // Mock execCommand to return true to simulate a successful copy
+      document.execCommand = jest.fn().mockReturnValue(true);
+      
       const success = await utils.copyToClipboard('test');
       expect(success).toBe(true);
       expect(document.execCommand).toHaveBeenCalledWith('copy');

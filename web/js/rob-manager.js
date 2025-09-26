@@ -84,7 +84,7 @@ class RiskOfBiasManager {
         this.setupRoBInterface();
         
         if (appState.currentProject) {
-            this.loadProject(appState.currentProject);
+            this.loadRoBArticles();
         }
     }
 
@@ -388,7 +388,7 @@ class RiskOfBiasManager {
             this.robAssessments[articleId] = assessment;
 
             // Sauvegarder sur serveur
-            await fetchAPI(API_ENDPOINTS.projectRob(appState.currentProject.id, articleId), {
+            await fetchAPI(`/projects/${appState.currentProject.id}/articles/${articleId}/rob`, {
                 method: 'POST',
                 body: {
                     rob_assessment: assessment,

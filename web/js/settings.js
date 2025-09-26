@@ -961,7 +961,7 @@ export async function handleDeleteProfile() {
     // Utilisation de la nouvelle modale de confirmation
     showConfirmModal(
         MESSAGES.confirmProfileDeleteTitle,
-        MESSAGES.confirmProfileDeleteBody(profile.name),
+        MESSAGES.confirmDeleteBody('le profil', profile.name),
         {
             confirmText: MESSAGES.deleteButton,
             confirmClass: 'btn--danger',

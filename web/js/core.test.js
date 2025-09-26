@@ -10,6 +10,7 @@ import * as analyses from './analyses.js';
 import * as search from './search.js';
 import * as ui from './ui-improved.js';
 import * as importModule from './import.js';
+import * as validation from './validation.js';
 
 jest.mock('./projects.js');
 jest.mock('./articles.js');
@@ -17,6 +18,7 @@ jest.mock('./analyses.js');
 jest.mock('./search.js');
 jest.mock('./ui-improved.js');
 jest.mock('./import.js');
+jest.mock('./validation.js');
 
 describe('Module Core - Event Delegation', () => {
   beforeEach(() => {
@@ -51,6 +53,30 @@ describe('Module Core - Event Delegation', () => {
 
     // Assert
     expect(analyses.runProjectAnalysis).toHaveBeenCalledWith('discussion');
+  });
+
+  it('devrait appeler viewArticleDetails lors du clic sur "détails"', () => {
+    // Arrange
+    document.body.innerHTML = `<button data-action="view-details" data-article-id="art-123"></button>`;
+    const detailButton = document.querySelector('[data-action="view-details"]');
+
+    // Act
+    detailButton.click();
+
+    // Assert
+    expect(articles.viewArticleDetails).toHaveBeenCalledWith('art-123');
+  });
+
+  it('devrait appeler handleValidateExtraction lors du clic sur un bouton de validation', () => {
+    // Arrange
+    document.body.innerHTML = `<button data-action="validate-extraction" data-id="ext-1" data-decision="include"></button>`;
+    const validateButton = document.querySelector('[data-action="validate-extraction"]');
+
+    // Act
+    validateButton.click();
+
+    // Assert
+    expect(validation.handleValidateExtraction).toHaveBeenCalledWith('ext-1', 'include');
   });
 
   it('devrait appeler closeModal lors du clic sur un bouton de fermeture de modale', () => {

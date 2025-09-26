@@ -101,7 +101,8 @@ class ThesisWorkflow {
         e.preventDefault();
         
         if (!this.currentProject?.id) {
-            alert('Sélectionnez d\'abord un projet');
+            // ✅ CORRECTION: Use showToast for consistency with the rest of the app and the test.
+            showToast("Veuillez sélectionner un projet d'abord.", 'warning');
             return;
         }
 

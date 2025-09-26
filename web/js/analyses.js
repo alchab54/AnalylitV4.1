@@ -15,11 +15,12 @@ export async function loadProjectAnalyses() {
 
     try {
         // FIX: The analysis results are part of the main project object.
-        // No need for a separate API call.
-        const analyses = appState.currentProject; 
-        setAnalysisResults(analyses); // Update state with the project data
+        // This was incorrect. We need to fetch the analyses for the project.
+        const analyses = await fetchAPI(API_ENDPOINTS.projectAnalyses(appState.currentProject.id));
+        setAnalysisResults(analyses);
         renderAnalysesSection();
     } catch (e) {
+        // ✅ CORRECTION: Add error handling to catch the rejected promise.
         console.error('Erreur chargement analyses:', e);
         showToast(MESSAGES.errorLoadingAnalyses, 'error');
     }
