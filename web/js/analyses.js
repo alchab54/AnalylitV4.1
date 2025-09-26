@@ -214,7 +214,8 @@ export function exportPRISMAReport() {
         const checkbox = item.querySelector('input[type="checkbox"]');
         const textarea = item.querySelector('textarea');
 
-        const element = labelElement ? labelElement.innerText.trim().replace(/"/g, '""') : "N/A";
+        const element = labelElement && labelElement.innerText ? 
+    labelElement.innerText.trim().replace(/"/g, '""') : "N/A";
         const statut = checkbox && checkbox.checked ? "Complété" : "Non complété";
         const notes = textarea ? textarea.value.replace(/"/g, '""').replace(/\n/g, ' ') : "";
 
