@@ -27,7 +27,7 @@ export async function loadProjects() {
         return projects;
     } catch (error) {
         console.error("Erreur lors du chargement des projets:", error);
-        showError("Impossible de charger les projets.");
+        showToast("Impossible de charger les projets.", 'error');
         
         // Afficher un état vide en cas d'erreur
         renderProjectCards([]);

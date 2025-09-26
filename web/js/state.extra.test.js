@@ -95,4 +95,39 @@ describe('State - Coverage Boost', () => {
         state.setNotificationCount(0);
         expect(state.appState.notificationCount).toBe(0); // Corrected property name
     });
+
+  it('setStakeholders devrait mettre à jour les parties prenantes et émettre un événement', () => {
+    const mockStakeholders = [{ id: 's1', name: 'Dr. Smith' }];
+    const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
+
+    state.setStakeholders(mockStakeholders);
+
+    expect(state.appState.stakeholders).toEqual(mockStakeholders);
+    expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(CustomEvent));
+    expect(dispatchEventSpy.mock.calls[0][0].type).toBe('stakeholders-updated');
+  });
+
+  it('setPrompts devrait mettre à jour les prompts et émettre un événement', () => {
+    const mockPrompts = [{ id: 'p1', name: 'Synthèse' }];
+    const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
+
+    state.setPrompts(mockPrompts);
+
+    expect(state.appState.prompts).toEqual(mockPrompts);
+    expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(CustomEvent));
+    expect(dispatchEventSpy.mock.calls[0][0].type).toBe('prompts-updated');
+  });
+
+  it('filterSearchResults devrait filtrer les articles par statut', () => {
+    state.appState.searchResults = [
+      { title: 'Article A', status: 'completed' },
+      { title: 'Article B', status: 'pending' },
+      { title: 'Article C', status: 'completed' },
+    ];
+
+    const filtered = state.filterSearchResults({ status: 'completed' });
+
+    expect(filtered).toHaveLength(2);
+    expect(filtered[0].title).toBe('Article A');
+    });
 });

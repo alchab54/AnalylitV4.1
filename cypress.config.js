@@ -67,17 +67,6 @@ export default defineConfig({
         }
       });
 
-      // ✅ IGNORER les erreurs JS non-critiques
-      on('uncaught:exception', (err, runnable) => {
-        // Ignorer les erreurs de source maps et modules externes
-        if (err.message.includes('vis-network') || 
-            err.message.includes('socket.io') ||
-            err.message.includes('map file')) {
-          return false;
-        }
-        return true;
-      });
-      
       return config
     },
   },

@@ -169,7 +169,7 @@ async function processZoteroFile(file) {
 export async function processPmidImport(event) {
   event.preventDefault();
   // 1. LIRE LES VALEURS D'ABORD
-  const pmidTextarea = document.getElementById('pmid-list');
+  const pmidTextarea = document.getElementById('pmidDoiInput');
   if (!pmidTextarea) {
     showToast(MESSAGES.pmidImportFieldNotFound, 'error');
     return;

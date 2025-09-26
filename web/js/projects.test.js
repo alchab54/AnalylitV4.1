@@ -9,45 +9,37 @@ import { appState, elements } from './app-improved.js';
 
 // Mocker les dépendances
 jest.mock('./api.js');
-jest.mock('./ui-improved.js', () => ({
+jest.mock('./ui-improved.js', () => ({ // Full mock
+  showToast: jest.fn(),
+  showError: jest.fn(),
+  showSuccess: jest.fn(),
+  renderProjectCards: jest.fn(),
   showLoadingOverlay: jest.fn(),
   closeModal: jest.fn(),
-  showToast: jest.fn(),
-  showSuccess: jest.fn(),
-  showError: jest.fn(),
-  renderProjectCards: jest.fn(),
-  renderProjectDetail: jest.fn(), // ✅ CORRECTION: Ajouter la fonction manquante au mock
-  escapeHtml: (str) => str, // ✅ CORRECTION: Ajouter la fonction escapeHtml au mock
   showConfirmModal: jest.fn(),
+  escapeHtml: (str) => str, // Keep a simple implementation for escapeHtml
 }));
 jest.mock('./state.js');
 jest.mock('./app-improved.js', () => ({
-  // Simuler l'export de appState
   appState: {
     projects: [],
     currentProject: null,
-    currentProjectFiles: new Set(), // ✅ CORRECTION: Add missing properties to mock
-    analysisResults: {},            // ✅ CORRECTION: Add missing properties to mock
+    currentProjectFiles: new Set(),
+    analysisResults: {},
   },
-  // Simuler l'export de elements avec une fonction mockable
   elements: {
     projectsList: jest.fn(),
   },
 }));
 
 describe('Module Projects', () => {
-  beforeEach(() => {
-    // Réinitialiser les mocks et l'état avant chaque test
-    jest.clearAllMocks();
-    appState.projects = [];
-    appState.currentProject = null;
 
-    // Configurer le DOM de test
+  beforeEach(() => {
+    // Réinitialiser les mocks et le DOM
+    jest.clearAllMocks();
     document.body.innerHTML = `
       <div id="projects-list"></div>
-      <div id="projectDetail">
-        <div id="projectDetailContent"></div>
-      </div>
+      <div id="projectDetail"><div id="projectDetailContent"></div></div>
       <div id="projectPlaceholder"></div>
       <form id="createProjectForm">
         <input id="projectName" value="Nouveau Projet Test">
@@ -55,8 +47,6 @@ describe('Module Projects', () => {
         <select id="projectAnalysisMode"><option value="full" selected></option></select>
       </form>
     `;
-
-    // ✅ CORRECTION: Configurer le mock pour qu'il retourne l'élément du DOM quand il est appelé
     elements.projectsList.mockReturnValue(document.querySelector('#projects-list'));
   });
 
@@ -82,7 +72,7 @@ describe('Module Projects', () => {
 
       await projects.loadProjects();
 
-      expect(ui.showError).toHaveBeenCalledWith('Impossible de charger les projets.');
+      expect(ui.showToast).toHaveBeenCalledWith('Impossible de charger les projets.', 'error');
       // ✅ CORRECTION: La logique d'erreur appelle displayEmptyProjectsState, qui appelle renderProjectCards.
       expect(ui.renderProjectCards).toHaveBeenCalledWith([]);
     });
@@ -132,17 +122,18 @@ describe('Module Projects', () => {
     it('devrait sélectionner un projet et mettre à jour l\'UI', async () => {
       const projectToSelect = { id: '1', name: 'Projet 1' };
       appState.projects = [projectToSelect];
-      
+      // ✅ CORRECTION: Make the mock update the state so renderProjectDetail works.
+      state.setCurrentProject.mockImplementation((project) => {
+        appState.currentProject = project;
+      });
+
       await projects.selectProject('1');
 
       expect(state.setCurrentProject).toHaveBeenCalledWith(projectToSelect);
-      expect(ui.renderProjectCards).toHaveBeenCalled();
-      
-      // ✅ CORRECTION: Instead of spying, check the DOM result of renderProjectDetail.
-      // This is more robust against internal module call issues.
       const detailContainer = document.querySelector('#projectDetailContent');
       expect(detailContainer.innerHTML).toContain('Projet 1');
       expect(document.querySelector('#projectDetail').style.display).toBe('block');
+      expect(document.querySelector('#projectPlaceholder').style.display).toBe('none');
     });
 
     it("ne devrait rien faire si l'ID du projet est invalide", async () => {
@@ -155,6 +146,8 @@ describe('Module Projects', () => {
 
   describe('deleteProject', () => {
     it('devrait ouvrir une modale de confirmation avant de supprimer', async () => {
+      // The mock is now global for the file, no need for dynamic import
+
       await projects.deleteProject('1', 'Projet à supprimer');
 
       expect(ui.showConfirmModal).toHaveBeenCalledWith(

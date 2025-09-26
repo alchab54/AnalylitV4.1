@@ -1,7 +1,4 @@
-/**
- * @jest-environment jsdom
- */
-import { setupDelegatedEventListeners } from './core.js';
+/** @jest-environment jsdom */
 
 // Mocker toutes les actions importées pour vérifier qu'elles sont appelées
 import * as projects from './projects.js';
@@ -10,22 +7,28 @@ import * as analyses from './analyses.js';
 import * as search from './search.js';
 import * as ui from './ui-improved.js';
 import * as importModule from './import.js';
+import * as grids from './grids.js';
 import * as validation from './validation.js';
 
 jest.mock('./projects.js');
 jest.mock('./articles.js');
 jest.mock('./analyses.js');
 jest.mock('./search.js');
+jest.mock('./grids.js');
 jest.mock('./ui-improved.js');
 jest.mock('./import.js');
 jest.mock('./validation.js');
 
 describe('Module Core - Event Delegation', () => {
+  let setupDelegatedEventListeners;
+
   beforeEach(() => {
     // Réinitialiser les mocks et le DOM
     jest.clearAllMocks();
     document.body.innerHTML = '';
-    // Initialiser les écouteurs d'événements sur le nouveau body
+    
+    // Importer et initialiser les écouteurs d'événements sur le nouveau body
+    setupDelegatedEventListeners = require('./core.js').setupDelegatedEventListeners;
     setupDelegatedEventListeners();
   });
 
@@ -65,6 +68,30 @@ describe('Module Core - Event Delegation', () => {
 
     // Assert
     expect(articles.viewArticleDetails).toHaveBeenCalledWith('art-123');
+  });
+
+  it('devrait appeler deleteProject lors du clic sur "supprimer projet"', () => {
+    // Arrange
+    document.body.innerHTML = `<button data-action="delete-project" data-project-id="p1" data-project-name="Project One"></button>`;
+    const deleteButton = document.querySelector('[data-action="delete-project"]');
+
+    // Act
+    deleteButton.click();
+
+    // Assert
+    expect(projects.deleteProject).toHaveBeenCalledWith('p1', 'Project One');
+  });
+
+  it('devrait appeler showPRISMAModal lors du clic sur le bouton PRISMA', () => {
+    // Arrange
+    document.body.innerHTML = `<button data-action="show-prisma-modal"></button>`;
+    const prismaButton = document.querySelector('[data-action="show-prisma-modal"]');
+
+    // Act
+    prismaButton.click();
+
+    // Assert
+    expect(analyses.showPRISMAModal).toHaveBeenCalled();
   });
 
   it('devrait appeler handleValidateExtraction lors du clic sur un bouton de validation', () => {
@@ -118,6 +145,22 @@ describe('Module Core - Event Delegation', () => {
 
     // Assert
     expect(search.handleMultiDatabaseSearch).toHaveBeenCalledWith(expect.any(Event));
+  });
+
+  it('devrait appeler handleSaveGrid lors de la soumission du formulaire de grille', () => {
+    // Arrange
+    document.body.innerHTML = `<form id="gridForm" data-action="save-grid"><input name="id" value=""/><input name="name" value=""/><input name="description" value=""/></form>`;
+    const form = document.querySelector('form');
+
+    // Act
+    const submitEvent = new Event('submit', {
+      bubbles: true,
+      cancelable: true
+    });
+    form.dispatchEvent(submitEvent);
+
+    // Assert
+    expect(grids.handleSaveGrid).toHaveBeenCalledWith(expect.any(Event));
   });
 
   // --- Test pour l'événement 'change' ---

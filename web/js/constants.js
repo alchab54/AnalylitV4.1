@@ -59,6 +59,9 @@ export const API_ENDPOINTS = {
     projectExport: (id) => `/projects/${id}/export`,
     projectExportThesis: (id) => `/projects/${id}/export/thesis`,
     projectIndexPdfs: (id) => `/projects/${id}/index-pdfs`, // Ajout du endpoint manquant
+    projectImportZotero: (id) => `/projects/${id}/upload-zotero`, // ✅ CORRECTION: Endpoint manquant
+    projectUploadPdfs: (id) => `/projects/${id}/upload-pdfs-bulk`, // ✅ CORRECTION: Endpoint manquant
+    projectAddManualArticles: (id) => `/projects/${id}/add-manual-articles`, // ✅ CORRECTION: Endpoint manquant
     projectRun: (id) => `/projects/${id}/run`, // ✅ CORRECTION: Endpoint manquant pour le traitement par lot
     
     // Search
@@ -178,6 +181,8 @@ export const MESSAGES = {
     analysisJobStarted: (type, jobId) => `La génération pour ${type} a été lancée (Job: ${jobId}).`,
     analysisStartedSimple: (type) => `La génération pour ${type} a été lancée.`, 
     errorStartingAnalysis: "Erreur lors du lancement de l'analyse",
+    analysisComplete: (type) => `Analyse ${type} terminée.`,
+    refreshingAnalyses: 'Rafraîchissement des analyses...',
     advancedAnalysisModalTitle: 'Lancer une Analyse Avancée',
     startingMetaAnalysis: 'Lancement de la méta-analyse...', 
     metaAnalysisStarted: 'Méta-analyse lancée avec succès.',
@@ -273,6 +278,7 @@ export const MESSAGES = {
     searchQueryRequired: 'Veuillez saisir une requête de recherche.',
     searching: 'Recherche en cours...', 
     searchStarted: 'Recherche lancée en arrière-plan. Les résultats apparaîtront progressivement.',
+    searchComplete: (count) => `Recherche terminée (${count} résultats).`,
     newSearch: 'Nouvelle Recherche',
 
     // RoB

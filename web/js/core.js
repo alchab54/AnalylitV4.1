@@ -371,7 +371,7 @@ export function initializeWebSocket() {
         });
 
         appState.socket.on('ANALYSIS_COMPLETED', (data) => {
-            showSuccess(MESSAGES.analysisComplete(data.analysis_type));
+            showToast(MESSAGES.analysisComplete(data.analysis_type), 'success');
             if (appState.currentSection === 'analyses') {
                 console.log(MESSAGES.refreshingAnalyses);
                 loadProjectAnalyses();
@@ -379,7 +379,7 @@ export function initializeWebSocket() {
         });
 
         appState.socket.on('search_completed', (data) => {
-            showSuccess(MESSAGES.searchComplete(data.total_results || 0));
+            showToast(MESSAGES.searchComplete(data.total_results || 0), 'success');
             // Rediriger automatiquement vers la section des résultats
             showSection('results');
         });

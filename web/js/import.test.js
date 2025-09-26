@@ -27,6 +27,14 @@ describe('Fonctions d\'importation', () => {
         global.FormData = jest.fn().mockImplementation(() => ({
             append: jest.fn()
         }));
+        // ✅ CORRECTION: Mock FileReader pour simuler la lecture de fichier
+        global.FileReader = jest.fn(() => ({
+            readAsText: jest.fn(),
+            readAsDataURL: jest.fn(),
+            onload: jest.fn(),
+            onerror: jest.fn(),
+            result: '{"mock": "file content"}' // Contenu de fichier simulé
+        }));
     });
  
     describe('handleIndexPdfs', () => {
@@ -54,6 +62,11 @@ describe('Fonctions d\'importation', () => {
                 }]
             };
  
+            // Simuler la lecture de fichier réussie
+            FileReader.mockImplementation(() => ({
+                readAsText: jest.fn(function() { this.onload(); }), // Appelle onload immédiatement
+                result: '{"items":[]}'
+            }));
             await importModule.handleZoteroImport(mockFileInput);
  
             expect(uiImproved.showLoadingOverlay).toHaveBeenCalledWith(true, "Import du fichier Zotero...");
@@ -89,6 +102,11 @@ describe('Fonctions d\'importation', () => {
                 }]
             };
  
+            // Simuler la lecture de fichier réussie pour l'upload
+            FileReader.mockImplementation(() => ({
+                readAsDataURL: jest.fn(function() { this.onload(); }), // Appelle onload immédiatement
+                result: 'data:application/pdf;base64,mockcontent'
+            }));
             await importModule.handleUploadPdfs(mockFileInput);
  
             expect(uiImproved.showLoadingOverlay).toHaveBeenCalledWith(true, "Upload de 1 PDF(s)...");
@@ -122,7 +140,7 @@ describe('Fonctions d\'importation', () => {
             // ✅ CORRECTION: Mock DOM complet
             document.body.innerHTML = `
                 <div id="pmidImportModal" style="display: block;">
-                    <form data-action="submit-pmid-import">
+                    <form data-action="submit-pmid-import" id="pmid-import-form"> 
                         <input id="pmidDoiInput" value="12345678, 10.1000/test">
                         <button type="submit">Importer</button>
                     </form>
@@ -131,7 +149,7 @@ describe('Fonctions d\'importation', () => {
  
             const mockEvent = {
                 preventDefault: jest.fn(),
-                target: document.querySelector('form')
+                target: document.getElementById('pmid-import-form')
             };
  
             await importModule.processPmidImport(mockEvent);
@@ -142,19 +160,21 @@ describe('Fonctions d\'importation', () => {
  
         it('devrait valider les champs requis', async () => {
             document.body.innerHTML = `
-                <form data-action="submit-pmid-import">
-                    <input id="pmidDoiInput" value="">
-                </form>
+                <div id="pmidImportModal">
+                    <form data-action="submit-pmid-import" id="pmid-import-form-empty">
+                        <input id="pmidDoiInput" value=""> 
+                    </form>
+                </div>
             `;
  
             const mockEvent = {
                 preventDefault: jest.fn(),
-                target: document.querySelector('form')
+                target: document.getElementById('pmid-import-form-empty')
             };
  
             await importModule.processPmidImport(mockEvent);
  
-            expect(uiImproved.showToast).toHaveBeenCalledWith(expect.stringContaining('identifiant'), 'error');
+            expect(uiImproved.showToast).toHaveBeenCalledWith("Veuillez saisir au moins un identifiant.", 'warning');
             expect(api.fetchAPI).not.toHaveBeenCalled();
         });
     });
