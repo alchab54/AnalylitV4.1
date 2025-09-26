@@ -209,14 +209,13 @@ export class LayoutOptimizer {
     isEffectivelyEmpty(element) {
         if (!element) return true;
 
-        // Replace non-breaking spaces and trim to check for actual text content.
-        const textContent = (element.textContent || '').replace(/\u00A0/g, ' ').trim();
-        const hasText = textContent.length > 0;
-        // ✅ CORRECTION: Ne compter que les éléments enfants qui ne sont pas des scripts ou des styles.
-        const hasVisibleChildren = element.children.length > 0 && Array.from(element.children).some(child => child.tagName !== 'SCRIPT' && child.tagName !== 'STYLE');
+        const hasText = (element.textContent || '').replace(/\s|&nbsp;|\u00A0/g, '').length > 0; // Use regex to remove all whitespace including non-breaking spaces
+        
+        const hasVisibleChildren = Array.from(element.children).some(child => {
+            return child.tagName !== 'SCRIPT' && child.tagName !== 'STYLE' && getComputedStyle(child).display !== 'none';
+        });
 
         const hasBackgroundImage = getComputedStyle(element).backgroundImage !== 'none';
-        // ✅ CORRECTION: Un min-height de 0 est considéré comme non contraignant.
         const hasSignificantMinHeight = parseInt(getComputedStyle(element).minHeight, 10) > 0;
 
         return !hasText && !hasVisibleChildren && !hasBackgroundImage && !hasSignificantMinHeight;

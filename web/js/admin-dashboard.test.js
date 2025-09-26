@@ -35,7 +35,7 @@ describe('Module AdminDashboard', () => {
   test('devrait initialiser le layout et charger les données', async () => {
     fetchAPI.mockResolvedValueOnce({ tasks: [] }).mockResolvedValueOnce({ queues: [] });
     dashboard = new AdminDashboard();
-    await new Promise(process.nextTick); // Permettre aux promesses de se résoudre
+    await dashboard.init(); // Attendre l'initialisation complète
 
     expect(document.querySelector('.admin-header')).not.toBeNull();
     expect(document.querySelector('.admin-panels')).not.toBeNull();
@@ -46,13 +46,13 @@ describe('Module AdminDashboard', () => {
   test('devrait rafraîchir les données périodiquement', async () => {
     fetchAPI.mockResolvedValue({ tasks: [], queues: {} });
     dashboard = new AdminDashboard();
-    await new Promise(process.nextTick);
+    await dashboard.init();
 
     expect(fetchAPI).toHaveBeenCalledTimes(2); // 1 pour tasks, 1 pour queues
 
-    // Avancer le temps de 10 secondes
+    // Avancer le temps de 10 secondes pour déclencher setInterval
     jest.advanceTimersByTime(10000);
-    await new Promise(process.nextTick);
+    await new Promise(process.nextTick); // Allow promises triggered by the timer to resolve
 
     expect(fetchAPI).toHaveBeenCalledTimes(4); // Devrait avoir été appelé à nouveau
   });
@@ -68,8 +68,7 @@ describe('Module AdminDashboard', () => {
     fetchAPI.mockResolvedValueOnce(mockTasks).mockResolvedValueOnce(mockQueues);
 
     dashboard = new AdminDashboard();
-    // Attendre la résolution des promesses de fetchAPI
-    await new Promise(process.nextTick);
+    await dashboard.init();
 
     const statsGrid = document.getElementById('admin-stats-grid');
     // Utiliser une assertion moins stricte pour ignorer les espaces
@@ -88,8 +87,7 @@ describe('Module AdminDashboard', () => {
     fetchAPI.mockResolvedValueOnce(mockTasks).mockResolvedValueOnce({ queues: [] });
 
     dashboard = new AdminDashboard();
-    // Attendre la résolution des promesses de fetchAPI
-    await new Promise(process.nextTick);
+    await dashboard.init();
 
     expect(document.querySelector('#task-queue-list .task-item').textContent).toContain('Analyse en cours');
     expect(document.querySelector('#task-completed-list .task-item').textContent).toContain('Indexation terminée');
@@ -100,8 +98,7 @@ describe('Module AdminDashboard', () => {
     fetchAPI.mockResolvedValueOnce([]).mockResolvedValueOnce({ queues: [] });
 
     dashboard = new AdminDashboard();
-    // Attendre la résolution des promesses de fetchAPI
-    await new Promise(process.nextTick);
+    await dashboard.init();
 
     expect(document.getElementById('task-queue-list').textContent).toContain('Aucune tâche.');
   });
@@ -111,8 +108,7 @@ describe('Module AdminDashboard', () => {
     jest.spyOn(console, 'error').mockImplementation(() => {}); // Masquer le console.error
 
     dashboard = new AdminDashboard();
-    // Attendre la résolution des promesses de fetchAPI
-    await new Promise(process.nextTick);
+    await dashboard.init();
 
     expect(document.getElementById('task-queue-list').textContent).toContain('Erreur de chargement des données.');
     console.error.mockRestore();
@@ -121,7 +117,8 @@ describe('Module AdminDashboard', () => {
   test('devrait appeler l\'API pour annuler une tâche après confirmation', async () => {
     window.confirm = jest.fn(() => true);
     fetchAPI.mockResolvedValue({});
-    dashboard = new AdminDashboard(); // Constructor calls loadData
+    dashboard = new AdminDashboard();
+    await dashboard.init();
 
     await dashboard.cancelTask('task-to-cancel');
 
@@ -132,7 +129,7 @@ describe('Module AdminDashboard', () => {
   test('ne devrait pas annuler une tâche si l\'utilisateur annule', async () => {
     window.confirm = jest.fn(() => false);
     dashboard = new AdminDashboard();
-    await new Promise(process.nextTick); // Laisser le constructeur finir
+    await dashboard.init(); // Laisser le constructeur finir
 
     // Clear mocks from constructor calls
     fetchAPI.mockClear();

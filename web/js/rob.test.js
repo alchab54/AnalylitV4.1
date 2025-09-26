@@ -7,7 +7,9 @@ import * as api from './api.js';
 import * as ui from './ui-improved.js';
 
 // Mocker les dépendances
-jest.mock('./api.js');
+jest.mock('./api.js', () => ({
+  fetchAPI: jest.fn(),
+}));
 jest.mock('./ui-improved.js', () => ({
   showToast: jest.fn(),
   showLoadingOverlay: jest.fn(),
@@ -32,6 +34,7 @@ describe('Module RoB (Risk of Bias)', () => {
     // Now, in beforeEach, where `document` is available, define the mock's implementation.
     elements.robContainer.mockReturnValue(document.getElementById('robContainer'));
     appState.currentProject = { id: 'proj-1' };
+
     appState.searchResults = [];
     appState.currentProjectExtractions = [];
     appState.selectedSearchResults.clear();
@@ -41,13 +44,13 @@ describe('Module RoB (Risk of Bias)', () => {
     it("devrait afficher un message si aucun projet n'est sélectionné", async () => {
       appState.currentProject = null;
       await rob.loadRobSection();
-      expect(elements.robContainer.innerHTML).toContain('Sélectionnez un projet pour évaluer le risque de biais.');
+      expect(document.getElementById('robContainer').innerHTML).toContain('Sélectionnez un projet pour évaluer le risque de biais.');
     });
 
     it("devrait afficher un message si le projet n'a pas d'articles", async () => {
       appState.searchResults = [];
       await rob.loadRobSection();
-      expect(elements.robContainer.innerHTML).toContain("Aucun article dans ce projet. Lancez une recherche d'abord.");
+      expect(document.getElementById('robContainer').innerHTML).toContain("Aucun article dans ce projet. Lancez une recherche d'abord.");
     });
 
     it('devrait afficher la liste des articles à évaluer', async () => {
@@ -65,9 +68,6 @@ describe('Module RoB (Risk of Bias)', () => {
       api.fetchAPI.mockResolvedValue(mockRobData);
       document.body.innerHTML += `<div id="rob-summary-art-1"></div>`;
       
-      // ✅ CORRECTION: The endpoint function was missing in the test setup.
-      api.API_ENDPOINTS = { projectRob: (projId, artId) => `/api/projects/${projId}/articles/${artId}/rob` };
-      
       await rob.fetchAndDisplayRob('art-1', false);
 
       expect(api.fetchAPI).toHaveBeenCalledWith('/api/projects/proj-1/articles/art-1/rob');
@@ -79,9 +79,6 @@ describe('Module RoB (Risk of Bias)', () => {
       const mockRobData = { domain_1_bias: 'High risk' };
       api.fetchAPI.mockResolvedValue(mockRobData);
       document.body.innerHTML += `<div id="rob-summary-art-1"></div>`;
-
-      // ✅ CORRECTION: The endpoint function was missing in the test setup.
-      api.API_ENDPOINTS = { projectRob: (projId, artId) => `/api/projects/${projId}/articles/${artId}/rob` };
 
       await rob.fetchAndDisplayRob('art-1', true);
 
@@ -100,10 +97,6 @@ describe('Module RoB (Risk of Bias)', () => {
       const form = document.querySelector('form');
       const mockEvent = { preventDefault: jest.fn(), target: form.querySelector('button') };
       api.fetchAPI.mockRejectedValue(new Error('Save Failed'));
-      
-      // ✅ CORRECTION: The endpoint function was missing in the test setup.
-      api.API_ENDPOINTS = { projectRob: (projId, artId) => `/api/projects/${projId}/articles/${artId}/rob` };
-
 
       await rob.handleSaveRobAssessment(mockEvent);
 

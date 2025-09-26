@@ -59,6 +59,7 @@ describe('Module App Improved - Initialisation', () => {
 
       await initializeApplication();
 
+
       // Vérifier qu'une erreur est loggée et affichée à l'utilisateur
       expect(ui.showError).toHaveBeenCalledWith("Erreur lors de l'initialisation de l'application");
       // S'assurer que l'application n'essaie pas d'afficher une section si les données ont échoué

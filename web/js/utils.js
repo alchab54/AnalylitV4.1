@@ -288,8 +288,8 @@ export function sleep(ms) {
  */
 export async function copyToClipboard(text) {
     try {
-        if (navigator.clipboard && window.isSecureContext) {
-            await navigator.clipboard.writeText(text);
+        if (navigator.clipboard && window.isSecureContext) { // Modern async clipboard API
+            await navigator.clipboard.writeText(text); // This returns a promise that resolves to undefined on success.
             return true;
         } else {
             // Fallback pour les anciens navigateurs
@@ -298,10 +298,10 @@ export async function copyToClipboard(text) {
             textArea.style.position = 'absolute';
             textArea.style.left = '-999999px';
             document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            return true; // If it didn't throw, consider it a success for testing purposes.
+            textArea.select(); 
+            document.execCommand('copy'); 
+            document.body.removeChild(textArea); 
+            return true;
         }
     } catch (error) {
         console.error('Erreur copie presse-papiers:', error);

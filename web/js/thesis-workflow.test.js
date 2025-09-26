@@ -63,6 +63,9 @@ describe('Module ThesisWorkflow', () => {
       form.innerHTML = `<input id="thesis-search-query" value="test"><input type="checkbox" name="databases" value="pubmed" checked><input name="max_results" value="100">`;
       const mockEvent = { preventDefault: jest.fn(), target: form };
 
+      // Clear mocks that may have been called in the constructor
+      fetchAPI.mockClear();
+
       await workflow.handleThesisSearch(mockEvent);
 
       expect(showToast).toHaveBeenCalledWith("Veuillez sélectionner un projet d'abord.", 'warning');
@@ -75,6 +78,9 @@ describe('Module ThesisWorkflow', () => {
       const form = document.getElementById('search-form');
       form.innerHTML = `<input id="thesis-search-query" value="test"><input type="checkbox" name="databases" value="pubmed" checked><input name="max_results" value="100">`;
       const mockEvent = { preventDefault: jest.fn(), target: form };
+
+      // Clear mocks that may have been called in the constructor
+      fetchAPI.mockClear();
 
       await workflow.handleThesisSearch(mockEvent);
 

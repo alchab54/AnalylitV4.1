@@ -199,7 +199,7 @@ describe('Module Utils - Fonctions Utilitaires', () => {
 
   describe('copyToClipboard', () => {
     it('devrait appeler navigator.clipboard.writeText si disponible', async () => {
-      const writeTextMock = jest.fn().mockResolvedValue(undefined);
+      const writeTextMock = jest.fn().mockResolvedValue(true); // Mock a successful resolution
       Object.defineProperty(navigator, 'clipboard', { value: { writeText: writeTextMock }, configurable: true });
       const result = await utils.copyToClipboard('test'); 
       expect(result).toBe(true);

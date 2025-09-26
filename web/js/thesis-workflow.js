@@ -2,6 +2,7 @@
 import { fetchAPI } from './api.js';
 import { API_ENDPOINTS } from './constants.js';
 import { appState } from './app-improved.js';
+import { showToast } from './ui-improved.js';
 
 class ThesisWorkflow {
     constructor() {

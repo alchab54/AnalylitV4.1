@@ -4,17 +4,18 @@ import { showLoadingOverlay, escapeHtml, showToast } from './ui-improved.js';
 import { API_ENDPOINTS, MESSAGES } from './constants.js';
 
 export async function loadRobSection() {
-    if (!elements.robContainer) return;
+    const container = elements.robContainer();
+    if (!container) return;
 
     if (!appState.currentProject?.id) {
-        elements.robContainer.innerHTML = `<div class="empty-state"><p>${MESSAGES.selectProjectForRob}</p></div>`;
+        container.innerHTML = `<div class="empty-state"><p>${MESSAGES.selectProjectForRob}</p></div>`;
         return;
     }
 
     // On se base sur les articles déjà chargés dans `searchResults`
     const articles = appState.searchResults || []; // Read from state
     if (articles.length === 0) {
-        elements.robContainer.innerHTML = `<div class="empty-state"><p>${MESSAGES.noArticlesForRob}</p></div>`;
+        container.innerHTML = `<div class="empty-state"><p>${MESSAGES.noArticlesForRob}</p></div>`;
         return;
     }
 
@@ -34,7 +35,7 @@ export async function loadRobSection() {
         </div>
     `).join('');
 
-    elements.robContainer.innerHTML = `
+    container.innerHTML = `
         <div class="section-header__actions">
             <button class="btn btn--primary" data-action="run-rob-analysis">${MESSAGES.runRobAnalysis}</button>
         </div>
@@ -48,7 +49,7 @@ export async function fetchAndDisplayRob(articleId, editMode = false) {
 
     try {
         summaryContainer.innerHTML = `<div class="loading-spinner"></div>`;
-        const robData = await fetchAPI(API_ENDPOINTS.projectRob(appState.currentProject.id, articleId)); // Read from state
+        const robData = await fetchAPI(API_ENDPOINTS.projectRob(appState.currentProject.id, articleId));
         
         if (!robData || Object.keys(robData).length === 0) {
             summaryContainer.innerHTML = `<p class="text-secondary">${MESSAGES.noRobData}</p>`;
@@ -138,7 +139,7 @@ export async function handleSaveRobAssessment(event) {
     button.textContent = 'Sauvegarde...';
 
     try {
-        await fetchAPI(API_ENDPOINTS.projectRob(appState.currentProject.id, articleId), { // Read from state
+        await fetchAPI(API_ENDPOINTS.projectRob(appState.currentProject.id, articleId), {
             method: 'POST',
             body: data
         });

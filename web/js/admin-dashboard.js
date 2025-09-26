@@ -3,17 +3,20 @@ import { fetchAPI } from './api.js';
 class AdminDashboard {
     constructor() {
         this.dashboardContainer = document.getElementById('admin-dashboard');
-        this.init();
+        if (!this.dashboardContainer) return;
+
+        this.renderLayout();
+        // L'initialisation des données et du timer se fera dans une méthode async séparée
     }
 
-    init() {
+    async init() {
         if (!this.dashboardContainer) return;
-        this.renderLayout();
-        this.loadData();
+        await this.loadData();
         setInterval(() => this.loadData(), 10000); // Refresh every 10 seconds
 
         // Simulate admin role for demonstration
         document.body.dataset.userRole = 'admin';
+        return this; // Permet le chaînage
     }
 
     renderLayout() {
@@ -170,6 +173,9 @@ export default AdminDashboard;
 // Initialisation si le script est chargé directement
 if (typeof window !== 'undefined') {
     document.addEventListener('DOMContentLoaded', () => {
-        window.adminDashboard = new AdminDashboard();
+        // On crée l'instance, puis on l'initialise de manière asynchrone
+        const dashboard = new AdminDashboard();
+        dashboard.init();
+        window.adminDashboard = dashboard;
     });
 }

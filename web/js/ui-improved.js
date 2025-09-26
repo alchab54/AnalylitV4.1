@@ -545,7 +545,9 @@ function ensureGenericModalExists() {
         </div>
     </div>`;
 
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    // Append to a specific container if it exists, otherwise to the body.
+    const container = document.querySelector(SELECTORS.modalsContainer) || document.body;
+    container.insertAdjacentHTML('beforeend', modalHTML);
 }
 
 export function showModalWithContent(title, contentHtml, options = {}) {
@@ -619,7 +621,7 @@ export function showConfirmModal(title, message, options = {}) {
         }
     ];
 
-    showModal(title, `<p>${escapeHtml(message)}</p>`, { actions });
+    showModalWithContent(title, `<p>${escapeHtml(message)}</p>`, { actions });
 
     // Gestionnaire temporaire pour la confirmation
     const handleConfirm = (e) => {

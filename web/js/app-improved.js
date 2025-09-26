@@ -72,13 +72,12 @@ async function loadInitialData() {
         const { loadProjects } = await import('./projects.js');
         
         // Chargement en parallèle des données essentielles
-        const promises = [
+        const [projects, profiles, databases] = await Promise.all([
             loadProjects(), // This updates appState.projects
             loadAnalysisProfiles(), // This updates appState.analysisProfiles
             loadAvailableDatabases() // This updates appState.availableDatabases
-        ];
+        ]);
         
-        await Promise.all(promises);
         console.log('appState after initial load:', appState);
         
         const endTime = performance.now();
@@ -97,8 +96,8 @@ async function loadAnalysisProfiles() {
     try {
         const { fetchAPI } = await import('./api.js');
         const response = await fetchAPI(API_ENDPOINTS.analysisProfiles);
-        setAnalysisProfiles(response.profiles || []);
-        return response.profiles || [];
+        setAnalysisProfiles(response || []);
+        return response || [];
     } catch (error) {
         console.error('Erreur lors du chargement des profils d\'analyse:', error);
         setAnalysisProfiles([]);
@@ -124,7 +123,7 @@ async function loadAvailableDatabases() {
  * Affiche un message d'erreur
  */
 function showError(message) {
-    import('./ui-improved.js').then(ui => ui.showError(message));
+    import('./ui-improved.js').then(ui => ui.showError ? ui.showError(message) : ui.showToast(message, 'error'));
 }
 
 /**
@@ -134,10 +133,8 @@ export async function initializeApplication() {
     if (isInitialized) return;
     
     console.log('🚀 Démarrage de AnalyLit V4.1 Frontend (Version améliorée)...');
-    
-    try {
-        const startTime = performance.now();
-        
+
+    const startTime = performance.now();
         // Initialisation de l'état
         initializeState();
         
@@ -159,18 +156,12 @@ export async function initializeApplication() {
                 projectsButton.classList.add('app-nav__button--active');
                 console.log('🎯 Section projets activée par défaut via app-improved.js');
             }
-        } catch (error) {
-            console.error('Erreur initialisation section:', error);
-        }
-        
-        const endTime = performance.now();
-        console.log(`✅ Application initialisée en ${(endTime - startTime).toFixed(2)}ms`);
-        
-        isInitialized = true;
-        
+
+            isInitialized = true;
+
     } catch (error) {
         console.error('❌ Erreur lors de l\'initialisation:', error);
-        showError('Erreur lors de l\'initialisation de l\'application');
+        showError("Erreur lors de l'initialisation de l'application");
     }
 }
 
