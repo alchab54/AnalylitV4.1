@@ -20,7 +20,9 @@ import {
     savePRISMAProgress,
     loadProjectAnalyses,
     exportPRISMAReport,
-    renderAnalysesSection as renderAnalysesSectionFromAnalyses,
+    handleRunKnowledgeGraph,
+    handleRunDiscussionGeneration,
+    renderAnalysesSection,
     handleRunATNAnalysis, // Alias pour éviter conflit
     showRunAnalysisModal,
     handleDeleteAnalysis
@@ -62,7 +64,9 @@ import {
     showEditPromptModal,
     showEditProfileModal,
     deleteProfile,
+    handleDownloadSelectedModel,
     showPullModelModal,
+    downloadModel,
     handleSaveProfile
 } from './settings.js'; // This was already correct
 import { fetchAPI } from './api.js';
@@ -123,6 +127,9 @@ const uiActions = {
     'view-analysis-results': handleViewAnalysisResults,
 };
 
+const themeActions = {
+    'toggle-theme': () => import('./theme-manager.js').then(module => new module.ThemeManager().toggleTheme()),
+};
 const compactModeAction = {
     'toggle-compact-mode': () => { document.body.classList.toggle('compact'); localStorage.setItem(CONFIG.COMPACT_MODE_STORAGE, document.body.classList.contains('compact')); },
 };
@@ -156,6 +163,9 @@ const validationActions = {
 
 const analysisActions = {
     'run-analysis': (target) => runProjectAnalysis(target.dataset.analysisType),
+    'atn-analysis': () => showSection('atn-analysis'),
+    'discussion-generation': handleRunDiscussionGeneration,
+    'knowledge-graph': handleRunKnowledgeGraph,
     'run-atn-analysis': handleRunATNAnalysis,
     'show-prisma-modal': () => showPRISMAModal(),
     'save-prisma-progress': savePRISMAProgress,
@@ -221,12 +231,14 @@ const settingsActions = {
     'edit-prompt': (target) => showEditPromptModal(target.dataset.promptId),
     'create-prompt-modal': () => showEditPromptModal(null),
     'edit-profile': (target) => showEditProfileModal(target.dataset.id),
+    'download-selected-model': handleDownloadSelectedModel,
     'delete-profile': (target) => deleteProfile(target.dataset.profileId),
     'create-profile-modal': () => showEditProfileModal(null),
     'pull-model-modal': showPullModelModal
 };
 
 const clickActions = {
+    ...themeActions,
     ...uiActions,
     ...projectActions,
     ...articleActions,
@@ -390,8 +402,7 @@ export async function refreshCurrentSection() {
             break;
         case 'analyses':
             // ✅ CORRECTION CRITIQUE: Appeler renderAnalysesSection() 
-            console.log('🔧 Refreshing analyses section'); // Debug
-            const { renderAnalysesSection } = await import('./analyses.js');
+            console.log('🔧 Refreshing analyses section');
             renderAnalysesSection(); // APPEL MANQUANT !
             break;
         case 'import':

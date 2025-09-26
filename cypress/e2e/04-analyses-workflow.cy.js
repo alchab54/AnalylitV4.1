@@ -130,15 +130,24 @@ describe('Workflow de Gestion des Analyses', () => {
     cy.waitForToast('warning', 'Veuillez sélectionner un projet en premier.');
   });
 
-  // ✅ CORRECTION: Test simplifié pour la suppression
-  it('Devrait permettre de supprimer une analyse', () => {
-    // Cliquer sur le premier bouton de suppression trouvé
+  // ✅ TEST AMÉLIORÉ: Utilise cy.intercept() pour valider le comportement de suppression
+  it('Devrait permettre de supprimer une analyse et de confirmer l\'appel API', () => {
+    // Intercepter la requête DELETE vers l'API de suppression d'analyse
+    cy.intercept('DELETE', '/api/projects/*/analyses/*').as('deleteAnalysis');
+
+    // Stub la confirmation de la fenêtre pour qu'elle retourne toujours 'true' (OK)
+    cy.on('window:confirm', (str) => {
+      expect(str).to.contain('supprimer les résultats de l\'analyse');
+      return true;
+    });
+
+    // Cliquer sur le premier bouton de suppression disponible
     cy.get('[data-action="delete-analysis"]').first().click({ force: true });
-    
-    // Simplifier - juste vérifier que la confirmation est demandée
-    cy.on('window:confirm', () => true);
-    
-    // Pas de cy.wait() compliqué, on valide que l'action est déclenchée
-    cy.log('Test de suppression déclenché avec succès');
+
+    // Attendre que l'appel API intercepté soit effectué
+    cy.wait('@deleteAnalysis').its('response.statusCode').should('eq', 200);
+
+    // Vérifier que le toast de succès est affiché
+    cy.waitForToast('success', 'Résultats de l\'analyse atn_scores supprimés avec succès.');
   });
 });

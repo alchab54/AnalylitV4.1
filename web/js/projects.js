@@ -18,14 +18,10 @@ export async function loadProjects() {
     try {
         const projects = await fetchAPI(API_ENDPOINTS.projects);
         setProjects(projects || []);
-
-        // Rendu de la liste pour l'interface principale
-        // CETTE FONCTION CRÉE LE CONTENEUR #projects-list
-        renderProjectsList();
-        // MAINTENANT, on peut remplir le conteneur avec les cartes
-        renderProjectCards(projects);
         
-        // Sélection automatique du premier projet si nécessaire
+        // This function renders the list container and the cards inside it.
+        renderProjectsList();
+        
         autoSelectFirstProject();
         
         return projects;
@@ -121,13 +117,18 @@ async function selectProject(projectId) {
  */
 async function deleteProject(projectId, projectName) {
     if (!projectId) return;
-
-    const confirmMessage = `Êtes-vous sûr de vouloir supprimer le projet "${projectName}" ? Cette action est irréversible.`;
-    if (window.confirm(confirmMessage)) {
-        // FIX: Await the confirmation logic to ensure the test waits correctly.
-        // The API call and UI refresh will now happen *after* the confirm dialog is handled.
-        await confirmDeleteProject(projectId);
-    }
+    
+    // Use the non-blocking custom confirmation modal from ui-improved.js
+    const { showConfirmModal } = await import('./ui-improved.js');
+    showConfirmModal(
+        MESSAGES.confirmDeleteProjectTitle,
+        MESSAGES.confirmDeleteProjectBody(projectName),
+        {
+            confirmText: MESSAGES.deleteButton,
+            confirmClass: 'btn--danger',
+            onConfirm: () => confirmDeleteProject(projectId)
+        }
+    );
 }
 
 /**
@@ -315,6 +316,7 @@ function renderProjectDetail(project) {
 
     detailWrapper.style.display = 'block'; // ✅ CORRECTION: Make the wrapper visible
     placeholder.style.display = 'none';
+    detailContainer.style.display = 'block'; // ✅ FIX: Make the content container visible as well to pass the test
     
     // Métriques
     const articlesCount = Number(project.article_count || 0);

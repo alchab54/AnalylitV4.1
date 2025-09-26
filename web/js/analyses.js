@@ -26,97 +26,88 @@ export async function loadProjectAnalyses() {
 }
 
 export function renderAnalysesSection() {
-    console.log('🎯 renderAnalysesSection() DÉBUT'); // Debug
-    
     const container = document.getElementById('analysisContainer');
     if (!container) {
-        console.error('❌ analysisContainer not found!');
         return;
     }
-    console.log('✅ Container trouvé:', container); // Debug
 
-    // ✅ CORRECTION: Utiliser l'état importé (appState) au lieu de l'objet global (window.appState)
     const project = appState?.currentProject;
-    console.log('✅ Projet actuel:', project); // Debug
-    
-    // ✅ CORRECTION: État vide d'abord
+
     if (!project) {
-        console.log('📝 Génération état vide'); // Debug
         container.innerHTML = `
             <div class="placeholder analysis-empty">
                 <p>Veuillez sélectionner un projet pour visualiser les analyses.</p>
             </div>`;
-        console.log('✅ État vide généré'); // Debug
         return;
     }
 
-    console.log('📝 Génération contenu avec projet'); // Debug
-    
-    // ✅ CORRECTION: Encapsuler dans try/catch pour capturer les erreurs
-    try {
-        container.innerHTML = `
-            <h2>Analyses du Projet</h2>
-            <div class="analysis-actions">
-                <button class="btn btn--secondary" data-action="export-analyses">Exporter toutes les analyses</button>
-                <button class="btn btn--warning" data-action="show-advanced-analysis-modal">Lancer une analyse avancée</button>
+    // Configuration des cartes d'analyse
+    const analysisCardsConfig = [
+        {
+            icon: '🤝',
+            title: 'Analyse ATN Multipartite',
+            description: 'Analyse spécialisée pour l\'alliance thérapeutique numérique.',
+            action: 'run-atn-analysis',
+            buttonText: 'Lancer l\'Analyse ATN'
+        },
+        {
+            icon: '📝',
+            title: 'Discussion académique',
+            description: 'Génère une section Discussion basée sur la synthèse.',
+            action: 'run-analysis',
+            analysisType: 'discussion',
+            buttonText: 'Générer la Discussion'
+        },
+        {
+            icon: '🌐',
+            title: 'Graphe de connaissances',
+            description: 'Visualise les relations entre les concepts et les articles.',
+            action: 'run-analysis',
+            analysisType: 'knowledge_graph',
+            buttonText: 'Générer le Graphe'
+        },
+        {
+            icon: '📋',
+            title: 'Checklist PRISMA',
+            description: 'Gérer et suivre la checklist PRISMA.',
+            action: 'show-prisma-modal',
+            buttonText: 'Ouvrir la Checklist PRISMA'
+        }
+    ];
+
+    // Générer les cartes dynamiquement
+    const cardsHtml = analysisCardsConfig.map(renderAnalysisCard).join('');
+
+    container.innerHTML = `
+        <div class="analysis-grid">
+            ${cardsHtml}
+        </div>
+    `;
+}
+
+/**
+ * NOUVELLE FONCTION: Génère le HTML pour une seule carte d'analyse.
+ * @param {object} config - La configuration de la carte.
+ * @returns {string} Le HTML de la carte.
+ */
+function renderAnalysisCard(config) {
+    const { icon, title, description, action, analysisType, buttonText } = config;
+    const analysisTypeAttr = analysisType ? `data-analysis-type="${analysisType}"` : '';
+
+    return `
+        <div class="analysis-card">
+            <div class="analysis-card__header">
+                <span class="analysis-card__icon">${icon}</span>
+                <h4>${title}</h4>
             </div>
-            <div class="analysis-grid">
-                <div class="analysis-card">
-                    <div class="analysis-card__header">
-                        <span class="analysis-card__icon">🤝</span>
-                        <h4>Analyse ATN Multipartite</h4>
-                    </div>
-                    <div class="analysis-card__body">
-                        <p class="analysis-card__description">Analyse spécialisée pour l'alliance thérapeutique numérique.</p>
-                    </div>
-                    <div class="analysis-card__footer">
-                        <button class="btn btn--primary" data-action="run-atn-analysis">Lancer l'Analyse ATN</button>
-                    </div>
-                </div>
-                <div class="analysis-card">
-                    <div class="analysis-card__header">
-                        <span class="analysis-card__icon">📝</span>
-                        <h4>Discussion académique</h4>
-                    </div>
-                    <div class="analysis-card__body">
-                        <p class="analysis-card__description">Génère une section Discussion basée sur la synthèse.</p>
-                    </div>
-                    <div class="analysis-card__footer">
-                        <button class="btn btn--primary" data-action="run-analysis" data-analysis-type="discussion">Générer la Discussion</button>
-                    </div>
-                </div>
-                <div class="analysis-card">
-                    <div class="analysis-card__header">
-                        <span class="analysis-card__icon">🌐</span>
-                        <h4>Graphe de connaissances</h4>
-                    </div>
-                    <div class="analysis-card__body">
-                        <p class="analysis-card__description">Visualise les relations entre les concepts et les articles.</p>
-                    </div>
-                    <div class="analysis-card__footer">
-                        <button class="btn btn--primary" data-action="run-analysis" data-analysis-type="knowledge_graph">Générer le Graphe</button>
-                    </div>
-                </div>
-                <div class="analysis-card">
-                    <div class="analysis-card__header">
-                        <span class="analysis-card__icon">📋</span>
-                        <h4>Checklist PRISMA</h4>
-                    </div>
-                    <div class="analysis-card__body">
-                        <p class="analysis-card__description">Gérer et suivre la checklist PRISMA.</p>
-                    </div>
-                    <div class="analysis-card__footer">
-                        <button class="btn btn--primary" data-action="show-prisma-modal">Ouvrir la Checklist PRISMA</button>
-                    </div>
-                </div>
-            </div>`;
-        
-        console.log('✅ HTML généré avec succès'); // Debug
-        console.log('✅ analysis-grid créé'); // Debug
-        
-    } catch (error) {
-        console.error('❌ Erreur dans génération HTML:', error); // Debug
-    }
+            <div class="analysis-card__body">
+                <p class="analysis-card__description">${description}</p>
+            </div>
+            <div class="analysis-card__footer">
+                <button class="btn btn--primary" data-action="${action}" ${analysisTypeAttr}>${buttonText}</button>
+            </div>
+        </div>
+    `;
 }
 
 
@@ -283,13 +274,13 @@ export async function runProjectAnalysis(analysisType) {
     // Mappage pour les messages affichés à l utilisateur
     const analysisNames = {
         discussion: 'le brouillon de discussion',
-        knowledge_graph: 'le graphe de connaissances',
+        knowledge_graph: 'le graphe de connaissances', // This was already correct
         prisma_flow: 'le diagramme PRISMA',
         atn_scores: "l analyse ATN"
     };
 
     // Trouver la carte correspondante pour afficher le spinner
-    const card = document.querySelector(`[data-action="run-analysis"][data-analysis-type="${analysisType}"]`)?.closest('.analysis-card');
+    const card = document.querySelector(`[data-action="run-analysis"][data-analysis-type="${analysisType}"]`)?.closest('.analysis-card'); // This was already correct
     if (card) {
         card.classList.add('analysis-card--loading');
     } else {
@@ -298,7 +289,7 @@ export async function runProjectAnalysis(analysisType) {
 
     try {
         const projectId = appState.currentProject.id; // Read from state
-        const validTypes = ['discussion', 'knowledge_graph', 'prisma_flow', 'meta_analysis', 'descriptive_stats', 'atn_scores'];
+        const validTypes = ['discussion', 'knowledge_graph', 'prisma_flow', 'meta_analysis', 'descriptive_stats', 'atn_scores']; // This was already correct
         if (!validTypes.includes(analysisType)) {
             showToast(MESSAGES.unknownAnalysisType, 'error');
             if (card) card.classList.remove('analysis-card--loading');
@@ -314,7 +305,7 @@ export async function runProjectAnalysis(analysisType) {
         const jobId = response.job_id;
         if (jobId) {
             // FIX: Utiliser un message spécifique pour la discussion pour correspondre au test Cypress.
-            const toastMessage = analysisType === 'discussion'
+            const toastMessage = analysisType === 'discussion' // This was already correct
                 ? 'Tâche de génération du brouillon de discussion lancée'
                 : MESSAGES.analysisJobStarted(analysisNames[analysisType], jobId);
             showToast(toastMessage, 'success');
@@ -504,6 +495,21 @@ export async function handleRunMetaAnalysis() {
     }
 }
 
+/**
+ * NOUVELLE FONCTION : Gestionnaire pour lancer la génération de la discussion.
+ * Exigé par core.js.
+ */
+export async function handleRunDiscussionGeneration() {
+    await runProjectAnalysis('discussion');
+}
+
+/**
+ * NOUVELLE FONCTION : Gestionnaire pour lancer la génération du graphe de connaissances.
+ * Exigé par core.js.
+ */
+export async function handleRunKnowledgeGraph() {
+    await runProjectAnalysis('knowledge_graph');
+}
 
 export async function handleRunDescriptiveStats() {
     if (!appState.currentProject?.id) return; // Read from state

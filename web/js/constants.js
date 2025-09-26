@@ -82,6 +82,7 @@ export const API_ENDPOINTS = {
     projectAnalyses: (id) => `/projects/${id}/analyses`,
     projectRunAnalysis: (id) => `/projects/${id}/run-analysis`,
     projectExportAnalyses: (id) => `/projects/${id}/export/analyses`,
+    projectDeleteAnalysis: (projectId, analysisType) => `/projects/${projectId}/analyses/${analysisType}`,
     
     // Chat
     projectChatHistory: (id) => `/api/projects/${id}/chat-history`,
