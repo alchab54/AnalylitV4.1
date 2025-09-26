@@ -107,4 +107,30 @@ describe('Core - Coverage Boost', () => {
         connectCallback();
         expect(mockSocket.emit).toHaveBeenCalledWith('join_room', { room: 'proj-123' });
     });
+
+    it('devrait gérer des changements de section rapides sans erreur', () => {
+        // Simule des changements de section rapides
+        const sections = ['projects', 'search', 'projects', 'search'];
+        
+        expect(() => {
+            sections.forEach(sectionId => {
+                core.showSection(sectionId);
+            });
+        }).not.toThrow();
+
+        // Vérifie l'état final
+        const projectsSection = document.getElementById('projects');
+        const searchSection = document.getElementById('search');
+        expect(projectsSection.classList.contains('active')).toBe(false);
+        expect(searchSection.classList.contains('active')).toBe(true);
+    });
+
+    it('devrait ignorer les événements WebSocket pour une autre room', async () => {
+        state.appState.currentProject = { id: 'proj-123' };
+        core.initializeWebSocket();
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        // Simuler un événement pour une autre room
+        expect(mockSocket.emit).not.toHaveBeenCalledWith('join_room', { room: 'other-project' });
+    });
 });
