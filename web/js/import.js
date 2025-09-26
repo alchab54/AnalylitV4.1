@@ -77,9 +77,9 @@ export function handleZoteroImport(target) {
 export function showPmidImportModal() {
   const content = `
     <form id="pmid-import-form" data-action="submit-pmid-import">
-      <div class="form-group">
-        <label for="pmid-list">PMIDs / DOI / arXiv ID (un par ligne)</label>
-        <textarea id="pmid-list" rows="5" class="form-control" placeholder="32123456\n10.1038/s41586-020-2649-2\narXiv:2004.12345"></textarea>
+      <div class="form-group"> 
+        <label for="pmidDoiInput">PMIDs / DOI / arXiv ID (un par ligne)</label> 
+        <textarea id="pmidDoiInput" rows="5" class="form-control" placeholder="32123456\n10.1038/s41586-020-2649-2\narXiv:2004.12345"></textarea> 
       </div>
       <div class="modal-actions">
         <button type="button" class="btn btn--secondary" data-action="close-modal">Annuler</button>
@@ -156,7 +156,10 @@ async function processZoteroFile(file) {
   try {
     const formData = new FormData();
     formData.append('file', file[0]); // 'file' est le nom attendu par le backend
-    const result = await fetchAPI(API_ENDPOINTS.projectImportZotero(appState.currentProject.id), { method: 'POST', body: formData }); // Corrected endpoint usage
+    const result = await fetchAPI(API_ENDPOINTS.projectImportZotero(appState.currentProject.id), {
+        method: 'POST',
+        body: formData // Pass FormData directly, fetchAPI will handle it
+    });
     showToast(MESSAGES.zoteroImportSuccess(result.imported || 0), 'success');
     await loadSearchResults(); // Refresh results to show new articles
   } catch (e) {
@@ -239,8 +242,8 @@ async function processPdfUpload(files) {
   try {
     const formData = new FormData();
     [...files].forEach(f => formData.append('files', f));
-    const result = await fetchAPI(API_ENDPOINTS.projectUploadPdfs(appState.currentProject.id), { method: 'POST', body: formData }); // Corrected endpoint usage
-    showToast(MESSAGES.pdfsUploadedSuccess(result.successful_uploads?.length || 0), 'success');
+    const result = await fetchAPI(API_ENDPOINTS.projectUploadPdfs(appState.currentProject.id), { method: 'POST', body: formData });
+    showToast(MESSAGES.pdfsUploadedSuccess(result.task_ids?.length || 0), 'success');
     document.getElementById('bulkPDFInput').value = ''; // Reset file input
   } catch (e) {
     showToast(`${MESSAGES.uploadError}: ${e.message}`, 'error');

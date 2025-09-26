@@ -167,7 +167,7 @@ export async function handleSaveRobAssessment(event) {
 
         await fetchAPI(endpoint, {
             method: 'POST',
-            body: { assessment }
+            body: { rob_assessment: assessment }
         });
 
         showToast('Évaluation sauvegardée', 'success');

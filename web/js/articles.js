@@ -272,7 +272,7 @@ export async function handleDeleteSelectedArticles() {
         const response = await fetchAPI(API_ENDPOINTS.articlesBatchDelete, {
             method: 'POST',
             body: JSON.stringify({
-                article_ids: selectedArticles.map(a => a.id),
+                article_ids: selectedArticles, // selectedArticles is already an array of IDs
                 project_id: appState.currentProject.id
             })
         });

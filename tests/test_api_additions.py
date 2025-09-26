@@ -1,6 +1,6 @@
 import pytest
 import json
-from utils.models import Project # Import Project for type hinting if needed
+from utils.models import Project, RiskOfBias # Import Project for type hinting if needed
 
 @pytest.fixture(scope='function')
 def new_project(client):
@@ -56,8 +56,7 @@ def test_get_task_status(client, new_project):
     assert status_data['task_id'] == task_id
     assert 'status' in status_data
     assert status_data['status'] in ['queued', 'started', 'finished', 'failed']
-
-def test_save_rob_assessment(client, new_project):
+def test_save_rob_assessment(client, db_session, new_project):
     """Teste l'endpoint POST /api/projects/<id>/rob/<article_id>."""
     project_id = new_project['id']
     article_id = 'pmid:123456'  # ID d'article factice
@@ -69,12 +68,22 @@ def test_save_rob_assessment(client, new_project):
         'allocation_concealment_notes': 'Non mentionné.',
     }
     
-    response = client.post(f'/api/projects/{project_id}/rob/{article_id}', json={
+    response = client.post(f'/api/projects/{project_id}/articles/{article_id}/rob', json={
         'rob_assessment': assessment_data
     })
     
     assert response.status_code == 200
-    assert response.get_json()['message'] == 'Évaluation RoB sauvegardée avec succès'
+    assert response.get_json()['message'] == "Évaluation RoB sauvegardée avec succès"
+
+    # Vérifier que les données ont bien été écrites en base de données
+    saved_assessment = db_session.query(RiskOfBias).filter_by(
+        project_id=project_id,
+        article_id=article_id
+    ).first()
+
+    assert saved_assessment is not None
+    assert saved_assessment.random_sequence_generation == 'low'
+    assert saved_assessment.allocation_concealment_notes == 'Non mentionné.'
 
 def test_get_task_status_not_found(client):
     """Teste le cas où l'ID de la tâche n'existe pas."""

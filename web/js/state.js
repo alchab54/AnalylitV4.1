@@ -257,7 +257,7 @@ export function markNotificationAsRead(notificationId) {
  */
 export function setStakeholders(stakeholders) {
     appState.stakeholders = stakeholders || [];
-    console.log(`👥 Parties prenantes mises à jour: ${stakeholders.length} parties prenantes`);
+    console.log(`👥 Parties prenantes mises à jour: ${stakeholders?.length || 0} parties prenantes`);
 
     // Émettre un événement
     window.dispatchEvent(new CustomEvent('stakeholders-updated', {
@@ -271,7 +271,7 @@ export function setStakeholders(stakeholders) {
  */
 export function setProjects(projects) {
     appState.projects = projects || [];
-    console.log(`📁 Liste des projets mise à jour: ${projects.length} projets`);
+    console.log(`📁 Liste des projets mise à jour: ${projects?.length || 0} projets`);
 
     // Émettre un événement pour que l'UI puisse réagir
     window.dispatchEvent(new CustomEvent('projects-updated', {
@@ -302,7 +302,7 @@ export function setCurrentProject(project) {
  */
 export function setStakeholderGroups(groups) {
     appState.stakeholderGroups = groups || [];
-    console.log(`👥 Groupes de parties prenantes mis à jour: ${groups.length} groupes`);
+    console.log(`👥 Groupes de parties prenantes mis à jour: ${groups?.length || 0} groupes`);
 
     // Émettre un événement
     window.dispatchEvent(new CustomEvent('stakeholder-groups-updated', {
@@ -316,7 +316,7 @@ export function setStakeholderGroups(groups) {
  */
 export function setAvailableDatabases(databases) {
     appState.availableDatabases = databases || [];
-    console.log(`🗄️ Bases de données disponibles mises à jour: ${databases.length} bases`);
+    console.log(`🗄️ Bases de données disponibles mises à jour: ${databases?.length || 0} bases`);
 
     // Émettre un événement pour que l'UI puisse réagir
     window.dispatchEvent(new CustomEvent('available-databases-updated', {
@@ -403,7 +403,7 @@ export function getStateDebugInfo() {
 export function setCurrentProjectGrids(grids) {
     if (appState.currentProject) {
         appState.currentProject.grids = grids || [];
-        console.log(`📋 Grilles mises à jour pour le projet: ${appState.currentProject.name}`, grids);
+        console.log(`📋 Grilles mises à jour pour le projet: ${appState.currentProject.name}`, grids?.length || 0);
         
         // Émettre un événement de changement
         window.dispatchEvent(new CustomEvent('project-grids-updated', {
@@ -440,7 +440,7 @@ export function setCurrentProjectAnalyses(analyses) {
  */
 export function setAnalysisProfiles(profiles) {
     appState.analysisProfiles = profiles || [];
-    console.log(`👤 Profils d'analyse mis à jour: ${profiles.length} profils`);
+    console.log(`👤 Profils d'analyse mis à jour: ${profiles?.length || 0} profils`);
 
     // Émettre un événement pour que l'UI puisse réagir
     window.dispatchEvent(new CustomEvent('analysis-profiles-updated', {
@@ -454,7 +454,7 @@ export function setAnalysisProfiles(profiles) {
  */
 export function setPrompts(prompts) {
     appState.prompts = prompts || [];
-    console.log(`💬 Prompts mis à jour: ${prompts.length} prompts`);
+    console.log(`💬 Prompts mis à jour: ${prompts?.length || 0} prompts`);
 
     // Émettre un événement
     window.dispatchEvent(new CustomEvent('prompts-updated', {
@@ -468,7 +468,7 @@ export function setPrompts(prompts) {
  */
 export function setOllamaModels(models) {
     appState.ollamaModels = models || [];
-    console.log(`🧠 Modèles Ollama mis à jour: ${models.length} modèles`);
+    console.log(`🧠 Modèles Ollama mis à jour: ${models?.length || 0} modèles`);
 
     // Émettre un événement
     window.dispatchEvent(new CustomEvent('ollama-models-updated', {
@@ -534,7 +534,7 @@ export function setCurrentProjectExtractions(extractions) {
  */
 export function setChatMessages(messages) {
     appState.chatMessages = messages || [];
-    console.log(`💬 Messages de chat mis à jour: ${messages.length} messages`);
+    console.log(`💬 Messages de chat mis à jour: ${messages?.length || 0} messages`);
 
     // Émettre un événement
     window.dispatchEvent(new CustomEvent('chat-messages-updated', {
@@ -564,7 +564,7 @@ export function setActiveEvaluator(evaluator) {
  */
 export function setScreeningDecisions(decisions) {
     appState.screeningDecisions = decisions || [];
-    console.log(`🔍 Décisions de screening mises à jour: ${decisions.length} décisions`);
+    console.log(`🔍 Décisions de screening mises à jour: ${decisions?.length || 0} décisions`);
 
     // Émettre un événement
     window.dispatchEvent(new CustomEvent('screening-decisions-updated', {
@@ -578,7 +578,7 @@ export function setScreeningDecisions(decisions) {
  */
 export function setNotifications(notifications) {
     appState.notifications = notifications || [];
-    console.log(`🔔 Notifications mises à jour: ${notifications.length} notifications`);
+    console.log(`🔔 Notifications mises à jour: ${notifications?.length || 0} notifications`);
 
     window.dispatchEvent(new CustomEvent('notifications-updated', {
         detail: { notifications }
@@ -799,7 +799,7 @@ export function setAnalysisResults(results) {
  */
 export function setQueuesStatus(status) {
     appState.queuesInfo = status || { queues: [] };
-    console.log(`🔄 Statut des files d'attente mis à jour.`);
+    console.log(`🔄 Statut des files d'attente mis à jour. ${Object.keys(status?.queues || {}).length} files.`);
 
     // Émettre un événement pour que l'UI puisse réagir
     window.dispatchEvent(new CustomEvent('queues-status-updated', {

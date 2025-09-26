@@ -258,10 +258,10 @@ function renderProjectDetail(project) {
     // Métriques
     const articlesCount = Number(project.article_count || 0);
     const pdfCount = appState.currentProjectFiles?.size || 0;
-    const isIndexed = Boolean(project.indexed_at);
-    const synthesis = appState.analysisResults?.synthesis_result;
-    const discussion = appState.analysisResults?.discussion_draft;
-    const graph = appState.analysisResults?.knowledge_graph;
+    const isIndexed = Boolean(project.indexed_at); // Assuming project.indexed_at is a timestamp or boolean
+    const synthesis = appState.analysisResults?.synthesis_result?.content; // Check for content
+    const discussion = appState.analysisResults?.discussion_draft?.content; // Check for content
+    const graph = appState.analysisResults?.knowledge_graph?.nodes?.length > 0; // Check for graph data
 
     try {
         detailContainer.innerHTML = `

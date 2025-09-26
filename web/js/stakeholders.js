@@ -99,7 +99,7 @@ const renderStakeholders = (stakeholders) => {
         });
 };
 
-const showCreateStakeholderModal = (projectId) => { // This function is called by core.js
+export const showCreateStakeholderModal = (projectId) => { // This function is called by core.js
         if (!projectId) {
             showError(MESSAGES.selectProjectFirst);
             return;
@@ -131,7 +131,7 @@ const showCreateStakeholderModal = (projectId) => { // This function is called b
         showModal('Créer une nouvelle partie prenante', content);
 };
 
-const handleCreateStakeholder = async (event, projectId) => { // This function is called by core.js
+export const handleCreateStakeholder = async (event, projectId) => { // This function is called by core.js
         event.preventDefault();
         if (!projectId) {
             showError('Veuillez sélectionner un projet d\'abord.');
@@ -160,7 +160,7 @@ const handleCreateStakeholder = async (event, projectId) => { // This function i
         }
 };
 
-const showEditStakeholderModal = async (projectId, stakeholderId) => {
+export const showEditStakeholderModal = async (projectId, stakeholderId) => {
         if (!projectId) {
             showError('Veuillez sélectionner un projet d\'abord.');
             return;
@@ -208,7 +208,7 @@ const showEditStakeholderModal = async (projectId, stakeholderId) => {
         }
 };
 
-const handleUpdateStakeholder = async (event, projectId, stakeholderId) => {
+export const handleUpdateStakeholder = async (event, projectId, stakeholderId) => {
         event.preventDefault();
         if (!projectId) {
             showError('Veuillez sélectionner un projet d\'abord.');
@@ -237,7 +237,7 @@ const handleUpdateStakeholder = async (event, projectId, stakeholderId) => {
         }
 };
 
-const handleDeleteStakeholder = async (projectId, stakeholderId) => {
+export const handleDeleteStakeholder = async (projectId, stakeholderId) => {
         if (!projectId) {
             showError('Veuillez sélectionner un projet d\'abord.');
             return;
@@ -277,7 +277,7 @@ export const addStakeholderGroup = async (projectId, groupData) => {
         }
 };
 
-const removeStakeholderGroup = async (projectId, groupId) => {
+export const removeStakeholderGroup = async (projectId, groupId) => {
         if (!projectId || !groupId) { // Check if projectId and groupId are valid
             showError('ID du projet et du groupe requis.');
             return false;

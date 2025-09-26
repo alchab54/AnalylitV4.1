@@ -65,7 +65,7 @@ export const API_ENDPOINTS = {
     projectRun: (id) => `/projects/${id}/run`, // ✅ CORRECTION: Endpoint manquant pour le traitement par lot
     
     // Search
-    search: '/api/search',
+    search: '/search', // ✅ CORRECTION: L'API est sur /api/search, le préfixe est ajouté par fetchAPI
     projectSearchResults: (id) => `/projects/${id}/search-results`,
     
     // Articles
@@ -88,6 +88,7 @@ export const API_ENDPOINTS = {
     projectRunAnalysis: (id) => `/projects/${id}/run-analysis`,
     projectExportAnalyses: (id) => `/projects/${id}/export/analyses`,
     projectDeleteAnalysis: (projectId, analysisType) => `/projects/${projectId}/analyses/${analysisType}`,
+    projectRunRobAnalysis: (id) => `/projects/${id}/run-rob-analysis`, // ✅ CORRECTION: Endpoint manquant
     projectPrismaChecklist: (id) => `/projects/${id}/prisma-checklist`, // ✅ CORRECTION: Endpoint manquant
     
     // Chat
@@ -100,16 +101,22 @@ export const API_ENDPOINTS = {
     prompts: '/api/prompts',
     promptById: (id) => `/api/prompts/${id}`,
     ollamaModels: '/api/ollama/models',
+    zoteroSettings: '/api/settings/zotero', // ✅ CORRECTION: Endpoint manquant
     ollamaPull: '/api/ollama/pull',
     databases: '/api/databases',
     
     // Queues
     queuesInfo: '/api/queues/info',
-    queuesClear: '/api/queues/clear'
+    queuesClear: '/api/queues/clear',
+
+    // Tasks
+    taskCancel: (id) => `/api/tasks/${id}/cancel`, // ✅ CORRECTION: Endpoint manquant
+    taskRetry: (id) => `/api/tasks/${id}/retry`, // ✅ CORRECTION: Endpoint manquant
 };
 
 API_ENDPOINTS.tasksStatus = '/api/tasks/status';
 API_ENDPOINTS.projectStakeholders = (projectId) => `/projects/${projectId}/stakeholders`;
+API_ENDPOINTS.stakeholderById = (projectId, stakeholderId) => `/projects/${projectId}/stakeholders/${stakeholderId}`; // ✅ CORRECTION: Endpoint manquant
 API_ENDPOINTS.projectStakeholderGroups = (projectId) => `/projects/${projectId}/stakeholder-groups`;
 API_ENDPOINTS.stakeholderGroupById = (projectId, groupId) => `/projects/${projectId}/stakeholder-groups/${groupId}`;
 
@@ -202,6 +209,7 @@ export const MESSAGES = {
     noAnalysisProfileFound: 'Aucun profil d\'analyse trouvé.',
     refreshingQueuesStatus: "Rafraîchissement du statut des files...",
     noPromptTemplateFound: 'Aucun modèle de prompt trouvé.',
+    cannotApplyTemplate: "Impossible d'appliquer le template ici.",
     noOllamaModelFound: 'Aucun modèle Ollama trouvé',
     aceNotLoaded: "La bibliothèque Ace n'a pas pu être chargée.",
     aceRetry: "Ace non chargé. Nouvel essai dans 100ms.",
@@ -222,6 +230,10 @@ export const MESSAGES = {
     clearButton: 'Vider',
     queueCleared: (name) => `La file "${name}" a été vidée.`, 
     promptSaved: 'Modèle de prompt sauvegardé.',
+    taskCancelRequestSent: 'Demande d\'annulation de la tâche envoyée.', // ✅ CORRECTION: Message manquant
+    taskCancelError: 'Erreur lors de l\'annulation de la tâche', // ✅ CORRECTION: Message manquant
+    taskRetrySuccess: (taskId) => `La tâche ${taskId} a été relancée.`, // ✅ CORRECTION: Message manquant
+    taskRetryError: 'Erreur lors de la nouvelle tentative de la tâche', // ✅ CORRECTION: Message manquant
     selectNotFound: "L'élément select 'available-models-select' est introuvable.",
     modelListNotFound: "Erreur : Impossible de trouver la liste des modèles.",
     modelDownloaded: (name) => `Modèle ${name} téléchargé avec succès`,

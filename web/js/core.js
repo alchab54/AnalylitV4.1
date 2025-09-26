@@ -131,9 +131,9 @@ function handleViewAnalysisResults(target) {
 const uiActions = {
     'toggle-sidebar': toggleSidebar, // This is a click action, not a submit action
     'close-modal': (target) => closeModal(target.closest('.modal')?.id),
-    'clear-notifications': () => clearNotifications(),
-    'create-project-modal': showCreateProjectModal, // CORRIGÉ: La fonction est bien showCreateProjectModal
-    'retry-task': handleRetryTask, // Correction du nom de la fonction
+    'clear-notifications': clearNotifications,
+    'create-project-modal': showCreateProjectModal,
+    'retry-task': handleRetryTask,
     'cancel-task': handleCancelTask,
     'set-active-evaluator': (target) => setActiveEvaluator(target.value),
     'show-section': (target) => showSection(target.dataset.sectionId),

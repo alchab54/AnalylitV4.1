@@ -1,18 +1,27 @@
 // Client API CORRIGÉ pour éviter les doubles /api/
 export async function fetchAPI(endpoint, options = {}) {
-    // Ne pas ajouter /api si déjà présent
     const url = endpoint.startsWith('/api/') ? endpoint : `/api${endpoint}`;
+
+    const isFormData = options.body instanceof FormData;
 
     const defaultOptions = {
         headers: {
-            'Content-Type': 'application/json',
             'Accept': 'application/json',
             ...options.headers,
         },
         ...options,
     };
 
-    if (defaultOptions.body && typeof defaultOptions.body === 'object') {
+    // Ne pas définir Content-Type pour FormData, le navigateur le fera
+    if (!isFormData) {
+        defaultOptions.headers['Content-Type'] = 'application/json';
+    } else {
+        // Supprimer le Content-Type que le navigateur doit définir lui-même
+        delete defaultOptions.headers['Content-Type'];
+    }
+
+    // Ne stringify que si ce n'est pas un FormData
+    if (defaultOptions.body && typeof defaultOptions.body === 'object' && !isFormData) {
         defaultOptions.body = JSON.stringify(defaultOptions.body);
     }
 

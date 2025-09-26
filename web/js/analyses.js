@@ -16,8 +16,15 @@ export async function loadProjectAnalyses() {
     try {
         // FIX: The analysis results are part of the main project object.
         // This was incorrect. We need to fetch the analyses for the project.
-        const analyses = await fetchAPI(API_ENDPOINTS.projectAnalyses(appState.currentProject.id));
-        setAnalysisResults(analyses);
+        const analysesArray = await fetchAPI(API_ENDPOINTS.projectAnalyses(appState.currentProject.id));
+        // Transform the array of analyses into an object with specific keys
+        const analysisResultsObject = analysesArray.reduce((acc, analysis) => {
+            if (analysis.type) {
+                acc[`${analysis.type}_result`] = analysis; // e.g., synthesis_result, discussion_draft
+            }
+            return acc;
+        }, {});
+        setAnalysisResults(analysisResultsObject);
         renderAnalysesSection();
     } catch (e) {
         // ✅ CORRECTION: Add error handling to catch the rejected promise.

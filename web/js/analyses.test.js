@@ -48,11 +48,21 @@ describe('Module Analyses', () => {
 
   describe('loadProjectAnalyses', () => {
     it('devrait charger les analyses et rendre la section', async () => {
-      // ✅ CORRECTION: Ensure the mock returns the data the function expects.
-      api.fetchAPI.mockResolvedValue(appState.currentProject);
+      // ✅ CORRECTION: The function now fetches an array of analyses, not the whole project.
+      const mockAnalysesArray = [
+        { type: 'discussion', content: 'This is a discussion.' },
+        { type: 'knowledge_graph', content: { nodes: [], edges: [] } }
+      ];
+      api.fetchAPI.mockResolvedValue(mockAnalysesArray);
+
       await analyses.loadProjectAnalyses();
 
-      expect(state.setAnalysisResults).toHaveBeenCalledWith(appState.currentProject); // Now this will pass
+      // The function transforms the array into an object.
+      const expectedResultsObject = {
+        'discussion_result': mockAnalysesArray[0],
+        'knowledge_graph_result': mockAnalysesArray[1]
+      };
+      expect(state.setAnalysisResults).toHaveBeenCalledWith(expectedResultsObject);
       expect(document.querySelector('.analysis-grid')).not.toBeNull();
       expect(document.body.innerHTML).toContain('Analyse ATN Multipartite');
     });

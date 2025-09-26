@@ -91,7 +91,7 @@ function showError(message) {
  * ✅ VERSION FINALE: Point d'entrée principal de l'application
  */
 export async function initializeApplication() {
-	if (isInitialized) return;
+	if (isInitialized) return; // Return early if already initialized
     
 	console.log('🚀 Démarrage de AnalyLit V4.1 Frontend (Version améliorée)...');
     

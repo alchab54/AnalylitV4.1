@@ -9,7 +9,7 @@ from sqlalchemy.exc import IntegrityError
 # CORRECTION : Imports propres et cohérents
 from utils.app_globals import background_queue, processing_queue, analysis_queue, discussion_draft_queue
 from utils.database import with_db_session, get_session
-from utils.models import Project, Grid, Extraction, AnalysisProfile
+from utils.models import Project, Grid, Extraction, AnalysisProfile, RiskOfBias
 from utils.file_handlers import save_file_to_project_dir
 from tasks_v4_complete import (
     run_discussion_generation_task,
@@ -323,7 +323,7 @@ def run_rob_analysis(project_id):
         task_ids.append(job.id)
     return jsonify({"message": f"{len(task_ids)} tâches d'analyse de risque de biais lancées", "task_ids": task_ids}), 202
 
-@projects_bp.route('/projects/<project_id>/rob/<article_id>', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/articles/<article_id>/rob', methods=['POST'])
 @with_db_session
 def save_rob_assessment(session, project_id, article_id):
     data = request.get_json()
@@ -332,10 +332,29 @@ def save_rob_assessment(session, project_id, article_id):
     if not assessment_data:
         return jsonify({"error": "Données d'évaluation manquantes"}), 400
 
-    # Ici, vous devriez insérer ou mettre à jour l'évaluation dans la table risk_of_bias
-    # Pour l'instant, nous allons juste retourner un succès
-    logger.info(f"Sauvegarde de l'évaluation RoB pour l'article {article_id} dans le projet {project_id}")
-    
+    # Logique "Upsert" : Mettre à jour si existant, sinon créer.
+    rob_assessment = session.query(RiskOfBias).filter_by(
+        project_id=project_id,
+        article_id=article_id
+    ).first()
+
+    if rob_assessment:
+        # Mettre à jour l'enregistrement existant
+        for key, value in assessment_data.items():
+            if hasattr(rob_assessment, key):
+                setattr(rob_assessment, key, value)
+        logger.info(f"Mise à jour de l'évaluation RoB pour l'article {article_id}")
+    else:
+        # Créer un nouvel enregistrement
+        rob_assessment = RiskOfBias(
+            project_id=project_id,
+            article_id=article_id,
+            **assessment_data
+        )
+        session.add(rob_assessment)
+        logger.info(f"Création de l'évaluation RoB pour l'article {article_id}")
+
+    session.commit()
     return jsonify({"message": "Évaluation RoB sauvegardée avec succès"}), 200
 
 @projects_bp.route('/projects/<project_id>/add-manual-articles', methods=['POST'])

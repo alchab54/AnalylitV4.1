@@ -23,6 +23,10 @@ describe('Module Constants - Configuration centralisée', () => {
       expect(API_ENDPOINTS.projects).toBe('/projects/');
       expect(API_ENDPOINTS.databases).toBe('/api/databases');
       expect(API_ENDPOINTS.analysisProfiles).toBe('/api/analysis-profiles');
+      // Test dynamic endpoints
+      expect(API_ENDPOINTS.projectById('123')).toBe('/projects/123');
+      expect(API_ENDPOINTS.gridById('proj1', 'grid2')).toBe('/projects/proj1/grids/grid2');
+      expect(API_ENDPOINTS.projectExport('456')).toBe('/projects/456/export');
     });
 
     test('les fonctions d\'endpoints dynamiques devraient fonctionner', () => {
@@ -42,6 +46,10 @@ describe('Module Constants - Configuration centralisée', () => {
       // Vérification que les messages ne sont pas vides
       expect(MESSAGES.projectCreated).not.toBe('');
       expect(MESSAGES.loading).not.toBe('');
+      // Test dynamic messages
+      const projectName = 'Test Project';
+      const confirmMessage = MESSAGES.confirmDeleteBody('le projet', projectName);
+      expect(confirmMessage).toContain(projectName);
     });
 
     test('les fonctions de messages dynamiques devraient fonctionner', () => {

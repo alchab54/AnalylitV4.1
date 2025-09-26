@@ -9,15 +9,15 @@ import { appState, elements } from './app-improved.js';
 
 // Mocker les dépendances
 jest.mock('./api.js');
-jest.mock('./ui-improved.js', () => ({ // Full mock
+jest.mock('./ui-improved.js', () => ({
   showToast: jest.fn(),
   showError: jest.fn(),
   showSuccess: jest.fn(),
-  renderProjectCards: jest.fn(),
   showLoadingOverlay: jest.fn(),
   closeModal: jest.fn(),
   showConfirmModal: jest.fn(),
-  escapeHtml: (str) => str, // Keep a simple implementation for escapeHtml
+  escapeHtml: (str) => str, // Keep this for safety
+  renderProjectCards: jest.fn(),
 }));
 jest.mock('./state.js');
 jest.mock('./app-improved.js', () => ({

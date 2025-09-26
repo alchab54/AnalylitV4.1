@@ -743,7 +743,7 @@ function renderProfileForm(profile) {
     });
 
     // Gérer le bouton de suppression
-    const deleteBtn = document.querySelector('#delete-profile-btn'); 
+    const deleteBtn = document.querySelector('#delete-profile-btn');
     if (profile.is_default || profile.id.startsWith('new_')) {
         deleteBtn.disabled = true;
         deleteBtn.title = profile.is_default ? MESSAGES.cannotDeleteDefaultProfile : "";
@@ -754,8 +754,8 @@ function renderProfileForm(profile) {
 
     // Charger les prompts dans les éditeurs Ace
     promptTypes.forEach(type => {
-        let promptKey = (type === 'stakeholder') ? 'stakeholder_analysis_prompt' : `${type}_prompt`;
-        const dbContent = profile[promptKey] || "{}";
+        const promptKey = (type === 'stakeholder') ? 'stakeholder_analysis_prompt' : `${type}_prompt`;
+        const dbContent = profile[promptKey] || "{}"; // Assuming it's a JSON string
         let promptData = { system: "", user: "" };
 
         try {
@@ -763,7 +763,8 @@ function renderProfileForm(profile) {
             promptData.system = parsedData.system || "";
             promptData.user = parsedData.user || "";
         } catch (e) {
-            promptData.system = dbContent; // Ancien format texte
+            // If parsing fails, assume it's plain text for system prompt and empty user prompt
+            promptData.system = dbContent;
             promptData.user = "";
         }
 
