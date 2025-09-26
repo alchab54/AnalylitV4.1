@@ -1,45 +1,38 @@
 import time
 import pytest
-import threading
+import uuid
 from rq import Worker, Queue, Connection
-from redis import Redis
+from redis import from_url
+from utils.models import Extraction, Project, AnalysisProfile # Import pour le setup
 
 POLL_TIMEOUT = 5.0
 POLL_STEP = 0.2
 
-@pytest.fixture(scope="module")
-def background_worker():
-    """Démarre un worker RQ en arrière-plan pour la durée des tests du module."""
-    redis_conn = Redis(host="redis", port=6379, db=0)
-    stop_flag = {"stop": False}
-
-    def run():
-        with Connection(redis_conn):
-            # Écoute sur les files utilisées par l'application
-            queues = [Queue("high"), Queue("default"), Queue("low"), Queue("background_queue")]
-            worker = Worker(queues)
-            # Boucle non bloquante
-            while not stop_flag["stop"]:
-                worker.work(burst=True)
-                time.sleep(0.1)
-
-    t = threading.Thread(target=run, daemon=True)
-    t.start()
-    try:
-        yield
-    finally:
-        stop_flag["stop"] = True
-        t.join(timeout=2.0)
+@pytest.fixture
+def setup_project(db_session):
+    """Crée un projet avec un profil d'analyse par défaut."""
+    # Rendre le nom du profil unique pour chaque test pour éviter les conflits.
+    profile = AnalysisProfile(name=f"Default Test Profile {uuid.uuid4()}")
+    db_session.add(profile)
+    db_session.flush() # Assure que le profil a un ID avant de l'assigner.
+    
+    # Créer le projet et l'associer au profil.
+    project = Project(id=str(uuid.uuid4()), name="Test Project for API")
+    project.analysis_profile = profile
+    
+    db_session.add(project)
+    db_session.commit()
+    return project.id
 
 @pytest.mark.integration
-def test_enqueue_and_complete_via_api(client, test_project, background_worker):
+def test_enqueue_and_complete_via_api(client, setup_project):
     """
     Teste le cycle de vie complet d'une tâche : envoi via API, 
     exécution par le worker, et vérification du statut.
     """
     # 1. Enqueue une tâche simple via l'API de recherche
     search_data = {
-        "project_id": test_project.id,
+        "project_id": setup_project,
         "query": "test query",
         "databases": ["pubmed"],
         "max_results_per_db": 1
@@ -49,6 +42,21 @@ def test_enqueue_and_complete_via_api(client, test_project, background_worker):
     data = resp.get_json()
     task_id = data.get("task_id")
     assert task_id
+
+    # Attendre que le job apparaisse dans la file pour éviter une race condition
+    redis_conn = from_url("redis://redis:6379/0")
+    with Connection(redis_conn):
+        q = Queue('background_queue') # La recherche est dans la background_queue
+        
+        # Poll the queue until the job is there
+        start_wait = time.time()
+        while len(q) == 0 and time.time() - start_wait < POLL_TIMEOUT:
+            time.sleep(POLL_STEP)
+        
+        assert len(q) > 0, "Le job n'est jamais apparu dans la file d'attente."
+
+        worker = Worker([q], connection=redis_conn)
+        worker.work(burst=True)
 
     # 2. Poll le statut de la tâche jusqu'à sa complétion
     start = time.time()
@@ -65,18 +73,30 @@ def test_enqueue_and_complete_via_api(client, test_project, background_worker):
     assert status in ("finished", "success", "completed")
 
 @pytest.mark.integration
-def test_failed_task_via_api(client, test_project, background_worker):
+def test_failed_task_via_api(client, setup_project, db_session):
     """
     Teste qu'une tâche qui échoue est correctement marquée comme "failed".
     Nous utilisons un endpoint qui peut échouer si les conditions ne sont pas réunies.
     """
-    # 1. Enqueue une tâche qui va échouer (ex: analyse sans données)
-    resp = client.post(f"/api/projects/{test_project.id}/run-analysis", json={"type": "discussion"})
+    # 1. Setup: Ajouter une extraction pour que la requête soit valide
+    extraction = Extraction(project_id=setup_project, pmid="pmid_for_fail_test", relevance_score=8.0, extracted_data='{"conclusion": "This is a valid conclusion.", "limites": "Some limits."}')
+    db_session.add(extraction)
+    db_session.commit()
+
+    # 2. Enqueue une tâche qui va échouer (ex: analyse de discussion)
+    resp = client.post(f"/api/projects/{setup_project}/run-analysis", json={"type": "discussion"})
     assert resp.status_code == 202
     task_id = resp.get_json().get("job_id")
     assert task_id
 
-    # 2. Poll le statut jusqu'à ce qu'il soit "failed"
+    # 3. Exécuter le worker
+    redis_conn = from_url("redis://redis:6379/0")
+    with Connection(redis_conn):
+        q = Queue('analysis_queue')
+        worker = Worker([q], connection=redis_conn)
+        worker.work(burst=True)
+
+    # 4. Poll le statut jusqu'à ce qu'il soit "failed"
     start = time.time()
     status = None
     error_msg = None
@@ -102,10 +122,10 @@ def test_queues_info_exposes_reality(client):
     if r.status_code == 200:
         info = r.get_json()
         assert isinstance(info, dict)
-        assert "queues" in info
-        assert "workers" in info
+        # La structure de l'API a changé, on vérifie la nouvelle structure
+        assert isinstance(info.get('queues'), list)
         
         # Vérifie la structure des données des files
-        for q_name, meta in info["queues"].items():
-            assert "pending" in meta
-            assert "display" in meta
+        for queue_info in info['queues']:
+            assert "name" in queue_info
+            assert "size" in queue_info
