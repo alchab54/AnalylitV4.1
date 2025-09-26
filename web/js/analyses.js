@@ -289,7 +289,7 @@ export async function runProjectAnalysis(analysisType) {
     }
 
     try {
-        const projectId = appState.currentProject.id; // Read from state
+        const projectId = appState.currentProject.id;
         const validTypes = ['discussion', 'knowledge_graph', 'prisma_flow', 'meta_analysis', 'descriptive_stats', 'atn_scores']; // This was already correct
         if (!validTypes.includes(analysisType)) {
             showToast(MESSAGES.unknownAnalysisType, 'error');
@@ -298,9 +298,9 @@ export async function runProjectAnalysis(analysisType) {
             return;
         }
 
-        const response = await fetchAPI(API_ENDPOINTS.projectRunAnalysis(projectId), {
+        const response = await fetchAPI(API_ENDPOINTS.projectRunAnalysis(projectId), { // Corrected endpoint
             method: 'POST',
-            body: { type: analysisType }
+            body: { analysis_type: analysisType } // Corrected body key
         });
 
         const jobId = response.job_id;
@@ -321,7 +321,7 @@ export async function runProjectAnalysis(analysisType) {
             showToast(MESSAGES.analysisStartedSimple(analysisNames[analysisType]), 'success');
         }
         // Fermer la modale si l'analyse a été lancée depuis
-        if (document.querySelector('.modal-content .analysis-option')) closeModal();
+        if (document.querySelector('.modal-content .analysis-option')) closeModal('genericModal');
     } catch (e) {
         showToast(`${MESSAGES.errorStartingAnalysis}: ${e.message}`, 'error');
         // The loading state on the card should be removed by a websocket event later

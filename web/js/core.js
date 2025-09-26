@@ -402,8 +402,10 @@ export async function refreshCurrentSection() {
             break;
         case 'analyses':
             // ✅ CORRECTION CRITIQUE: Appeler renderAnalysesSection() 
-            console.log('🔧 Refreshing analyses section');
-            renderAnalysesSection(); // APPEL MANQUANT !
+            if (appState.currentProject) {
+                console.log('🔧 Refreshing analyses section');
+                loadProjectAnalyses();
+            }
             break;
         case 'import':
             renderImportSection(appState.currentProject); // This is correct for 'import'

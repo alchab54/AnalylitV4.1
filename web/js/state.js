@@ -1,6 +1,6 @@
 // web/js/state.js
 /**
- * État global de l'application AnalyLit
+ * État global de l'application AnalyLit V4.1
  * Gestion centralisée des données et de l'état
  */
 
@@ -36,7 +36,7 @@ export const appState = {
     ollamaModels: [], // Added
     selectedProfileId: null, // Added
     availableDatabases: [], // Added
-    unreadNotifications: 0, // Added
+    notificationCount: 0,
 
     // Paramètres et configuration
     settings: {
@@ -64,7 +64,7 @@ export const appState = {
     // Données spécifiques à une section
     searchResults: [],
     currentProjectExtractions: [],
-    currentValidations: [],
+    currentValidations: [], // Added
     chatMessages: [], // Added
     screeningDecisions: [],
     activeEvaluator: 'evaluator1', // Added default evaluator
@@ -84,10 +84,14 @@ export function initializeState() {
     appState.projects = [];
     appState.currentProject = null;
     appState.currentProjectFiles = new Set();
+    appState.searchResults = [];
+    appState.selectedSearchResults = new Set();
     
     // État initial de l'interface
     appState.currentSection = 'projects';
     appState.isLoading = false;
+    appState.isConnected = false;
+    appState.notificationCount = 0;
     
     // Réinitialiser les caches
     appState.cache.articles.clear();
@@ -102,7 +106,7 @@ export function initializeState() {
  * @param {string} status - 'connected', 'connecting', 'disconnected'
  */
 export function setConnectionStatus(status) {
-    if (appState.connectionStatus !== status) {
+    if (appState.connectionStatus !== status) { // This was checking against isConnected
         appState.connectionStatus = status;
         console.log(`🔗 Statut de connexion: ${status}`);
         
@@ -111,6 +115,7 @@ export function setConnectionStatus(status) {
             detail: { status }
         }));
     }
+    appState.isConnected = (status === 'connected');
 }
 
 /**
@@ -319,6 +324,17 @@ export function setAvailableDatabases(databases) {
     }));
 }
 
+/**
+ * Met à jour le compteur de notifications
+ * @param {number} count - Le nouveau nombre de notifications
+ */
+export function setNotificationCount(count) {
+    appState.notificationCount = count;
+}
+
+export function incrementNotificationCount() {
+    appState.notificationCount++;
+}
 
 /**
  * Met à jour les fichiers du projet actuel (Set de noms de fichiers)
@@ -580,24 +596,17 @@ export function setUnreadNotificationsCount(count) {
 // Export par défaut
 export default appState;
 
-// Ajoutez ces fonctions à la fin de votre fichier web/js/state.js
-
-/**
- * Gère la sélection d'articles pour validation
- */
-export const selectedArticles = new Set();
-
 /**
  * Ajoute un article à la sélection
  * @param {string|number} articleId - ID de l'article
  */
 export function addSelectedArticle(articleId) {
-    selectedArticles.add(articleId);
+    appState.selectedSearchResults.add(articleId);
     console.log(`📄 Article ajouté à la sélection: ${articleId}`);
     
     // Émettre un événement
     window.dispatchEvent(new CustomEvent('articles-selection-changed', {
-        detail: { selectedIds: Array.from(selectedArticles) }
+        detail: { selectedIds: Array.from(appState.selectedSearchResults) }
     }));
 }
 
@@ -606,12 +615,12 @@ export function addSelectedArticle(articleId) {
  * @param {string|number} articleId - ID de l'article
  */
 export function removeSelectedArticle(articleId) {
-    selectedArticles.delete(articleId);
+    appState.selectedSearchResults.delete(articleId);
     console.log(`📄 Article retiré de la sélection: ${articleId}`);
     
     // Émettre un événement
     window.dispatchEvent(new CustomEvent('articles-selection-changed', {
-        detail: { selectedIds: Array.from(selectedArticles) }
+        detail: { selectedIds: Array.from(appState.selectedSearchResults) }
     }));
 }
 
@@ -619,7 +628,7 @@ export function removeSelectedArticle(articleId) {
  * Vide la sélection d'articles
  */
 export function clearSelectedArticles() {
-    selectedArticles.clear();
+    appState.selectedSearchResults.clear();
     console.log('🗑️ Sélection d\'articles vidée');
     
     // Émettre un événement
@@ -634,7 +643,7 @@ export function clearSelectedArticles() {
  * @returns {boolean}
  */
 export function isArticleSelected(articleId) {
-    return selectedArticles.has(articleId);
+    return appState.selectedSearchResults.has(articleId);
 }
 
 /**
@@ -642,7 +651,7 @@ export function isArticleSelected(articleId) {
  * @returns {Array} IDs des articles sélectionnés
  */
 export function getSelectedArticles() {
-    return Array.from(selectedArticles);
+    return Array.from(appState.selectedSearchResults);
 }
 
 /**
@@ -652,16 +661,16 @@ export function getSelectedArticles() {
  */
 export function toggleAllArticles(articleIds, select = true) {
     if (select) {
-        articleIds.forEach(id => selectedArticles.add(id));
+        articleIds.forEach(id => appState.selectedSearchResults.add(id));
         console.log(`📄 ${articleIds.length} articles sélectionnés`);
     } else {
-        selectedArticles.clear();
+        appState.selectedSearchResults.clear();
         console.log('📄 Tous les articles désélectionnés');
     }
     
     // Émettre un événement
     window.dispatchEvent(new CustomEvent('articles-selection-changed', {
-        detail: { selectedIds: Array.from(selectedArticles) }
+        detail: { selectedIds: Array.from(appState.selectedSearchResults) }
     }));
 }
 
@@ -840,7 +849,7 @@ if (typeof window !== 'undefined') {
         getCurrentProjectGrids,
         
         // Articles selection
-        selectedArticles,
+        selectedArticles: appState.selectedSearchResults,
         addSelectedArticle,
         removeSelectedArticle,
         clearSelectedArticles,

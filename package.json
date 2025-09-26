@@ -8,9 +8,9 @@
     "test:unit": "jest --config jest.config.cjs --coverage --verbose",
     "test:unit:watch": "jest --config jest.config.cjs --watch --coverage",
     "test:e2e": "cypress run --headless",
-    "test:e2e:open": "cypress open",
-    "test:all": "npm run test:unit && npm run test:e2e",
-    "install-deps": "npm install"
+    "test:e2e:open": "cypress open",    "test:all": "npm run test:unit && npm run test:e2e",
+    "install-deps": "npm install",
+    "test:validate": "npm run test:unit && node scripts/validate-coverage.js"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.28.3",

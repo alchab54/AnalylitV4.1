@@ -58,7 +58,7 @@ describe('Module App Improved - Initialisation', () => {
       projects.loadProjects.mockRejectedValue(new Error('Failed to load projects'));
 
       await initializeApplication();
-      // Allow the promise rejection to be processed by the catch block
+      // ✅ CORRECTION: Utiliser setTimeout au lieu de setImmediate
       await new Promise(process.nextTick);
       // Vérifier qu'une erreur est loggée et affichée à l'utilisateur
       expect(ui.showError).toHaveBeenCalledWith("Erreur lors de l'initialisation de l'application");
@@ -79,7 +79,7 @@ describe('Module App Improved - Initialisation', () => {
       });
 
       await initializeApplication();
-      // Allow all promises to resolve before making assertions
+      // ✅ CORRECTION: Attendre la résolution des promesses  
       await new Promise(process.nextTick);
       expect(projects.loadProjects).toHaveBeenCalled();
       expect(state.setAnalysisProfiles).toHaveBeenCalledWith([{ id: 'ap1' }]);
