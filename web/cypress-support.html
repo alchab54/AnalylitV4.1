@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnalyLit v4.1 - Tests Cypress</title>
+    
+    <!-- CSS MINIMAL POUR TESTS -->
+    <link rel="stylesheet" href="css/frontend-fix.css">
+    
+    <!-- PAS de scripts externes lourds pour les tests -->
+</head>
+<body data-test-mode="true">
+    <!-- Structure minimale pour tests -->
+    <header class="app-header">
+        <div class="container">
+            <h1 class="app-header__title">🧬 AnalyLit v4.1</h1>
+        </div>
+    </header>
+
+    <nav class="app-nav">
+        <div class="container">
+            <button class="app-nav__button app-nav__button--active" data-action="show-section" data-section-id="projects">
+                📁 Projets
+            </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="search">
+                🔍 Recherche
+            </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="validation">
+                ✅ Validation
+            </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="analyses">
+                📊 Analyses
+            </button>
+        </div>
+    </nav>
+
+    <main class="app-main">
+        <div class="container">
+            <section id="projects" class="app-section active">
+                <div class="section-header">
+                    <h2>Gestion des Projets</h2>
+                    <div class="section-header__actions">
+                        <button id="create-project-btn" class="btn btn-primary" data-action="create-project-modal">
+                            ➕ Nouveau Projet
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="projects-list" class="projects-grid">
+                    <!-- Projets test -->
+                </div>
+            </section>
+
+            <section id="search" class="app-section">
+                <h2>Recherche</h2>
+            </section>
+
+            <section id="validation" class="app-section">
+                <h2>Validation</h2>
+            </section>
+
+            <section id="analyses" class="app-section">
+                <h2>Analyses</h2>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modale test -->
+    <div id="newProjectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Créer un Nouveau Projet</h3>
+                <button class="modal-close" data-action="close-modal">×</button>
+            </div>
+            <form id="createProjectForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="projectName">Nom du projet</label>
+                        <input type="text" id="projectName" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" data-action="close-modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Créer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts minimaux pour tests -->
+    <script src="js/cypress-test-support.js"></script>
+</body>
+</html>

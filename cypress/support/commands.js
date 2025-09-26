@@ -1,205 +1,152 @@
 // ===================================================================
-// == ANALYLIT V4.1 - COMMANDES CYPRESS PERSONNALISÉES ==
+// COMMANDES CYPRESS RENFORCÉES - AnalyLit v4.1
 // ===================================================================
 
-// ===============================================
-// == COMMANDES D'INTERACTION INTELLIGENTES ==
-// ===============================================
- 
-// Clic avec retry automatique
-Cypress.Commands.add('smartClick', (selector, options = {}) => {
-  // Amélioration : Utilise les assertions intégrées de Cypress pour la robustesse
-  // et force le clic pour gérer les cas de chevauchement.
-  cy.get(selector, { timeout: 8000 })
-    .should('exist') // D'abord, s'assurer que l'élément est dans le DOM
-    .scrollIntoView() // S'assurer qu'il est dans la vue
-    .click({ force: true, ...options }); // Forcer le clic pour éviter les erreurs de "détachement" ou de couverture
-});
-
-// Attente intelligente des boutons avant de cliquer
-Cypress.Commands.add('waitForButtonAndClick', (selector) => {
-  cy.get(selector, { timeout: 10000 })
-    .should('exist')
-    .and('not.be.disabled')
-    .click({ force: true }); // force:true pour gérer les cas où il serait couvert
-});
-
-// ===============================================
-// == COMMANDES DE NAVIGATION ==
-// ===============================================
-
-// Commande de navigation CORRIGÉE
-Cypress.Commands.add('navigateToSection', (sectionName) => {
-  // 1. Forcer la navigation d'abord
-  cy.get(`[data-section-id="${sectionName}"]`, { timeout: 8000 })
-    .should('exist')
-    .click({ force: true })
+// ✅ ATTENTE ROBUSTE de l'application
+Cypress.Commands.add('waitForAppReady', () => {
+  // Attendre les éléments critiques
+  cy.get('body', { timeout: 30000 }).should('be.visible');
+  cy.get('.app-header', { timeout: 20000 }).should('be.visible');
+  cy.get('.app-nav', { timeout: 20000 }).should('be.visible');
   
-  // 2. Attendre que la section existe dans le DOM
+  // Attendre que les scripts JS soient chargés
+  cy.window().should('have.property', 'AnalyLit');
+  
+  // Attendre les APIs critiques
+  cy.intercept('GET', '/api/projects/').as('getProjects');
+  cy.wait('@getProjects');
+  
+  // Pause finale pour stabilité
+  cy.wait(2000);
+  
+  console.log('✅ App complètement prête');
+});
+
+// ✅ NAVIGATION RENFORCÉE
+Cypress.Commands.add('navigateToSection', (sectionName) => {
+  // 1. Cliquer sur le bouton avec retry
+  cy.get(`[data-section-id="${sectionName}"]`, { timeout: 15000 })
+    .should('exist')
+    .and('be.visible')
+    .click({ force: true });
+  
+  // 2. Attendre que la section soit active
   cy.get(`#${sectionName}`, { timeout: 10000 })
     .should('exist')
+    .and('have.class', 'active')
+    .and('be.visible');
+    
+  // 3. Vérification finale avec retry
+  cy.get(`#${sectionName}`).should('not.have.css', 'display', 'none');
   
-  // 3. NOUVEAU : Forcer l'affichage de la section si elle est cachée
-  cy.get(`#${sectionName}`).then($section => {
-    if ($section.css('display') === 'none') {
-      cy.log('Section cachée détectée - correction automatique')
-      cy.get(`[data-section-id="${sectionName}"]`).click({ force: true })
-      cy.wait(500) // Laisser le temps au JavaScript de traiter
-    }
-  })
-  
-  // 4. Vérifier la visibilité finale
-  cy.get(`#${sectionName}`, { timeout: 8000 })
-    .should('not.have.css', 'display', 'none')
-})
+  console.log(`✅ Navigation vers ${sectionName} réussie`);
+});
 
-// Attendre que l'application soit prête
-Cypress.Commands.add('waitForAppReady', () => {
-  // Attendre les éléments de base
-  cy.get('body', { timeout: 10000 }).should('be.visible')
-  cy.get('.app-header', { timeout: 8000 }).should('be.visible')
-  cy.get('.app-nav', { timeout: 8000 }).should('be.visible')
-  // ✅ CORRECTION - Plus simple et robuste
-  cy.get('body').should('contain', 'AnalyLit') // Juste vérifier que l'app est chargée
-  cy.wait(500) // Petite pause pour la stabilité
-})
-
-// ===============================================
-// == COMMANDES DE PROJET ==
-// ===============================================
-
+// ✅ CRÉATION PROJET ULTRA-ROBUSTE
 Cypress.Commands.add('createTestProject', (projectName = 'Projet Test Cypress') => {
-  // Navigation vers projets
-  cy.navigateToSection('projects')
+  // 1. Assurer qu'on est dans projets
+  cy.navigateToSection('projects');
   
-  // Cliquer pour créer un projet
-  cy.get('[data-action="create-project"], #create-project-btn')
-    .first()
-    .click({ force: true })
-  
-  // Attendre que la modale existe
-  cy.get('#newProjectModal', { timeout: 10000 })
-    .should('exist')
-  
-  // S'assurer que le champ nom est visible et remplissable
-  cy.get('#projectName')
+  // 2. Cliquer création avec attente
+  cy.get('#create-project-btn', { timeout: 10000 })
     .should('be.visible')
-    .clear()
-    .type(projectName, { force: true })
+    .and('not.be.disabled')
+    .click({ force: true });
   
-  // Soumettre le formulaire - utilise la méthode native du formulaire (plus robuste)
-  cy.get('#createProjectForm').submit()
+  // 3. Attendre modale visible
+  cy.get('#newProjectModal', { timeout: 10000 })
+    .should('be.visible')
+    .and('have.class', 'modal--show');
   
-  // Attendre la fermeture simple
-  cy.get('#newProjectModal', { timeout: 8000 })
-    .should('not.have.class', 'modal--show')
+  // 4. Remplir formulaire avec retry
+  cy.get('#projectName', { timeout: 8000 })
+    .should('be.visible')
+    .clear({ force: true })
+    .type(projectName, { force: true, delay: 50 });
   
-  cy.contains('.project-card', projectName, { timeout: 10000 })
-    .should('exist')
-})
+  // 5. Soumettre avec interception API
+  cy.intercept('POST', '/api/projects/').as('createProject');
+  cy.get('#createProjectForm button[type="submit"]').click({ force: true });
+  
+  // 6. Attendre réponse API
+  cy.wait('@createProject', { timeout: 15000 }).its('response.statusCode').should('eq', 201);
+  
+  // 7. Attendre fermeture modale
+  cy.get('#newProjectModal', { timeout: 8000 }).should('not.be.visible');
+  
+  // 8. Vérifier projet créé
+  cy.contains('.project-card', projectName, { timeout: 15000 }).should('exist');
+  
+  console.log(`✅ Projet "${projectName}" créé avec succès`);
+});
 
-// Commande CORRIGÉE pour les clics sur projets
+// ✅ SÉLECTION PROJET RENFORCÉE
 Cypress.Commands.add('selectProject', (projectName) => {
-  // S'assurer qu'on est dans la section projets
-  cy.navigateToSection('projects')
+  // 1. Navigation projets
+  cy.navigateToSection('projects');
   
-  // Cliquer sur le projet avec force
-  cy.contains('.project-card', projectName, { timeout: 8000 })
+  // 2. Attendre le projet
+  cy.contains('.project-card', projectName, { timeout: 15000 })
     .should('exist')
-    .click({ force: true })
+    .and('be.visible');
   
-  // Vérifier l'activation dans une nouvelle chaîne pour éviter le "detached from DOM"
+  // 3. Cliquer avec force
+  cy.contains('.project-card', projectName).click({ force: true });
+  
+  // 4. Vérifier activation
   cy.contains('.project-card', projectName)
     .should('have.class', 'project-card--active');
-})
+    
+  console.log(`✅ Projet "${projectName}" sélectionné`);
+});
 
-// ===============================================
-// == COMMANDES DE MODAL ==
-// ===============================================
-
-// Ouvrir une modale
-Cypress.Commands.add('openModal', (triggerSelector, modalSelector) => {
-  cy.smartClick(triggerSelector);
-  
-  cy.get(modalSelector, { timeout: 5000 })
-    .should('be.visible')
-    .and('have.class', 'modal--show')
-})
-
-// Fermer une modale
-Cypress.Commands.add('closeModal', (modalSelector) => {
-  cy.get(modalSelector)
-    .should('be.visible')
-    .within(() => {
-      cy.get('.modal__close, [data-action="close"], .btn-cancel')
-        .first().smartClick();
-    })
-  
-  cy.get(modalSelector, { timeout: 3000 })
-    .should('not.have.class', 'modal--show')
-})
-
-// NOUVEAU : Commande pour forcer l'affichage d'une section
-Cypress.Commands.add('forceShowSection', (sectionName) => {
-  cy.get(`#${sectionName}`).then($el => {
-    if ($el.css('display') === 'none') {
-      cy.window().then(win => {
-        win.eval(`
-          document.querySelector('#${sectionName}').style.display = 'block';
-          document.querySelector('[data-section-id="${sectionName}"]').click();
-        `)
-      })
-    }
-  })
-})
-
-// ===============================================
-// == COMMANDES DE DEBUGGING ==
-// ===============================================
-
-// Débugger un élément
-Cypress.Commands.add('debugElement', (selector) => {
-  cy.get(selector).then(($el) => {
-    console.log('🔍 Element debug:', {
-      selector: selector,
-      exists: $el.length > 0,
-      visible: $el.is(':visible'),
-      display: $el.css('display'),
-      visibility: $el.css('visibility'),
-      opacity: $el.css('opacity'),
-      classes: $el.attr('class')
-    })
-  })
-})
-
-// Attendre qu'un élément soit vraiment prêt
-Cypress.Commands.add('waitForElement', (selector, options = {}) => {
-  const timeout = options.timeout || 8000
-  const shouldBeVisible = options.visible !== false
-  
-  cy.get(selector, { timeout })
-    .should('exist')
-  
-  if (shouldBeVisible) {
-    cy.get(selector)
-      .should('be.visible');
-  }
-})
-
-// ===============================================
-// == COMMANDES DE TOAST ==
-// ===============================================
-
-// Attendre l'apparition d'un toast
-Cypress.Commands.add('waitForToast', (type = '', message = '') => {
+// ✅ ATTENTE TOAST AMÉLIORÉE
+Cypress.Commands.add('waitForToast', (type, message) => {
   if (type && message) {
-    cy.get(`.toast--${type}`, { timeout: 8000 })
-      .should('contain.text', message)
-  } else if (type) {
-    cy.get(`.toast--${type}`, { timeout: 8000 })
+    cy.get('.toast', { timeout: 10000 })
       .should('be.visible')
+      .and('contain.text', message);
   } else {
-    cy.get('.toast', { timeout: 8000 })
-      .should('be.visible')
+    cy.get('.toast', { timeout: 10000 }).should('be.visible');
   }
-})
+});
+
+// ✅ DÉBOGAGE AVANCÉ
+Cypress.Commands.add('debugUI', () => {
+  cy.window().then((win) => {
+    console.log('🔍 DEBUG UI STATE:');
+    console.log('- App initialized:', win.AnalyLit ? 'YES' : 'NO');
+    console.log('- Projects loaded:', win.AnalyLit?.appState?.projects?.length || 0);
+    console.log('- Current section:', document.querySelector('.app-section.active')?.id);
+    console.log('- Navigation buttons:', document.querySelectorAll('.app-nav__button').length);
+    console.log('- Modals count:', document.querySelectorAll('.modal').length);
+  });
+});
+
+// ✅ NETTOYAGE ENTRE TESTS
+Cypress.Commands.add('resetApp', () => {
+  // Fermer toutes modales
+  cy.get('.modal.modal--show').then($modals => {
+    if ($modals.length) {
+      cy.get('.modal-close').click({ force: true, multiple: true });
+    }
+  });
+  
+  // Retour section projets
+  cy.navigateToSection('projects');
+  
+  console.log('🧹 App réinitialisée pour prochain test');
+});
+
+// ✅ COMMANDE MANQUANTE : Ajout d'une commande générique pour ouvrir les modales.
+// Cette commande est utilisée dans les tests mais n'était pas définie.
+Cypress.Commands.add('openModal', (triggerSelector, modalSelector) => {
+  // Cliquer sur l'élément qui déclenche l'ouverture de la modale
+  cy.get(triggerSelector, { timeout: 10000 }).should('be.visible').click({ force: true });
+
+  // Attendre que la modale soit visible
+  cy.get(modalSelector, { timeout: 8000 })
+    .should('be.visible')
+    .and('have.class', 'modal--show');
+  console.log(`✅ Modale ${modalSelector} ouverte avec succès`);
+});

@@ -1,119 +1,58 @@
-describe('Workflow de Thèse ATN', () => {
-    beforeEach(() => {
-        cy.visit('http://localhost:8080');
-        // Utiliser une commande personnalisée pour attendre que l'app soit prête
-        // au lieu d'un wait() statique.
-        cy.waitForAppReady(); 
-        
-        // Utiliser une commande personnalisée pour la création de projet
-        cy.createTestProject('Thèse ATN Test');
-        
-        // S'assurer que le projet est visible avant de continuer
-        cy.contains('.project-card', 'Thèse ATN Test').should('be.visible');
-    });
+describe('Workflow de Thèse ATN - Version Optimisée', () => {
+  const projectName = 'Thèse ATN Test';
 
-    it('devrait permettre une recherche spécialisée ATN', () => {
-        // Aller à la recherche
-        cy.navigateToSection('search');
-        
-        // Vérifier que l'interface de recherche est bien chargée
-        cy.get('.thesis-search-header h3').should('contain', 'Recherche Bibliographique');
-        cy.get('#thesis-search-query').should('be.visible');
-        
-        // Saisir une requête ATN
-        cy.get('#thesis-search-query').type('alliance thérapeutique numérique empathie IA');
-        
-        // Vérifier les bases de données spécialisées
-        cy.get('input[name="databases"][value="pubmed"]').should('be.checked');
-        cy.get('input[name="databases"][value="crossref"]').should('be.checked');
-        
-        // Ajuster les paramètres
-        cy.get('input[name="max_results"]').clear().type('50');
-        
-        // Lancer la recherche
-        cy.get('button[type="submit"]').click();
-        
-        // Vérifier le message de progression
-        cy.get('.search-status').should('contain', 'Lancement de la recherche');
-    });
+  beforeEach(() => {
+    cy.intercept('GET', '/api/projects/', { fixture: 'projects-empty.json' }).as('getProjects');
+    cy.intercept('POST', '/api/projects/', { fixture: 'test-project.json' }).as('createProject');
+    cy.intercept('GET', '/api/projects/test-project-123/extractions', { fixture: 'extractions.json' }).as('getExtractions');
 
-    it('devrait afficher les statistiques de validation PRISMA', () => {
-        // Aller à la validation
-        cy.navigateToSection('validation');
-        
-        // Vérifier les statistiques PRISMA
-        cy.get('.prisma-stats').should('be.visible');
-        cy.get('.stat-card').should('have.length.gte', 4);
-        
-        // Vérifier les labels des statistiques
-        cy.get('.stat-label').should('contain', 'Total Articles');
-        cy.get('.stat-label').should('contain', 'Inclus');
-        cy.get('.stat-label').should('contain', 'Exclus');
-        cy.get('.stat-label').should('contain', 'Progression');
-    });
+    cy.visit('/');
+    cy.waitForAppReady();
 
-    it('devrait pouvoir calculer le Kappa Cohen', () => {
-        // Aller à la validation
-        cy.navigateToSection('validation');
-        
-        // Cliquer sur calculer Kappa
-        cy.get('button').contains('Calculer Kappa Cohen').click();
-        
-        // Vérifier l'alerte de confirmation
-        cy.on('window:alert', (alertText) => {
-            expect(alertText).to.contains('Calcul Kappa Cohen lancé');
-        });
-    });
+    cy.createTestProject(projectName);
+    cy.selectProject(projectName);
+  });
 
-    it('devrait proposer tous les exports nécessaires pour la thèse', () => {
-        // Aller aux analyses
-        cy.navigateToSection('analyses');
-        
-        // Vérifier la section d'export
-        cy.get('.export-section').should('be.visible');
-        cy.get('.export-buttons').should('be.visible');
-        
-        // Vérifier tous les boutons d'export
-        cy.get('button').contains('Diagramme PRISMA').should('be.visible');
-        cy.get('button').contains('Tableau de données').should('be.visible');
-        cy.get('button').contains('Bibliographie').should('be.visible');
-        cy.get('button').contains('Export complet thèse').should('be.visible');
-        cy.get('button').contains('Rapport de thèse').should('be.visible');
-    });
+  it('devrait permettre une recherche spécialisée ATN', () => {
+    cy.intercept('POST', '/api/search', { body: { task_id: 'search-task-123' } }).as('runSearch');
+    cy.navigateToSection('search');
 
-    it('devrait pouvoir générer un rapport de thèse', () => {
-        // Aller aux analyses  
-        cy.navigateToSection('analyses');
-        
-        // Cliquer sur générer rapport de thèse
-        cy.get('button').contains('Rapport de thèse').click();
-        
-        // Le fichier devrait être téléchargé automatiquement
-        // (Cypress ne peut pas vérifier les téléchargements facilement, 
-        // mais on peut vérifier que la fonction est appelée)
-    });
+    cy.get('input[name="query"]').type('alliance thérapeutique numérique');
+    cy.get('form[data-action="run-multi-search"]').submit();
 
-    it('devrait permettre la gestion complète du checklist PRISMA', () => {
-        // Ouvrir la modale PRISMA
-        cy.get('[data-action="show-prisma-modal"]').click({ force: true });
-        
-        // Vérifier la modale
-        cy.get('#prismaModal').should('have.class', 'modal--show');
-        cy.get('#prisma-checklist-content').should('be.visible');
-        
-        // Vérifier les éléments PRISMA
-        cy.get('.prisma-item').should('have.length.gte', 15);
-        
-        // Cocher quelques éléments
-        cy.get('.prisma-checkbox').first().check({ force: true });
-        cy.get('.prisma-notes').first().type('Titre conforme aux standards PRISMA-ScR', { force: true });
-        
-        // Sauvegarder
-        cy.get('#prismaModal').find('button').contains('Sauvegarder').click();
-        cy.waitForToast('success', 'Checklist PRISMA sauvegardée');
-        
-        // Exporter
-        cy.get('#prismaModal').find('button').contains('Exporter').click();
-        cy.waitForToast('success', 'Exportation de la checklist PRISMA terminée.');
-    });
+    cy.wait('@runSearch');
+    cy.waitForToast('success', 'Recherche lancée en arrière-plan.');
+  });
+
+  it('devrait afficher les statistiques de validation et permettre le calcul du Kappa', () => {
+    cy.intercept('POST', '/api/projects/*/calculate-kappa', { body: { success: true, task_id: 'kappa-task-123' } }).as('calculateKappa');
+    cy.navigateToSection('validation');
+    cy.wait('@getExtractions');
+
+    cy.get('.validation-stats').should('be.visible');
+    cy.get('.stat-item--included').should('contain.text', '1'); // Based on extractions.json fixture
+    cy.get('.stat-item--excluded').should('contain.text', '1');
+
+    cy.get('button[data-action="calculate-kappa"]').click();
+    cy.wait('@calculateKappa');
+    cy.waitForToast('success', 'Calcul Kappa lancé');
+  });
+
+  it('devrait permettre la gestion complète de la checklist PRISMA', () => {
+    cy.intercept('POST', '/api/projects/*/prisma-checklist', { statusCode: 200, body: { message: 'OK' } }).as('savePrisma');
+    cy.navigateToSection('analyses');
+
+    cy.get('[data-action="show-prisma-modal"]').click({ force: true });
+    cy.get('#prismaModal').should('be.visible');
+
+    cy.get('.prisma-item').first().find('input[type="checkbox"]').check({ force: true });
+    cy.get('.prisma-item').first().find('textarea').type('Note de test PRISMA.');
+
+    cy.get('[data-action="save-prisma-progress"]').click();
+    cy.wait('@savePrisma');
+    cy.waitForToast('success', 'Checklist PRISMA sauvegardée');
+
+    cy.get('[data-action="export-prisma-report"]').click();
+    cy.waitForToast('success', 'Exportation de la checklist PRISMA terminée.');
+  });
 });

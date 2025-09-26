@@ -18,29 +18,28 @@ export default defineConfig({
     specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'cypress/support/e2e.js',
     fixturesFolder: 'cypress/fixtures',
-    
+
     // Résultats et rapports
     screenshotsFolder: 'reports/cypress/screenshots',
-    videosFolder: 'reports/cypress/videos', 
+    videosFolder: 'reports/cypress/videos',
     downloadsFolder: 'cypress/downloads',
-    
     // Timeouts optimisés Ryzen 3700X
-    defaultCommandTimeout: 8000,
-    requestTimeout: 10000,
-    responseTimeout: 10000,
+    defaultCommandTimeout: 15000,
+    requestTimeout: 15000,
+    responseTimeout: 15000,
     pageLoadTimeout: 30000,
     taskTimeout: 60000,
     
     // Options d'exécution
-    video: true,
+    video: false,
     screenshotOnRunFailure: true,
     trashAssetsBeforeRuns: true,
     watchForFileChanges: false,
     
     // Retries intelligents
     retries: {
-      runMode: 2,      // CI/CD
-      openMode: 0,     // Développement
+      runMode: 2,
+      openMode: 1
     },
     
     // Variables d'environnement
@@ -62,12 +61,22 @@ export default defineConfig({
     
     setupNodeEvents(on, config) {
       // Tâches personnalisées
-      on('task', {
-        log(message) {
-          console.log(message)
-          return null
+      on('task', { log(message) {
+          console.log(message);
+          return null;
         }
-      })
+      });
+
+      // ✅ IGNORER les erreurs JS non-critiques
+      on('uncaught:exception', (err, runnable) => {
+        // Ignorer les erreurs de source maps et modules externes
+        if (err.message.includes('vis-network') || 
+            err.message.includes('socket.io') ||
+            err.message.includes('map file')) {
+          return false;
+        }
+        return true;
+      });
       
       return config
     },

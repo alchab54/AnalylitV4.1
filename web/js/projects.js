@@ -316,7 +316,7 @@ function renderProjectDetail(project) {
 
     detailWrapper.style.display = 'block'; // ✅ CORRECTION: Make the wrapper visible
     placeholder.style.display = 'none';
-    detailContainer.style.display = 'block'; // ✅ FIX: Make the content container visible as well to pass the test
+    detailContainer.style.display = 'block';
     
     // Métriques
     const articlesCount = Number(project.article_count || 0);

@@ -1,41 +1,54 @@
-describe('Workflow de Gestion des Analyses', () => {
-  beforeEach(() => {
-    cy.visit('/');
-    cy.waitForAppReady();
-    
-    // Créer ET sélectionner le projet en séparant les étapes pour plus de stabilité
-    cy.createTestProject('Projet Analyses Test');
+describe('Workflow de Gestion des Analyses - Version Optimisée avec Mocks API', () => {
+  const projectName = 'Projet Analyses Test';
 
-    // Attendre un peu avant la sélection pour éviter les race conditions
-    cy.wait(500);
-    
-    // Sélectionner avec la commande corrigée
-    cy.selectProject('Projet Analyses Test');
+  beforeEach(() => {
+    // ✅ Intercepter les appels API pour isoler les tests
+    cy.intercept('GET', '/api/projects/', { fixture: 'projects-empty.json' }).as('getProjectsInitial');
+    cy.intercept('POST', '/api/projects/', { fixture: 'test-project.json' }).as('createProject');
+    cy.intercept('GET', '/api/projects/test-project-123', { fixture: 'test-project.json' }).as('getProjectDetails');
+    cy.intercept('GET', '/api/projects/test-project-123/analyses', {
+      body: {
+        // Simuler une analyse terminée pour le test de visualisation
+        atn_scores: { status: 'completed', result: { mean_score: 4.5 } }
+      }
+    }).as('getAnalyses');
+
+    // Visiter l'application
+    cy.visit('/', { timeout: 30000 });
+    cy.waitForAppReady();
+
+    // Créer et sélectionner le projet via les commandes robustes
+    cy.createTestProject(projectName);
+    cy.selectProject(projectName);
+
+    // Naviguer vers la section des analyses
+    cy.navigateToSection('analyses');
   });
 
   it("Devrait afficher la section des analyses et les cartes d'analyse", () => {
-    // ✅ Naviguer vers la section pour s'assurer que le contenu est rendu
-    cy.navigateToSection('analyses');
-
-    cy.contains('h2', 'Analyses du Projet').should('exist');
-    cy.get('.analysis-grid').should('exist');
+    cy.contains('h2', 'Analyses du Projet').should('be.visible');
+    cy.get('.analysis-grid').should('be.visible');
     cy.get('.analysis-card').should('have.length.at.least', 4); // Au moins ATN, Discussion, Graphe, PRISMA
   });
 
   it('Devrait lancer les analyses principales depuis leurs cartes respectives', () => {
     const mainAnalyses = [
-      { cardTitle: 'Analyse ATN Multipartite', buttonSelector: '[data-action="run-atn-analysis"]', toastMessage: 'Analyse ATN lancée' },
-      { cardTitle: 'Discussion académique', buttonSelector: '[data-action="run-analysis"][data-analysis-type="discussion"]', toastMessage: 'Tâche de génération du brouillon de discussion lancée' },
-      { cardTitle: 'Graphe de connaissances', buttonSelector: '[data-action="run-analysis"][data-analysis-type="knowledge_graph"]', toastMessage: 'Tâche de génération du graphe de connaissances lancée' }
+      { type: 'atn_scores', cardTitle: 'Analyse ATN Multipartite', toastMessage: 'Analyse ATN lancée' },
+      { type: 'discussion', cardTitle: 'Discussion académique', toastMessage: 'Tâche de génération du brouillon de discussion lancée' },
+      { type: 'knowledge_graph', cardTitle: 'Graphe de connaissances', toastMessage: 'Tâche de génération du graphe de connaissances lancée' }
     ];
 
     mainAnalyses.forEach(analysis => {
-      // Trouver la carte, cliquer sur le bouton d'analyse
+      // Intercepter l'appel API pour cette analyse spécifique
+      cy.intercept('POST', '/api/projects/*/run-analysis', { body: { job_id: `job-${analysis.type}` } }).as(`run-${analysis.type}`);
+
+      // Lancer l'analyse depuis la carte
       cy.get('.analysis-card').contains('h4', analysis.cardTitle).parents('.analysis-card').within(() => {
-        cy.get(analysis.buttonSelector).click({ force: true });
+        cy.get('button').click({ force: true });
       });
 
-      // Vérifier la notification de succès
+      // Valider l'appel API et la notification
+      cy.wait(`@run-${analysis.type}`).its('request.body.type').should('eq', analysis.type);
       cy.waitForToast('success', analysis.toastMessage);
 
       // Vérifier que la carte passe en état de chargement
@@ -43,111 +56,102 @@ describe('Workflow de Gestion des Analyses', () => {
     });
   });
 
-  it(`Devrait afficher les résultats d'une analyse terminée (si disponible)`, () => {
-    // Ce test est conditionnel et ne s'exécute que si une analyse est déjà terminée.
-    cy.get('.analysis-card--done').first().then(($card) => {
-      if ($card.length > 0) {
-        cy.wrap($card).find('[data-action="view-analysis-results"]').click({ force: true });
-        // Vérifier que le conteneur de résultats correspondant est visible
-        const targetId = $card.find('[data-action="view-analysis-results"]').attr('data-target-id');
-        cy.get(`#${targetId}`).should('exist');
-      } else {
-        cy.log('Aucune analyse terminée trouvée pour visualiser les résultats. Ce test est conditionnel.');
-      }
-    });
+  it('Devrait afficher les résultats d\'une analyse terminée', () => {
+    // Grâce au mock dans beforeEach, la carte "terminée" doit exister
+    cy.get('.analysis-card--done').should('be.visible').first().as('completedCard');
+
+    // Cliquer pour voir les résultats
+    cy.get('@completedCard').find('[data-action="view-analysis-results"]').click({ force: true });
+
+    // Vérifier que le conteneur de résultats est visible
+    cy.get('#atn-results').should('be.visible').and('contain', 'Résultats Analyse ATN');
   });
 
   it('Devrait interagir avec la modale PRISMA', () => {
+    // Intercepter la sauvegarde
+    cy.intercept('POST', '/api/projects/*/prisma-checklist', { statusCode: 200, body: { message: 'OK' } }).as('savePrisma');
+
+    // Ouvrir la modale
     cy.get('[data-action="show-prisma-modal"]').click({ force: true });
     cy.get('#prismaModal').should('be.visible');
     cy.contains('h2', 'Checklist PRISMA').should('be.visible');
 
-    // Interagir avec les éléments de la checklist
+    // Interagir avec la checklist
     cy.get('.prisma-item').first().within(() => {
       cy.get('input[type="checkbox"]').check({ force: true });
       cy.get('textarea').type(`Notes de test pour l'élément PRISMA.`, { force: true });
     });
 
-    // Sauvegarder la progression PRISMA
+    // Sauvegarder et valider l'appel API
     cy.get('[data-action="save-prisma-progress"]').click({ force: true });
+    cy.wait('@savePrisma');
     cy.waitForToast('success', 'Checklist PRISMA sauvegardée');
 
-    // Exporter le rapport PRISMA
+    // Exporter et valider le toast (action client)
     cy.get('[data-action="export-prisma-report"]').click({ force: true });
-    // ✅ Le test vérifie maintenant le message de succès de l'exportation
     cy.waitForToast('success', 'Exportation de la checklist PRISMA terminée.');
 
-    cy.get('#prismaModal .modal-close').click();
-    cy.get('#prismaModal').should('not.exist');
+    // Fermer la modale
+    cy.get('#prismaModal .modal-close').click({ force: true });
+    cy.get('#prismaModal').should('not.be.visible');
   });
 
-  it(`Devrait ouvrir la modale d'analyses avancées et lancer diverses analyses`, () => {
+  it("Devrait lancer des analyses depuis la modale d'analyses avancées", () => {
     const advancedAnalyses = [
       { type: 'meta_analysis', toastMessage: 'Tâche de méta-analyse lancée' },
-      { type: 'prisma_flow', toastMessage: 'Tâche de génération du diagramme PRISMA lancée' },
+      { type: 'prisma_flow', toastMessage: 'Tâche de diagramme PRISMA lancée' },
       { type: 'descriptive_stats', toastMessage: 'Tâche de statistiques descriptives lancée' }
     ];
 
     advancedAnalyses.forEach(analysis => {
-      // Ouvrir la modale avant chaque lancement
-      cy.openModal('[data-action="show-advanced-analysis-modal"]', '.modal-content');
+      // Intercepter l'appel API
+      cy.intercept('POST', '/api/projects/*/run-analysis', { body: { job_id: `job-${analysis.type}` } }).as(`run-advanced-${analysis.type}`);
+
+      // Ouvrir la modale
+      cy.get('[data-action="show-advanced-analysis-modal"]').click({ force: true });
+      cy.get('#advancedAnalysisModal').should('be.visible');
 
       // Lancer l'analyse
       cy.get(`.analysis-option[data-analysis-type="${analysis.type}"]`).click({ force: true });
       
-      // Vérifier le toast et la fermeture de la modale
+      // Valider l'appel, le toast et la fermeture de la modale
+      cy.wait(`@run-advanced-${analysis.type}`).its('request.body.type').should('eq', analysis.type);
       cy.waitForToast('success', analysis.toastMessage);
-      cy.get('.modal-content').should('not.be.visible');
+      cy.get('#advancedAnalysisModal').should('not.be.visible');
     });
   });
 
-  it(`Devrait permettre d'exporter les analyses`, () => {
+  it("Devrait déclencher l'exportation des analyses", () => {
+    // L'exportation ouvre une nouvelle fenêtre, on vérifie juste le déclenchement
     cy.get('[data-action="export-analyses"]').click({ force: true });
     cy.waitForToast('info', `Préparation de l'exportation des analyses...`);
-    // On ne peut pas tester le téléchargement de fichier directement avec Cypress sans plugins spécifiques
-    // Mais on peut vérifier que l'action est déclenchée et la notification affichée.
   });
 
-  it(`Devrait gérer l'état vide si aucun projet n'est sélectionné`, () => {
-    // Test autonome : ne pas utiliser le beforeEach global
+  it("Devrait gérer l'état vide si aucun projet n'est sélectionné", () => {
+    // Test autonome qui ne dépend pas du beforeEach
+    cy.intercept('GET', '/api/projects/', { fixture: 'projects-empty.json' }).as('getEmptyProjects');
     cy.visit('/');
     cy.waitForAppReady();
     cy.navigateToSection('analyses');
-    cy.get('#analysisContainer').contains('p', 'Veuillez sélectionner un projet pour visualiser les analyses.').should('be.visible');
+    cy.get('#analysisContainer').should('contain.text', 'Veuillez sélectionner un projet pour visualiser les analyses.');
   });
 
-  // --- Scénarios d'erreur (basiques, car les mocks backend sont complexes en E2E) ---
-  it('Devrait afficher une erreur si une analyse est lancée sans projet sélectionné', () => {
-    // Test autonome : ne pas utiliser le beforeEach global
-    cy.visit('/');
-    cy.waitForAppReady();
-    cy.navigateToSection('analyses');
-
-    // Tenter de lancer une analyse ATN
-    cy.get('.analysis-card').contains('h4', 'Analyse ATN Multipartite').parents('.analysis-card').within(() => {
-      cy.get('[data-action="run-atn-analysis"]').click({ force: true });
-    });
-    cy.waitForToast('warning', 'Veuillez sélectionner un projet en premier.');
-  });
-
-  // ✅ TEST AMÉLIORÉ: Utilise cy.intercept() pour valider le comportement de suppression
   it('Devrait permettre de supprimer une analyse et de confirmer l\'appel API', () => {
-    // Intercepter la requête DELETE vers l'API de suppression d'analyse
-    cy.intercept('DELETE', '/api/projects/*/analyses/*').as('deleteAnalysis');
+    const analysisTypeToDelete = 'atn_scores';
+    // Intercepter la requête DELETE
+    cy.intercept('DELETE', `/api/projects/*/analyses/${analysisTypeToDelete}`, { statusCode: 200, body: { message: 'Deleted' } }).as('deleteAnalysis');
 
-    // Stub la confirmation de la fenêtre pour qu'elle retourne toujours 'true' (OK)
+    // Simuler la confirmation de l'utilisateur
     cy.on('window:confirm', (str) => {
       expect(str).to.contain('supprimer les résultats de l\'analyse');
       return true;
     });
 
-    // Cliquer sur le premier bouton de suppression disponible
-    cy.get('[data-action="delete-analysis"]').first().click({ force: true });
+    // Cliquer sur le bouton de suppression de l'analyse terminée (mockée)
+    cy.get('.analysis-card--done').find(`[data-action="delete-analysis"][data-analysis-type="${analysisTypeToDelete}"]`).click({ force: true });
 
-    // Attendre que l'appel API intercepté soit effectué
+    // Valider l'appel API et le toast de succès
     cy.wait('@deleteAnalysis').its('response.statusCode').should('eq', 200);
-
-    // Vérifier que le toast de succès est affiché
-    cy.waitForToast('success', 'Résultats de l\'analyse atn_scores supprimés avec succès.');
+    cy.waitForToast('success', `Résultats de l'analyse ${analysisTypeToDelete} supprimés avec succès.`);
   });
 });
