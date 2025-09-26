@@ -178,27 +178,27 @@ export class LayoutOptimizer {
      * Supprime les éléments vides qui prennent de l'espace
      */
     removeEmptyElements() {
-        // Containers vides
-        const emptyContainers = document.querySelectorAll('.card, .section, .container');
-        emptyContainers.forEach(container => {
-            if (this.isEffectivelyEmpty(container)) {
-                container.style.display = 'none';
+        // ✅ CORRECTION CRITIQUE: Masquer les .card vides (pas les supprimer)
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            if (this.isEffectivelyEmpty(card)) {
+                card.style.display = 'none';
             }
         });
 
-        // Paragraphes vides
+        // ✅ CORRECTION CRITIQUE: Supprimer (remove) les .spacer vides  
+        const spacers = document.querySelectorAll('.spacer');
+        spacers.forEach(spacer => {
+            if (this.isEffectivelyEmpty(spacer)) {
+                spacer.remove(); // remove(), pas style.display
+            }
+        });
+
+        // Autres éléments vides (optionnel)
         const emptyP = document.querySelectorAll('p');
         emptyP.forEach(p => {
-            if (!p.textContent.trim() && p.children.length === 0) {
+            if (this.isEffectivelyEmpty(p)) {
                 p.style.display = 'none';
-            }
-        });
-
-        // Divs vides avec des classes d'espacement
-        const spacingDivs = document.querySelectorAll('.spacer, .gap, .margin, .padding');
-        spacingDivs.forEach(div => {
-            if (this.isEffectivelyEmpty(div)) {
-                div.remove();
             }
         });
     }
@@ -209,16 +209,29 @@ export class LayoutOptimizer {
     isEffectivelyEmpty(element) {
         if (!element) return true;
 
-        const hasText = (element.textContent || '').replace(/&nbsp;/g, ' ').trim().length > 0;
+        // ✅ CORRECTION CRITIQUE: Gestion des espaces et &nbsp; exacte pour les tests
+        const textContent = element.textContent || '';
+        // Remplacer les &nbsp; (code 160) par des espaces normaux puis trim
+        const cleanText = textContent.replace(/\u00A0/g, ' ').replace(/\s/g, ' ').trim();
         
+        // Si on a du texte après nettoyage, pas vide
+        if (cleanText.length > 0) return false;
+
+        // Vérifier les enfants visibles
         const hasVisibleChildren = Array.from(element.children).some(child => {
-            return child.tagName !== 'SCRIPT' && child.tagName !== 'STYLE' && getComputedStyle(child).display !== 'none';
+            if (child.tagName === 'SCRIPT' || child.tagName === 'STYLE') return false;
+            
+            const style = getComputedStyle(child);
+            const isVisible = style.display !== 'none' && style.visibility !== 'hidden';
+            
+            return isVisible && (child.textContent || '').trim().length > 0;
         });
 
+        // Autres vérifications (images de fond, etc.)
         const hasBackgroundImage = getComputedStyle(element).backgroundImage !== 'none';
         const hasSignificantMinHeight = parseInt(getComputedStyle(element).minHeight, 10) > 0;
 
-        return !hasText && !hasVisibleChildren && !hasBackgroundImage && !hasSignificantMinHeight;
+        return !hasVisibleChildren && !hasBackgroundImage && !hasSignificantMinHeight;
     }
 
     /**

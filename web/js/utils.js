@@ -288,9 +288,10 @@ export function sleep(ms) {
  */
 export async function copyToClipboard(text) {
     try {
-        if (navigator.clipboard && window.isSecureContext) { // Modern async clipboard API
-            await navigator.clipboard.writeText(text); // This returns a promise that resolves to undefined on success.
-            return true;
+        // ✅ CORRECTION CRITIQUE: Vérifier clipboard API et retourner true
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+            return true; // ✅ Important: retourner true après succès
         } else { // Fallback for older browsers
             // Fallback pour les anciens navigateurs
             const textArea = document.createElement('textarea');
@@ -298,10 +299,10 @@ export async function copyToClipboard(text) {
             textArea.style.position = 'absolute';
             textArea.style.left = '-999999px';
             document.body.appendChild(textArea);
-            textArea.select(); 
-            document.execCommand('copy'); 
-            document.body.removeChild(textArea); 
-            return true;
+            textArea.select();
+            const success = document.execCommand('copy');
+            document.body.removeChild(textArea);
+            return success;
         }
     } catch (error) {
         console.error('Erreur copie presse-papiers:', error);
