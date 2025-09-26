@@ -224,7 +224,7 @@ export class LayoutOptimizer {
             const style = getComputedStyle(child);
             const isVisible = style.display !== 'none' && style.visibility !== 'hidden';
             
-            return isVisible && (child.textContent || '').trim().length > 0;
+            return isVisible;
         });
 
         // Autres vérifications (images de fond, etc.)
