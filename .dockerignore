@@ -155,7 +155,6 @@ transformers_cache/
 !docker-compose*
 !requirements.txt
 !package.json
-!package-lock.json
 !README.md
 !docs/
 !backend/config/profiles.json

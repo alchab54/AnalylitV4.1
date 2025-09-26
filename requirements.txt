@@ -58,6 +58,7 @@ feedparser==6.0.11
 pytest==7.4.3
 pytest-mock==3.10.0        # ✅ FIXTURE mocker
 pytest-cov==4.1.0          # ✅ Coverage
+fakeredis==2.23.0          # ✅ Mock Redis pour tests isolés
 pytest-asyncio==0.21.1     # ✅ Async support
 
 # --- Tests Avancés ---

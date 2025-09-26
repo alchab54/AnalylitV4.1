@@ -90,9 +90,9 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-    
+
     volumes:
-      # Monter les logs et les projets pour la persistance et l'accès depuis l'hôte
+      # Volumes pour les données persistantes et les logs
       - ./logs:/home/appuser/app/logs
       - ./projects:/home/appuser/app/projects
       - ./migrations:/home/appuser/app/migrations
