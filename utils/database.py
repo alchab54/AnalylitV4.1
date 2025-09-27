@@ -6,6 +6,7 @@ from functools import wraps
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate # ✅ CORRECTION: Importer Migrate ici
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +22,7 @@ from .db_base import Base
 # Elle sera liée dans create_app() pour l'application principale,
 # et dans run_migrations.py pour le script de migration.
 db = SQLAlchemy()
+migrate = Migrate() # ✅ CORRECTION: Créer l'instance de Migrate ici
 
 def init_database(database_url=None, is_test: bool = False):
     """Initialise le moteur et la factory de session."""

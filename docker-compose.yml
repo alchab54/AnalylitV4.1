@@ -59,6 +59,10 @@ services:
       - "5000:5000"
       - "8080:5000"
     environment:
+      # ✅ CORRECTION: Indiquer à Flask où trouver l'application.
+      # Essentiel pour que `flask db upgrade` dans entrypoint.sh fonctionne.
+      - FLASK_APP=backend.server_v4_complete:app
+      # Essentiel pour que `flask db upgrade` dans entrypoint.sh fonctionne.
       - FLASK_ENV=production
       - WAIT_HOSTS=db:5432,redis:6379,ollama:11434
       - WAIT_TIMEOUT=60

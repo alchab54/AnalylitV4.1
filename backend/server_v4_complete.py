@@ -35,7 +35,6 @@ from api.selection import selection_bp
 from api.settings import settings_bp
 from api.stakeholders import stakeholders_bp
 from flask_cors import CORS
-from flask_socketio import SocketIO
 from sqlalchemy.exc import IntegrityError
 from rq.worker import Worker 
 from werkzeug.utils import secure_filename
@@ -43,7 +42,8 @@ from flask_migrate import Migrate # <-- 1. IMPORTER MIGRATE
 
 
 # --- Imports des utilitaires et de la configuration ---
-from utils.database import with_db_session, db # Import db here
+from flask_socketio import SocketIO
+from utils.database import with_db_session, db, migrate # ✅ CORRECTION: Importer 'db' et 'migrate' depuis la source unique
 from utils.app_globals import (
     processing_queue, synthesis_queue, analysis_queue, background_queue,
     extension_queue, redis_conn, models_queue
@@ -82,9 +82,7 @@ PROJECTS_DIR = Path(PROJECTS_DIR_STR)
 # --- Initialisation des extensions ---
 # On les déclare ici pour qu_elles soient accessibles globalement,
 # mais on les initialise dans create_app()
-
 socketio = SocketIO()
-migrate = Migrate()
 
 
 def create_app(config_override=None):
@@ -108,7 +106,7 @@ def create_app(config_override=None):
     if config_override:
         app.config.update(config_override)
         
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql+psycopg2://postgres:password@db:5432/postgres')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql+psycopg2://analylit_user:strong_password@db:5432/analylit_db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_size': 10,
@@ -127,7 +125,7 @@ def create_app(config_override=None):
     db.init_app(app)
 
     # --- NOUVEAU : INITIALISER FLASK-MIGRATE ---
-    migrate.init_app(app, db)  # <-- 2. BRANCHER MIGRATE À L_APP ET À LA DB
+    migrate.init_app(app, db, directory='migrations')  # ✅ CORRECTION: Utiliser l'instance importée
 
 
     # Import et initialisation forcés - BON ORDRE :

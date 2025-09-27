@@ -9,16 +9,15 @@ done
 
 echo "✅ Base de données prête!"
 
-echo "🔄 Création des tables de base de données..."
-python -c "
-from utils.database import init_database
-from utils import models # Ensure models are loaded to populate Base.metadata
+echo "🔄 Application des migrations de la base de données..."
+# Utilise Flask-Migrate pour appliquer les migrations.
+# La commande 'upgrade' amène la base de données à la dernière version définie dans les fichiers de migration.
+# C'est la méthode standard et robuste pour gérer le schéma de la base de données.
+flask db upgrade
 
-print('Création du schéma et des tables...')
-init_database()
-print('✅ Schéma et tables créés avec succès via init_database!')
-"
+echo "✅ Migrations de la base de données appliquées."
 
 echo "🚀 Démarrage du serveur Gunicorn..."
-# Optimisation pour un CPU 8 cœurs : 8 workers pour maximiser l'utilisation du CPU.
-exec gunicorn --bind 0.0.0.0:5000 --workers 8 --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker "server_v4_complete:create_app()"
+# La commande Gunicorn est maintenant gérée par le `command` dans docker-compose.yml,
+# qui utilise le fichier de configuration gunicorn.conf.py pour plus de flexibilité.
+exec "$@"
