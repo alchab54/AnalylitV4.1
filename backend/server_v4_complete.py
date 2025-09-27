@@ -51,7 +51,7 @@ from werkzeug.utils import secure_filename
 
 # --- Imports des utilitaires et de la configuration ---
 from flask_socketio import SocketIO
-from utils.database import with_db_session, db, migrate # ✅ CORRECTION: Importer 'db' et 'migrate' depuis la source unique
+from utils.database import with_db_session, db  # ← SUPPRIMER 'migrate'
 from utils.app_globals import (
     processing_queue, synthesis_queue, analysis_queue, background_queue,
     extension_queue, redis_conn, models_queue
@@ -133,7 +133,7 @@ def create_app(config_override=None):
     db.init_app(app)
 
     # --- NOUVEAU : INITIALISER FLASK-MIGRATE ---
-    migrate.init_app(app, db)
+    # migrate.init_app(app, db)  # ← COMMENTER CETTE LIGNE
 
 
     # Import et initialisation forcés - BON ORDRE :
