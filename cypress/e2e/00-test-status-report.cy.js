@@ -15,14 +15,14 @@ describe('AnalyLit V4.1 - Rapport de Tests Complet', () => {
   it('✅ Application Web - Port 8080 Accessible', () => {
     // CORRECTION: Utiliser cy.request() pour tester une route API qui renvoie du JSON.
     // cy.visit() est pour les pages HTML.
-    cy.request('http://localhost:8080/api/admin/health').then((response) => {
+    cy.request('http://localhost:5001/api/admin/health').then((response) => {
       expect(response.status).to.eq(200);
       expect(response.body).to.have.property('status', 'healthy');
     });
   });
 
   it('✅ Interface Utilisateur Chargée', () => {
-    cy.visit('http://localhost:8080');
+    cy.visit('http://localhost:5001');
     cy.get('body').should('be.visible');
     cy.get('html').should('exist');
   });

@@ -364,6 +364,13 @@ def create_app(config_override=None):
 
     # --- Enregistrement des routes (Blueprints ou routes directes) ---
 
+    # --- HEALTHCHECK ROUTE ---
+    @app.route("/api/health", methods=["GET"])  # <-- Doit avoir 4 espaces
+    def health_check():
+        """Route simple pour le healthcheck de Docker."""
+        return jsonify({"status": "healthy"}), 200
+
+
     # ==================== ROUTES API PROJECTS ====================
     @app.route("/api/projects/", methods=["POST"])
     @with_db_session
@@ -1007,10 +1014,6 @@ def create_app(config_override=None):
     app.register_blueprint(settings_bp, url_prefix='/api')
     app.register_blueprint(stakeholders_bp, url_prefix='/api')
     app.register_blueprint(tasks_bp, url_prefix='/api')
-    # --- HEALTHCHECK ROUTE (via Blueprint) ---
-    # Enregistré en dernier pour éviter les conflits.
-    # La route est maintenant /api/admin/health
-    app.register_blueprint(admin_bp, url_prefix='/api')
 
 
     # La factory DOIT retourner l_objet app
@@ -1044,11 +1047,8 @@ def post_fork(server, worker):
     # C'est le point le plus sûr pour éviter les MonkeyPatchWarning avec plusieurs workers.
     import gevent.monkey
     gevent.monkey.patch_all()
-    
     server.log.info("Worker %s forked.", worker.pid)
-    # ✅ CORRECTION: Supprimer la ré-initialisation de la base de données.
-    # db.init_app() est déjà appelé dans create_app(). Un deuxième appel
-    # fait planter les workers Gunicorn, causant l'erreur ECONNREFUSED.
+    db.init_app(app)
 
 if __name__ == "__main__":
     # Le monkey-patching doit être fait le plus tôt possible, mais SEULEMENT
