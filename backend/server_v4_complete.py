@@ -114,7 +114,10 @@ def create_app(config_override=None):
     if config_override:
         app.config.update(config_override)
         
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql+psycopg2://analylit_user:strong_password@db:5432/analylit_db')
+    # ✅ CORRECTION: Utiliser 'localhost' comme hôte par défaut pour la base de données.
+    # L'hôte 'db' ne fonctionne que lorsque le serveur Python est lui-même dans un conteneur Docker.
+    # Pour le développement local, on se connecte via localhost sur le port exposé 5433.
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql+psycopg2://analylit_user:strong_password@localhost:5433/analylit_db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_size': 10,

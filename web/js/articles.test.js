@@ -103,7 +103,9 @@ describe('Module Articles', () => {
     it("devrait afficher un message si aucun résultat n'est trouvé", () => {
       appState.searchResults = [];
       articles.renderSearchResultsTable();
-      expect(document.querySelector('#results-list').innerHTML).toContain('Aucun résultat trouvé');
+      // ✅ CORRECTION: When no results are found, the #results-list element is replaced.
+      // We must check the parent container instead.
+      expect(document.querySelector('#resultsContainer').innerHTML).toContain('Aucun résultat trouvé');
     });
   });
 

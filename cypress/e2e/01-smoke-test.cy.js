@@ -1,8 +1,8 @@
 describe('Tests de Smoke - Vérifications de base AnalyLit', () => {
   
   beforeEach(() => {
-    // Intercepter les projets pour que waitForAppReady fonctionne
-    cy.intercept('GET', '/api/projects/', { fixture: 'projects-empty.json' }).as('getProjects');
+    // ✅ CORRECTION: Utiliser la commande centralisée qui configure TOUS les mocks nécessaires.
+    cy.setupMockAPI();
     cy.visit('/');
     cy.waitForAppReady();
   });

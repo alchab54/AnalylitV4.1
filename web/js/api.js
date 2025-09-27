@@ -31,12 +31,19 @@ export async function fetchAPI(endpoint, options = {}) {
         const response = await fetch(url, defaultOptions);
 
         if (!response.ok) {
-            let errorMsg = `Erreur ${response.status}`;
+            // Tenter de lire le corps de la réponse pour un message d'erreur plus détaillé.
+            let errorMsg = `Erreur HTTP ${response.status}: ${response.statusText}`;
+            const errorText = await response.text().catch(() => null); // Ne pas planter si le corps est vide
+
             try {
-                const errorData = await response.json();
+                // Essayer de parser comme JSON, ce qui est courant pour les erreurs API.
+                const errorData = errorText ? JSON.parse(errorText) : { message: response.statusText };
                 errorMsg = errorData.error || errorData.message || errorMsg;
-            } catch (e) { 
-                errorMsg = `Erreur HTTP ${response.status}: ${response.statusText}`;
+            } catch (e) {
+                // Si ce n'est pas du JSON, utiliser le texte brut s'il existe.
+                if (errorText) {
+                    errorMsg = `${errorMsg} - ${errorText.substring(0, 150)}`; // Afficher un extrait du texte d'erreur
+                }
             }
             throw new Error(errorMsg);
         }

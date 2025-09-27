@@ -18,6 +18,11 @@ def main():
     if str(project_root) not in sys.path:
         sys.path.insert(0, str(project_root))
 
+    # --- CORRECTION DÉFINITIVE POUR LE DÉVELOPPEMENT LOCAL ---
+    # Forcer l'utilisation de la base de données locale (localhost) exposée par Docker,
+    # en ignorant la variable DATABASE_URL du fichier .env qui est destinée à l'intérieur de Docker.
+    os.environ['DATABASE_URL'] = 'postgresql+psycopg2://analylit_user:strong_password@localhost:5433/analylit_db'
+
     from backend.server_v4_complete import create_app
     
     if sys.platform == 'win32':

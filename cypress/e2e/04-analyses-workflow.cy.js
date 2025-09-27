@@ -14,6 +14,9 @@ describe('Workflow de Gestion des Analyses - Version Optimisée avec Mocks API',
     }).as('getAnalyses');
 
     // Visiter l'application
+    // ✅ CORRECTION: Le hook beforeEach de ce test n'appelait pas cy.setupMockAPI(),
+    // ce qui causait l'échec de cy.waitForAppReady() car l'alias @getProjects n'existait pas.
+    cy.setupMockAPI();
     cy.visit('/', { timeout: 30000 });
     cy.waitForAppReady();
 

@@ -10,16 +10,17 @@ import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 export async function loadSearchResults(page = 1) {
     showLoadingOverlay(true, MESSAGES.loadingResults);
     
+    const container = document.querySelector(SELECTORS.resultsContainer);
+    if (!container) {
+        showLoadingOverlay(false);
+        return;
+    }
     if (!appState.currentProject?.id) {
-        // ✅ CORRECTION : Utiliser querySelector et vérifier l'existence de l'élément
-        const container = document.querySelector(SELECTORS.resultsContainer);
-        if (container) {
-            container.innerHTML = `
+        container.innerHTML = `
                 <div class="results-empty">
                     <h3>${MESSAGES.noProjectSelected}</h3> 
                     <p>${MESSAGES.selectProjectToViewResults}</p> 
                 </div>`;
-        }
         showLoadingOverlay(false);
         return;
     }
@@ -33,12 +34,9 @@ export async function loadSearchResults(page = 1) {
         
         renderSearchResultsTable();
     } catch (error) {
-        showToast(`Erreur: ${error.message}`, 'error');
-        // ✅ CORRECTION : Utiliser querySelector et vérifier l'existence de l'élément
-        const container = document.querySelector(SELECTORS.resultsContainer);
-        if (container) {
-            container.innerHTML = `<div class="error-state">Erreur de chargement des résultats.</div>`;
-        }
+        showToast(`Erreur: ${error.message}`, 'error');        
+        container.innerHTML = `<div class="error-state">Erreur de chargement des résultats.</div>`;
+        
     } finally {
         showLoadingOverlay(false);
     }
@@ -46,7 +44,7 @@ export async function loadSearchResults(page = 1) {
 
 export function renderSearchResultsTable() {
     // ✅ CORRECTION: The test fails because the articles are rendered in the wrong container.
-    const container = document.getElementById('results-list');
+    const container = document.querySelector(SELECTORS.resultsContainer);
     if (!container) return;
     
     // ✅ CORRECTION : Utiliser le même sélecteur que ci-dessus
@@ -115,9 +113,7 @@ export function renderSearchResultsTable() {
     }).join('');
 
     // ✅ CORRECTION: Utiliser la nouvelle structure HTML avec des DIVs
-    const parentContainer = document.querySelector(SELECTORS.resultsContainer);
-    if (parentContainer) {
-        parentContainer.innerHTML = `
+    container.innerHTML = `
             <div class="results-header">
                 <div class="results-stats">
                     <strong>${appState.searchResults.length}</strong> articles trouvés
@@ -140,7 +136,6 @@ export function renderSearchResultsTable() {
             <div id="results-list" class="results-list-container">
                 ${articleRows}
             </div>`;
-    }
 
     updateSelectionCounter();
 }

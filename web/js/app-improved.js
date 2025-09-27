@@ -92,20 +92,20 @@ function showError(message) {
  */
 export async function initializeApplication() {
 	console.log('🚀 Démarrage de AnalyLit V4.1 Frontend (Version améliorée)...');
-    
+    if (isInitialized) return;
+    isInitialized = true;
 	try {
 		// ✅ CORRECTION: Appels DIRECTS pour que les mocks des tests fonctionnent
 		initializeState();
 		setupDelegatedEventListeners(); 
 		initializeWebSocket();
 
-		// ✅ CORRECTION CRITIQUE: Appel direct à loadInitialData
+		// ✅ CORRECTION CRITIQUE: Attendre que les données soient chargées AVANT de continuer.
 		await loadInitialData();
         
         // ✅ CORRECTION: Afficher la section par défaut APRÈS que les données soient chargées.
         showSection('projects');
         console.log('✅ Application initialisée avec succès');
-        
 	} catch (error) {
 		console.error('❌ Erreur lors de l\'initialisation:', error);
         
@@ -130,6 +130,7 @@ if (typeof window !== 'undefined') {
 	window.AnalyLit = {
 		appState,
 		elements,
+		initializeApplication, // ✅ EXPOSER la fonction pour les tests Cypress
 		reinitialize: () => {
 			isInitialized = false;
 			if (typeof location !== 'undefined') location.reload();

@@ -2,6 +2,9 @@ describe('Workflow de Gestion des Projets - Version Optimisée', () => {
   
   beforeEach(() => {
     // ✅ Visit avec timeout étendu
+    // ✅ CORRECTION: Ajouter le setup des mocks API pour que waitForAppReady fonctionne.
+    cy.setupMockAPI();
+    
     cy.visit('/', { timeout: 30000 });
     
     // ✅ Attente COMPLÈTE de l'app
