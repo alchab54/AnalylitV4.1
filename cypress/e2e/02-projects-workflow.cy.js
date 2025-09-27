@@ -34,16 +34,16 @@ describe('Workflow de Gestion des Projets - Version Optimisée', () => {
       .click({ force: true });
     
     // Attendre modale
-    cy.get('#newProjectModal', { timeout: 10000 })
+    cy.get('#newProjectModal', { timeout: 10000 }).as('projectModal')
       .should('be.visible')
       .and('contain', 'Créer un Nouveau Projet');
     
     // Fermer modale
-    cy.get('#newProjectModal [data-action="close-modal"]')
+    cy.get('@projectModal').find('[data-action="close-modal"]')
       .click({ force: true });
     
     // Vérifier fermeture
-    cy.get('#newProjectModal', { timeout: 5000 })
+    cy.get('@projectModal', { timeout: 5000 })
       .should('not.be.visible');
       
     console.log('✅ Modal workflow validé');

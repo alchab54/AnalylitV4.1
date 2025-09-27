@@ -12,9 +12,10 @@ describe('AnalyLit V4.1 - Rapport de Tests Complet', () => {
     expect(477).to.equal(477);
   });
 
-  it('✅ Application Web - Port 8080 Accessible', () => {
-    // CORRECTION: Utiliser cy.request() pour tester une route API qui renvoie du JSON.
-    // cy.visit() est pour les pages HTML.
+  it('✅ API Backend Accessible', () => {
+    // Ce test vérifie que le frontend (sur le port 8888) peut bien communiquer
+    // avec le backend (sur le port 5001) via le proxy.
+    // cy.request() utilise la `baseUrl` (http://localhost:8888) et le proxy redirige l'appel.
     cy.request('/api/admin/health').then((response) => {
       expect(response.status).to.eq(200);
       expect(response.body).to.have.property('status', 'healthy');
@@ -22,7 +23,7 @@ describe('AnalyLit V4.1 - Rapport de Tests Complet', () => {
   });
 
   it('✅ Interface Utilisateur Chargée', () => {
-    cy.visit('/');
+    cy.visit('/'); // Visite la `baseUrl` (http://localhost:8888)
     cy.get('body').should('be.visible');
     cy.get('html').should('exist');
   });

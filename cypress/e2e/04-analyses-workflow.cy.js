@@ -46,16 +46,16 @@ describe('Workflow de Gestion des Analyses - Version Optimisée avec Mocks API',
       cy.intercept('POST', '/api/projects/*/run-analysis', { body: { job_id: `job-${analysis.type}` } }).as(`run-${analysis.type}`);
 
       // Lancer l'analyse depuis la carte
-      cy.get('.analysis-card').contains('h4', analysis.cardTitle).parents('.analysis-card').within(() => {
+      cy.get('.analysis-card').contains('h4', analysis.cardTitle).parents('.analysis-card').as('targetCard').within(() => {
         cy.get('button').click({ force: true });
       });
 
-      // Valider l'appel API et la notification
+      // Assert: Valider l'appel API et la notification
       cy.wait(`@run-${analysis.type}`).its('request.body.type').should('eq', analysis.type);
       cy.waitForToast('success', analysis.toastMessage);
 
       // Vérifier que la carte passe en état de chargement
-      cy.get('.analysis-card').contains('h4', analysis.cardTitle).parents('.analysis-card').should('have.class', 'analysis-card--loading');
+      cy.get('@targetCard').should('have.class', 'analysis-card--loading');
     });
   });
 
@@ -63,10 +63,10 @@ describe('Workflow de Gestion des Analyses - Version Optimisée avec Mocks API',
     // Grâce au mock dans beforeEach, la carte "terminée" doit exister
     cy.get('.analysis-card--done').should('be.visible').first().as('completedCard');
 
-    // Cliquer pour voir les résultats
+    // Act: Cliquer pour voir les résultats
     cy.get('@completedCard').find('[data-action="view-analysis-results"]').click({ force: true });
 
-    // Vérifier que le conteneur de résultats est visible
+    // Assert: Vérifier que le conteneur de résultats est visible
     cy.get('#atn-results').should('be.visible').and('contain', 'Résultats Analyse ATN');
   });
 
@@ -74,29 +74,29 @@ describe('Workflow de Gestion des Analyses - Version Optimisée avec Mocks API',
     // Intercepter la sauvegarde
     cy.intercept('POST', '/api/projects/*/prisma-checklist', { statusCode: 200, body: { message: 'OK' } }).as('savePrisma');
 
-    // Ouvrir la modale
+    // Act: Ouvrir la modale
     cy.get('[data-action="show-prisma-modal"]').click({ force: true });
-    cy.get('#prismaModal').should('be.visible');
+    cy.get('#prismaModal').as('prismaModal').should('be.visible');
     cy.contains('h2', 'Checklist PRISMA').should('be.visible');
 
-    // Interagir avec la checklist
+    // Act: Interagir avec la checklist
     cy.get('.prisma-item').first().within(() => {
       cy.get('input[type="checkbox"]').check({ force: true });
       cy.get('textarea').type(`Notes de test pour l'élément PRISMA.`, { force: true });
     });
 
-    // Sauvegarder et valider l'appel API
+    // Act & Assert: Sauvegarder et valider l'appel API
     cy.get('[data-action="save-prisma-progress"]').click({ force: true });
     cy.wait('@savePrisma');
     cy.waitForToast('success', 'Checklist PRISMA sauvegardée');
 
-    // Exporter et valider le toast (action client)
+    // Act & Assert: Exporter et valider le toast (action client)
     cy.get('[data-action="export-prisma-report"]').click({ force: true });
     cy.waitForToast('success', 'Exportation de la checklist PRISMA terminée.');
 
-    // Fermer la modale
-    cy.get('#prismaModal .modal-close').click({ force: true });
-    cy.get('#prismaModal').should('not.be.visible');
+    // Act & Assert: Fermer la modale
+    cy.get('@prismaModal').find('.modal-close').click({ force: true });
+    cy.get('@prismaModal').should('not.be.visible');
   });
 
   it("Devrait lancer des analyses depuis la modale d'analyses avancées", () => {
@@ -110,17 +110,17 @@ describe('Workflow de Gestion des Analyses - Version Optimisée avec Mocks API',
       // Intercepter l'appel API
       cy.intercept('POST', '/api/projects/*/run-analysis', { body: { job_id: `job-${analysis.type}` } }).as(`run-advanced-${analysis.type}`);
 
-      // Ouvrir la modale
+      // Act: Ouvrir la modale
       cy.get('[data-action="show-advanced-analysis-modal"]').click({ force: true });
-      cy.get('#advancedAnalysisModal').should('be.visible');
+      cy.get('#advancedAnalysisModal').as('advancedModal').should('be.visible');
 
-      // Lancer l'analyse
+      // Act: Lancer l'analyse
       cy.get(`.analysis-option[data-analysis-type="${analysis.type}"]`).click({ force: true });
       
-      // Valider l'appel, le toast et la fermeture de la modale
+      // Assert: Valider l'appel, le toast et la fermeture de la modale
       cy.wait(`@run-advanced-${analysis.type}`).its('request.body.type').should('eq', analysis.type);
       cy.waitForToast('success', analysis.toastMessage);
-      cy.get('#advancedAnalysisModal').should('not.be.visible');
+      cy.get('@advancedModal').should('not.be.visible');
     });
   });
 
