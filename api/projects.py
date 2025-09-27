@@ -316,10 +316,10 @@ def upload_zotero_file(project_id):
         file_path = save_file_to_project_dir(file, project_id, filename, PROJECTS_DIR)
         
         # ✅ CORRECTION: La tâche d'import depuis un fichier est `import_from_zotero_json_task`
-        job = background_queue.enqueue(
-            import_from_zotero_json_task,
+        job = background_queue.enqueue( # Utiliser la bonne tâche pour l'import de fichier
+            import_from_zotero_file_task,
             project_id=project_id,
-            items_list=json.load(open(file_path))['items'] # La tâche attend une liste d'items
+            json_file_path=file_path
         )
         return jsonify({"message": "Importation de fichier Zotero lancée", "imported": len(json.load(open(file_path))['items']), "task_id": job.id}), 202
     except Exception as e:

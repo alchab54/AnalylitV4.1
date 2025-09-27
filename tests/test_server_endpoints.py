@@ -20,7 +20,7 @@ from tasks_v4_complete import (
     # --- TÂCHES AJOUTÉES POUR LES NOUVEAUX TESTS ---
     multi_database_search_task,
     process_single_article_task,
-    import_from_zotero_file_task,
+    import_from_zotero_json_task,
     import_pdfs_from_zotero_task,
     run_risk_of_bias_task,
     run_meta_analysis_task,

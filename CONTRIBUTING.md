@@ -51,15 +51,20 @@ docker compose up -d
 
 ### 2. **Tests Locaux**
 
+Avant de soumettre votre code, assurez-vous que tous les tests passent.
+
 ```bash
-# Tous les tests
-make test
+# Lancer tous les tests backend (Python/Pytest)
+docker-compose exec web pytest
 
-# Tests spécifiques  
-pytest tests/test_specific_feature.py -v
+# Lancer un fichier de test backend spécifique
+docker-compose exec web pytest tests/test_server_endpoints.py -v
 
-# Coverage
-pytest --cov=analylit tests/
+# Lancer les tests unitaires frontend (JavaScript/Jest)
+docker-compose exec web npm run test:unit
+
+# Lancer les tests End-to-End (Cypress) en mode headless
+docker-compose exec web npm run test:e2e
 ```
 
 ### 3. **Standards Code**
