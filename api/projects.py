@@ -9,7 +9,7 @@ from sqlalchemy.exc import IntegrityError
 # CORRECTION : Imports propres et cohérents
 from utils.app_globals import background_queue, processing_queue, analysis_queue, discussion_draft_queue
 from utils.database import with_db_session, get_session
-from utils.models import Project, Grid, Extraction, AnalysisProfile, RiskOfBias
+from utils.models import Project, Grid, Extraction, AnalysisProfile, RiskOfBias, Analysis
 from utils.file_handlers import save_file_to_project_dir
 from tasks_v4_complete import (
     run_discussion_generation_task,
@@ -65,6 +65,16 @@ def get_project_details(session, project_id):
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
     return jsonify(project.to_dict()), 200
+
+@projects_bp.route('/projects/<project_id>/analyses', methods=['GET'])
+@with_db_session
+def get_project_analyses(session, project_id):
+    """
+    Retourne les résultats de toutes les analyses terminées pour un projet.
+    """
+    # Cette requête suppose que vous avez un modèle 'Analysis' qui stocke les résultats.
+    analyses = session.query(Analysis).filter_by(project_id=project_id).all()
+    return jsonify([analysis.to_dict() for analysis in analyses]), 200
 
 @projects_bp.route('/projects/<project_id>', methods=['DELETE'])
 @with_db_session
@@ -265,6 +275,7 @@ def run_advanced_analysis(project_id):
     task_map = {
         "meta_analysis": run_meta_analysis_task,
         "atn_scores": run_atn_score_task,
+        "discussion": run_discussion_generation_task,
         "knowledge_graph": run_knowledge_graph_task,
         "prisma_flow": run_prisma_flow_task,
         "atn_specialized_extraction": run_atn_specialized_extraction_task,
@@ -315,11 +326,12 @@ def upload_zotero_file(project_id):
         filename = secure_filename(file.filename)
         file_path = save_file_to_project_dir(file, project_id, filename, PROJECTS_DIR)
         
-        # ✅ CORRECTION: La tâche d'import depuis un fichier est `import_from_zotero_json_task`
-        job = background_queue.enqueue( # Utiliser la bonne tâche pour l'import de fichier
+        # ✅ CORRECTION: Utiliser la tâche correcte pour l'import de fichier
+        job = background_queue.enqueue(
             import_from_zotero_file_task,
             project_id=project_id,
-            json_file_path=file_path
+            json_file_path=file_path,
+            job_timeout=3600 # 1 heure
         )
         return jsonify({"message": "Importation de fichier Zotero lancée", "imported": len(json.load(open(file_path))['items']), "task_id": job.id}), 202
     except Exception as e:

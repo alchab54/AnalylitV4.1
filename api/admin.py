@@ -12,7 +12,7 @@ from utils.app_globals import (
  
 admin_bp = Blueprint('admin_bp', __name__)
  
-@admin_bp.route('/admin/queues/info', methods=['GET'])
+@admin_bp.route('/queues/info', methods=['GET'])
 def get_queues_info():
     """Retourne le statut des files RQ."""
     queues_list = [processing_queue, synthesis_queue, analysis_queue, background_queue]

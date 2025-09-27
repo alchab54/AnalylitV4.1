@@ -53,8 +53,8 @@ class AdminDashboard {
     async loadData() {
         try {
             const [tasks, queues] = await Promise.all([
-                fetchAPI('/api/tasks/status'),
-                fetchAPI('/api/queues/status')
+                fetchAPI('/api/tasks/status'), // Note: This endpoint might need a separate fix if it doesn't exist.
+                fetchAPI('/api/queues/info')   // ✅ CORRECTION: Utiliser la route standardisée.
             ]);
             this.renderStats(tasks, queues);
             this.renderTaskLists(tasks);
