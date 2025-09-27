@@ -396,6 +396,7 @@ def save_rob_assessment(session, project_id, article_id):
         rob_assessment.domain_2_bias = assessment_data.get('allocation_concealment', rob_assessment.domain_2_bias)
         rob_assessment.domain_2_justification = assessment_data.get('allocation_concealment_notes', rob_assessment.domain_2_justification)
         logger.info(f"Mise à jour de l'évaluation RoB pour l'article {article_id}")
+        status_code = 200
     else:
         # Créer un nouvel enregistrement
         rob_assessment = RiskOfBias(
@@ -409,6 +410,7 @@ def save_rob_assessment(session, project_id, article_id):
         )
         session.add(rob_assessment)
         logger.info(f"Création de l'évaluation RoB pour l'article {article_id}")
+        status_code = 201
 
     session.commit()
     # CORRECTION: Construire manuellement le dictionnaire de réponse pour garantir
@@ -419,7 +421,7 @@ def save_rob_assessment(session, project_id, article_id):
     response_data['article_id'] = rob_assessment.article_id
     response_data['random_sequence_generation'] = rob_assessment.domain_1_bias
     response_data['allocation_concealment_notes'] = rob_assessment.domain_2_justification
-    return jsonify(response_data), 200
+    return jsonify(response_data), status_code
 
 @projects_bp.route('/projects/<project_id>/add-manual-articles', methods=['POST'])
 def add_manual_articles(project_id):

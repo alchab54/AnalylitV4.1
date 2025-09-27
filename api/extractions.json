@@ -1,0 +1,32 @@
+[
+  {
+    "id": "test-extraction-1",
+    "pmid": "PMID:12345678",
+    "title": "Mock Article 1: Impact of Diabetes on Health",
+    "relevance_score": 8,
+    "relevance_justification": "Étude pertinente sur le diabète et l'IA",
+    "extracted_data": {
+      "population": "Patients diabétiques",
+      "intervention": "Application mobile IA",
+      "outcome": "Amélioration du contrôle glycémique",
+      "study_type": "RCT"
+    },
+    "analysis_source": "pdf",
+    "created_at": "2023-01-15T10:00:00.000Z"
+  },
+  {
+    "id": "test-extraction-2", 
+    "pmid": "PMID:87654321",
+    "title": "Mock Article 2: New Therapies for Type 2 Diabetes",
+    "relevance_score": 7,
+    "relevance_justification": "Thérapies innovantes avec IA",
+    "extracted_data": {
+      "population": "Patients T2D",
+      "intervention": "Chatbot thérapeutique",
+      "outcome": "Meilleure adhérence au traitement",
+      "study_type": "Cohorte"
+    },
+    "analysis_source": "abstract",
+    "created_at": "2022-11-01T14:30:00.000Z"
+  }
+]

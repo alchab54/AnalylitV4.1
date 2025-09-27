@@ -107,7 +107,7 @@ class AdminDashboard {
 
         container.innerHTML = tasks.map(task => `
             <div class="task-item status-${task.status}">
-                <div class="task-info">
+            <div class="task-info"> 
                     <div class="task-name">${task.description || task.id}</div>
                     <div class="task-project">Queue: ${task.queue}</div>
                     <div class="task-time">Créée: ${new Date(task.created_at).toLocaleString('fr-FR')}</div>
@@ -118,7 +118,7 @@ class AdminDashboard {
                 </div>
             </div>
         `).join('');
-    }
+    } 
 
     renderPerformanceMetrics() {
         const container = document.getElementById('performance-metrics');
