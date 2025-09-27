@@ -10,7 +10,7 @@ from urllib3.util.retry import Retry
 
 # Import de la configuration de manière sécurisée
 try:
-    from config_v4 import get_config
+    from backend.config.config_v4 import get_config
     config = get_config()
 except ImportError:
     # Fallback pour un contexte où le module config n'est pas dans le path

@@ -333,6 +333,38 @@ const action = submitActions[actionName];
     });
 }
 
+/**
+ * Met à jour l'indicateur de connexion WebSocket dans l'en-tête.
+ * @param {string} status - 'connected', 'connecting', ou 'disconnected'.
+ */
+function updateConnectionIndicatorUI(status) {
+    const container = elements.connectionStatus();
+    if (!container) return;
+
+    const dot = container.querySelector('.status-dot');
+    const text = container.querySelector('.status-text');
+
+    if (!dot || !text) return;
+
+    // Retirer les anciennes classes de statut
+    dot.classList.remove('connected', 'connecting', 'disconnected');
+
+    switch (status) {
+        case 'connected':
+            dot.classList.add('connected');
+            text.textContent = 'Connecté';
+            break;
+        case 'disconnected':
+            dot.classList.add('disconnected');
+            text.textContent = 'Déconnecté';
+            break;
+        default: // 'connecting' ou autre
+            dot.classList.add('connecting');
+            text.textContent = 'Connexion...';
+            break;
+    }
+}
+
 export function initializeWebSocket() {
     try {
         if (typeof io !== 'function') {
@@ -346,7 +378,7 @@ export function initializeWebSocket() {
         appState.socket.on('connect', () => {
             console.log(MESSAGES.websocketConnected);
             setConnectionStatus('connected');
-            if (elements.connectionStatus()) elements.connectionStatus().textContent = '✅';
+            updateConnectionIndicatorUI('connected');
             if (appState.currentProject?.id) { // Check if currentProject and its ID exist
                 appState.socket.emit('join_room', { room: appState.currentProject.id });
             }
@@ -354,8 +386,8 @@ export function initializeWebSocket() {
         
         appState.socket.on('disconnect', () => {
             console.warn(MESSAGES.websocketDisconnected);
-            appState.socketConnected = false;
-            if (elements.connectionStatus) elements.connectionStatus.textContent = '⏳';
+            setConnectionStatus('disconnected');
+            updateConnectionIndicatorUI('disconnected');
         });
 
         appState.socket.on('notification', (data) => {
@@ -386,7 +418,7 @@ export function initializeWebSocket() {
 
     } catch (e) {
         console.error(MESSAGES.websocketError, e);
-        if (elements.connectionStatus()) elements.connectionStatus().textContent = '❌';
+        updateConnectionIndicatorUI('disconnected');
     }
 }
 

@@ -44,7 +44,7 @@ describe('Analyses - Coverage Boost', () => {
                 <div class="analysis-results" id="discussion-results"></div>
                 <div class="analysis-results" id="knowledge-graph-results"></div>
             </div>
-        `;
+        `; // Note: The closing </form> tag was missing in the original, which could cause issues.
         // Mock window functions
         global.confirm = jest.fn(() => true);
         global.open = jest.fn();
@@ -96,8 +96,9 @@ describe('Analyses - Coverage Boost', () => {
 
         await analyses.savePRISMAProgress();
 
-        // The querySelector in the function is more specific
-        const item2Checkbox = document.querySelector('input[name="item2"]');
+        // ✅ CORRECTION: Utiliser un sélecteur plus stable pour le test.
+        // Le sélecteur original était fragile.
+        const item2Checkbox = document.querySelector('[data-item-id="item2"]');
         if(item2Checkbox) item2Checkbox.dataset.itemId = 'item2';
 
         expect(api.fetchAPI).toHaveBeenCalledWith('/projects/test-project/prisma-checklist', {

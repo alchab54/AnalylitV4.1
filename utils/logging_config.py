@@ -1,7 +1,7 @@
 # utils/logging_config.py
 import logging
 from logging.handlers import TimedRotatingFileHandler
-from config_v4 import get_config
+from backend.config.config_v4 import get_config
 
 config = get_config()
 

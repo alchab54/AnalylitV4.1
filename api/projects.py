@@ -10,8 +10,8 @@ from sqlalchemy.exc import IntegrityError
 from utils.app_globals import background_queue, processing_queue, analysis_queue, discussion_draft_queue
 from utils.database import with_db_session, get_session
 from utils.models import Project, Grid, Extraction, AnalysisProfile, RiskOfBias, Analysis
-from utils.file_handlers import save_file_to_project_dir
-from tasks_v4_complete import (
+from utils.file_handlers import save_file_to_project_dir 
+from backend.tasks_v4_complete import (
     run_discussion_generation_task,
     answer_chat_question_task,
     process_single_article_task,
@@ -55,7 +55,8 @@ def create_project(session):
 @projects_bp.route('/projects/', methods=['GET'])
 @with_db_session
 def get_all_projects(session):
-    projects = session.query(Project).all()
+    """Retourne la liste de tous les projets."""
+    projects = session.query(Project).order_by(Project.created_at.desc()).all()
     return jsonify([p.to_dict() for p in projects]), 200
 
 @projects_bp.route('/projects/<project_id>', methods=['GET'])

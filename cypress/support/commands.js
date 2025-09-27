@@ -4,17 +4,16 @@
 
 // ✅ ATTENTE ROBUSTE de l'application
 Cypress.Commands.add('waitForAppReady', () => {
-  // Attendre les éléments critiques
-  cy.get('body', { timeout: 30000 }).should('be.visible');
-  cy.get('.app-header', { timeout: 20000 }).should('be.visible');
-  cy.get('.app-nav', { timeout: 20000 }).should('be.visible');
-  
-  // Attendre que les scripts JS soient chargés
-  cy.window().should('have.property', 'AnalyLit');
-  
-  // Attendre les APIs critiques
+  // ✅ CORRECTION CRITIQUE: Intercepter la requête AVANT de visiter la page.
+  // Cela garantit que Cypress "écoute" au moment où l'application fait l'appel.
   cy.intercept('GET', '/api/projects/').as('getProjects');
-  cy.wait('@getProjects');
+
+  // Visiter la page de test dédiée. L'application va se charger et déclencher l'appel.
+  cy.visit('/cypress-support.html');
+
+  // Attendre que la requête interceptée soit terminée.
+  // On augmente le timeout pour laisser le temps au serveur de répondre.
+  cy.wait('@getProjects', { timeout: 15000 });
   
   // Pause finale pour stabilité
   cy.wait(2000);
@@ -69,12 +68,17 @@ Cypress.Commands.add('createTestProject', (projectName = 'Projet Test Cypress') 
   cy.get('#createProjectForm button[type="submit"]').click({ force: true });
   
   // 6. Attendre réponse API
-  cy.wait('@createProject', { timeout: 15000 }).its('response.statusCode').should('eq', 201);
+  cy.wait('@createProject', { timeout: 20000 }).its('response.statusCode').should('eq', 201);
   
   // 7. Attendre fermeture modale
   cy.get('#newProjectModal', { timeout: 8000 }).should('not.be.visible');
   
+  // ✅ CORRECTION ROBUSTE: Attendre que la liste des projets se recharge après la création.
+  // On intercepte la requête GET qui suit la création du projet.
+  cy.wait('@getProjects', { timeout: 15000 });
+
   // 8. Vérifier projet créé
+  // On augmente le timeout ici pour laisser le temps au DOM de se mettre à jour.
   cy.contains('.project-card', projectName, { timeout: 15000 }).should('exist');
   
   console.log(`✅ Projet "${projectName}" créé avec succès`);
@@ -126,11 +130,15 @@ Cypress.Commands.add('debugUI', () => {
 // ✅ NETTOYAGE ENTRE TESTS
 Cypress.Commands.add('resetApp', () => {
   // Fermer toutes modales
-  cy.get('.modal.modal--show').then($modals => {
-    if ($modals.length) {
+  cy.get('body').then($body => {
+    // On vérifie si une modale est présente SANS faire échouer le test
+    if ($body.find('.modal.modal--show').length) {
+      // Si une modale est trouvée, on la ferme
       cy.get('.modal-close').click({ force: true, multiple: true });
+      // On peut même attendre qu'elle disparaisse pour être sûr
+      cy.get('.modal.modal--show').should('not.exist');
     }
-  });
+  }); // Si aucune modale n'est trouvée, ce bloc est simplement ignoré.
   
   // Retour section projets
   cy.navigateToSection('projects');

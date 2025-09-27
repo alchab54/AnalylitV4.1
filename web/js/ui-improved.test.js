@@ -179,7 +179,8 @@ describe('Module UI Improved', () => {
       expect(confirmButton).not.toBeNull();
       confirmButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
-      await jest.runAllTimersAsync();
+      // ✅ CORRECTION: Attendre que toutes les promesses et timers soient résolus.
+      await jest.runAllTimersAsync(); 
 
       expect(onConfirm).toHaveBeenCalledTimes(1);
     });

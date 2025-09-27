@@ -1,7 +1,7 @@
 import os
 from redis import Redis
 from rq import Queue
-from config_v4 import get_config
+from backend.config.config_v4 import get_config
 
 REDIS_HOST = os.getenv("REDIS_HOST", "analylit_redis")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))

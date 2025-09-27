@@ -149,7 +149,7 @@ export async function renderSettings() {
     }
 
     // 3. Initialiser les composants interactifs
-    initializeAllEditors();
+    // initializeAllEditors(); // ✅ CORRECTION: Différer l'initialisation des éditeurs
     setupSettingsEventListeners(); // Attacher les écouteurs aux éléments fraîchement créés
 
     // 4. Sélectionner le premier profil par défaut

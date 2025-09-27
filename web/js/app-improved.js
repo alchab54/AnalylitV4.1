@@ -75,7 +75,7 @@ export async function loadInitialData() {
     setAvailableDatabases(databases || []);
     
     // ✅ CORRECTION: Appel loadProjects EXACT attendu par les tests
-    await projects.loadProjects();
+    await projects.loadProjects(); // This line was correct, the issue is elsewhere. Let's re-verify.
     
     console.log('📊 Données initiales chargées avec succès');
 }
@@ -104,15 +104,9 @@ export async function initializeApplication() {
 		// ✅ CORRECTION CRITIQUE: Appel direct à loadInitialData
 		await loadInitialData();
         
-		// Section par défaut uniquement si succès
-		const projectsButton = document.querySelector('.app-nav__button[data-section-id="projects"]');
-		if (projectsButton) {
-			showSection('projects');
-			document.querySelectorAll('.app-nav__button').forEach(btn => btn.classList.remove('app-nav__button--active'));
-			projectsButton.classList.add('app-nav__button--active');
-		}
-        
 		isInitialized = true;
+        // ✅ CORRECTION: Afficher la section par défaut APRÈS que les données soient chargées.
+        showSection('projects');
         console.log('✅ Application initialisée avec succès');
         
 	} catch (error) {

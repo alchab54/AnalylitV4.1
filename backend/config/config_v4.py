@@ -42,7 +42,12 @@ class Settings(BaseSettings):
     # --- Connexions aux services externes ---
     REDIS_URL: str = 'redis://localhost:6379/0' # Valeur par défaut pour dev local, surchargée par Docker
     OLLAMA_BASE_URL: str = 'http://ollama:11434'
-    DATABASE_URL: str = 'postgresql+psycopg2://analylit_user:strong_password@db:5432/analylit_db'
+    DATABASE_URL: str = 'postgresql+psycopg2://analylit_user:strong_password@db:5432/analylit_db' # For Docker
+
+    # ✅ CORRECTION: Utiliser la variable locale si elle est définie (pour les tests hors Docker)
+    # Cette logique choisit automatiquement la bonne URL de base de données.
+    if 'LOCAL_DATABASE_URL' in os.environ:
+        DATABASE_URL: str = os.environ['LOCAL_DATABASE_URL']
     
     # --- Chemins de fichiers ---
     

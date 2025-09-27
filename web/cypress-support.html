@@ -3,81 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnalyLit v4.1 - Tests Cypress</title>
+    <title>AnalyLit v4.1 - Test Runner</title>
     
-    <!-- CSS MINIMAL POUR TESTS -->
+    <!-- CSS UNIQUE -->
     <link rel="stylesheet" href="css/frontend-fix.css">
-    
-    <!-- PAS de scripts externes lourds pour les tests -->
 </head>
-<body data-test-mode="true">
-    <!-- Structure minimale pour tests -->
-    <header class="app-header">
+<body data-user-role="user" id="app-body">
+    <!-- En-tête principal -->
+    <header class="app-header" id="main-header">
         <div class="container">
-            <h1 class="app-header__title">🧬 AnalyLit v4.1</h1>
+            <div class="app-header__content">
+                <div class="app-header__left">
+                    <h1 class="app-header__title">
+                        <span role="img" aria-hidden="true">🧬</span>
+                        AnalyLit v4.1
+                    </h1>
+                </div>
+                <div class="app-header__right">
+                    <div id="connection-status" class="connection-indicator">
+                        <span class="status-dot connected"></span>
+                        <span class="status-text">Connecté</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
-    <nav class="app-nav">
+    <!-- Navigation FIXE -->
+    <nav class="app-nav" id="main-navigation" role="navigation" aria-label="Navigation principale">
         <div class="container">
             <button class="app-nav__button app-nav__button--active" data-action="show-section" data-section-id="projects">
-                📁 Projets
+                <span role="img" aria-hidden="true">📁</span> Projets
             </button>
             <button class="app-nav__button" data-action="show-section" data-section-id="search">
-                🔍 Recherche
+                <span role="img" aria-hidden="true">🔍</span> Recherche
+            </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="results">
+                <span role="img" aria-hidden="true">📄</span> Résultats
             </button>
             <button class="app-nav__button" data-action="show-section" data-section-id="validation">
-                ✅ Validation
+                <span role="img" aria-hidden="true">✅</span> Validation
+            </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="rob">
+                <span role="img" aria-hidden="true">⚖️</span> Risk of Bias
+            </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="grids">
+                <span role="img" aria-hidden="true">📋</span> Grilles
             </button>
             <button class="app-nav__button" data-action="show-section" data-section-id="analyses">
-                📊 Analyses
+                <span role="img" aria-hidden="true">📊</span> Analyses
+            </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="atn-analysis">
+                <span role="img" aria-hidden="true">🧠</span> Analyses ATN
+            </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="import">
+                <span role="img" aria-hidden="true">📥</span> Import
+            </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="chat">
+                <span role="img" aria-hidden="true">💬</span> Chat IA
+            </button>
+            <button class="app-nav__button" data-action="show-section" data-section-id="settings">
+                <span role="img" aria-hidden="true">⚙️</span> Paramètres
             </button>
         </div>
     </nav>
 
-    <main class="app-main">
+    <!-- Contenu principal -->
+    <main class="app-main" id="main-content" role="main">
         <div class="container">
-            <section id="projects" class="app-section active">
-                <div class="section-header">
-                    <h2>Gestion des Projets</h2>
-                    <div class="section-header__actions">
-                        <button id="create-project-btn" class="btn btn-primary" data-action="create-project-modal">
-                            ➕ Nouveau Projet
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="projects-list" class="projects-grid">
-                    <!-- Projets test -->
-                </div>
-            </section>
-
-            <section id="search" class="app-section">
-                <h2>Recherche</h2>
-            </section>
-
-            <section id="validation" class="app-section">
-                <h2>Validation</h2>
-            </section>
-
-            <section id="analyses" class="app-section">
-                <h2>Analyses</h2>
-            </section>
+            <section id="projects" class="app-section active"></section>
+            <section id="search" class="app-section" style="display: none;"></section>
+            <section id="results" class="app-section" style="display:none"></section>
+            <section id="validation" class="app-section" style="display: none;"></section>
+            <section id="rob" class="app-section" style="display: none;"></section>
+            <section id="grids" class="app-section" style="display: none;"></section>
+            <section id="analyses" class="app-section" style="display: none;"></section>
+            <section id="atn-analysis" class="app-section" style="display: none;"></section>
+            <section id="import" class="app-section" style="display: none;"></section>
+            <section id="chat" class="app-section" style="display: none;"></section>
+            <section id="settings" class="app-section" style="display: none;"></section>
         </div>
     </main>
 
-    <!-- Modale test -->
-    <div id="newProjectModal" class="modal">
+    <!-- MODALES -->
+    <div id="newProjectModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-backdrop" data-action="close-modal"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Créer un Nouveau Projet</h3>
-                <button class="modal-close" data-action="close-modal">×</button>
+                <h3 class="modal-title">Créer un Nouveau Projet</h3>
+                <button class="modal-close" data-action="close-modal" aria-label="Fermer">×</button>
             </div>
-            <form id="createProjectForm">
+            <form id="createProjectForm" data-action="create-project">
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="projectName">Nom du projet</label>
-                        <input type="text" id="projectName" class="form-control" required>
+                        <input type="text" id="projectName" name="name" class="form-control" required>
                     </div>
                 </div>
                 <div class="modal-actions">
@@ -87,8 +107,18 @@
             </form>
         </div>
     </div>
+    <div id="prismaModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true"></div>
+    <div id="genericModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true"></div>
 
-    <!-- Scripts minimaux pour tests -->
-    <script src="js/cypress-test-support.js"></script>
+    <!-- Overlay de chargement -->
+    <div id="loadingOverlay" class="loading-overlay" aria-hidden="true"></div>
+
+    <!-- Conteneur pour les toasts -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Scripts d'initialisation -->
+    <script type="module" src="js/app-improved.js"></script>
+
 </body>
 </html>
+

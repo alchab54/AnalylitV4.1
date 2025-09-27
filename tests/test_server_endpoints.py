@@ -14,7 +14,7 @@ from unittest.mock import patch, MagicMock
 
 # --- IMPORTS NÉCESSAIRES POUR LES TESTS D'ASSERTION FINAUX ---
 # Nous devons importer les fonctions de tâches réelles pour les comparer
-from tasks_v4_complete import (
+from backend.tasks_v4_complete import (
     run_discussion_generation_task,
     answer_chat_question_task,
     # --- TÂCHES AJOUTÉES POUR LES NOUVEAUX TESTS ---
@@ -219,7 +219,7 @@ def test_api_run_discussion_draft_enqueues_task(mock_enqueue, client, db_session
     response_data = json.loads(response.data)
     assert response_data['task_id'] == "mocked_job_id_123"
 
-@patch('utils.app_globals.background_queue.enqueue')
+@patch('backend.server_v4_complete.background_queue.enqueue')
 def test_api_post_chat_message_enqueues_task(mock_enqueue, client, db_session):
     """
     Teste d'intégration API : Vérifie que l'endpoint de chat met bien en file la tâche RAG.
@@ -258,7 +258,7 @@ def test_api_post_chat_message_enqueues_task(mock_enqueue, client, db_session):
 # === DÉBUT DES NOUVEAUX TESTS AJOUTÉS (Couverture restante) ===
 # =================================================================
 
-@patch('utils.app_globals.background_queue.enqueue')
+@patch('backend.server_v4_complete.background_queue.enqueue')
 def test_api_search_enqueues_task(mock_enqueue, client, db_session):
     """
     Teste POST /api/search et vérifie qu'il met en file la tâche de recherche.
@@ -350,7 +350,7 @@ def test_api_run_pipeline_enqueues_tasks(mock_enqueue, client, db_session):
     ("knowledge_graph", run_knowledge_graph_task),
     ("prisma_flow", run_prisma_flow_task),
 ])
-@patch('utils.app_globals.analysis_queue.enqueue')
+@patch('backend.server_v4_complete.analysis_queue.enqueue')
 def test_api_run_advanced_analysis_enqueues_tasks(mock_enqueue, analysis_type, expected_task, client, db_session):
     """
     Teste POST /api/projects/<id>/run-analysis pour tous les types d'analyse (paramétré).
@@ -376,7 +376,7 @@ def test_api_run_advanced_analysis_enqueues_tasks(mock_enqueue, analysis_type, e
         job_timeout=1800
     )
 
-@patch('utils.app_globals.background_queue.enqueue')
+@patch('backend.server_v4_complete.background_queue.enqueue')
 def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
     """
     Teste POST /api/projects/<id>/import-zotero (PDF sync)
@@ -416,7 +416,7 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
         job_timeout='30m'
     )
 
-@patch('utils.app_globals.background_queue.enqueue') 
+@patch('backend.server_v4_complete.background_queue.enqueue')
 def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session):
     """
     Teste POST /api/projects/<id>/upload-zotero (File import) - Version simplifiée
@@ -453,7 +453,7 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
  
         assert json.loads(response.data)['task_id'] == mock_job.id
 
-@patch('utils.app_globals.analysis_queue.enqueue')
+@patch('backend.server_v4_complete.analysis_queue.enqueue')
 def test_api_run_rob_analysis_enqueues_task(mock_enqueue, client, db_session):
     """
     Teste POST /api/projects/<id>/run-rob-analysis et vérifie les appels multiples à enqueue.

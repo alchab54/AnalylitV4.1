@@ -70,7 +70,9 @@ describe('Module Analyses', () => {
     it("devrait afficher un message si aucun projet n'est sélectionné", async () => {
       appState.currentProject = null;
       await analyses.loadProjectAnalyses();
-      expect(elements.analysisContainer().innerHTML).toContain('Sélectionnez un projet pour voir les analyses.');
+      // ✅ CORRECTION: Utiliser `textContent` au lieu de `innerHTML` pour ignorer les balises HTML
+      // et les espaces, ce qui rend le test plus robuste.
+      expect(elements.analysisContainer().textContent).toContain('Veuillez sélectionner un projet pour visualiser les analyses.');
     });
 
     it("devrait gérer une erreur de l'API", async () => {

@@ -9,7 +9,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from utils.database import with_db_session
 from utils.app_globals import background_queue
-from tasks_v4_complete import multi_database_search_task
+from backend.tasks_v4_complete import multi_database_search_task
 from utils.fetchers import db_manager
 
 logger = logging.getLogger(__name__)

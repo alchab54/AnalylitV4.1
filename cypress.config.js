@@ -1,82 +1,35 @@
-// ===================================================================
-// == ANALYLIT V4.1 - CONFIGURATION CYPRESS CORRIGÉE ==
-// ===================================================================
-
 import { defineConfig } from 'cypress';
 
 export default defineConfig({
-  // ===============================================
-  // == TESTS E2E SEULEMENT (Désactiver Component) ==
-  // ===============================================
+  // Configuration globale
+  projectId: 'tn6aw5', // Remplacez par votre ID de projet Cypress Dashboard
+
+  // Configuration pour les tests End-to-End (E2E)
   e2e: {
-    // Configuration de base
-    baseUrl: 'http://localhost:8080',
-    viewportWidth: 1280,
-    viewportHeight: 720,
-    
-    // Chemins des fichiers
-    specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
+    // URL de base de votre application en test
+    baseUrl: 'http://localhost:8888',
+
+    // Fichier de support pour les commandes personnalisées, etc.
     supportFile: 'cypress/support/e2e.js',
-    fixturesFolder: 'cypress/fixtures',
 
-    // Résultats et rapports
-    screenshotsFolder: 'reports/cypress/screenshots',
-    videosFolder: 'reports/cypress/videos',
-    downloadsFolder: 'cypress/downloads',
-    // Timeouts optimisés Ryzen 3700X
-    defaultCommandTimeout: 15000,
-    requestTimeout: 15000,
-    responseTimeout: 15000,
-    pageLoadTimeout: 30000,
-    taskTimeout: 60000,
-    
-    // Options d'exécution
+    // --- Optimisations pour CI/CD ---
+
+    // 1. Désactive l'enregistrement vidéo.
+    // C'est le gain de performance le plus significatif en CI.
+    // Le post-traitement, la compression et la sauvegarde de la vidéo sont désactivés.
     video: false,
-    screenshotOnRunFailure: true,
-    trashAssetsBeforeRuns: true,
-    watchForFileChanges: false,
-    
-    // Retries intelligents
-    retries: {
-      runMode: 2,
-      openMode: 1
-    },
-    
-    // Variables d'environnement
-    env: {
-      apiUrl: 'http://localhost:5000/api',
-      coverage: false,
-    },
-    
-    // Exclusions
-    excludeSpecPattern: [
-      '**/examples/*',
-      '**/node_modules/*',
-      '**/*.hot-update.js'
-    ],
-    
-    // Configuration navigateur
-    chromeWebSecurity: false,
-    modifyObstructiveCode: false,
-    
-    setupNodeEvents(on, config) {
-      // Tâches personnalisées
-      on('task', { log(message) {
-          console.log(message);
-          return null;
-        }
-      });
 
-      return config
+    // 2. Désactive les captures d'écran automatiques en cas d'échec d'un test.
+    // Utile pour accélérer les runs, mais peut être activé si le débogage visuel est crucial.
+    screenshotOnRunFailure: false,
+
+    // 3. Réduit le nombre de tests gardés en mémoire vive.
+    // Libère de la RAM, ce qui est bénéfique dans les conteneurs CI/CD.
+    // La valeur par défaut est 50. Mettre à 0 pour une optimisation maximale.
+    numTestsKeptInMemory: 5,
+
+    setupNodeEvents(on, config) {
+      // implémentez ici les écouteurs d'événements du nœud
     },
   },
-
-  // ===============================================
-  // == DÉSACTIVER COMPLÈTEMENT LES TESTS COMPONENT ==
-  // ===============================================
-  // ❌ PAS DE TESTS DE COMPOSANTS pour AnalyLit v4.1
-  // Ceci résout l'erreur "supportFile component missing"
-  
-  // NE PAS inclure de section "component" du tout
-  // Cypress ne cherchera plus de supportFile component
 });

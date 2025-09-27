@@ -5,8 +5,8 @@ import json
 from flask import Blueprint, jsonify, request, send_file
 from utils.database import with_db_session, get_session
 from utils.models import Project, Article, Extraction # Assuming these models are relevant for reporting
-from utils.app_globals import background_queue # For potentially long-running report generation tasks
-from tasks_v4_complete import (
+from utils.app_globals import background_queue # For potentially long-running report generation tasks 
+from backend.tasks_v4_complete import (
     generate_bibliography_task,
     generate_summary_table_task,
     export_excel_report_task

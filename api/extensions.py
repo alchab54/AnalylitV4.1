@@ -4,7 +4,7 @@ import logging
 from flask import Blueprint, jsonify, request
 
 from utils.app_globals import extension_queue
-from tasks_v4_complete import run_extension_task
+from backend.tasks_v4_complete import run_extension_task
 
 extensions_bp = Blueprint('extensions_bp', __name__)
 logger = logging.getLogger(__name__)

@@ -60,10 +60,9 @@ describe('Core - Coverage Boost', () => {
     it('showSection devrait mettre à jour les boutons de navigation', () => {
         core.showSection('projects');
  
-        // The actual DOM update is handled by an event listener in the real app,
-        // which we don't need to test here. We just need to ensure the state function is called.
-        // The test for the DOM update itself belongs in a different test file (e.g., an integration test).
-        // For this unit test, we just confirm the core function did its job.
+        // ✅ CORRECTION: Le test unitaire doit vérifier l'appel de la fonction de l'état,
+        // pas l'effet de bord sur le DOM qui est géré par un autre listener.
+        // Cela rend le test moins fragile et plus ciblé.
         expect(state.setCurrentSection).toHaveBeenCalledWith('projects');
     });
 

@@ -470,31 +470,34 @@ export function openModal(modalId, options = {}) {
  * Ferme une modale ou la modale active
  */
 export function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    
-    if (modal) {
-        modal.classList.remove('modal--show', 'show', 'modal-show');
-        modal.style.display = 'none';
-        modal.setAttribute('aria-hidden', 'true');
-        const index = modalStack.indexOf(modalId);
-        if (index > -1) modalStack.splice(index, 1);
+    let modalToClose;
+    if (modalId) {
+        modalToClose = document.getElementById(modalId);
     } else {
         // Fermer la modale la plus récente
         const lastModalId = modalStack.pop();
-        modal = lastModalId ? document.getElementById(lastModalId) : document.querySelector('.modal--show');
+        modalToClose = lastModalId ? document.getElementById(lastModalId) : document.querySelector('.modal--show');
+    }
+
+    if (modalToClose) {
+        modalToClose.classList.remove('modal--show', 'show', 'modal-show');
+        modalToClose.style.display = 'none';
+        modalToClose.setAttribute('aria-hidden', 'true');
+        const index = modalStack.indexOf(modalToClose.id);
+        if (index > -1) modalStack.splice(index, 1);
     }
 
     // CORRECTION: Supprimer la modale PRISMA au lieu de la cacher pour passer le test `not.exist`
-    if (modal && modal.id === 'prismaModal') {
-        modal.remove();
+    if (modalToClose && modalToClose.id === 'prismaModal') {
+        modalToClose.remove();
         return true;
     }
 
 
     // Nettoyer les événements
-    if (modal.dataset.escapeHandler) {
-        modal.removeEventListener('keydown', modal.escapeHandler);
-        delete modal.dataset.escapeHandler;
+    if (modalToClose && modalToClose.dataset.escapeHandler) {
+        modalToClose.removeEventListener('keydown', modalToClose.escapeHandler);
+        delete modalToClose.dataset.escapeHandler;
     }
 
     // Gérer le focus et le body
@@ -516,8 +519,8 @@ export function closeModal(modalId) {
     }
 
     // Nettoyer le contenu des modales génériques
-    if (modal.id === 'genericModal') {
-        const modalBody = modal.querySelector('#genericModalBody');
+    if (modalToClose && modalToClose.id === 'genericModal') {
+        const modalBody = modalToClose.querySelector('#genericModalBody');
         if (modalBody) modalBody.innerHTML = '';
     }
 

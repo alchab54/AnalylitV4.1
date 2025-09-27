@@ -9,7 +9,7 @@ from unittest.mock import patch, MagicMock
 from utils.models import Project, Grid, Prompt, Extraction
 
 # Import des tâches pour vérifier les appels enqueue
-from tasks_v4_complete import pull_ollama_model_task, run_extension_task
+from backend.tasks_v4_complete import pull_ollama_model_task, run_extension_task
 
 # --- Fixture pour un projet de test ---
 
@@ -149,7 +149,7 @@ def test_api_admin_endpoints(client):
     """
     Teste les routes de l'API d'administration (Ollama pull, Queue clear).
     """
-    # --- 1. POST apiollamapull (Vérifie la mise en file) ---
+    # --- 1. POST api/ollama/pull (Vérifie la mise en file) ---
     with patch('server_v4_complete.models_queue.enqueue') as mock_enqueue:
         mock_job = MagicMock()
         mock_job.get_id.return_value = "mock_pull_task_id"
@@ -190,7 +190,7 @@ def test_api_extensions_endpoint(client):
     """
     Teste l'endpoint générique POST /api/extensions.
     """
-    with patch('utils.app_globals.extension_queue.enqueue') as mock_enqueue:
+    with patch('backend.server_v4_complete.extension_queue.enqueue') as mock_enqueue:
         mock_job = MagicMock()
         mock_job.id = "mock_extension_task_id"
         mock_enqueue.return_value = mock_job

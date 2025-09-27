@@ -35,7 +35,7 @@ from redis import Redis
 from rq import get_current_job
 
 # --- Importer la config de l'application ---
-from config_v4 import get_config
+from backend.config.config_v4 import get_config
 
 # --- Importer les modèles de la base de données ---
 from utils.models import (
@@ -1357,4 +1357,3 @@ def run_empathy_comparative_analysis_task(session, project_id: str, **kwargs):
     """Dummy task for empathy comparative analysis."""
     logger.info(f"Running empathy comparative analysis for project {project_id}")
     send_project_notification(project_id, 'analysis_completed', 'Empathy comparative analysis completed.', {'analysis_type': 'empathy_comparative_analysis'})
-

@@ -5,7 +5,7 @@ import json
 from typing import Dict, Any, Optional
 from datetime import datetime
 import redis
-from config_v4 import get_config
+from backend.config.config_v4 import get_config
 
 logger = logging.getLogger(__name__)
 config = get_config()

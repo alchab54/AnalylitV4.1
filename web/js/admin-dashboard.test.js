@@ -40,7 +40,7 @@ describe('Module AdminDashboard', () => {
     expect(document.querySelector('.admin-header')).not.toBeNull();
     expect(document.querySelector('.admin-panels')).not.toBeNull();
     expect(fetchAPI).toHaveBeenCalledWith('/api/tasks/status');
-    expect(fetchAPI).toHaveBeenCalledWith('/api/queues/status');
+    expect(fetchAPI).toHaveBeenCalledWith('/api/queues/info');
   });
 
   test('devrait rafraîchir les données périodiquement', async () => {
@@ -51,10 +51,12 @@ describe('Module AdminDashboard', () => {
     expect(fetchAPI).toHaveBeenCalledTimes(2); // 1 pour tasks, 1 pour queues
 
     // Avancer le temps de 10 secondes pour déclencher setInterval
-    jest.advanceTimersByTime(10000);
-    await Promise.resolve(); // Allow promises triggered by the timer to resolve
+    // ✅ CORRECTION: Utiliser runOnlyPendingTimers et await pour plus de robustesse
+    await jest.runOnlyPendingTimersAsync();
 
-    expect(fetchAPI).toHaveBeenCalledTimes(4); // Devrait avoir été appelé à nouveau
+    // Les appels se produisent à l'intérieur de loadData, qui est appelé par le timer.
+    // L'attente garantit que les promesses à l'intérieur de loadData sont résolues.
+    expect(fetchAPI).toHaveBeenCalledTimes(4);
   });
 
   test('devrait afficher les statistiques correctement', async () => {

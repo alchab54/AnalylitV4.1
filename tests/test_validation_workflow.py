@@ -54,7 +54,7 @@ def test_update_decision_for_second_evaluator(client, db_session, setup_double_c
     assert "evaluator1" in validations and validations["evaluator1"] == "include"
     assert "evaluator2" in validations and validations["evaluator2"] == "exclude"
 
-@patch('server_v4_complete.background_queue.enqueue')
+@patch('backend.server_v4_complete.background_queue.enqueue')
 def test_calculate_kappa_task_enqueued(mock_enqueue, client, setup_double_coding_data):
     """
     Vérifie que la tâche de calcul Kappa peut être mise en file d'attente via l'endpoint dédié.
@@ -75,7 +75,7 @@ def test_calculate_kappa_task_enqueued(mock_enqueue, client, setup_double_coding
     assert response.get_json()['task_id'] == "kappa_task_123"
     
     # Vérifier que la bonne tâche a été mise en file d'attente
-    from tasks_v4_complete import calculate_kappa_task
+    from backend.tasks_v4_complete import calculate_kappa_task
     mock_enqueue.assert_called_once_with(
         calculate_kappa_task, 
         project_id=project_id,

@@ -59,7 +59,7 @@ from rq.job import Job
 from rq.registry import StartedJobRegistry, FinishedJobRegistry, FailedJobRegistry
 
 # --- Imports des tâches asynchrones ---
-from tasks_v4_complete import (
+from backend.tasks_v4_complete import (
     run_extension_task, multi_database_search_task, process_single_article_task,
     run_synthesis_task, run_discussion_generation_task, run_knowledge_graph_task,
     run_prisma_flow_task, run_meta_analysis_task, run_descriptive_stats_task, run_atn_score_task,

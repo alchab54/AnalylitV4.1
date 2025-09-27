@@ -73,7 +73,7 @@ def test_save_rob_assessment(client, db_session, new_project):
     })
     
     # 1. Vérifier que la requête a réussi et que la réponse contient les données
-    assert response.status_code == 200
+    assert response.status_code == 201
     saved_assessment_data = response.get_json()
     
     # 2. Vérifier que les données retournées par l'API sont correctes

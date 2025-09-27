@@ -6,10 +6,10 @@ import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 // This function is called by refreshCurrentSection in core.js
 export async function loadProjectAnalyses() {
+    // ✅ CORRECTION: Vérifier l'existence du projet AVANT de tenter un appel API.
+    // Cela corrige l'erreur du test unitaire qui échouait.
     if (!appState.currentProject) {
-        if (elements.analysisContainer()) {
-            elements.analysisContainer().innerHTML = `<p>${MESSAGES.selectProjectToViewAnalyses}</p>`;
-        }
+        renderAnalysesSection(); // Appeler render pour afficher le message "sélectionnez un projet"
         return;
     }
 
