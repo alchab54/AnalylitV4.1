@@ -1,27 +1,17 @@
 -- Création du rôle utilisateur (adapté)
-DO
-$do$
-BEGIN
-   IF NOT EXISTS (
-      SELECT FROM pg_roles WHERE rolname = 'analylit_user'
-   ) THEN
-      CREATE ROLE analylit_user WITH LOGIN PASSWORD 'strong_password';
-   END IF;
-END
-$do$;
+-- ===================================================================
+-- == ANALYLIT V4.1 - SCRIPT D'INITIALISATION POSTGRESQL ==
+-- ===================================================================
+--
+-- Ce script est exécuté automatiquement par l'image Docker de PostgreSQL
+-- APRÈS la création de la base de données et de l'utilisateur définis
+-- dans `docker-compose.yml` (POSTGRES_DB, POSTGRES_USER).
+--
+-- Le script se connecte automatiquement à la base `analylit_db`.
 
--- Se connecter à la base 'postgres' pour vérifier si 'analylit_db' existe
-\c postgres
+-- Créer le schéma applicatif pour une meilleure organisation des tables.
+-- L'utilisateur 'analylit_user' en devient propriétaire.
+CREATE SCHEMA IF NOT EXISTS analylit_schema AUTHORIZATION analylit_user;
 
--- Créer la base de données uniquement si elle n'existe pas
-DO
-$do$
-BEGIN
-   IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'analylit_db') THEN
-      CREATE DATABASE analylit_db WITH OWNER = analylit_user;
-   END IF;
-END
-$do$;
-
--- Donner tous les privilèges à l'utilisateur sur sa base de données (après sa création)
-GRANT ALL PRIVILEGES ON DATABASE analylit_db TO analylit_user;
+-- S'assurer que l'utilisateur a tous les droits sur son schéma.
+GRANT ALL PRIVILEGES ON SCHEMA analylit_schema TO analylit_user;
