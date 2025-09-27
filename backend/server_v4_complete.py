@@ -38,12 +38,11 @@ from flask_cors import CORS
 from sqlalchemy.exc import IntegrityError
 from rq.worker import Worker 
 from werkzeug.utils import secure_filename
-from flask_migrate import Migrate # <-- 1. IMPORTER MIGRATE
 
 
 # --- Imports des utilitaires et de la configuration ---
-from flask_socketio import SocketIO
-from utils.database import with_db_session, db, migrate # ✅ CORRECTION: Importer 'db' et 'migrate' depuis la source unique
+from flask_socketio import SocketIO # ✅ CORRECTION: Importer 'db' et 'migrate' depuis la source unique
+from utils.database import with_db_session, db, migrate
 from utils.app_globals import (
     processing_queue, synthesis_queue, analysis_queue, background_queue,
     extension_queue, redis_conn, models_queue
@@ -125,7 +124,7 @@ def create_app(config_override=None):
     db.init_app(app)
 
     # --- NOUVEAU : INITIALISER FLASK-MIGRATE ---
-    migrate.init_app(app, db, directory='migrations')  # ✅ CORRECTION: Utiliser l'instance importée
+    migrate.init_app(app, db)  # ✅ CORRECTION: Utiliser l'instance importée
 
 
     # Import et initialisation forcés - BON ORDRE :

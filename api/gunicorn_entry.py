@@ -1,6 +1,11 @@
 # backend/gunicorn_entry.py
 
-# Maintenant que le patch est fait, importer la factory de l'application Flask et créer l'application.
-from server_v4_complete import create_app
+# CRITICAL: Perform monkey-patching before any other modules are imported.
+# This is the earliest possible point and resolves the MonkeyPatchWarning.
+import gevent.monkey
+gevent.monkey.patch_all()
+
+# Now that patching is done, import the Flask app factory and create the app.
+from backend.server_v4_complete import create_app
 
 app = create_app()
