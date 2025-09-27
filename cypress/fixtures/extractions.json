@@ -1,2 +1,42 @@
 [
+  {
+    "id": "extraction-e2e-1",
+    "project_id": "test-project-e2e-1",
+    "pmid": "PMID:12345678",
+    "title": "Mock Article 1: Impact of AI on Healthcare",
+    "relevance_score": 8,
+    "relevance_justification": "Highly relevant study on AI in healthcare with robust methodology",
+    "extracted_data": {
+      "population": "Adult patients with chronic conditions",
+      "intervention": "AI-powered mobile health application",
+      "outcome": "Improved medication adherence and patient satisfaction",
+      "study_type": "Randomized Controlled Trial",
+      "sample_size": "N=245",
+      "duration": "6 months",
+      "ai_type": "Machine Learning",
+      "therapeutic_alliance_score": 7.5
+    },
+    "analysis_source": "pdf",
+    "created_at": "2023-01-15T11:00:00.000Z"
+  },
+  {
+    "id": "extraction-e2e-2",
+    "project_id": "test-project-e2e-1", 
+    "pmid": "PMID:87654321",
+    "title": "Mock Article 2: Digital Therapeutic Alliance",
+    "relevance_score": 9,
+    "relevance_justification": "Excellent study directly related to therapeutic alliance in digital contexts",
+    "extracted_data": {
+      "population": "Patients with mental health conditions",
+      "intervention": "Digital therapeutic chatbot with empathy modules",
+      "outcome": "Enhanced therapeutic alliance and treatment engagement",
+      "study_type": "Mixed Methods Study",
+      "sample_size": "N=156",
+      "duration": "12 weeks", 
+      "ai_type": "Natural Language Processing",
+      "therapeutic_alliance_score": 8.2
+    },
+    "analysis_source": "abstract",
+    "created_at": "2023-01-15T11:30:00.000Z"
+  }
 ]

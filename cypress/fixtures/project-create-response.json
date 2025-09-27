@@ -1,0 +1,6 @@
+{
+  "id": "e2e-mock-project-12345",
+  "name": "Test Project E2E",
+  "description": "Projet créé automatiquement par les tests E2E",
+  "mode": "screening"
+}

@@ -9,18 +9,21 @@
     "test:unit": "jest --config jest.config.cjs --coverage --verbose",
     "test:unit:watch": "jest --config jest.config.cjs --watch --coverage",
     "test:e2e": "cypress run --headless",
-    "test:e2e:open": "cypress open",
+    "test:e2e:quick": "cypress run --spec 'cypress/e2e/00-basic-smoke.cy.js'",
+    "test:e2e:projects": "cypress run --spec 'cypress/e2e/01-projects-simple.cy.js'",
+    "test:e2e:all-simple": "cypress run --spec 'cypress/e2e/00-basic-smoke.cy.js,cypress/e2e/01-projects-simple.cy.js'",
     "test:all": "npm run test:unit && npm run test:e2e",
     "install-deps": "npm install",
-    "test:validate": "npm run test:unit && node scripts/validate-coverage.js"
+    "test:validate": "npm run test:unit && node scripts/validate-coverage.js",
+    "cypress:open": "cypress open"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-react": "^7.24.7",
     "@testing-library/jest-dom": "^6.1.0",
+    "cypress": "^13.10.0",
+    "http-server": "^14.1.1",
     "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
-    "cypress": "13.10.0",
-    "http-server": "^14.1.1"
+    "jest-environment-jsdom": "^29.7.0"
   }
 }

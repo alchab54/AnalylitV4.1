@@ -91,8 +91,6 @@ function showError(message) {
  * ✅ VERSION FINALE: Point d'entrée principal de l'application
  */
 export async function initializeApplication() {
-	if (isInitialized) return; // Return early if already initialized
-    
 	console.log('🚀 Démarrage de AnalyLit V4.1 Frontend (Version améliorée)...');
     
 	try {
@@ -104,7 +102,6 @@ export async function initializeApplication() {
 		// ✅ CORRECTION CRITIQUE: Appel direct à loadInitialData
 		await loadInitialData();
         
-		isInitialized = true;
         // ✅ CORRECTION: Afficher la section par défaut APRÈS que les données soient chargées.
         showSection('projects');
         console.log('✅ Application initialisée avec succès');

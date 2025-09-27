@@ -1,0 +1,16 @@
+[{
+  "id": "result-1",
+  "title": "A mock search result",
+  "authors": "E2E Test",
+  "year": 2025,
+  "source": "Mock DB",
+  "abstract": "This is a mock abstract for an E2E test."
+},
+{
+  "id": "result-2",
+  "title": "Another mock result",
+  "authors": "Cypress",
+  "year": 2024,
+  "source": "Fixture DB",
+  "abstract": "This is another mock abstract to ensure the list renders correctly."
+}]
