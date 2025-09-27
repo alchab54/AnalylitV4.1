@@ -1,4 +1,13 @@
 import logging
+# --- CORRECTION CRITIQUE : Résolution du ModuleNotFoundError ---
+# Ce bloc de code est essentiel pour rendre le serveur exécutable directement
+# pour le développement local. Il ajoute la racine du projet au chemin de Python,
+# permettant ainsi aux imports absolus (ex: `from api.admin import admin_bp`) de fonctionner.
+import sys
+from pathlib import Path
+project_root = Path(__file__).resolve().parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
 
 logger = logging.getLogger(__name__)
 
