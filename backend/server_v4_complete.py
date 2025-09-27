@@ -51,7 +51,7 @@ from werkzeug.utils import secure_filename
 
 # --- Imports des utilitaires et de la configuration ---
 from flask_socketio import SocketIO
-from utils.database import with_db_session, db  # ← SUPPRIMER 'migrate'
+from utils.database import with_db_session, db, migrate
 from utils.app_globals import (
     processing_queue, synthesis_queue, analysis_queue, background_queue,
     extension_queue, redis_conn, models_queue
@@ -133,7 +133,7 @@ def create_app(config_override=None):
     db.init_app(app)
 
     # --- NOUVEAU : INITIALISER FLASK-MIGRATE ---
-    # migrate.init_app(app, db)  # ← COMMENTER CETTE LIGNE
+    migrate.init_app(app, db)
 
 
     # Import et initialisation forcés - BON ORDRE :
@@ -363,13 +363,6 @@ def create_app(config_override=None):
     # --- FIN DES AJOUTS POUR L_EXTENSION ZOTERO ---
 
     # --- Enregistrement des routes (Blueprints ou routes directes) ---
-
-    # --- HEALTHCHECK ROUTE ---
-    @app.route("/api/health", methods=["GET"])  # <-- Doit avoir 4 espaces
-    def health_check():
-        """Route simple pour le healthcheck de Docker."""
-        return jsonify({"status": "healthy"}), 200
-
 
     # ==================== ROUTES API PROJECTS ====================
     @app.route("/api/projects/", methods=["POST"])
@@ -970,6 +963,8 @@ def create_app(config_override=None):
         logging.error(f"Erreur interne: {error} pour {request.method} {request.path}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
 
+    # ✅ CORRECTION: La route la plus spécifique ('/') doit être déclarée AVANT la route générique ('/<path:path>').
+    # Cela garantit que la requête pour la page d'accueil est correctement traitée.
     @app.route('/')
     def serve_index():
         """Sert le fichier principal de l_interface (index.html)."""
@@ -982,8 +977,7 @@ def create_app(config_override=None):
     def serve_static(path):
         """Sert les autres fichiers statiques (CSS, JS, images)."""
         return send_from_directory(app.static_folder, path)
-    
-    # ==================== NEW SEARCH ROUTE ====================
+
     @app.route("/api/search", methods=["GET"])
     @with_db_session
     def new_search(session):
@@ -1013,6 +1007,10 @@ def create_app(config_override=None):
     app.register_blueprint(settings_bp, url_prefix='/api')
     app.register_blueprint(stakeholders_bp, url_prefix='/api')
     app.register_blueprint(tasks_bp, url_prefix='/api')
+    # --- HEALTHCHECK ROUTE (via Blueprint) ---
+    # Enregistré en dernier pour éviter les conflits.
+    # La route est maintenant /api/admin/health
+    app.register_blueprint(admin_bp, url_prefix='/api')
 
 
     # La factory DOIT retourner l_objet app
@@ -1046,8 +1044,11 @@ def post_fork(server, worker):
     # C'est le point le plus sûr pour éviter les MonkeyPatchWarning avec plusieurs workers.
     import gevent.monkey
     gevent.monkey.patch_all()
+    
     server.log.info("Worker %s forked.", worker.pid)
-    db.init_app(app)
+    # ✅ CORRECTION: Supprimer la ré-initialisation de la base de données.
+    # db.init_app() est déjà appelé dans create_app(). Un deuxième appel
+    # fait planter les workers Gunicorn, causant l'erreur ECONNREFUSED.
 
 if __name__ == "__main__":
     # Le monkey-patching doit être fait le plus tôt possible, mais SEULEMENT
