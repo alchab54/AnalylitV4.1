@@ -7,9 +7,9 @@ from utils.database import with_db_session
 logger = logging.getLogger(__name__)
 
 # Le frontend appelle /api/analysis-profiles, donc nous utilisons ce préfixe.
-settings_bp = Blueprint("settings_bp", __name__, url_prefix="/api/settings")
+settings_bp = Blueprint("settings_bp", __name__)
 
-@settings_bp.route("/models", methods=["GET"])
+@settings_bp.route("/api/settings/models", methods=["GET"])
 @with_db_session
 def get_available_models(session):
     """Retourne la liste des modèles Ollama disponibles."""

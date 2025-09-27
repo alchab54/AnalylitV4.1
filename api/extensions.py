@@ -6,10 +6,10 @@ from flask import Blueprint, jsonify, request
 from utils.app_globals import extension_queue
 from tasks_v4_complete import run_extension_task
 
-extensions_bp = Blueprint('extensions_bp', __name__, url_prefix='/api/extensions')
+extensions_bp = Blueprint('extensions_bp', __name__)
 logger = logging.getLogger(__name__)
 
-@extensions_bp.route('/run', methods=['POST'])
+@extensions_bp.route('/extensions/run', methods=['POST'])
 def run_extension():
     """Exécute une extension personnalisée via une tâche de fond."""
     data = request.get_json()

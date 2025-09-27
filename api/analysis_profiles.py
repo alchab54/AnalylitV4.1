@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from utils.database import with_db_session
 from utils.models import AnalysisProfile
 
-analysis_profiles_bp = Blueprint('analysis_profiles_bp', __name__, url_prefix='/api')
+analysis_profiles_bp = Blueprint('analysis_profiles_bp', __name__)
 logger = logging.getLogger(__name__)
 
 @analysis_profiles_bp.route('/analysis-profiles', methods=['POST'])

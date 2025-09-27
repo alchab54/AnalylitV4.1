@@ -29,10 +29,10 @@ from tasks_v4_complete import (
 )
 from werkzeug.utils import secure_filename
 
-projects_bp = Blueprint('projects_bp', __name__, url_prefix='/api/projects')
+projects_bp = Blueprint('projects_bp', __name__)
 logger = logging.getLogger(__name__)
 
-@projects_bp.route('', methods=['POST'])
+@projects_bp.route('/projects', methods=['POST'])
 @with_db_session
 def create_project(session):
     data = request.get_json()
@@ -52,13 +52,13 @@ def create_project(session):
         session.rollback()
         return jsonify({"error": "Un projet avec ce nom existe déjà"}), 409
 
-@projects_bp.route('', methods=['GET'])
+@projects_bp.route('/projects/', methods=['GET'])
 @with_db_session
 def get_all_projects(session):
     projects = session.query(Project).all()
     return jsonify([p.to_dict() for p in projects]), 200
 
-@projects_bp.route('/<project_id>', methods=['GET'])
+@projects_bp.route('/projects/<project_id>', methods=['GET'])
 @with_db_session
 def get_project_details(session, project_id):
     project = session.query(Project).filter_by(id=project_id).first()
@@ -66,7 +66,7 @@ def get_project_details(session, project_id):
         return jsonify({"error": "Projet non trouvé"}), 404
     return jsonify(project.to_dict()), 200
 
-@projects_bp.route('/<project_id>', methods=['DELETE'])
+@projects_bp.route('/projects/<project_id>', methods=['DELETE'])
 @with_db_session
 def delete_project(session, project_id):
     project = session.query(Project).filter_by(id=project_id).first()
@@ -74,9 +74,9 @@ def delete_project(session, project_id):
         return jsonify({"error": "Projet non trouvé"}), 404
     session.delete(project)
     session.commit()
-    return jsonify({"message": "Projet supprimé"}), 200
+    return '', 204
 
-@projects_bp.route('/<project_id>/grids/import', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/grids/import', methods=['POST'])
 @with_db_session
 def import_grid(session, project_id):
     if 'file' not in request.files:
@@ -107,13 +107,13 @@ def import_grid(session, project_id):
         logger.error(f"Erreur lors de l'import de la grille: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
 
-@projects_bp.route('/<project_id>/grids', methods=['GET'])
+@projects_bp.route('/projects/<project_id>/grids', methods=['GET'])
 @with_db_session
 def get_grids(session, project_id):
     grids = session.query(Grid).filter_by(project_id=project_id).all()
     return jsonify([grid.to_dict() for grid in grids]), 200
 
-@projects_bp.route('/<project_id>/grids', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/grids', methods=['POST'])
 @with_db_session
 def create_grid(session, project_id):
     data = request.get_json()
@@ -129,7 +129,7 @@ def create_grid(session, project_id):
     session.commit()
     return jsonify(new_grid.to_dict()), 201
 
-@projects_bp.route('/<project_id>/grids/<grid_id>', methods=['PUT'])
+@projects_bp.route('/projects/<project_id>/grids/<grid_id>', methods=['PUT'])
 @with_db_session
 def update_grid(session, project_id, grid_id):
     grid = session.query(Grid).filter_by(id=grid_id, project_id=project_id).first()
@@ -147,7 +147,7 @@ def update_grid(session, project_id, grid_id):
     session.commit()
     return jsonify(grid.to_dict()), 200
 
-@projects_bp.route('/<project_id>/extractions/<extraction_id>/decision', methods=['PUT'])
+@projects_bp.route('/projects/<project_id>/extractions/<extraction_id>/decision', methods=['PUT'])
 @with_db_session
 def set_extraction_decision(session, project_id, extraction_id):
     data = request.get_json()
@@ -173,7 +173,7 @@ def set_extraction_decision(session, project_id, extraction_id):
     session.commit()
     return jsonify(extraction.to_dict()), 200
 
-@projects_bp.route('/<project_id>/import-validations', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/import-validations', methods=['POST'])
 @with_db_session
 def import_validations(session, project_id):
     if 'file' not in request.files:
@@ -211,21 +211,21 @@ def import_validations(session, project_id):
         logger.error(f"Erreur lors de l'import des validations: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
 
-@projects_bp.route('/<project_id>/run-discussion-draft', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/run-discussion-draft', methods=['POST'])
 def run_discussion_draft(project_id):
     job = discussion_draft_queue.enqueue(run_discussion_generation_task, project_id=project_id, job_timeout='1h')
     return jsonify({"message": "Génération du brouillon de discussion lancée", "task_id": job.id}), 202
 
-@projects_bp.route('/<project_id>/chat', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/chat', methods=['POST'])
 def chat_with_project(project_id):
     data = request.get_json()
     question = data.get('question')
     if not question:
         return jsonify({"error": "Question is required"}), 400
     job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout='15m')
-    return jsonify({"message": "Question soumise", "job_id": job.id}), 202
+    return jsonify({"message": "Question soumise", "task_id": job.id}), 202
 
-@projects_bp.route('/<project_id>/run', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/run', methods=['POST'])
 @with_db_session
 def run_pipeline(session, project_id):
     data = request.get_json()
@@ -257,7 +257,7 @@ def run_pipeline(session, project_id):
         task_ids.append(job.id)
     return jsonify({"message": f"{len(task_ids)} tâches de traitement lancées", "task_ids": [str(tid) for tid in task_ids]}), 202
 
-@projects_bp.route('/<project_id>/run-analysis', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/run-analysis', methods=['POST'])
 def run_advanced_analysis(project_id):
     data = request.get_json()
     analysis_type = data.get('type')
@@ -278,7 +278,7 @@ def run_advanced_analysis(project_id):
     job = analysis_queue.enqueue(task_function, project_id=project_id, job_timeout='30m')
     return jsonify({"message": f"Analyse '{analysis_type}' lancée", "task_id": job.id}), 202
 
-@projects_bp.route('/<project_id>/import-zotero-pdfs', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/import-zotero-pdfs', methods=['POST'])
 def import_zotero_pdfs(project_id):
     data = request.get_json()
     pmids = data.get('articles', [])
@@ -301,7 +301,7 @@ def import_zotero_pdfs(project_id):
     return jsonify({"message": "Importation Zotero lancée", "task_id": job.id}), 202
 
 # ✅ CORRECTION: Renommage de la route pour éviter le conflit avec l'import JSON
-@projects_bp.route('/<project_id>/upload-zotero', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/upload-zotero', methods=['POST'])
 def upload_zotero_file(project_id):
     if 'file' not in request.files:
         return jsonify({"error": "Données JSON invalides"}), 400 # Message attendu par le frontend
@@ -321,7 +321,7 @@ def upload_zotero_file(project_id):
             project_id=project_id,
             items_list=json.load(open(file_path))['items'] # La tâche attend une liste d'items
         )
-        return jsonify({"message": "Importation de fichier Zotero lancée", "imported": len(json.load(open(file_path))['items']), "job_id": job.id}), 202
+        return jsonify({"message": "Importation de fichier Zotero lancée", "imported": len(json.load(open(file_path))['items']), "task_id": job.id}), 202
     except Exception as e:
         logger.error(f"Erreur lors de l'upload du fichier Zotero: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
@@ -340,9 +340,9 @@ def import_zotero_json_extension(project_id):
         items_list=items_list,
         job_timeout='1h'
     )
-    return jsonify({"message": "Importation Zotero JSON lancée", "job_id": job.id}), 202
+    return jsonify({"message": "Importation Zotero JSON lancée", "task_id": job.id}), 202
 
-@projects_bp.route('/<project_id>/run-rob-analysis', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/run-rob-analysis', methods=['POST'])
 def run_rob_analysis(project_id):
     data = request.get_json()
     article_ids = data.get('article_ids', [])
@@ -362,7 +362,7 @@ def run_rob_analysis(project_id):
     return jsonify({"message": f"{len(task_ids)} tâches d'analyse de risque de biais lancées", "task_ids": task_ids}), 202
 
 # ✅ CORRECTION: La route doit correspondre à l'appel du test et du frontend.
-@projects_bp.route('/<project_id>/rob/<article_id>', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/rob/<article_id>', methods=['POST'])
 @with_db_session
 def save_rob_assessment(session, project_id, article_id):
     data = request.get_json()
@@ -409,7 +409,7 @@ def save_rob_assessment(session, project_id, article_id):
     response_data['allocation_concealment_notes'] = rob_assessment.domain_2_justification
     return jsonify(response_data), 200
 
-@projects_bp.route('/<project_id>/add-manual-articles', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/add-manual-articles', methods=['POST'])
 def add_manual_articles(project_id):
     data = request.get_json()
     # ✅ CORRECTION: Le test envoie 'items', et non 'identifiers'.
@@ -426,12 +426,12 @@ def add_manual_articles(project_id):
     )
     return jsonify({"message": f"Ajout de {len(articles_data)} article(s) manuel(s) lancé", "task_id": job.id}), 202
 
-@projects_bp.route('/<project_id>/run-knowledge-graph', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/run-knowledge-graph', methods=['POST'])
 def run_knowledge_graph(project_id):
     job = analysis_queue.enqueue(run_knowledge_graph_task, project_id=project_id, job_timeout='30m')
     return jsonify({"message": "Génération du graphe de connaissances lancée", "task_id": job.id}), 202
 
-@projects_bp.route('/<project_id>/prisma-checklist', methods=['GET'])
+@projects_bp.route('/projects/<project_id>/prisma-checklist', methods=['GET'])
 @with_db_session
 def get_prisma_checklist(session, project_id):
     from utils.prisma_scr import get_base_prisma_checklist
@@ -443,7 +443,7 @@ def get_prisma_checklist(session, project_id):
         return jsonify(json.loads(project.prisma_checklist))
     return jsonify(get_base_prisma_checklist())
 
-@projects_bp.route('/<project_id>/prisma-checklist', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/prisma-checklist', methods=['POST'])
 @with_db_session
 def save_prisma_checklist(session, project_id):
     project = session.query(Project).filter_by(id=project_id).first()
@@ -455,7 +455,7 @@ def save_prisma_checklist(session, project_id):
     session.commit()
     return jsonify({"message": "Checklist PRISMA sauvegardée"}), 200
 
-@projects_bp.route('/<project_id>/export/thesis', methods=['GET'])
+@projects_bp.route('/projects/<project_id>/export/thesis', methods=['GET'])
 @with_db_session
 def export_thesis(session, project_id):
     """Export de thèse."""
@@ -480,7 +480,7 @@ def export_thesis(session, project_id):
         logger.error(f"Erreur lors de l'export de la thèse: {e}")
         return jsonify({"error": "Erreur lors de la génération de l'export"}), 500
 
-@projects_bp.route('/<project_id>/upload-pdfs-bulk', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/upload-pdfs-bulk', methods=['POST'])
 @with_db_session
 def upload_pdfs_bulk(session, project_id):
     """Upload en masse de PDFs."""

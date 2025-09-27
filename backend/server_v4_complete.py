@@ -26,8 +26,14 @@ from flask import Flask, request, jsonify, send_from_directory, abort, send_file
 # --- Import des Blueprints API ---
 from api.admin import admin_bp
 from api.analysis_profiles import analysis_profiles_bp
+from api.extensions import extensions_bp
+from api.files import files_bp
 from api.projects import projects_bp
+from api.reporting import reporting_bp
 from api.search import search_bp
+from api.selection import selection_bp
+from api.settings import settings_bp
+from api.stakeholders import stakeholders_bp
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from sqlalchemy.exc import IntegrityError
@@ -989,11 +995,19 @@ def create_app(config_override=None):
         return jsonify([r.to_dict() for r in results])
 
     # Enregistrement des Blueprints
-    app.register_blueprint(admin_bp)
-    app.register_blueprint(analysis_profiles_bp)
-    app.register_blueprint(projects_bp)
-    app.register_blueprint(search_bp)
-    app.register_blueprint(tasks_bp)
+    # ✅ CORRECTION: Enregistrer tous les blueprints avec le préfixe /api pour assurer la cohérenceet résoudre les erreurs 404.
+    app.register_blueprint(admin_bp, url_prefix='/api')
+    app.register_blueprint(analysis_profiles_bp, url_prefix='/api')
+    app.register_blueprint(extensions_bp, url_prefix='/api')
+    app.register_blueprint(files_bp, url_prefix='/api')
+    app.register_blueprint(projects_bp, url_prefix='/api')
+    app.register_blueprint(reporting_bp, url_prefix='/api')
+    app.register_blueprint(search_bp, url_prefix='/api')
+    app.register_blueprint(selection_bp, url_prefix='/api')
+    app.register_blueprint(settings_bp, url_prefix='/api')
+    app.register_blueprint(stakeholders_bp, url_prefix='/api')
+    app.register_blueprint(tasks_bp, url_prefix='/api')
+
 
     # La factory DOIT retourner l_objet app
     return app
@@ -1022,6 +1036,10 @@ def post_fork(server, worker):
     Hook Gunicorn pour s_assurer que chaque worker a sa propre initialisation de DB.
     Cela évite les problèmes de partage de connexion entre les processus.
     """
+    # CRITICAL: Effectuer le monkey-patching DANS chaque worker après le fork.
+    # C'est le point le plus sûr pour éviter les MonkeyPatchWarning avec plusieurs workers.
+    import gevent.monkey
+    gevent.monkey.patch_all()
     server.log.info("Worker %s forked.", worker.pid)
     db.init_app(app)
 

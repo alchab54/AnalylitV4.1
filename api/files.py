@@ -6,7 +6,8 @@ from werkzeug.utils import secure_filename
 
 from utils.file_handlers import save_file_to_project_dir
 
-from utils.app_globals import PROJECTS_DIR, with_db_session
+from utils.app_globals import PROJECTS_DIR
+from utils.database import with_db_session
 
-files_bp = Blueprint('files_bp', __name__, url_prefix='/api')
+files_bp = Blueprint('files_bp', __name__)
 logger = logging.getLogger(__name__)

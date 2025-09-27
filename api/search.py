@@ -13,7 +13,7 @@ from tasks_v4_complete import multi_database_search_task
 from utils.fetchers import db_manager
 
 logger = logging.getLogger(__name__)
-search_bp = Blueprint('search_api', __name__, url_prefix='/api')
+search_bp = Blueprint('search_api', __name__)
 
 @search_bp.route('/databases', methods=['GET'])
 def get_available_databases():

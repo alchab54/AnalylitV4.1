@@ -12,7 +12,7 @@ from tasks_v4_complete import (
     export_excel_report_task
 )
 
-reporting_bp = Blueprint('reporting_bp', __name__, url_prefix='/api')
+reporting_bp = Blueprint('reporting_bp', __name__)
 logger = logging.getLogger(__name__)
 
 @reporting_bp.route('/projects/<project_id>/reports/bibliography', methods=['POST'])

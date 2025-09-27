@@ -10,3 +10,6 @@ keepalive = 2
 max_requests = 500      # Recycler workers plus souvent
 max_requests_jitter = 50
 preload_app = True      # Partage mémoire entre workers
+reload = True
+
+

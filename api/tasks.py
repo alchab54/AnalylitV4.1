@@ -4,7 +4,7 @@ from rq.job import Job
 from rq.exceptions import NoSuchJobError
 from utils.app_globals import redis_conn
 
-tasks_bp = Blueprint('tasks_bp', __name__, url_prefix='/api')
+tasks_bp = Blueprint('tasks_bp', __name__)
 logger = logging.getLogger(__name__)
 
 @tasks_bp.route('/tasks/<task_id>/status', methods=['GET'])

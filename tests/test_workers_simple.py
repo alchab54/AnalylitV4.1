@@ -31,37 +31,29 @@ class TestWorkersBasic:
 
     def test_queue_basic_operations(self, fake_redis):
         """Test des opérations de base des queues"""
-        try:
-            from rq import Queue
-            
-            # Utiliser fake redis pour éviter dépendance externe
-            with patch('redis.Redis') as mock_redis:
-                mock_redis.return_value = fake_redis
-                
-                queue = Queue('test', connection=fake_redis)
-                assert queue.name == 'test'
-                assert len(queue) == 0
-                
-        except ImportError:
-            pytest.skip("RQ non disponible")
+        from rq import Queue
+
+        # Utiliser fake redis pour éviter dépendance externe
+        with patch('redis.Redis') as mock_redis:
+            mock_redis.return_value = fake_redis
+
+            queue = Queue('test', connection=fake_redis)
+            assert queue.name == 'test'
+            assert len(queue) == 0
 
     def test_job_creation_mock(self):
         """Test de création de job avec mock"""
-        try:
-            from rq import Job
-            
-            # Mock d'un job
-            job = Job.create(
-                simple_add, 
-                args=(3, 7),
-                connection=MagicMock()
-            )
-            
-            assert job.func_name == 'tests.test_workers_simple.simple_add'
-            assert job.args == (3, 7)
-            
-        except ImportError:
-            pytest.skip("RQ non disponible")
+        from rq.job import Job
+
+        # Mock d'un job
+        job = Job.create(
+            simple_add,
+            args=(3, 7),
+            connection=MagicMock()
+        )
+
+        assert job.func_name.endswith('test_workers_simple.simple_add')
+        assert job.args == (3, 7)
 
     @patch('rq.Worker')
     def test_worker_mock_execution(self, mock_worker_class):

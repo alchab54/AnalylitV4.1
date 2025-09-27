@@ -83,7 +83,7 @@ services:
           cpus: '1.5'
           memory: 2000M
     # La commande est maintenant aussi dans entrypoint.sh
-    command: gunicorn --conf backend/config/gunicorn.conf.py backend.gunicorn_entry:app    
+    command: gunicorn --conf backend/config/gunicorn.conf.py api.gunicorn_entry:app
     depends_on:
       base:
         condition: service_started
@@ -101,6 +101,7 @@ services:
       - ./scripts/run_migrations.py:/home/appuser/app/run_migrations.py
       - ./web:/home/appuser/app/web
       - ./backend:/home/appuser/app/backend
+      - ./api:/home/appuser/app/api
       - ./pytest.ini:/home/appuser/app/pytest.ini
 
   # Workers multiples pour paralléliser les tâches
