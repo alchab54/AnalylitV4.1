@@ -420,7 +420,7 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
 @patch('utils.app_globals.background_queue.enqueue') 
 def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session):
     """
-    Teste POST /api/projects/<id>/upload-zotero-file (File import)
+    Teste POST /api/projects/<id>/upload-zotero (File import)
     """
     # ARRANGE
     mock_job = MagicMock()
@@ -429,35 +429,31 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
     project_data = {'name': 'API Test Zotero File', 'mode': 'screening'}
     resp = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
     project_id = json.loads(resp.data)['id']
-
+ 
     file_content = b'{"items": [{"title": "Test Zotero Item"}]}'
     file_data = {'file': (io.BytesIO(file_content), 'test.json')}
-
+ 
     # ACT
     with patch('api.projects.save_file_to_project_dir', return_value='/fake/path/to/test.json') as mock_save_file, \
-         patch('builtins.open', MagicMock()),
-         patch('builtins.open', MagicMock()), \
          patch('json.load', return_value={'items': [{'title': 'Test Zotero Item'}]}):
+        
         response = client.post(
             f'/api/projects/{project_id}/upload-zotero',
             data=file_data, 
             content_type='multipart/form-data'
         )
-
+ 
         # ASSERT
-        # 1. Vérifier le statut 202
         assert response.status_code == 202
-
-        # 2. Vérifier que la sauvegarde a été appelée
         mock_save_file.assert_called_once()
-
-        # 3. Vérifier que la tâche a été mise en file
+        
         mock_q_enqueue.assert_called_once_with(
-            import_from_zotero_json_task, 
+            import_from_zotero_file_task,  # ← Correction du nom de la tâche
             project_id=project_id,
-            items_list=[{'title': 'Test Zotero Item'}]
+            items_list=[{'title': 'Test Zotero Item'}],
+            job_timeout='1h'
         )
-
+ 
         assert json.loads(response.data)['task_id'] == mock_job.id
 
 @patch('utils.app_globals.analysis_queue.enqueue')
