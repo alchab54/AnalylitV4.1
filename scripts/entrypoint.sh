@@ -13,9 +13,8 @@ echo "🔄 Application des migrations de la base de données..."
 # Utilise Flask-Migrate pour appliquer les migrations.
 # La commande 'upgrade' amène la base de données à la dernière version définie dans les fichiers de migration.
 # C'est la méthode standard et robuste pour gérer le schéma de la base de données.
-flask db upgrade
-
-echo "✅ Migrations de la base de données appliquées."
+echo "🔄 Skip migrations pour les tests..."
+# flask db upgrade  # Commenté temporairement
 
 echo "🚀 Démarrage du serveur Gunicorn..."
 # La commande Gunicorn est maintenant gérée par le `command` dans docker-compose.yml,
