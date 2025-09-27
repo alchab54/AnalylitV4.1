@@ -107,7 +107,8 @@ def clean_db(db_session, test_app):
     """Assure une base de données vide en supprimant toutes les données des tables clés."""
     with test_app.app_context(): # Ensure we are in the correct app context
         print("\n--- Cleaning database (deleting data) ---")
-        from utils.models import Project, Extraction, SearchResult, Grid, ChatMessage, AnalysisProfile # Import models here
+        from utils.models import Project, Extraction, SearchResult, Grid, ChatMessage, AnalysisProfile, RiskOfBias # Import models here
+        db_session.query(RiskOfBias).delete()
         db_session.query(Extraction).delete()
         db_session.query(SearchResult).delete()
         db_session.query(Grid).delete()

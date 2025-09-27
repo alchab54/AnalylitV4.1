@@ -8,7 +8,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from utils.database import with_db_session
-from utils.queues import get_background_queue
+from utils.app_globals import background_queue
 from tasks_v4_complete import multi_database_search_task
 from utils.fetchers import db_manager
 
@@ -57,7 +57,6 @@ def search_multiple_databases(session):
         session.rollback() # Rollback in case of error
         return jsonify({'error': 'Erreur interne'}), 500
 
-    background_queue = get_background_queue()
     task_kwargs = {
         "project_id": project_id, "query": simple_query, "databases": databases,
         "max_results_per_db": max_results_per_db, "expert_queries": expert_queries,

@@ -12,10 +12,10 @@ from tasks_v4_complete import (
     export_excel_report_task
 )
 
-reporting_bp = Blueprint('reporting_bp', __name__)
+reporting_bp = Blueprint('reporting_bp', __name__, url_prefix='/api')
 logger = logging.getLogger(__name__)
 
-@reporting_bp.route('/projects/<project_id>/reports/bibliography', methods=['GET'])
+@reporting_bp.route('/projects/<project_id>/reports/bibliography', methods=['POST'])
 @with_db_session
 def generate_bibliography(session, project_id):
     """
@@ -30,7 +30,7 @@ def generate_bibliography(session, project_id):
     job = background_queue.enqueue(generate_bibliography_task, project_id=project_id, job_timeout='10m')
     return jsonify({"message": "Génération de la bibliographie lancée", "task_id": job.id}), 202
 
-@reporting_bp.route('/projects/<project_id>/reports/summary-table', methods=['GET'])
+@reporting_bp.route('/projects/<project_id>/reports/summary-table', methods=['POST'])
 @with_db_session
 def generate_summary_table(session, project_id):
     """
@@ -45,7 +45,7 @@ def generate_summary_table(session, project_id):
     job = background_queue.enqueue(generate_summary_table_task, project_id=project_id, job_timeout='10m')
     return jsonify({"message": "Génération du tableau de synthèse lancée", "task_id": job.id}), 202
 
-@reporting_bp.route('/projects/<project_id>/reports/excel-export', methods=['GET'])
+@reporting_bp.route('/projects/<project_id>/reports/excel-export', methods=['POST'])
 @with_db_session
 def export_summary_table_excel(session, project_id):
     """

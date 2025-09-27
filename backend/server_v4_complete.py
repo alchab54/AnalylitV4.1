@@ -1,5 +1,7 @@
 import logging
 
+logger = logging.getLogger(__name__)
+
 import feedparser
 
 # --- CORRECTIF DE COMPATIBILITÉ PYZOTERO / FEEDPARSER ---
@@ -24,7 +26,6 @@ from flask import Flask, request, jsonify, send_from_directory, abort, send_file
 # --- Import des Blueprints API ---
 from api.admin import admin_bp
 from api.analysis_profiles import analysis_profiles_bp
-from api.extensions import extensions_bp
 from api.projects import projects_bp
 from api.search import search_bp
 from flask_cors import CORS
@@ -39,7 +40,7 @@ from flask_migrate import Migrate # <-- 1. IMPORTER MIGRATE
 from utils.database import with_db_session, db # Import db here
 from utils.app_globals import (
     processing_queue, synthesis_queue, analysis_queue, background_queue,
-    extension_queue, redis_conn
+    extension_queue, redis_conn, models_queue
 )
 from utils.models import Project, Grid, Extraction, Prompt, AnalysisProfile, SearchResult, ChatMessage, RiskOfBias
 from api.tasks import tasks_bp
@@ -78,7 +79,6 @@ PROJECTS_DIR = Path(PROJECTS_DIR_STR)
 
 socketio = SocketIO()
 migrate = Migrate()
-models_queue = rq.Queue('models', connection=redis_conn)
 
 
 def create_app(config_override=None):
@@ -703,20 +703,7 @@ def create_app(config_override=None):
             task_ids.append(job.id)
         # --- FIN DE LA CORRECTION ---
         return jsonify({"message": "RoB analysis initiated", "task_ids": task_ids}), 202
-
-    @app.route('/api/projects/<project_id>/rob/<article_id>', methods=['POST'])
-    @with_db_session
-    def save_rob_assessment(session, project_id, article_id):
-        data = request.get_json()
-        assessment_data = data.get('rob_assessment')
-
-        if not assessment_data:
-            return jsonify({"error": "Données d_évaluation manquantes"}), 400
-
-        logging.info(f"Sauvegarde de l_évaluation RoB pour l_article {article_id} dans le projet {project_id}")
-        
-        return jsonify({"message": "Évaluation RoB sauvegardée avec succès"}), 200
-
+    
     # ==================== ROUTES API CHAT ====================
     @app.route('/api/projects/<project_id>/calculate-kappa', methods=['POST'])
     @with_db_session
@@ -835,6 +822,20 @@ def create_app(config_override=None):
             logging.error(f"Impossible de contacter le serveur Ollama à l_adresse {app_config.OLLAMA_BASE_URL}. Erreur: {e}")
             return jsonify({'success': False, 'error': str(e)}), 500
 
+    @app.route('/api/ollama/pull', methods=['POST'])
+    def pull_ollama_model():
+        data = request.get_json()
+        model_name = data.get('model')
+        if not model_name:
+            return jsonify({"error": "Le nom du modèle est requis"}), 400
+
+        job = models_queue.enqueue(
+            pull_ollama_model_task,
+            model_name,
+            job_timeout='30m'
+        )
+        return jsonify({"message": f"Téléchargement du modèle '{model_name}' lancé", "task_id": job.get_id()}), 200
+
     @app.route('/api/tasks/status', methods=['GET'])
     @with_db_session
     def get_tasks_status(session): # Implémentation de la logique de la route
@@ -920,6 +921,28 @@ def create_app(config_override=None):
                     job.delete()
             return jsonify({"message": f"File '{queue_name}' et ses registres ont été vidés."} ), 200
         return jsonify({"error": "File non trouvée"}), 404
+
+    @app.route('/api/extensions', methods=['POST'])
+    @with_db_session
+    def post_extension(session):
+        data = request.get_json(silent=True) or {}
+        project_id = data.get("project_id")
+        extension_name = data.get("extension_name")
+
+        if not project_id or not extension_name:
+            logger.warning("Payload invalide: %s", data)
+            return jsonify({"error": "project_id et extension_name requis"}), 400
+
+        logger.info("Enqueue extension: project_id=%s, extension=%s", project_id, extension_name)
+        job = extension_queue.enqueue(
+            run_extension_task,
+            project_id=project_id,
+            extension_name=extension_name,
+            job_timeout="30m",
+            result_ttl=3600,
+        )
+        logger.info("Job enqueued: %s", job.id)
+        return jsonify({"task_id": job.id, "message": "Extension lancée"}), 202
 
     # --- ROUTES POUR SERVIR L_INTERFACE UTILISATEUR (FRONTEND) ---
     # Ces routes doivent être DÉFINIES AVANT les routes API génériques comme /<path:path>

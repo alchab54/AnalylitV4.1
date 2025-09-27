@@ -16,6 +16,7 @@ background_queue = Queue("analylit_background_v4", connection=redis_conn, defaul
 
 # Pour l’endpoint /api/extensions
 extension_queue = processing_queue
+models_queue = Queue("models", connection=redis_conn, default_timeout=3600)
 
 # Alias pour compatibilité des tests et flexibilité
 discussion_draft_queue = analysis_queue

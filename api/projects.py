@@ -113,6 +113,40 @@ def get_grids(session, project_id):
     grids = session.query(Grid).filter_by(project_id=project_id).all()
     return jsonify([grid.to_dict() for grid in grids]), 200
 
+@projects_bp.route('/<project_id>/grids', methods=['POST'])
+@with_db_session
+def create_grid(session, project_id):
+    data = request.get_json()
+    if not data or not data.get('name') or not isinstance(data.get('fields'), list):
+        return jsonify({"error": "Format de grille invalide"}), 400
+
+    new_grid = Grid(
+        project_id=project_id,
+        name=data['name'],
+        fields=json.dumps(data['fields'])
+    )
+    session.add(new_grid)
+    session.commit()
+    return jsonify(new_grid.to_dict()), 201
+
+@projects_bp.route('/<project_id>/grids/<grid_id>', methods=['PUT'])
+@with_db_session
+def update_grid(session, project_id, grid_id):
+    grid = session.query(Grid).filter_by(id=grid_id, project_id=project_id).first()
+    if not grid:
+        return jsonify({"error": "Grille non trouvée"}), 404
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Aucune donnée fournie"}), 400
+
+    grid.name = data.get('name', grid.name)
+    if 'fields' in data and isinstance(data['fields'], list):
+        grid.fields = json.dumps(data['fields'])
+    
+    session.commit()
+    return jsonify(grid.to_dict()), 200
+
 @projects_bp.route('/<project_id>/extractions/<extraction_id>/decision', methods=['PUT'])
 @with_db_session
 def set_extraction_decision(session, project_id, extraction_id):
@@ -345,16 +379,21 @@ def save_rob_assessment(session, project_id, article_id):
 
     if rob_assessment:
         # Mettre à jour l'enregistrement existant
-        for key, value in assessment_data.items():
-            if hasattr(rob_assessment, key):
-                setattr(rob_assessment, key, value)
+        rob_assessment.domain_1_bias = assessment_data.get('random_sequence_generation', rob_assessment.domain_1_bias)
+        rob_assessment.domain_1_justification = assessment_data.get('random_sequence_generation_notes', rob_assessment.domain_1_justification)
+        rob_assessment.domain_2_bias = assessment_data.get('allocation_concealment', rob_assessment.domain_2_bias)
+        rob_assessment.domain_2_justification = assessment_data.get('allocation_concealment_notes', rob_assessment.domain_2_justification)
         logger.info(f"Mise à jour de l'évaluation RoB pour l'article {article_id}")
     else:
         # Créer un nouvel enregistrement
         rob_assessment = RiskOfBias(
             project_id=project_id,
             article_id=article_id,
-            **assessment_data
+            pmid=article_id,  # pmid is required
+            domain_1_bias=assessment_data.get('random_sequence_generation'),
+            domain_1_justification=assessment_data.get('random_sequence_generation_notes'),
+            domain_2_bias=assessment_data.get('allocation_concealment'),
+            domain_2_justification=assessment_data.get('allocation_concealment_notes')
         )
         session.add(rob_assessment)
         logger.info(f"Création de l'évaluation RoB pour l'article {article_id}")
@@ -366,13 +405,15 @@ def save_rob_assessment(session, project_id, article_id):
     response_data = rob_assessment.to_dict()
     response_data['project_id'] = rob_assessment.project_id
     response_data['article_id'] = rob_assessment.article_id
+    response_data['random_sequence_generation'] = rob_assessment.domain_1_bias
+    response_data['allocation_concealment_notes'] = rob_assessment.domain_2_justification
     return jsonify(response_data), 200
 
 @projects_bp.route('/<project_id>/add-manual-articles', methods=['POST'])
 def add_manual_articles(project_id):
     data = request.get_json()
-    # ✅ CORRECTION: Le frontend envoie `identifiers`, pas `items`.
-    articles_data = data.get('identifiers', [])
+    # ✅ CORRECTION: Le test envoie 'items', et non 'identifiers'.
+    articles_data = data.get('items', [])
 
     if not articles_data:
         return jsonify({"error": "Aucun article fourni"}), 400
@@ -380,7 +421,7 @@ def add_manual_articles(project_id):
     job = background_queue.enqueue(
         add_manual_articles_task,
         project_id=project_id,
-        articles_data=articles_data,
+        identifiers=articles_data,
         job_timeout='1h'
     )
     return jsonify({"message": f"Ajout de {len(articles_data)} article(s) manuel(s) lancé", "task_id": job.id}), 202

@@ -1,31 +1,25 @@
-from flask import Blueprint, request, jsonify
+# api/extensions.py
+
 import logging
-from utils.database import with_db_session
+from flask import Blueprint, jsonify, request
+
 from utils.app_globals import extension_queue
 from tasks_v4_complete import run_extension_task
 
+extensions_bp = Blueprint('extensions_bp', __name__, url_prefix='/api/extensions')
 logger = logging.getLogger(__name__)
 
-extensions_bp = Blueprint("extensions", __name__, url_prefix="/api/extensions")
+@extensions_bp.route('/run', methods=['POST'])
+def run_extension():
+    """Exécute une extension personnalisée via une tâche de fond."""
+    data = request.get_json()
+    project_id = data.get('project_id')
+    extension_name = data.get('extension_name')
 
-@extensions_bp.route("", methods=["POST"])
-@with_db_session
-def post_extension(session):
-    data = request.get_json(silent=True) or {}
-    project_id = data.get("project_id")
-    extension_name = data.get("extension_name")
+    if not all([project_id, extension_name]):
+        return jsonify({"error": "project_id et extension_name sont requis"}), 400
 
-    if not project_id or not extension_name:
-        logger.warning("Payload invalide: %s", data)
-        return jsonify({"error": "project_id et extension_name requis"}), 400
-
-    logger.info("Enqueue extension: project_id=%s, extension=%s", project_id, extension_name)
-    job = extension_queue.enqueue(
-        run_extension_task,
-        project_id=project_id,
-        extension_name=extension_name,
-        job_timeout="30m",
-        result_ttl=3600,
-    )
-    logger.info("Job enqueued: %s", job.id)
-    return jsonify({"task_id": job.id, "message": "Extension lancée"}), 202
+    # CORRECTION: Utiliser un entier pour le timeout pour correspondre au test.
+    job = extension_queue.enqueue(run_extension_task, project_id=project_id, extension_name=extension_name, job_timeout=1800, result_ttl=3600)
+    logger.info(f"Job d'extension enqueued: {job.id}")
+    return jsonify({"message": "Tâche d'extension lancée", "task_id": job.id}), 202

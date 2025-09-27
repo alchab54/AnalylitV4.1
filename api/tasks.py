@@ -4,10 +4,10 @@ from rq.job import Job
 from rq.exceptions import NoSuchJobError
 from utils.app_globals import redis_conn
 
-tasks_bp = Blueprint('tasks_bp', __name__, url_prefix='/api/tasks')
+tasks_bp = Blueprint('tasks_bp', __name__, url_prefix='/api')
 logger = logging.getLogger(__name__)
 
-@tasks_bp.route('/<task_id>/status', methods=['GET'])
+@tasks_bp.route('/tasks/<task_id>/status', methods=['GET'])
 def get_task_status(task_id):
     """
     Récupère le statut d'une tâche spécifique à partir de son ID.
@@ -36,3 +36,16 @@ def get_task_status(task_id):
         'exc_info': exc_string
     }
     return jsonify(response)
+
+@tasks_bp.route('/tasks/<task_id>/cancel', methods=['POST'])
+def cancel_task(task_id):
+    """Annule une tâche en cours."""
+    try:
+        job = Job.fetch(task_id, connection=redis_conn)
+        job.cancel()
+        return jsonify({"message": "Demande d_annulation envoyée."}), 200
+    except NoSuchJobError:
+        return jsonify({"error": "Tâche non trouvée"}), 404
+    except Exception as e:
+        logger.error(f"Erreur lors de l'annulation de la tâche {task_id}: {e}")
+        return jsonify({"error": "Erreur interne du serveur"}), 500

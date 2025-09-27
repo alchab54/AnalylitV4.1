@@ -162,7 +162,7 @@ def test_get_all_projects(client, db_session): # Utilise session
     created_project2 = json.loads(create_response2.data)
 
     # 2. Make a GET request
-    response = client.get('/api/projects/')
+    response = client.get('/api/projects')
     data = json.loads(response.data)
 
     # 3. Assertions
@@ -185,7 +185,7 @@ def test_get_all_projects_empty(client, db_session, clean_db): # Utilise session
     WHEN the '/api/projects' route is called with GET
     THEN check that the response is 200 OK and contains an empty list.
     """
-    response = client.get('/api/projects/')
+    response = client.get('/api/projects')
     data = json.loads(response.data)
     assert response.status_code == 200
     assert isinstance(data, list)

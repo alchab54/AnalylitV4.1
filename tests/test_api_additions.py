@@ -27,7 +27,7 @@ def test_run_analysis_new_types(client, new_project):
     assert response_atn.status_code == 202
     json_data = response_atn.get_json()
     assert 'task_id' in json_data
-    assert json_data['message'] == "Analyse atn_specialized_extraction lancée"
+    assert json_data['message'] == "Analyse 'atn_specialized_extraction' lancée"
 
     # Teste empathy_comparative_analysis
     response_empathy = client.post(f'/api/projects/{project_id}/run-analysis', json={
@@ -36,7 +36,7 @@ def test_run_analysis_new_types(client, new_project):
     assert response_empathy.status_code == 202
     json_data_empathy = response_empathy.get_json()
     assert 'task_id' in json_data_empathy
-    assert json_data_empathy['message'] == "Analyse empathy_comparative_analysis lancée"
+    assert json_data_empathy['message'] == "Analyse 'empathy_comparative_analysis' lancée"
 
 def test_get_task_status(client, new_project):
     """Teste le nouvel endpoint /api/tasks/<id>/status."""

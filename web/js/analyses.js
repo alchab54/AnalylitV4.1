@@ -318,7 +318,7 @@ export async function runProjectAnalysis(analysisType) {
             if (analysisType === 'discussion') {
                 toastMessage = 'Tâche de génération du brouillon de discussion lancée';
             } else if (analysisType === 'knowledge_graph') {
-                toastMessage = 'Tâche de génération du graphe de connaissances lancée';
+                toastMessage = "La génération pour le graphe de connaissances a été lancée.";
             } else if (['meta_analysis', 'prisma_flow', 'descriptive_stats'].includes(analysisType)) {
                 toastMessage = `Tâche de ${analysisNames[analysisType].replace('le ', '')} lancée`;
             } else {
