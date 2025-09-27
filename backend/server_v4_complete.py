@@ -938,7 +938,7 @@ def create_app(config_override=None):
             run_extension_task,
             project_id=project_id,
             extension_name=extension_name,
-            job_timeout="30m",
+            job_timeout=1800,
             result_ttl=3600,
         )
         logger.info("Job enqueued: %s", job.id)
