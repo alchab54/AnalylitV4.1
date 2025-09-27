@@ -213,7 +213,7 @@ def test_api_run_discussion_draft_enqueues_task(mock_enqueue, client, db_session
     mock_enqueue.assert_called_once_with(
         run_discussion_generation_task, # <-- Vérifie l'objet fonction, pas le string
         project_id=project_id,
-        job_timeout='1h'
+        job_timeout=3600
     )
 
     response_data = json.loads(response.data)
@@ -248,11 +248,11 @@ def test_api_post_chat_message_enqueues_task(mock_enqueue, client, db_session):
         answer_chat_question_task, # <-- Vérifie l'objet fonction, pas le string
         project_id=project_id,
         question="Test question?",
-        job_timeout='15m'
+        job_timeout=900
     )
 
     response_data = json.loads(response.data)
-    assert response_data['task_id'] == "mocked_chat_job_456"
+    assert response_data['task_id'] == "mocked_chat_job_456" # La réponse du serveur est bien 'task_id'
 
 # =================================================================
 # === DÉBUT DES NOUVEAUX TESTS AJOUTÉS (Couverture restante) ===
@@ -278,7 +278,7 @@ def test_api_search_enqueues_task(mock_enqueue, client, db_session):
     }
 
     # ACT
-    response = client.post('/api/search', data=json.dumps(search_payload), content_type='application/json')
+    response = client.post('/api/search', data=json.dumps(search_payload), content_type='application/json') # Le préfixe /api est déjà dans la route
 
     # ASSERT
     assert response.status_code == 202
@@ -288,8 +288,7 @@ def test_api_search_enqueues_task(mock_enqueue, client, db_session):
         query="diabetes",
         expert_queries=None,
         databases=["pubmed", "arxiv"],
-        max_results_per_db=50,
-        job_timeout='30m'
+        max_results_per_db=50
     )
 
 @patch('utils.app_globals.processing_queue.enqueue')
@@ -332,7 +331,7 @@ def test_api_run_pipeline_enqueues_tasks(mock_enqueue, client, db_session):
         profile=profile.to_dict(),
         analysis_mode="screening",
         custom_grid_id=None,
-        job_timeout='30m'
+        job_timeout=1800
     )
 
     mock_enqueue.assert_any_call(
@@ -342,7 +341,7 @@ def test_api_run_pipeline_enqueues_tasks(mock_enqueue, client, db_session):
         profile=profile.to_dict(),
         analysis_mode="screening",
         custom_grid_id=None,
-        job_timeout='30m' # CORRECTION: Le serveur utilise '30m'
+        job_timeout=1800
     )
 
 @pytest.mark.parametrize("analysis_type, expected_task", [
@@ -374,7 +373,7 @@ def test_api_run_advanced_analysis_enqueues_tasks(mock_enqueue, analysis_type, e
     mock_enqueue.assert_called_once_with(
         expected_task, # Vérifie que la bonne fonction tâche est appelée
         project_id=project_id,
-        job_timeout='30m'
+        job_timeout=1800
     )
 
 @patch('utils.app_globals.background_queue.enqueue')
@@ -399,8 +398,8 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
     }
 
     # ACT
-    # CORRECTION: La route est /import-zotero-pdfs
-    response = client.post( # CORRECTION: La route est /import-zotero-pdfs
+    # CORRECTION: La route est /import-zotero-pdfs, pas /import-zotero/
+    response = client.post(
         f'/api/projects/{project_id}/import-zotero/', 
         data=json.dumps(import_payload), 
         content_type='application/json'
@@ -414,7 +413,7 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
         pmids=["pmid1", "pmid2"],
         zotero_user_id="123",
         zotero_api_key="abc",
-        job_timeout='1h' # CORRECTION: Le serveur utilise '1h'
+        job_timeout=3600
     )
 
 @patch('utils.app_globals.background_queue.enqueue') 
@@ -435,6 +434,7 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
  
     # ACT
     with patch('api.projects.save_file_to_project_dir', return_value='/fake/path/to/test.json') as mock_save_file, \
+         patch('builtins.open', MagicMock()), \
          patch('json.load', return_value={'items': [{'title': 'Test Zotero Item'}]}):
         
         response = client.post(
@@ -448,10 +448,9 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
         mock_save_file.assert_called_once()
         
         mock_q_enqueue.assert_called_once_with(
-            import_from_zotero_file_task,  # ← Correction du nom de la tâche
+            import_from_zotero_json_task,
             project_id=project_id,
-            items_list=[{'title': 'Test Zotero Item'}],
-            job_timeout='1h'
+            items_list=[{'title': 'Test Zotero Item'}]
         )
  
         assert json.loads(response.data)['task_id'] == mock_job.id
@@ -491,12 +490,12 @@ def test_api_run_rob_analysis_enqueues_task(mock_enqueue, client, db_session):
         run_risk_of_bias_task, # Vérifie la fonction
         project_id=project_id,
         article_id="pmid100",
-        job_timeout='20m' # CORRECTION: Le serveur utilise '20m'
+        job_timeout=1200
     )
 
     mock_enqueue.assert_any_call(
         run_risk_of_bias_task,
         project_id=project_id,
         article_id="pmid200",
-        job_timeout='20m' # CORRECTION: Le serveur utilise '20m'
+        job_timeout=1200
     )

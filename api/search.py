@@ -59,8 +59,7 @@ def search_multiple_databases(session):
 
     task_kwargs = {
         "project_id": project_id, "query": simple_query, "databases": databases,
-        "max_results_per_db": max_results_per_db, "expert_queries": expert_queries,
-        "job_timeout": '30m'
+        "max_results_per_db": max_results_per_db, "expert_queries": expert_queries
     }
     job = background_queue.enqueue(multi_database_search_task, **task_kwargs)
     return jsonify({'message': f'Recherche lancée dans {len(databases)} base(s)', 'task_id': job.id}), 202
