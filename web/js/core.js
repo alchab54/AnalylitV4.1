@@ -41,7 +41,7 @@ import { handleRunRobAnalysis, fetchAndDisplayRob, loadRobSection, handleSaveRob
 import { showSearchModal, handleMultiDatabaseSearch, handleExpertSearch, renderSearchSection } from './search.js';
 import { handleValidateExtraction, resetValidationStatus, filterValidationList, loadValidationSection, renderValidationSection, calculateKappa } from './validation.js'; // Corrected import
 import {
-    closeModal, toggleSidebar, showCreateProjectModal, showToast, showLoadingOverlay, showSuccess, showError } from './ui-improved.js';
+    closeModal, toggleSidebar, showCreateProjectModal, showToast, showLoadingOverlay, showSuccess, showError, openModal } from './ui-improved.js';
 import { clearNotifications, updateNotificationIndicator, handleWebSocketNotification } from './notifications.js';
 import { handleDeleteGrid, loadProjectGrids, renderGridsSection, showGridFormModal, addGridFieldInput, removeGridField, handleSaveGrid, triggerGridImport, handleGridImportUpload } from './grids.js';
 import { renderReportingSection, generateBibliography, generateSummaryTable, exportSummaryTableExcel, savePrismaChecklist } from './reporting.js';
@@ -119,6 +119,7 @@ function handleViewAnalysisResults(target) {
     if (!targetId) return;
     const resultElement = document.getElementById(targetId);
     if (resultElement) {
+        resultElement.style.display = 'block'; // Make it visible
         resultElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 }
@@ -184,7 +185,7 @@ const analysisActions = {
     'save-prisma-progress': savePRISMAProgress,
     'export-prisma-report': exportPRISMAReport,
     'export-analyses': exportAnalyses,
-    'show-advanced-analysis-modal': showRunAnalysisModal,
+    'show-advanced-analysis-modal': () => openModal('advancedAnalysisModal'),
     'delete-analysis': (target) => handleDeleteAnalysis(target.dataset.analysisType)
 };
 

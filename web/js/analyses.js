@@ -1,7 +1,7 @@
 import { appState, elements } from './app-improved.js'; // Read from state
 import { fetchAPI } from './api.js';
 import { setAnalysisResults, setQueuesStatus } from './state.js';
-import { showLoadingOverlay, escapeHtml, showModal, closeModal, openModal, showToast } from './ui-improved.js'; // Corrected import
+import { showLoadingOverlay, escapeHtml, showModal, closeModal, openModal, showToast, showConfirmModal } from './ui-improved.js'; // Corrected import
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
 // This function is called by refreshCurrentSection in core.js
@@ -257,7 +257,7 @@ export async function handleRunATNAnalysis() {
         const response = await fetchAPI(API_ENDPOINTS.projectRunAnalysis(projectId), {
             method: 'POST',
             body: JSON.stringify({
-                type: 'atnscores' // CORRECTION : type spécifique
+                type: 'atn_scores' // CORRECTION : type spécifique
             })
         });
 
@@ -542,31 +542,33 @@ export async function handleRunDescriptiveStats() {
 }
 
 export async function handleDeleteAnalysis(analysisType) {
-    if (!appState.currentProject?.id) { // Read from state
+    if (!appState.currentProject?.id) {
         showToast(MESSAGES.noProjectSelected, 'warning');
         return;
     }
 
-    const confirmDelete = confirm(`Êtes-vous sûr de vouloir supprimer les résultats de l'analyse ${analysisType} pour ce projet ?`);
-    if (!confirmDelete) {
-        return;
-    }
-
-    try {
-        showLoadingOverlay(true, `Suppression de l'analyse ${analysisType}...`);
-        // Appel API pour supprimer les résultats de l'analyse
-        // NOTE: Cet endpoint est hypothétique et doit être implémenté côté backend.
-        await fetchAPI(API_ENDPOINTS.projectDeleteAnalysis(appState.currentProject.id, analysisType), {
-            method: 'DELETE',
-        });
-        showToast(`Résultats de l'analyse ${analysisType} supprimés avec succès.`, 'success'); // Maintenu pour correspondre au test
-        // Recharger la section des analyses pour refléter le changement
-        loadProjectAnalyses();
-    } catch (error) {
-        showToast(`Erreur lors de la suppression de l'analyse ${analysisType}: ${error.message}`, 'error');
-    } finally {
-        showLoadingOverlay(false);
-    }
+    showConfirmModal(
+        'Confirmer la suppression',
+        `Êtes-vous sûr de vouloir supprimer les résultats de l\'analyse ${analysisType} pour ce projet ?`,
+        {
+            confirmText: 'Supprimer',
+            confirmClass: 'btn--danger',
+            onConfirm: async () => {
+                try {
+                    showLoadingOverlay(true, `Suppression de l\'analyse ${analysisType}...`);
+                    await fetchAPI(API_ENDPOINTS.projectDeleteAnalysis(appState.currentProject.id, analysisType), {
+                        method: 'DELETE',
+                    });
+                    showToast(`Résultats de l\'analyse ${analysisType} supprimés avec succès.`, 'success');
+                    loadProjectAnalyses();
+                } catch (error) {
+                    showToast(`Erreur lors de la suppression de l\'analyse ${analysisType}: ${error.message}`, 'error');
+                } finally {
+                    showLoadingOverlay(false);
+                }
+            }
+        }
+    );
 }
 
 /**

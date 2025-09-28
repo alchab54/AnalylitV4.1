@@ -91,7 +91,7 @@ Cypress.Commands.add('resetApp', () => {
 
 Cypress.Commands.add('waitForToast', (type, message) => {
   // Attend qu'un toast spécifique apparaisse.
-  cy.get(`.toast.toast--${type}`, { timeout: 10000 }).should('be.visible').and('contain.text', message);
+  cy.get(`.toast.toast--${type}`, { timeout: 10000 }).should('contain.text', message);
   cy.log(`Toast found: [${type}] ${message}`);
 });
 

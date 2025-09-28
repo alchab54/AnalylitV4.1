@@ -164,10 +164,7 @@ const TOAST_DURATION = {
 export function showToast(message, type = 'info', duration = 5000) {
     console.log('🎯 showToast() appelé:', message, type); // Debug
     
-    // ✅ CORRECTION: Supprimer tous les toasts existants d'abord
-    const existingToasts = document.querySelectorAll('.toast');
-    console.log('🧹 Suppression toasts existants:', existingToasts.length); // Debug
-    existingToasts.forEach(toast => toast.remove());
+    // Multiple toasts can now exist simultaneously.
     
     const toastId = `toast-${Date.now()}`;
     const toast = document.createElement('div');

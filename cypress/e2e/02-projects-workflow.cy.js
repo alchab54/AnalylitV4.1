@@ -39,7 +39,7 @@ describe('Workflow de Gestion des Projets - Version Optimisée', () => {
       .and('contain', 'Créer un Nouveau Projet');
     
     // Fermer modale
-    cy.get('@projectModal').find('[data-action="close-modal"]')
+    cy.get('@projectModal').find('.modal-close')
       .click({ force: true });
     
     // Vérifier fermeture
@@ -109,7 +109,7 @@ describe('Workflow de Gestion des Projets - Version Optimisée', () => {
     for(let i = 0; i < 3; i++) {
       cy.get('#create-project-btn').click({ force: true });
       cy.wait(100);
-      cy.get('[data-action="close-modal"]').click({ force: true });
+      cy.get('#newProjectModal .modal-close').click({ force: true });
       cy.wait(100);
     }
     

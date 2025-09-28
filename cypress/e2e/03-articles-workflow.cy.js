@@ -3,7 +3,7 @@ describe('Workflow de Gestion des Articles - Version Optimisée', () => {
   
   beforeEach(() => {
     // Isoler les tests avec des interceptions API
-    cy.intercept('GET', '/api/projects/', { fixture: 'projects-empty.json' }).as('getProjects');
+    cy.intercept('GET', '/api/projects/', { body: [{ id: 'test-project-123', name: projectName, description: 'Description de test', article_count: 1 }] }).as('getProjects');
     cy.intercept('POST', '/api/projects/', { fixture: 'test-project.json' }).as('createProject');
     cy.intercept('GET', `/api/projects/test-project-123/search-results?page=1`, { fixture: 'articles.json' }).as('getArticles');
     cy.intercept('GET', `/api/projects/test-project-123/extractions`, { body: [] }).as('getExtractions');
@@ -11,7 +11,7 @@ describe('Workflow de Gestion des Articles - Version Optimisée', () => {
     cy.visit('/');
     cy.waitForAppReady();
     
-    cy.createTestProject(projectName);
+    cy.createTestProject({ name: projectName });
     cy.selectProject(projectName);
     cy.navigateToSection('results');
     
@@ -22,7 +22,7 @@ describe('Workflow de Gestion des Articles - Version Optimisée', () => {
     // Vérifier que les données du fixture sont bien affichées
     cy.get('.results-list-container').should('be.visible');
     cy.get('.result-row').should('have.length.greaterThan', 0);
-    cy.contains('.article-title', 'Digital therapeutic alliance').should('be.visible');
+    cy.contains('.article-title', 'Intelligence Artificielle en Santé').should('be.visible');
   });
 
   it("Devrait permettre la sélection multiple d'articles", () => {
@@ -37,7 +37,7 @@ describe('Workflow de Gestion des Articles - Version Optimisée', () => {
     cy.get('.result-row').first().find('[data-action="view-details"]').click({ force: true });
     
     cy.get('#articleDetailModal').should('be.visible');
-    cy.get('#articleDetailContent').should('contain.text', 'Digital therapeutic alliance');
+    cy.get('#articleDetailContent').should('contain.text', 'Intelligence Artificielle en Santé');
   });
 
   it('Devrait permettre le screening par lot', () => {
@@ -47,7 +47,7 @@ describe('Workflow de Gestion des Articles - Version Optimisée', () => {
     cy.get('[data-action="batch-process-modal"]').should('not.be.disabled').click({ force: true });
     
     cy.get('#batchProcessModal').should('be.visible');
-    cy.get('#batchProcessModal button[data-action="start-batch-process"]').click({ force: true });
+    cy.get('#batchProcessModal .modal-body button[data-action="start-batch-process"]').click({ force: true });
 
     cy.wait('@startBatch');
     cy.waitForToast('success', 'Tâche de screening lancée avec succès');
