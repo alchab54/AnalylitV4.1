@@ -1,26 +1,12 @@
+# backend/manage.py
+
 import os
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask.cli import FlaskGroup
 
-from utils.database import db # Import the global db instance
+from backend.server_v4_complete import create_app, db
+from utils.database import migrate
 
-# Create the Flask app directly for CLI
-app = Flask(__name__)
+# Create an app instance for the CLI
+app = create_app()
 
-# Configure the app
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', "postgresql://user:pass@db/analylit_db")
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Initialize db with the app
-db.init_app(app)
-
-# Initialize migrate with the app and db
-migrate = Migrate(app, db)
-
-# Create a FlaskGroup for CLI commands
-cli = FlaskGroup(app)
-
-if __name__ == '__main__':
-    cli()
+# Link the Migrate instance to the app and db for the 'flask db' command
+migrate.init_app(app, db)

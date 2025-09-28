@@ -134,10 +134,8 @@ def create_app(config_override=None):
     # L_initialisation de la base de données est maintenant déplacée vers les points d_entrée
     # (post_fork pour Gunicorn, et __main__ pour le dev local) pour éviter la double initialisation.
     db.init_app(app)
-
-    # --- NOUVEAU : INITIALISER FLASK-MIGRATE ---
-    migrate.init_app(app, db)
-
+    # ✅ CORRECTION: L'initialisation de Flask-Migrate est déplacée vers le script
+    # manage.py pour éviter les doubles initialisations avec le CLI.
 
     # Import et initialisation forcés - BON ORDRE :
     # Les modèles sont déjà importés au top du fichier
@@ -1037,8 +1035,9 @@ def register_models():
 
 
 # --- Point d_entrée pour Gunicorn et développement local ---
-# Gunicorn va chercher cette variable 'app'
-app = create_app()
+# ✅ CORRECTION: Supprimer la création de l'instance 'app' globale.
+# L'application doit être créée uniquement par la factory `create_app()` au moment de l'exécution.
+# app = create_app()
 
 # --- GUNICORN HOOK ---
 def post_fork(server, worker):
@@ -1051,7 +1050,10 @@ def post_fork(server, worker):
     import gevent.monkey
     gevent.monkey.patch_all()
     server.log.info("Worker %s forked.", worker.pid)
-    db.init_app(app)
+    # ✅ CORRECTION: Le hook doit utiliser le contexte de l'application passée par Gunicorn.
+    # Gunicorn utilise le point d'entrée `api.gunicorn_entry:app` qui appelle déjà create_app().
+    # db.init_app(server.app.application) # This is a more robust way if needed, but init_app is already in create_app.
+    pass # The initialization is already handled in create_app.
 
 if __name__ == "__main__":
     # Le monkey-patching doit être fait le plus tôt possible, mais SEULEMENT
@@ -1059,10 +1061,13 @@ if __name__ == "__main__":
     import gevent.monkey
     gevent.monkey.patch_all()
 
+    # Créer l'application pour le développement local
+    app = create_app()
+
     # Ce bloc est pour le développement local UNIQUEMENT
-    # Initialiser la base de données pour le serveur de développement
-    with app.app_context():
-        db.init_app(app)
+    # L'initialisation de la base de données est déjà gérée par l'appel `create_app()`
+    # with app.app_context():
+    #     db.init_app(app)
 
     # Utilise le serveur de développement de SocketIO
     # NOTE FOR PRODUCTION WITH GUNICORN:
