@@ -13,10 +13,7 @@ describe('AnalyLit V4.1 - Rapport de Tests Complet', () => {
   });
 
   it('✅ API Backend Accessible', () => {
-    // Ce test vérifie que le frontend (sur le port 8888) peut bien communiquer
-    // avec le backend (sur le port 5001) via le proxy.
-    // cy.request() utilise la `baseUrl` (http://localhost:8888) et le proxy redirige l'appel.
-    cy.request('/api/admin/health').then((response) => {
+    cy.request('http://localhost:5000/api/admin/health').then((response) => {
       expect(response.status).to.eq(200);
       expect(response.body).to.have.property('status', 'healthy');
     });

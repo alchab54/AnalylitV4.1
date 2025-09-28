@@ -2,7 +2,7 @@
 export async function fetchAPI(endpoint, options = {}) {
     // ✅ CORRECTION: Utiliser une URL absolue pour appeler directement le backend sur le port 5001,
     // en contournant le proxy du serveur de développement (http-server sur 8888).
-    const API_BASE_URL = 'http://localhost:5001';
+    const API_BASE_URL = 'http://localhost:5000';
     const url = `${API_BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
 
     const isFormData = options.body instanceof FormData;

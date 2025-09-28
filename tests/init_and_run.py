@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings("ignore", message="Failed to load image Python extension")
+
 import os
 import sys
 from pathlib import Path

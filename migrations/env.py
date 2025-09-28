@@ -13,10 +13,9 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 from server_v4_complete import create_app, db # Importer la factory et l'instance de la DB
 from utils.models import SCHEMA
 
-# Créer l'application et initialiser la DB dans le contexte d'Alembic
+# Créer l'application pour le contexte d'Alembic
+# L'initialisation de la DB est déjà faite dans create_app
 app = create_app()
-with app.app_context():
-    db.init_app(app)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

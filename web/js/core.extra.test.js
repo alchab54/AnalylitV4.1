@@ -94,7 +94,7 @@ describe('Core - Coverage Boost', () => {
         
         core.initializeWebSocket();
         
-        expect(global.io).toHaveBeenCalledWith('/', expect.any(Object));
+        expect(global.io).toHaveBeenCalledWith('http://localhost:5000', expect.any(Object));
         expect(mockSocket.on).toHaveBeenCalledWith('connect', expect.any(Function));
         expect(mockSocket.on).toHaveBeenCalledWith('disconnect', expect.any(Function));
         expect(mockSocket.on).toHaveBeenCalledWith('notification', expect.any(Function));

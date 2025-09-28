@@ -32,7 +32,7 @@ describe('fetchAPI Utility', () => {
     const result = await fetchAPI('/test-endpoint');
     
     expect(result).toEqual(mockData);
-    expect(global.fetch).toHaveBeenCalledWith('/api/test-endpoint', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:5000/test-endpoint', {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
