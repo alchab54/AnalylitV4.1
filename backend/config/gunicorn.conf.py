@@ -9,7 +9,8 @@ timeout = 120           # Timeout réduit
 keepalive = 2
 max_requests = 500      # Recycler workers plus souvent
 max_requests_jitter = 50
-preload_app = True      # Partage mémoire entre workers
-reload = True
+preload_app = True      # Partage la mémoire entre les workers
 
-
+# ✅ CORRECTION: Le rechargement automatique de Gunicorn est incompatible avec gevent
+# et cause des erreurs de type KeyError. Il doit être désactivé.
+reload = False

@@ -59,9 +59,9 @@ services:
       - "5000:5000"
       - "8080:5000"
     environment:
-      # ✅ CORRECTION: Indiquer à Flask où trouver l'application.
-      # Essentiel pour que `flask db upgrade` dans entrypoint.sh fonctionne.
-      - FLASK_APP=backend.server_v4_complete:app
+      # ✅ CORRECTION: Utiliser le nouveau script 'manage.py' comme point d'entrée pour les commandes Flask.
+      # Cela suit le pattern standard et évite les initialisations doubles.
+      - FLASK_APP=backend/manage.py
       # Essentiel pour que `flask db upgrade` dans entrypoint.sh fonctionne.
       - FLASK_ENV=production
       - WAIT_HOSTS=db:5432,redis:6379,ollama:11434

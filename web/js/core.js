@@ -373,7 +373,10 @@ export function initializeWebSocket() {
             return;
         }
 
-        appState.socket = io(CONFIG.WEBSOCKET_URL, { path: '/socket.io/', transports: ['websocket', 'polling'] });
+        // ✅ CORRECTION: Forcer la connexion WebSocket vers le backend sur le port 5001,
+        // en contournant le serveur de développement (8888).
+        const WEBSOCKET_URL = 'http://localhost:5001';
+        appState.socket = io(WEBSOCKET_URL, { path: '/socket.io/', transports: ['websocket', 'polling'] });
 
         appState.socket.on('connect', () => {
             console.log(MESSAGES.websocketConnected);

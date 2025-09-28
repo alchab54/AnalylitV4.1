@@ -23,33 +23,25 @@ def main():
     # en ignorant la variable DATABASE_URL du fichier .env qui est destinée à l'intérieur de Docker.
     os.environ['DATABASE_URL'] = 'postgresql+psycopg2://analylit_user:strong_password@localhost:5433/analylit_db'
 
-    from backend.server_v4_complete import create_app
+    # ✅ CORRECTION: Importer la factory et l'utiliser pour créer l'app ici.
+    # Cela évite les problèmes d'initialisation double.
+    from backend.server_v4_complete import create_app, socketio
     
     if sys.platform == 'win32':
         # --- Configuration pour Windows (qui ne supporte pas Gunicorn) ---
         print("Starting server with gevent-websocket for Windows...")
-        from gevent import pywsgi
-        from geventwebsocket.handler import WebSocketHandler
         
+        # Créer l'instance de l'application
         app = create_app()
-        # CORRECTION: Changed port from 5000 to 5001 to avoid conflicts on Windows.
-        print(f"Server starting on http://0.0.0.0:5001")
-        server = pywsgi.WSGIServer(('0.0.0.0', 5001), app, handler_class=WebSocketHandler)
-        server.serve_forever()
+
+        # Lancer le serveur avec SocketIO
+        socketio.run(app, host="0.0.0.0", port=5001, debug=True, allow_unsafe_werkzeug=True)
+
     else:
-        # --- Configuration pour Linux/macOS (Gunicorn) ---
-        print("Starting Gunicorn...")
-        gunicorn_cmd = [
-            "gunicorn",
-            "backend.server_v4_complete:create_app()",
-            "-k", "geventwebsocket.gunicorn.workers.GeventWebSocketWorker",
-            "-w", "1",
-            "--timeout", "300",
-            "-b", "0.0.0.0:5000",
-            "--access-logfile", "-",
-            "--error-logfile", "-"
-        ]
-        os.execvp("gunicorn", gunicorn_cmd)
+        # --- Configuration pour Linux/macOS (similaire à Windows pour le dev local) ---
+        print("Starting server with gevent-websocket for Linux/macOS...")
+        app = create_app()
+        socketio.run(app, host="0.0.0.0", port=5001, debug=True)
         
 if __name__ == "__main__":
     main()

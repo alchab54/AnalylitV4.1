@@ -134,8 +134,8 @@ def create_app(config_override=None):
     # L_initialisation de la base de données est maintenant déplacée vers les points d_entrée
     # (post_fork pour Gunicorn, et __main__ pour le dev local) pour éviter la double initialisation.
     db.init_app(app)
-    # ✅ CORRECTION: L'initialisation de Flask-Migrate est déplacée vers le script
-    # manage.py pour éviter les doubles initialisations avec le CLI.
+    # ✅ CORRECTION: L'initialisation de Migrate est maintenant gérée par le script
+    # `manage.py` pour les commandes CLI, afin d'éviter les conflits.
 
     # Import et initialisation forcés - BON ORDRE :
     # Les modèles sont déjà importés au top du fichier

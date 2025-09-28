@@ -1,6 +1,9 @@
 // Client API CORRIGÉ pour éviter les doubles /api/
 export async function fetchAPI(endpoint, options = {}) {
-    const url = endpoint.startsWith('/api/') ? endpoint : `/api${endpoint}`;
+    // ✅ CORRECTION: Utiliser une URL absolue pour appeler directement le backend sur le port 5001,
+    // en contournant le proxy du serveur de développement (http-server sur 8888).
+    const API_BASE_URL = 'http://localhost:5001';
+    const url = `${API_BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
 
     const isFormData = options.body instanceof FormData;
 

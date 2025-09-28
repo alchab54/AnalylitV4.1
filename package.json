@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "http-server web -p 8888 -c-1 --proxy http://localhost:5001",
+    "start": "http-server web -p 8888 -c-1",
     "test:unit": "jest --config jest.config.cjs --coverage --verbose",
     "test:unit:watch": "jest --config jest.config.cjs --watch --coverage",
     "test:e2e": "cypress run --headless",
@@ -15,7 +15,8 @@
     "test:all": "npm-run-all --parallel test:unit test:e2e",
     "install-deps": "npm install",
     "test:validate": "npm run test:unit && node scripts/validate-coverage.js",
-    "cypress:open": "cypress open"
+    "cypress:open": "cypress open",
+    "db:migrate": "docker compose exec web flask db upgrade"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.28.3",
