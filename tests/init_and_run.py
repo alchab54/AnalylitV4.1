@@ -33,12 +33,12 @@ def main():
     if sys.platform == 'win32':
         # --- Configuration pour Windows (qui ne supporte pas Gunicorn) ---
         print("Starting server with gevent-websocket for Windows...")
-        
+
         # Créer l'instance de l'application
         app = create_app()
 
         # Lancer le serveur avec SocketIO
-        socketio.run(app, host="0.0.0.0", port=5001, debug=True, allow_unsafe_werkzeug=True)
+        socketio.run(app, host="0.0.0.0", port=5000, debug=True, allow_unsafe_werkzeug=True)
 
     else:
         # --- Configuration pour Linux/macOS (similaire à Windows pour le dev local) ---
