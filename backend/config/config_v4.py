@@ -9,8 +9,10 @@ from pathlib import Path
 def load_default_models() -> Dict[str, Any]:
     """Charge les profils de modèles depuis un fichier JSON externe."""
     try:
-        # Le chemin est relatif à la racine de l'application dans le conteneur
-        config_path = Path(__file__).parent / "profiles.json"
+        # ✅ CORRECTION: Utiliser un chemin absolu pour trouver profiles.json.
+        # Le chemin relatif échouait lors de l'exécution des tests avec pytest,
+        # car le répertoire de travail n'était pas le même.
+        config_path = Path(__file__).resolve().parent / "profiles.json"
         with open(config_path, 'r', encoding='utf-8') as f:
             # CORRECTION : S'assurer que la fonction retourne un dictionnaire
             # comme l'indique son annotation de type `-> Dict[str, Any]`.

@@ -1017,6 +1017,13 @@ def create_app(config_override=None):
     app.register_blueprint(tasks_bp, url_prefix='/api')
 
 
+    @app.route('/debug/search-path')
+    @with_db_session
+    def debug_search_path(session):
+        from sqlalchemy import text
+        result = session.execute(text("SHOW search_path;")).scalar()
+        return jsonify({"search_path": result})
+
     # La factory DOIT retourner l_objet app
     return app
 

@@ -21,7 +21,7 @@ from .db_base import Base
 # Créez l'instance ici, mais ne la liez à aucune application.
 # Elle sera liée dans create_app() pour l'application principale,
 # et dans run_migrations.py pour le script de migration.
-db = SQLAlchemy()
+db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
 
 def init_database(database_url=None, is_test: bool = False):

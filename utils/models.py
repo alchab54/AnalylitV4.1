@@ -326,12 +326,7 @@ class GreyLiterature(Base):
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
-# === FORCER L'ENREGISTREMENT DES MODÈLES ===
-# Cette ligne force SQLAlchemy à reconnaître tous les modèles
-__all__ = [
-    'Project', 'SearchResult', 'Extraction', 'AnalysisProfile', 
-    'Grid', 'Prompt', 'ChatMessage', 'RiskOfBias', 'GreyLiterature', 'Stakeholder'
-]
+
 
 class ProcessingLog(Base):
     __tablename__ = 'processing_log'

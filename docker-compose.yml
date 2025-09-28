@@ -108,6 +108,31 @@ services:
       - ./api:/home/appuser/app/api
       - ./pytest.ini:/home/appuser/app/pytest.ini
 
+  # ✅ NOUVEAU SERVICE: 'migrate' pour les commandes de base de données.
+  # Ce service partage l'environnement du service 'web' mais ne lance pas de serveur.
+  # Il est utilisé pour exécuter des commandes ponctuelles comme `flask db migrate`.
+  migrate:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+    container_name: analylit_migrate
+    # Pas de ports exposés, car ce service ne sert qu'à exécuter des commandes.
+    environment:
+      - FLASK_APP=backend/manage.py
+      - FLASK_ENV=production
+      - WAIT_HOSTS=db:5432
+      - WAIT_TIMEOUT=30
+      - PYTHONPATH=/home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
+    env_file:
+      - .env
+    # La commande est conçue pour ne rien faire et attendre une commande de `docker-compose run`.
+    command: ["sleep", "infinity"]
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/home/appuser/app/migrations
+      - ./backend:/home/appuser/app/backend
   # Workers multiples pour paralléliser les tâches
   worker-fast:
     build:

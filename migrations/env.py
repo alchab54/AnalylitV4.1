@@ -10,12 +10,18 @@ from sqlalchemy import text
 # Ajoute le répertoire racine de l'application au path pour trouver 'utils'
 import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
-from server_v4_complete import create_app, db # Importer la factory et l'instance de la DB
+
+# ✅ CORRECTION: Importer la factory et les objets DB APRÈS les modèles.
+# Cela garantit que les modèles sont enregistrés avec SQLAlchemy avant que l'app ne soit créée.
+from backend.server_v4_complete import create_app, db # Importer la factory et l'instance de la DB
 from utils.models import SCHEMA
+from utils.database import migrate # Importer l'instance de Migrate
 
 # Créer l'application pour le contexte d'Alembic
 # L'initialisation de la DB est déjà faite dans create_app
 app = create_app()
+# ✅ CORRECTION: Initialiser l'extension Migrate sur l'instance de l'app créée par env.py.
+migrate.init_app(app, db)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -55,11 +61,11 @@ config.set_main_option('sqlalchemy.url', app.config['SQLALCHEMY_DATABASE_URI'])
 # ... etc.
 
 
-def get_metadata():
-    if hasattr(target_db, 'metadatas'):
-        return target_db.metadatas[None]
-    # --- MODIFICATION POUR LE SCHÉMA ---
-    # Assigner le schéma aux métadonnées avant de les retourner
+def get_metadata_with_schema():
+    """
+    Retourne les métadonnées de la base de données en s'assurant que le schéma est défini.
+    C'est l'étape cruciale pour qu'Alembic sache où créer/modifier les tables.
+    """
     meta = target_db.metadata
     meta.schema = SCHEMA
     return meta
@@ -78,9 +84,7 @@ def run_migrations_offline():
 
     """
     url = config.get_main_option("sqlalchemy.url")
-    context.configure(
-        url=url, target_metadata=get_metadata(), literal_binds=True
-    )
+    context.configure(url=url, target_metadata=get_metadata_with_schema(), literal_binds=True)
 
     with context.begin_transaction():
         context.run_migrations()
@@ -122,7 +126,7 @@ def run_migrations_online():
         # Consolider en un seul appel à context.configure
         context.configure(
             connection=connection,
-            target_metadata=get_metadata(),
+            target_metadata=get_metadata_with_schema(),
             include_schemas=True,  # Indiquer à Alembic de prendre en compte les schémas
             **conf_args
         )
@@ -131,7 +135,16 @@ def run_migrations_online():
             context.run_migrations()
 
 
-if context.is_offline_mode():
-    run_migrations_offline()
-else:
-    run_migrations_online()
+# ✅ CORRECTION: Exécuter les migrations à l'intérieur du contexte de l'application.
+# Cela garantit que toutes les extensions Flask, y compris SQLAlchemy et Migrate,
+# sont correctement initialisées et que `db.metadata` contient bien les modèles.
+with app.app_context():
+    # ✅ CORRECTION FINALE: Importer les modèles ICI, à l'intérieur du contexte de l'app.
+    # C'est l'endroit le plus sûr pour garantir que les modèles sont enregistrés
+    # sur l'objet `db.metadata` que Alembic va inspecter.
+    from utils import models
+
+    if context.is_offline_mode():
+        run_migrations_offline()
+    else:
+        run_migrations_online()
