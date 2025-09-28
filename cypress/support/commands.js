@@ -37,6 +37,8 @@ Cypress.Commands.add('checkAppIsLoaded', () => {
 Cypress.Commands.add('setupMockAPI', () => {
   // Intercepte les appels API les plus courants pour les tests isolés.
   cy.intercept('GET', '/api/projects/', { fixture: 'projects.json' }).as('getProjects');
+  cy.intercept('GET', '/api/analysis-profiles', { body: [] }).as('getAnalysisProfiles');
+  cy.intercept('GET', '/api/databases', { body: [] }).as('getDatabases');
   cy.intercept('GET', '/api/projects/*/search-results?page=1', { fixture: 'articles.json' }).as('getArticles');
   cy.intercept('GET', '/api/projects/*/extractions', { fixture: 'extractions.json' }).as('getExtractions');
   cy.log('Mock API setup complete.');

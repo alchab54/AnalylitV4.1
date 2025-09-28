@@ -583,7 +583,7 @@ export async function exportAnalyses() {
     try {
         showLoadingOverlay(true, MESSAGES.preparingExport);
         // L URL pointe vers l endpoint backend qui génère le fichier ZIP
-        const exportUrl = `/api${API_ENDPOINTS.projectExportAnalyses(appState.currentProject.id)}`;
+        const exportUrl = API_ENDPOINTS.projectExportAnalyses(appState.currentProject.id);
 
         // Ouvre une nouvelle fenêtre pour déclencher le téléchargement du fichier
         window.open(exportUrl, '_blank');
