@@ -122,14 +122,11 @@ def create_app(config_override=None):
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_size': 10,
         'pool_recycle': 120,
-        'pool_pre_ping': True
+        'pool_pre_ping': True,
+        "connect_args": {
+            "options": "-c search_path=analylit_schema,public"
+        }
     }
-
-    # --- NOUVEAU : CONFIGURATION DU SCHÉMA POUR FLASK-MIGRATE ---
-    # Indique à Alembic de créer les tables dans le bon schéma.
-    from utils.models import SCHEMA
-    if SCHEMA:
-        app.config['SQLALCHEMY_ENGINE_OPTIONS']['connect_args'] = {'options': f'-csearch_path={SCHEMA}'}
 
     # L_initialisation de la base de données est maintenant déplacée vers les points d_entrée
     # (post_fork pour Gunicorn, et __main__ pour le dev local) pour éviter la double initialisation.
