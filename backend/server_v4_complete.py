@@ -51,13 +51,14 @@ from werkzeug.utils import secure_filename
 
 # --- Imports des utilitaires et de la configuration ---
 from flask_socketio import SocketIO
-from utils.database import with_db_session, db, migrate
+from utils.extensions import db, migrate
+from utils.database import with_db_session # Importer seulement le décorateur
 from utils.app_globals import (
     processing_queue, synthesis_queue, analysis_queue, background_queue,
     extension_queue, redis_conn, models_queue
 )
 from utils.models import Project, Grid, Extraction, Prompt, AnalysisProfile, SearchResult, ChatMessage, RiskOfBias
-from api.tasks import tasks_bp
+from api.tasks import tasks_bp # type: ignore
 from utils.file_handlers import save_file_to_project_dir
 from utils.app_globals import PROJECTS_DIR as PROJECTS_DIR_STR
 from utils.prisma_scr import get_base_prisma_checklist
@@ -130,17 +131,10 @@ def create_app(config_override=None):
         }
     }
 
-    # L_initialisation de la base de données est maintenant déplacée vers les points d_entrée
-    # (post_fork pour Gunicorn, et __main__ pour le dev local) pour éviter la double initialisation.
+    # ✅ INITIALISER LES EXTENSIONS ICI, À L'INTÉRIEUR DE LA FACTORY
     db.init_app(app)
-    # ✅ CORRECTION: L'initialisation de Migrate est maintenant gérée par le script
-    # `manage.py` pour les commandes CLI, afin d'éviter les conflits.
-
-    # Import et initialisation forcés - BON ORDRE :
-    # Les modèles sont déjà importés au top du fichier
-    # L_initialisation est maintenant gérée par le service 'migrate' dans docker-compose
-    # from utils.database import init_database
-    # init_database()  
+    migrate.init_app(app, db) # Lier migrate à l'application ET à la base de données
+    socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent')
 
     # Configuration des extensions
     CORS(app, 
@@ -154,8 +148,6 @@ def create_app(config_override=None):
          ],
          expose_headers=["Content-Disposition"],
          supports_credentials=True)
-
-    socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent')
 
     # --- Fonctions utilitaires internes à l_app ---
     def first_or_404(query):
@@ -1012,51 +1004,22 @@ def register_models():
     """Force l_enregistrement de tous les modèles."""
     pass  # Juste le fait d_importer ce module enregistre les modèles
 
-
-# --- Point d_entrée pour Gunicorn et développement local ---
-# ✅ CORRECTION: Supprimer la création de l'instance 'app' globale.
-# L'application doit être créée uniquement par la factory `create_app()` au moment de l'exécution.
-# app = create_app()
-
 # --- GUNICORN HOOK ---
 def post_fork(server, worker):
     """
     Hook Gunicorn pour s_assurer que chaque worker a sa propre initialisation de DB.
     Cela évite les problèmes de partage de connexion entre les processus.
     """
-    # CRITICAL: Effectuer le monkey-patching DANS chaque worker après le fork.
-    # C'est le point le plus sûr pour éviter les MonkeyPatchWarning avec plusieurs workers.
     import gevent.monkey
     gevent.monkey.patch_all()
     server.log.info("Worker %s forked.", worker.pid)
-    # ✅ CORRECTION: Le hook doit utiliser le contexte de l'application passée par Gunicorn.
-    # Gunicorn utilise le point d'entrée `api.gunicorn_entry:app` qui appelle déjà create_app().
-    # db.init_app(server.app.application) # This is a more robust way if needed, but init_app is already in create_app.
-    pass # The initialization is already handled in create_app.
 
 if __name__ == "__main__":
-    # Le monkey-patching doit être fait le plus tôt possible, mais SEULEMENT
-    # lors de l_exécution directe, pas lors de l_import par Gunicorn ou Pytest.
     import gevent.monkey
     gevent.monkey.patch_all()
 
     # Créer l'application pour le développement local
-    app = create_app()
-
-    # Ce bloc est pour le développement local UNIQUEMENT
-    # L'initialisation de la base de données est déjà gérée par l'appel `create_app()`
-    # with app.app_context():
-    #     db.init_app(app)
+    app = create_app() # L'instance est locale à ce bloc
 
     # Utilise le serveur de développement de SocketIO
-    # NOTE FOR PRODUCTION WITH GUNICORN:
-    # For WebSockets to work, Gunicorn must be launched with the gevent-websocket worker.
-    # 1. Ensure 'gevent-websocket' is in your requirements.txt.
-    # 2. Launch Gunicorn with the following command:
-    #    gunicorn --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker --bind 0.0.0.0:5000 server_v4_complete:app
     socketio.run(app, host="0.0.0.0", port=5000, debug=True, allow_unsafe_werkzeug=True)
-else:
-    # Pour Gunicorn/production, Gunicorn appellera create_app()
-    # Gunicorn appellera create_app() via le fichier d_entrypoint.
-    # init_database() est appelé dans create_app ou par le script d_entrypoint.
-    pass

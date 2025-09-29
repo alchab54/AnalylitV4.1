@@ -1,30 +1,7 @@
 # 📊 API Reference - AnalyLit v4.1
 
 ## 🎯 **Vue d'Ensemble**
-
 L'API REST d'AnalyLit v4.1 offre un accès programmatique complet à toutes les fonctionnalités de l'application. Base URL: `http://localhost:8080/api`
-
----
-
-## 🔐 **Authentification**
-
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "username": "user@example.com",
-  "password": "motdepasse"
-}
-```
-
-**Réponse:**
-```json
-{
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-  "user_id": 123
-}
-```
 
 ---
 
@@ -32,8 +9,7 @@ Content-Type: application/json
 
 ### **Lister les Projets**
 ```http
-GET /api/projects
-Authorization: Bearer {token}
+GET /api/projects/
 ```
 
 ### **Créer un Projet**

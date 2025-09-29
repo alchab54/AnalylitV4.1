@@ -1,10 +1,9 @@
 # backend/manage.py
 
 from backend.server_v4_complete import create_app
-from utils.database import db, migrate
+from utils.extensions import db, migrate # ✅ Importer depuis les extensions
 
-# Create an app instance for the CLI
-# The create_app factory now handles all extension initializations.
+# Créer une instance d'application dédiée pour les commandes CLI
 app = create_app()
 
 # Link the Migrate instance to the app and db for the 'flask db' command

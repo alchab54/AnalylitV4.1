@@ -106,11 +106,9 @@
 `)`
 
 **💾 Module database.py \- Base de Données**
-
-`# Initialisation base`  
-`init_db()  # Utilise config par défaut`  
-`init_db(db_url="sqlite:///test.db")  # Config custom`
-
+ 
+`# Initialisation base (maintenant gérée par la factory create_app)`
+`app = create_app()`
 `# Données par défaut`  
 `seed_default_data(engine)`
 
@@ -442,11 +440,11 @@
 **🐳 Docker Management**
 
 `# Démarrage complet`  
-`docker-compose -f docker-compose-complete.yml up --build -d`
+`docker-compose up --build -d`
 
 `# Vérification services`  
 `docker-compose ps`  
-`docker-compose logs -f web worker`
+`docker-compose logs -f web worker-default`
 
 `# Redémarrage service spécifique`  
 `docker-compose restart web`  
@@ -473,7 +471,7 @@
 **🗃️ Base de Données**
 
 `# Connexion PostgreSQL`  
-`docker exec -it analylit-db-v4 psql -U analylit_user -d analylit_db`
+`docker exec -it analylit_db psql -U analylit_user -d analylit_db`
 
 `# Commandes SQL utiles`  
 `SELECT COUNT(*) FROM projects;`  
@@ -481,10 +479,10 @@
 `SELECT status, COUNT(*) FROM extractions GROUP BY status;`
 
 `# Sauvegarde`  
-`docker exec analylit-db-v4 pg_dump -U analylit_user analylit_db > backup.sql`
+`docker exec analylit_db pg_dump -U analylit_user analylit_db > backup.sql`
 
 `# Restauration`  
-`docker exec -i analylit-db-v4 psql -U analylit_user analylit_db < backup.sql`
+`docker exec -i analylit_db psql -U analylit_user analylit_db < backup.sql`
 
 **🤖 Ollama Management**
 
@@ -492,7 +490,7 @@
 `curl http://localhost:11434/api/tags`
 
 `# Télécharger modèle`  
-`curl -X POST http://localhost:11434/api/pull \`  
+`curl -X POST http://localhost:11434/api/pull \`
   `-d '{"name": "llama3.1:8b"}'`
 
 `# Test direct Ollama`  
@@ -530,8 +528,8 @@
 `curl -X POST http://localhost:8080/api/queues/processing/clear`  
 `curl -X POST http://localhost:8080/api/queues/background/clear`
 
-`# Redémarrer worker`  
-`docker-compose restart worker`
+`# Redémarrer les workers`  
+`docker-compose restart worker-default worker-fast worker-ai`
 
 **3\. IA/Ollama inaccessible**
 
@@ -539,15 +537,15 @@
 `curl http://localhost:11434/api/tags`
 
 `# Redémarrer service`  
-`docker-compose restart ollama`
+`docker-compose restart analylit_ollama`
 
 `# Vérifier GPU (si disponible)`  
-`docker exec analylit-ollama-v4 nvidia-smi`
+`docker exec analylit_ollama nvidia-smi`
 
 **4\. Base de données corrompue**
 
-`# Recréer schema`  
-`docker exec -it analylit-db-v4 psql -U analylit_user -d analylit_db`  
+`# Recréer schema`
+`docker exec -it analylit_db psql -U analylit_user -d analylit_db`
 `DROP SCHEMA public CASCADE;`  
 `CREATE SCHEMA public;`
 
@@ -566,10 +564,10 @@
 **Logs spécialisés**
 
 `# Tâches RQ`  
-`docker exec analylit-worker-v4 rq info`
+`docker exec analylit_worker_default rq info`
 
 `# Flask debugging`  
-`docker exec analylit-web-v4 flask routes`
+`docker exec analylit_web flask routes`
 
 `# Base données queries`  
 `# Ajouter à config SQLAlchemy : echo=True`
@@ -579,7 +577,7 @@
 **Nettoyage périodique**
 
 `# Nettoyage Redis`  
-`docker exec analylit-redis-v4 redis-cli FLUSHALL`
+`docker exec analylit_redis redis-cli FLUSHALL`
 
 `# Nettoyage logs Docker`  
 `docker system prune --volumes`
@@ -590,7 +588,7 @@
 **Mise à jour**
 
 `# Backup avant mise à jour`  
-`docker exec analylit-db-v4 pg_dump -U analylit_user analylit_db > backup.sql`
+`docker exec analylit_db pg_dump -U analylit_user analylit_db > backup.sql`
 
 `# Pull nouvelles images`  
 `docker-compose pull`

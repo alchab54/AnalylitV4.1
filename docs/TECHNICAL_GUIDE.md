@@ -1,4 +1,4 @@
-**AnalyLit v4.1 \- Guide Technique Complet**
+r**AnalyLit v4.1 \- Guide Technique Complet**
 
 **Application de Scoping Review pour l'Alliance Thérapeutique Numérique**
 
@@ -227,11 +227,12 @@ Pour permettre une recherche de précision (Experte), le flux de données a ét�
 `analylit/`  
 `├── 🐍 Backend Python`  
 `│   ├── server_v4_complete.py      # Serveur Flask principal`  
-`│   ├── tasks_v4_complete.py       # Tâches asynchrones RQ`  
-`│   ├── config_v4.py               # Configuration application`  
-`│   ├── init_and_run.py           # Point d'entrée production`  
+s `│   ├── manage.py                  # Point d'entrée pour Flask CLI (migrations)`
+`│   ├── tasks_v4_complete.py       # Tâches asynchrones RQ`
+`│   ├── config/config_v4.py        # Configuration application`
 `│   │`  
 `│   └── utils/                     # Modules utilitaires`  
+`│       ├── extensions.py          # Instances Flask (SQLAlchemy, Migrate)`
 `│       ├── models.py              # Modèles SQLAlchemy`  
 `│       ├── database.py            # Gestion base données`  
 `│       ├── ai_processors.py       # Interface Ollama`  
@@ -246,10 +247,10 @@ Pour permettre une recherche de précision (Experte), le flux de données a ét�
 `│       └── reporting.py           # Génération rapports`  
 `│`  
 `├── 🐳 Infrastructure`  
-`│   ├── docker-compose-complete.yml # Orchestration services`  
-`│   ├── Dockerfile-*               # Images conteneurs`  
-`│   ├── nginx_complete.conf        # Configuration proxy`  
-`│   └── env.example               # Variables environnement`  
+`│   ├── docker-compose.yml         # Orchestration services`
+`│   ├── docker/Dockerfile.*        # Images conteneurs`
+`│   ├── database/postgres.conf     # Config PostgreSQL`
+`│   └── .env.example               # Variables environnement`
 `│`  
 `├── 🧪 Tests`  
 `│   ├── conftest.py               # Configuration pytest`  
@@ -355,11 +356,10 @@ Pour permettre une recherche de précision (Experte), le flux de données a ét�
 
 **Gestion des Projets**
 
-`GET    /api/projects                        # Liste projets`  
-`POST   /api/projects                        # Créer projet`  
-`GET    /api/projects/{id}                   # Détails projet`  
-`DELETE /api/projects/{id}                   # Supprimer projet`  
-`PUT    /api/projects/{id}/analysis-profile  # Modifier profil IA`
+`GET    /api/projects/                       # Liste projets`
+`POST   /api/projects                        # Créer projet`
+`GET    /api/projects/{id}                   # Détails projet`
+`DELETE /api/projects/{id}                   # Supprimer projet`
 
 **Recherche et Résultats**
 
@@ -639,14 +639,16 @@ Pour permettre une recherche de précision (Experte), le flux de données a ét�
 **🐳 Architecture Docker**
 
 **Services orchestrés** (`docker-compose-complete.yml`):
-
-`services:`  
-  `db:          # PostgreSQL 15`  
-  `redis:       # Redis 7 (cache + queues)`  
-  `ollama:      # Ollama IA (GPU support)`  
-  `web:         # Flask backend`  
-  `worker:      # RQ worker`    
-  `nginx:       # Reverse proxy + frontend`
+`services:`
+  `db:             # PostgreSQL 15 (Données principales)`
+  `test-db:        # PostgreSQL 15 (Base de tests isolée)`
+  `redis:          # Redis 7 (Cache + Queues RQ)`
+  `ollama:         # Ollama IA (GPU support)`
+  `web:            # Serveur Flask/Gunicorn`
+  `migrate:        # Service pour les migrations DB`
+  `worker-default: # Workers RQ pour tâches générales`
+  `worker-fast:    # Workers RQ pour tâches rapides`
+  `worker-ai:      # Workers RQ pour tâches IA (GPU)`
 
 **🚀 Déploiement Production**
 
@@ -657,7 +659,7 @@ Pour permettre une recherche de précision (Experte), le flux de données a ét�
 `# Éditer .env avec vos configurations`
 
 `# Démarrage`  
-`docker-compose -f docker-compose-complete.yml up --build -d`
+`docker-compose up --build -d`
 
 `# Vérification`  
 `docker-compose ps`  
@@ -665,7 +667,7 @@ Pour permettre une recherche de précision (Experte), le flux de données a ét�
 
 `# Monitoring`  
 `docker-compose logs -f web worker`
-
+`docker-compose logs -f web worker-default`
 **Variables d'environnement critiques**:
 
 `# Base de données`  
