@@ -71,8 +71,11 @@ logger = logging.getLogger(__name__)
 PROJECTS_DIR = Path(getattr(config, 'PROJECTS_DIR', '/tmp/projects')) # type: ignore
 PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 
-# ❌ SUPPRESSION: La création globale de l'engine et de la session est la source du conflit de base de données.
-# La session sera maintenant gérée par le contexte de l'application Flask.
+# --- Base de Données (SQLAlchemy Uniquement pour les tâches) ---
+# ✅ CORRECTION: Rétablir une factory de session pour les workers RQ,
+# mais le décorateur ci-dessous s'assurera que les tests utilisent leur propre session.
+engine = create_engine(config.DATABASE_URL, pool_pre_ping=True)
+SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 # --- Embeddings / Vector store (RAG) ---
 EMBEDDING_MODEL_NAME = getattr(config, "EMBEDDING_MODEL", "all-MiniLM-L6-v2")
@@ -99,25 +102,26 @@ def with_db_session(func):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        # ✅ CORRECTION FINALE: Utiliser la session gérée par Flask-SQLAlchemy (`db.session`)
-        # qui est correctement configurée par les fixtures de test.
-        from utils.database import db
-
+        # ✅ CORRECTION FINALE: Logique de session robuste pour les tests et la production.
+        # Si le premier argument est déjà une session SQLAlchemy (fournie par une fixture de test),
+        # on l'utilise directement.
         if args and hasattr(args[0], 'query'): # Détecte si une session est déjà passée
             # La session est déjà fournie (cas des tests)
             return func(*args, **kwargs)
         
+        # Cas normal (exécution par RQ) : créer une nouvelle session pour la durée de la tâche.
+        session = SessionFactory()
         try:
-            # En production (via RQ), on injecte la session de l'application.
-            result = func(db.session, *args, **kwargs)
-            db.session.commit()
+            # Injecter la session comme premier argument pour standardiser la signature des tâches.
+            result = func(session, *args, **kwargs)
+            session.commit()
             return result
         except Exception as e:
-            db.session.rollback()
+            session.rollback()
             logger.error(f"Erreur dans la tâche {func.__name__}: {e}", exc_info=True)
             raise # Propager l'exception pour que RQ marque la tâche comme échouée
         finally:
-            db.session.remove()
+            session.close() # Toujours fermer la session pour libérer la connexion.
     return wrapper
 
 # ================================================================ 
