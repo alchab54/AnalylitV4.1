@@ -106,8 +106,6 @@ services:
     depends_on:
       # ✅ CORRECTION: Le service web attend maintenant que le service migrate ait terminé.
       migrate:
-        condition: service_completed_successfully
-      base:
         condition: service_started
       db:
         condition: service_healthy

@@ -31,13 +31,15 @@ def app():
     Fixture de session : Crée l'application et la base de données UNE SEULE FOIS
     pour toute la session de test. C'est beaucoup plus rapide.
     """
-    # ✅ CORRECTION: Utiliser le `container_name` ('analylit_test_db') comme nom d'hôte,
-    # car il est défini dans docker-compose.yml et prend le pas sur le nom de service ('test-db').
+    # ✅ CORRECTION : Le nom d'hôte doit correspondre au `container_name` défini dans docker-compose.yml.
+    # L'ancien nom 'test-db' n'est plus résolu par le DNS de Docker.
     test_db_url = 'postgresql://analylit_user:strong_password@analylit_test_db:5432/analylit_test_db'
-    os.environ['DATABASE_URL'] = test_db_url
-    os.environ['TEST_DATABASE_URL'] = test_db_url
     
-    _app = create_app()
+    # ✅ CORRECTION : Forcer une configuration de test isolée.
+    _app = create_app({
+        'TESTING': True,
+        'SQLALCHEMY_DATABASE_URI': test_db_url
+    })
     with _app.app_context():
         # On nettoie et on crée le schéma une seule fois au début de la session.
         # C'est la seule opération destructrice, et elle se produit avant que les
