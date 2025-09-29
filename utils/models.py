@@ -9,7 +9,7 @@ import uuid
 import json
 from .db_base import Base  # Importer la Base partagée
  
-SCHEMA = None #'analylit_schema' if os.getenv('TESTING') != 'true' else None
+SCHEMA = 'analylit_schema' if os.getenv('TESTING') != 'true' else None
 
 def _uuid():
     return str(uuid.uuid4())
