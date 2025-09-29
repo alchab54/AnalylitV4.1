@@ -129,7 +129,7 @@ services:
     env_file:
       - .env
     # ✅ CORRECTION: Ce service exécute maintenant les migrations puis se termine avec succès.
-    # Il ne démarre pas de serveur.
+    # La commande est maintenant une liste pour que l'argument "migrate-only" soit correctement interprété.
     command: ["/home/appuser/app/scripts/entrypoint.sh", "migrate-only"]
     depends_on:
       db:
