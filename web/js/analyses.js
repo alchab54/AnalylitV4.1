@@ -293,27 +293,27 @@ export async function runProjectAnalysis(analysisType) {
             body: { type: analysisType } // Corrected body key
         });
 
-        const jobId = response.job_id;
-        if (jobId) {
-            // FIX: Utiliser des messages spécifiques pour correspondre aux tests Cypress.
+        // ✅ CORRECTION: Utiliser job_id (et non task_id) et des messages de toast spécifiques
+        // pour chaque type d'analyse, ce qui correspond aux attentes des tests Cypress.
+        if (response.job_id) {
             let toastMessage;
             if (analysisType === 'discussion') {
-                toastMessage = 'Tâche de génération du brouillon de discussion lancée';
+                toastMessage = MESSAGES.analysisJobStarted('le brouillon de discussion', response.job_id);
             } else if (analysisType === 'atn_scores') {
-                toastMessage = 'Analyse ATN lancée';
+                toastMessage = MESSAGES.atnAnalysisJobStarted(response.job_id);
             } else if (analysisType === 'knowledge_graph') {
-                toastMessage = "La génération pour le graphe de connaissances a été lancée.";
+                toastMessage = MESSAGES.analysisJobStarted('le graphe de connaissances', response.job_id);
             } else if (['meta_analysis', 'prisma_flow', 'descriptive_stats'].includes(analysisType)) {
                 // ✅ CORRECTION: Le test attend un message spécifique pour la méta-analyse.
                 if (analysisType === 'meta_analysis') {
-                    toastMessage = 'Tâche de méta-analyse lancée';
+                    toastMessage = MESSAGES.metaAnalysisStarted;
                 } else if (analysisType === 'prisma_flow') {
-                    toastMessage = 'La génération pour le diagramme PRISMA a été lancée.';
+                    toastMessage = MESSAGES.analysisStartedSimple('le diagramme PRISMA');
                 } else { // descriptive_stats
-                    toastMessage = `Tâche de ${analysisNames[analysisType].replace('le ', '')} lancée`;
+                    toastMessage = MESSAGES.descriptiveStatsStarted;
                 }
             } else {
-                toastMessage = MESSAGES.analysisJobStarted(analysisNames[analysisType], jobId);
+                toastMessage = MESSAGES.analysisJobStarted(analysisNames[analysisType], response.job_id);
             }
             showToast(toastMessage, 'success');
         } else {
