@@ -492,17 +492,42 @@ def save_prisma_checklist(session, project_id):
 @with_db_session
 def export_thesis(session, project_id):
     """Export de thèse."""
+    import pandas as pd
     import zipfile
     import io
     from flask import send_file
     
     try:
-        # Créer un zip simple pour le test
+        # 1. Récupérer les données pertinentes (articles inclus)
+        articles_query = (
+            session.query(SearchResult)
+            .join(Extraction, SearchResult.article_id == Extraction.pmid)
+            .filter(SearchResult.project_id == project_id)
+            .filter(Extraction.user_validation_status == 'include') # ✅ Filtrer par statut
+        )
+
+        articles = [r.to_dict() for r in articles_query.all()]
+
+        if not articles:
+            return jsonify({"error": "Aucun article inclus à exporter"}), 404
+
+        # 2. Créer le DataFrame et le fichier Excel en mémoire
+        df = pd.DataFrame(articles)
+        excel_buffer = io.BytesIO()
+        df.to_excel(excel_buffer, index=False, sheet_name='Articles Inclus')
+        excel_buffer.seek(0)
+
+        # 3. Formater la bibliographie
+        bibliography_text = format_bibliography(articles)
+
+        # 4. Créer le fichier zip en mémoire
         zip_buffer = io.BytesIO()
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-            zip_file.writestr('rapport.txt', 'Contenu du rapport de thèse.')
+            zip_file.writestr('export_articles.xlsx', excel_buffer.read())
+            zip_file.writestr('bibliographie.txt', bibliography_text.encode('utf-8'))
         zip_buffer.seek(0)
         
+        # 5. Envoyer le fichier
         return send_file(
             zip_buffer,
             as_attachment=True,

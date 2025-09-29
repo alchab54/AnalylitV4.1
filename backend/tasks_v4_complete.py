@@ -432,37 +432,46 @@ def run_synthesis_task(session, project_id: str, profile: dict):
     tpl = get_effective_prompt_template('synthesis_prompt', get_synthesis_prompt_template())
     prompt = tpl.format(project_description=project_description, data_for_prompt=data_for_prompt)
     output = call_ollama_api(prompt, profile.get('synthesis_model', 'llama3.1:8b'), output_format="json")
-    
-    if output and isinstance(output, dict):
-        update_project_status(session, project_id, status='completed', result=output)
-        send_project_notification(project_id, 'synthesis_completed', 'Synthèse générée.')
-    else:
+    try:
+        if output and isinstance(output, dict):
+            update_project_status(session, project_id, status='completed', result=output)
+            send_project_notification(project_id, 'synthesis_completed', 'Synthèse générée.')
+        else:
+            update_project_status(session, project_id, status='failed')
+            send_project_notification(project_id, 'synthesis_failed', 'Réponse IA invalide.')
+    except Exception as e:
         update_project_status(session, project_id, status='failed')
-        send_project_notification(project_id, 'synthesis_failed', 'Réponse IA invalide.')
+        logger.error(f"Erreur dans la tâche de synthèse : {e}", exc_info=True)
+        raise
 
 @with_db_session
 def run_discussion_generation_task(session, project_id: str):
     """Génère le brouillon de la discussion."""
-    update_project_status(session, project_id, 'generating_analysis')
-    rows = session.execute(text("SELECT e.extracted_data, e.pmid, s.title, e.relevance_score FROM extractions e JOIN search_results s ON e.project_id = s.project_id AND e.pmid = s.article_id WHERE e.project_id = :pid AND e.relevance_score >= 7 AND e.extracted_data IS NOT NULL"), {"pid": project_id}).mappings().all()
-    if not rows: # Ne pas lever d'erreur, mais mettre à jour le statut et notifier.
+    try:
+        update_project_status(session, project_id, 'generating_analysis')
+        rows = session.execute(text("SELECT e.extracted_data, e.pmid, s.title, e.relevance_score FROM extractions e JOIN search_results s ON e.project_id = s.project_id AND e.pmid = s.article_id WHERE e.project_id = :pid AND e.relevance_score >= 7 AND e.extracted_data IS NOT NULL"), {"pid": project_id}).mappings().all()
+        if not rows: # Ne pas lever d'erreur, mais mettre à jour le statut et notifier.
+            update_project_status(session, project_id, status='failed')
+            send_project_notification(project_id, 'analysis_failed', "Aucune donnée d'extraction pertinente trouvée pour générer la discussion.")
+            return
+
+        # The user request mentioned a correction for a function call on line 300.
+        # That line does not exist in this file. The logic for enqueuing tasks is in `server_v4_complete.py`.
+        # The most similar logic in this file is the call to `generate_discussion_draft` below.
+        # I will assume the intent was to ensure this part is correct, which it appears to be.
+        # No changes are made based on the user's specific instruction for line 300 as it's not applicable here.
+        df = pd.DataFrame(rows)
+        profile = session.execute(text("SELECT profile_used FROM projects WHERE id = :pid"), {"pid": project_id}).scalar_one_or_none() or 'standard'
+        # The following line correctly calls the local function `generate_discussion_draft`
+        model_name = config.DEFAULT_MODELS.get(profile, {}).get('synthesis', 'llama3.1:8b')
+        draft = generate_discussion_draft(df, lambda p, m: call_ollama_api(p, m, temperature=0.7), model_name)
+
+        update_project_status(session, project_id, status='completed', discussion=draft)
+        send_project_notification(project_id, 'analysis_completed', 'Le brouillon de discussion a été généré.', {'discussion_draft': draft})
+    except Exception as e:
         update_project_status(session, project_id, status='failed')
-        send_project_notification(project_id, 'analysis_failed', "Aucune donnée d'extraction pertinente trouvée pour générer la discussion.")
-        return
-
-    # The user request mentioned a correction for a function call on line 300.
-    # That line does not exist in this file. The logic for enqueuing tasks is in `server_v4_complete.py`.
-    # The most similar logic in this file is the call to `generate_discussion_draft` below.
-    # I will assume the intent was to ensure this part is correct, which it appears to be.
-    # No changes are made based on the user's specific instruction for line 300 as it's not applicable here.
-    df = pd.DataFrame(rows)
-    profile = session.execute(text("SELECT profile_used FROM projects WHERE id = :pid"), {"pid": project_id}).scalar_one_or_none() or 'standard'
-    # The following line correctly calls the local function `generate_discussion_draft`
-    model_name = config.DEFAULT_MODELS.get(profile, {}).get('synthesis', 'llama3.1:8b')
-    draft = generate_discussion_draft(df, lambda p, m: call_ollama_api(p, m, temperature=0.7), model_name)
-
-    update_project_status(session, project_id, status='completed', discussion=draft)
-    send_project_notification(project_id, 'analysis_completed', 'Le brouillon de discussion a été généré.', {'discussion_draft': draft})
+        logger.error(f"Erreur dans la tâche de discussion : {e}", exc_info=True)
+        raise
 
 @with_db_session
 def run_knowledge_graph_task(session, project_id: str):
@@ -563,7 +572,7 @@ def run_meta_analysis_task(session, project_id: str):
     ax.set_title('Distribution des Scores de Pertinence')
     ax.legend()
     plt.savefig(plot_path, bbox_inches='tight')
-    plt.close(fig)    
+    plt.close(fig)
     update_project_status(session, project_id, status='completed', analysis_result=analysis_result, analysis_plot_path=plot_path)
     send_project_notification(project_id, 'analysis_completed', 'Méta-analyse terminée.')
 

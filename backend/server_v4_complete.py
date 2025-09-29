@@ -597,42 +597,43 @@ def create_app(config_override=None):
     @with_db_session
     def export_thesis(session, project_id):
         """Génère et retourne un export complet de thèse (Excel, Biblio) dans un fichier zip."""
-
         try:
             # 1. Récupérer les données pertinentes (articles inclus)
             articles_query = (
                 session.query(SearchResult)
                 .join(Extraction, SearchResult.article_id == Extraction.pmid)
                 .filter(SearchResult.project_id == project_id)
-                .filter(Extraction.user_validation_status == 'include')
+                .filter(Extraction.user_validation_status == 'include') # ✅ Filtrer par statut
             )
 
             articles = [
                 {
-                    'title': r.title, 'authors': r.authors, 'publication_date': r.publication_date,
-                    'journal': r.journal, 'abstract': r.abstract
+                    'title': r.title, 'authors': r.authors, 
+                    'publication_date': r.publication_date, 'journal': r.journal, 
+                    'abstract': r.abstract
                 } for r in articles_query.all()
             ]
 
             if not articles:
                 return jsonify({"error": "Aucun article inclus à exporter"}), 404
 
-            # 2. Créer le DataFrame et le fichier Excel en mémoire
+            # 2. Créer le DataFrame et le fichier Excel en mémoire (logique existante)
             df = pd.DataFrame(articles)
             excel_buffer = io.BytesIO()
             df.to_excel(excel_buffer, index=False, sheet_name='Articles Inclus')
             excel_buffer.seek(0)
 
-            # 3. Formater la bibliographie
-            bibliography_text = "\n".join(format_bibliography(articles))
+            # 3. Formater la bibliographie (✅ Utilise la fonction maintenant définie)
+            bibliography_text = format_bibliography(articles)
 
-            # 4. Créer le fichier zip en mémoire
+            # 4. Créer le fichier zip en mémoire (logique existante)
             zip_buffer = io.BytesIO()
             with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
                 zip_file.writestr('export_articles.xlsx', excel_buffer.read())
                 zip_file.writestr('bibliographie.txt', bibliography_text.encode('utf-8'))
             zip_buffer.seek(0)
 
+            # 5. Envoyer le fichier (logique existante)
             return send_file(
                 zip_buffer,
                 as_attachment=True,
