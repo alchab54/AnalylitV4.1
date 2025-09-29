@@ -15,12 +15,12 @@ pytest_plugins = [
     "pytest_asyncio",
 ]
 
+# Set TESTING environment variable for models.py
+os.environ['TESTING'] = 'true'
+
 # --- IMPORTS DE L'APPLICATION ---
 from backend.server_v4_complete import create_app
 from utils.database import db
-
-# Set TESTING environment variable for models.py
-os.environ['TESTING'] = 'true'
 
 @pytest.fixture(scope='session')
 def app():

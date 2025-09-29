@@ -14,7 +14,7 @@ services:
       POSTGRES_DB: analylit_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./database/init-user-db.sql:/docker-entrypoint-initdb.d/init.sql
+      # - ./database/init-user-db.sql:/docker-entrypoint-initdb.d/init.sql
       # Monter la configuration personnalisée
       - ./database/postgres.conf:/usr/share/postgresql/postgresql.conf.sample
     ports:
@@ -87,7 +87,7 @@ services:
           cpus: '1.5'
           memory: 2000M
     # La commande est maintenant aussi dans entrypoint.sh
-    command: ["/home/appuser/app/scripts/entrypoint.sh", "start-web"]
+    command: ["start-web"]
     depends_on:
       # ✅ CORRECTION: Le service web attend maintenant que le service migrate ait terminé.
       migrate:
@@ -126,11 +126,16 @@ services:
       - WAIT_HOSTS=db:5432
       - WAIT_TIMEOUT=30
       - PYTHONPATH=/home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
+      # ✅ AJOUTEZ ces variables pour les migrations:
+      - POSTGRES_USER=analylit_user
+      - POSTGRES_PASSWORD=strong_password
+      - POSTGRES_DB=analylit_db
+      - DATABASE_URL=postgresql://analylit_user:strong_password@db:5432/analylit_db
     env_file:
       - .env
     # ✅ CORRECTION: Ce service exécute maintenant les migrations puis se termine avec succès.
     # La commande est maintenant une liste pour que l'argument "migrate-only" soit correctement interprété.
-    command: ["/home/appuser/app/scripts/entrypoint.sh", "migrate-only"]
+    command: ["migrate-only"]
     depends_on:
       db:
         condition: service_healthy

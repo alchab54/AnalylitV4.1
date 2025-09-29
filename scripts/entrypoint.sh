@@ -11,12 +11,18 @@ echo "✅ Base de données prête!"
 
 # ✅ CORRECTION FINALE : Exécuter les migrations OU démarrer le serveur, mais pas les deux.
 if [ "$1" = "migrate-only" ]; then
-    echo "🔄 Application des migrations de la base de données..."
-    # On "tamponne" d'abord la base de données avec la dernière version pour éviter les erreurs de recréation.
+  echo "🔄 Application des migrations de la base de données..."
+  # ✅ CORRECTION: Vérifier si des migrations existent avant stamp
+  if flask db current >/dev/null 2>&1; then
+    echo "Stamping existing migrations..."
     flask db stamp head
-    # Ensuite, on applique les nouvelles migrations.
+  else
+    echo "Initialisation première migration..."
     flask db upgrade
-    echo "✅ Migrations terminées. Le conteneur va s'arrêter."
+  fi
+  # Appliquer les nouvelles migrations
+  flask db upgrade
+  echo "✅ Migrations terminées. Le conteneur va s'arrêter."
 elif [ "$1" = "start-web" ]; then
     echo "🚀 Démarrage du serveur Gunicorn..."
     # La commande Gunicorn est maintenant gérée par le `command` dans docker-compose.yml,
