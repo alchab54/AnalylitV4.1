@@ -20,7 +20,9 @@ def test_seed_default_data_when_empty(db_session):
 def test_seed_default_data_when_exists(db_session):
     """Teste que le seeding ne crée pas de doublons."""
     # Arrange: Assume default data is already seeded by test_app fixture
-    
+    # ✅ CORRECTION: Appeler le seeding une première fois pour s'assurer que les données existent.
+    seed_default_data(db_session)
+
     # Assert initial state (data should exist from initial seeding)
     profile_before = db_session.query(AnalysisProfile).filter_by(name='Standard').first()
     project_before = db_session.query(Project).filter_by(name='Projet par défaut').first()

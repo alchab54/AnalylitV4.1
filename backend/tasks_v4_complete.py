@@ -338,6 +338,7 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
 
     session.execute(text("UPDATE projects SET status = 'search_completed', pmids_count = :n, updated_at = :ts WHERE id = :id"), {"n": total_found, "ts": datetime.now().isoformat(), "id": project_id})
     
+    session.commit() # Commit the status update
     # Amélioration de la notification finale
     final_message = f'Recherche terminée: {total_found} articles trouvés.'
     if failed_databases:
@@ -894,6 +895,7 @@ def calculate_kappa_task(session, project_id: str):
     }
     
     session.execute(text("UPDATE projects SET inter_rater_reliability = :result WHERE id = :pid"), {"result": json.dumps(result), "pid": project_id})
+    session.commit()
     message = f"Kappa = {kappa:.3f} ({interpretation}), n = {len(eval1_decisions)}"
     send_project_notification(project_id, 'kappa_calculated', message)
 

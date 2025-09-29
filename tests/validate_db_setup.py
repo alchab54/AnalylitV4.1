@@ -1,95 +1,105 @@
 #!/usr/bin/env python3
-"""Script de validation de la configuration DB pour les tests"""
+"""Script de validation avec diagnostic complet"""
 
 import os
 import sys
+import time
 from pathlib import Path
 
 # Ajouter le répertoire racine au PATH
 root_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(root_dir))
 
-from backend.server_v4_complete import create_app
-from utils.database import db
-from sqlalchemy import text
-
-def validate_test_db():
-    """Valide que la configuration de test fonctionne"""
-    # ✅ CORRECTION CRITIQUE : URL de test dédiée
-    test_db_url = 'postgresql://analylit_user:strong_password@analylit_test_db:5432/analylit_test_db'
-    # ✅ CORRECTION : Configuration complète avec search_path
-    app = create_app({
+def validate_connection():
+    """Validation étape par étape"""
+    
+    # Test de base
+    from backend.server_v4_complete import create_app
+    from utils.database import db
+    from sqlalchemy import text
+    
+    test_config = {
         'TESTING': True,
-        'SQLALCHEMY_DATABASE_URI': test_db_url,
+        'SQLALCHEMY_DATABASE_URI': 'postgresql://analylit_user:strong_password@analylit_test_db:5432/analylit_test_db',
         'SQLALCHEMY_ENGINE_OPTIONS': {
-            "connect_args": {
-                "options": "-c search_path=analylit_schema,public"
-            }
+            'pool_size': 1,
+            'connect_args': {"options": "-c search_path=analylit_schema,public"}
         }
-    })
+    }
+    
+    app = create_app(test_config)
     
     with app.app_context():
+        # Étape 1: Connexion
         try:
-            # Test de connexion
             result = db.session.execute(text("SELECT 1")).scalar()
-            print(f"✅ Connexion DB: OK (result={result})")
-            
-            # Test du search_path
-            search_path = db.session.execute(text("SHOW search_path")).scalar()
-            print(f"✅ Search path: {search_path}")
-            
-            # CRÉER LE SCHÉMA ET LES TABLES (même logique que conftest.py)
-            try:
-                db.session.execute(text("CREATE SCHEMA IF NOT EXISTS analylit_schema"))
-                db.session.commit()
-                print("✅ Schéma créé")
-            except Exception as e:
-                print(f"⚠️ Schéma existe déjà: {e}")
-                db.session.rollback()
-            
-            # FORCER la création des tables
-            try:
-                db.create_all()
-                db.session.commit()
-                print("✅ Tables forcées avec db.create_all()")
-            except Exception as e:
-                print(f"⚠️ Erreur create_all: {e}")
-                db.session.rollback()
-            
-            # Vérifier les tables APRÈS création forcée
+            print(f"✅ 1. Connexion: OK ({result})")
+        except Exception as e:
+            print(f"❌ 1. Connexion: FAILED - {e}")
+            return False
+        
+        # Étape 2: Search path
+        try:
+            path = db.session.execute(text("SHOW search_path")).scalar()
+            print(f"✅ 2. Search path: {path}")
+        except Exception as e:
+            print(f"❌ 2. Search path: FAILED - {e}")
+        
+        # Étape 3: Schémas disponibles
+        try:
+            schemas = db.session.execute(text("""
+                SELECT schema_name FROM information_schema.schemata 
+                WHERE schema_name NOT IN ('information_schema', 'pg_catalog', 'pg_toast')
+            """)).fetchall()
+            print(f"✅ 3. Schémas disponibles: {[s[0] for s in schemas]}")
+        except Exception as e:
+            print(f"❌ 3. Schémas: FAILED - {e}")
+        
+        # Étape 4: Créer schéma de test
+        try:
+            db.session.execute(text("DROP SCHEMA IF EXISTS analylit_schema CASCADE"))
+            db.session.execute(text("CREATE SCHEMA analylit_schema"))
+            db.session.commit()
+            print("✅ 4. Schéma test créé")
+        except Exception as e:
+            print(f"❌ 4. Création schéma: FAILED - {e}")
+            db.session.rollback()
+            return False
+        
+        # Étape 5: Créer tables
+        try:
+            db.create_all()
+            db.session.commit()
+            print("✅ 5. Tables créées")
+        except Exception as e:
+            print(f"❌ 5. Création tables: FAILED - {e}")
+            db.session.rollback()
+            return False
+        
+        # Étape 6: Vérifier tables
+        try:
             tables = db.session.execute(text("""
-                SELECT schemaname, tablename 
-                FROM pg_tables 
+                SELECT tablename FROM pg_tables 
                 WHERE schemaname = 'analylit_schema'
                 ORDER BY tablename
             """)).fetchall()
             
-            print(f"✅ Tables trouvées dans 'analylit_schema' ({len(tables)}):")
-            for schema, table in tables:
-                print(f"  - {schema}.{table}")
+            table_names = [t[0] for t in tables]
+            print(f"✅ 6. Tables dans analylit_schema ({len(table_names)}): {table_names}")
             
-            if len(tables) == 0:
-                print("❌ PROBLÈME: Aucune table trouvée même après db.create_all()")
-                # Diagnostique supplémentaire
-                all_tables = db.session.execute(text("""
-                    SELECT schemaname, tablename 
-                    FROM pg_tables 
-                    WHERE schemaname NOT IN ('information_schema', 'pg_catalog')
-                    ORDER BY schemaname, tablename
-                """)).fetchall()
-                print(f"📋 Toutes les tables dans la DB ({len(all_tables)}):")
-                for schema, table in all_tables:
-                    print(f"  - {schema}.{table}")
+            if len(table_names) == 0:
+                print("❌ Aucune table trouvée!")
                 return False
                 
-            return True
-            
         except Exception as e:
-            print(f"❌ Erreur: {e}")
+            print(f"❌ 6. Vérification tables: FAILED - {e}")
             return False
+        
+        print("✅ VALIDATION COMPLÈTE RÉUSSIE")
+        return True
 
 if __name__ == "__main__":
-    print("--- Lancement du script de validation AMÉLIORÉ ---")
-    success = validate_test_db()
-    print("--- Fin du script ---")
+    print("=== VALIDATION DE LA CONFIGURATION DB TEST ===")
+    success = validate_connection()
+    print("=" * 50)
     sys.exit(0 if success else 1)

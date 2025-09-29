@@ -55,10 +55,10 @@ def test_run_rob_analysis_success(client, setup_test_data):
     # Vérifier les résultats
     assert response.status_code == 202, "L'API doit accepter la tâche et répondre 202."
     data = response.get_json()
-    assert "message" in data, "La réponse doit contenir un message de confirmation."
-    assert "task_ids" in data, "La réponse doit contenir une liste d'IDs de tâches."
-    assert len(data['task_ids']) == 1, "Une tâche doit être créée pour un article."
-    assert data['message'] == "RoB analysis initiated"
+    assert "message" in data
+    assert "job_ids" in data, "La réponse doit contenir une liste d'IDs de tâches."
+    assert len(data['job_ids']) == 1, "Une tâche doit être créée pour un article."
+    assert data['message'] == "RoB analysis initiated" # Correction du message attendu
 
 def test_run_rob_analysis_no_articles(client, setup_test_data):
     """
@@ -75,7 +75,7 @@ def test_run_rob_analysis_no_articles(client, setup_test_data):
 
     assert response.status_code == 202
     data = response.get_json()
-    assert len(data['task_ids']) == 0, "Aucune tâche ne doit être créée si aucun article n'est fourni."
+    assert len(data['job_ids']) == 0, "Aucune tâche ne doit être créée si aucun article n'est fourni."
 
 def test_run_rob_analysis_project_not_found(client):
     """

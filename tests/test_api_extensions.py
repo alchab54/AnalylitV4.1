@@ -169,30 +169,26 @@ def test_api_prisma_checklist_workflow(client: FlaskClient, db_session: Session,
 # CATEGORIE 4: ADMIN & INFRASTRUCTURE
 # ================================================================
 
-@patch('api.admin.Worker')
-@patch('api.admin.processing_queue')
-@patch('api.admin.synthesis_queue')
-@patch('api.admin.analysis_queue')
-@patch('api.admin.background_queue')
-@patch('api.admin.ai_queue')
-@patch('api.admin.fast_queue')
-def test_api_admin_queues_status(mock_fast_q, mock_ai_q, mock_bg_q, mock_an_q, mock_syn_q, mock_proc_q, mock_worker, client: FlaskClient):
+@patch('backend.server_v4_complete.Worker')
+@patch('backend.server_v4_complete.processing_queue')
+@patch('backend.server_v4_complete.synthesis_queue')
+@patch('backend.server_v4_complete.analysis_queue')
+@patch('backend.server_v4_complete.background_queue')
+def test_api_admin_queues_status(mock_bg_q, mock_an_q, mock_syn_q, mock_proc_q, mock_worker, client: FlaskClient):
     """
     Teste l'endpoint d'administration des files (queues) pour le monitoring.
     """
     # ARRANGE
-    mock_proc_q.name = 'analylit_processing_v4'; mock_proc_q.count = 5
-    mock_syn_q.name = 'analylit_synthesis_v4'; mock_syn_q.count = 2
-    mock_an_q.name = 'analylit_analysis_v4'; mock_an_q.count = 0
-    mock_bg_q.name = 'analylit_background_v4'; mock_bg_q.count = 1
-    mock_ai_q.name = 'ai_queue'; mock_ai_q.count = 0
-    mock_fast_q.name = 'fast_queue'; mock_fast_q.count = 0
+    mock_proc_q.name = 'analylit_processing_v4'; mock_proc_q.__len__.return_value = 5
+    mock_syn_q.name = 'analylit_synthesis_v4'; mock_syn_q.__len__.return_value = 2
+    mock_an_q.name = 'analylit_analysis_v4'; mock_an_q.__len__.return_value = 0
+    mock_bg_q.name = 'analylit_background_v4'; mock_bg_q.__len__.return_value = 1
     
     mock_worker_instance = MagicMock(); mock_worker_instance.queue_names.return_value = ['analylit_processing_v4', 'analylit_background_v4']
     mock_worker.all.return_value = [mock_worker_instance]
 
     # ACT
-    response = client.get('/api/queues/status')
+    response = client.get('/api/queues/info') # La route est dans admin_bp
     assert response.status_code == 200
     queues_data = response.json['queues']
     

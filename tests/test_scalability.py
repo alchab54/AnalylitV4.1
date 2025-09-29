@@ -71,7 +71,7 @@ def test_analysis_task_on_large_dataset(db_session, large_project, mocker):
     
     # Simuler 10 000 extractions avec des scores
     # On mock la requête SQL pour ne pas réellement insérer 10k extractions
-    mock_scores = [7.5 + (i % 3 - 1) * 0.1 for i in range(10000)]
+    mock_scores = MagicMock(all=MagicMock(return_value=[7.5 + (i % 3 - 1) * 0.1 for i in range(10000)]))
     mocker.patch('sqlalchemy.orm.session.Session.execute').return_value.scalars.return_value = mock_scores
     mocker.patch('tasks_v4_complete.send_project_notification')
 
@@ -79,12 +79,12 @@ def test_analysis_task_on_large_dataset(db_session, large_project, mocker):
     run_meta_analysis_task.__wrapped__(db_session, project_id)
 
     # Récupérer l'objet projet depuis la base de données avant de le rafraîchir
-    project = db_session.get(Project, project_id)
-    assert project is not None, "Le projet n'a pas pu être retrouvé dans la base de données."
+    # CORRECTION: On ne peut pas rafraîchir un mock. On récupère directement l'objet depuis la DB.
+    project_from_db = db_session.get(Project, project_id)
+    assert project_from_db is not None, "Le projet n'a pas pu être retrouvé dans la base de données."
     # Vérifier que l'analyse a réussi et que les calculs sont corrects
-    db_session.refresh(project) # Recharger l'état de l'objet depuis la DB pour voir le résultat écrit par la tâche
-    assert project.analysis_result is not None, "La tâche d'analyse n'a pas écrit de résultat."
-    results = json.loads(project.analysis_result)
+    assert project_from_db.analysis_result is not None, "La tâche d'analyse n'a pas écrit de résultat."
+    results = json.loads(project_from_db.analysis_result)
     
     assert results['n_articles'] == 10000
     assert results['mean_score'] == pytest.approx(7.5)

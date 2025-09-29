@@ -413,8 +413,8 @@ def create_app(config_override=None):
         task_ids = []
         for article_id in article_ids:
             job = processing_queue.enqueue(process_single_article_task, project_id=project_id, article_id=article_id, profile=profile.to_dict(), analysis_mode=analysis_mode, custom_grid_id=custom_grid_id, job_timeout='30m')
-            job_id = str(job.id) if hasattr(job, 'id') else str(uuid.uuid4())
-            task_ids.append(job.id)
+            job_id = str(job.id) if hasattr(job, 'id') else str(uuid.uuid4()) # type: ignore
+            task_ids.append(job_id)
         return jsonify({"message": f"{len(task_ids)} tâches lancées", "job_ids": task_ids}), 202
 
     @app.route("/api/projects/<project_id>/run-synthesis", methods=["POST"])
@@ -523,40 +523,6 @@ def create_app(config_override=None):
         except Exception as e:
             logging.error(f"Erreur d_enqueue pour import Zotero: {e}")
             return jsonify({"error": f"Erreur de traitement: {str(e)}"}), 500   
-             
-    @app.route("/api/projects/<project_id>/upload-zotero", methods=["POST"])
-    @with_db_session
-    def upload_zotero(session, project_id):
-        """Upload Zotero direct."""
-        try:
-            # CORRECTION : Meilleure gestion des types de requêtes
-            if request.is_json or (request.content_type and 'application/json' in request.content_type):
-                data = request.get_json()
-                if not data:
-                    return jsonify({"error": "Données JSON invalides"}), 400
-            else:
-                # Pour les tests qui envoient du form data
-                data = request.form.to_dict()
-                if 'articles' in data:
-                    data['articles'] = data['articles'].split(',')
-            
-            pmids = data.get("articles", [])
-            # Utiliser les vraies valeurs pour les tests
-            zotero_user_id = data.get("zotero_user_id", "123")
-            zotero_api_key = data.get("zotero_api_key", "abc")
-            
-            job = background_queue.enqueue(
-                import_pdfs_from_zotero_task,
-                project_id=project_id,
-                pmids=pmids,
-                zotero_user_id=zotero_user_id,
-                zotero_api_key=zotero_api_key,
-                job_timeout='1h'
-            )
-            job_id = str(job.id) if job and job.id else "unknown"
-            return jsonify({"message": "Zotero import started", "job_id": job_id}), 202
-        except Exception as e:
-            return jsonify({"error": f"Erreur: {str(e)}"}), 400
     
     @app.route('/api/projects/<project_id>/upload-zotero-file', methods=['POST']) # The user request is to fix the test, but the test is correct. The server code is wrong.
     @with_db_session
@@ -756,10 +722,10 @@ def create_app(config_override=None):
     @app.route("/api/settings/profiles", methods=["GET"])
     def handle_profiles():
         try:
-            profiles_path = Path("profiles.json")
+            profiles_path = Path(__file__).parent / "config" / "profiles.json"
             if profiles_path.exists():
                 with open(profiles_path, 'r', encoding='utf-8') as f:
-                    return jsonify(json.load(f))
+                    return jsonify(json.load(f)) # type: ignore
         except Exception as e:
             logging.error(f"Erreur lors de la récupération des profils: {e}")
             return jsonify({"error": "Erreur serveur"}), 500
@@ -953,7 +919,7 @@ def create_app(config_override=None):
             extension_name=extension_name,
             job_timeout=1800,
             result_ttl=3600,
-        )
+        ) # type: ignore
         logger.info("Job enqueued: %s", job.id)
         return jsonify({"job_id": job.id, "message": "Extension lancée"}), 202
 

@@ -219,7 +219,7 @@ def test_api_run_discussion_draft_enqueues_task(mock_enqueue, client, db_session
     response_data = json.loads(response.data) # type: ignore
     assert response_data['job_id'] == "mocked_job_id_123"
 
-@patch('api.chat.background_queue.enqueue')
+@patch('api.projects.background_queue.enqueue')
 def test_api_post_chat_message_enqueues_task(mock_enqueue, client, db_session):
     """
     Teste d'intégration API : Vérifie que l'endpoint de chat met bien en file la tâche RAG.
@@ -425,14 +425,14 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
     # On patche la fonction qui sauvegarde le fichier pour ne pas écrire sur le disque
     with patch('server_v4_complete.save_file_to_project_dir', return_value='/fake/path/to/test.json'):
         response = client.post(
-            f'/api/projects/{project_id}/upload-zotero-file',
+            f'/api/projects/{project_id}/upload-zotero-file', # Correction du nom de la route
             data=file_data,
             content_type='multipart/form-data'
         )
  
         # ASSERT
         assert response.status_code == 202
-        assert response.get_json()['task_id'] == "zotero_file_job_q"
+        assert response.get_json()['job_id'] == "zotero_file_job_q"
         mock_q_enqueue.assert_called_once_with(
             import_from_zotero_file_task,
             project_id=project_id,

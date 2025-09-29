@@ -74,7 +74,7 @@ def test_file_upload_path_traversal_is_prevented(client, setup_project):
 
     # On utilise "patch" pour espionner l'appel à secure_filename
     # ✅ CORRECTION: La route est dans `server_v4_complete`, donc on patche là où `secure_filename` est importé et utilisé.
-    with patch('server_v4_complete.secure_filename') as mock_secure_filename:
+    with patch('utils.file_handlers.secure_filename') as mock_secure_filename:
         mock_secure_filename.return_value = "etc_passwd"
 
         # Tenter d'uploader le fichier
