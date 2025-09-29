@@ -32,6 +32,7 @@ app = create_app({
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 logger = logging.getLogger('alembic.env')
+logging.getLogger('alembic').setLevel(logging.DEBUG)
 
 
 # add your model's MetaData object here
@@ -48,11 +49,12 @@ with app.app_context():
 
 def get_metadata_with_schema():
     """
-    Retourne les métadonnées de la base de données en s'assurant que le schéma est défini.
-    C'est l'étape cruciale pour qu'Alembic sache où créer/modifier les tables.
+    Retourne les métadonnées en forçant le schéma sur TOUTES les tables
     """
     meta = target_metadata
-    meta.schema = SCHEMA
+    # ✅ CORRECTION CRITIQUE: Forcer le schéma sur chaque table
+    for table in meta.tables.values():
+        table.schema = SCHEMA
     return meta
 
 
@@ -94,22 +96,31 @@ def run_migrations_online():
     )
 
     with connectable.connect() as connection:
-        # 1. Créer le schéma s'il n'existe pas
+        # 1. Créer le schéma
         if SCHEMA:
             logger.info(f"Création/Vérification du schéma : {SCHEMA}")
             connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
-
-        # 2. Configurer le contexte Alembic AVANT de l'utiliser
+            # ✅ AJOUT: Définir le search_path pour forcer l'utilisation du schéma
+            connection.execute(text(f"SET search_path TO {SCHEMA}, public"))
+        
+        # 2. Configurer avec le schéma par défaut
         context.configure(
             connection=connection,
             target_metadata=get_metadata_with_schema(),
             version_table_schema=SCHEMA,
             include_schemas=True,
+            include_object=lambda obj, name, type_, reflected, compare_to: (
+                obj.schema == SCHEMA if hasattr(obj, 'schema') else True
+            )
         )
 
         # 3. Exécuter les migrations à l'intérieur d'une transaction
         with context.begin_transaction():
             context.run_migrations()
+
+    # 4. Create alembic_version table manually
+    with connectable.connect() as connection:
+        connection.execute(text(f"CREATE TABLE IF NOT EXISTS {SCHEMA}.alembic_version (version_num VARCHAR(32) NOT NULL, CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num))"))
 
 
 if context.is_offline_mode():
