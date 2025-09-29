@@ -32,6 +32,16 @@ services:
           cpus: '1.0'
           memory: 1000M
 
+  test-db:
+    image: postgres:15-alpine
+    container_name: analylit_test_db
+    environment:
+      POSTGRES_USER: analylit_user
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: analylit_test_db # Base séparée pour tests
+    tmpfs:
+      - /var/lib/postgresql/data # Base temporaire en RAM
+
   redis:
     image: redis:7-alpine
     container_name: analylit_redis
@@ -100,6 +110,8 @@ services:
         condition: service_started
       db:
         condition: service_healthy
+      test-db:
+        condition: service_started
       redis:
         condition: service_started
 

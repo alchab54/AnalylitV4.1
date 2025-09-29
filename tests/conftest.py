@@ -25,71 +25,24 @@ from utils.database import db, migrate
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import ProgrammingError
 
-@pytest.fixture(scope='session')
-def app(request):
+@pytest.fixture(scope='function')
+def app():
     """
-    Fixture de session pour créer et configurer une instance de l'application Flask
-    pour la durée de la session de test.
-    ✅ CORRECTION: Gère la création de bases de données uniques pour les tests parallèles (pytest-xdist).
-    ✅ CORRECTION DÉFINITIVE: Crée et supprime physiquement les bases de données de test pour chaque worker.
+    Fixture de fonction pour créer une app et une base de données isolées pour chaque test.
+    C'est une solution robuste qui garantit qu'aucun état n'est partagé entre les tests.
     """
-    # Détecte si on est dans un worker xdist
-    worker_id = getattr(request.config, "workerinput", {}).get("workerid", "master")
-
-    if worker_id == "master":
-        # Pour le worker principal ou sans xdist, utiliser une DB en mémoire est le plus rapide et propre.
-        db_uri = "sqlite:///:memory:"
-        db_name = None # Pas de nom de DB pour sqlite en mémoire
-    else:
-        # Pour les workers parallèles, on utilise PostgreSQL.
-        base_db_url = os.environ.get("DATABASE_URL", "postgresql+psycopg2://analylit_user:strong_password@db:5432/analylit_db")
-        db_name = f"test_db_{worker_id}"
-        db_uri = base_db_url.replace('/analylit_db', f'/{db_name}')
-
-        # Se connecter au moteur PostgreSQL (DB 'postgres') pour créer la nouvelle DB
-        maintenance_uri = base_db_url.replace('/analylit_db', '/postgres')
-        # ✅ CORRECTION: Utiliser l'isolation_level "AUTOCOMMIT" pour CREATE/DROP DATABASE
-        engine = create_engine(maintenance_uri, isolation_level="AUTOCOMMIT")
-        with engine.connect() as conn:
-            try:
-                # Supprime la base si elle existe d'une session de test précédente
-                conn.execute(text(f"DROP DATABASE IF EXISTS {db_name}"))
-            except ProgrammingError:
-                pass # Peut échouer si des connexions sont actives, mais on continue
-            conn.execute(text(f"CREATE DATABASE {db_name}"))
-
-    test_config = {
-        "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": db_uri,
-        "SQLALCHEMY_TRACK_MODIFICATIONS": False,
-        "WTF_CSRF_ENABLED": False,
-        "SERVER_NAME": "localhost",
-        "SQLALCHEMY_ECHO": False # Désactive les logs SQL bruyants pendant les tests
-    }
-    _app = create_app(test_config)
-
-    # ✅ CORRECTION: Initialiser Flask-Migrate sur l'app de test.
-    migrate.init_app(_app, db)
-
-    # The app context is pushed here so that db.create_all() has access to the app.
-    # This creates the schema ONCE per worker session.
+    # ✅ Force une base de test séparée
+    test_db_url = 'postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db'
+    os.environ['DATABASE_URL'] = test_db_url
+    os.environ['TEST_DATABASE_URL'] = test_db_url
+    
+    _app = create_app()
     with _app.app_context():
-        # ✅ CORRECTION: Utiliser Alembic pour créer le schéma de la base de données de test.
-        # Cela garantit que les tests s'exécutent sur un schéma identique à la production.
-        # ✅ CORRECTION FINALE: Exécuter `upgrade()` pour TOUS les types de DB, y compris SQLite.
-        # Cela garantit que le schéma est créé même pour le worker 'master'.
-        from flask_migrate import upgrade
-        upgrade()
-
-        yield _app
+        # Pour une base test vierge, on peut utiliser create_all
         db.drop_all()
-
-    # Si on a utilisé PostgreSQL, on nettoie la base de données créée
-    # ✅ CORRECTION: S'assurer que maintenance_uri est défini avant d'être utilisé.
-    if worker_id != "master" and db_name and 'maintenance_uri' in locals():
-        engine = create_engine(maintenance_uri, isolation_level="AUTOCOMMIT")
-        with engine.connect() as conn:
-            conn.execute(text(f"DROP DATABASE {db_name}"))
+        db.create_all()  # Safe sur base test isolée
+        yield _app
+        db.drop_all()  # Nettoyage après chaque test
 
 @pytest.fixture
 def client(app):
