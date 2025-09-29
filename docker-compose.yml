@@ -157,6 +157,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      test-db:
+        condition: service_started
     volumes:
       - ./migrations:/home/appuser/app/migrations
       - ./backend:/home/appuser/app/backend

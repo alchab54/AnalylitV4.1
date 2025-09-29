@@ -49,7 +49,9 @@ def init_database(database_url=None, is_test: bool = False):
         # Import models here to ensure SCHEMA is correctly set based on os.environ['TESTING']
         from . import models
         
-        Base.metadata.create_all(bind=engine)
+        # SUPPRIMÉ: Base.metadata.create_all(bind=engine)
+        # La création des tables doit être gérée EXCLUSIVEMENT par Flask-Migrate (`flask db upgrade`)
+        # pour éviter les conflits et les erreurs "relation already exists".
         SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
         logger.info("✅ Base de données initialisée avec succès.")
     except Exception as e:
