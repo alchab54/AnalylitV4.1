@@ -997,9 +997,6 @@ def format_bibliography(articles: list) -> str:
         result = session.execute(text("SHOW search_path;")).scalar()
         return jsonify({"search_path": result})
 
-    # La factory DOIT retourner l_objet app
-    return app
-
 def register_models():
     """Force l_enregistrement de tous les modèles."""
     pass  # Juste le fait d_importer ce module enregistre les modèles

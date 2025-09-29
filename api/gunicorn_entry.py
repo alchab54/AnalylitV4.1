@@ -1,5 +1,3 @@
-# backend/gunicorn_entry.py
-
 # CRITICAL: Perform monkey-patching before any other modules are imported.
 # This is the earliest possible point and resolves the MonkeyPatchWarning.
 import gevent.monkey
