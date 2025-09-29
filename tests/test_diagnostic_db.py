@@ -7,6 +7,7 @@ en se connectant et en listant les tables existantes.
 
 import os
 import pytest
+from sqlalchemy import text # ✅ Import manquant
 
 def test_database_connection_and_schema(app):
     """

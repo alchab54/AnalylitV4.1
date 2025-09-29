@@ -72,24 +72,19 @@ def db_session(app):
     à la fin, sans affecter les autres tests.
     """
     with app.app_context(): 
-        connection = db.engine.connect()
-        transaction = connection.begin()
+        # Utiliser une connexion unique pour la durée de la fixture
+        with db.engine.connect() as connection:
+            # Démarrer une transaction
+            transaction = connection.begin()
+            # Lier la session de l'application à cette connexion transactionnelle
+            session = db.Session(bind=connection)
+            db.session = session # Remplacer la session globale par notre session de test
 
-        # ✅ CORRECTION: Forcer le chemin de recherche au bon schéma pour cette transaction.
-        # Cela résout les erreurs "relation does not exist".
-        connection.execute(text("SET search_path TO analylit_schema, public"))
-        
-        # Lier la session de l'application à cette connexion transactionnelle
-        session = db.Session(bind=connection)
-        db.session = session # Remplacer la session globale par notre session de test
-        
-        try:
             yield session
-        finally:
-            # Après chaque test :
-            session.remove()
+
+            # Après chaque test, la transaction est annulée, nettoyant toutes les données
             transaction.rollback()
-            connection.close()
+            session.close()
 
 @pytest.fixture(scope="function")
 def setup_project(db_session):
