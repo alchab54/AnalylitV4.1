@@ -9,20 +9,6 @@ done
 
 echo "✅ Base de données prête!"
 
-echo "🔄 Application des migrations de la base de données..."
-# Utilise Flask-Migrate pour appliquer les migrations.
-# La commande 'upgrade' amène la base de données à la dernière version définie dans les fichiers de migration.
-# ✅ CORRECTION : On "tamponne" d'abord la base de données avec la dernière version.
-# Si la base de données est nouvelle, cela n'a aucun effet.
-# Si les tables existent déjà, cela empêche Alembic de tenter de les recréer.
-flask db stamp head
-# Ensuite, on applique les nouvelles migrations (s'il y en a).
-flask db upgrade
-
-echo "✅ Migrations terminées."
-
-# Démarrer Gunicorn uniquement si l'argument est "start-web"
-if [ "$1" = "start-web" ]; then
 # ✅ CORRECTION FINALE : Exécuter les migrations OU démarrer le serveur, mais pas les deux.
 if [ "$1" = "migrate-only" ]; then
     echo "🔄 Application des migrations de la base de données..."
