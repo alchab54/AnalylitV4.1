@@ -72,16 +72,18 @@ def test_analysis_task_on_large_dataset(db_session, large_project, mocker):
     # Simuler 10 000 extractions avec des scores
     # On mock la requête SQL pour ne pas réellement insérer 10k extractions
     mock_scores = [7.5 + (i % 3 - 1) * 0.1 for i in range(10000)]
-    mocker.patch('sqlalchemy.orm.session.Session.execute').return_value.scalars.return_value.all.return_value = mock_scores
+    mocker.patch('sqlalchemy.orm.session.Session.execute').return_value.scalars.return_value = mock_scores
     mocker.patch('tasks_v4_complete.send_project_notification')
 
     # Exécuter la tâche de méta-analyse
     run_meta_analysis_task.__wrapped__(db_session, project_id)
 
-    # Vérifier que l'analyse a réussi et que les calculs sont corrects
+    # Récupérer l'objet projet depuis la base de données avant de le rafraîchir
     project = db_session.get(Project, project_id)
-    # CORRECTION: Le mock doit simuler que la tâche a écrit une chaîne JSON dans la DB.
-    project.analysis_result = '{"n_articles": 10000, "mean_score": 7.5}'
+    assert project is not None, "Le projet n'a pas pu être retrouvé dans la base de données."
+    # Vérifier que l'analyse a réussi et que les calculs sont corrects
+    db_session.refresh(project) # Recharger l'état de l'objet depuis la DB pour voir le résultat écrit par la tâche
+    assert project.analysis_result is not None, "La tâche d'analyse n'a pas écrit de résultat."
     results = json.loads(project.analysis_result)
     
     assert results['n_articles'] == 10000

@@ -124,11 +124,11 @@ class TestWorkersCore:
         # Worker avec priorité: high > default > low
         worker = Worker([high_queue, default_queue, low_queue], connection=rq_connection)
 
-        # ✅ CORRECTION: Lancer le worker une seule fois pour traiter toutes les tâches en attente.
-        # Le worker traitera d'abord high, puis default, puis low.
+        # ✅ CORRECTION : Lancer le worker une seule fois pour traiter toutes les tâches.
+        # Le mode 'burst' lui fait traiter toutes les tâches en attente puis s'arrêter.
         worker.work(burst=True)
 
-        # Vérifier les résultats de tous les jobs APRÈS que le worker a terminé.
+        # Vérifier les résultats de tous les jobs APRÈS que le worker a terminé son travail.
         high_job.refresh()
         default_job.refresh()
         low_job.refresh()

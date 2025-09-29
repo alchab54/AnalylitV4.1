@@ -4,6 +4,7 @@ import json
 import logging
 import time
 import requests
+import re
 from typing import Any
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -73,19 +74,25 @@ def call_ollama_api(prompt: str, model: str = "llama3.1:8b", output_format: str 
         
         if output_format == "json":
             try:
-                # CORRECTION: Utilisation d'une regex pour extraire le premier bloc JSON valide.
-                start = raw_response.find('{')
-                end = raw_response.rfind('}')
-                if start != -1 and end != -1:
-                    json_str = raw_response[start:end+1]
-                    return json.loads(json_str) # Tente de parser le bloc extrait.
-                raise json.JSONDecodeError("Marqueurs JSON non trouvés", raw_response, 0)
+                # Regex pour trouver le premier bloc JSON valide (entre { et })
+                # Cela gère le texte ou les ```json avant/après.
+                json_match = re.search(r'\{.*\}', raw_response, re.DOTALL)
+                if json_match:
+                    json_str = json_match.group(0)
+                    return json.loads(json_str)
+                else:
+                    # Si aucun match, on lève une erreur pour déclencher le nettoyage.
+                    raise json.JSONDecodeError("Aucun bloc JSON trouvé dans la réponse.", raw_response, 0)
             except json.JSONDecodeError:
                 logger.warning(f"Réponse IA non-JSON valide: {raw_response[:200]}...")
                 try:
                     cleanup_prompt = f"Extrais UNIQUEMENT l'objet JSON valide du texte suivant. Ne fournis rien d'autre.\n\n{raw_response}"
                     cleaned_response = call_ollama_api(cleanup_prompt, model="phi3:mini", output_format="text")
-                    return json.loads(cleaned_response)
+                    # Le nettoyage peut aussi retourner un JSON dans un bloc de code
+                    cleaned_match = re.search(r'\{.*\}', cleaned_response, re.DOTALL)
+                    if cleaned_match:
+                        return json.loads(cleaned_match.group(0))
+                    raise json.JSONDecodeError("Le nettoyage du JSON a aussi échoué.", cleaned_response, 0)
                 except Exception as cleanup_error:
                     logger.error(f"Échec de la tentative de nettoyage du JSON: {cleanup_error}")
                     raise AIResponseError("La réponse de l'IA était un JSON invalide et n'a pas pu être nettoyée.")

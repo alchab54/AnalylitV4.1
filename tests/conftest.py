@@ -73,6 +73,10 @@ def db_session(app):
     with app.app_context(): 
         connection = db.engine.connect()
         transaction = connection.begin()
+
+        # ✅ CORRECTION: Forcer le chemin de recherche au bon schéma pour cette transaction.
+        # Cela résout les erreurs "relation does not exist" dans les tests de tâches.
+        connection.execute(text("SET search_path TO analylit_schema"))
         
         # Lier la session de l'application à cette transaction
         session = db.create_scoped_session(options={'bind': connection, 'binds': {}})

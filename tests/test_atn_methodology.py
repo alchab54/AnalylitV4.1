@@ -2,7 +2,7 @@
 
 import pytest
 import json
-from unittest.mock import MagicMock
+import re
 
 # Imports des fonctions et templates à tester
 from utils.prompt_templates import get_scoping_atn_template
@@ -70,16 +70,16 @@ def test_atn_extraction_grid_completeness():
 
     # Extraire les clés JSON du prompt généré
     try:
-        # CORRECTION: Isoler le bloc JSON qui commence après "Répondez UNIQUEMENT avec ce JSON :"
-        # et qui est délimité par des accolades.
-        json_marker = "Répondez UNIQUEMENT avec ce JSON :\n"
-        json_part = prompt.split(json_marker)[1].strip()
-        generated_data = json.loads(json_part)
-        generated_fields = list(generated_data.keys())
+        # AMÉLIORATION: Utiliser une regex pour extraire le premier bloc JSON valide.
+        # C'est plus robuste que de se baser sur un texte fixe.
+        json_match = re.search(r'\{.*\}', prompt, re.DOTALL)
+        if not json_match:
+            pytest.fail("Aucun bloc JSON trouvé dans le prompt ATN généré.")
         
-    except (IndexError, json.JSONDecodeError) as e:
-        # Afficher l'erreur et le JSON problématique pour un débogage facile
-        pytest.fail(f"Impossible de parser le bloc JSON du prompt ATN.\nErreur: {e}\nJSON problématique:\n{json_part}")
+        generated_data = json.loads(json_match.group(0))
+        generated_fields = list(generated_data.keys())
+    except json.JSONDecodeError as e:
+        pytest.fail(f"Impossible de parser le bloc JSON du prompt ATN.\nErreur: {e}\nJSON problématique:\n{json_match.group(0)}")
 
     # Vérifications
     assert len(generated_fields) == 30, "Le nombre de champs dans la grille ATN doit être de 30."

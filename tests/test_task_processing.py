@@ -820,12 +820,13 @@ def test_index_project_pdfs_task(db_session, mocker, mock_embedding_model):
     # Nous reconfigurons le mock fourni par la fixture 'mock_embedding_model'
     
     # 1. Créer l'objet de retour (simulant un array numpy)
-    mock_np_array_return_1D = MagicMock()
-    # 2. Configurer tolist() pour retourner le VECTEUR 1D (que cette tâche buggée attend)
-    mock_np_array_return_1D.tolist.return_value = [[0.123] * 384] * 18 # Corrected to return 18 embedding vectors
+    mock_np_array_return_2D = MagicMock()
+    # 2. CORRECTION: Configurer tolist() pour retourner une LISTE DE VECTEURS (2D).
+    # La tâche attend une liste d'embeddings, un pour chaque chunk.
+    mock_np_array_return_2D.tolist.return_value = [[0.123] * 384 for _ in range(18)]
     
     # 3. Configurer le mock 'encode' (fourni par la fixture) pour TOUJOURS retourner cet objet
-    mock_embedding_model.encode.return_value = mock_np_array_return_1D
+    mock_embedding_model.encode.return_value = mock_np_array_return_2D
     # --- FIN CORRECTION MOCK ---
     
     mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
