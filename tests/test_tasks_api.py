@@ -80,8 +80,8 @@ def test_cancel_task(client):
     """
     Vérifie que la route d'annulation de tâche répond correctement.
     """
-    # CORRECTION: Patch le bon module où redis_conn est importé et utilisé
-    with patch('rq.job.Job.fetch') as mock_fetch, patch('utils.app_globals.redis_conn') as mock_redis_conn:
+    # Patch Job.fetch and the connection it uses internally.
+    with patch('rq.job.Job.fetch') as mock_fetch, patch('rq.job.get_redis_connection') as mock_get_redis:
         mock_job = MagicMock()
         mock_fetch.return_value = mock_job
         mock_job.cancel.return_value = None # simule la méthode cancel()
@@ -91,7 +91,7 @@ def test_cancel_task(client):
         
         assert response.status_code == 200
         assert response.get_json()['message'] == "Demande d_annulation envoyée."
-        mock_fetch.assert_called_once_with(fake_task_id, connection=mock.ANY)
+        mock_fetch.assert_called_once_with(fake_task_id, connection=mock_get_redis.return_value)
         mock_job.cancel.assert_called_once()
 
 def test_get_tasks_status(client):
@@ -121,7 +121,7 @@ def test_get_tasks_status(client):
     mock_queued_job.exc_info = None
     
     # 1. Simuler des tâches dans différentes files (en cours, terminée, etc.)
-    with patch('server_v4_complete.Job.fetch_many') as mock_fetch_many:
+    with patch('api.tasks.Job.fetch_many') as mock_fetch_many:
         # Simuler la réponse de fetch_many pour chaque type de registre
         # La fonction get_all_tasks_status appelle fetch_many plusieurs fois par queue:
         # 1. started_job_registry

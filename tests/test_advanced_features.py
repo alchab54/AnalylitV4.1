@@ -13,7 +13,7 @@ def test_pull_ollama_model_task(mocker: MockerFixture):
     """
     
     # 1. Mocker `requests.post` que la tâche appelle en interne.
-    mock_post = mocker.patch('requests.post')
+    mock_post = mocker.patch('tasks_v4_complete.requests.post')
     
     # Simuler une réponse réussie
     mock_response = mocker.Mock()
@@ -40,7 +40,7 @@ def test_pull_ollama_model_task_failure(mocker: MockerFixture):
     
     # 1. Mocker `requests.post` pour qu'il lève une exception
     error_message = "Connection refused"
-    mocker.patch('requests.post', side_effect=requests.exceptions.RequestException(error_message))
+    mocker.patch('tasks_v4_complete.requests.post', side_effect=requests.exceptions.RequestException(error_message))
     
     model_name = "model-inexistant"
     

@@ -71,7 +71,7 @@ def test_generate_discussion_draft_logic():
 # 2. Tests pour utils.file_handlers.py
 # =================================================================
 
-@patch('os.path.exists', return_value=True)
+@patch('utils.file_handlers.os.path.exists', return_value=True)
 @patch('utils.file_handlers._extract_text_with_pymupdf', return_value="Texte de PyMuPDF.")
 def test_extract_text_from_pdf_logic_pymupdf_succeeds(mock_pymupdf, mock_exists):
     """
@@ -81,7 +81,7 @@ def test_extract_text_from_pdf_logic_pymupdf_succeeds(mock_pymupdf, mock_exists)
     assert result == "Texte de PyMuPDF."
     mock_pymupdf.assert_called_once()
 
-@patch('os.path.exists', return_value=True)
+@patch('utils.file_handlers.os.path.exists', return_value=True)
 @patch('utils.file_handlers._extract_text_with_pymupdf', return_value="") # PyMuPDF échoue
 @patch('utils.file_handlers._extract_text_with_pdfplumber', return_value="Texte de PDFPlumber.") # PDFPlumber réussit
 def test_extract_text_from_pdf_logic_fallback_to_pdfplumber(mock_pdfplumber, mock_pymupdf, mock_exists):
@@ -93,7 +93,7 @@ def test_extract_text_from_pdf_logic_fallback_to_pdfplumber(mock_pdfplumber, moc
     mock_pymupdf.assert_called_once()
     mock_pdfplumber.assert_called_once()
 
-@patch('os.path.exists', return_value=True)
+@patch('utils.file_handlers.os.path.exists', return_value=True)
 @patch('utils.file_handlers._extract_text_with_pymupdf', return_value="") # PyMuPDF échoue
 @patch('utils.file_handlers._extract_text_with_pdfplumber', return_value="") # PDFPlumber échoue
 @patch('utils.file_handlers._extract_text_with_ocr', return_value="") # OCR échoue

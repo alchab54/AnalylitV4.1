@@ -124,8 +124,8 @@ def test_api_settings_endpoints(client):
     """
     # --- 1. GET apisettingsprofiles (Mocke la lecture du fichier profiles.json) ---
     mock_json_data = {"profiles": [{"id": "test_profile", "name": "Test Profile"}]}
-    # Mocker 'open' dans le contexte de 'server_v4_complete' où la route est définie
-    with patch("builtins.open", new_callable=MagicMock) as mock_open:
+    # Mocker 'open' dans le contexte de 'api.settings' où la route est définie
+    with patch("api.settings.open", new_callable=MagicMock) as mock_open:
         mock_file = mock_open.return_value.__enter__.return_value
         mock_file.read.return_value = json.dumps(mock_json_data)
         
@@ -138,7 +138,7 @@ def test_api_admin_endpoints(client):
     Teste les routes de l'API d'administration (Ollama pull, Queue clear).
     """
     # --- 1. POST api/ollama/pull (Vérifie la mise en file) ---
-    with patch('server_v4_complete.models_queue.enqueue') as mock_enqueue:
+    with patch('api.admin.models_queue.enqueue') as mock_enqueue:
         mock_job = MagicMock()
         mock_job.get_id.return_value = "mock_pull_task_id"
         mock_enqueue.return_value = mock_job
@@ -158,7 +158,7 @@ def test_api_admin_endpoints(client):
 
     # --- 2. POST apiqueuesclear (Vérifie l'appel .empty()) ---
     # On mock la méthode .empty() de l'objet 'processing_queue'
-    with patch('server_v4_complete.processing_queue.empty') as mock_queue_empty:
+    with patch('api.admin.processing_queue.empty') as mock_queue_empty:
         response_clear = client.post('/api/admin/queues/clear', json={'queue_name': 'analylit_processing_v4'})
         
         assert response_clear.status_code == 200
@@ -178,7 +178,7 @@ def test_api_extensions_endpoint(client):
     """
     Teste l'endpoint générique POST /api/extensions.
     """
-    with patch('backend.server_v4_complete.extension_queue.enqueue') as mock_enqueue:
+    with patch('api.extensions.extension_queue.enqueue') as mock_enqueue:
         mock_job = MagicMock()
         mock_job.id = "mock_extension_task_id"
         mock_enqueue.return_value = mock_job

@@ -86,7 +86,7 @@ class TestWorkersIntegration:
                 # Au minimum, on s'attend à voir le nombre de jobs
                 assert "count" in info or "size" in info
  
-    @patch('backend.server_v4_complete.processing_queue') # ✅ CORRECTION: Patcher la queue où elle est utilisée
+    @patch('api.projects.processing_queue') # ✅ CORRECTION: Patcher la queue où elle est utilisée
     def test_worker_queue_integration(self, mock_queue, client):
         """Test d'intégration avec les vraies queues RQ"""
         mock_queue_instance = mock_queue.return_value
@@ -105,7 +105,7 @@ class TestWorkersIntegration:
             project_id = project_resp.get_json().get("id")
             
             # Déclencher une tâche qui devrait utiliser les workers
-            with patch('backend.server_v4_complete.enqueue_task') as mock_enqueue: # ✅ CORRECTION: Patcher le bon chemin
+            with patch('api.projects.processing_queue.enqueue') as mock_enqueue: # ✅ CORRECTION: Patcher le bon chemin
                 mock_enqueue.return_value = "job-456"
                 
                 response = client.post(f'/projects/{project_id}/run', json={

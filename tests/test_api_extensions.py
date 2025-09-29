@@ -169,11 +169,11 @@ def test_api_prisma_checklist_workflow(client: FlaskClient, db_session: Session,
 # CATEGORIE 4: ADMIN & INFRASTRUCTURE
 # ================================================================
 
-@patch('server_v4_complete.Worker')
-@patch('server_v4_complete.processing_queue')
-@patch('server_v4_complete.synthesis_queue')
-@patch('server_v4_complete.analysis_queue')
-@patch('server_v4_complete.background_queue')
+@patch('api.admin.Worker')
+@patch('api.admin.processing_queue')
+@patch('api.admin.synthesis_queue')
+@patch('api.admin.analysis_queue')
+@patch('api.admin.background_queue')
 def test_api_admin_queues_status(mock_bg_q, mock_an_q, mock_syn_q, mock_proc_q, mock_worker, client: FlaskClient):
     """
     Teste l'endpoint d'administration des files (queues) pour le monitoring.
@@ -196,7 +196,7 @@ def test_api_admin_queues_status(mock_bg_q, mock_an_q, mock_syn_q, mock_proc_q, 
     proc_q_data = next(q for q in queues_data if q['name'] == 'analylit_processing_v4')
     assert proc_q_data['size'] == 5 and proc_q_data['workers'] == 1
 
-@patch('server_v4_complete.background_queue.enqueue')
+@patch('api.projects.background_queue.enqueue')
 def test_api_upload_pdfs_bulk(mock_enqueue, client: FlaskClient, setup_project: Project):
     """
     Teste l'endpoint d'upload de PDF en masse.
