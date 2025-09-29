@@ -12,6 +12,7 @@ sys.path.insert(0, str(root_dir))
 pytest_plugins = [
     # Les plugins comme 'pytest-mock', 'pytest-xdist', 'pytest-cov', et 'pytest-asyncio'
     # sont automatiquement découverts par pytest lorsqu'ils sont installés.
+    # sont automatiquement découverts par pytest lorsqu'ils sont installés.
     # Les déclarer ici peut parfois causer des conflits d'import.
 ]
 
@@ -21,7 +22,7 @@ os.environ['TESTING'] = 'true'
 # --- IMPORTS DE L'APPLICATION ---
 from backend.server_v4_complete import create_app
 from utils.database import db, migrate
-from utils.models import Project
+from utils.models import Project, AnalysisProfile
 # ✅ CORRECTION: Imports nécessaires pour la création/suppression de DB
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import ProgrammingError
