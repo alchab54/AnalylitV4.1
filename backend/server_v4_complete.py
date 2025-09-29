@@ -120,11 +120,13 @@ def create_app(config_override=None):
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-        'pool_size': 10,
-        'pool_recycle': 120,
-        'pool_pre_ping': True,
+        'pool_size': 10, # Nombre de connexions maintenues dans le pool
+        'pool_recycle': 120, # Recycler les connexions après 2 minutes d'inactivité
+        'pool_pre_ping': True, # Vérifier la connexion avant chaque utilisation
+        # ✅ CORRECTION FINALE: Garantir que chaque connexion utilise le bon schéma.
+        # C'est la solution la plus robuste pour résoudre les erreurs "relation does not exist".
         "connect_args": {
-            "options": "-c search_path=analylit_schema,public"
+            "options": f"-csearch_path={utils.models.SCHEMA},public"
         }
     }
 
