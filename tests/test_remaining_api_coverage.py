@@ -124,8 +124,8 @@ def test_api_settings_endpoints(client):
     """
     # --- 1. GET apisettingsprofiles (Mocke la lecture du fichier profiles.json) ---
     mock_json_data = {"profiles": [{"id": "test_profile", "name": "Test Profile"}]}
-    # Mocker la fonction qui lit le fichier
-    with patch("builtins.open", new_callable=MagicMock) as mock_open:
+    # Mocker la fonction qui lit le fichier avec mock_open
+    with patch("builtins.open", new_callable=mocker.mock_open, read_data=json.dumps(mock_json_data)) as mock_open:
         mock_open.return_value.read.return_value = json.dumps(mock_json_data)
         response_profiles = client.get('/api/settings/profiles') # La route est dans server_v4_complete.py
     
@@ -190,7 +190,7 @@ def test_api_extensions_endpoint(client):
         response = client.post('/api/extensions/run', json=payload)
 
         assert response.status_code == 202
-        assert response.json['task_id'] == "mock_extension_task_id"
+        assert response.json['job_id'] == "mock_extension_task_id"
         
         # Vérifie que la tâche générique 'run_extension_task' est appelée
         mock_enqueue.assert_called_once_with(

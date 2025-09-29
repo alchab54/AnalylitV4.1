@@ -56,7 +56,7 @@ def test_run_knowledge_graph_returns_task_id(client, test_project):
     response = client.post(f'/api/projects/{test_project.id}/run-knowledge-graph', content_type='application/json')
     assert response.status_code == 202
     response_data = response.get_json()
-    assert 'task_id' in response_data
+    assert 'job_id' in response_data
     assert response_data['message'] == 'Génération du graphe de connaissances lancée'
 
 def test_add_manual_articles_returns_task_id(client, test_project):

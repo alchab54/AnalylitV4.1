@@ -4,6 +4,7 @@ import os
 import re
 from pathlib import Path # Déjà importé plus bas, mais on garde pour la clarté
 from typing import Optional
+from werkzeug.utils import secure_filename
 
 # --- NOUVELLES IMPORTATIONS POUR L'EXTRACTION ROBUSTE ---
 import fitz  # PyMuPDF
