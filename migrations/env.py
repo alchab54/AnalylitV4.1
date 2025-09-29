@@ -94,21 +94,21 @@ def run_migrations_online():
     )
 
     with connectable.connect() as connection:
-        # ✅ CORRECTION FINALE: Isoler toute la logique de migration dans une transaction
-        # et s'assurer que le schéma est créé et utilisé.
+        # 1. Créer le schéma s'il n'existe pas
+        if SCHEMA:
+            logger.info(f"Création/Vérification du schéma : {SCHEMA}")
+            connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
+
+        # 2. Configurer le contexte Alembic AVANT de l'utiliser
+        context.configure(
+            connection=connection,
+            target_metadata=get_metadata_with_schema(),
+            version_table_schema=SCHEMA,
+            include_schemas=True,
+        )
+
+        # 3. Exécuter les migrations à l'intérieur d'une transaction
         with context.begin_transaction():
-            if SCHEMA:
-                logger.info(f"Création/Vérification du schéma : {SCHEMA}")
-                connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
-            
-            context.configure(
-                connection=connection,
-                target_metadata=get_metadata_with_schema(),
-                # ✅ AJOUT CRITIQUE: Spécifier où stocker la table de versions d'Alembic.
-                version_table_schema=SCHEMA,
-                include_schemas=True, # Nécessaire pour que version_table_schema fonctionne
-            )
-            
             context.run_migrations()
 
 

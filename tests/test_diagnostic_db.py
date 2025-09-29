@@ -20,13 +20,13 @@ def test_database_connection_and_schema(app):
     with app.app_context():
         try:
             # Requête pour trouver la table 'projects'
-            query_projects = "SELECT schemaname, tablename FROM pg_tables WHERE tablename = 'projects'"
-            result_projects = db.engine.execute(query_projects)
+            query_projects = text("SELECT schemaname, tablename FROM pg_tables WHERE tablename = 'projects'")
+            result_projects = db.session.execute(query_projects)
             print("Table 'projects' trouvée :", list(result_projects))
 
             # Requête pour lister toutes les tables dans le schéma public
-            query_all_tables = "SELECT tablename FROM pg_tables WHERE schemaname = 'public'"
-            result_all = db.engine.execute(query_all_tables)
+            query_all_tables = text("SELECT tablename FROM pg_tables WHERE schemaname = 'public'")
+            result_all = db.session.execute(query_all_tables)
             print("Toutes les tables dans le schéma 'public' :", [row[0] for row in result_all])
         except Exception as e:
             pytest.fail(f"Une erreur est survenue lors de la connexion à la DB : {e}")

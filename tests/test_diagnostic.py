@@ -9,6 +9,7 @@ os.environ['TESTING'] = 'true'
 
 from sqlalchemy import create_engine
 from utils.database import Base
+import pytest # ✅ CORRECTION: Importer pytest pour utiliser le décorateur.
 
 @pytest.mark.skip(reason="Ce test est redondant avec le test_simple_database et échoue avec SQLite à cause du schéma.")
 def test_diagnostic_tables_skipped():

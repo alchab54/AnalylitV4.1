@@ -10,9 +10,9 @@ sys.path.insert(0, str(root_dir))
 
 # --- ACTIVATION DES PLUGINS PYTEST ---
 pytest_plugins = [
-    "pytest_mock",
-    "pytest_cov",
-    "pytest_asyncio",
+    # Les plugins comme 'pytest-mock', 'pytest-xdist', 'pytest-cov', et 'pytest-asyncio'
+    # sont automatiquement découverts par pytest lorsqu'ils sont installés.
+    # Les déclarer ici peut parfois causer des conflits d'import.
 ]
 
 # Set TESTING environment variable for models.py
@@ -21,6 +21,7 @@ os.environ['TESTING'] = 'true'
 # --- IMPORTS DE L'APPLICATION ---
 from backend.server_v4_complete import create_app
 from utils.database import db, migrate
+from utils.models import Project
 # ✅ CORRECTION: Imports nécessaires pour la création/suppression de DB
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import ProgrammingError
@@ -74,12 +75,12 @@ def db_session(app):
         transaction = connection.begin()
 
         # ✅ CORRECTION: Forcer le chemin de recherche au bon schéma pour cette transaction.
-        # Cela résout les erreurs "relation does not exist" dans les tests de tâches.
-        connection.execute(text("SET search_path TO analylit_schema"))
+        # Cela résout les erreurs "relation does not exist".
+        connection.execute(text("SET search_path TO analylit_schema, public"))
         
-        # Lier la session de l'application à cette transaction
-        session = db.create_scoped_session(options={'bind': connection, 'binds': {}})
-        db.session = session
+        # Lier la session de l'application à cette connexion transactionnelle
+        session = db.Session(bind=connection)
+        db.session = session # Remplacer la session globale par notre session de test
         
         try:
             yield session
@@ -88,6 +89,21 @@ def db_session(app):
             session.remove()
             transaction.rollback()
             connection.close()
+
+@pytest.fixture(scope="function")
+def setup_project(db_session):
+    """
+    Fixture pour créer un projet de test unique pour chaque fonction.
+    Cette fixture était manquante et causait des erreurs.
+    """
+    import uuid
+    project = Project(
+        id=str(uuid.uuid4()),
+        name=f"Test Project {uuid.uuid4().hex[:6]}"
+    )
+    db_session.add(project)
+    db_session.flush()
+    return project
 
 # ❌ SUPPRESSION: Cette fixture est la principale cause des deadlocks en mode parallèle.
 # Chaque test tentait de supprimer des données en même temps, créant des verrous.

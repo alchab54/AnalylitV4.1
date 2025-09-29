@@ -81,13 +81,13 @@ def test_cancel_task(client):
     Vérifie que la route d'annulation de tâche répond correctement.
     """
     # Patch Job.fetch and the connection it uses internally.
-    with patch('rq.job.Job.fetch') as mock_fetch, patch('rq.job.get_redis_connection') as mock_get_redis:
+    with patch('rq.job.Job.fetch') as mock_fetch:
         mock_job = MagicMock()
         mock_fetch.return_value = mock_job
         mock_job.cancel.return_value = None # simule la méthode cancel()
         
         fake_task_id = str(uuid.uuid4())
-        response = client.post(f'/api/tasks/{fake_task_id}/cancel')
+        response = client.post(f'/api/tasks/{fake_task_id}/cancel') # La route est dans api/tasks.py
         
         assert response.status_code == 200
         assert response.get_json()['message'] == "Demande d_annulation envoyée."
