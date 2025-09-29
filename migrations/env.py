@@ -88,7 +88,7 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-
+    logger.info("Running migrations in online mode...")
     connectable = engine_from_config(
         config.get_section(config.config_ini_section),
         prefix="sqlalchemy.",
