@@ -1,13 +1,14 @@
 # tests/test_validation_workflow.py
 import pytest
 import json
+import uuid
 import io
 from unittest.mock import patch
 from utils.models import Project, SearchResult, Extraction
 
 # ----- SETUP DES DONNÉES DE TEST -----
 @pytest.fixture
-def setup_double_coding_data(db_session):
+def setup_double_coding_data(db_session, client):
     """Crée un projet et deux articles pour tester le double codage."""
     project = Project(name="Project for Validation Test")
     db_session.add(project)

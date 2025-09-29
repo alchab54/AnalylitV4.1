@@ -6,9 +6,11 @@ from utils.models import Project, SearchResult, Extraction
 # ----- SETUP DES DONNÉES DE TEST -----
 @pytest.fixture
 def setup_test_data(db_session):
-    """Crée un projet, un article et une extraction pour les tests."""
-    # Créer un projet
-    project = Project(name="Project for RoB Test")
+    """
+    Crée un projet, un article et une extraction pour les tests,
+    directement en base de données pour éviter les deadlocks.
+    """
+    project = Project(id=str(uuid.uuid4()), name="Project for RoB Test")
     db_session.add(project)
     db_session.flush()
 
@@ -24,7 +26,8 @@ def setup_test_data(db_session):
 
     # Créer une extraction pour cet article
     extraction = Extraction(
-        project_id=project.id,
+        id=str(uuid.uuid4()),
+        project_id=project.id, # Assurez-vous que l'ID du projet est bien passé
         pmid="pmid_rob_123"
     )
     db_session.add(extraction)

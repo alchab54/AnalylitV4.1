@@ -120,24 +120,23 @@ class TestWorkersCore:
         low_job = low_queue.enqueue(simple_task, 1, 1)
         high_job = high_queue.enqueue(simple_task, 2, 2) 
         default_job = default_queue.enqueue(simple_task, 3, 3)
-        
+
         # Worker avec priorité: high > default > low
         worker = Worker([high_queue, default_queue, low_queue], connection=rq_connection)
-        # Process one job from high queue
-        worker.work(burst=True) 
+
+        # ✅ CORRECTION: Lancer le worker une seule fois pour traiter toutes les tâches en attente.
+        # Le worker traitera d'abord high, puis default, puis low.
+        worker.work(burst=True)
+
+        # Vérifier les résultats de tous les jobs APRÈS que le worker a terminé.
         high_job.refresh()
+        default_job.refresh()
+        low_job.refresh()
+
         assert high_job.is_finished
         assert high_job.return_value() == 4
-
-        # Process one job from default queue
-        worker.work(burst=True) 
-        default_job.refresh()
         assert default_job.is_finished, f"Default job status is {default_job.get_status()}"
         assert default_job.return_value() == 6
-        
-        # Process one job from low queue
-        worker.work(burst=True) 
-        low_job.refresh()
         assert low_job.is_finished
         assert low_job.return_value() == 2
 

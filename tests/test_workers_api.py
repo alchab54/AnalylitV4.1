@@ -1,61 +1,43 @@
 """
 Tests d'intégration workers adaptés aux endpoints AnalyLit existants.
 """
-
 import pytest
 import json
 from unittest.mock import patch
 
 @pytest.mark.integration
 class TestWorkersIntegration:
-    """Tests d'intégration workers avec endpoints réels"""
+    """Tests d'intégration workers avec endpoints réels."""
     
-    def test_project_analysis_enqueue(self, client):
+    def test_project_analysis_enqueue(self, client, setup_project):
         """Test d'enqueue d'analyse via endpoint projet existant"""
-        # Créer un projet test
-        project_resp = client.post('/projects/', json={
-            "name": "Test Analysis Project",
-            "description": "Projet pour tester les workers"
+        project_id = setup_project.id
+        
+        # Lancer une analyse (endpoint existant)
+        analysis_resp = client.post(f'/api/projects/{project_id}/run-analysis', json={
+            "type": "discussion"
         })
         
-        if project_resp.status_code in (200, 201):
-            project_data = project_resp.get_json()
-            project_id = project_data.get("id")
-            
-            # Lancer une analyse (endpoint existant)
-            analysis_resp = client.post(f'/projects/{project_id}/analyses/run', json={
-                "analysis_type": "discussion"
-            })
-            
-            # L'endpoint peut retourner 200 (job lancé) ou 400 (pas d'articles)
-            assert analysis_resp.status_code in (200, 202, 400)
-            
-            if analysis_resp.status_code in (200, 202):
-                data = analysis_resp.get_json()
-                assert "task_id" in data or "job_id" in data
+        # L'endpoint peut retourner 202 (job lancé) ou 400 (pas d'articles)
+        assert analysis_resp.status_code in (202, 400)
+        
+        if analysis_resp.status_code == 202:
+            data = analysis_resp.get_json()
+            assert "task_id" in data or "job_id" in data
 
-    def test_project_search_enqueue(self, client):
+    def test_project_search_enqueue(self, client, setup_project):
         """Test d'enqueue de recherche via endpoint existant"""
-        # Créer un projet test
-        project_resp = client.post('/projects/', json={
-            "name": "Test Search Project",
-            "description": "Projet pour tester la recherche"
+        project_id = setup_project.id
+        # Lancer une recherche multi-bases
+        search_resp = client.post('/api/search', json={
+            "query": "alliance thérapeutique numérique",
+            "project_id": project_id,
+            "databases": ["pubmed"],
+            "max_results": 10
         })
         
-        if project_resp.status_code in (200, 201):
-            project_data = project_resp.get_json()
-            project_id = project_data.get("id")
-            
-            # Lancer une recherche multi-bases
-            search_resp = client.post('/api/search', json={
-                "query": "alliance thérapeutique numérique",
-                "project_id": project_id,
-                "databases": ["pubmed"],
-                "max_results": 10
-            })
-            
-            # Accepter 200 (succès) ou 202 (accepted/async)
-            assert search_resp.status_code in (200, 202, 400)
+        # Accepter 202 (accepted/async) ou 400 (bad request)
+        assert search_resp.status_code in (202, 400)
 
     def test_task_status_endpoint(self, client):
         """Test de vérification du statut des tâches"""
@@ -87,63 +69,44 @@ class TestWorkersIntegration:
                 assert "count" in info or "size" in info
  
     @patch('api.projects.processing_queue') # ✅ CORRECTION: Patcher la queue où elle est utilisée
-    def test_worker_queue_integration(self, mock_queue, client):
+    def test_worker_queue_integration(self, mock_queue, client, setup_project):
         """Test d'intégration avec les vraies queues RQ"""
+        project_id = setup_project.id
         mock_queue_instance = mock_queue.return_value
         mock_queue_instance.enqueue.return_value = type('Job', (), {
             'id': 'test-job-123',
             'get_status': lambda: 'queued'
         })()
         
-        # Créer un projet
-        project_resp = client.post('/projects/', json={
-            "name": "Worker Integration Test",
-            "description": "Test intégration workers"
-        })
-        
-        if project_resp.status_code in (200, 201):
-            project_id = project_resp.get_json().get("id")
+        # Déclencher une tâche qui devrait utiliser les workers
+        with patch('api.projects.processing_queue.enqueue') as mock_enqueue: # ✅ CORRECTION: Patcher le bon chemin
+            mock_enqueue.return_value.id = "job-456"
             
-            # Déclencher une tâche qui devrait utiliser les workers
-            with patch('api.projects.processing_queue.enqueue') as mock_enqueue: # ✅ CORRECTION: Patcher le bon chemin
-                mock_enqueue.return_value = "job-456"
-                
-                response = client.post(f'/projects/{project_id}/run', json={
-                    "task_type": "index_pdfs",
-                    "files": ["test.pdf"]
-                })
-                
-                # Si l'endpoint n'existe pas, c'est OK pour ce test
-                assert response.status_code in (200, 202, 400, 404, 405) # Accepter 400 si le profil n'est pas set
+            response = client.post(f'/api/projects/{project_id}/run', json={
+                "articles": ["pmid1"], "profile": "standard"
+            })
+            
+            # Si l'endpoint n'existe pas, c'est OK pour ce test
+            assert response.status_code in (202, 400, 404, 405) # Accepter 400 si le profil n'est pas set
 
-    def test_background_task_completion_simulation(self, client):
+    def test_background_task_completion_simulation(self, client, setup_project):
         """Simulation de completion d'une tâche en arrière-plan"""
-        # Créer un projet avec des articles
-        project_resp = client.post('/projects/', json={
-            "name": "Background Task Test",
-            "description": "Test tâches arrière-plan"
-        })
-        
-        if project_resp.status_code in (200, 201):
-            project_id = project_resp.get_json().get("id")
+        # Mock d'une tâche qui se termine
+        with patch('rq.job.Job.fetch') as mock_fetch:
+            mock_job = type('Job', (), {
+                'id': 'completed-job',
+                'is_finished': True,
+                'is_failed': False,
+                'return_value': {"status": "completed", "results": "test"},
+                'get_status': lambda: 'finished'
+            })()
             
-            # Mock d'une tâche qui se termine
-            with patch('rq.job.Job.fetch') as mock_fetch:
-                mock_job = type('Job', (), {
-                    'id': 'completed-job',
-                    'is_finished': True,
-                    'is_failed': False,
-                    'return_value': {"status": "completed", "results": "test"},
-                    'get_status': lambda: 'finished'
-                })()
-                
-                mock_fetch.return_value = mock_job
-                
-                # Vérifier le statut d'une tâche "terminée"
-                if hasattr(client, 'get'):
-                    status_resp = client.get(f'/api/tasks/completed-job')
-                    # L'endpoint pourrait ne pas exister, c'est OK
-                    assert status_resp.status_code in (200, 404)
+            mock_fetch.return_value = mock_job
+            
+            # Vérifier le statut d'une tâche "terminée"
+            status_resp = client.get(f'/api/tasks/completed-job/status')
+            # L'endpoint pourrait ne pas exister, c'est OK
+            assert status_resp.status_code in (200, 404)
 
 @pytest.mark.performance
 class TestWorkersPerformance:

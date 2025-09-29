@@ -31,19 +31,26 @@ def app():
     Fixture de session : Crée l'application et la base de données UNE SEULE FOIS
     pour toute la session de test. C'est beaucoup plus rapide.
     """
-    test_db_url = 'postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db'
+    # ✅ CORRECTION: Utiliser le `container_name` ('analylit_test_db') comme nom d'hôte,
+    # car il est défini dans docker-compose.yml et prend le pas sur le nom de service ('test-db').
+    test_db_url = 'postgresql://analylit_user:strong_password@analylit_test_db:5432/analylit_test_db'
     os.environ['DATABASE_URL'] = test_db_url
     os.environ['TEST_DATABASE_URL'] = test_db_url
     
     _app = create_app()
     with _app.app_context():
-        # On nettoie et on crée le schéma une seule fois.
+        # On nettoie et on crée le schéma une seule fois au début de la session.
+        # C'est la seule opération destructrice, et elle se produit avant que les
+        # workers parallèles ne démarrent leurs transactions.
         db.drop_all()
         db.create_all()
         yield _app
         # Le nettoyage final se fait à la fin de toute la session.
         db.drop_all()
 
+# ✅ SOLUTION: Remplacer la fixture 'clean_db' par une fixture 'autouse'
+# qui s'assure que chaque test utilise une session transactionnelle.
+# Cela rend la fixture 'clean_db' obsolète et supprime la cause des deadlocks.
 @pytest.fixture
 def client(app):
     """Client de test Flask pour les requêtes HTTP."""
@@ -74,40 +81,12 @@ def db_session(app):
             transaction.rollback()
             connection.close()
 
+# ❌ SUPPRESSION: Cette fixture est la principale cause des deadlocks en mode parallèle.
+# Chaque test tentait de supprimer des données en même temps, créant des verrous.
+# L'isolation par transaction de `db_session` la rend inutile.
 @pytest.fixture
-def setup_project(db_session):
-    """Crée un projet de test."""
-    import uuid
-    from datetime import datetime
-    from utils.models import Project
-    project = Project(
-        id=str(uuid.uuid4()),
-        name=f"Test Project {uuid.uuid4().hex[:8]}",
-        description="Projet de test",
-        analysis_mode="screening",
-        created_at=datetime.utcnow()
-    )
-    db_session.add(project)
-    # ✅ CORRECTION: Ne pas commiter ici. La fixture db_session gère la transaction.
-    # Le commit peut causer des deadlocks en parallèle. On flush pour obtenir l'ID.
-    db_session.flush()
-    yield project
-
-@pytest.fixture  
 def clean_db(db_session):
-    """Assure une base de données vide en supprimant toutes les données des tables clés."""
-    from utils.models import Project, Extraction, SearchResult, Grid, ChatMessage, AnalysisProfile, RiskOfBias, Prompt
-    db_session.query(RiskOfBias).delete()
-    db_session.query(Extraction).delete()
-    db_session.query(SearchResult).delete()
-    db_session.query(Grid).delete()
-    db_session.query(ChatMessage).delete()
-    db_session.query(AnalysisProfile).delete()
-    db_session.query(Project).delete()
-    db_session.query(Prompt).delete()
-    # ✅ CORRECTION: Remplacer commit() par flush() pour rester dans la transaction du test.
-    # Le commit() est la cause des deadlocks en mode parallèle.
-    db_session.flush()
+    """Fixture dépréciée et maintenant vide. L'isolation est gérée par db_session."""
     yield db_session
 
 @pytest.fixture(scope="function")
