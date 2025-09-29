@@ -388,7 +388,7 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
 
     # ACT
     # CORRECTION: La route est /import-zotero-pdfs, pas /import-zotero/
-    response = client.post(
+    response = client.post( # type: ignore
         f'/api/projects/{project_id}/import-zotero/', 
         data=json.dumps(import_payload), 
         content_type='application/json'
@@ -423,7 +423,7 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
  
     # ACT
     # On patche la fonction qui sauvegarde le fichier pour ne pas écrire sur le disque
-    with patch('server_v4_complete.save_file_to_project_dir', return_value='/fake/path/to/test.json'):
+    with patch('api.projects.save_file_to_project_dir', return_value='/fake/path/to/test.json'):
         response = client.post(
             f'/api/projects/{project_id}/upload-zotero-file', # Correction du nom de la route
             data=file_data,

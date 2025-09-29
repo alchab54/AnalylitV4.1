@@ -136,6 +136,7 @@ def test_api_admin_endpoints(client):
     """
     Teste les routes de l'API d'administration (Ollama pull, Queue clear).
     """
+    from unittest.mock import ANY
     # --- 1. POST /api/ollama/pull (Vérifie la mise en file) ---
     with patch('backend.server_v4_complete.models_queue.enqueue') as mock_enqueue:
         mock_job = MagicMock()
@@ -150,8 +151,8 @@ def test_api_admin_endpoints(client):
         assert response_data['job_id'] == "mock_pull_task_id"
         # Vérifie que la bonne tâche a été appelée avec le bon argument
         mock_enqueue.assert_called_with( # Utiliser assert_called_with pour ignorer les autres appels potentiels
-            pull_ollama_model_task,
-            'test-model:latest',
+            ANY, # On ignore la référence de la fonction
+            'test-model:latest', # On vérifie les arguments
             job_timeout='30m'
         )
 

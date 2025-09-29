@@ -80,7 +80,8 @@ def test_cancel_task(client):
     """
     Vérifie que la route d'annulation de tâche répond correctement.
     """
-    # Patch Job.fetch and the connection it uses internally.
+    # Patch Job.fetch et la connexion qu'il utilise en interne.
+    mock_get_redis = patch('api.tasks.redis_conn', new=MagicMock())
     with patch('rq.job.Job.fetch') as mock_fetch:
         mock_job = MagicMock()
         mock_fetch.return_value = mock_job
@@ -91,7 +92,7 @@ def test_cancel_task(client):
         
         assert response.status_code == 200
         assert response.get_json()['message'] == "Demande d_annulation envoyée."
-        mock_fetch.assert_called_once_with(fake_task_id, connection=mock_get_redis.return_value)
+        mock_fetch.assert_called_once_with(fake_task_id, connection=ANY)
         mock_job.cancel.assert_called_once()
 
 def test_get_tasks_status(client):

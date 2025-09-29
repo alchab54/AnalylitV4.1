@@ -22,4 +22,4 @@ def run_extension():
     # CORRECTION: Utiliser un entier pour le timeout pour correspondre au test.
     job = extension_queue.enqueue(run_extension_task, project_id=project_id, extension_name=extension_name, job_timeout=1800, result_ttl=3600)
     logger.info(f"Job d'extension enqueued: {job.id}")
-    return jsonify({"message": "Tâche d'extension lancée", "task_id": job.id}), 202
+    return jsonify({"message": "Tâche d'extension lancée", "job_id": job.id}), 202

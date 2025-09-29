@@ -28,7 +28,7 @@ def generate_bibliography(session, project_id):
 
     # Enfiler une tâche de fond pour la génération de la bibliographie
     job = background_queue.enqueue(generate_bibliography_task, project_id=project_id, job_timeout='10m')
-    return jsonify({"message": "Génération de la bibliographie lancée", "task_id": job.id}), 202
+    return jsonify({"message": "Génération de la bibliographie lancée", "job_id": job.id}), 202
 
 @reporting_bp.route('/projects/<project_id>/reports/summary-table', methods=['POST'])
 @with_db_session
@@ -43,7 +43,7 @@ def generate_summary_table(session, project_id):
 
     # Enfiler une tâche de fond pour la génération du tableau de synthèse
     job = background_queue.enqueue(generate_summary_table_task, project_id=project_id, job_timeout='10m')
-    return jsonify({"message": "Génération du tableau de synthèse lancée", "task_id": job.id}), 202
+    return jsonify({"message": "Génération du tableau de synthèse lancée", "job_id": job.id}), 202
 
 @reporting_bp.route('/projects/<project_id>/reports/excel-export', methods=['POST'])
 @with_db_session
@@ -58,6 +58,6 @@ def export_summary_table_excel(session, project_id):
 
     # Enfiler une tâche de fond pour l'export Excel
     job = background_queue.enqueue(export_excel_report_task, project_id=project_id, job_timeout='10m')
-    return jsonify({"message": "Export Excel lancé", "task_id": job.id}), 202
+    return jsonify({"message": "Export Excel lancé", "job_id": job.id}), 202
 
 # TODO: Ajouter des routes pour récupérer le statut des tâches de rapport si nécessaire
