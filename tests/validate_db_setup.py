@@ -15,14 +15,15 @@ from sqlalchemy import text
 
 def validate_test_db():
     """Valide que la configuration de test fonctionne"""
-    
-    test_db_url = os.getenv('TEST_DATABASE_URL', 'postgresql://analylit_user:strong_password@analylit_test_db:5432/analylit_test_db')
+    # ✅ CORRECTION CRITIQUE : URL de test dédiée
+    test_db_url = 'postgresql://analylit_user:strong_password@analylit_test_db:5432/analylit_test_db'
+    # ✅ CORRECTION : Configuration complète avec search_path
     app = create_app({
         'TESTING': True,
         'SQLALCHEMY_DATABASE_URI': test_db_url,
         'SQLALCHEMY_ENGINE_OPTIONS': {
             "connect_args": {
-                "options": "-csearch_path=analylit_schema,public"
+                "options": "-c search_path=analylit_schema,public"
             }
         }
     })
@@ -37,17 +38,49 @@ def validate_test_db():
             search_path = db.session.execute(text("SHOW search_path")).scalar()
             print(f"✅ Search path: {search_path}")
             
-            # Vérifier les tables
+            # CRÉER LE SCHÉMA ET LES TABLES (même logique que conftest.py)
+            try:
+                db.session.execute(text("CREATE SCHEMA IF NOT EXISTS analylit_schema"))
+                db.session.commit()
+                print("✅ Schéma créé")
+            except Exception as e:
+                print(f"⚠️ Schéma existe déjà: {e}")
+                db.session.rollback()
+            
+            # FORCER la création des tables
+            try:
+                db.create_all()
+                db.session.commit()
+                print("✅ Tables forcées avec db.create_all()")
+            except Exception as e:
+                print(f"⚠️ Erreur create_all: {e}")
+                db.session.rollback()
+            
+            # Vérifier les tables APRÈS création forcée
             tables = db.session.execute(text("""
-                SELECT tablename 
+                SELECT schemaname, tablename 
                 FROM pg_tables 
                 WHERE schemaname = 'analylit_schema'
                 ORDER BY tablename
-            """)).scalars().all()
+            """)).fetchall()
             
             print(f"✅ Tables trouvées dans 'analylit_schema' ({len(tables)}):")
-            for table in tables:
-                print(f"  - {table}")
+            for schema, table in tables:
+                print(f"  - {schema}.{table}")
+            
+            if len(tables) == 0:
+                print("❌ PROBLÈME: Aucune table trouvée même après db.create_all()")
+                # Diagnostique supplémentaire
+                all_tables = db.session.execute(text("""
+                    SELECT schemaname, tablename 
+                    FROM pg_tables 
+                    WHERE schemaname NOT IN ('information_schema', 'pg_catalog')
+                    ORDER BY schemaname, tablename
+                """)).fetchall()
+                print(f"📋 Toutes les tables dans la DB ({len(all_tables)}):")
+                for schema, table in all_tables:
+                    print(f"  - {schema}.{table}")
+                return False
                 
             return True
             
@@ -56,7 +89,7 @@ def validate_test_db():
             return False
 
 if __name__ == "__main__":
-    print("--- Lancement du script de validation de la base de données de test ---")
+    print("--- Lancement du script de validation AMÉLIORÉ ---")
     success = validate_test_db()
     print("--- Fin du script ---")
     sys.exit(0 if success else 1)

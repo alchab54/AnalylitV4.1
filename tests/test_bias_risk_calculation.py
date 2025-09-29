@@ -1,5 +1,6 @@
 import pytest
 import json
+import uuid  # ✅ Import manquant causant NameError
 from unittest.mock import patch
 from utils.models import Project, SearchResult, Extraction
 

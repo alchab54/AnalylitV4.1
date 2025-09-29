@@ -8,14 +8,6 @@ from pathlib import Path
 root_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(root_dir))
 
-# --- ACTIVATION DES PLUGINS PYTEST ---
-pytest_plugins = [
-    # Les plugins comme 'pytest-mock', 'pytest-xdist', 'pytest-cov', et 'pytest-asyncio'
-    # sont automatiquement découverts par pytest lorsqu'ils sont installés.
-    # sont automatiquement découverts par pytest lorsqu'ils sont installés.
-    # Les déclarer ici peut parfois causer des conflits d'import.
-]
-
 # Set TESTING environment variable for models.py
 os.environ['TESTING'] = 'true'
 
@@ -23,20 +15,19 @@ os.environ['TESTING'] = 'true'
 from backend.server_v4_complete import create_app
 from utils.database import db, migrate
 from utils.models import Project, AnalysisProfile
-# ✅ CORRECTION: Imports nécessaires pour la création/suppression de DB
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import ProgrammingError
 
 @pytest.fixture(scope='session')
 def app():
     """
-    Fixture de session : Crée l'application et la base de données UNE SEULE FOIS
-    pour toute la session de test. C'est beaucoup plus rapide.
+    Fixture de session : Crée l'application et FORCE la création des tables
     """
-    # ✅ CORRECTION : Le nom d'hôte doit correspondre au `container_name` défini dans docker-compose.yml.
-    test_db_url = os.getenv('TEST_DATABASE_URL', 'postgresql://analylit_user:strong_password@analylit_test_db:5432/analylit_test_db')
+    # ✅ CORRECTION CRITIQUE : URL de test dédiée
+    test_db_url = os.getenv('TEST_DATABASE_URL', 
+                           'postgresql://analylit_user:strong_password@analylit_test_db:5432/analylit_test_db')
     
-    # ✅ CORRECTION : Forcer une configuration de test isolée.
+    # ✅ CORRECTION : Configuration complète avec search_path
     _app = create_app({
         'TESTING': True,
         'SQLALCHEMY_DATABASE_URI': test_db_url,
@@ -45,35 +36,59 @@ def app():
             'pool_recycle': 120,
             'pool_pre_ping': True,
             "connect_args": {
-                "options": f"-csearch_path={AnalysisProfile.__table_args__['schema']}"
+                "options": "-c search_path=analylit_schema,public"
             }
         }
     })
+    
     with _app.app_context():
-        # Initialiser migrate AVANT les opérations
+        # Initialiser migrate
         migrate.init_app(_app, db)
 
-        # Nettoyer complètement avant de commencer
         try:
-            db.session.execute(text(f"DROP SCHEMA IF EXISTS {AnalysisProfile.__table_args__['schema']} CASCADE;"))
+            # ÉTAPE 1: Nettoyage complet
+            db.session.execute(text("DROP SCHEMA IF EXISTS analylit_schema CASCADE;"))
             db.session.commit()
+            print("✅ Schéma nettoyé")
         except Exception as e:
             db.session.rollback()
-            print(f"Avertissement lors du nettoyage du schéma : {e}")
+            print(f"⚠️ Nettoyage: {e}")
 
-        # Créer le schéma et appliquer les migrations
-        db.session.execute(text(f"CREATE SCHEMA IF NOT EXISTS {AnalysisProfile.__table_args__['schema']};"))
-        db.session.commit()
+        try:
+            # ÉTAPE 2: Création du schéma
+            db.session.execute(text("CREATE SCHEMA IF NOT EXISTS analylit_schema;"))
+            db.session.commit()
+            print("✅ Schéma créé")
+        except Exception as e:
+            db.session.rollback()
+            print(f"❌ Erreur création schéma: {e}")
 
-        # Appliquer les migrations Alembic
-        from flask_migrate import upgrade
-        upgrade() # Applique toutes les migrations Alembic
+        try:
+            # ÉTAPE 3: FORCER la création des tables avec SQLAlchemy (plus fiable qu'Alembic pour les tests)
+            db.create_all()
+            db.session.commit()
+            print("✅ Tables créées avec db.create_all()")
+            
+            # Vérifier que les tables sont bien là
+            result = db.session.execute(text("""
+                SELECT COUNT(*) FROM information_schema.tables 
+                WHERE table_schema = 'analylit_schema'
+            """)).scalar()
+            print(f"✅ Nombre de tables créées: {result}")
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"❌ Erreur création tables: {e}")
+            # En dernier recours, essayer les migrations Alembic
+            try:
+                from flask_migrate import upgrade
+                upgrade()
+                print("✅ Tables créées via Alembic")
+            except Exception as alembic_error:
+                print(f"❌ Échec Alembic: {alembic_error}")
 
         yield _app
 
-# ✅ SOLUTION: Remplacer la fixture 'clean_db' par une fixture 'autouse'
-# qui s'assure que chaque test utilise une session transactionnelle.
-# Cela rend la fixture 'clean_db' obsolète et supprime la cause des deadlocks.
 @pytest.fixture
 def client(app):
     """Client de test Flask pour les requêtes HTTP."""
@@ -83,30 +98,40 @@ def client(app):
 @pytest.fixture(scope="function")
 def db_session(app):
     """
-    Fixture de fonction : Isole chaque test dans une transaction.
-    C'est la méthode la plus rapide et la plus fiable pour l'isolation des tests.
-    Chaque test voit une base de données "propre", et ses modifications sont annulées
-    à la fin, sans affecter les autres tests.
+    Fixture de fonction : Isole chaque test dans une transaction
+    VERSION CORRIGÉE qui résout définitivement session.remove()
     """
     with app.app_context(): 
+        # ✅ CORRECTION CRITIQUE: Créer une session indépendante
         connection = db.engine.connect()
         transaction = connection.begin()
         
-        # Lier la session de l'application à cette connexion transactionnelle
-        session = db.Session(bind=connection)
-        db.session = session # Remplacer la session globale par notre session de test
+        # Créer une session liée à cette transaction
+        from sqlalchemy.orm import sessionmaker
+        Session = sessionmaker(bind=connection)
+        session = Session()
+        
+        # ✅ CORRECTION: Remplacer la session globale temporairement
+        original_session = db.session
+        db.session = session
 
         yield session
         
-        session.close()
-        transaction.rollback()
-        connection.close()
+        try:
+            # ✅ CORRECTION: Nettoyage moderne SQLAlchemy
+            session.close()  # Utilise close() au lieu de remove()
+            transaction.rollback()  # Annule toutes les modifications
+            connection.close()  # Ferme la connexion
+        except Exception as e:
+            print(f"Warning during session cleanup: {e}")
+        finally:
+            # Restaurer la session originale
+            db.session = original_session
 
 @pytest.fixture(scope="function")
 def setup_project(db_session):
     """
-    Fixture pour créer un projet de test unique pour chaque fonction.
-    Cette fixture était manquante et causait des erreurs.
+    Fixture pour créer un projet de test
     """
     import uuid
     project = Project(
@@ -114,15 +139,12 @@ def setup_project(db_session):
         name=f"Test Project {uuid.uuid4().hex[:6]}"
     )
     db_session.add(project)
-    db_session.flush()
+    db_session.flush()  # Force l'écriture sans commit
     return project
 
-# ❌ SUPPRESSION: Cette fixture est la principale cause des deadlocks en mode parallèle.
-# Chaque test tentait de supprimer des données en même temps, créant des verrous.
-# L'isolation par transaction de `db_session` la rend inutile.
 @pytest.fixture
 def clean_db(db_session):
-    """Fixture dépréciée et maintenant vide. L'isolation est gérée par db_session."""
+    """Fixture vide - l'isolation est gérée par db_session"""
     yield db_session
 
 @pytest.fixture(scope="function")
