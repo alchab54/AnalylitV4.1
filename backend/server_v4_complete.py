@@ -603,7 +603,7 @@ def create_app(config_override=None):
         if not project:
             return jsonify({"error": "Projet non trouvé"}), 404
         task_ids, successful_uploads, failed_uploads = [], [], []
-        for file in files: # The user request is to fix the test, but the test is correct. The server code is wrong.
+        for file in files:
             if file and file.filename:
                 # 1. Nettoyer le nom de fichier pour enlever les caractères dangereux (Path Traversal)
                 filename = secure_filename(file.filename)
@@ -612,19 +612,20 @@ def create_app(config_override=None):
                 if filename and filename.lower().endswith('.pdf'):
                     try:
                         file_path = save_file_to_project_dir(file, project_id, filename, PROJECTS_DIR)
-                        # CORRECTION : La tâche de traitement doit être lancée ici.
+                        # La tâche de traitement est lancée ici.
                         job = background_queue.enqueue(add_manual_articles_task, project_id=project_id, identifiers=[str(file_path)], job_timeout='10m')
                         task_ids.append(job.id)
                         successful_uploads.append(filename)
                     except Exception as e:
                         logging.error(f"Erreur lors de la sauvegarde du fichier {filename}: {e}")
-                        failed_uploads.append(filename)
+                        failed_uploads.append(file.filename)
                 else:
                     # Le nom de fichier est soit vide, soit n_est pas un PDF. On le rejette.
                     failed_uploads.append(file.filename)
         response_message = f"{len(successful_uploads)} PDF(s) mis en file pour traitement."
         if failed_uploads:
             response_message += f" {len(failed_uploads)} fichier(s) ignoré(s) (format invalide ou erreur)."
+            return jsonify({"message": response_message, "task_ids": task_ids, "failed_files": failed_uploads}), 202
         return jsonify({"message": response_message, "task_ids": task_ids, "failed_files": failed_uploads}), 202
 
     @app.route('/api/projects/<project_id>/export/thesis', methods=['GET'])

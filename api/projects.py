@@ -7,10 +7,13 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
 
 # CORRECTION : Imports propres et cohérents
-from utils.app_globals import background_queue, processing_queue, analysis_queue, discussion_draft_queue
+from utils.app_globals import (
+    background_queue, processing_queue, analysis_queue, discussion_draft_queue, 
+    extension_queue
+)
 from utils.database import with_db_session, get_session
 from utils.models import Project, Grid, Extraction, AnalysisProfile, RiskOfBias, Analysis
-from utils.file_handlers import save_file_to_project_dir 
+from utils.file_handlers import save_file_to_project_dir
 from backend.tasks_v4_complete import (
     run_discussion_generation_task,
     answer_chat_question_task,
@@ -20,12 +23,15 @@ from backend.tasks_v4_complete import (
     run_knowledge_graph_task,
     run_prisma_flow_task,
     import_from_zotero_file_task,
-    import_pdfs_from_zotero_task, # Added this import
-    run_atn_specialized_extraction_task, # Added this import
-    run_empathy_comparative_analysis_task, # Added this import
-    import_from_zotero_json_task, # Added this import
+    import_pdfs_from_zotero_task,
+    run_atn_specialized_extraction_task,
+    run_empathy_comparative_analysis_task,
+    import_from_zotero_json_task,
     run_risk_of_bias_task,
-    add_manual_articles_task
+    add_manual_articles_task,
+    run_descriptive_stats_task,
+    run_atn_stakeholder_analysis_task,
+    run_extension_task
 )
 from werkzeug.utils import secure_filename
 
@@ -269,26 +275,37 @@ def run_pipeline(session, project_id):
     return jsonify({"message": f"{len(task_ids)} tâches de traitement lancées", "task_ids": [str(tid) for tid in task_ids]}), 202
 
 @projects_bp.route('/projects/<project_id>/run-analysis', methods=['POST'])
-def run_advanced_analysis(project_id):
+@with_db_session
+def run_analysis(session, project_id):
+    """
+    Lance une analyse avancée (méta-analyse, graphe, etc.).
+    ✅ CORRECTION: La logique a été entièrement revue pour mapper correctement
+    les types d'analyse aux bonnes tâches et aux bonnes files d'attente.
+    """
     data = request.get_json()
     analysis_type = data.get('type')
 
-    task_map = {
-        "meta_analysis": run_meta_analysis_task,
-        "atn_scores": run_atn_score_task,
-        "discussion": run_discussion_generation_task,
-        "knowledge_graph": run_knowledge_graph_task,
-        "prisma_flow": run_prisma_flow_task,
-        "atn_specialized_extraction": run_atn_specialized_extraction_task,
-        "empathy_comparative_analysis": run_empathy_comparative_analysis_task,
+    # Mapping des types d'analyse aux (fonction_tache, file_attente, timeout)
+    analysis_tasks = {
+        "discussion": (run_discussion_generation_task, discussion_draft_queue, 1800),
+        "knowledge_graph": (run_knowledge_graph_task, analysis_queue, 1800),
+        "prisma_flow": (run_prisma_flow_task, analysis_queue, 1800),
+        "meta_analysis": (run_meta_analysis_task, analysis_queue, 1800),
+        "descriptive_stats": (run_descriptive_stats_task, analysis_queue, 1800),
+        "atn_scores": (run_atn_score_task, analysis_queue, 1800),
+        "atn_stakeholder": (run_atn_stakeholder_analysis_task, analysis_queue, 1800),
+        "atn_specialized_extraction": (run_atn_specialized_extraction_task, extension_queue, 1800),
+        "empathy_comparative_analysis": (run_empathy_comparative_analysis_task, extension_queue, 1800)
     }
 
-    task_function = task_map.get(analysis_type)
-    if not task_function:
-        return jsonify({"error": "Type d'analyse inconnu"}), 400
-
-    job = analysis_queue.enqueue(task_function, project_id=project_id, job_timeout=1800) # 30 minutes
-    return jsonify({"message": f"Analyse '{analysis_type}' lancée", "task_id": job.id}), 202
+    if analysis_type in analysis_tasks:
+        task_func, queue, timeout = analysis_tasks[analysis_type]
+        job = queue.enqueue(
+            task_func, project_id=project_id, job_timeout=timeout
+        )
+        return jsonify({"message": f"Analyse '{analysis_type}' lancée", "task_id": str(job.id)}), 202
+    else:
+        return jsonify({"error": f"Type d'analyse inconnu: {analysis_type}"}), 400
 
 @projects_bp.route('/projects/<project_id>/import-zotero-pdfs', methods=['POST'])
 def import_zotero_pdfs(project_id):

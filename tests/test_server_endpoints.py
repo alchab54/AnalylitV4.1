@@ -323,15 +323,13 @@ def test_api_run_pipeline_enqueues_tasks(mock_enqueue, client, db_session):
     # Doit être appelé 2 fois (une pour pmid1, une pour pmid2)
     assert mock_enqueue.call_count == 2
 
-    # AMÉLIORATION: Assertion plus robuste.
-    # On vérifie que la bonne tâche a été appelée pour chaque article,
-    # sans être trop strict sur les autres arguments qui peuvent changer.
+    # ✅ AMÉLIORATION: Assertion plus robuste qui ne dépend pas de l'ordre des appels.
+    # On vérifie que la bonne tâche a été appelée pour chaque article.
     calls = mock_enqueue.call_args_list
-    assert len(calls) == 2
-    # Vérifie que la bonne fonction a été passée en premier argument
-    assert calls[0].args[0] == process_single_article_task
-    assert calls[1].args[0] == process_single_article_task
-    # Vérifie que les bons article_id ont été passés dans les kwargs
+    # On s'assure que la bonne fonction a été appelée
+    for call in calls:
+        assert call.args[0] == process_single_article_task
+    # On vérifie que les bons article_id ont été passés, peu importe l'ordre.
     called_article_ids = {call.kwargs['article_id'] for call in calls}
     assert called_article_ids == {"pmid1", "pmid2"}
 

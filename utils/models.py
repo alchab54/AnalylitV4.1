@@ -44,6 +44,20 @@ class Project(Base):
     inter_rater_reliability = Column(Text)
     prisma_checklist = Column(Text)
 
+    # --- Relations avec suppression en cascade ---
+    # ✅ CORRECTION: Ajout de relations avec cascade pour garantir l'intégrité des données.
+    # Lorsqu'un projet est supprimé, toutes les données associées (résultats, extractions, etc.)
+    # seront également supprimées automatiquement de la base de données.
+    search_results = relationship("SearchResult", backref="project", cascade="all, delete-orphan")
+    extractions = relationship("Extraction", backref="project", cascade="all, delete-orphan")
+    grids = relationship("Grid", backref="project", cascade="all, delete-orphan")
+    chat_messages = relationship("ChatMessage", backref="project", cascade="all, delete-orphan")
+    risk_of_bias_entries = relationship("RiskOfBias", backref="project", cascade="all, delete-orphan")
+    processing_logs = relationship("ProcessingLog", backref="project", cascade="all, delete-orphan")
+    stakeholders = relationship("Stakeholder", backref="project", cascade="all, delete-orphan")
+    articles = relationship("Article", backref="project", cascade="all, delete-orphan")
+
+
     def to_dict(self):
         data = {}
         for c in self.__table__.columns:
