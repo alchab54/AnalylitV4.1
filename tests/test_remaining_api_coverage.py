@@ -158,7 +158,7 @@ def test_api_admin_endpoints(client):
 
     # --- 2. POST /api/queues/clear (Vérifie l'appel .empty()) ---
     # On mock la méthode .empty() de l'objet 'processing_queue' là où elle est utilisée
-    with patch('backend.server_v4_complete.processing_queue.empty') as mock_queue_empty:
+    with patch('backend.server_v4_complete.processing_queue.empty') as mock_queue_empty: # type: ignore
         response_clear = client.post('/api/admin/queues/clear', json={'queue_name': 'analylit_processing_v4'})
         
         assert response_clear.status_code == 200

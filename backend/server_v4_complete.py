@@ -898,7 +898,7 @@ def create_app(config_override=None):
                 for job_id in registry.get_job_ids():
                     job = Job.fetch(job_id, connection=redis_conn)
                     job.delete()
-            return jsonify({"message": f"File '{queue_name}' et ses registres ont été vidés."} ), 200
+            return jsonify({"message": f"File '{queue_name}' et ses registres ont été vidés."}), 200
         return jsonify({"error": "File non trouvée"}), 404
 
     @app.route('/api/extensions', methods=['POST'])

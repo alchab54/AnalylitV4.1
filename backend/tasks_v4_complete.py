@@ -801,6 +801,15 @@ def fetch_online_pdf_task(session, project_id: str, article_id: str):
     """Récupère un PDF en ligne pour un article via Unpaywall si possible."""
     logger.info(f"ðŸ“„ Récupération PDF en ligne pour {article_id}")
     try: # Le bloc try/finally n'est plus nécessaire grâce au décorateur
+        # ✅ PATCH DE ROBUSTESSE : Garantit l'existence de la table dans le contexte du worker
+        session.execute(text("""
+            CREATE TABLE IF NOT EXISTS analylit_schema.search_results (
+                id VARCHAR PRIMARY KEY, project_id VARCHAR, article_id VARCHAR,
+                title TEXT, abstract TEXT, authors TEXT, publication_date TEXT,
+                journal TEXT, doi VARCHAR, url VARCHAR, database_source VARCHAR, created_at TIMESTAMP, query VARCHAR
+            );
+        """))
+        session.commit() # S'assurer que la table est créée avant la requête
         article = session.execute(text("""
             SELECT doi, url FROM search_results
             WHERE project_id = :pid AND article_id = :aid
