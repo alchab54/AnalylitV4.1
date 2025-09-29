@@ -410,39 +410,37 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
 @patch('api.projects.background_queue.enqueue')
 def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session):
     """
-    Teste POST /api/projects/<id>/upload-zotero (File import) - Version simplifiée
+    Teste POST /api/projects/<id>/upload-zotero-file (File import)
     """
     # ARRANGE
     mock_job = MagicMock()
     mock_job.id = "zotero_file_job_q"
     mock_q_enqueue.return_value = mock_job
     project_data = {'name': 'API Test Zotero File', 'mode': 'screening'}
-    resp = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
+    resp = client.post('/api/projects/', data=json.dumps(project_data), content_type='application/json')
     project_id = json.loads(resp.data)['id']
  
     file_content = b'{"items": [{"title": "Test Zotero Item"}]}'
     file_data = {'file': (io.BytesIO(file_content), 'test.json')}
  
     # ACT
-    with patch('api.projects.save_file_to_project_dir', return_value='/fake/path/to/test.json'), \
-         patch('builtins.open', MagicMock()), \
-         patch('json.load', return_value={'items': [{'title': 'Test Zotero Item'}]}):
-        
+    # On patche la fonction qui sauvegarde le fichier pour ne pas écrire sur le disque
+    with patch('server_v4_complete.save_file_to_project_dir', return_value='/fake/path/to/test.json'):
         response = client.post(
-            f'/api/projects/{project_id}/upload-zotero',
-            data=file_data, 
+            f'/api/projects/{project_id}/upload-zotero-file',
+            data=file_data,
             content_type='multipart/form-data'
         )
  
         # ASSERT
         assert response.status_code == 202
-        # Vérifier que l'endpoint répond correctement (peu importe si save_file est appelé)
-        assert response.status_code in (200, 201, 202)
-        
-        assert mock_q_enqueue.called
-
- 
-        assert json.loads(response.data)['task_id'] == mock_job.id
+        assert response.get_json()['task_id'] == "zotero_file_job_q"
+        mock_q_enqueue.assert_called_once_with(
+            import_from_zotero_file_task,
+            project_id=project_id,
+            json_file_path='/fake/path/to/test.json',
+            job_timeout='15m'
+        )
 
 @patch('api.projects.analysis_queue.enqueue')
 def test_api_run_rob_analysis_enqueues_task(mock_enqueue, client, db_session):
