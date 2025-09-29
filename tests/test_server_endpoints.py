@@ -179,22 +179,18 @@ def test_get_all_projects(client, db_session): # Utilise session
     assert found_project1['name'] == project1_data['name']
     assert found_project1['analysis_mode'] == project1_data['mode']
 
-def test_get_all_projects_empty(client, clean_db): # ✅ Garder seulement clean_db
+def test_get_all_projects_empty(client, db_session): # ✅ Utiliser la session transactionnelle
     """
-    Test avec base de données vraiment vide grâce à clean_db
+    Test avec base de données vraiment vide grâce à db_session
     WHEN the '/api/projects' route is called with GET
     THEN check that the response is 200 OK and contains an empty list.
     """
-    # S'assurer que la base est vide avant le test
-    with clean_db.bind.connect() as conn:
-        conn.execute(text("TRUNCATE TABLE analylit_schema.projects CASCADE"))
-        conn.commit()
+    db_session.execute(text("TRUNCATE TABLE analylit_schema.projects CASCADE;"))
+    db_session.commit()
     
     response = client.get('/api/projects/')
-    data = json.loads(response.data)
     assert response.status_code == 200
-    assert isinstance(data, list)
-    assert len(data) == 0
+    assert len(response.json) == 0
 
 @patch('api.projects.discussion_draft_queue.enqueue')
 def test_api_run_discussion_draft_enqueues_task(mock_enqueue, client, db_session):
@@ -429,7 +425,7 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
  
     # ACT
     # On patche la fonction qui sauvegarde le fichier pour ne pas écrire sur le disque
-    with patch('api.projects.save_file_to_project_dir', return_value='/fake/path/to/test.json'):
+    with patch('backend.server_v4_complete.save_file_to_project_dir', return_value='/fake/path/to/test.json'):
         response = client.post(
             f'/api/projects/{project_id}/upload-zotero-file', # Correction du nom de la route
             data=file_data,

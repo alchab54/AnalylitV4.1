@@ -993,15 +993,6 @@ def create_app(config_override=None):
     # La factory DOIT retourner l_objet app
     return app
 
-def format_bibliography(articles):
-    """Format bibliography for thesis export."""
-    bibliography = []
-    for article in articles:
-        # Format simple pour les tests
-        citation = f"{article.get('authors', 'Unknown')}. ({article.get('publication_date', 'n.d.')}). {article.get('title', 'No title')}. {article.get('journal', 'Unknown journal')}."
-        bibliography.append(citation)
-    return bibliography
-
 def register_models():
     """Force l_enregistrement de tous les modèles."""
     pass  # Juste le fait d_importer ce module enregistre les modèles

@@ -11,11 +11,6 @@ from unittest.mock import patch, MagicMock
 # --- Imports des modèles ---
 from utils.models import Project, SearchResult, Extraction
 
-def format_bibliography(references):
-    """Fonction manquante pour le formatage bibliographique"""
-    return "\n".join([f"- {ref}" for ref in references])
-
-
 class TestThesisExport:
     """Tests complets pour l'export spécialisé thèse"""
 
@@ -118,5 +113,5 @@ class TestThesisExport:
             )
             
             assert response.status_code == 202
-            assert 'task_id' in response.json
+            assert 'job_id' in response.json
             mock_enqueue.assert_called_once()

@@ -33,6 +33,7 @@ from backend.tasks_v4_complete import (
     run_atn_stakeholder_analysis_task,
     run_extension_task
 )
+from utils.helpers import format_bibliography
 from werkzeug.utils import secure_filename
 
 projects_bp = Blueprint('projects_bp', __name__)

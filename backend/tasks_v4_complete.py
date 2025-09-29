@@ -434,10 +434,10 @@ def run_synthesis_task(session, project_id: str, profile: dict):
     output = call_ollama_api(prompt, profile.get('synthesis_model', 'llama3.1:8b'), output_format="json")
     
     if output and isinstance(output, dict):
-        update_project_status(session, project_id, 'completed', result=output)
+        update_project_status(session, project_id, status='completed', result=output)
         send_project_notification(project_id, 'synthesis_completed', 'Synthèse générée.')
     else:
-        update_project_status(session, project_id, 'failed')
+        update_project_status(session, project_id, status='failed')
         send_project_notification(project_id, 'synthesis_failed', 'Réponse IA invalide.')
 
 @with_db_session
@@ -446,7 +446,7 @@ def run_discussion_generation_task(session, project_id: str):
     update_project_status(session, project_id, 'generating_analysis')
     rows = session.execute(text("SELECT e.extracted_data, e.pmid, s.title, e.relevance_score FROM extractions e JOIN search_results s ON e.project_id = s.project_id AND e.pmid = s.article_id WHERE e.project_id = :pid AND e.relevance_score >= 7 AND e.extracted_data IS NOT NULL"), {"pid": project_id}).mappings().all()
     if not rows: # Ne pas lever d'erreur, mais mettre à jour le statut et notifier.
-        update_project_status(session, project_id, 'failed')
+        update_project_status(session, project_id, status='failed')
         send_project_notification(project_id, 'analysis_failed', "Aucune donnée d'extraction pertinente trouvée pour générer la discussion.")
         return
 
@@ -461,7 +461,7 @@ def run_discussion_generation_task(session, project_id: str):
     model_name = config.DEFAULT_MODELS.get(profile, {}).get('synthesis', 'llama3.1:8b')
     draft = generate_discussion_draft(df, lambda p, m: call_ollama_api(p, m, temperature=0.7), model_name)
 
-    update_project_status(session, project_id, 'completed', discussion=draft)
+    update_project_status(session, project_id, status='completed', discussion=draft)
     send_project_notification(project_id, 'analysis_completed', 'Le brouillon de discussion a été généré.', {'discussion_draft': draft})
 
 @with_db_session
@@ -505,7 +505,7 @@ def run_prisma_flow_task(session, project_id: str):
     n_included = session.execute(text("SELECT COUNT(*) FROM extractions WHERE project_id = :pid"), {"pid": project_id}).scalar_one()
     
     if total_found == 0:
-        update_project_status(session, project_id, status='analysis_completed')
+        update_project_status(session, project_id, status='completed')
         return
     
     n_after_duplicates, n_excluded_screening = total_found, total_found - n_included
@@ -540,7 +540,7 @@ def run_meta_analysis_task(session, project_id: str):
     
     scores_list = session.execute(text("SELECT relevance_score FROM extractions WHERE project_id = :pid AND relevance_score IS NOT NULL AND relevance_score > 0"), {"pid": project_id}).scalars().all()
     if len(scores_list) < 2:
-        update_project_status(session, project_id, 'failed')
+        update_project_status(session, project_id, status='failed')
         send_project_notification(project_id, 'analysis_failed', 'Pas assez de données pour la méta-analyse (au moins 2 scores requis).')
         return
     
@@ -564,7 +564,7 @@ def run_meta_analysis_task(session, project_id: str):
     ax.legend()
     plt.savefig(plot_path, bbox_inches='tight')
     plt.close(fig)    
-    update_project_status(session, project_id, 'completed', analysis_result=analysis_result, analysis_plot_path=plot_path)
+    update_project_status(session, project_id, status='completed', analysis_result=analysis_result, analysis_plot_path=plot_path)
     send_project_notification(project_id, 'analysis_completed', 'Méta-analyse terminée.')
 
 @with_db_session
@@ -575,7 +575,7 @@ def run_descriptive_stats_task(session, project_id: str):
     
     rows = session.execute(text("SELECT relevance_score FROM extractions WHERE project_id = :pid AND relevance_score IS NOT NULL"), {"pid": project_id}).mappings().all()
     if not rows:
-        update_project_status(session, project_id, 'failed')
+        update_project_status(session, project_id, status='failed')
         return
     
     scores = [r['relevance_score'] for r in rows]
@@ -585,7 +585,7 @@ def run_descriptive_stats_task(session, project_id: str):
         'min_score': float(np.min(scores)), 'max_score': float(np.max(scores))
     }
     
-    update_project_status(session, project_id, 'completed', analysis_result=stats_result)
+    update_project_status(session, project_id, status='completed', analysis_result=stats_result)
     send_project_notification(project_id, 'analysis_completed', 'Statistiques descriptives générées')
 
 # ================================================================ 
@@ -939,7 +939,7 @@ def run_atn_stakeholder_analysis_task(session, project_id: str):
         "ethical_regulatory": {"ethical_considerations_count": len(ethical), "gdpr_mentions": regulatory["gdpr"], "ai_act_mentions": regulatory["ai_act"], "regulatory_compliance_rate": (regulatory["gdpr"] / total_studies * 100) if total_studies > 0 else 0}
     }
     
-    if ai_types_dist: # type: ignore
+    if ai_types_dist:
         project_dir, plot_path = PROJECTS_DIR / project_id, str(PROJECTS_DIR / project_id / 'atn_ai_types_distribution.png')
         project_dir.mkdir(exist_ok=True)
         fig, ax = plt.subplots(figsize=(10, 6))
@@ -948,8 +948,8 @@ def run_atn_stakeholder_analysis_task(session, project_id: str):
         for bar in bars: ax.text(bar.get_x() + bar.get_width()/2., bar.get_height(), f'{int(bar.get_height())}', ha='center', va='bottom')
         plt.tight_layout(); plt.savefig(plot_path, bbox_inches='tight'); plt.close(fig)
         analysis_result["plot_path"] = plot_path
-    
-    update_project_status(session, project_id, 'completed', analysis_result=analysis_result)
+
+    update_project_status(session, project_id, status='completed', analysis_result=analysis_result)
     send_project_notification(project_id, 'atn_analysis_completed', 'Analyse ATN multipartie prenante terminée.')
 
 @with_db_session
@@ -959,7 +959,7 @@ def run_atn_score_task(session, project_id: str):
     update_project_status(session, project_id, 'generating_analysis')
     extractions = session.execute(text("SELECT pmid, title, extracted_data FROM extractions WHERE project_id = :pid AND extracted_data IS NOT NULL"), {"pid": project_id}).mappings().all()
     if not extractions:
-        update_project_status(session, project_id, 'failed')
+        update_project_status(session, project_id, status='failed')
         send_project_notification(project_id, 'analysis_failed', 'Aucune donnée d\'extraction disponible pour le calcul du score ATN.')
         return
     
@@ -1005,7 +1005,7 @@ def run_atn_score_task(session, project_id: str):
         except Exception: continue
     
     if not scores:
-        update_project_status(session, project_id, 'failed')
+        update_project_status(session, project_id, status='failed')
         send_project_notification(project_id, 'analysis_failed', 'Aucun score ATN calculable à partir des données extraites.')
         return
     
@@ -1022,7 +1022,7 @@ def run_atn_score_task(session, project_id: str):
         ax.set_xlabel('Score ATN'); ax.set_ylabel('Nombre d\'Articles'); ax.set_title('Distribution des Scores ATN'); ax.set_xticks(range(0, 11))
         plt.savefig(plot_path, bbox_inches='tight'); plt.close(fig)
     
-    update_project_status(session, project_id, 'completed', analysis_result=analysis_result, analysis_plot_path=plot_path)
+    update_project_status(session, project_id, status='completed', analysis_result=analysis_result, analysis_plot_path=plot_path)
     send_project_notification(project_id, 'analysis_completed', f'Scores ATN calculés: {mean_atn:.2f} (moyenne)')
 
 # ================================================================ 

@@ -73,3 +73,12 @@ def truncate_text(text: str, max_length: int = 100, suffix: str = "...") -> str:
     if not text or len(text) <= max_length:
         return text
     return text[:max_length - len(suffix)] + suffix
+
+def format_bibliography(articles: list) -> list:
+    """Format bibliography for thesis export."""
+    bibliography = []
+    for article in articles:
+        # Format simple pour les tests
+        citation = f"{article.get('authors', 'Unknown')}. ({article.get('publication_date', 'n.d.')}). {article.get('title', 'No title')}. {article.get('journal', 'Unknown journal')}."
+        bibliography.append(citation)
+    return bibliography
