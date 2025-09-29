@@ -19,8 +19,12 @@ from utils.models import SCHEMA # Importer notre variable de schéma
 # access to the values within the .ini file in use.
 config = context.config
 
-# Créer une app Flask minimale pour le contexte d'Alembic
-app = create_app()
+# ✅ CORRECTION: 1. Créer l'application d'abord.
+# Fournir une configuration minimale pour qu'Alembic puisse se connecter à la DB.
+app = create_app({
+    'SQLALCHEMY_DATABASE_URI': os.getenv('DATABASE_URL', 'postgresql://analylit_user:strong_password@db:5432/analylit_db'),
+    'SQLALCHEMY_TRACK_MODIFICATIONS': False
+})
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -31,7 +35,8 @@ logger = logging.getLogger('alembic.env')
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-# ✅ CORRECTION: Utiliser le contexte de l'application pour garantir que tout est initialisé.
+# ✅ CORRECTION: 2. Utiliser le contexte de l'application pour garantir que tout est initialisé.
+# Cela lie les modèles à l'instance SQLAlchemy et configure l'URL pour Alembic.
 with app.app_context():
     # Importer les modèles ici pour qu'ils soient enregistrés dans les métadonnées de `db`
     from utils import models

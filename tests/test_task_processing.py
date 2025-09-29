@@ -768,7 +768,8 @@ def test_calculate_kappa_task(db_session, mocker):
     mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
 
     # ACT
-    calculate_kappa_task.__wrapped__(db_session, project_id)
+    # ✅ CORRECTION: Appeler la tâche directement. Le décorateur @with_db_session gérera l'injection de la session.
+    calculate_kappa_task(db_session, project_id)
 
     # ASSERT
     updated_project = db_session.get(Project, project_id)

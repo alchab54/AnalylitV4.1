@@ -63,7 +63,8 @@ def test_file_upload_path_traversal_is_prevented(client, setup_project):
     Test de sécurité (Path Traversal) : Vérifie que `secure_filename` bloque
     les tentatives d'écriture de fichiers en dehors du répertoire prévu.
     """
-    project_id = setup_project # La fixture setup_project retourne l'ID
+    # ✅ CORRECTION: La fixture setup_project retourne un objet Project. Il faut utiliser son attribut .id.
+    project_id = setup_project.id
     # Payload de fichier avec un nom de fichier malveillant
     malicious_filename = "../../../etc/passwd.pdf"
     file_content = b"hacked"
@@ -97,7 +98,8 @@ def test_file_upload_rejects_dangerous_file_types(client, setup_project):
     Test de sécurité (File Upload) : Vérifie que seuls les fichiers PDF
     sont acceptés par l'endpoint d'upload de PDF.
     """
-    project_id = setup_project
+    # ✅ CORRECTION: La fixture setup_project retourne un objet Project. Il faut utiliser son attribut .id.
+    project_id = setup_project.id
     # Payload avec un type de fichier non autorisé (.sh)
     dangerous_file = (io.BytesIO(b'echo "hacked"'), 'exploit.sh')
     data = {'files': dangerous_file}
