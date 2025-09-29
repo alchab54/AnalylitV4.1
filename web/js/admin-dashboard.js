@@ -1,18 +1,25 @@
 import { fetchAPI } from './api.js';
+import { API_ENDPOINTS } from './constants.js';
 
 class AdminDashboard {
     constructor() {
         this.dashboardContainer = document.getElementById('admin-dashboard');
+        this.intervalId = null;
         if (!this.dashboardContainer) return;
 
         this.renderLayout();
         // L'initialisation des données et du timer se fera dans une méthode async séparée
     }
 
+    destroy() {
+        if (this.intervalId) clearInterval(this.intervalId);
+        this.dashboardContainer.innerHTML = '';
+    }
+
     async init() {
         if (!this.dashboardContainer) return;
         await this.loadData();
-        setInterval(() => this.loadData(), 10000); // Refresh every 10 seconds
+        this.intervalId = setInterval(() => this.loadData(), 10000); // Refresh every 10 seconds
 
         // Simulate admin role for demonstration
         document.body.dataset.userRole = 'admin';
@@ -24,8 +31,8 @@ class AdminDashboard {
             <div class="admin-header">
                 <h2>Tableau de Bord Administration</h2>
                 <div class="admin-actions">
-                    <button class="btn-admin" onclick="window.adminDashboard.refreshData()">Rafraîchir</button>
-                    <button class="btn-admin-danger" onclick="window.adminDashboard.clearFailedTasks()">Purger les tâches échouées</button>
+                    <button class="btn-admin" data-action="admin-refresh-data">Rafraîchir</button>
+                    <button class="btn-admin-danger" data-action="admin-clear-failed-tasks">Purger les tâches échouées</button>
                 </div>
             </div>
             <div id="admin-stats-grid" class="admin-stats-grid"></div>
@@ -53,8 +60,8 @@ class AdminDashboard {
     async loadData() {
         try {
             const [tasks, queues] = await Promise.all([
-                fetchAPI('/api/tasks/status'), // Note: This endpoint might need a separate fix if it doesn't exist.
-                fetchAPI('/api/queues/info')   // ✅ CORRECTION: Utiliser la route standardisée.
+                fetchAPI(API_ENDPOINTS.tasksStatus),
+                fetchAPI(API_ENDPOINTS.queuesInfo)
             ]);
             this.renderStats(tasks, queues);
             this.renderTaskLists(tasks);
@@ -114,7 +121,7 @@ class AdminDashboard {
                 </div>
                 <div class="task-actions">
                     <span class="status-badge status-${task.status}">${task.status}</span>
-                    ${task.status === 'started' ? '<button class="btn-cancel" onclick="window.adminDashboard.cancelTask(\' + task.id + \')">Annuler</button>' : ''}
+                    ${task.status === 'started' ? `<button class="btn-cancel" data-action="admin-cancel-task" data-task-id="${task.id}">Annuler</button>` : ''}
                 </div>
             </div>
         `).join('');
@@ -144,7 +151,7 @@ class AdminDashboard {
     async cancelTask(taskId) {
         if (!confirm(`Voulez-vous vraiment annuler la tâche ${taskId} ?`)) return;
         try {
-            await fetchAPI(`/api/tasks/${taskId}/cancel`, { method: 'POST' });
+            await fetchAPI(API_ENDPOINTS.taskCancel(taskId), { method: 'POST' });
             this.loadData();
         } catch (error) {
             console.error("Erreur annulation tâche:", error);
@@ -155,7 +162,7 @@ class AdminDashboard {
     async clearFailedTasks() {
         if (!confirm("Voulez-vous vraiment purger toutes les tâches échouées ?")) return;
         try {
-            await fetchAPI('/api/queues/clear', { 
+            await fetchAPI(API_ENDPOINTS.queuesClear, { 
                 method: 'POST', 
                 body: { queue_name: 'analylit_failed_v4' } // Assumes a failed queue, adjust if needed
             });

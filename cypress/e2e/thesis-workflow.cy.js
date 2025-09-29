@@ -7,7 +7,12 @@ describe('Workflow de Thèse ATN - Version Optimisée', () => {
     cy.intercept('GET', '/api/projects/test-project-123/extractions', { fixture: 'extractions.json' }).as('getExtractions');
 
     cy.visit('/');
-    cy.waitForAppReady();
+    // ✅ CORRECTION CRITIQUE: Appeler l'initialisation manuellement pour éviter la race condition.
+    cy.window().then((win) => {
+      expect(win.AnalyLit).to.be.an('object');
+      win.AnalyLit.initializeApplication();
+    });
+    cy.waitForAppReady(); // Attend que les projets soient chargés via le mock
 
     cy.createTestProject(projectName);
     cy.selectProject(projectName);

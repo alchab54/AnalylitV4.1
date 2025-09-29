@@ -53,72 +53,72 @@ export const SELECTORS = {
 // URLs API centralisées
 export const API_ENDPOINTS = {
     // Projects
-    projects: '/api/projects/',
-    projectById: (id) => `/api/projects/${id}`,
-    projectFiles: (id) => `/api/projects/${id}/files`,
-    projectExport: (id) => `/api/projects/${id}/export`,
-    projectExportThesis: (id) => `/api/projects/${id}/export/thesis`,
-    projectIndexPdfs: (id) => `/api/projects/${id}/index-pdfs`, // Ajout du endpoint manquant
-    projectImportZotero: (id) => `/api/projects/${id}/upload-zotero`, // ✅ CORRECTION: Endpoint manquant
-    projectUploadPdfs: (id) => `/api/projects/${id}/upload-pdfs-bulk`, // ✅ CORRECTION: Endpoint manquant
-    projectAddManualArticles: (id) => `/api/projects/${id}/add-manual-articles`, // ✅ CORRECTION: Endpoint manquant
-    projectRun: (id) => `/api/projects/${id}/run`, // ✅ CORRECTION: Endpoint manquant pour le traitement par lot
+    projects: '/projects',
+    projectById: (id) => `/projects/${id}`,
+    projectFiles: (id) => `/projects/${id}/files`,
+    projectExport: (id) => `/projects/${id}/export`,
+    projectExportThesis: (id) => `/projects/${id}/export/thesis`,
+    projectIndexPdfs: (id) => `/projects/${id}/index-pdfs`,
+    projectImportZotero: (id) => `/projects/${id}/upload-zotero`,
+    projectUploadPdfs: (id) => `/projects/${id}/upload-pdfs-bulk`,
+    projectAddManualArticles: (id) => `/projects/${id}/add-manual-articles`,
+    projectRun: (id) => `/projects/${id}/run`,
     
     // Search
-    search: '/api/search', // ✅ CORRECTION: Le préfixe est ajouté ici pour la cohérence des tests.
-    projectSearchResults: (id) => `/api/projects/${id}/search-results`,
+    search: '/search',
+    projectSearchResults: (id) => `/projects/${id}/search-results`,
     
     // Articles
-    projectArticles: (id) => `/api/projects/${id}/articles`,
-    articlesBatchDelete: '/api/articles/batch-delete',
+    projectArticles: (id) => `/projects/${id}/articles`,
+    articlesBatchDelete: '/articles/batch-delete',
     
     // Validation
-    projectExtractions: (id) => `/api/projects/${id}/extractions`,
-    projectExtractionDecision: (projectId, extractionId) => `/api/projects/${projectId}/extractions/${extractionId}/decision`,
-    projectScreeningDecisions: (id) => `/api/projects/${id}/screening-decisions`, // Ajout du endpoint manquant
-    projectCalculateKappa: (id) => `/api/projects/${id}/calculate-kappa`,
+    projectExtractions: (id) => `/projects/${id}/extractions`,
+    projectExtractionDecision: (projectId, extractionId) => `/projects/${projectId}/extractions/${extractionId}/decision`,
+    projectScreeningDecisions: (id) => `/projects/${id}/screening-decisions`,
+    projectCalculateKappa: (id) => `/projects/${id}/calculate-kappa`,
     
     // Grids
-    grids: (projectId) => `/api/projects/${projectId}/grids`,
-    gridById: (projectId, gridId) => `/api/projects/${projectId}/grids/${gridId}`,
-    gridsImport: (projectId) => `/api/projects/${projectId}/grids/import`, // Ajout du endpoint manquant
+    grids: (projectId) => `/projects/${projectId}/grids`,
+    gridById: (projectId, gridId) => `/projects/${projectId}/grids/${gridId}`,
+    gridsImport: (projectId) => `/projects/${projectId}/grids/import`,
     
     // Analyses
-    projectAnalyses: (id) => `/api/projects/${id}/analyses`,
-    projectRunAnalysis: (id) => `/api/projects/${id}/run-analysis`,
-    projectExportAnalyses: (id) => `/api/projects/${id}/export/analyses`,
-    projectDeleteAnalysis: (projectId, analysisType) => `/api/projects/${projectId}/analyses/${analysisType}`,
-    projectRunRobAnalysis: (id) => `/api/projects/${id}/run-rob-analysis`, // ✅ CORRECTION: Endpoint manquant
-    projectPrismaChecklist: (id) => `/api/projects/${id}/prisma-checklist`, // ✅ CORRECTION: Endpoint manquant
+    projectAnalyses: (id) => `/projects/${id}/analyses`,
+    projectRunAnalysis: (id) => `/projects/${id}/run-analysis`,
+    projectExportAnalyses: (id) => `/projects/${id}/export/analyses`,
+    projectDeleteAnalysis: (projectId, analysisType) => `/projects/${projectId}/analyses/${analysisType}`,
+    projectRunRobAnalysis: (id) => `/projects/${id}/run-rob-analysis`,
+    projectPrismaChecklist: (id) => `/projects/${id}/prisma-checklist`,
     
     // Chat
-    projectChatHistory: (id) => `/api/projects/${id}/chat-history`,
-    projectChat: (id) => `/api/projects/${id}/chat`,
+    projectChatHistory: (id) => `/projects/${id}/chat-history`,
+    projectChat: (id) => `/projects/${id}/chat`,
 
     // Settings
-    analysisProfiles: '/api/analysis-profiles',
-    analysisProfileById: (id) => `/api/analysis-profiles/${id}`,
-    prompts: '/api/prompts',
-    promptById: (id) => `/api/prompts/${id}`,
-    ollamaModels: '/api/ollama/models',
-    zoteroSettings: '/api/settings/zotero', // ✅ CORRECTION: Endpoint manquant
-    ollamaPull: '/api/ollama/pull',
-    databases: '/api/databases',
+    analysisProfiles: '/analysis-profiles',
+    analysisProfileById: (id) => `/analysis-profiles/${id}`,
+    prompts: '/prompts',
+    promptById: (id) => `/prompts/${id}`,
+    ollamaModels: '/ollama/models',
+    zoteroSettings: '/settings/zotero',
+    ollamaPull: '/ollama/pull',
+    databases: '/databases',
     
     // Queues
-    queuesInfo: '/api/queues/info',
-    queuesClear: '/api/queues/clear',
+    queuesInfo: '/queues/info',
+    queuesClear: '/queues/clear',
 
     // Tasks
-    taskCancel: (id) => `/api/tasks/${id}/cancel`, // ✅ CORRECTION: Endpoint manquant
-    taskRetry: (id) => `/api/tasks/${id}/retry`, // ✅ CORRECTION: Endpoint manquant
+    taskCancel: (id) => `/tasks/${id}/cancel`,
+    taskRetry: (id) => `/tasks/${id}/retry`,
 };
 
-API_ENDPOINTS.tasksStatus = '/api/tasks/status';
-API_ENDPOINTS.projectStakeholders = (projectId) => `/api/projects/${projectId}/stakeholders`;
-API_ENDPOINTS.stakeholderById = (projectId, stakeholderId) => `/api/projects/${projectId}/stakeholders/${stakeholderId}`; // ✅ CORRECTION: Endpoint manquant
-API_ENDPOINTS.projectStakeholderGroups = (projectId) => `/api/projects/${projectId}/stakeholder-groups`;
-API_ENDPOINTS.stakeholderGroupById = (projectId, groupId) => `/api/projects/${projectId}/stakeholder-groups/${groupId}`;
+API_ENDPOINTS.tasksStatus = '/tasks/status';
+API_ENDPOINTS.projectStakeholders = (projectId) => `/projects/${projectId}/stakeholders`;
+API_ENDPOINTS.stakeholderById = (projectId, stakeholderId) => `/projects/${projectId}/stakeholders/${stakeholderId}`;
+API_ENDPOINTS.projectStakeholderGroups = (projectId) => `/projects/${projectId}/stakeholder-groups`;
+API_ENDPOINTS.stakeholderGroupById = (projectId, groupId) => `/projects/${projectId}/stakeholder-groups/${groupId}`;
 
 // Messages d'état
 export const MESSAGES = {
@@ -350,10 +350,20 @@ noTasksInProgress: 'Aucune tâche en cours.',
 
 // Configuration de l'application
 export const CONFIG = {
-    API_BASE_URL: 'http://localhost:8080/api',
-    WEBSOCKET_URL: '/',
+    // ✅ AMÉLIORATION: Centralisation de la configuration depuis config.js
+    API_BASE_URL: 'http://localhost:5000', // Base URL pour fetchAPI
+    WEBSOCKET_URL: 'http://localhost:5000', // URL pour Socket.IO
+
+    // Clés pour le stockage local
     LOCAL_STORAGE_LAST_SECTION: 'analylit_last_section',
     LOCAL_STORAGE_THEME: 'analylit_theme', // Moved from config.js
+    LOCAL_STORAGE_LAST_PROJECT: 'analylit_last_project_id',
+    LOCAL_STORAGE_USER_PREFS: 'analylit_user_prefs',
+
+    // Paramètres de l'application
+    APP_VERSION: '4.1.0',
+    DEBUG_MODE: true,
+    DEFAULT_THEME: 'light',
 };
 
 // Messages pour le ThemeManager

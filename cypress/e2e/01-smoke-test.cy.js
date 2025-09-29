@@ -3,7 +3,12 @@ describe('Tests de Smoke - Vérifications de base AnalyLit', () => {
   beforeEach(() => {
     // ✅ CORRECTION: Utiliser la commande centralisée qui configure TOUS les mocks nécessaires.
     cy.setupMockAPI();
-    cy.visit('/');
+    cy.visitApp(); // Utilise la commande personnalisée pour la cohérence
+    // ✅ CORRECTION CRITIQUE: Appeler l'initialisation manuellement pour éviter la race condition.
+    cy.window().then((win) => {
+      expect(win.AnalyLit).to.be.an('object');
+      win.AnalyLit.initializeApplication();
+    });
     cy.waitForAppReady();
   });
 

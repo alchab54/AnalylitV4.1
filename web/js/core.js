@@ -20,8 +20,6 @@ import {
     savePRISMAProgress,
     loadProjectAnalyses,
     exportPRISMAReport,
-    handleRunKnowledgeGraph,
-    handleRunDiscussionGeneration,
     renderAnalysesSection,
     handleRunATNAnalysis, // Alias pour éviter conflit
     showRunAnalysisModal,
@@ -70,6 +68,7 @@ import {
     handleSaveProfile
 } from './settings.js'; // This was already correct
 import { fetchAPI } from './api.js';
+import AdminDashboard from './admin-dashboard.js';
 import { API_ENDPOINTS, MESSAGES, CONFIG } from './constants.js';
 
 export function showSection(sectionId) {
@@ -114,49 +113,30 @@ async function handleRetryTask(target) {
     }
 }
 
-function handleViewAnalysisResults(target) {
-    const targetId = target.dataset.targetId;
-    if (!targetId) return;
-    const resultElement = document.getElementById(targetId);
-    if (resultElement) {
-        resultElement.style.display = 'block'; // Make it visible
-        resultElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-}
+const adminDashboard = new AdminDashboard();
 
 /**
  * Mappe les valeurs de data-action aux fonctions de traitement.
  * L'objet est divisé par section pour une meilleure lisibilité.
  */
 
-const uiActions = {
-    'toggle-sidebar': toggleSidebar, // This is a click action, not a submit action
+const clickActions = {
+    // UI & Navigation
+    'toggle-sidebar': toggleSidebar,
     'close-modal': (target) => closeModal(target.closest('.modal')?.id),
     'clear-notifications': clearNotifications,
-    'create-project-modal': showCreateProjectModal,
-    'retry-task': handleRetryTask,
-    'cancel-task': handleCancelTask,
-    'set-active-evaluator': (target) => setActiveEvaluator(target.value),
     'show-section': (target) => showSection(target.dataset.sectionId),
-    'view-analysis-results': handleViewAnalysisResults,
-};
-
-const themeActions = {
     'toggle-theme': () => import('./theme-manager.js').then(module => new module.ThemeManager().toggleTheme()),
-};
-const compactModeAction = {
     'toggle-compact-mode': () => { document.body.classList.toggle('compact'); localStorage.setItem(CONFIG.COMPACT_MODE_STORAGE, document.body.classList.contains('compact')); },
-};
 
-
-const projectActions = {
+    // Projects
+    'create-project-modal': () => openModal('newProjectModal'),
     'select-project': (target) => selectProject(target.dataset.projectId),
     'delete-project': (target) => deleteProject(target.dataset.projectId, target.dataset.projectName),
     'export-project': (target) => handleExportProject(target.dataset.projectId),
-    'confirm-delete-project': (target) => confirmDeleteProject(target.dataset.projectId), // Nouvelle action
-};
+    'confirm-delete-project': (target) => confirmDeleteProject(target.dataset.projectId),
 
-const articleActions = {
+    // Articles
     'view-details': (target) => viewArticleDetails(target.dataset.articleId),
     'toggle-article-selection': (target) => toggleArticleSelection(target.dataset.articleId),
     'select-all-articles': (target) => selectAllArticles(target),
@@ -164,51 +144,50 @@ const articleActions = {
     'paginate-results': (target) => loadSearchResults(parseInt(target.dataset.page, 10)),
     'batch-process-modal': showBatchProcessModal,
     'start-batch-process': startBatchProcessing,
-};
 
-const validationActions = {
+    // Validation
     'validate-extraction': (target) => handleValidateExtraction(target.dataset.id, target.dataset.decision),
     'reset-validation': (target) => resetValidationStatus(target.dataset.id),
     'filter-validations': (target) => filterValidationList(target.dataset.status, target),
     'calculate-kappa': calculateKappa,
     'run-extraction-modal': showRunExtractionModal,
     'start-full-extraction': startFullExtraction,
-};
 
-const analysisActions = {
+    // Analyses
     'run-analysis': (target) => runProjectAnalysis(target.dataset.analysisType),
     'atn-analysis': () => showSection('atn-analysis'),
-    'discussion-generation': handleRunDiscussionGeneration,
-    'knowledge-graph': handleRunKnowledgeGraph,
     'run-atn-analysis': handleRunATNAnalysis,
     'show-prisma-modal': () => showPRISMAModal(),
     'save-prisma-progress': savePRISMAProgress,
     'export-prisma-report': exportPRISMAReport,
     'export-analyses': exportAnalyses,
     'show-advanced-analysis-modal': () => openModal('advancedAnalysisModal'),
-    'delete-analysis': (target) => handleDeleteAnalysis(target.dataset.analysisType)
-};
+    'delete-analysis': (target) => handleDeleteAnalysis(target.dataset.analysisType),
+    'run-advanced-analysis': (target) => runProjectAnalysis(target.dataset.analysisType),
+    'view-analysis-results': (target) => {
+        const targetId = target.dataset.targetId;
+        if (!targetId) return;
+        const resultElement = document.getElementById(targetId);
+        if (resultElement) resultElement.style.display = 'block';
+    },
 
-const robActions = { // This was already correct
+    // Risk of Bias (RoB)
     'run-rob-analysis': handleRunRobAnalysis,
     'edit-rob': (target) => fetchAndDisplayRob(target.dataset.articleId, true),
-    'cancel-edit-rob': (target) => fetchAndDisplayRob(target.dataset.articleId, false)
-};
+    'cancel-edit-rob': (target) => fetchAndDisplayRob(target.dataset.articleId, false),
 
-const gridActions = {
+    // Grids
     'create-grid-modal': () => showGridFormModal(),
     'edit-grid': (target) => showGridFormModal(target.dataset.gridId),
     'delete-grid': (target) => handleDeleteGrid(target.dataset.gridId),
     'add-grid-field': addGridFieldInput,
     'triggerGridImport': triggerGridImport,
     'remove-grid-field': removeGridField,
-};
 
-const searchActions = {
-    'show-search-modal': showSearchModal
-};
+    // Search
+    'show-search-modal': showSearchModal,
 
-const chatActions = {
+    // Chat
     'send-chat-message': sendChatMessage,
     'submit-chat-on-enter': (target, event) => {
         if (event.key === 'Enter' && !event.shiftKey) {
@@ -216,57 +195,45 @@ const chatActions = {
             sendChatMessage();
         }
     },
-};
 
-const importExportActions = {
-    'trigger-zotero-import': (target) => document.getElementById('zoteroFileInput').click(),
+    // Import/Export
+    'trigger-zotero-import': () => document.getElementById('zoteroFileInput').click(),
     'show-pmid-import-modal': showPmidImportModal,
-    'trigger-upload-pdfs': (target) => document.getElementById('bulkPDFInput').click(), // Corrected action
+    'trigger-upload-pdfs': () => document.getElementById('bulkPDFInput').click(),
     'index-pdfs': handleIndexPdfs,
     'zotero-sync': handleZoteroSync,
     'export-for-thesis': exportForThesis,
-};
 
-const stakeholderActions = {
+    // Stakeholders
     'manage-stakeholders': showStakeholderManagementModal,
-    'add-stakeholder-group': addStakeholderGroup, // This was already correct
+    'add-stakeholder-group': addStakeholderGroup,
     'run-stakeholder-analysis': runStakeholderAnalysis,
     'delete-stakeholder-group': (target) => deleteStakeholderGroup(target.dataset.groupId),
-};
 
-const reportingActions = {
+    // Reporting
     'generate-bibliography': generateBibliography,
     'generate-summary-table': generateSummaryTable,
     'export-summary-excel': exportSummaryTableExcel,
     'save-prisma-checklist': savePrismaChecklist,
-};
 
-const settingsActions = {
+    // Settings
     'edit-prompt': (target) => showEditPromptModal(target.dataset.promptId),
     'create-prompt-modal': () => showEditPromptModal(null),
     'edit-profile': (target) => showEditProfileModal(target.dataset.id),
     'download-selected-model': handleDownloadSelectedModel,
     'delete-profile': (target) => deleteProfile(target.dataset.profileId),
     'create-profile-modal': () => showEditProfileModal(null),
-    'pull-model-modal': showPullModelModal
-};
+    'pull-model-modal': showPullModelModal,
 
-const clickActions = {
-    ...themeActions,
-    ...uiActions,
-    ...projectActions,
-    ...articleActions,
-    ...validationActions,
-    ...analysisActions,
-    ...robActions,
-    ...gridActions,
-    ...searchActions,
-    ...chatActions,
-    ...importExportActions,
-    ...stakeholderActions,
-    ...reportingActions,
-    ...settingsActions
-    ,...compactModeAction
+    // Tasks
+    'retry-task': handleRetryTask,
+    'cancel-task': handleCancelTask,
+    'set-active-evaluator': (target) => setActiveEvaluator(target.value)
+    ,
+    // Admin Dashboard
+    'admin-refresh-data': () => adminDashboard.refreshData(),
+    'admin-clear-failed-tasks': () => adminDashboard.clearFailedTasks(),
+    'admin-cancel-task': (target) => adminDashboard.cancelTask(target.dataset.taskId)
 };
 
 export function setupDelegatedEventListeners() {
@@ -366,7 +333,7 @@ function updateConnectionIndicatorUI(status) {
     }
 }
 
-export function initializeWebSocket() {
+export async function initializeWebSocket() {
     try {
         if (typeof io !== 'function') {
             console.warn(MESSAGES.socketUnavailable);
@@ -376,8 +343,8 @@ export function initializeWebSocket() {
 
         // ✅ CORRECTION: Forcer la connexion WebSocket vers le backend sur le port 5001,
         // en contournant le serveur de développement (8888).
-        const WEBSOCKET_URL = 'http://localhost:5000';
-        appState.socket = io(WEBSOCKET_URL, { path: '/socket.io/', transports: ['websocket', 'polling'] });
+        const { CONFIG } = await import('./constants.js');
+        appState.socket = io(CONFIG.WEBSOCKET_URL, { path: '/socket.io/', transports: ['websocket', 'polling'] });
 
         appState.socket.on('connect', () => {
             console.log(MESSAGES.websocketConnected);
@@ -426,60 +393,39 @@ export function initializeWebSocket() {
     }
 }
 
+const sectionRefreshActions = {
+    'projects': () => {
+        loadProjects();
+        if (appState.currentProject) {
+            renderProjectDetail(appState.currentProject);
+        }
+    },
+    'results': loadSearchResults,
+    'validation': loadValidationSection,
+    'grids': () => {
+        if (appState.currentProject) {
+            loadProjectGrids(appState.currentProject.id);
+            renderGridsSection(appState.currentProject, elements);
+        }
+    },
+    'rob': loadRobSection,
+    'analyses': () => {
+        if (appState.currentProject) {
+            loadProjectAnalyses();
+        }
+    },
+    'import': () => renderImportSection(appState.currentProject),
+    'search': () => renderSearchSection(appState.currentProject),
+    'settings': renderSettings,
+    'tasks': fetchTasks,
+    'chat': loadChatMessages,
+    'stakeholders': () => renderStakeholdersSection(appState.currentProject),
+};
+
 export async function refreshCurrentSection() {
-    switch (appState.currentSection) {
-        case 'projects':
-            loadProjects(); // Toujours rafraîchir la liste des projets
-            if (appState.currentProject) {
-                renderProjectDetail(appState.currentProject);
-            }
-            break;
-        case 'results':
-            loadSearchResults();
-            break;
-        case 'validation':
-            loadValidationSection(); // This will call renderValidationSection internally
-            break;
-        case 'grids':
-            if (appState.currentProject) {
-                loadProjectGrids(appState.currentProject.id);
-                renderGridsSection(appState.currentProject, elements);
-            }
-            break;
-        case 'rob':
-            loadRobSection();
-            break;
-        case 'analyses':
-            // ✅ CORRECTION CRITIQUE: Appeler renderAnalysesSection() 
-            if (appState.currentProject) {
-                console.log('🔧 Refreshing analyses section');
-                loadProjectAnalyses();
-            }
-            break;
-        case 'import':
-            renderImportSection(appState.currentProject); // This is correct for 'import'
-            break;
-        case 'search':
-            renderSearchSection(appState.currentProject);
-            break;
-        case 'settings':
-            renderSettings();
-            break;
-        case 'tasks':
-            fetchTasks(); // This will call renderTasks internally
-            break;
-        case 'reporting':
-            renderReportingSection(elements);
-            break;
-        case 'chat':
-            loadChatMessages();
-            renderChatInterface();
-            break;
-        case 'stakeholders':
-            renderStakeholdersSection(appState.currentProject); // Use render function
-            break;
-        default:
-            break;
+    const action = sectionRefreshActions[appState.currentSection];
+    if (action) {
+        action();
     }
 }
 

@@ -6,6 +6,13 @@ describe('Workflow de Gestion des Projets - Version Optimisée', () => {
     cy.setupMockAPI();
     
     cy.visit('/', { timeout: 30000 });
+
+    // ✅ CORRECTION CRITIQUE: Appeler l'initialisation manuellement pour éviter la race condition.
+    // Cela garantit que les appels API partent APRÈS que cy.intercept soit prêt.
+    cy.window().then((win) => {
+      expect(win.AnalyLit).to.be.an('object');
+      win.AnalyLit.initializeApplication();
+    });
     
     // ✅ Attente COMPLÈTE de l'app
     cy.waitForAppReady();
@@ -53,7 +60,7 @@ describe('Workflow de Gestion des Projets - Version Optimisée', () => {
     const projectName = `Projet Test ${Date.now()}`;
     
     // ✅ Intercepter API pour tests fiables
-    cy.intercept('POST', '/api/projects/', {
+    cy.intercept('POST', '/api/projects', {
       statusCode: 201,
       body: {
         id: 'test-project-123',
@@ -63,7 +70,7 @@ describe('Workflow de Gestion des Projets - Version Optimisée', () => {
       }
     }).as('createProject');
     
-    cy.intercept('GET', '/api/projects/', {
+    cy.intercept('GET', '/api/projects', {
       statusCode: 200,
       body: {
         projects: [{

@@ -3,7 +3,13 @@ describe('Workflow de Risk of Bias (RoB)', () => {
   beforeEach(() => {
     cy.setupMockAPI();
     cy.visitApp();
-    cy.contains('Projet E2E AnalyLit').click();
+    // ✅ CORRECTION: Appeler l'initialisation manuellement pour garantir que les mocks sont prêts.
+    cy.window().then((win) => {
+      expect(win.AnalyLit).to.be.an('object');
+      win.AnalyLit.initializeApplication();
+    });
+    cy.waitForAppReady();
+    cy.contains('.project-card', 'Projet E2E AnalyLit').click();
     cy.navigateToSection('rob');
   });
 

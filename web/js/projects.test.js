@@ -54,8 +54,6 @@ describe('Module Projects', () => {
     it('devrait charger les projets, les définir dans l\'état et les afficher', async () => {
       const mockProjects = [{ id: '1', name: 'Projet 1' }];
       api.fetchAPI.mockResolvedValue(mockProjects);
-      
-      // ✅ CORRECTION: Simuler l'effet de bord de setProjects pour que appState soit à jour
       state.setProjects.mockImplementation((projects) => {
         appState.projects = projects;
       });
@@ -69,11 +67,8 @@ describe('Module Projects', () => {
 
     it('devrait gérer une erreur lors du chargement des projets', async () => {
       api.fetchAPI.mockRejectedValue(new Error('API Error'));
-
       await projects.loadProjects();
-
       expect(ui.showToast).toHaveBeenCalledWith('Impossible de charger les projets.', 'error');
-      // ✅ CORRECTION: La logique d'erreur appelle displayEmptyProjectsState, qui appelle renderProjectCards.
       expect(ui.renderProjectCards).toHaveBeenCalledWith([]);
     });
   });
@@ -122,7 +117,6 @@ describe('Module Projects', () => {
     it('devrait sélectionner un projet et mettre à jour l\'UI', async () => {
       const projectToSelect = { id: '1', name: 'Projet 1' };
       appState.projects = [projectToSelect];
-      // ✅ CORRECTION: Make the mock update the state so renderProjectDetail works.
       state.setCurrentProject.mockImplementation((project) => {
         appState.currentProject = project;
       });

@@ -11,11 +11,13 @@ describe('Workflow Projets - Version Simplifiée', () => {
   it('Devrait afficher la section projets', () => {
     // Visite l'application et attend que les projets soient chargés.
     cy.visitApp();
-    // ✅ CORRECTION: Appeler l'initialisation manuellement pour éviter les race conditions.
+    // ✅ CORRECTION CRITIQUE: Appeler l'initialisation manuellement pour éviter les race conditions.
     cy.window().then((win) => {
       // Appelle la fonction d'initialisation que nous avons exposée sur window.
       // Cela garantit que les appels API partent APRÈS que cy.intercept soit prêt.
-      win.AnalyLit.initializeApplication();
+      // La vérification 'win.AnalyLit' assure que le script principal est chargé.
+      expect(win.AnalyLit).to.be.an('object');
+      win.AnalyLit.initializeApplication(); 
     });
     cy.waitForAppReady(); // ✅ CORRECTION: Attendre que l'app soit prête et les projets chargés.
     
@@ -28,7 +30,8 @@ describe('Workflow Projets - Version Simplifiée', () => {
     const projectName = 'Mon Projet E2E Test';
     cy.visitApp();
     cy.window().then((win) => {
-      win.AnalyLit.initializeApplication();
+      expect(win.AnalyLit).to.be.an('object');
+      win.AnalyLit.initializeApplication(); 
     });
     cy.waitForAppReady();
     cy.createTestProject({
@@ -47,7 +50,8 @@ describe('Workflow Projets - Version Simplifiée', () => {
   it('Devrait pouvoir naviguer vers les articles', () => {
     cy.visitApp();
     cy.window().then((win) => {
-      win.AnalyLit.initializeApplication();
+      expect(win.AnalyLit).to.be.an('object');
+      win.AnalyLit.initializeApplication(); 
     });
     cy.waitForAppReady();
     

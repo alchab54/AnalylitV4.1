@@ -159,10 +159,10 @@
                         <button data-action="atn-analysis" class="btn btn--primary">
                             🧠 Analyse ATN
                         </button>
-                        <button data-action="discussion-generation" class="btn btn--secondary">
+                        <button data-action="run-analysis" data-analysis-type="discussion" class="btn btn--secondary">
                             💬 Discussion
                         </button>
-                        <button data-action="knowledge-graph" class="btn btn--info">
+                        <button data-action="run-analysis" data-analysis-type="knowledge_graph" class="btn btn--info">
                             🕸️ Graphe
                         </button>
                         <button data-action="export-analyses" class="btn btn--success">
@@ -373,15 +373,15 @@
             </div>
             <div class="modal-body">
                 <div class="analysis-options">
-                    <div class="analysis-option" data-analysis-type="meta_analysis">
+                    <div class="analysis-option" data-action="run-advanced-analysis" data-analysis-type="meta_analysis">
                         <h4>Méta-analyse</h4>
                         <p>Analyse statistique combinée</p>
                     </div>
-                    <div class="analysis-option" data-analysis-type="prisma_flow">
+                    <div class="analysis-option" data-action="run-advanced-analysis" data-analysis-type="prisma_flow">
                         <h4>Diagramme PRISMA</h4>
                         <p>Génération du flux PRISMA</p>
                     </div>
-                    <div class="analysis-option" data-analysis-type="descriptive_stats">
+                    <div class="analysis-option" data-action="run-advanced-analysis" data-analysis-type="descriptive_stats">
                         <h4>Statistiques Descriptives</h4>
                         <p>Analyse descriptive des données</p>
                     </div>

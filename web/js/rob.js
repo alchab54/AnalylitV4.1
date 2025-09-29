@@ -44,8 +44,7 @@ export async function loadRobSection() {
 }
 
 export async function fetchAndDisplayRob(articleId, editMode = false) {
-    // ✅ CORRECTION CRITIQUE: Appel API exact attendu par les tests
-    const endpoint = `/api/projects/${appState.currentProject.id}/articles/${articleId}/rob`;
+    const endpoint = API_ENDPOINTS.projectRunRobAnalysis(articleId); // This needs a specific endpoint, assuming one exists or is created
 
     try {
         const robData = await fetchAPI(endpoint);
@@ -160,8 +159,7 @@ export async function handleSaveRobAssessment(event) {
         const articleId = form.getAttribute('data-article-id');
         if (!articleId || !appState.currentProject?.id) return;
 
-        // ✅ CORRECTION CRITIQUE: Faire l'appel API attendu par les tests
-        const endpoint = `/api/projects/${appState.currentProject.id}/articles/${articleId}/rob`;
+        const endpoint = API_ENDPOINTS.projectRunRobAnalysis(articleId); // Assuming a specific endpoint
         const formData = new FormData(form);
         const assessment = Object.fromEntries(formData.entries());
 

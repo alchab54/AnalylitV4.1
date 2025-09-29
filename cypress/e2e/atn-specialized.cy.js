@@ -2,15 +2,26 @@ describe('Workflow des Analyses ATN Spécialisées', () => {
   const projectName = 'Projet ATN Test';
 
   beforeEach(() => {
-    cy.intercept('GET', '/api/projects/', { fixture: 'projects-empty.json' }).as('getProjects');
-    cy.intercept('POST', '/api/projects/', { fixture: 'test-project.json' }).as('createProject');
-    cy.intercept('GET', '/api/projects/test-project-123/extractions', { fixture: 'extractions.json' }).as('getExtractions');
+    // ✅ CORRECTION: Utiliser les URL sans slash final et les fixtures cohérents.
+    cy.intercept('GET', '/api/projects', { fixture: 'projects.json' }).as('getProjects');
+    cy.intercept('POST', '/api/projects', { fixture: 'test-project.json' }).as('createProject');
+    // ✅ CORRECTION: L'ID du projet dans projects.json est 'test-project-e2e-1'.
+    cy.intercept('GET', '/api/projects/test-project-e2e-1/extractions', { fixture: 'extractions.json' }).as('getExtractions');
 
     cy.visit('/');
+    cy.window().then((win) => {
+      expect(win.AnalyLit).to.be.an('object');
+      win.AnalyLit.initializeApplication();
+    });
     cy.waitForAppReady();
 
+    // ✅ CORRECTION: Attendre la création et le rechargement avant de sélectionner.
     cy.createTestProject(projectName);
-    cy.selectProject(projectName);
+    cy.wait('@createProject');
+    cy.wait('@getProjects');
+
+    // ✅ CORRECTION: Sélectionner le projet qui existe dans le fixture.
+    cy.selectProject('Projet ATN Test'); // Le fixture projects.json contient ce projet.
     cy.navigateToSection('atn-analysis');
   });
 
@@ -23,7 +34,7 @@ describe('Workflow des Analyses ATN Spécialisées', () => {
   it('devrait permettre de charger les articles pour l\'extraction ATN', () => {
     cy.get('.atn-tab[data-tab="extraction"]').click();
     cy.get('button').contains('Charger Articles').click();
-    cy.wait('@getExtractions');
+    cy.wait('@getExtractions'); // ✅ CORRECTION: Attendre explicitement que les données arrivent.
     cy.get('.atn-articles-grid').should('be.visible');
     cy.get('.atn-article-card').should('have.length.greaterThan', 0);
   });

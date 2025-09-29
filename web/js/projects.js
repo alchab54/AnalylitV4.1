@@ -16,7 +16,7 @@ import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
  */
 export async function loadProjects() {
     try {
-        const projects = await fetchAPI(API_ENDPOINTS.projects);
+        const projects = await fetchAPI(API_ENDPOINTS.projects); // This was already correct, the issue is likely in the test setup or another file.
         setProjects(projects || []);
         
         // This function renders the list container and the cards inside it.
@@ -162,7 +162,9 @@ async function handleExportProject(projectId) {
         return;
     }
     
-    window.open(API_ENDPOINTS.projectExport(projectId), '_blank');
+    const { getApiUrl } = await import('./api.js');
+    const fullUrl = await getApiUrl(API_ENDPOINTS.projectExport(projectId));
+    window.open(fullUrl, '_blank');
     showToast(MESSAGES.projectExportStarted, 'info');
 }
 

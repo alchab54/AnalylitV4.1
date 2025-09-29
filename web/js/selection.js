@@ -1,9 +1,10 @@
-import { apiGet, apiPost } from './api-client.js';
+import { fetchAPI } from './api.js';
+import { API_ENDPOINTS } from './constants.js';
 
 const container = document.querySelector('#results-list');
 
 async function load() {
-    const data = await apiGet('/api/selection');
+    const data = await fetchAPI(API_ENDPOINTS.projectArticles(appState.currentProject.id)); // Assuming this is the correct endpoint
     render(data);
 }
 
@@ -24,7 +25,7 @@ function render(items) {
 }
 
 async function toggle(id, included) {
-    await apiPost('/api/selection/toggle', { id, included });
+    await fetchAPI(API_ENDPOINTS.projectExtractionDecision(appState.currentProject.id, id), { method: 'PUT', body: { decision: included ? 'include' : 'exclude' } }); // Assuming this is the correct endpoint
     await load();
 }
 

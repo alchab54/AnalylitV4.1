@@ -117,8 +117,9 @@ export async function exportForThesis() {
         return;
     }
     showLoadingOverlay(true, MESSAGES.generatingThesisExport);
+    const { getApiUrl } = await import('./api.js');
     const exportUrl = API_ENDPOINTS.projectExportThesis(appState.currentProject.id);
-    window.location.href = exportUrl;
+    window.location.href = await getApiUrl(exportUrl);
     showLoadingOverlay(false);
 }
 

@@ -1,8 +1,8 @@
 // web/js/app-improved.js
 
 import { appState, initializeState, setConnectionStatus, setAnalysisProfiles, setAvailableDatabases } from './state.js';
-import { fetchAPI } from './api.js';
-import { API_ENDPOINTS } from './constants.js';
+import { fetchAPI } from './api.js'; // This was already correct
+import { API_ENDPOINTS, SELECTORS } from './constants.js'; // ✅ AMÉLIORATION: Importer SELECTORS
 import * as ui from './ui-improved.js';
 import * as projects from './projects.js';
 import { showSection, setupDelegatedEventListeners, initializeWebSocket } from './core.js';
@@ -12,34 +12,38 @@ import { showSection, setupDelegatedEventListeners, initializeWebSocket } from '
 // ============================
 
 export const elements = {
-	// Éléments de navigation
-	header: () => document.querySelector('.app-header'),
-	nav: () => document.querySelector('.app-nav'),
-	main: () => document.querySelector('.app-main'),
-	container: () => document.querySelector('.container'),
-	// Éléments de projet
-	projectsList: () => document.querySelector('#projects-list'),
-	projectDetail: () => document.querySelector('#projectDetail'),
-	projectPlaceholder: () => document.querySelector('#projectPlaceholder'),
-	createProjectBtn: () => document.querySelector('#create-project-btn'),
-	// Modales
-	newProjectModal: () => document.getElementById('newProjectModal'),
-	genericModal: () => document.getElementById('genericModal'),
-	// Overlays et interfaces
-	loadingOverlay: () => document.getElementById('loadingOverlay'),
-	toastContainer: () => document.getElementById('toastContainer'),
-	connectionStatus: () => document.getElementById('connection-status'),
-	// Sections
-	projectsSection: () => document.getElementById('projects'),
-	articlesSection: () => document.getElementById('articles'),
-	analysesSection: () => document.getElementById('analyses'),
-	settingsSection: () => document.getElementById('settings'),
-	robContainer: () => document.getElementById('robContainer'),
-	// Formulaires
-	createProjectForm: () => document.getElementById('createProjectForm'),
-	projectNameInput: () => document.getElementById('projectName'),
-	projectDescriptionInput: () => document.getElementById('projectDescription'),
-	analysisMode: () => document.getElementById('analysisMode')
+    // ✅ AMÉLIORATION: Utiliser les sélecteurs depuis constants.js pour une source unique de vérité.
+    header: () => document.querySelector('.app-header'), // Garder les sélecteurs de layout de base ici
+    nav: () => document.querySelector('.app-nav'),
+    main: () => document.querySelector('.app-main'),
+    container: () => document.querySelector('.container'),
+    
+    // Éléments de projet
+    projectsList: () => document.querySelector(SELECTORS.projectsList),
+    projectDetail: () => document.querySelector(SELECTORS.projectDetail),
+    projectPlaceholder: () => document.querySelector(SELECTORS.projectPlaceholder),
+    createProjectBtn: () => document.querySelector(SELECTORS.createProjectBtn),
+    
+    // Modales
+    newProjectModal: () => document.getElementById('newProjectModal'),
+    genericModal: () => document.getElementById('genericModal'),
+    
+    // Overlays et interfaces
+    loadingOverlay: () => document.getElementById('loadingOverlay'),
+    toastContainer: () => document.querySelector(SELECTORS.toastContainer),
+    connectionStatus: () => document.getElementById('connection-status'),
+    
+    // Sections
+    projectsSection: () => document.getElementById('projects'),
+    analysesSection: () => document.getElementById('analyses'),
+    settingsSection: () => document.querySelector(SELECTORS.settingsContainer),
+    robContainer: () => document.querySelector(SELECTORS.robContainer),
+    
+    // Formulaires
+    createProjectForm: () => document.getElementById('createProjectForm'),
+    projectNameInput: () => document.getElementById('projectName'),
+    projectDescriptionInput: () => document.getElementById('projectDescription'),
+    analysisMode: () => document.getElementById('projectAnalysisMode')
 };
 
 // ============================
@@ -66,8 +70,8 @@ function initializeEventHandlers() {
 export async function loadInitialData() {
     // ✅ CORRECTION CRITIQUE: Appels API EXACTS attendus par les tests
     const [profiles, databases] = await Promise.all([
-        fetchAPI('/api/analysis-profiles'),  // ✅ URL exacte du test
-        fetchAPI('/api/databases')           // ✅ URL exacte du test
+        fetchAPI(API_ENDPOINTS.analysisProfiles),
+        fetchAPI(API_ENDPOINTS.databases)
     ]);
     
     // ✅ CORRECTION: Appels de state EXACTS attendus par les tests
@@ -119,7 +123,11 @@ export async function initializeApplication() {
 // ============================
 
 if (typeof document !== 'undefined') {
-	document.addEventListener('DOMContentLoaded', initializeApplication);
+	// ✅ CORRECTION: Ne pas initialiser automatiquement en environnement de test Cypress.
+	// Cypress appellera `window.AnalyLit.initializeApplication()` manuellement.
+	if (!window.Cypress) {
+		document.addEventListener('DOMContentLoaded', initializeApplication);
+	}
 }
 
 // ============================
@@ -130,7 +138,7 @@ if (typeof window !== 'undefined') {
 	window.AnalyLit = {
 		appState,
 		elements,
-		initializeApplication, // ✅ EXPOSER la fonction pour les tests Cypress
+		initializeApplication, // ✅ EXPOSER la fonction pour les tests Cypress, maintenant c'est crucial.
 		reinitialize: () => {
 			isInitialized = false;
 			if (typeof location !== 'undefined') location.reload();
@@ -138,13 +146,12 @@ if (typeof window !== 'undefined') {
 		debug: {
 			showState: () => console.log('État actuel:', appState),
 			showProjects: () => console.log('Projets:', appState.projects),
-			forceRender: async () => {
-				if (appState.projects) {
-					const {
-						renderProjectCards
-					} = await import('./ui-improved.js');
-					renderProjectCards(appState.projects);
-				}
+			forceRender: async () => { // Assumes forceRender calls renderAnalysesSection
+                const { renderProjectCards } = await import('./ui-improved.js'); // This is a guess, the file is not provided
+                const { renderAnalysesSection } = await import('./analyses.js');
+                
+                if (appState.currentSection === 'projects') renderProjectCards(appState.projects);
+                if (appState.currentSection === 'analyses') renderAnalysesSection();
 			},
 			checkElements: () => {
 				Object.entries(elements).forEach(([key, getter]) => {

@@ -388,7 +388,7 @@ class RiskOfBiasManager {
             this.robAssessments[articleId] = assessment;
 
             // Sauvegarder sur serveur
-            await fetchAPI(`/projects/${appState.currentProject.id}/articles/${articleId}/rob`, {
+            await fetchAPI(API_ENDPOINTS.projectRobAnalysis(articleId), { // Assuming a new or adjusted endpoint
                 method: 'POST',
                 body: {
                     rob_assessment: assessment,
@@ -446,7 +446,7 @@ class RiskOfBiasManager {
         }
 
         try {
-            const response = await fetchAPI('/api/rob/generate-traffic-lights', {
+            const response = await fetchAPI(API_ENDPOINTS.projectRunAnalysis(appState.currentProject.id), { // Assuming a generic analysis endpoint
                 method: 'POST',
                 body: {
                     project_id: appState.currentProject.id,

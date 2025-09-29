@@ -1,9 +1,18 @@
 // Client API CORRIGÉ pour éviter les doubles /api/
+
+/**
+ * Constructs the full API URL including the base path and /api prefix.
+ * @param {string} endpoint - The API endpoint (e.g., '/projects').
+ * @returns {Promise<string>} The full URL for the API endpoint.
+ */
+export async function getApiUrl(endpoint) {
+    const { CONFIG } = await import('./constants.js');
+    const API_BASE_URL = `${CONFIG.API_BASE_URL}/api`;
+    return `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+}
+
 export async function fetchAPI(endpoint, options = {}) {
-    // ✅ CORRECTION: Utiliser une URL absolue pour appeler directement le backend sur le port 5001,
-    // en contournant le proxy du serveur de développement (http-server sur 8888).
-    const API_BASE_URL = 'http://localhost:5000';
-    const url = `${API_BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+    const url = await getApiUrl(endpoint);
 
     const isFormData = options.body instanceof FormData;
 

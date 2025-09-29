@@ -412,7 +412,7 @@ class ATNAnalyzer {
         try {
             this.updateExtractionProgress('Lancement de l\'extraction ATN spécialisée...');
 
-            const response = await fetchAPI(`/projects/${appState.currentProject.id}/run-analysis`, {
+            const response = await fetchAPI(API_ENDPOINTS.projectRunAnalysis(appState.currentProject.id), {
                 method: 'POST',
                 body: {
                     type: 'atn_specialized_extraction',
@@ -439,7 +439,7 @@ class ATNAnalyzer {
         const poll = async () => {
             try {
                 // Vérifier le statut de la tâche (adapter selon votre API)
-                const status = await fetchAPI(`/api/tasks/${taskId}/status`);
+                const status = await fetchAPI(API_ENDPOINTS.tasksStatus); // Assuming this endpoint can take a task_id query param or similar
                 
                 if (status.state === 'SUCCESS') {
                     this.updateExtractionProgress('✅ Extraction ATN terminée avec succès !');
@@ -499,7 +499,7 @@ class ATNAnalyzer {
 
         const poll = async () => {
             try {
-                const status = await fetchAPI(`/api/tasks/${taskId}/status`);
+                const status = await fetchAPI(API_ENDPOINTS.tasksStatus); // Assuming this endpoint can take a task_id query param or similar
                 
                 if (status.state === 'SUCCESS') {
                     this.displayEmpathyResults(status.result);
