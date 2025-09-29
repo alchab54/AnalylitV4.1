@@ -1,6 +1,7 @@
 import json
 import pytest
 from utils.models import AnalysisProfile
+from utils.database import seed_default_data
 import uuid
 
 def test_api_analysis_profiles_crud_workflow(client, db_session):
@@ -13,6 +14,9 @@ def test_api_analysis_profiles_crud_workflow(client, db_session):
     4. DELETE (Supprimer) le profil personnalisé.
     5. DELETE (Échec) la suppression d'un profil par défaut.
     """
+    
+    # --- 0. Seed Data (Assurer que le profil "Standard" existe) ---
+    seed_default_data(db_session)
     
     # --- 1. POST (Créer) ---
     profile_data = {

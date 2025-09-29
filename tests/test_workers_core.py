@@ -123,16 +123,23 @@ class TestWorkersCore:
         
         # Worker avec priorité: high > default > low
         worker = Worker([high_queue, default_queue, low_queue], connection=rq_connection)
-        worker.work(burst=True)
-        
-        # Vérifier que toutes les tâches sont terminées
+        # Process one job from high queue
+        worker.work(burst=True) 
         high_job.refresh()
-        default_job.refresh() 
-        low_job.refresh()
-        
         assert high_job.is_finished
+        assert high_job.return_value() == 4
+
+        # Process one job from default queue
+        worker.work(burst=True) 
+        default_job.refresh()
         assert default_job.is_finished
+        assert default_job.return_value() == 9
+        
+        # Process one job from low queue
+        worker.work(burst=True) 
+        low_job.refresh()
         assert low_job.is_finished
+        assert low_job.return_value() == 2
 
     def test_worker_job_timeout(self, worker_queues, rq_connection):
         """Vérifier la gestion des timeouts"""

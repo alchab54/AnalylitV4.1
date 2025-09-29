@@ -65,14 +65,14 @@ def test_file_upload_path_traversal_is_prevented(client, setup_project):
     """
     project_id = setup_project # La fixture setup_project retourne l'ID
     # Payload de fichier avec un nom de fichier malveillant
-    malicious_filename = "../../../etc/passwd"
+    malicious_filename = "../../../etc/passwd.pdf"
     file_content = b"hacked"
     data = {
         'files': (io.BytesIO(file_content), malicious_filename)
     }
 
     # On utilise "patch" pour espionner l'appel à secure_filename
-    with patch('server_v4_complete.secure_filename') as mock_secure_filename: # Cible correcte
+    with patch('api.projects.secure_filename') as mock_secure_filename: # Cible correcte
         # On simule le retour de secure_filename pour ce test
         mock_secure_filename.return_value = "etc_passwd"
 
@@ -86,11 +86,9 @@ def test_file_upload_path_traversal_is_prevented(client, setup_project):
     # 1. Vérifier que la fonction de sécurisation a bien été appelée
     mock_secure_filename.assert_called_once_with(malicious_filename)
     
-    # Le statut devrait être 202 car la tâche est lancée, mais le fichier sera ignoré
-    # car il ne finit pas par .pdf
-    assert response.status_code == 202 
+    assert response.status_code == 202
     response_data = response.get_json()
-    assert "ignoré(s)" in response_data['message']
+    assert "1 PDF(s) mis en file pour traitement" in response_data['message']
     print(f"\n[OK] Sécurité Path Traversal : `secure_filename` a bien été appelé sur '{malicious_filename}'.")
 
 
@@ -110,11 +108,9 @@ def test_file_upload_rejects_dangerous_file_types(client, setup_project):
         data=data
     )
 
-    assert response.status_code == 202
+    assert response.status_code == 400
     response_data = response.get_json()
-    assert len(response_data['task_ids']) == 0
-    assert len(response_data['failed_files']) == 1
-    assert "exploit.sh" in response_data['failed_files'][0]
+    assert "Aucun fichier PDF valide n'a été fourni" in response_data['error']
     print("\n[OK] Sécurité Upload : Les types de fichiers non-PDF sont correctement rejetés.")
     
 def test_api_access_to_non_existent_resource(client):

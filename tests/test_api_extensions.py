@@ -179,10 +179,10 @@ def test_api_admin_queues_status(mock_bg_q, mock_an_q, mock_syn_q, mock_proc_q, 
     Teste l'endpoint d'administration des files (queues) pour le monitoring.
     """
     # ARRANGE
-    mock_proc_q.name = 'analylit_processing_v4'; mock_proc_q.__len__.return_value = 5
-    mock_syn_q.name = 'analylit_synthesis_v4'; mock_syn_q.__len__.return_value = 2
-    mock_an_q.name = 'analylit_analysis_v4'; mock_an_q.__len__.return_value = 0
-    mock_bg_q.name = 'analylit_background_v4'; mock_bg_q.__len__.return_value = 1
+    mock_proc_q.name = 'analylit_processing_v4'; mock_proc_q.count = 5
+    mock_syn_q.name = 'analylit_synthesis_v4'; mock_syn_q.count = 2
+    mock_an_q.name = 'analylit_analysis_v4'; mock_an_q.count = 0
+    mock_bg_q.name = 'analylit_background_v4'; mock_bg_q.count = 1
     
     mock_worker_instance = MagicMock(); mock_worker_instance.queue_names.return_value = ['analylit_processing_v4', 'analylit_background_v4']
     mock_worker.all.return_value = [mock_worker_instance]

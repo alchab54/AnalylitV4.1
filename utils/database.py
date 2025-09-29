@@ -82,6 +82,7 @@ def seed_default_data(session):
     try:
         if not session.query(AnalysisProfile).filter_by(name='Standard').first():
             session.add(AnalysisProfile(name='Standard', is_custom=False))
+            session.flush() # Make it available for the next query
         if not session.query(Project).filter_by(name='Projet par défaut').first():
             session.add(Project(name='Projet par défaut'))
         session.commit()

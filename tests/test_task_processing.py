@@ -850,7 +850,7 @@ def test_index_project_pdfs_task(db_session, mocker, mock_embedding_model):
     
     mock_notify.assert_any_call(project_id, 'indexing_completed', f'{total_pdfs} PDF(s) ont été traités et indexés.', {'task_name': 'indexation'})
     
-@patch('tasks_v4_complete.fetch_unpaywall_pdf_url') # <-- CHEMIN CORRIGÉ
+@patch('utils.fetchers.fetch_unpaywall_pdf_url') # <-- CHEMIN CORRIGÉ
 def test_fetch_online_pdf_task(mock_unpaywall, db_session, mocker):
     """Teste le téléchargement de PDF via Unpaywall."""
     # ARRANGE

@@ -15,7 +15,7 @@ class TestThesisExport:
     """Tests complets pour l'export spécialisé thèse"""
 
     # La fixture 'client' est maintenant injectée directement
-    @patch('server_v4_complete.format_bibliography')
+    @patch('api.projects.format_bibliography')
     @patch('pandas.DataFrame.to_excel')
     def test_thesis_excel_export_comprehensive(self, mock_to_excel, mock_format_bib, client, db_session):
         """

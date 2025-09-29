@@ -7,6 +7,10 @@ from unittest.mock import patch, MagicMock
 
 # Import des modèles nécessaires
 from utils.models import Project, Grid, Prompt, Extraction
+# Import des tâches pour les mocks
+from tasks_v4_complete import pull_ollama_model_task, run_extension_task
+
+
 
 # =================================================================
 # 1. Tests pour le CRUD des Grilles et Prompts
