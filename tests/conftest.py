@@ -71,7 +71,10 @@ def app(request):
     # The app context is pushed here so that db.create_all() has access to the app.
     # This creates the schema ONCE per worker session.
     with _app.app_context():
-        db.create_all()
+        # ✅ Conditionally create tables: only if it's a PostgreSQL test DB
+        if db_uri.startswith("postgresql"):
+            db.create_all()
+
         yield _app
         db.drop_all()
 
@@ -95,7 +98,7 @@ def db_session(app, request):
     Starts a transaction before each test and rolls it back after.
     This is the fastest and most reliable way to isolate tests.
     """
-    with app.app_context():
+    with app.app_context(): 
         connection = db.engine.connect()
         transaction = connection.begin()
 

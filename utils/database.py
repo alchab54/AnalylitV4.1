@@ -49,12 +49,6 @@ def init_database(database_url=None, is_test: bool = False):
         # Import models here to ensure SCHEMA is correctly set based on os.environ['TESTING']
         from . import models
         
-        # Conditionally create schema only if it's defined (i.e., not in test mode)
-        if models.SCHEMA:
-            with engine.connect() as connection:
-                connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {models.SCHEMA}"))
-                connection.commit()
-        
         Base.metadata.create_all(bind=engine)
         SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
         logger.info("✅ Base de données initialisée avec succès.")
