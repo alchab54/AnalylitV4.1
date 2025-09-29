@@ -41,12 +41,14 @@ def app():
     with _app.app_context():
         # On nettoie et on crée le schéma une seule fois au début de la session.
         # C'est la seule opération destructrice, et elle se produit avant que les
-        # workers parallèles ne démarrent leurs transactions.
-        db.drop_all()
-        db.create_all()
+        # workers parallèles ne démarrent leurs transactions. 
+        # ✅ CORRECTION: Ces lignes sont supprimées. La création du schéma est maintenant
+        # entièrement gérée par le service `migrate` et Alembic au démarrage de Docker.
+        # db.drop_all()
+        # db.create_all()
         yield _app
         # Le nettoyage final se fait à la fin de toute la session.
-        db.drop_all()
+        # db.drop_all() # Commenté aussi pour éviter de supprimer le schéma entre les sessions de test.
 
 # ✅ SOLUTION: Remplacer la fixture 'clean_db' par une fixture 'autouse'
 # qui s'assure que chaque test utilise une session transactionnelle.

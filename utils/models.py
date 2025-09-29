@@ -8,8 +8,10 @@ from datetime import datetime
 import uuid
 import json
 from .db_base import Base  # Importer la Base partagée
- 
-SCHEMA = 'analylit_schema' if os.getenv('TESTING') != 'true' else None
+
+# ✅ CORRECTION: Forcer l'utilisation du même schéma en mode test et en mode production
+# pour éliminer les erreurs "relation does not exist".
+SCHEMA = 'analylit_schema'
 
 def _uuid():
     return str(uuid.uuid4())
