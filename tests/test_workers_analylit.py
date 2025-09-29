@@ -74,28 +74,29 @@ class TestAnalyLitWorkers:
     
     def test_discussion_analysis_worker(self, analysis_queue, rq_connection):
         """Test worker d'analyse de discussion"""
-        # Configure the mock directly at the module level
-        DiscussionGenerator.return_value.generate.return_value = {
-            "summary": "Test discussion analysis",
-            "key_themes": ["theme1", "theme2"],
-            "word_count": 1500
-        }
+        # Patch DiscussionGenerator pour ce test spécifique
+        with patch('tests.test_workers_analylit.DiscussionGenerator') as mock_gen_class:
+            mock_gen_instance = mock_gen_class.return_value
+            mock_gen_instance.generate.return_value = {
+                "summary": "Test discussion analysis",
+                "key_themes": ["theme1", "theme2"],
+            }
 
-        job = analysis_queue.enqueue(
-            discussion_task_for_test,
-            "proj-123", 
-            [{"title": "Test Article", "abstract": "Test abstract"}], 
-            meta={"analysis_type": "discussion"}
-        )
-        
-        worker = Worker([analysis_queue], connection=rq_connection)
-        worker.work(burst=True)
-        
-        job.refresh()
-        assert job.is_finished
-        result = job.return_value()
-        assert "summary" in result
-        assert "key_themes" in result
+            job = analysis_queue.enqueue(
+                discussion_task_for_test,
+                "proj-123", 
+                [{"title": "Test Article", "abstract": "Test abstract"}], 
+                meta={"analysis_type": "discussion"}
+            )
+            
+            worker = Worker([analysis_queue], connection=rq_connection)
+            worker.work(burst=True)
+            
+            job.refresh()
+            assert job.is_finished
+            result = job.return_value()
+            assert "summary" in result
+            assert "key_themes" in result
 
     def test_search_worker_with_database(self, analysis_queue, rq_connection):
         """Test worker de recherche avec vraie base"""

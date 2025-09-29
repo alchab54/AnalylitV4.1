@@ -23,6 +23,10 @@ def test_database_models_work():
     # Créer un moteur SQLite en mémoire
     engine = create_engine("sqlite:///:memory:")
     
+    # Retirer le préfixe de schéma pour la compatibilité avec SQLite
+    for table in Base.metadata.tables.values():
+        table.schema = None
+
     # Créer toutes les tables
     Base.metadata.create_all(engine)
     
@@ -59,6 +63,10 @@ def test_seed_default_data_function():
     # Créer un moteur SQLite en mémoire
     engine = create_engine("sqlite:///:memory:")
     
+    # Retirer le préfixe de schéma pour la compatibilité avec SQLite
+    for table in Base.metadata.tables.values():
+        table.schema = None
+
     # Créer toutes les tables
     Base.metadata.create_all(engine)
     

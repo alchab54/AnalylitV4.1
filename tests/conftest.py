@@ -47,7 +47,8 @@ def app():
         # que les tests ne commencent.
         migrate.init_app(_app, db)
         db.drop_all() # Assure un état propre avant les migrations
-        migrate.upgrade() # Applique toutes les migrations Alembic
+        from flask_migrate import upgrade
+        upgrade() # Applique toutes les migrations Alembic
 
         yield _app
 
