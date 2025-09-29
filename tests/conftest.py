@@ -17,7 +17,7 @@ _db_lock = threading.Lock()
 
 # --- IMPORTS DE L'APPLICATION ---
 from backend.server_v4_complete import create_app
-from utils.database import db, migrate
+from utils.extensions import db, migrate
 from sqlalchemy import text
 
 @pytest.fixture(scope='session')

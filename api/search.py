@@ -7,7 +7,7 @@ from datetime import datetime
 from flask import Blueprint, jsonify, request
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
-from utils.database import with_db_session
+from utils.extensions import db
 from utils.app_globals import background_queue
 from backend.tasks_v4_complete import multi_database_search_task
 from utils.fetchers import db_manager
@@ -24,8 +24,7 @@ def get_available_databases():
         return jsonify([]), 200
 
 @search_bp.route('/search', methods=['POST'])
-@with_db_session
-def search_multiple_databases(session):
+def search_multiple_databases():
     data = request.get_json(force=True)
     project_id = data.get('project_id')
     databases = data.get('databases', ['pubmed'])
@@ -46,15 +45,15 @@ def search_multiple_databases(session):
     main_query_to_save = next(iter(expert_queries.values())) if is_expert_mode and expert_queries else simple_query
     
     try:
-        session.execute(text("""
+        db.session.execute(text("""
             UPDATE projects
             SET search_query = :q, databases_used = :dbs, status = 'searching', updated_at = :now
             WHERE id = :pid
         """), {"q": main_query_to_save, "dbs": json.dumps(databases), "now": datetime.now().isoformat(), "pid": project_id})
-        session.commit() # Commit the changes to the database
+        db.session.commit() # Commit the changes to the database
     except SQLAlchemyError as e:
         logger.error(f"Erreur DB saving search params: {e}", exc_info=True)
-        session.rollback() # Rollback in case of error
+        db.session.rollback() # Rollback in case of error
         return jsonify({'error': 'Erreur interne'}), 500
 
     task_kwargs = {
@@ -65,14 +64,13 @@ def search_multiple_databases(session):
     return jsonify({'message': f'Recherche lancée dans {len(databases)} base(s)', 'job_id': job.id}), 202
 
 @search_bp.route('/projects/<project_id>/search-stats', methods=['GET'])
-@with_db_session
-def get_project_search_stats(session, project_id):
+def get_project_search_stats(project_id):
     try:
         uuid.UUID(project_id, version=4)
     except ValueError:
         return jsonify({'error': 'ID de projet invalide'}), 400
 
-    stats = session.execute(text("""
+    stats = db.session.execute(text("""
         SELECT database_source, COUNT(*) as count
         FROM search_results WHERE project_id = :pid
         GROUP BY database_source

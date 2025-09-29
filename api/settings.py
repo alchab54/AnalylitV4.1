@@ -2,7 +2,7 @@
 
 from flask import Blueprint, request, jsonify
 import logging
-from utils.database import with_db_session
+from utils.extensions import db
 
 logger = logging.getLogger(__name__)
 
@@ -10,8 +10,7 @@ logger = logging.getLogger(__name__)
 settings_bp = Blueprint("settings_bp", __name__)
 
 @settings_bp.route("/api/settings/models", methods=["GET"])
-@with_db_session
-def get_available_models(session):
+def get_available_models():
     """Retourne la liste des modèles Ollama disponibles."""
     try:
         # TODO: Implémenter la logique pour récupérer les modèles depuis Ollama
