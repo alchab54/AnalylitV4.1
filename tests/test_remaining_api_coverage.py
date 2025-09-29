@@ -8,22 +8,6 @@ from unittest.mock import patch, MagicMock
 # Import des modèles nécessaires
 from utils.models import Project, Grid, Prompt, Extraction
 
-# Import des tâches pour vérifier les appels enqueue
-from backend.tasks_v4_complete import pull_ollama_model_task, run_extension_task
-
-# --- Fixture pour un projet de test ---
-
-@pytest.fixture
-def setup_project(db_session):
-    """Crée un projet simple et le stocke en BDD."""
-    project = Project(
-        id=str(uuid.uuid4()),
-        name="Projet de Test pour Couverture"
-    )
-    db_session.add(project)
-    db_session.commit()
-    return project
-
 # =================================================================
 # 1. Tests pour le CRUD des Grilles et Prompts
 # =================================================================
@@ -83,7 +67,7 @@ def test_api_prompt_update(client, db_session):
         content="Ancien template."
     )
     db_session.add(prompt)
-    db_session.commit()
+    db_session.flush()
     prompt_id = prompt.id
 
     # --- 1. PUT (Mettre à jour) ---
@@ -112,7 +96,7 @@ def test_api_get_extractions(client, db_session, setup_project):
     ext2 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid2", title="Titre 2")
     db_session.add_all([ext1, ext2])
     
-    db_session.commit()
+    db_session.flush()
 
     # --- 1. GET (Lire) ---
     response_get = client.get(f'/api/projects/{project_id}/extractions')
@@ -171,14 +155,14 @@ def test_api_admin_endpoints(client):
     # --- 2. POST apiqueuesclear (Vérifie l'appel .empty()) ---
     # On mock la méthode .empty() de l'objet 'processing_queue'
     with patch('server_v4_complete.processing_queue.empty') as mock_queue_empty:
-        response_clear = client.post('/api/queues/clear', json={'queue_name': 'analylit_processing_v4'})
+        response_clear = client.post('/api/admin/queues/clear', json={'queue_name': 'analylit_processing_v4'})
         
         assert response_clear.status_code == 200
         assert "vidés" in response_clear.json['message']
         mock_queue_empty.assert_called_once() # Vérifie que la file a bien été vidée
 
     # --- 3. POST apiqueuesclear (Test échec) ---
-    response_clear_fail = client.post('/api/queues/clear', json={'queue_name': 'file_inexistante'})
+    response_clear_fail = client.post('/api/admin/queues/clear', json={'queue_name': 'file_inexistante'})
     assert response_clear_fail.status_code == 404
     assert "non trouvée" in response_clear_fail.json['error']
 

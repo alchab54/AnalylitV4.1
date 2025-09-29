@@ -92,7 +92,7 @@ def test_search_task_adds_articles_to_db(db_session, mocker):
     project_id = str(uuid.uuid4()) # Déjà unique, c'est bon.
     project = Project(id=project_id, name="Test Search")
     db_session.add(project)
-    db_session.commit() 
+    db_session.flush() 
 
     mock_search_results = [
         {'id': 'pmid1', 'title': 'Article 1', 'abstract': 'Abstract 1', 'database_source': 'pubmed'},
@@ -106,7 +106,7 @@ def test_search_task_adds_articles_to_db(db_session, mocker):
     multi_database_search_task.__wrapped__(
         db_session, project_id=project_id, query="test query", databases=['pubmed'], max_results_per_db=2
     )
-    db_session.commit() 
+    db_session.flush() 
 
     # ASSERT
     results = db_session.query(SearchResult).filter_by(project_id=project_id).all()
@@ -128,7 +128,7 @@ def test_multi_database_search_task_resilience_on_fetcher_failure(db_session, mo
     project_id = str(uuid.uuid4()) # Déjà unique, c'est bon.
     project = Project(id=project_id, name="Test Resilience")
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
 
     # Simuler une erreur pour PubMed, mais un succès pour arXiv
     mocker.patch('tasks_v4_complete.db_manager.search_pubmed', side_effect=Exception("PubMed API down"))
@@ -153,9 +153,9 @@ def test_process_single_article_task_insufficient_content(db_session, mocker):
     search_result = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id=article_id, title="Test Title", abstract="")
 
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
     db_session.add(search_result)
-    db_session.commit()
+    db_session.flush()
 
     mocker.patch('tasks_v4_complete.extract_text_from_pdf', return_value=None)
     mock_log_status = mocker.patch('tasks_v4_complete.log_processing_status')
@@ -192,9 +192,9 @@ def test_process_single_article_task_full_extraction_with_pdf_and_grid(db_sessio
     grid = Grid(id=grid_id, project_id=project_id, name="Test Grid", fields=json.dumps([{"name": "population"}]))
 
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
     db_session.add_all([search_result, grid])
-    db_session.commit()
+    db_session.flush()
 
     mock_pdf_text = "Texte PDF contenant des infos sur la population: 500 patients. Ce texte doit être suffisamment long pour passer la validation de 100 caractères, sinon la tâche utilisera le résumé (abstract) qui est trop court."
     mock_ai_response = {"population": "500 patients"}
@@ -208,7 +208,7 @@ def test_process_single_article_task_full_extraction_with_pdf_and_grid(db_sessio
         db_session, project_id, article_id, {"extract_model": "test-model"}, "full_extraction", grid_id
     )
 
-    db_session.commit()
+    db_session.flush()
 
     # ASSERT
     result = db_session.execute(
@@ -240,7 +240,7 @@ def test_process_single_article_task_screening_mode(mock_ollama_api, db_session,
     abstract="Et ceci est un résumé assez long pour que le test passe la vérification de longueur minimale."
     )   
     db_session.add_all([project, search_result])
-    db_session.commit()
+    db_session.flush()
 
     mock_ai_response = {"relevance_score": 8.5, "justification": "Très pertinent."}
     mock_ollama_api.return_value = mock_ai_response
@@ -272,9 +272,9 @@ def test_run_synthesis_task_filters_by_score(db_session, mocker):
     ext3 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid3", relevance_score=4.0)
 
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
     db_session.add_all([sr1, sr2, sr3, ext1, ext2, ext3])
-    db_session.commit()
+    db_session.flush()
 
     mock_ai_response = {"synthesis_summary": "Synthèse basée sur 2 articles."}
     mock_ollama_api = mocker.patch('tasks_v4_complete.call_ollama_api', return_value=mock_ai_response)
@@ -307,7 +307,7 @@ def test_run_discussion_generation_task(db_session, mocker):
     
     # CORRECTION ForeignKeyViolation : Commiter le parent (Project) d'abord.
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
 
     # Données valides (seront utilisées)
     sr1 = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id=f"pmid_{uuid.uuid4().hex[:6]}", title="Article 1")
@@ -321,7 +321,7 @@ def test_run_discussion_generation_task(db_session, mocker):
 
     # Commiter les enfants après que le parent existe.
     db_session.add_all([sr1, ext1, sr2, ext2])
-    db_session.commit()
+    db_session.flush()
 
     mock_draft_text = "Ceci est le brouillon de discussion généré."
     
@@ -356,9 +356,9 @@ def test_run_atn_stakeholder_analysis_task_aggregation_logic(db_session, mocker)
     ext2 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid2", extracted_data=ext2_data)
 
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
     db_session.add_all([ext1, ext2])
-    db_session.commit()
+    db_session.flush()
 
     mocker.patch('tasks_v4_complete.send_project_notification')
     mocker.patch('matplotlib.pyplot.savefig') 
@@ -387,9 +387,9 @@ def test_add_manual_articles_task_ignores_duplicates(db_session, mocker):
     sr_existing = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id="12345", title="Existant")
     
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
     db_session.add(sr_existing)
-    db_session.commit()
+    db_session.flush()
     
     def dynamic_fetch_side_effect(article_id_input):
         common_data = {'abstract': '', 'authors': '', 'doi': '', 'journal': '', 'publication_date': '', 'url': '', 'database_source': 'manual'}
@@ -427,7 +427,7 @@ def test_answer_chat_question_task_rag_logic(db_session, mocker, mock_embedding_
     project = Project(id=project_id, name="Chat RAG Project")
 
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
 
     mock_query_results = {'documents': [["Contexte trouvé sur le sujet A."]]}
     mock_embedding_vector_list = [[0.1, 0.2, 0.3]] # Ce que .tolist() DOIT retourner (2D)
@@ -452,7 +452,7 @@ def test_answer_chat_question_task_rag_logic(db_session, mocker, mock_embedding_
     # ACT
     answer_chat_question_task.__wrapped__(db_session, project_id, question)
 
-    db_session.commit()
+    db_session.flush()
 
     # ASSERT
     mock_chroma_instance.get_collection.assert_called_once_with(name=f"project_{project_id}")
@@ -481,7 +481,7 @@ def test_import_pdfs_from_zotero_task(db_session, mocker):
     project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Zotero PDF Test")
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
 
     pmids_to_fetch = ["12345"]
 
@@ -526,7 +526,7 @@ def test_run_risk_of_bias_task(db_session, mocker):
     article_id = f"rob_test_{uuid.uuid4().hex[:8]}"
     project = Project(id=project_id, name="RoB Test")
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
 
     mock_pdf_text = "Texte PDF de plus de 500 caractères pour valider la logique de la tâche et s'assurer qu'elle ne s'arrête pas prématurément. " * 10
     mock_rob_response = {
@@ -577,12 +577,12 @@ def test_run_knowledge_graph_task(db_session, mocker):
     profile = AnalysisProfile(id=profile_id, name="Profil KG", extract_model="test-kg-model")
     project = Project(id=project_id, name="Test KG", profile_used=profile_id)
     db_session.add_all([profile, project])
-    db_session.commit()
+    db_session.flush()
 
     ext1 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid1", title="Article sur A et B")
     ext2 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid2", title="Article sur B et C")
     db_session.add_all([ext1, ext2])
-    db_session.commit()
+    db_session.flush()
 
     mock_graph_json = {"nodes": [{"id": "pmid1"}, {"id": "pmid2"}], "edges": [{"from": "pmid1", "to": "pmid2"}]}
     mock_ollama = mocker.patch('tasks_v4_complete.call_ollama_api', return_value=mock_graph_json)
@@ -590,7 +590,7 @@ def test_run_knowledge_graph_task(db_session, mocker):
 
     # ACT
     run_knowledge_graph_task.__wrapped__(db_session, project_id)
-    db_session.commit() # Commit the changes made by the task
+    db_session.flush() # Commit the changes made by the task
     
     # ASSERT
     mock_ollama.assert_called_once_with(mocker.ANY, model="test-kg-model", output_format="json")
@@ -609,13 +609,13 @@ def test_run_prisma_flow_task(db_session, mocker):
     project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Test PRISMA")
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
 
     sr1 = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id="pmid1")
     sr2 = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id="pmid2")
     ext1 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid1") # 1 inclus (parce qu'il existe)
     db_session.add_all([sr1, sr2, ext1])
-    db_session.commit()
+    db_session.flush()
 
     mock_savefig = mocker.patch('matplotlib.pyplot.savefig')
     mocker.patch('matplotlib.pyplot.close')
@@ -645,13 +645,13 @@ def test_run_meta_analysis_task(db_session, mocker):
     project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Test Meta")
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
 
     ext1 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid1", relevance_score=8.0)
     ext2 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid2", relevance_score=9.0)
     ext3 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid3", relevance_score=7.0)
     db_session.add_all([ext1, ext2, ext3])
-    db_session.commit()
+    db_session.flush()
 
     mock_savefig = mocker.patch('matplotlib.pyplot.savefig')
     mocker.patch('matplotlib.pyplot.close')
@@ -679,13 +679,13 @@ def test_run_descriptive_stats_task(db_session, mocker):
     project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Test Stats")
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
 
     ext1 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid1", relevance_score=10.0)
     ext2 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid2", relevance_score=5.0)
     ext3 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid3", relevance_score=0.0)
     db_session.add_all([ext1, ext2, ext3])
-    db_session.commit()
+    db_session.flush()
     mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
 
     # ACT
@@ -710,7 +710,7 @@ def test_run_atn_score_task(db_session, mocker):
     project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Test ATN Score")
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
 
     # Score: alliance (3) + numérique (3) + patient (2) + empathie (2) = 10
     ext1_data = json.dumps({"description": "Analyse de l'alliance therapeutique numerique et de l'empathie du patient."})
@@ -720,7 +720,7 @@ def test_run_atn_score_task(db_session, mocker):
     ext2_data = json.dumps({"description": "Un article sans grand rapport."}) # "rapport" contains "app"
     ext2 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid2", title="Non ATN", extracted_data=ext2_data)
     db_session.add_all([ext1, ext2])
-    db_session.commit()
+    db_session.flush()
 
     mock_savefig = mocker.patch('matplotlib.pyplot.savefig')
     mocker.patch('matplotlib.pyplot.close')
@@ -748,7 +748,7 @@ def test_calculate_kappa_task(db_session, mocker):
     project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Test Kappa")
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
 
     # Accord Parfait (1.0)
     val1 = json.dumps({"evaluator1": "include", "evaluator2": "include"})
@@ -764,7 +764,7 @@ def test_calculate_kappa_task(db_session, mocker):
     ext4 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid4", validations=val4)
     
     db_session.add_all([ext1, ext2, ext3, ext4])
-    db_session.commit()
+    db_session.flush()
     mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
 
     # ACT
@@ -796,7 +796,7 @@ def test_index_project_pdfs_task(db_session, mocker, mock_embedding_model):
     project_id = str(uuid.uuid4()) # Déjà unique.
     project = Project(id=project_id, name="Test Index RAG")
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
 
     # Mocks pour ChromaDB
     mock_chroma_instance = MagicMock()
@@ -860,7 +860,7 @@ def test_fetch_online_pdf_task(mock_unpaywall, db_session, mocker):
     project = Project(id=project_id, name="Test Fetch PDF")
     sr = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id=article_id, doi="10.1234/test")
     db_session.add_all([project, sr])
-    db_session.commit()
+    db_session.flush()
 
     mock_pdf_url = "http://example.com/mock.pdf"
     mock_pdf_content = b'%PDF-1.4...test content...'

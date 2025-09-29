@@ -41,7 +41,7 @@ class TestThesisExport:
         extraction = Extraction(project_id=project_id, pmid=article_id_to_include, user_validation_status="include")
 
         db_session.add_all([search_result, extraction])
-        db_session.commit()
+        db_session.flush()
 
         # --- ACT (Action) ---
         # Utiliser le client de test fourni par la fixture
@@ -63,7 +63,7 @@ class TestThesisExport:
         db_session.add(project)
         db_session.flush()
         project_id = project.id
-        db_session.commit()
+        db_session.flush()
 
         # --- ACT & ASSERT ---
         # 1. Récupérer la checklist de base
@@ -98,7 +98,7 @@ class TestThesisExport:
         db_session.flush()
         project_id = project.id
         db_session.add(SearchResult(project_id=project_id, article_id="PMID1", title="Article 1"))
-        db_session.commit()
+        db_session.flush()
 
         # --- ACT & ASSERT ---
         with patch('server_v4_complete.analysis_queue.enqueue') as mock_enqueue:

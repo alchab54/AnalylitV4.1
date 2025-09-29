@@ -68,14 +68,16 @@ def app(request):
     }
     _app = create_app(test_config)
 
+    # The app context is pushed here so that db.create_all() has access to the app.
+    # This creates the schema ONCE per worker session.
     with _app.app_context():
         db.create_all()
         yield _app
         db.drop_all()
 
     # Si on a utilisé PostgreSQL, on nettoie la base de données créée
-    if worker_id != "master" and db_name:
-        # Réutiliser la même logique d'engine pour le nettoyage
+    # ✅ CORRECTION: S'assurer que maintenance_uri est défini avant d'être utilisé.
+    if worker_id != "master" and db_name and 'maintenance_uri' in locals():
         engine = create_engine(maintenance_uri, isolation_level="AUTOCOMMIT")
         with engine.connect() as conn:
             conn.execute(text(f"DROP DATABASE {db_name}"))
@@ -86,13 +88,32 @@ def client(app):
     with app.test_client() as client:
         yield client
 
-@pytest.fixture
-def db_session(app):
-    """Fournit une session de base de données par test."""
+@pytest.fixture(scope="function")
+def db_session(app, request):
+    """
+    ✅ THE DEFINITIVE FIX: Provides a transactional scope for tests.
+    Starts a transaction before each test and rolls it back after.
+    This is the fastest and most reliable way to isolate tests.
+    """
     with app.app_context():
+        connection = db.engine.connect()
+        transaction = connection.begin()
+
+        # Bind the session to the transaction; this is the key step.
+        # The app's db.session will now use this transaction.
+        db.session.configure(bind=connection)
+        db.session.begin_nested()
+
+        # This is a 'teardown' function that pytest will call after the test has run.
+        @request.addfinalizer
+        def teardown():
+            # Rollback the overall transaction and close the connection
+            transaction.rollback()
+            connection.close()
+            # Unbind the session
+            db.session.remove()
+
         yield db.session
-        db.session.rollback()
-        db.session.remove()
 
 @pytest.fixture
 def setup_project(db_session):
@@ -108,7 +129,9 @@ def setup_project(db_session):
         created_at=datetime.utcnow()
     )
     db_session.add(project)
-    db_session.commit()
+    # ✅ CORRECTION: Ne pas commiter ici. La fixture db_session gère la transaction.
+    # Le commit peut causer des deadlocks en parallèle. On flush pour obtenir l'ID.
+    db_session.flush()
     yield project
 
 @pytest.fixture  
@@ -123,7 +146,9 @@ def clean_db(db_session):
     db_session.query(AnalysisProfile).delete()
     db_session.query(Project).delete()
     db_session.query(Prompt).delete()
-    db_session.commit()
+    # ✅ CORRECTION: Remplacer commit() par flush() pour rester dans la transaction du test.
+    # Le commit() est la cause des deadlocks en mode parallèle.
+    db_session.flush()
     yield db_session
 
 @pytest.fixture(scope="function")

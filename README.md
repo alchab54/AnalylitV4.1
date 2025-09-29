@@ -15,7 +15,7 @@
 
 ✅ **149 tests automatisés** - 100% de réussite  
 ✅ **95.2% de couverture** de code critique  
-✅ **Architecture microservices** validée  
+✅ **Architecture transactionnelle** validée pour les tests parallèles  
 ✅ **Sécurité enterprise** testée  
 ✅ **Performance scalable** certifiée  
 ✅ **Standards internationaux** conformes (PRISMA-ScR, JBI)  

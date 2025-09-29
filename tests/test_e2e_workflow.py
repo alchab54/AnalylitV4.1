@@ -40,7 +40,7 @@ def test_full_end_to_end_workflow(client, db_session):
         Extraction(project_id=project_id, pmid="e2e_pmid_2")
     ]
     db_session.add_all(extractions_to_add)
-    db_session.commit()
+    db_session.flush()
     
     # === ÉTAPE 3: Prise de décision de screening ===
     extraction_to_include = db_session.query(Extraction).filter_by(project_id=project_id, pmid="e2e_pmid_1").one()
@@ -52,7 +52,7 @@ def test_full_end_to_end_workflow(client, db_session):
     # Il faut un profil d'analyse
     profile = AnalysisProfile(name=f"Default Profile E2E - {uuid.uuid4().hex}", is_custom=False)
     db_session.add(profile)
-    db_session.commit()
+    db_session.flush()
     profile_id = profile.id
     
     synthesis_data = {"profile": profile_id}

@@ -19,7 +19,7 @@ def large_project(db_session):
     """
     project = Project(name="Projet Scalabilité (10k articles)")
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
 
     # Utiliser une insertion en masse pour la performance
     articles_to_insert = [
@@ -32,7 +32,7 @@ def large_project(db_session):
         ) for i in range(10000)
     ]
     db_session.bulk_save_objects(articles_to_insert)
-    db_session.commit()
+    db_session.flush()
     
     return project.id
 

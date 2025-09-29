@@ -10,17 +10,6 @@ from utils.models import Project, AnalysisProfile, SearchResult, ChatMessage
 
 # --- Fixture pour un projet de test (utilisée par plusieurs tests) ---
 
-@pytest.fixture
-def setup_project(db_session):
-    """Crée un projet simple et le stocke en BDD."""
-    project = Project(
-        id=str(uuid.uuid4()),
-        name="Projet de Test pour Couverture"
-    )
-    db_session.add(project)
-    db_session.commit()
-    return project
-
 # =================================================================
 # 1. Tests pour le CRUD des Profils d'Analyse
 # =================================================================
@@ -48,7 +37,7 @@ def test_api_get_search_results_pagination(client, db_session, setup_project):
             )
         )
     db_session.add_all(articles_to_create)
-    db_session.commit()
+    db_session.flush()
 
     # --- Test Page 1 ---
     response_p1 = client.get(f'/api/projects/{project_id}/search-results?page=1&per_page=10&sort_by=title&sort_order=asc')
@@ -125,7 +114,7 @@ def test_api_get_chat_history(client, db_session, setup_project):
     
     db_session.add_all([msg1_user, msg3_final, msg2_assistant])
     
-    db_session.commit()
+    db_session.flush()
 
     # --- Test GET History ---
     response = client.get(f'/api/projects/{project_id}/chat-history')
@@ -169,7 +158,7 @@ def test_api_get_search_results_pagination(client, db_session, setup_project):
             )
         )
     db_session.add_all(articles_to_create)
-    db_session.commit()
+    db_session.flush()
 
     # --- Test Page 1 ---
     response_p1 = client.get(f'/api/projects/{project_id}/search-results?page=1&per_page=10&sort_by=title&sort_order=asc')
@@ -246,7 +235,7 @@ def test_api_get_chat_history(client, db_session, setup_project):
     
     db_session.add_all([msg1_user, msg3_final, msg2_assistant])
     
-    db_session.commit()
+    db_session.flush()
 
     # --- Test GET History ---
     response = client.get(f'/api/projects/{project_id}/chat-history')

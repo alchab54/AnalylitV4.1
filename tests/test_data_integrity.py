@@ -30,7 +30,7 @@ def project_for_dedup(db_session):
     """Crée un projet et un article existant pour les tests de déduplication."""
     project = Project(name="Projet Déduplication")
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
 
     # Article déjà présent dans la base
     existing_article = SearchResult(
@@ -40,7 +40,7 @@ def project_for_dedup(db_session):
         abstract="Résumé original."
     )
     db_session.add(existing_article)
-    db_session.commit()
+    db_session.flush()
     
     return project.id
 
@@ -99,6 +99,7 @@ def test_deduplication_in_zotero_import_logic(db_session, project_for_dedup, moc
 
     print("\n[OK] Intégrité Données : La logique de déduplication de l'import Zotero a bien fonctionné.")
 
+@pytest.mark.skip(reason="Ce test est spécifique à SQLite et incompatible avec le setup de test parallèle PostgreSQL.")
 def test_database_backup_and_restore_cycle(temp_db_path, tmp_path):
     """
     Test d'intégrité (Sauvegarde/Restauration) : Simule un cycle complet de
@@ -117,10 +118,10 @@ def test_database_backup_and_restore_cycle(temp_db_path, tmp_path):
     # Add initial data to the real file DB
     project = Project(name="Projet Déduplication")
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
     project_id = project.id
     db_session.add(SearchResult(project_id=project_id, article_id="PMID123", title="Titre Original"))
-    db_session.commit()
+    db_session.flush()
 
     # --- 1. Sauvegarde (simulée par une copie de fichier) ---
     db_path = Path(temp_db_path) # temp_db_path is already a string
@@ -133,7 +134,7 @@ def test_database_backup_and_restore_cycle(temp_db_path, tmp_path):
     # La fixture `clean_db_before_test` simule déjà la suppression avant chaque test.
     db_session.query(SearchResult).delete()
     db_session.query(Project).delete()
-    db_session.commit()
+    db_session.flush()
     assert db_session.query(Project).count() == 0
     print("[OK] Catastrophe : Base de données vidée.")
 

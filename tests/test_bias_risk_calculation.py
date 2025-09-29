@@ -10,7 +10,7 @@ def setup_test_data(db_session):
     # Créer un projet
     project = Project(name="Project for RoB Test")
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
 
     # Créer un article associé au projet
     article = SearchResult(
@@ -20,7 +20,7 @@ def setup_test_data(db_session):
         abstract="This is an abstract."
     )
     db_session.add(article)
-    db_session.commit()
+    db_session.flush()
 
     # Créer une extraction pour cet article
     extraction = Extraction(
@@ -28,7 +28,7 @@ def setup_test_data(db_session):
         pmid="pmid_rob_123"
     )
     db_session.add(extraction)
-    db_session.commit()
+    db_session.flush()
 
     return project.id, "pmid_rob_123"
 

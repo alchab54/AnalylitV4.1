@@ -18,20 +18,6 @@ from utils.prisma_scr import get_base_prisma_checklist
 # FIXTURES SPÉCIFIQUES À CE FICHIER
 # =================================================================
 
-@pytest.fixture
-def setup_project(db_session: Session):
-    """
-    Crée un projet de test et le retourne en tant qu'objet ORM complet.
-    Le commit assure qu'il est visible par l'application Flask.
-    """
-    project = Project(
-        id=str(uuid.uuid4()),
-        name=f"Test Project {uuid.uuid4().hex[:8]}", 
-        description="A test project")
-    db_session.add(project)
-    db_session.commit()
-    return project
-
 # ================================================================
 # CATEGORIE 1: GESTION DES ENTITÉS (GRILLES, PROMPTS)
 # ================================================================
@@ -115,7 +101,7 @@ def test_api_full_validation_workflow(client: FlaskClient, db_session: Session, 
     # 1. Setup
     extraction = Extraction(project_id=project_id, pmid=article_id, title="Test Workflow Validation")
     db_session.add(extraction)
-    db_session.commit()
+    db_session.flush()
     extraction_id_db = extraction.id
 
     # 2. Étape 1: Eval 1 prend une décision

@@ -9,7 +9,7 @@ def test_run_atn_score_task_no_extractions(db_session):
     """Test that the task handles projects with no extractions."""
     project_id = str(uuid.uuid4())
     db_session.execute(text("INSERT INTO projects (id, name) VALUES (:id, :name)"), {'id': project_id, 'name': 'Test Project'})
-    db_session.commit()
+    db_session.flush()
     
     run_atn_score_task.__wrapped__(db_session, project_id)
     
@@ -35,7 +35,7 @@ def test_run_atn_score_task_scoring_logic(db_session):
             text("INSERT INTO extractions (id, project_id, pmid, title, extracted_data) VALUES (:id, :pid, :pmid, :title, :data)"),
             {'id': str(uuid.uuid4()), 'pid': project_id, 'pmid': ext['pmid'], 'title': ext['title'], 'data': ext['extracted_data']}
         )
-    db_session.commit()
+    db_session.flush()
 
     # Run the task
     run_atn_score_task.__wrapped__(db_session, project_id)

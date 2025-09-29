@@ -119,6 +119,10 @@ docker compose up --build
 - [ ] Liens vers les issues résolues
 - [ ] Tests ajoutés/mis à jour
 
+### ✅ **Règle d'Or pour les Tests**
+N'utilisez **JAMAIS** `db_session.commit()` dans un test. Utilisez `db_session.flush()` si vous avez besoin de persister des données pour les lire dans le même test. La fixture `db_session` gère automatiquement le `rollback` pour garantir l'isolation.
+
+
 ## 📝 Standards de Code
 
 ### **Convention Commits**

@@ -17,17 +17,6 @@ from utils.models import Project, SearchResult
 
 # --- Fixture pour un projet de test (utilisée par plusieurs tests) ---
 
-@pytest.fixture
-def setup_project(db_session):
-    """Crée un projet simple et le stocke en BDD."""
-    project = Project(
-        id=str(uuid.uuid4()),
-        name="Projet de Test pour Logique"
-    )
-    db_session.add(project)
-    db_session.commit()
-    return project
-
 # =================================================================
 # 1. Tests pour utils.analysis.py
 # =================================================================

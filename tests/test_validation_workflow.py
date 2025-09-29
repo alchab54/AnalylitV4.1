@@ -11,7 +11,7 @@ def setup_double_coding_data(db_session):
     """Crée un projet et deux articles pour tester le double codage."""
     project = Project(name="Project for Validation Test")
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
 
     articles_data = [
         {"id": "pmid_kappa_1", "title": "Article A"},
@@ -24,7 +24,7 @@ def setup_double_coding_data(db_session):
         db_session.add(article)
         db_session.add(extraction)
     
-    db_session.commit()
+    db_session.flush()
     return project.id
 
 # ----- TESTS DU WORKFLOW DE VALIDATION ET KAPPA -----

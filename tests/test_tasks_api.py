@@ -15,7 +15,7 @@ def test_project(db_session):
     """Fixture pour créer un projet de test réutilisable."""
     project = Project(id=str(uuid.uuid4()), name="Test Project for Tasks")
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
     return project
 
 def test_search_returns_task_id(client, test_project):

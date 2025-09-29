@@ -301,7 +301,7 @@ def test_api_run_pipeline_enqueues_tasks(mock_enqueue, client, db_session):
     profile_id = str(uuid.uuid4()) # Déjà unique, c'est bon.
     profile = AnalysisProfile(id=profile_id, name="Standard Profile", preprocess_model="model1", extract_model="model2", synthesis_model="model3")
     db_session.add(profile)
-    db_session.commit()
+    db_session.flush()
 
     # 2. Créer le projet
     project_data = {'name': 'API Test Run', 'mode': 'screening'}

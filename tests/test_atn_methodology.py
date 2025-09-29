@@ -18,7 +18,7 @@ def setup_atn_project(db_session):
     """Crée un projet et des extractions avec des données ATN de référence."""
     project = Project(name="Projet Test Méthodologie ATN")
     db_session.add(project)
-    db_session.commit()
+    db_session.flush()
 
     # Données de référence pour valider les calculs
     extraction_1_data = {
@@ -43,7 +43,7 @@ def setup_atn_project(db_session):
     ext3 = Extraction(project_id=project.id, pmid="atn3", extracted_data=json.dumps(extraction_3_data))
 
     db_session.add_all([ext1, ext2, ext3])
-    db_session.commit()
+    db_session.flush()
 
     return project.id
 

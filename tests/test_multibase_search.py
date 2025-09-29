@@ -18,7 +18,7 @@ def test_multi_database_search_task_expert_mode(mock_db_session, mocker):
     """
     project_id = str(uuid.uuid4())
     mock_db_session.execute(text("INSERT INTO projects (id, name) VALUES (:id, :name)"), {'id': project_id, 'name': 'Test Project Expert'})
-    mock_db_session.commit()
+    mock_db_session.flush()
 
     databases = ['pubmed', 'arxiv']
     
@@ -60,7 +60,7 @@ def test_multi_database_search_task_expert_mode_partial(mock_db_session, mocker)
     """
     project_id = str(uuid.uuid4())
     mock_db_session.execute(text("INSERT INTO projects (id, name) VALUES (:id, :name)"), {'id': project_id, 'name': 'Test Project Partial'})
-    mock_db_session.commit()
+    mock_db_session.flush()
 
     databases = ['pubmed', 'arxiv'] # L'utilisateur a coché les deux
     simple_query = "ignored query"
