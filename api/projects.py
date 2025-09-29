@@ -231,7 +231,7 @@ def import_validations(session, project_id):
 @projects_bp.route('/projects/<project_id>/run-discussion-draft', methods=['POST'])
 def run_discussion_draft(project_id):
     job = discussion_draft_queue.enqueue(run_discussion_generation_task, project_id=project_id, job_timeout=1800)
-    return jsonify({"message": "Génération du brouillon de discussion lancée", "task_id": job.id}), 202
+    return jsonify({"message": "Génération du brouillon de discussion lancée", "job_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/chat', methods=['POST'])
 def chat_with_project(project_id):
@@ -240,7 +240,7 @@ def chat_with_project(project_id):
     if not question:
         return jsonify({"error": "Question is required"}), 400
     job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout=900) # 15 minutes
-    return jsonify({"message": "Question soumise", "task_id": job.id}), 202
+    return jsonify({"message": "Question soumise", "job_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/run', methods=['POST'])
 @with_db_session
@@ -272,7 +272,7 @@ def run_pipeline(session, project_id):
             job_timeout=1800 # 30 minutes
         )
         task_ids.append(job.id)
-    return jsonify({"message": f"{len(task_ids)} tâches de traitement lancées", "task_ids": [str(tid) for tid in task_ids]}), 202
+    return jsonify({"message": f"{len(task_ids)} tâches de traitement lancées", "job_ids": [str(tid) for tid in task_ids]}), 202
 
 @projects_bp.route('/projects/<project_id>/run-analysis', methods=['POST'])
 @with_db_session
@@ -303,7 +303,7 @@ def run_analysis(session, project_id):
         job = queue.enqueue(
             task_func, project_id=project_id, job_timeout=timeout
         )
-        return jsonify({"message": f"Analyse '{analysis_type}' lancée", "task_id": str(job.id)}), 202
+        return jsonify({"message": f"Analyse '{analysis_type}' lancée", "job_id": str(job.id)}), 202
     else:
         return jsonify({"error": f"Type d'analyse inconnu: {analysis_type}"}), 400
 
@@ -327,7 +327,7 @@ def import_zotero_pdfs(project_id):
         zotero_api_key=zotero_api_key,
         job_timeout=3600 # 1 heure
     )
-    return jsonify({"message": "Importation Zotero lancée", "task_id": job.id}), 202
+    return jsonify({"message": "Importation Zotero lancée", "job_id": job.id}), 202
 
 # ✅ CORRECTION: Renommage de la route pour éviter le conflit avec l'import JSON
 @projects_bp.route('/projects/<project_id>/upload-zotero', methods=['POST'])
@@ -351,7 +351,7 @@ def upload_zotero_file(project_id):
             json_file_path=file_path,
             job_timeout=3600 # 1 heure
         )
-        return jsonify({"message": "Importation de fichier Zotero lancée", "imported": len(json.load(open(file_path))['items']), "task_id": job.id}), 202
+        return jsonify({"message": "Importation de fichier Zotero lancée", "imported": len(json.load(open(file_path))['items']), "job_id": job.id}), 202
     except Exception as e:
         logger.error(f"Erreur lors de l'upload du fichier Zotero: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
@@ -370,7 +370,7 @@ def import_zotero_json_extension(project_id):
         items_list=items_list,
         job_timeout=3600 # 1 heure
     )
-    return jsonify({"message": "Importation Zotero JSON lancée", "task_id": job.id}), 202
+    return jsonify({"message": "Importation Zotero JSON lancée", "job_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/run-rob-analysis', methods=['POST'])
 def run_rob_analysis(project_id):
@@ -389,7 +389,7 @@ def run_rob_analysis(project_id):
             job_timeout=1200 # 20 minutes
         )
         task_ids.append(job.id)
-    return jsonify({"message": f"{len(task_ids)} tâches d'analyse de risque de biais lancées", "task_ids": task_ids}), 202
+    return jsonify({"message": f"{len(task_ids)} tâches d'analyse de risque de biais lancées", "job_ids": task_ids}), 202
 
 # ✅ CORRECTION: La route doit correspondre à l'appel du test et du frontend.
 @projects_bp.route('/projects/<project_id>/rob/<article_id>', methods=['POST'])
@@ -456,12 +456,12 @@ def add_manual_articles(project_id):
         identifiers=articles_data,
         job_timeout=3600 # 1 heure
     )
-    return jsonify({"message": f"Ajout de {len(articles_data)} article(s) manuel(s) lancé", "task_id": job.id}), 202
+    return jsonify({"message": f"Ajout de {len(articles_data)} article(s) manuel(s) lancé", "job_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/run-knowledge-graph', methods=['POST'])
 def run_knowledge_graph(project_id):
     job = analysis_queue.enqueue(run_knowledge_graph_task, project_id=project_id, job_timeout=1800) # 30 minutes
-    return jsonify({"message": "Génération du graphe de connaissances lancée", "task_id": job.id}), 202
+    return jsonify({"message": "Génération du graphe de connaissances lancée", "job_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/prisma-checklist', methods=['GET'])
 @with_db_session
@@ -545,4 +545,4 @@ def upload_pdfs_bulk(session, project_id):
     if failed_uploads:
         response_message += f" {len(failed_uploads)} fichier(s) ignoré(s)."
     
-    return jsonify({"message": response_message, "task_ids": task_ids, "failed_files": failed_uploads}), 202
+    return jsonify({"message": response_message, "job_ids": task_ids, "failed_files": failed_uploads}), 202

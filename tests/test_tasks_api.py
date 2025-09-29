@@ -34,10 +34,10 @@ def test_search_returns_task_id(client, test_project):
 
     # 4. Assertions
     assert response.status_code == 202, "La route devrait retourner un statut 202 Accepted"
-    response_data = response.get_json()
-    assert 'task_id' in response_data, "La réponse JSON doit contenir une clé 'task_id'"
-    assert isinstance(response_data['task_id'], str), "Le task_id doit être une chaîne de caractères"
-    assert len(response_data['task_id']) > 10, "Le task_id doit avoir une longueur raisonnable"
+    response_data = response.get_json() # type: ignore
+    assert 'job_id' in response_data, "La réponse JSON doit contenir une clé 'job_id'"
+    assert isinstance(response_data['job_id'], str), "Le job_id doit être une chaîne de caractères"
+    assert len(response_data['job_id']) > 10, "Le job_id doit avoir une longueur raisonnable"
 
 def test_run_discussion_draft_returns_task_id(client, test_project):
     """
@@ -45,13 +45,13 @@ def test_run_discussion_draft_returns_task_id(client, test_project):
     """
     response = client.post(f'/api/projects/{test_project.id}/run-discussion-draft', content_type='application/json')
     assert response.status_code == 202
-    response_data = response.get_json()
-    assert 'task_id' in response_data
+    response_data = response.get_json() # type: ignore
+    assert 'job_id' in response_data
     assert response_data['message'] == 'Génération du brouillon de discussion lancée'
 
 def test_run_knowledge_graph_returns_task_id(client, test_project):
     """
-    Vérifie que la route POST /api/projects/<id>/run-knowledge-graph retourne un task_id.
+    Vérifie que la route POST /api/projects/<id>/run-knowledge-graph retourne un job_id.
     """
     response = client.post(f'/api/projects/{test_project.id}/run-knowledge-graph', content_type='application/json')
     assert response.status_code == 202
@@ -61,7 +61,7 @@ def test_run_knowledge_graph_returns_task_id(client, test_project):
 
 def test_add_manual_articles_returns_task_id(client, test_project):
     """
-    Vérifie que la route POST /api/projects/<id>/add-manual-articles retourne un task_id.
+    Vérifie que la route POST /api/projects/<id>/add-manual-articles retourne un job_id.
     """
     articles_data = {
         "items": [
@@ -72,8 +72,8 @@ def test_add_manual_articles_returns_task_id(client, test_project):
 
     response = client.post(f'/api/projects/{test_project.id}/add-manual-articles', data=json.dumps(articles_data), content_type='application/json')
     assert response.status_code == 202
-    response_data = response.get_json()
-    assert 'task_id' in response_data
+    response_data = response.get_json() # type: ignore
+    assert 'job_id' in response_data
     assert 'Ajout de 2 article(s)' in response_data['message']
 
 def test_cancel_task(client):

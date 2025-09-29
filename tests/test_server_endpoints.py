@@ -216,8 +216,8 @@ def test_api_run_discussion_draft_enqueues_task(mock_enqueue, client, db_session
         job_timeout=1800
     )
 
-    response_data = json.loads(response.data)
-    assert response_data['task_id'] == "mocked_job_id_123"
+    response_data = json.loads(response.data) # type: ignore
+    assert response_data['job_id'] == "mocked_job_id_123"
 
 @patch('api.chat.background_queue.enqueue')
 def test_api_post_chat_message_enqueues_task(mock_enqueue, client, db_session):
@@ -251,8 +251,8 @@ def test_api_post_chat_message_enqueues_task(mock_enqueue, client, db_session):
         job_timeout='15m'
     )
 
-    response_data = json.loads(response.data)
-    assert response_data['task_id'] == "mocked_chat_job_456" # La réponse du serveur est bien 'task_id'
+    response_data = json.loads(response.data) # type: ignore
+    assert response_data['job_id'] == "mocked_chat_job_456" # La réponse du serveur est bien 'job_id'
 
 # =================================================================
 # === DÉBUT DES NOUVEAUX TESTS AJOUTÉS (Couverture restante) ===
@@ -465,9 +465,9 @@ def test_api_run_rob_analysis_enqueues_task(mock_enqueue, client, db_session):
 
     # ASSERT
     assert response.status_code == 202
-    response_data = response.get_json()
-    assert 'task_ids' in response_data
-    assert len(response_data['task_ids']) == 2 # Vérifie le nombre de tâches, pas les IDs exacts
+    response_data = response.get_json() # type: ignore
+    assert 'job_ids' in response_data
+    assert len(response_data['job_ids']) == 2 # Vérifie le nombre de tâches, pas les IDs exacts
 
     assert mock_enqueue.call_count == 2 # Doit être appelé pour pmid100 ET pmid200
     

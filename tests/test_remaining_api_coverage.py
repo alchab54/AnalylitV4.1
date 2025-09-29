@@ -145,9 +145,9 @@ def test_api_admin_endpoints(client):
         response_pull = client.post('/api/ollama/pull', json={'model': 'test-model:latest'})
         
         assert response_pull.status_code == 200
-        response_data = response_pull.json
-        assert 'task_id' in response_data
-        assert response_data['task_id'] == "mock_pull_task_id"
+        response_data = response_pull.json # type: ignore
+        assert 'job_id' in response_data
+        assert response_data['job_id'] == "mock_pull_task_id"
         # Vérifie que la bonne tâche a été appelée avec le bon argument
         mock_enqueue.assert_called_once_with(
             pull_ollama_model_task,
@@ -189,7 +189,7 @@ def test_api_extensions_endpoint(client):
         response = client.post('/api/extensions/run', json=payload)
 
         assert response.status_code == 202
-        assert response.json['task_id'] == "mock_extension_task_id"
+        assert response.json['job_id'] == "mock_extension_task_id"
         
         # Vérifie que la tâche générique 'run_extension_task' est appelée
         mock_enqueue.assert_called_once_with(

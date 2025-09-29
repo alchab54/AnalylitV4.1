@@ -412,7 +412,7 @@ def create_app(config_override=None):
         for article_id in article_ids:
             job = processing_queue.enqueue(process_single_article_task, project_id=project_id, article_id=article_id, profile=profile.to_dict(), analysis_mode=analysis_mode, custom_grid_id=custom_grid_id, job_timeout='30m')
             job_id = str(job.id) if hasattr(job, 'id') else str(uuid.uuid4())
-            task_ids.append(job_id)
+            task_ids.append(job.id)
         return jsonify({"message": f"{len(task_ids)} tâches lancées", "job_ids": task_ids}), 202
 
     @app.route("/api/projects/<project_id>/run-synthesis", methods=["POST"])
@@ -424,7 +424,7 @@ def create_app(config_override=None):
         if not profile:
             return jsonify({"error": "Profil d_analyse non trouvé"}), 404
         job = synthesis_queue.enqueue(run_synthesis_task, project_id=project_id, profile=profile.to_dict(), job_timeout='1h')
-        return jsonify({"message": "Synthèse lancée", "task_id": job.id}), 202
+        return jsonify({"message": "Synthèse lancée", "job_id": job.id}), 202
 
     @app.route("/api/projects/<project_id>/grids/<grid_id>", methods=["PUT"])
     @with_db_session
@@ -516,8 +516,8 @@ def create_app(config_override=None):
                 zotero_user_id=zotero_user_id,
                 zotero_api_key=zotero_api_key,
                 job_timeout='30m'
-            )
-            return jsonify({"message": "Zotero PDF import started", "task_id": str(job.id)}), 202
+            ) # type: ignore
+            return jsonify({"message": "Zotero PDF import started", "job_id": str(job.id)}), 202
         except Exception as e:
             logging.error(f"Erreur d_enqueue pour import Zotero: {e}")
             return jsonify({"error": f"Erreur de traitement: {str(e)}"}), 500   
@@ -551,8 +551,8 @@ def create_app(config_override=None):
                 zotero_api_key=zotero_api_key,
                 job_timeout='1h'
             )
-            task_id = str(job.id) if job and job.id else "unknown"
-            return jsonify({"message": "Zotero import started", "task_id": task_id}), 202
+            job_id = str(job.id) if job and job.id else "unknown"
+            return jsonify({"message": "Zotero import started", "job_id": job_id}), 202
         except Exception as e:
             return jsonify({"error": f"Erreur: {str(e)}"}), 400
     
@@ -578,8 +578,8 @@ def create_app(config_override=None):
                 json_file_path=str(file_path),
                 job_timeout='15m'
             )
-            task_id = str(job.id) if job and job.id else "unknown"
-            return jsonify({"message": "Importation Zotero lancée", "task_id": task_id}), 202
+            job_id = str(job.id) if job and job.id else "unknown"
+            return jsonify({"message": "Importation Zotero lancée", "job_id": job_id}), 202
         except Exception as e:
             logging.error(f"Erreur upload-zotero-file: {e}")
             return jsonify({"error": f"Erreur: {str(e)}"}), 400
@@ -622,8 +622,8 @@ def create_app(config_override=None):
         response_message = f"{len(successful_uploads)} PDF(s) mis en file pour traitement."
         if failed_uploads:
             response_message += f" {len(failed_uploads)} fichier(s) ignoré(s) (format invalide ou erreur)."
-            return jsonify({"message": response_message, "task_ids": task_ids, "failed_files": failed_uploads}), 202
-        return jsonify({"message": response_message, "task_ids": task_ids, "failed_files": failed_uploads}), 202
+            return jsonify({"message": response_message, "job_ids": task_ids, "failed_files": failed_uploads}), 202
+        return jsonify({"message": response_message, "job_ids": task_ids, "failed_files": failed_uploads}), 202
 
     @app.route('/api/projects/<project_id>/export/thesis', methods=['GET'])
     @with_db_session
@@ -686,7 +686,7 @@ def create_app(config_override=None):
         # L_endpoint de test attend un message spécifique pour 2 articles.
         message = f"Ajout de {len(items)} article(s) en cours..."
         job = background_queue.enqueue(add_manual_articles_task, project_id=project_id, identifiers=items, job_timeout='10m')
-        return jsonify({"message": message, "task_id": str(job.id)}), 202
+        return jsonify({"message": message, "job_id": str(job.id)}), 202
 
     @app.route('/api/projects/<project_id>/run-rob-analysis', methods=['POST'])
     @with_db_session
@@ -712,8 +712,8 @@ def create_app(config_override=None):
                 job_timeout='30m'
             )
             task_ids.append(job.id)
-        # --- FIN DE LA CORRECTION ---
-        return jsonify({"message": "RoB analysis initiated", "task_ids": task_ids}), 202
+        # --- FIN DE LA CORRECTION --- # type: ignore
+        return jsonify({"message": "RoB analysis initiated", "job_ids": task_ids}), 202
     
     # ==================== ROUTES API CHAT ====================
     @app.route('/api/projects/<project_id>/calculate-kappa', methods=['POST'])
@@ -721,7 +721,7 @@ def create_app(config_override=None):
     def trigger_kappa_calculation(session, project_id):
         """Déclenche le calcul du coefficient Kappa pour un projet."""
         job = background_queue.enqueue(calculate_kappa_task, project_id=project_id, job_timeout='5m')
-        return jsonify({"message": "Kappa calculation task enqueued", "task_id": job.id}), 202
+        return jsonify({"message": "Kappa calculation task enqueued", "job_id": job.id}), 202
 
 
     @app.route("/api/projects/<project_id>/chat", methods=["POST"])
@@ -737,9 +737,9 @@ def create_app(config_override=None):
             job_timeout='15m'
             )
             # Assurez-vous de retourner l_ID du job
-            task_id = str(job.id) if job and job.id else "unknown"
-            logging.debug(f"Chat endpoint returning: {{'message': 'Question soumise', 'task_id': {task_id}}}")
-            return jsonify({"message": "Question soumise", "task_id": task_id}), 202
+            job_id = str(job.id) if job and job.id else "unknown"
+            logging.debug(f"Chat endpoint returning: {{'message': 'Question soumise', 'job_id': {job_id}}}")
+            return jsonify({"message": "Question soumise", "job_id": job_id}), 202
         except Exception as e:
             logging.error(f"Erreur lors de l_enqueue du chat: {e}")
             return jsonify({"error": "Erreur interne du serveur"}), 500
@@ -845,7 +845,7 @@ def create_app(config_override=None):
             model_name,
             job_timeout='30m'
         )
-        return jsonify({"message": f"Téléchargement du modèle '{model_name}' lancé", "task_id": job.get_id()}), 200
+        return jsonify({"message": f"Téléchargement du modèle '{model_name}' lancé", "job_id": job.get_id()}), 200
 
     @app.route('/api/tasks/status', methods=['GET'])
     @with_db_session
@@ -953,7 +953,7 @@ def create_app(config_override=None):
             result_ttl=3600,
         )
         logger.info("Job enqueued: %s", job.id)
-        return jsonify({"task_id": job.id, "message": "Extension lancée"}), 202
+        return jsonify({"job_id": job.id, "message": "Extension lancée"}), 202
 
     # --- ROUTES POUR SERVIR L_INTERFACE UTILISATEUR (FRONTEND) ---
     # Ces routes doivent être DÉFINIES AVANT les routes API génériques comme /<path:path>
