@@ -644,6 +644,20 @@ def create_app(config_override=None):
             logging.error(f"Erreur lors de l_export de la thèse: {e}")
             return jsonify({"error": "Erreur lors de la génération de l_export"}), 500
 
+def format_bibliography(articles: list) -> str:
+    """
+    Formate une liste d'articles en une chaîne de bibliographie simple.
+    Cette fonction était manquante, causant une NameError critique.
+    """
+    entries = []
+    for article in articles:
+        authors = article.get('authors', 'N.A.').split(';')[0] if article.get('authors') else 'N.A.'
+        year = article.get('publication_date', 'N.D.').split('-')[0] if article.get('publication_date') else 'N.D.'
+        title = article.get('title', 'Sans titre')
+        journal = article.get('journal', 'N.D.')
+        entries.append(f"- {authors} ({year}). {title}. *{journal}*.")
+    return "\n".join(sorted(entries))
+
     @with_db_session
     def add_manual_articles_route(session, project_id):
         """Ajoute manuellement des articles à un projet via une tâche de fond."""

@@ -74,11 +74,19 @@ def truncate_text(text: str, max_length: int = 100, suffix: str = "...") -> str:
         return text
     return text[:max_length - len(suffix)] + suffix
 
-def format_bibliography(articles: list) -> list:
-    """Format bibliography for thesis export."""
-    bibliography = []
+def format_bibliography(articles: list) -> str:
+    """
+    Formate une liste d'articles en une chaîne de bibliographie simple.
+    """
+    entries = []
     for article in articles:
-        # Format simple pour les tests
-        citation = f"{article.get('authors', 'Unknown')}. ({article.get('publication_date', 'n.d.')}). {article.get('title', 'No title')}. {article.get('journal', 'Unknown journal')}."
-        bibliography.append(citation)
-    return bibliography
+        # Assurer que les auteurs et la date sont des chaînes avant de les manipuler
+        authors_str = article.get('authors', 'N.A.') or 'N.A.'
+        date_str = article.get('publication_date', 'N.D.') or 'N.D.'
+        
+        authors = authors_str.split(';')[0]
+        year = date_str.split('-')[0]
+        title = article.get('title', 'Sans titre')
+        journal = article.get('journal', 'N.D.')
+        entries.append(f"- {authors} ({year}). {title}. *{journal}*.")
+    return "\n".join(sorted(entries))
