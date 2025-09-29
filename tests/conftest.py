@@ -34,21 +34,38 @@ def app():
     pour toute la session de test. C'est beaucoup plus rapide.
     """
     # ✅ CORRECTION : Le nom d'hôte doit correspondre au `container_name` défini dans docker-compose.yml.
-    # L'ancien nom 'test-db' n'est plus résolu par le DNS de Docker.
-    test_db_url = 'postgresql://analylit_user:strong_password@analylit_test_db:5432/analylit_test_db'
+    test_db_url = os.getenv('TEST_DATABASE_URL', 'postgresql://analylit_user:strong_password@analylit_test_db:5432/analylit_test_db')
     
     # ✅ CORRECTION : Forcer une configuration de test isolée.
     _app = create_app({
         'TESTING': True,
-        'SQLALCHEMY_DATABASE_URI': test_db_url
+        'SQLALCHEMY_DATABASE_URI': test_db_url,
+        'SQLALCHEMY_ENGINE_OPTIONS': {
+            'pool_size': 5,
+            'pool_recycle': 120,
+            'pool_pre_ping': True,
+            "connect_args": {
+                "options": f"-csearch_path={AnalysisProfile.__table_args__['schema']}"
+            }
+        }
     })
     with _app.app_context():
-        # ✅ CORRECTION FINALE: Appliquer les migrations sur la base de données de TEST.
-        # C'est l'étape cruciale qui manquait. Cela garantit que la base de données
-        # de test a le bon schéma (`analylit_schema`) et toutes les tables avant
-        # que les tests ne commencent.
+        # Initialiser migrate AVANT les opérations
         migrate.init_app(_app, db)
-        db.drop_all() # Assure un état propre avant les migrations
+
+        # Nettoyer complètement avant de commencer
+        try:
+            db.session.execute(text(f"DROP SCHEMA IF EXISTS {AnalysisProfile.__table_args__['schema']} CASCADE;"))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(f"Avertissement lors du nettoyage du schéma : {e}")
+
+        # Créer le schéma et appliquer les migrations
+        db.session.execute(text(f"CREATE SCHEMA IF NOT EXISTS {AnalysisProfile.__table_args__['schema']};"))
+        db.session.commit()
+
+        # Appliquer les migrations Alembic
         from flask_migrate import upgrade
         upgrade() # Applique toutes les migrations Alembic
 
@@ -72,19 +89,18 @@ def db_session(app):
     à la fin, sans affecter les autres tests.
     """
     with app.app_context(): 
-        # Utiliser une connexion unique pour la durée de la fixture
-        with db.engine.connect() as connection:
-            # Démarrer une transaction
-            transaction = connection.begin()
-            # Lier la session de l'application à cette connexion transactionnelle
-            session = db.Session(bind=connection)
-            db.session = session # Remplacer la session globale par notre session de test
+        connection = db.engine.connect()
+        transaction = connection.begin()
+        
+        # Lier la session de l'application à cette connexion transactionnelle
+        session = db.Session(bind=connection)
+        db.session = session # Remplacer la session globale par notre session de test
 
-            yield session
-
-            # Après chaque test, la transaction est annulée, nettoyant toutes les données
-            transaction.rollback()
-            session.close()
+        yield session
+        
+        session.close()
+        transaction.rollback()
+        connection.close()
 
 @pytest.fixture(scope="function")
 def setup_project(db_session):
