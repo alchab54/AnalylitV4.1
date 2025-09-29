@@ -118,10 +118,6 @@ def run_migrations_online():
         with context.begin_transaction():
             context.run_migrations()
 
-    # 4. Create alembic_version table manually
-    with connectable.connect() as connection:
-        connection.execute(text(f"CREATE TABLE IF NOT EXISTS {SCHEMA}.alembic_version (version_num VARCHAR(32) NOT NULL, CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num))"))
-
 
 if context.is_offline_mode():
     run_migrations_offline()
