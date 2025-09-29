@@ -115,7 +115,6 @@ docker-compose.override.yml
 # ===============================================
 # Application logs
 *.log
-logs/
 log/
 gunicorn.log
 celery.log
@@ -171,6 +170,7 @@ site/
 !backend/config/profiles.json
 !backend/config/grille-ATN.json
 !migrations/
+!/.gitkeep
 !docker/
 !scripts/
 
