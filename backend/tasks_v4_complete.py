@@ -68,14 +68,11 @@ from utils.logging_config import setup_logging
 config = get_config()
 
 logger = logging.getLogger(__name__)
-PROJECTS_DIR = Path(getattr(config, 'PROJECTS_DIR', '/tmp/projects'))
+PROJECTS_DIR = Path(getattr(config, 'PROJECTS_DIR', '/tmp/projects')) # type: ignore
 PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 
-# --- Base de Données (SQLAlchemy Uniquement) ---
-# ✅ CORRECTION: Ne pas créer de session globale ici. La session sera injectée par le décorateur.
-engine = create_engine(config.DATABASE_URL, pool_pre_ping=True)
-SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
-Session = scoped_session(SessionFactory)
+# ❌ SUPPRESSION: La création globale de l'engine et de la session est la source du conflit de base de données.
+# La session sera maintenant gérée par le contexte de l'application Flask.
 
 # --- Embeddings / Vector store (RAG) ---
 EMBEDDING_MODEL_NAME = getattr(config, "EMBEDDING_MODEL", "all-MiniLM-L6-v2")
@@ -102,26 +99,25 @@ def with_db_session(func):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        # ✅ CORRECTION: Logique de session robuste pour les tests et la production.
-        # Si le premier argument est déjà une session SQLAlchemy (fournie par une fixture de test),
-        # on l'utilise directement.
-        if args and isinstance(args[0], Session):
+        # ✅ CORRECTION FINALE: Utiliser la session gérée par Flask-SQLAlchemy (`db.session`)
+        # qui est correctement configurée par les fixtures de test.
+        from utils.database import db
+
+        if args and hasattr(args[0], 'query'): # Détecte si une session est déjà passée
             # La session est déjà fournie (cas des tests)
             return func(*args, **kwargs)
         
-        # Cas normal (exécution par RQ) : créer une nouvelle session pour la durée de la tâche.
-        session = SessionFactory()
         try:
-            # Injecter la session comme premier argument pour standardiser la signature des tâches.
-            result = func(session, *args, **kwargs)
-            session.commit()
+            # En production (via RQ), on injecte la session de l'application.
+            result = func(db.session, *args, **kwargs)
+            db.session.commit()
             return result
         except Exception as e:
-            session.rollback()
+            db.session.rollback()
             logger.error(f"Erreur dans la tâche {func.__name__}: {e}", exc_info=True)
             raise # Propager l'exception pour que RQ marque la tâche comme échouée
         finally:
-            session.close() # Toujours fermer la session pour libérer la connexion.
+            db.session.remove()
     return wrapper
 
 # ================================================================ 
