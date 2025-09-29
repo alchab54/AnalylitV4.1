@@ -48,44 +48,40 @@ def client(app):
     with app.test_client() as client:
         yield client
 
-@pytest.fixture
-def db_session(app):
-    """Fournit une session de base de données par test."""
-    with app.app_context():
-        yield db.session
-        db.session.rollback()
-        db.session.remove()
+@pytest.fixture(scope='session', autouse=True)
+def mock_all_queues_and_fetch(monkeypatch):
+    """
+    Fixture auto-utilisée pour mocker toutes les files RQ et Job.fetch pour toute la session de test.
+    """
+    # 1. Mocker les files d'attente
+    mock_job_obj = MagicMock(spec=Job)
+    mock_job_obj.id = "mocked_task_id_123"
+    mock_job_obj.get_id.return_value = "mocked_task_id_123"
+    
+    mock_q = MagicMock()
+    mock_q.enqueue.return_value = mock_job_obj
 
-@pytest.fixture
-def setup_project(db_session):
-    """Crée un projet de test."""
-    import uuid
-    from datetime import datetime
-    from utils.models import Project
-    project = Project(
-        id=str(uuid.uuid4()),
-        name=f"Test Project {uuid.uuid4().hex[:8]}",
-        description="Projet de test",
-        analysis_mode="screening",
-        created_at=datetime.utcnow()
-    )
-    db_session.add(project)
-    db_session.commit()
-    yield project
+    monkeypatch.setattr("backend.server_v4_complete.processing_queue", mock_q)
+    monkeypatch.setattr("backend.server_v4_complete.synthesis_queue", mock_q)
+    monkeypatch.setattr("backend.server_v4_complete.analysis_queue", mock_q)
+    monkeypatch.setattr("backend.server_v4_complete.background_queue", mock_q)
+    monkeypatch.setattr("backend.server_v4_complete.extension_queue", mock_q)
+    monkeypatch.setattr("backend.server_v4_complete.models_queue", mock_q)
 
-@pytest.fixture  
-def clean_db(db_session):
-    """Assure une base de données vide en supprimant toutes les données des tables clés."""
-    from utils.models import Project, Extraction, SearchResult, Grid, ChatMessage, AnalysisProfile, RiskOfBias
-    db_session.query(RiskOfBias).delete()
-    db_session.query(Extraction).delete()
-    db_session.query(SearchResult).delete()
-    db_session.query(Grid).delete()
-    db_session.query(ChatMessage).delete()
-    db_session.query(AnalysisProfile).delete()
-    db_session.query(Project).delete()
-    db_session.commit()
-    yield db_session
+    # 2. Mocker Job.fetch
+    mock_job_obj.get_status.return_value = 'queued'
+    mock_job_obj.return_value.return_value = {"status": "complete"}
+    mock_job_obj.enqueued_at = datetime.utcnow()
+    mock_job_obj.started_at = datetime.utcnow()
+    mock_job_obj.ended_at = None
+    mock_job_obj.is_failed = False
+
+    def mock_fetch(job_id, connection=None):
+        if job_id == "mocked_task_id_123":
+            return mock_job_obj
+        raise NoSuchJobError(f"Tâche non trouvée: {job_id}")
+
+    monkeypatch.setattr(Job, 'fetch', mock_fetch)
 
 @pytest.fixture
 def mock_queue():

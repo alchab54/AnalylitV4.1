@@ -14,7 +14,7 @@ services:
       POSTGRES_DB: analylit_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # - ./database/init-user-db.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./database/init-user-db.sql:/docker-entrypoint-initdb.d/init.sql
       # Monter la configuration personnalisée
       - ./database/postgres.conf:/usr/share/postgresql/postgresql.conf.sample
     ports:
@@ -82,12 +82,16 @@ services:
         window: 120s
       resources:
         limits:
-          memory: 4000M
+          memory: 8000M
         reservations:
           cpus: '1.5'
-          memory: 2000M
+          memory: 4000M
     # La commande est maintenant aussi dans entrypoint.sh
-    command: ["start-web"]
+    # ✅ CORRECTION: La commande est maintenant gérée directement ici, après l'attente de la DB par l'entrypoint.
+    # L'entrypoint exécutera simplement cette commande.
+    command: >
+      bash -c "echo '🚀 Démarrage du serveur Gunicorn...' &&
+               exec gunicorn --conf backend/config/gunicorn.conf.py api.gunicorn_entry:app"
     depends_on:
       # ✅ CORRECTION: Le service web attend maintenant que le service migrate ait terminé.
       migrate:
@@ -135,7 +139,9 @@ services:
       - .env
     # ✅ CORRECTION: Ce service exécute maintenant les migrations puis se termine avec succès.
     # La commande est maintenant une liste pour que l'argument "migrate-only" soit correctement interprété.
-    command: ["migrate-only"]
+    command: >
+      bash -c "echo 'Applying database migrations...' &&
+               flask db upgrade && echo 'Migrations finished.'"
     depends_on:
       db:
         condition: service_healthy

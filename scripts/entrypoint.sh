@@ -9,26 +9,7 @@ done
 
 echo "✅ Base de données prête!"
 
-# ✅ CORRECTION FINALE : Exécuter les migrations OU démarrer le serveur, mais pas les deux.
-if [ "$1" = "migrate-only" ]; then
-  echo "🔄 Application des migrations de la base de données..."
-  # ✅ CORRECTION: Vérifier si des migrations existent avant stamp
-  if flask db current >/dev/null 2>&1; then
-    echo "Stamping existing migrations..."
-    flask db stamp head
-  else
-    echo "Initialisation première migration..."
-    flask db upgrade
-  fi
-  # Appliquer les nouvelles migrations
-  flask db upgrade
-  echo "✅ Migrations terminées. Le conteneur va s'arrêter."
-elif [ "$1" = "start-web" ]; then
-    echo "🚀 Démarrage du serveur Gunicorn..."
-    # La commande Gunicorn est maintenant gérée par le `command` dans docker-compose.yml,
-    # qui utilise le fichier de configuration gunicorn.conf.py pour plus de flexibilité.
-    exec gunicorn --conf backend/config/gunicorn.conf.py api.gunicorn_entry:app
-else
-    echo "❌ Argument non reconnu: '$1'. Utiliser 'migrate-only' ou 'start-web'."
-    exit 1
-fi
+# ✅ CORRECTION: Ce script attend maintenant simplement que la base de données soit prête,
+# puis exécute la commande passée au conteneur (définie dans docker-compose.yml).
+echo "▶️ Exécution de la commande du conteneur..."
+exec "$@"
