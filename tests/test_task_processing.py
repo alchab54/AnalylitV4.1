@@ -103,7 +103,7 @@ def test_search_task_adds_articles_to_db(db_session, mocker):
     mocker.patch('tasks_v4_complete.send_project_notification')
 
     # ACT
-    multi_database_search_task.__wrapped__(
+    multi_database_search_task(
         db_session, project_id=project_id, query="test query", databases=['pubmed'], max_results_per_db=2
     )
     db_session.flush() 
@@ -136,7 +136,7 @@ def test_multi_database_search_task_resilience_on_fetcher_failure(db_session, mo
     mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
 
     # ACT
-    multi_database_search_task.__wrapped__(db_session, project_id, "test", ['pubmed', 'arxiv'])
+    multi_database_search_task(db_session, project_id, "test", ['pubmed', 'arxiv'])
 
     # ASSERT
     mock_notify.assert_any_call(project_id, 'search_completed', 'Recherche terminée: 1 articles trouvés. Échec pour: pubmed.', mocker.ANY)
@@ -162,7 +162,7 @@ def test_process_single_article_task_insufficient_content(db_session, mocker):
     mock_increment_processed_count = mocker.patch('tasks_v4_complete.increment_processed_count')
 
     # ACT
-    process_single_article_task.__wrapped__(
+    process_single_article_task(
         db_session, project_id, article_id, {}, "screening"
     )
 
@@ -204,7 +204,7 @@ def test_process_single_article_task_full_extraction_with_pdf_and_grid(db_sessio
     mock_ollama_api = mocker.patch('tasks_v4_complete.call_ollama_api', return_value=mock_ai_response)
 
     # ACT
-    process_single_article_task.__wrapped__(
+    process_single_article_task(
         db_session, project_id, article_id, {"extract_model": "test-model"}, "full_extraction", grid_id
     )
 
@@ -246,7 +246,7 @@ def test_process_single_article_task_screening_mode(mock_ollama_api, db_session,
     mock_ollama_api.return_value = mock_ai_response
 
     # ACT
-    process_single_article_task.__wrapped__(db_session, project_id, article_id, {"preprocess_model": "screening-model"}, "screening")
+    process_single_article_task(db_session, project_id, article_id, {"preprocess_model": "screening-model"}, "screening")
 
     # ASSERT
     mock_ollama_api.assert_called_once_with(mock.ANY, "screening-model", output_format="json")
@@ -281,7 +281,7 @@ def test_run_synthesis_task_filters_by_score(db_session, mocker):
     mocker.patch('tasks_v4_complete.send_project_notification')
 
     # ACT
-    run_synthesis_task.__wrapped__(db_session, project_id, {"synthesis_model": "test-model"})
+    run_synthesis_task(db_session, project_id, {"synthesis_model": "test-model"})
 
     # ASSERT
     mock_ollama_api.assert_called_once()
@@ -330,7 +330,7 @@ def test_run_discussion_generation_task(db_session, mocker):
     mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
 
     # ACT
-    run_discussion_generation_task.__wrapped__(db_session, project_id)
+    run_discussion_generation_task(db_session, project_id)
 
     # ASSERT
     mock_gen_draft.assert_called_once()
@@ -365,7 +365,7 @@ def test_run_atn_stakeholder_analysis_task_aggregation_logic(db_session, mocker)
     mocker.patch('matplotlib.pyplot.close')
 
     # ACT
-    run_atn_stakeholder_analysis_task.__wrapped__(db_session, project_id)
+    run_atn_stakeholder_analysis_task(db_session, project_id)
 
     # ASSERT
     updated_project = db_session.get(Project, project_id)
@@ -404,7 +404,7 @@ def test_add_manual_articles_task_ignores_duplicates(db_session, mocker):
     mocker.patch('time.sleep')
 
     # ACT
-    add_manual_articles_task.__wrapped__(db_session, project_id, ["12345", "67890"])
+    add_manual_articles_task(db_session, project_id, ["12345", "67890"])
 
     # ASSERT
     assert mock_fetch.call_count == 2
@@ -450,7 +450,7 @@ def test_answer_chat_question_task_rag_logic(db_session, mocker, mock_embedding_
     question = "Question sur A"
 
     # ACT
-    answer_chat_question_task.__wrapped__(db_session, project_id, question)
+    answer_chat_question_task(db_session, project_id, question)
 
     db_session.flush()
 
@@ -544,7 +544,7 @@ def test_run_risk_of_bias_task(db_session, mocker):
     mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
 
     # ACT
-    run_risk_of_bias_task.__wrapped__(db_session, project_id, article_id)
+    run_risk_of_bias_task(db_session, project_id, article_id)
 
     # ASSERT
     mock_ollama_api.assert_called_once()
@@ -589,7 +589,7 @@ def test_run_knowledge_graph_task(db_session, mocker):
     mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
 
     # ACT
-    run_knowledge_graph_task.__wrapped__(db_session, project_id)
+    run_knowledge_graph_task(db_session, project_id)
     db_session.flush() # Commit the changes made by the task
     
     # ASSERT
@@ -623,7 +623,7 @@ def test_run_prisma_flow_task(db_session, mocker):
     mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
 
     # ACT
-    run_prisma_flow_task.__wrapped__(db_session, project_id)
+    run_prisma_flow_task(db_session, project_id)
 
     # ASSERT
     assert mock_savefig.call_count == 2 # Une fois pour PNG, une fois pour PDF
@@ -659,7 +659,7 @@ def test_run_meta_analysis_task(db_session, mocker):
     mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
 
     # ACT
-    run_meta_analysis_task.__wrapped__(db_session, project_id)
+    run_meta_analysis_task(db_session, project_id)
 
     # ASSERT
     mock_savefig.assert_called_once()
@@ -689,7 +689,7 @@ def test_run_descriptive_stats_task(db_session, mocker):
     mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
 
     # ACT
-    run_descriptive_stats_task.__wrapped__(db_session, project_id)
+    run_descriptive_stats_task(db_session, project_id)
 
     # ASSERT
     updated_project = db_session.get(Project, project_id)
@@ -728,7 +728,7 @@ def test_run_atn_score_task(db_session, mocker):
     mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
 
     # ACT
-    run_atn_score_task.__wrapped__(db_session, project_id)
+    run_atn_score_task(db_session, project_id)
 
     # ASSERT
     mock_savefig.assert_called_once()
@@ -832,7 +832,7 @@ def test_index_project_pdfs_task(db_session, mocker, mock_embedding_model):
     mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
 
     # ACT
-    index_project_pdfs_task.__wrapped__(db_session, project_id)
+    index_project_pdfs_task(db_session, project_id)
 
     # ASSERT
     mock_chroma_instance.get_or_create_collection.assert_called_once_with(name=f"project_{project_id}")

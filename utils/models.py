@@ -9,10 +9,9 @@ import uuid
 import json
 from .db_base import Base  # Importer la Base partagée
 
-# ✅ CORRECTION: Forcer l'utilisation du même schéma en mode test et en mode production
-# pour éliminer les erreurs "relation does not exist". Le schéma est maintenant
-# défini de manière cohérente dans toute l'application.
-SCHEMA = 'analylit_schema' if os.getenv('FLASK_ENV') != 'testing' else 'analylit_schema'
+# ✅ SIMPLIFICATION: Le schéma est maintenant défini de manière statique.
+# La gestion des environnements est gérée par la configuration de la base de données.
+SCHEMA = 'analylit_schema'
 
 def _uuid():
     return str(uuid.uuid4())

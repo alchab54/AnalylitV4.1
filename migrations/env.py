@@ -1,31 +1,26 @@
 import logging
 from logging.config import fileConfig
 from pathlib import Path
-from flask import current_app
-
 from alembic import context
-from sqlalchemy import text
+from sqlalchemy import engine_from_config, pool, text
 
 # --- AJOUT POUR LA GESTION DU SCHÉMA ---
 # Ajoute le répertoire racine de l'application au path pour trouver 'utils'
 import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-# ✅ CORRECTION: Importer la factory et les objets DB APRÈS les modèles.
-# Cela garantit que les modèles sont enregistrés avec SQLAlchemy avant que l'app ne soit créée.
-from backend.server_v4_complete import create_app, db # Importer la factory et l'instance de la DB
-from utils.models import SCHEMA
-from utils.database import migrate # Importer l'instance de Migrate
-
-# Créer l'application pour le contexte d'Alembic
-# L'initialisation de la DB est déjà faite dans create_app
-app = create_app()
-# ✅ CORRECTION: Initialiser l'extension Migrate sur l'instance de l'app créée par env.py.
-migrate.init_app(app, db)
+# ✅ CORRECTION: Simplification radicale pour la fiabilité.
+# Nous allons créer une app minimale juste pour Alembic.
+from backend.server_v4_complete import create_app
+from utils.database import db
+from utils.models import SCHEMA # Importer notre variable de schéma
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+# Créer une app Flask minimale pour le contexte d'Alembic
+app = create_app()
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -34,31 +29,15 @@ if config.config_file_name is not None:
 logger = logging.getLogger('alembic.env')
 
 
-def get_engine():
-    try:
-        return app.extensions['migrate'].db.engine
-    except (TypeError, AttributeError, KeyError):
-        # Fallback si l'extension n'est pas encore initialisée
-        from sqlalchemy import create_engine
-        return create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-def get_engine_url():
-    try:
-        return get_engine().url.render_as_string(hide_password=False).replace(
-            '%', '%%')
-    except AttributeError:
-        return str(get_engine().url).replace('%', '%%')
-
-
 # add your model's MetaData object here
 # for 'autogenerate' support
-# from myapp import mymodel
-target_db = app.extensions['migrate'].db
-config.set_main_option('sqlalchemy.url', app.config['SQLALCHEMY_DATABASE_URI'])
+# ✅ CORRECTION: Utiliser le contexte de l'application pour garantir que tout est initialisé.
+with app.app_context():
+    # Importer les modèles ici pour qu'ils soient enregistrés dans les métadonnées de `db`
+    from utils import models
+    target_metadata = db.metadata
+    config.set_main_option('sqlalchemy.url', app.config.get('SQLALCHEMY_DATABASE_URI'))
 
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
 
 
 def get_metadata_with_schema():
@@ -66,7 +45,7 @@ def get_metadata_with_schema():
     Retourne les métadonnées de la base de données en s'assurant que le schéma est défini.
     C'est l'étape cruciale pour qu'Alembic sache où créer/modifier les tables.
     """
-    meta = target_db.metadata
+    meta = target_metadata
     meta.schema = SCHEMA
     return meta
 
@@ -83,8 +62,12 @@ def run_migrations_offline():
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
-    context.configure(url=url, target_metadata=get_metadata_with_schema(), literal_binds=True)
+    context.configure(
+        url=config.get_main_option("sqlalchemy.url"),
+        target_metadata=get_metadata_with_schema(),
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+    )
 
     with context.begin_transaction():
         context.run_migrations()
@@ -98,53 +81,32 @@ def run_migrations_online():
 
     """
 
-    # this callback is used to prevent an auto-migration from being generated
-    # when there are no changes to the schema
-    # reference: http://alembic.zzzcomputing.com/en/latest/cookbook.html
-    def process_revision_directives(context, revision, directives):
-        if getattr(config.cmd_opts, 'autogenerate', False):
-            script = directives[0]
-            if script.upgrade_ops.is_empty():
-                directives[:] = []
-                logger.info('No changes in schema detected.')
-    
-    try:
-        conf_args = current_app.extensions['migrate'].configure_args
-    except (KeyError, AttributeError):
-        conf_args = {} # Fallback si le contexte n'est pas disponible
-        
-    if conf_args.get("process_revision_directives") is None:
-        conf_args["process_revision_directives"] = process_revision_directives
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
 
-    engine = get_engine()
-
-    with engine.connect() as connection:
-        # Configurer la connexion pour utiliser le bon schéma
-        if SCHEMA:
-            connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
-
-        # Consolider en un seul appel à context.configure
-        context.configure(
-            connection=connection,
-            target_metadata=get_metadata_with_schema(),
-            include_schemas=True,  # Indiquer à Alembic de prendre en compte les schémas
-            **conf_args,
-        )
-
+    with connectable.connect() as connection:
+        # ✅ CORRECTION FINALE: Isoler toute la logique de migration dans une transaction
+        # et s'assurer que le schéma est créé et utilisé.
         with context.begin_transaction():
+            if SCHEMA:
+                logger.info(f"Création/Vérification du schéma : {SCHEMA}")
+                connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
+            
+            context.configure(
+                connection=connection,
+                target_metadata=get_metadata_with_schema(),
+                # ✅ AJOUT CRITIQUE: Spécifier où stocker la table de versions d'Alembic.
+                version_table_schema=SCHEMA,
+                include_schemas=True, # Nécessaire pour que version_table_schema fonctionne
+            )
+            
             context.run_migrations()
 
 
-# ✅ CORRECTION: Exécuter les migrations à l'intérieur du contexte de l'application.
-# Cela garantit que toutes les extensions Flask, y compris SQLAlchemy et Migrate,
-# sont correctement initialisées et que `db.metadata` contient bien les modèles.
-with app.app_context():
-    # ✅ CORRECTION FINALE: Importer les modèles ICI, à l'intérieur du contexte de l'app.
-    # C'est l'endroit le plus sûr pour garantir que les modèles sont enregistrés
-    # sur l'objet `db.metadata` que Alembic va inspecter.
-    from utils import models
-
-    if context.is_offline_mode():
-        run_migrations_offline()
-    else:
-        run_migrations_online()
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()

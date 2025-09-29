@@ -41,17 +41,15 @@ def app():
         'SQLALCHEMY_DATABASE_URI': test_db_url
     })
     with _app.app_context():
-        # On nettoie et on crée le schéma une seule fois au début de la session.
-        # C'est la seule opération destructrice, et elle se produit avant que les
-        # workers parallèles ne démarrent leurs transactions. 
-        # ✅ CORRECTION FINALE: Ces lignes sont maintenant commentées. La création du schéma
-        # est entièrement gérée par le service `migrate` et Alembic. Les tests
-        # doivent opérer sur la base de données déjà migrée.
-        # db.drop_all()
-        # db.create_all()
+        # ✅ CORRECTION FINALE: Appliquer les migrations sur la base de données de TEST.
+        # C'est l'étape cruciale qui manquait. Cela garantit que la base de données
+        # de test a le bon schéma (`analylit_schema`) et toutes les tables avant
+        # que les tests ne commencent.
+        migrate.init_app(_app, db)
+        db.drop_all() # Assure un état propre avant les migrations
+        migrate.upgrade() # Applique toutes les migrations Alembic
+
         yield _app
-        # Le nettoyage final se fait à la fin de toute la session.
-        # db.drop_all()
 
 # ✅ SOLUTION: Remplacer la fixture 'clean_db' par une fixture 'autouse'
 # qui s'assure que chaque test utilise une session transactionnelle.
