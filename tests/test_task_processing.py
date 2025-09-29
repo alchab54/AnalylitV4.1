@@ -736,7 +736,7 @@ def test_run_atn_score_task(db_session, mocker):
     result = json.loads(updated_project.analysis_result)
 
     assert result['total_articles_scored'] == 2
-    assert result['mean_atn'] == pytest.approx((10 + 0) / 2)
+    assert result['mean_atn'] == pytest.approx(5.0)
     assert result['atn_scores'][0]['atn_score'] == 10
     assert result['atn_scores'][1]['atn_score'] == 0
     mock_notify.assert_called_once()

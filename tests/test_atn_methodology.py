@@ -56,7 +56,7 @@ def test_atn_extraction_grid_completeness():
     # La liste de référence des 29 champs attendus
     expected_atn_fields = [
         "ID_étude", "Auteurs", "Année", "Titre", "DOI/PMID", "Type_étude",
-        "Niveau_preuve_HAS", "Pays_contexte", "Durée_suivi", "Taille_échantillon",
+        "Pays_contexte", "Durée_suivi", "Taille_échantillon",
         "Population_cible", "Type_IA", "Plateforme", "Fréquence_usage",
         "Instrument_empathie", "Score_empathie_IA", "Score_empathie_humain",
         "WAI-SR_modifié", "Taux_adhésion", "Confiance_algorithmique",

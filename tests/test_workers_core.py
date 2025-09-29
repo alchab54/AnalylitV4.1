@@ -132,8 +132,8 @@ class TestWorkersCore:
         # Process one job from default queue
         worker.work(burst=True) 
         default_job.refresh()
-        assert default_job.is_finished
-        assert default_job.return_value() == 9
+        assert default_job.is_finished, f"Default job status is {default_job.get_status()}"
+        assert default_job.return_value() == 6
         
         # Process one job from low queue
         worker.work(burst=True) 

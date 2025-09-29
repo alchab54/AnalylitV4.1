@@ -20,7 +20,7 @@ os.environ['TESTING'] = 'true'
 
 # --- IMPORTS DE L'APPLICATION ---
 from backend.server_v4_complete import create_app
-from utils.database import db
+from utils.database import db, migrate
 # ✅ CORRECTION: Imports nécessaires pour la création/suppression de DB
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import ProgrammingError
@@ -68,12 +68,18 @@ def app(request):
     }
     _app = create_app(test_config)
 
+    # ✅ CORRECTION: Initialiser Flask-Migrate sur l'app de test.
+    migrate.init_app(_app, db)
+
     # The app context is pushed here so that db.create_all() has access to the app.
     # This creates the schema ONCE per worker session.
     with _app.app_context():
-        # ✅ Conditionally create tables: only if it's a PostgreSQL test DB
-        if db_uri.startswith("postgresql"):
-            db.create_all()
+        # ✅ CORRECTION: Utiliser Alembic pour créer le schéma de la base de données de test.
+        # Cela garantit que les tests s'exécutent sur un schéma identique à la production.
+        # ✅ CORRECTION FINALE: Exécuter `upgrade()` pour TOUS les types de DB, y compris SQLite.
+        # Cela garantit que le schéma est créé même pour le worker 'master'.
+        from flask_migrate import upgrade
+        upgrade()
 
         yield _app
         db.drop_all()
