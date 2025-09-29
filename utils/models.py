@@ -9,17 +9,17 @@ import uuid
 import json
 from .db_base import Base  # Importer la Base partagée
  
-SCHEMA = 'analylit_schema' if os.getenv('TESTING') != 'true' else None
+SCHEMA = None #'analylit_schema' if os.getenv('TESTING') != 'true' else None
 
 def _uuid():
     return str(uuid.uuid4())
 
-class Project(Base):
+class Project(Base): 
     __tablename__ = 'projects'
     __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
 
     id = Column(String, primary_key=True, default=_uuid)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=False) 
     description = Column(Text)
     status = Column(String, default='pending')
     profile_used = Column(String)
@@ -37,7 +37,7 @@ class Project(Base):
     processed_count = Column(Integer, default=0)
     total_processing_time = Column(Float, default=0)
     indexed_at = Column(DateTime)
-    search_query = Column(Text)
+    search_query = Column(Text) 
     databases_used = Column(Text)
     inter_rater_reliability = Column(Text)
     prisma_checklist = Column(Text)

@@ -128,7 +128,7 @@ def run_migrations_online():
             connection=connection,
             target_metadata=get_metadata_with_schema(),
             include_schemas=True,  # Indiquer à Alembic de prendre en compte les schémas
-            **conf_args
+            **conf_args,
         )
 
         with context.begin_transaction():
