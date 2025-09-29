@@ -25,24 +25,24 @@ from utils.database import db, migrate
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import ProgrammingError
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='session')
 def app():
     """
-    Fixture de fonction pour créer une app et une base de données isolées pour chaque test.
-    C'est une solution robuste qui garantit qu'aucun état n'est partagé entre les tests.
+    Fixture de session : Crée l'application et la base de données UNE SEULE FOIS
+    pour toute la session de test. C'est beaucoup plus rapide.
     """
-    # ✅ Force une base de test séparée
     test_db_url = 'postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db'
     os.environ['DATABASE_URL'] = test_db_url
     os.environ['TEST_DATABASE_URL'] = test_db_url
     
     _app = create_app()
     with _app.app_context():
-        # Pour une base test vierge, on peut utiliser create_all
+        # On nettoie et on crée le schéma une seule fois.
         db.drop_all()
-        db.create_all()  # Safe sur base test isolée
+        db.create_all()
         yield _app
-        db.drop_all()  # Nettoyage après chaque test
+        # Le nettoyage final se fait à la fin de toute la session.
+        db.drop_all()
 
 @pytest.fixture
 def client(app):
@@ -51,31 +51,28 @@ def client(app):
         yield client
 
 @pytest.fixture(scope="function")
-def db_session(app, request):
+def db_session(app):
     """
-    ✅ THE DEFINITIVE FIX: Provides a transactional scope for tests.
-    Starts a transaction before each test and rolls it back after.
-    This is the fastest and most reliable way to isolate tests.
+    Fixture de fonction : Isole chaque test dans une transaction.
+    C'est la méthode la plus rapide et la plus fiable pour l'isolation des tests.
+    Chaque test voit une base de données "propre", et ses modifications sont annulées
+    à la fin, sans affecter les autres tests.
     """
     with app.app_context(): 
         connection = db.engine.connect()
         transaction = connection.begin()
-
-        # Bind the session to the transaction; this is the key step.
-        # The app's db.session will now use this transaction.
-        db.session.configure(bind=connection)
-        db.session.begin_nested()
-
-        # This is a 'teardown' function that pytest will call after the test has run.
-        @request.addfinalizer
-        def teardown():
-            # Rollback the overall transaction and close the connection
+        
+        # Lier la session de l'application à cette transaction
+        session = db.create_scoped_session(options={'bind': connection, 'binds': {}})
+        db.session = session
+        
+        try:
+            yield session
+        finally:
+            # Après chaque test :
+            session.remove()
             transaction.rollback()
             connection.close()
-            # Unbind the session
-            db.session.remove()
-
-        yield db.session
 
 @pytest.fixture
 def setup_project(db_session):
