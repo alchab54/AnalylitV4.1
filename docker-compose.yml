@@ -87,8 +87,11 @@ services:
           cpus: '1.5'
           memory: 2000M
     # La commande est maintenant aussi dans entrypoint.sh
-    command: gunicorn --conf backend/config/gunicorn.conf.py api.gunicorn_entry:app
+    command: ["/home/appuser/app/scripts/entrypoint.sh", "start-web"]
     depends_on:
+      # ✅ CORRECTION: Le service web attend maintenant que le service migrate ait terminé.
+      migrate:
+        condition: service_completed_successfully
       base:
         condition: service_started
       db:
@@ -125,8 +128,9 @@ services:
       - PYTHONPATH=/home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
     env_file:
       - .env
-    # La commande est conçue pour ne rien faire et attendre une commande de `docker-compose run`.
-    command: ["sleep", "infinity"]
+    # ✅ CORRECTION: Ce service exécute maintenant les migrations puis se termine avec succès.
+    # Il ne démarre pas de serveur.
+    command: ["/home/appuser/app/scripts/entrypoint.sh", "migrate-only"]
     depends_on:
       db:
         condition: service_healthy

@@ -1,126 +1,91 @@
-# tests/conftest.py - VERSION CORRIGÉE
+# tests/conftest.py
 import pytest
 import os
 import sys
 from pathlib import Path
-from sqlalchemy import create_engine
-import uuid # Added import for uuid
 
 # Ajouter le répertoire racine au PATH pour les imports
 root_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(root_dir))
 
 # --- ACTIVATION DES PLUGINS PYTEST ---
-# C'est la correction clé suggérée par gemini.md
 pytest_plugins = [
-    "pytest_mock",        # ✅ Active la fixture 'mocker'
+    "pytest_mock",
     "pytest_cov",
     "pytest_asyncio",
 ]
 
+# --- IMPORTS DE L'APPLICATION ---
+from backend.server_v4_complete import create_app
+from utils.database import db
+
 # Set TESTING environment variable for models.py
 os.environ['TESTING'] = 'true'
 
-# CORRECTION: Import depuis le fichier principal au lieu de utils inexistant
-from server_v4_complete import app, db, Project
-
 @pytest.fixture(scope='session')
-def app_config():
-    """Fournit une configuration de test propre."""
-    test_db_url = os.environ.get('DATABASE_URL', 'sqlite:///:memory:')
-    return {
-        'TESTING': True,
-        'WTF_CSRF_ENABLED': False,
-        'DATABASE_URL': test_db_url,
-        'SERVER_NAME': 'localhost'
+def app():
+    """
+    Fixture de session pour créer et configurer une instance de l'application Flask
+    pour la durée de la session de test.
+    """
+    test_config = {
+        "TESTING": True,
+        "SQLALCHEMY_DATABASE_URI": os.environ.get("TEST_DATABASE_URL", "sqlite:///:memory:"),
+        "SQLALCHEMY_TRACK_MODIFICATIONS": False,
+        "WTF_CSRF_ENABLED": False,
+        "SERVER_NAME": "localhost"
     }
+    _app = create_app(test_config)
 
-@pytest.fixture(scope='function')
-def test_app(app_config):
-    """Crée une instance de l'application Flask pour les tests."""
-    app.config.update(app_config)
-    
-    # Generate a unique database name for each test function
-    unique_db_name = f"analylit_test_db_{uuid.uuid4().hex}"
-    test_db_url = os.getenv("DATABASE_URL", "postgresql://user:pass@db/analylit_db_test").replace("analylit_db_test", unique_db_name)
-    app.config['SQLALCHEMY_DATABASE_URI'] = test_db_url
-
-    # Initialize the database for testing
-    from utils.database import init_database
-    init_database(is_test=True, database_url=test_db_url) # Pass the unique URL
-
-    with app.app_context():
-        # Explicitly delete default data that might cause IntegrityError
-        from utils.models import AnalysisProfile, Prompt
-        db.session.query(AnalysisProfile).filter_by(name='Standard Profile').delete()
-        db.session.query(AnalysisProfile).filter_by(name='Profil KG').delete() # For knowledge graph test
-        db.session.query(Prompt).filter_by(name='test_prompt_to_update').delete()
-        db.session.commit() # Commit deletions before creating all tables
-
+    with _app.app_context():
         db.create_all()
-        # CORRECTION: Appeler le seeding pour s'assurer que les données par défaut existent.
-        from utils.database import seed_default_data
-        seed_default_data(db.session)
-
-        yield app
-        # Removed db.drop_all() from here. clean_db will handle it.
-        db.session.remove() # Ensure session is removed after each test
-
+        yield _app
+        db.drop_all()
 
 @pytest.fixture
-def client(test_app):
+def client(app):
     """Client de test Flask pour les requêtes HTTP."""
-    # The test_app fixture already pushes an app context, so we don't need to push another one here.
-    with test_app.test_client() as client:
+    with app.test_client() as client:
         yield client
 
 @pytest.fixture
-def db_session(test_app):
+def db_session(app):
     """Fournit une session de base de données par test."""
-    # The test_app fixture already pushes an app context, so we don't need to push another one here.
-    yield db.session
-    db.session.rollback()
-    db.session.remove() # Ensure session is removed after each test
+    with app.app_context():
+        yield db.session
+        db.session.rollback()
+        db.session.remove()
 
 @pytest.fixture
-def setup_project(test_app, db_session):
+def setup_project(db_session):
     """Crée un projet de test."""
     import uuid
     from datetime import datetime
-    
-    with test_app.app_context():
-        project = Project(
-            id=str(uuid.uuid4()),
-            name=f"Test Project {uuid.uuid4().hex[:8]}",
-            description="Projet de test",
-            analysis_mode="screening",
-            created_at=datetime.utcnow()
-        )
-        
-        db_session.add(project)
-        db_session.commit()
-        
-        yield project.id
+    from utils.models import Project
+    project = Project(
+        id=str(uuid.uuid4()),
+        name=f"Test Project {uuid.uuid4().hex[:8]}",
+        description="Projet de test",
+        analysis_mode="screening",
+        created_at=datetime.utcnow()
+    )
+    db_session.add(project)
+    db_session.commit()
+    yield project
 
 @pytest.fixture  
-def clean_db(db_session, test_app):
+def clean_db(db_session):
     """Assure une base de données vide en supprimant toutes les données des tables clés."""
-    with test_app.app_context(): # Ensure we are in the correct app context
-        print("\n--- Cleaning database (deleting data) ---")
-        from utils.models import Project, Extraction, SearchResult, Grid, ChatMessage, AnalysisProfile, RiskOfBias # Import models here
-        db_session.query(RiskOfBias).delete()
-        db_session.query(Extraction).delete()
-        db_session.query(SearchResult).delete()
-        db_session.query(Grid).delete()
-        db_session.query(ChatMessage).delete()
-        db_session.query(AnalysisProfile).delete()
-        db_session.query(Project).delete()
-        db_session.commit()
-        print("--- Database cleaned (deleting data) ---")
-        yield db_session
-        # The test_app fixture's teardown will handle dropping the unique database.
-
-
+    from utils.models import Project, Extraction, SearchResult, Grid, ChatMessage, AnalysisProfile, RiskOfBias
+    db_session.query(RiskOfBias).delete()
+    db_session.query(Extraction).delete()
+    db_session.query(SearchResult).delete()
+    db_session.query(Grid).delete()
+    db_session.query(ChatMessage).delete()
+    db_session.query(AnalysisProfile).delete()
+    db_session.query(Project).delete()
+    db_session.commit()
+    yield db_session
 
 @pytest.fixture
 def mock_queue():
