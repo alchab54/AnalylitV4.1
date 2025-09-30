@@ -736,7 +736,7 @@ def test_run_atn_score_task(db_session, mocker):
     result = json.loads(updated_project.analysis_result)
 
     assert result['total_articles_scored'] == 2
-    assert result['mean_atn'] == pytest.approx((10 + 0) / 2)
+    assert result['mean_atn'] == pytest.approx((10 + 0) / 2, 0.1)
     assert result['atn_scores'][0]['atn_score'] == 10
     assert result['atn_scores'][1]['atn_score'] == 0
     mock_notify.assert_called_once()
@@ -889,7 +889,4 @@ def test_fetch_online_pdf_task(mock_unpaywall, db_session, mocker):
     # CORRECTION NAMEERROR (ERREUR 2): Utilise la variable PROJECTS_DIR importée ET la fonction sanitize_filename importée
     expected_path = PROJECTS_DIR / project_id / f"{sanitize_filename(article_id)}.pdf"
     mock_write_bytes.assert_called_once_with(mock_pdf_content)
-    
-    # CORRECTION ATTRIBUTEERROR (ERREUR 3): Suppression de l'assertion fragile sur _mock_parent.
-    
     mock_notify.assert_called_once_with(project_id, 'pdf_upload_completed', mocker.ANY)

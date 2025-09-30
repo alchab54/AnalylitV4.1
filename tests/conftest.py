@@ -82,10 +82,9 @@ def app():
             try:
                 # Créer le schéma
                 db.session.execute(text("CREATE SCHEMA analylit_schema"))
-
+                db.session.commit()
                 # ✅ Créer les tables avec SQLAlchemy (plus fiable que Alembic pour tests)
-                from utils.db_base import Base
-                Base.metadata.create_all(bind=db.engine)
+                db.create_all()
                 db.session.commit()
                 print("✅ Tables de test créées")
                 

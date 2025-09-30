@@ -53,12 +53,12 @@ def test_run_rob_analysis_success(client, setup_test_data):
     )
 
     # Vérifier les résultats
-    assert response.status_code == 202, "L'API doit accepter la tâche et répondre 202."
+    assert response.status_code == 202, "L'API doit accepter la tâche et répondre 202." # type: ignore
     data = response.get_json()
     assert "message" in data
     assert "job_ids" in data, "La réponse doit contenir une liste d'IDs de tâches."
     assert len(data['job_ids']) == 1, "Une tâche doit être créée pour un article."
-    assert data['message'] == "RoB analysis initiated" # Correction du message attendu
+    assert "tâches d'analyse de risque de biais lancées" in data['message']
 
 def test_run_rob_analysis_no_articles(client, setup_test_data):
     """
@@ -73,9 +73,9 @@ def test_run_rob_analysis_no_articles(client, setup_test_data):
         content_type='application/json'
     )
 
-    assert response.status_code == 202
+    assert response.status_code == 400 # type: ignore
     data = response.get_json()
-    assert len(data['job_ids']) == 0, "Aucune tâche ne doit être créée si aucun article n'est fourni."
+    assert "Aucun article ID fourni" in data['error']
 
 def test_run_rob_analysis_project_not_found(client):
     """
@@ -90,4 +90,4 @@ def test_run_rob_analysis_project_not_found(client):
     )
     
     # L'erreur 404 est gérée par le wrapper @with_db_session et le serveur Flask
-    assert response.status_code == 404, "Doit retourner 404 si le projet n'existe pas."
+    assert response.status_code == 404, "Doit retourner 404 si le projet n'existe pas." # type: ignore

@@ -390,8 +390,7 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
 
     # ACT
     # CORRECTION: La route est /import-zotero-pdfs, pas /import-zotero/
-    response = client.post( # type: ignore
-        f'/api/projects/{project_id}/import-zotero/', 
+    response = client.post(f'/api/projects/{project_id}/import-zotero-pdfs', 
         data=json.dumps(import_payload), 
         content_type='application/json'
     )

@@ -248,11 +248,6 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
     Recherche dans plusieurs bases et insère les résultats dans search_results.
     Gère à la fois les requêtes simples et les requêtes expertes spécifiques à chaque base.
     """
-    # CORRECTION: En mode test, la DB est nettoyée par les fixtures.
-    # Il faut s'assurer que les tables existent avant que la tâche ne s'exécute.
-    if os.environ.get('TESTING') == 'true':
-        from utils.database import init_database
-        init_database()
 
     if os.environ.get("ANALYLIT_TEST_MODE") == "true":
         _mock_multi_database_search_task(session, project_id, query, databases, max_results_per_db)

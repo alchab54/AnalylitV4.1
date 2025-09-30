@@ -127,7 +127,6 @@ services:
       - ./backend:/home/appuser/app/backend
       - ./api:/home/appuser/app/api
       - ./pytest.ini:/home/appuser/app/pytest.ini
-      - ./check_db.py:/home/appuser/app/check_db.py
 
   # ✅ NOUVEAU SERVICE: 'migrate' pour les commandes de base de données.
   # Ce service partage l'environnement du service 'web' mais ne lance pas de serveur.
@@ -144,13 +143,18 @@ services:
       - WAIT_HOSTS=db:5432
       - WAIT_TIMEOUT=30
       - PYTHONPATH=/home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
+      # ✅ AJOUTEZ ces variables pour les migrations:
+      - POSTGRES_USER=analylit_user
+      - POSTGRES_PASSWORD=strong_password
+      - POSTGRES_DB=analylit_db
+      - DATABASE_URL=postgresql://analylit_user:strong_password@db:5432/analylit_db
     env_file:
       - .env
     # ✅ CORRECTION: Ce service exécute maintenant les migrations puis se termine avec succès.
     # La commande est maintenant une liste pour que l'argument "migrate-only" soit correctement interprété.
     command: >
       bash -c "echo 'Applying database migrations...' &&
-               sleep 5 && flask db upgrade && echo 'Migrations finished.'"
+               flask db upgrade && echo 'Migrations finished.'"
     depends_on:
       db:
         condition: service_healthy
@@ -202,7 +206,10 @@ services:
       context: .  
       dockerfile: docker/Dockerfile.worker
     container_name: analylit_worker_ai
-    command: rq worker --url redis://redis:6379/0 ai_queue background_queue
+    # ✅ CORRECTION: Ajout de 'analysis_queue' pour que les tâches d'analyse (comme 'atn_specialized_extraction')
+    # soient traitées, évitant ainsi le blocage des tests qui les attendent.
+    # La commande précédente avait déjà cette correction, mais nous la confirmons ici.
+    command: rq worker --url redis://redis:6379/0 ai_queue background_queue analysis_queue
     env_file:
       - .env
     runtime: nvidia
