@@ -1,4 +1,4 @@
-r**AnalyLit v4.1 \- Guide Technique Complet**
+**AnalyLit v4.1 - Guide Technique**
 
 **Application de Scoping Review pour l'Alliance Thérapeutique Numérique**
 
@@ -227,7 +227,6 @@ Pour permettre une recherche de précision (Experte), le flux de données a ét�
 `analylit/`  
 `├── 🐍 Backend Python`  
 `│   ├── server_v4_complete.py      # Serveur Flask principal`  
-s `│   ├── manage.py                  # Point d'entrée pour Flask CLI (migrations)`
 `│   ├── tasks_v4_complete.py       # Tâches asynchrones RQ`
 `│   ├── config/config_v4.py        # Configuration application`
 `│   │`  
@@ -288,67 +287,79 @@ s `│   ├── manage.py                  # Point d'entrée pour Flask CLI (
 
 **Fonctions clés**:
 
-`def create_app() -> Flask                    # Factory application Flask`  
-`def multi_database_search_task()            # Recherche asynchrone`  
-`def with_db_session(func)                   # Décorateur gestion DB`  
-`def update_project_status()                 # Mise à jour états projets`
+```python
+def create_app() -> Flask: ...                    # Factory application Flask
+def multi_database_search_task(): ...            # Recherche asynchrone
+def with_db_session(func): ...                   # Décorateur gestion DB
+def update_project_status(): ...                 # Mise à jour états projets
+```
 
-**tasks\_v4\_complete.py (1429 lignes)**
+**tasks\_v4\_complete.py**
 
 **Système de tâches asynchrones avec RQ**
 
 **Tâches principales**:
 
-`@with_db_session`  
-`def multi_database_search_task()            # Recherche multi-bases`  
-`def process_single_article_task()           # Screening/extraction IA`    
-`def run_synthesis_task()                    # Génération synthèses`  
-`def run_discussion_generation_task()        # Brouillons discussion`  
-`def index_project_pdfs_task()              # Indexation RAG`  
-`def answer_chat_question_task()             # Chat IA contextuel`  
-`def run_meta_analysis_task()               # Analyses statistiques`  
-`def calculate_kappa_task()                 # Validation inter-évaluateurs`
+```python
+@with_db_session
+def multi_database_search_task(): ...            # Recherche multi-bases
+def process_single_article_task(): ...           # Screening/extraction IA
+def run_synthesis_task(): ...                    # Génération synthèses
+def run_discussion_generation_task(): ...        # Brouillons discussion
+def index_project_pdfs_task(): ...               # Indexation RAG
+def answer_chat_question_task(): ...             # Chat IA contextuel
+def run_meta_analysis_task(): ...                # Analyses statistiques
+def calculate_kappa_task(): ...                  # Validation inter-évaluateurs
+```
 
-**utils/models.py (471 lignes)**
+**utils/models.py**
 
 **Modèles de données SQLAlchemy**
 
 **Entités principales**:
 
-`class Project(Base)                         # Projets recherche`  
-`class SearchResult(Base)                    # Résultats recherche`  
-`class Extraction(Base)                      # Données extraites`  
-`class Grid(Base)                           # Grilles extraction`  
-`class ChatMessage(Base)                     # Historique chat`  
-`class AnalysisProfile(Base)                 # Profils IA`  
-`class RiskOfBias(Base)                     # Évaluation biais`  
-`class ProcessingLog(Base)                   # Logs traitement`
+```python
+class Project(Base): ...                         # Projets recherche
+class SearchResult(Base): ...                    # Résultats recherche
+class Extraction(Base): ...                      # Données extraites
+class Grid(Base): ...                            # Grilles extraction
+class ChatMessage(Base): ...                     # Historique chat
+class AnalysisProfile(Base): ...                 # Profils IA
+class RiskOfBias(Base): ...                      # Évaluation biais
+class ProcessingLog(Base): ...                   # Logs traitement
+```
 
-**utils/fetchers.py (796 lignes)**
+**utils/fetchers.py**
 
 **Interface APIs externes de recherche**
 
 **Classes principales**:
 
-`class DatabaseManager:`  
-    `def search_pubmed(query, max_results)   # API PubMed/Entrez`  
-    `def search_arxiv(query, max_results)    # API arXiv`  
-    `def search_crossref(query, max_results) # API CrossRef`  
-    `def _parse_pubmed_xml()                 # Parser XML PubMed`  
-    `def _parse_arxiv_xml()                  # Parser Atom arXiv`
+```python
+class DatabaseManager:
+    def search_pubmed(query, max_results): ...   # API PubMed/Entrez
+    def search_arxiv(query, max_results): ...    # API arXiv
+    def search_crossref(query, max_results): ... # API CrossRef
+    def _parse_pubmed_xml(): ...                 # Parser XML PubMed
+    def _parse_arxiv_xml(): ...                  # Parser Atom arXiv
+```
 
-`def fetch_article_details(article_id)      # Récupération métadonnées`  
-`def fetch_unpaywall_pdf_url(doi)          # URLs PDF Open Access`
+```python
+def fetch_article_details(article_id): ...      # Récupération métadonnées
+def fetch_unpaywall_pdf_url(doi): ...           # URLs PDF Open Access
+```
 
-**utils/ai\_processors.py (213 lignes)**
+**utils/ai\_processors.py**
 
 **Interface avec système IA Ollama**
 
 **Fonctions clés**:
 
-`def call_ollama_api(prompt, model, format)  # Appel API Ollama`  
-`def requests_session_with_retries()         # Session HTTP robuste`  
-`class AIResponseError(Exception)            # Gestion erreurs IA`
+```python
+def call_ollama_api(prompt, model, format): ...  # Appel API Ollama
+def requests_session_with_retries(): ...         # Session HTTP robuste
+class AIResponseError(Exception): ...            # Gestion erreurs IA
+```
 
 **API et Endpoints**
 
@@ -395,20 +406,24 @@ s `│   ├── manage.py                  # Point d'entrée pour Flask CLI (
 
 **Réponse standard**:
 
-`{`  
-  `"status": "success|error",`  
-  `"data": {...},`  
-  `"message": "Description",`  
-  `"timestamp": "2024-01-15T10:30:00Z"`  
-`}`
+```json
+{
+  "status": "success|error",
+  "data": {},
+  "message": "Description",
+  "timestamp": "2024-01-15T10:30:00Z"
+}
+```
 
 **Réponse tâche asynchrone**:
 
-`{`  
-  `"message": "Tâche lancée",`  
-  `"task_id": "uuid-task-id",`  
-  `"status_url": "/api/tasks/uuid-task-id/status"`  
-`}`
+```json
+{
+  "message": "Tâche lancée",
+  "task_id": "uuid-task-id",
+  "status_url": "/api/tasks/uuid-task-id/status"
+}
+```
 
 **Système de Tâches Asynchrones**
 
@@ -428,28 +443,34 @@ s `│   ├── manage.py                  # Point d'entrée pour Flask CLI (
 
 **Recherche et Import**
 
-`multi_database_search_task()               # Recherche multi-bases`  
-`import_from_zotero_file_task()            # Import fichier Zotero`  
-`import_pdfs_from_zotero_task()            # Sync PDFs Zotero API`  
-`add_manual_articles_task()                # Ajout manuel articles`
+```python
+def multi_database_search_task(): ...               # Recherche multi-bases
+def import_from_zotero_file_task(): ...            # Import fichier Zotero
+def import_pdfs_from_zotero_task(): ...            # Sync PDFs Zotero API
+def add_manual_articles_task(): ...                # Ajout manuel articles
+```
 
 **Traitement IA**
 
-`process_single_article_task()             # Screening/extraction individuel`  
-`run_synthesis_task()                      # Synthèse articles pertinents`  
-`run_discussion_generation_task()          # Génération discussion`  
-`index_project_pdfs_task()                # Indexation vectorielle`  
-`answer_chat_question_task()               # Réponses chat RAG`
+```python
+def process_single_article_task(): ...             # Screening/extraction individuel
+def run_synthesis_task(): ...                      # Synthèse articles pertinents
+def run_discussion_generation_task(): ...          # Génération discussion
+def index_project_pdfs_task(): ...                 # Indexation vectorielle
+def answer_chat_question_task(): ...               # Réponses chat RAG
+```
 
 **Analyses Avancées**
 
-`run_meta_analysis_task()                  # Méta-analyse statistique`  
-`run_atn_score_task()                      # Scores ATN spécialisés`  
-`run_knowledge_graph_task()               # Graphe connaissances`  
-`run_prisma_flow_task()                    # Diagramme PRISMA`  
-`run_descriptive_stats_task()             # Statistiques descriptives`  
-`calculate_kappa_task()                    # Coefficient Kappa Cohen`  
-`run_risk_of_bias_task()                  # Évaluation biais`
+```python
+def run_meta_analysis_task(): ...                  # Méta-analyse statistique
+def run_atn_score_task(): ...                      # Scores ATN spécialisés
+def run_knowledge_graph_task(): ...                # Graphe connaissances
+def run_prisma_flow_task(): ...                    # Diagramme PRISMA
+def run_descriptive_stats_task(): ...              # Statistiques descriptives
+def calculate_kappa_task(): ...                    # Coefficient Kappa Cohen
+def run_risk_of_bias_task(): ...                   # Évaluation biais
+```
 
 **📊 Monitoring des Tâches**
 
@@ -467,10 +488,12 @@ s `│   ├── manage.py                  # Point d'entrée pour Flask CLI (
 
 **Notifications WebSocket**:
 
-`// Frontend reçoit notifications temps réel`  
-`socket.on('task_progress', (data) => {`  
-  `updateProgressBar(data.progress);`  
-`});`
+```javascript
+// Frontend reçoit notifications temps réel
+socket.on('task_progress', (data) => {
+  updateProgressBar(data.progress);
+});
+```
 
 **Intelligence Artificielle**
 
@@ -478,29 +501,32 @@ s `│   ├── manage.py                  # Point d'entrée pour Flask CLI (
 
 **Configuration par défaut** (`profiles.json`):
 
-`{`  
-  `"fast": {`  
-    `"preprocess": "phi3:mini",`  
-    `"extract": "phi3:mini",`   
-    `"synthesis": "llama3.1:8b"`  
-  `},`  
-  `"standard": {`  
-    `"preprocess": "phi3:mini",`  
-    `"extract": "llama3.1:8b",`  
-    `"synthesis": "llama3.1:8b"`    
-  `},`  
-  `"deep": {`  
-    `"preprocess": "llama3.1:8b",`  
-    `"extract": "mixtral:8x7b",`  
-    `"synthesis": "llama3.1:70b"`  
-  `}`  
-`}`
+```json
+{
+  "fast": {
+    "preprocess": "phi3:mini",
+    "extract": "phi3:mini",
+    "synthesis": "llama3.1:8b"
+  },
+  "standard": {
+    "preprocess": "phi3:mini",
+    "extract": "llama3.1:8b",
+    "synthesis": "llama3.1:8b"
+  },
+  "deep": {
+    "preprocess": "llama3.1:8b",
+    "extract": "mixtral:8x7b",
+    "synthesis": "llama3.1:70b"
+  }
+}
+```
 
 **📝 Templates de Prompts**
 
 **Screening Template**
 
-`def get_screening_prompt_template():`  
+```python
+def get_screening_prompt_template():
     `return """En tant qu'assistant de recherche spécialisé,`   
     `analysez cet article et déterminez sa pertinence.`  
       
@@ -511,10 +537,12 @@ s `│   ├── manage.py                  # Point d'entrée pour Flask CLI (
     `Répondez UNIQUEMENT en JSON:`  
     `{{"relevance_score": 0-10, "decision": "À inclure"|"À exclure",`   
       `"justification": "..."}}"""`
+```
 
 **Template ATN Spécialisé**
 
-`def get_scoping_atn_template(fields):`  
+```python
+def get_scoping_atn_template(fields):
     `return """ROLE: Assistant expert en scoping review sur`   
     `l'alliance thérapeutique numérique.`  
       
@@ -527,6 +555,7 @@ s `│   ├── manage.py                  # Point d'entrée pour Flask CLI (
       
     `TEXTE À ANALYSER: {text}`  
     `Répondez UNIQUEMENT avec ce JSON : {...}"""`
+```
 
 **🔍 Système RAG (Retrieval-Augmented Generation)**
 
@@ -534,30 +563,34 @@ s `│   ├── manage.py                  # Point d'entrée pour Flask CLI (
 
 1. **Indexation** (`index_project_pdfs_task`):
 
-`# Extraction texte PDF`  
-`pdf_text = extract_text_from_pdf(pdf_path)`
+```python
+# Extraction texte PDF
+pdf_text = extract_text_from_pdf(pdf_path)
 
-`# Découpage chunks`  
-`chunks = [text[i:i+1200] for i in range(0, len(text), 1000)]`
+# Découpage chunks
+chunks = [text[i:i+1200] for i in range(0, len(text), 1000)]
 
-`# Vectorisation`  
-`embeddings = embedding_model.encode(chunks)`
+# Vectorisation
+embeddings = embedding_model.encode(chunks)
 
-`# Stockage ChromaDB`  
-`collection.add(documents=chunks, embeddings=embeddings)`
+# Stockage ChromaDB
+collection.add(documents=chunks, embeddings=embeddings)
+```
 
 2. **Requête** (`answer_chat_question_task`):
 
-`# Vectorisation question`  
-`query_embedding = embedding_model.encode([question])`
+```python
+# Vectorisation question
+query_embedding = embedding_model.encode([question])
 
-`# Recherche similarité`  
-`results = collection.query(query_embeddings=query_embedding, n_results=3)`
+# Recherche similarité
+results = collection.query(query_embeddings=query_embedding, n_results=3)
 
-`# Génération réponse`  
-`context = "\n".join(results['documents'][0])`  
-`prompt = f"Contexte: {context}\nQuestion: {question}"`  
-`response = call_ollama_api(prompt, "llama3.1:8b")`
+# Génération réponse
+context = "\n".join(results['documents'][0])
+prompt = f"Contexte: {context}\nQuestion: {question}"
+response = call_ollama_api(prompt, "llama3.1:8b")
+```
 
 **Tests et Qualité**
 
@@ -654,36 +687,52 @@ s `│   ├── manage.py                  # Point d'entrée pour Flask CLI (
 
 **Commandes essentielles**:
 
-`# Préparation`  
-`cp env.example .env`  
-`# Éditer .env avec vos configurations`
+```bash
+# Préparation
+cp .env.example .env
+# Éditer .env avec vos configurations
 
-`# Démarrage`  
-`docker-compose up --build -d`
+```
+```bash
+# Démarrage
+docker-compose up --build -d
 
-`# Vérification`  
-`docker-compose ps`  
-`curl http://localhost:8080/api/health`
+```
+```bash
+# Vérification
+docker-compose ps
+curl http://localhost:8080/api/health
 
-`# Monitoring`  
-`docker-compose logs -f web worker`
-`docker-compose logs -f web worker-default`
+```
+```bash
+# Monitoring
+docker-compose logs -f web worker-default
+```
+
 **Variables d'environnement critiques**:
 
-`# Base de données`  
-`DATABASE_URL=postgresql+psycopg2://user:pass@db:5432/analylit_db`
+```dotenv
+# Base de données
+DATABASE_URL=postgresql+psycopg2://user:pass@db:5432/analylit_db
 
-`# Services`  
-`REDIS_URL=redis://redis:6379/0`    
-`OLLAMA_BASE_URL=http://ollama:11434`
+```
+```dotenv
+# Services
+REDIS_URL=redis://redis:6379/0
+OLLAMA_BASE_URL=http://ollama:11434
 
-`# APIs externes`  
-`UNPAYWALL_EMAIL=your@email.com`  
-`ZOTERO_USER_ID=your_zotero_id`  
-`ZOTERO_API_KEY=your_api_key`
+```
+```dotenv
+# APIs externes
+UNPAYWALL_EMAIL=your@email.com
+ZOTERO_USER_ID=your_zotero_id
+ZOTERO_API_KEY=your_api_key
 
-`# Sécurité`    
-`SECRET_KEY=your_secret_key_here`
+```
+```dotenv
+# Sécurité
+SECRET_KEY=your_secret_key_here
+```
 
 **Commandes Utiles (via Makefile)**
 
@@ -868,11 +917,12 @@ L'application suit intégralement les 20 items PRISMA-ScR :
 
 **Auto-complétion intelligente** basée sur les données du projet :
 
-`# Exemple d'auto-complétion`   
-`if project.search_query and project.databases_used:`  
-    `checklist['sections']['methods']['items'][2]['status'] = 'auto-completed'`
+```python
+# Exemple d'auto-complétion
+if project.search_query and project.databases_used:
+    checklist['sections']['methods']['items'][2]['status'] = 'auto-completed'
+```
 
 Cette approche méthodologique rigoureuse garantit la conformité aux standards internationaux tout en optimisant l'efficacité par l'automatisation intelligente.
 
-*Guide généré pour AnalyLit v4.1 \- Application de Scoping Review ATN*  
-*Version: 4.1.0 | Date: 2024 | Auteur: \[Votre nom\]*
+*Guide généré pour AnalyLit v4.1 - Application de Scoping Review ATN*

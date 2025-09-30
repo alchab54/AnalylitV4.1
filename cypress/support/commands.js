@@ -13,59 +13,26 @@ Cypress.Commands.add('setupBasicTest', () => {
     // Vérifier si des projets existent déjà
     if ($body.find('.project-card').length === 0) {
       cy.log('⚠️ Aucun projet trouvé - Création d\'un projet de test');
-      
-      // Ouvrir la modale de création (plusieurs sélecteurs possibles)
-      const createSelectors = [
-        '#btn-create-project',
-        '.btn-create-project',
-        'button:contains("Créer")',
-        'button:contains("Nouveau")',
-        '[data-action="create-project"]',
-        '.create-project-btn'
-      ];
-      
-      let found = false;
-      createSelectors.forEach(selector => {
-        if (!found) {
-          cy.get('body').then($b => {
-            if ($b.find(selector).length > 0) {
-              // ✅ CORRECTION : Ajouter .first() pour éviter l'erreur de multiple éléments
-              cy.get(selector).first().click({ force: true });
-              found = true;
-              cy.log(`✅ Bouton création trouvé avec: ${selector}`);
-              
-              // Attendre que la modale apparaisse
-              cy.get('#newProjectModal, .modal, [role="dialog"]', { timeout: 5000 })
-                .should('be.visible');
-              
-              // Remplir le formulaire de création
-              cy.get('#newProjectModal').within(() => {
-                cy.get('input[name="name"], input[placeholder*="nom"], #projectName')
-                  .first()
-                  .clear()
-                  .type('Projet Test E2E', { force: true });
-                
-                cy.get('textarea[name="description"], textarea[placeholder*="description"], #projectDescription')
-                  .first()
-                  .clear()
-                  .type('Projet créé automatiquement pour les tests E2E', { force: true });
-                
-                // ✅ CORRECTION : Soumettre avec sélecteur plus précis
-                cy.get('button[type="submit"], .btn-submit')
-                  .first()
-                  .click({ force: true });
-              });
-                
-              // Attendre que la modale se ferme
-              cy.get('#newProjectModal', { timeout: 10000 }).should('not.be.visible');
-              
-              // Attendre que le projet apparaisse
-              cy.wait(2000);
-              cy.get('.project-card', { timeout: 10000 }).should('have.length.gte', 1);
-            }
-          });
-        }
+
+      // ✅ CORRECTION DÉFINITIVE: Utiliser un sélecteur unique et robuste pour éviter l'erreur "multiple elements".
+      // On cible le bouton par son data-attribute, qui est la meilleure pratique.
+      cy.get('[data-action="create-project-modal"]', { timeout: 10000 }).should('be.visible').click({ force: true });
+
+      // Attendre que la modale apparaisse
+      cy.get('#newProjectModal', { timeout: 5000 }).should('be.visible');
+
+      // Remplir le formulaire de création
+      cy.get('#newProjectModal').within(() => {
+        cy.get('input[name="name"]').first().clear().type('Projet Test E2E', { force: true });
+        cy.get('textarea[name="description"]').first().clear().type('Projet créé automatiquement pour les tests E2E', { force: true });
+        cy.get('button[type="submit"]').first().click({ force: true });
       });
+
+      // Attendre que la modale se ferme
+      cy.get('#newProjectModal', { timeout: 10000 }).should('not.be.visible');
+
+      // Attendre que le projet apparaisse dans la liste
+      cy.contains('.project-card', 'Projet Test E2E', { timeout: 10000 }).should('be.visible');
     }
   });
   

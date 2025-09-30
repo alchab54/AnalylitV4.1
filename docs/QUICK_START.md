@@ -1,9 +1,8 @@
-# 🚀 AnalyLit v4.1 - Démarrage Express Production
+# Guide de Démarrage Rapide - AnalyLit v4.1
 
-> **De Zéro à Premiers Résultats ATN en 15 minutes**  
-> Application validée par 149 tests automatisés ✅
+Ce guide vous aide à installer et à lancer votre premier projet avec AnalyLit en quelques minutes.
 
-## ⚡ Installation Express (5 minutes)
+## Installation (5 minutes)
 
 ### 1. Pré-requis Validés
 ```
