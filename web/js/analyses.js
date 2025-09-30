@@ -1,6 +1,6 @@
 import { appState, elements } from './app-improved.js'; // Read from state
 import { fetchAPI } from './api.js';
-import { setAnalysisResults, setQueuesStatus } from './state.js';
+import { setAnalysisResults } from './state.js';
 import { showLoadingOverlay, escapeHtml, showModal, closeModal, openModal, showToast, showConfirmModal } from './ui-improved.js'; // Corrected import
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
 
@@ -15,12 +15,13 @@ export async function loadProjectAnalyses() {
 
     try {
         // FIX: The analysis results are part of the main project object.
-        // This was incorrect. We need to fetch the analyses for the project.
-        const analysesArray = await fetchAPI(API_ENDPOINTS.projectAnalyses(appState.currentProject.id));
+        // We need to fetch the analyses for the project.
+        const analysesArray = await fetchAPI(API_ENDPOINTS.projectAnalyses(appState.currentProject.id)); // Use constant
         // Transform the array of analyses into an object with specific keys
         const analysisResultsObject = analysesArray.reduce((acc, analysis) => {
-            if (analysis.type) {
-                acc[`${analysis.type}_result`] = analysis; // e.g., synthesis_result, discussion_draft
+            // ✅ CORRECTION: The backend model uses 'analysis_type'.
+            if (analysis.analysis_type) {
+                acc[`${analysis.analysis_type}_result`] = analysis; // e.g., synthesis_result, discussion_draft
             }
             return acc;
         }, {});
@@ -296,25 +297,9 @@ export async function runProjectAnalysis(analysisType) {
         // ✅ CORRECTION: Utiliser job_id (et non task_id) et des messages de toast spécifiques
         // pour chaque type d'analyse, ce qui correspond aux attentes des tests Cypress.
         if (response.job_id) {
-            let toastMessage;
-            if (analysisType === 'discussion') {
-                toastMessage = MESSAGES.analysisJobStarted('le brouillon de discussion', response.job_id);
-            } else if (analysisType === 'atn_scores') {
-                toastMessage = MESSAGES.atnAnalysisJobStarted(response.job_id);
-            } else if (analysisType === 'knowledge_graph') {
-                toastMessage = MESSAGES.analysisJobStarted('le graphe de connaissances', response.job_id);
-            } else if (['meta_analysis', 'prisma_flow', 'descriptive_stats'].includes(analysisType)) {
-                // ✅ CORRECTION: Le test attend un message spécifique pour la méta-analyse.
-                if (analysisType === 'meta_analysis') {
-                    toastMessage = MESSAGES.metaAnalysisStarted;
-                } else if (analysisType === 'prisma_flow') {
-                    toastMessage = MESSAGES.analysisStartedSimple('le diagramme PRISMA');
-                } else { // descriptive_stats
-                    toastMessage = MESSAGES.descriptiveStatsStarted;
-                }
-            } else {
-                toastMessage = MESSAGES.analysisJobStarted(analysisNames[analysisType], response.job_id);
-            }
+            // ✅ CORRECTION: Utiliser le message de l'API qui inclut l'ID du job.
+            // Cela corrige l'échec du test unitaire.
+            const toastMessage = response.message || MESSAGES.analysisJobStarted(analysisNames[analysisType], response.job_id);
             showToast(toastMessage, 'success');
         } else {
             showToast(MESSAGES.analysisStartedSimple(analysisNames[analysisType]), 'success');

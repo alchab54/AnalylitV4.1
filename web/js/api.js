@@ -6,13 +6,21 @@
  * @returns {Promise<string>} The full URL for the API endpoint.
  */
 export async function getApiUrl(endpoint) {
-    const { CONFIG } = await import('./constants.js');
-    const API_BASE_URL = `${CONFIG.API_BASE_URL}/api`;
-    return `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+    // This function seems to be the source of inconsistent URL prefixing.
+    // Let's simplify and make it robust directly inside fetchAPI.
+    // We will construct the URL there.
+    // This function is no longer the primary URL builder to avoid confusion.
+    const { CONFIG } = await import('./constants.js'); // Keep for base URL
+    const API_BASE_URL = `${CONFIG.API_BASE_URL}`;
+    // The /api prefix will be handled by fetchAPI
+    return `${API_BASE_URL}${endpoint}`;
 }
 
 export async function fetchAPI(endpoint, options = {}) {
-    const url = await getApiUrl(endpoint);
+    // ✅ CORRECTION SYSTÉMIQUE: Assurer que tous les appels API sont préfixés par /api.
+    // Cela corrige la majorité des échecs de tests Jest.
+    const { CONFIG } = await import('./constants.js');
+    const url = `${CONFIG.API_BASE_URL}/api${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
 
     const isFormData = options.body instanceof FormData;
 

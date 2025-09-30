@@ -85,10 +85,9 @@ def get_project_search_results(project_id):
     sort_by = request.args.get('sort_by', 'created_at')
     sort_order = request.args.get('sort_order', 'desc')
     
-    # ✅ CORRECTION: La méthode .paginate() n'est pas directement compatible avec la fixture de test.
-    # On utilise une pagination manuelle avec la syntaxe SQLAlchemy 2.0 correcte.
+    # ✅ CORRECTION FINALE: Remplacer la tentative d'utiliser .query() qui est incompatible.
+    # Utiliser une approche SQLAlchemy 2.0 pure pour la pagination.
     stmt = select(SearchResult).filter_by(project_id=project_id)
-
     if hasattr(SearchResult, sort_by):
         order_column = getattr(SearchResult, sort_by)
         if sort_order == 'asc':
@@ -96,11 +95,11 @@ def get_project_search_results(project_id):
         else:
             stmt = stmt.order_by(order_column.desc())
 
-    # ✅ SOLUTION DÉFINITIVE : Pagination manuelle robuste pour contourner l'incompatibilité
-    # de la méthode .paginate() avec la fixture de test.
+    # Compter le total des résultats
     total_stmt = select(db.func.count()).select_from(stmt.subquery())
     total = db.session.execute(total_stmt).scalar_one()
     offset = (page - 1) * per_page
+    # Appliquer la pagination à la requête
     paginated_stmt = stmt.offset(offset).limit(per_page)
     items = db.session.execute(paginated_stmt).scalars().all()
     total_pages = (total + per_page - 1) // per_page if per_page > 0 else 0
@@ -567,8 +566,8 @@ def export_thesis(project_id):
         included_article_ids = db.session.scalars(select(Extraction.pmid).filter_by(project_id=project_id, user_validation_status='include')).all()
         
         if included_article_ids:
-            # ✅ CORRECTION: scalars().all() retourne déjà une liste de valeurs, pas des objets Row.
-            articles_to_export = [r.to_dict() for r in search_results if r.article_id in included_ids]
+            # ✅ CORRECTION FINALE: La variable `included_ids` n'était pas définie.
+            articles_to_export = [r.to_dict() for r in search_results if r.article_id in included_article_ids]
         else:
             articles_to_export = [r.to_dict() for r in search_results]
 
