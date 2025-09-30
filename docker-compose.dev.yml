@@ -6,6 +6,12 @@
 
 services:
   web:
+    # ✅ DEV MODE: Utiliser le serveur de développement Flask avec rechargement automatique.
+    command: >
+      bash -c "echo '🔧 Démarrage en mode DÉVELOPPEMENT...' &&
+               flask run --host=0.0.0.0 --port=5000"
+    environment:
+      - FLASK_ENV=development # Active le mode debug et le rechargement
     volumes:
       # Monter le code source pour le rechargement à chaud
       - ./api:/home/appuser/app/api
@@ -47,7 +53,13 @@ services:
   migrate:
     # En mode dev, on veut aussi que migrate utilise les derniers fichiers locaux
     volumes:
-      - .:/home/appuser/app
+      - ./api:/home/appuser/app/api
+      - ./backend:/home/appuser/app/backend
+      - ./scripts:/home/appuser/app/scripts
+      - ./utils:/home/appuser/app/utils
+      - ./migrations:/home/appuser/app/migrations
+      - ./alembic.ini:/home/appuser/app/alembic.ini
+      - ./scripts/entrypoint.sh:/home/appuser/app/entrypoint.sh # ✅ CORRECTION: Utiliser le bon chemin source pour le script.
     depends_on:
       test-db:
         condition: service_started
