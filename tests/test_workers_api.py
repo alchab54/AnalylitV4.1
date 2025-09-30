@@ -96,12 +96,11 @@ class TestWorkersIntegration:
             # ✅ CORRECTION: Utiliser MagicMock pour une simulation plus simple et correcte.
             mock_job = MagicMock()
             mock_job.id = 'completed-job'
-            mock_job.is_finished = True
-            mock_job.is_failed = False
-            # ✅ CORRECTION FINALE: `return_value` est une propriété qui doit contenir un dictionnaire sérialisable.
-            mock_job.return_value = {"status": "completed", "results": "test"}
+            mock_job.result = {"status": "completed", "results": "test"}
             mock_job.get_status.return_value = 'finished'
-            # ✅ CORRECTION FINALE: Explicitement définir les autres attributs accédés pour éviter la sérialisation d'un MagicMock.
+            mock_job.enqueued_at = None
+            mock_job.started_at = None
+            mock_job.ended_at = None
             mock_job.exc_info = None
 
             mock_fetch.return_value = mock_job
