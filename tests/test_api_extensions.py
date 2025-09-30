@@ -63,7 +63,7 @@ def test_api_prompts_get_and_update(client: FlaskClient, db_session: Session):
     Teste la récupération (GET) et la mise à jour (POST) des Prompts.
     """
     # 1. GET /prompts (doit retourner une liste, même si vide)
-    response_get = client.get('/api/prompts')
+    response_get = client.get('/api/settings/prompts')
     assert response_get.status_code == 200
     assert isinstance(response_get.json, list)
     
@@ -72,7 +72,7 @@ def test_api_prompts_get_and_update(client: FlaskClient, db_session: Session):
         "name": f"test_prompt_unique_{uuid.uuid4()}",
         "content": "This is a test template: {{context}}"
     }
-    response_post = client.post('/api/prompts', json=prompt_payload)
+    response_post = client.post('/api/settings/prompts', json=prompt_payload)
     assert response_post.status_code == 201
     assert response_post.json['name'] == prompt_payload['name']
     assert response_post.json['content'] == prompt_payload['content']
@@ -124,7 +124,7 @@ def test_api_full_validation_workflow(client: FlaskClient, db_session: Session, 
         content_type='multipart/form-data'
     )
     assert response_eval_2.status_code == 200
-    assert response_eval_2.json['message'] == "1 validations ont été importées pour l_évaluateur evaluator2."
+    assert response_eval_2.json['message'] == "1 validations ont été importées pour l'évaluateur evaluator2."
 
     # 5. Assert 2
     db_session.refresh(extraction)
@@ -169,11 +169,11 @@ def test_api_prisma_checklist_workflow(client: FlaskClient, db_session: Session,
 # CATEGORIE 4: ADMIN & INFRASTRUCTURE
 # ================================================================
 
-@patch('backend.server_v4_complete.Worker')
-@patch('backend.server_v4_complete.processing_queue')
-@patch('backend.server_v4_complete.synthesis_queue')
-@patch('backend.server_v4_complete.analysis_queue')
-@patch('backend.server_v4_complete.background_queue')
+@patch('api.admin.Worker')
+@patch('api.admin.processing_queue')
+@patch('api.admin.synthesis_queue')
+@patch('api.admin.analysis_queue')
+@patch('api.admin.background_queue')
 def test_api_admin_queues_status(mock_bg_q, mock_an_q, mock_syn_q, mock_proc_q, mock_worker, client: FlaskClient):
     """
     Teste l'endpoint d'administration des files (queues) pour le monitoring.

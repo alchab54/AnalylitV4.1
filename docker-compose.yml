@@ -206,9 +206,7 @@ services:
       context: .  
       dockerfile: docker/Dockerfile.worker
     container_name: analylit_worker_ai
-    # ✅ CORRECTION: Ajout de 'analysis_queue' pour que les tâches d'analyse (comme 'atn_specialized_extraction')
-    # soient traitées, évitant ainsi le blocage des tests qui les attendent.
-    # La commande précédente avait déjà cette correction, mais nous la confirmons ici.
+    # ✅ CORRECTION: Ajout de 'analysis_queue' pour que les tâches d'analyse soient traitées.
     command: rq worker --url redis://redis:6379/0 ai_queue background_queue analysis_queue
     env_file:
       - .env

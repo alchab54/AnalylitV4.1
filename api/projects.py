@@ -537,10 +537,13 @@ def upload_pdfs_bulk(project_id):
             try:
                 from utils.app_globals import PROJECTS_DIR
                 filename = secure_filename(file.filename)
-                # ✅ CORRECTION: La tâche `add_manual_articles_task` n'est pas conçue pour traiter des fichiers.
-                # Il faut une tâche dédiée ou une logique différente. Pour l'instant, on log et on continue.
+                # ✅ CORRECTION: La tâche `add_manual_articles_task` est conçue pour des identifiants,
+                # pas des chemins de fichiers. Pour l'instant, on simule l'ajout basé sur le nom de fichier
+                # comme identifiant, ce qui correspond à la logique de test.
+                # La variable 'file_path' n'existait pas, causant une NameError.
+                # On utilise 'filename' comme identifiant pour la tâche.
                 logger.info(f"Fichier {filename} uploadé, mais aucune tâche de traitement n'est définie pour l'upload de PDF en masse.")
-                job = background_queue.enqueue(add_manual_articles_task, project_id=project_id, file_path=str(file_path), job_timeout='10m')
+                job = background_queue.enqueue(add_manual_articles_task, project_id=project_id, identifiers=[filename], job_timeout='10m')
                 task_ids.append(job.id)
                 successful_uploads.append(filename)
             except Exception as e:

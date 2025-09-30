@@ -426,7 +426,7 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
     # On patche la fonction qui sauvegarde le fichier pour ne pas écrire sur le disque
     with patch('backend.server_v4_complete.save_file_to_project_dir', return_value='/fake/path/to/test.json'):
         response = client.post(
-            f'/api/projects/{project_id}/upload-zotero-file', # Correction du nom de la route
+            f'/api/projects/{project_id}/upload-zotero',
             data=file_data,
             content_type='multipart/form-data'
         )
