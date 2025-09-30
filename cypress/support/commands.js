@@ -67,7 +67,10 @@ Cypress.Commands.add('createTestProject', (projectData = {}) => {
 });
 
 Cypress.Commands.add('selectProject', (projectName) => {
-  cy.contains('.project-card', projectName).click({ force: true });
+  // ✅ CORRECTION: Attendre que la liste des projets soit visible avant de chercher un projet.
+  // Cela résout les erreurs de timeout dans les hooks beforeEach.
+  cy.get('#projects-list', { timeout: 10000 }).should('be.visible');
+  cy.contains('.project-card', projectName, { timeout: 10000 }).should('be.visible').click({ force: true });
   cy.get('#projectDetail h2').should('contain', projectName);
   cy.log(`Selected project: ${projectName}`);
 });
