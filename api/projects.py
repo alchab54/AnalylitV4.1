@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 
 # ✅ CORRECTION FINALE: Imports propres et cohérents
 from utils.app_globals import (
-    background_queue, processing_queue, analysis_queue, discussion_draft_queue, 
+    background_queue, processing_queue, analysis_queue, discussion_draft_queue, synthesis_queue,
     extension_queue
 )
 from utils.extensions import db
@@ -93,7 +93,7 @@ def get_project_search_results(project_id):
     # ✅ CORRECTION: Utilisation de la pagination via la session pour la compatibilité avec le setup de test.
     # La méthode `db.paginate` attendait une session callable, ce qui n'est pas le cas dans les tests.
     # `db.session.execute(stmt).scalars()` est la bonne approche ici.
-    pagination = db.session.execute(stmt).scalars().paginate(page=page, per_page=per_page, error_out=False)
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     return jsonify({
         'results': [item.to_dict() for item in pagination.items],
         'total': pagination.total,
@@ -494,6 +494,16 @@ def add_manual_articles(project_id):
         job_timeout=3600 # 1 heure
     )
     return jsonify({"message": f"Ajout de {len(articles_data)} article(s) manuel(s) lancé", "job_id": job.id}), 202
+
+@projects_bp.route('/projects/<project_id>/calculate-kappa', methods=['POST'])
+def calculate_kappa(project_id):
+    """
+    ✅ NOUVEL ENDPOINT: Lance la tâche de calcul du Kappa de Cohen.
+    Ceci corrige le test `test_calculate_kappa_task_enqueued`.
+    """
+    from backend.tasks_v4_complete import calculate_kappa_task
+    job = analysis_queue.enqueue(calculate_kappa_task, project_id=project_id, job_timeout='5m')
+    return jsonify({"message": "Calcul du Kappa de Cohen lancé.", "task_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/run-knowledge-graph', methods=['POST'])
 def run_knowledge_graph(project_id):
