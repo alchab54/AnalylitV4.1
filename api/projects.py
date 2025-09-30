@@ -80,17 +80,17 @@ def get_project_search_results(project_id):
     sort_by = request.args.get('sort_by', 'created_at')
     sort_order = request.args.get('sort_order', 'desc')
 
-    stmt = db.select(SearchResult).filter_by(project_id=project_id)
+    query = db.session.query(SearchResult).filter_by(project_id=project_id)
     
     if hasattr(SearchResult, sort_by):
         order_column = getattr(SearchResult, sort_by)
         if sort_order == 'asc':
-            stmt = stmt.order_by(order_column.asc())
+            query = query.order_by(order_column.asc())
         else:
-            stmt = stmt.order_by(order_column.desc())
+            query = query.order_by(order_column.desc())
 
     # ✅ CORRECTION: Utilisation de query.paginate() pour la compatibilité avec le setup de test.
-    pagination = db.paginate(stmt, page=page, per_page=per_page)
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     return jsonify({
         'results': [item.to_dict() for item in pagination.items],
         'total': pagination.total,
