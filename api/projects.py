@@ -118,22 +118,24 @@ def get_project_analyses(project_id):
     """
     Retourne les résultats de toutes les analyses terminées pour un projet.
     """
-    stmt = select(Analysis).filter_by(project_id=project_id)
-    analyses = db.session.execute(stmt).scalars().all()
+    # ✅ CORRECTION: Utiliser la syntaxe SQLAlchemy 2.0
+    analyses = db.session.scalars(select(Analysis).filter_by(project_id=project_id)).all()
     return jsonify([analysis.to_dict() for analysis in analyses]), 200
 
 @projects_bp.route('/projects/<project_id>/chat-history', methods=['GET'])
 def get_chat_history(project_id):
     """Retourne l'historique du chat pour un projet, trié par date."""
-    stmt = select(ChatMessage).filter_by(project_id=project_id).order_by(ChatMessage.timestamp.asc())
-    messages = db.session.execute(stmt).scalars().all()
+    # ✅ CORRECTION: Utiliser la syntaxe SQLAlchemy 2.0
+    messages = db.session.scalars(
+        select(ChatMessage).filter_by(project_id=project_id).order_by(ChatMessage.timestamp.asc())
+    ).all()
     return jsonify([msg.to_dict() for msg in messages])
 
 @projects_bp.route('/projects/<project_id>/extractions', methods=['GET'])
 def get_project_extractions(project_id):
     """Retourne toutes les extractions pour un projet."""
-    stmt = select(Extraction).filter_by(project_id=project_id)
-    extractions = db.session.execute(stmt).scalars().all()
+    # ✅ CORRECTION: Utiliser la syntaxe SQLAlchemy 2.0
+    extractions = db.session.scalars(select(Extraction).filter_by(project_id=project_id)).all()
     return jsonify([e.to_dict() for e in extractions]), 200
 
 @projects_bp.route('/projects/<project_id>', methods=['DELETE'])
@@ -177,8 +179,8 @@ def import_grid(project_id):
 
 @projects_bp.route('/projects/<project_id>/grids', methods=['GET'])
 def get_grids(project_id):
-    stmt = select(Grid).filter_by(project_id=project_id)
-    grids = db.session.execute(stmt).scalars().all()
+    # ✅ CORRECTION: Utiliser la syntaxe SQLAlchemy 2.0
+    grids = db.session.scalars(select(Grid).filter_by(project_id=project_id)).all()
     return jsonify([grid.to_dict() for grid in grids]), 200
 
 @projects_bp.route('/projects/<project_id>/grids', methods=['POST'])
@@ -262,8 +264,8 @@ def import_validations(project_id):
             if not article_id or not decision:
                 continue
 
-            stmt = select(Extraction).filter_by(project_id=project_id, pmid=article_id)
-            extraction = db.session.execute(stmt).scalar_one_or_none()
+            # ✅ CORRECTION: Utiliser la syntaxe SQLAlchemy 2.0
+            extraction = db.session.scalar(select(Extraction).filter_by(project_id=project_id, pmid=article_id))
             if extraction:
                 validations = json.loads(extraction.validations) if extraction.validations else {}
                 validations['evaluator2'] = decision # Le test suppose 'evaluator2'
@@ -303,8 +305,8 @@ def run_pipeline(project_id):
     if not profile_id:
         return jsonify({"error": "Profil d'analyse requis"}), 400
 
-    stmt = select(AnalysisProfile).filter_by(id=profile_id)
-    profile = db.session.execute(stmt).scalar_one_or_none()
+    # ✅ CORRECTION: Utiliser la syntaxe SQLAlchemy 2.0
+    profile = db.session.get(AnalysisProfile, profile_id)
     if not profile:
         return jsonify({"error": "Profil d'analyse non trouvé"}), 404
 
@@ -426,8 +428,8 @@ def run_rob_analysis(project_id):
     article_ids = data.get('article_ids', [])
 
     # ✅ CORRECTION: Vérifier que le projet existe avant de lancer les tâches.
-    stmt = select(Project).filter_by(id=project_id)
-    project = db.session.execute(stmt).scalar_one_or_none()
+    # ✅ CORRECTION: Utiliser la syntaxe SQLAlchemy 2.0
+    project = db.session.get(Project, project_id)
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
 
@@ -455,8 +457,8 @@ def save_rob_assessment(project_id, article_id):
         return jsonify({"error": "Données d'évaluation manquantes"}), 400
 
     # Logique "Upsert" : Mettre à jour si existant, sinon créer.
-    stmt = select(RiskOfBias).filter_by(project_id=project_id, article_id=article_id)
-    rob_assessment = db.session.execute(stmt).scalar_one_or_none()
+    # ✅ CORRECTION: Utiliser la syntaxe SQLAlchemy 2.0
+    rob_assessment = db.session.scalar(select(RiskOfBias).filter_by(project_id=project_id, article_id=article_id))
 
     if rob_assessment:
         # Mettre à jour l'enregistrement existant
@@ -527,8 +529,8 @@ def run_knowledge_graph(project_id):
 @projects_bp.route('/projects/<project_id>/prisma-checklist', methods=['GET'])
 def get_prisma_checklist(project_id):
     from utils.prisma_scr import get_base_prisma_checklist
-    stmt = select(Project).filter_by(id=project_id)
-    project = db.session.execute(stmt).scalar_one_or_none()
+    # ✅ CORRECTION: Utiliser la syntaxe SQLAlchemy 2.0
+    project = db.session.get(Project, project_id)
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
     
@@ -538,8 +540,8 @@ def get_prisma_checklist(project_id):
 
 @projects_bp.route('/projects/<project_id>/prisma-checklist', methods=['POST'])
 def save_prisma_checklist(project_id):
-    stmt = select(Project).filter_by(id=project_id)
-    project = db.session.execute(stmt).scalar_one_or_none()
+    # ✅ CORRECTION: Utiliser la syntaxe SQLAlchemy 2.0
+    project = db.session.get(Project, project_id)
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
     
@@ -559,16 +561,13 @@ def export_thesis(project_id):
     try:
         # ✅ NOUVEAU CODE ROBUSTE (SQLAlchemy 2.0 style) pour éviter l'erreur "missing FROM-clause"
         # ✅ REQUÊTE SIMPLIFIÉE ET ROBUSTE
-        stmt_sr = select(SearchResult).filter_by(project_id=project_id)
-        search_results = db.session.execute(stmt_sr).scalars().all()
+        search_results = db.session.scalars(select(SearchResult).filter_by(project_id=project_id)).all()
         
         # Filtrer par les extractions incluses si elles existent
-        stmt_ext = select(Extraction.pmid).filter_by(project_id=project_id, user_validation_status='include')
-        included_article_ids = db.session.execute(stmt_ext).scalars().all()
+        included_article_ids = db.session.scalars(select(Extraction.pmid).filter_by(project_id=project_id, user_validation_status='include')).all()
         
         if included_article_ids:
             # ✅ CORRECTION: scalars().all() retourne déjà une liste de valeurs, pas des objets Row.
-            included_ids = included_article_ids
             articles_to_export = [r.to_dict() for r in search_results if r.article_id in included_ids]
         else:
             articles_to_export = [r.to_dict() for r in search_results]

@@ -2,6 +2,7 @@
 
 import logging
 from flask import Blueprint, jsonify, request
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from utils.extensions import db
 from utils.models import Project, Stakeholder
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 @stakeholders_bp.route('/projects/<project_id>/stakeholders', methods=['POST'])
 def create_stakeholder(project_id):
-    project = db.session.query(Project).filter_by(id=project_id).first()
+    project = db.session.get(Project, project_id)
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
 
@@ -36,31 +37,31 @@ def create_stakeholder(project_id):
 
 @stakeholders_bp.route('/projects/<project_id>/stakeholders', methods=['GET'])
 def get_all_stakeholders(project_id):
-    project = db.session.query(Project).filter_by(id=project_id).first()
+    project = db.session.get(Project, project_id)
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
 
-    stakeholders = db.session.query(Stakeholder).filter_by(project_id=project_id).all()
+    stakeholders = db.session.scalars(select(Stakeholder).filter_by(project_id=project_id)).all()
     return jsonify([s.to_dict() for s in stakeholders]), 200
 
 @stakeholders_bp.route('/projects/<project_id>/stakeholders/<stakeholder_id>', methods=['GET'])
 def get_stakeholder_details(project_id, stakeholder_id):
-    project = db.session.query(Project).filter_by(id=project_id).first()
+    project = db.session.get(Project, project_id)
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
 
-    stakeholder = db.session.query(Stakeholder).filter_by(id=stakeholder_id, project_id=project_id).first()
+    stakeholder = db.session.scalar(select(Stakeholder).filter_by(id=stakeholder_id, project_id=project_id))
     if not stakeholder:
         return jsonify({"error": "Stakeholder non trouvé"}), 404
     return jsonify(stakeholder.to_dict()), 200
 
 @stakeholders_bp.route('/projects/<project_id>/stakeholders/<stakeholder_id>', methods=['PUT'])
 def update_stakeholder(project_id, stakeholder_id):
-    project = db.session.query(Project).filter_by(id=project_id).first()
+    project = db.session.get(Project, project_id)
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
 
-    stakeholder = db.session.query(Stakeholder).filter_by(id=stakeholder_id, project_id=project_id).first()
+    stakeholder = db.session.scalar(select(Stakeholder).filter_by(id=stakeholder_id, project_id=project_id))
     if not stakeholder:
         return jsonify({"error": "Stakeholder non trouvé"}), 404
 
@@ -82,11 +83,11 @@ def update_stakeholder(project_id, stakeholder_id):
 
 @stakeholders_bp.route('/projects/<project_id>/stakeholders/<stakeholder_id>', methods=['DELETE'])
 def delete_stakeholder(project_id, stakeholder_id):
-    project = db.session.query(Project).filter_by(id=project_id).first()
+    project = db.session.get(Project, project_id)
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
 
-    stakeholder = db.session.query(Stakeholder).filter_by(id=stakeholder_id, project_id=project_id).first()
+    stakeholder = db.session.scalar(select(Stakeholder).filter_by(id=stakeholder_id, project_id=project_id))
     if not stakeholder:
         return jsonify({"error": "Stakeholder non trouvé"}), 404
     
