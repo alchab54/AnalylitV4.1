@@ -11,8 +11,13 @@ Cypress.Commands.add('visitApp', () => {
 });
 
 Cypress.Commands.add('navigateToSection', (sectionId) => {
-  cy.get(`.app-nav__button[data-section-id="${sectionId}"]`).click({ force: true });
-  cy.get(`#${sectionId}`).should('be.visible');
+  // ✅ PATCH: Navigation vers une section avec validation
+  cy.get(`.app-nav__button[data-section-id="${sectionId}"]`, { timeout: 5000 })
+    .should('be.visible')
+    .click({ force: true });
+  cy.get(`.app-nav__button[data-section-id="${sectionId}"]`, { timeout: 5000 })
+    .should('have.class', 'app-nav__button--active');
+  cy.get(`#${sectionId}`).should('be.visible').and('not.be.empty');
   cy.log(`Navigated to section: ${sectionId}`);
 });
 
@@ -67,17 +72,35 @@ Cypress.Commands.add('createTestProject', (projectData = {}) => {
 });
 
 Cypress.Commands.add('selectProject', (projectName) => {
-  // ✅ CORRECTION: Attendre que la liste des projets soit visible avant de chercher un projet.
-  // Cela résout les erreurs de timeout dans les hooks beforeEach.
-  cy.get('#projects-list', { timeout: 10000 }).should('be.visible');
-  cy.contains('.project-card', projectName, { timeout: 10000 }).should('be.visible').click({ force: true });
-  cy.get('#projectDetail h2').should('contain', projectName);
+  // ✅ PATCH: Sélection de projet robuste
+  cy.intercept('GET', '/api/projects').as('getProjects');
+  cy.visit('/', { failOnStatusCode: false });
+  cy.wait('@getProjects', { timeout: 15000 });
+
+  cy.get('#projects-list', { timeout: 10000 })
+    .should('be.visible')
+    .and(($el) => {
+      expect(parseInt($el.css('height'))).to.be.greaterThan(0);
+    });
+
+  cy.contains('.project-card', projectName, { timeout: 10000 })
+    .should('be.visible')
+    .click({ force: true });
+
+  cy.contains('.project-card--selected', projectName, { timeout: 5000 }).should('exist');
   cy.log(`Selected project: ${projectName}`);
 });
 
 // ===================================================================
 // == COMMANDES UTILITAIRES ET DE DEBUG
 // ===================================================================
+
+Cypress.Commands.add('waitForElement', (selector, options = {}) => {
+  const timeout = options.timeout || 10000;
+  cy.get(selector, { timeout }).should('be.visible').and(($el) => {
+    expect(parseInt($el.css('height'))).to.be.greaterThan(0);
+  });
+});
 
 Cypress.Commands.add('resetApp', () => {
   // Simule un rechargement propre de l'état de l'application.
