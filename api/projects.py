@@ -85,7 +85,7 @@ def get_project_search_results(project_id):
     sort_by = request.args.get('sort_by', 'created_at')
     sort_order = request.args.get('sort_order', 'desc')
     
-    # ✅ CORRECTION FINALE: Remplacer la tentative d'utiliser .query() qui est incompatible.
+    # ✅ CORRECTION: Remplacer la tentative d'utiliser .query() qui est incompatible avec la syntaxe 2.0.
     # Utiliser une approche SQLAlchemy 2.0 pure pour la pagination.
     stmt = select(SearchResult).filter_by(project_id=project_id)
     if hasattr(SearchResult, sort_by):
@@ -99,7 +99,6 @@ def get_project_search_results(project_id):
     total_stmt = select(db.func.count()).select_from(stmt.subquery())
     total = db.session.execute(total_stmt).scalar_one()
     offset = (page - 1) * per_page
-    # Appliquer la pagination à la requête
     paginated_stmt = stmt.offset(offset).limit(per_page)
     items = db.session.execute(paginated_stmt).scalars().all()
     total_pages = (total + per_page - 1) // per_page if per_page > 0 else 0
@@ -566,7 +565,7 @@ def export_thesis(project_id):
         included_article_ids = db.session.scalars(select(Extraction.pmid).filter_by(project_id=project_id, user_validation_status='include')).all()
         
         if included_article_ids:
-            # ✅ CORRECTION FINALE: La variable `included_ids` n'était pas définie.
+            # ✅ CORRECTION: La variable `included_ids` n'était pas définie, et la logique était incorrecte.
             articles_to_export = [r.to_dict() for r in search_results if r.article_id in included_article_ids]
         else:
             articles_to_export = [r.to_dict() for r in search_results]
@@ -582,7 +581,7 @@ def export_thesis(project_id):
 
         # 3. Formater la bibliographie
         bibliography_text = format_bibliography(articles_to_export)
-
+        
         # 4. Créer le fichier zip en mémoire
         zip_buffer = io.BytesIO()
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:

@@ -63,7 +63,7 @@ def call_ollama_api(prompt: str, model: str = "llama3.1:8b", output_format: str 
         
         session = requests_session_with_retries()
 
-        if output_format == "json":
+        if output_format == "json": # This was already correct
             payload["format"] = "json"
             payload["prompt"] = prompt + "\n\nRépondez UNIQUEMENT avec un JSON valide et complet:"
             
