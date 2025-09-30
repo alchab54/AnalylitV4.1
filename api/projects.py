@@ -63,12 +63,16 @@ def create_project():
 @projects_bp.route('/projects/', methods=['GET'])
 def get_all_projects():
     """Retourne la liste de tous les projets."""
-    projects = db.session.query(Project).order_by(Project.created_at.desc()).all()
+    # ✅ CORRECTION: Remplacer la syntaxe obsolète de SQLAlchemy 1.x par la syntaxe 2.0.
+    stmt = select(Project).order_by(Project.created_at.desc())
+    projects = db.session.execute(stmt).scalars().all()
     return jsonify([p.to_dict() for p in projects]), 200
 
 @projects_bp.route('/projects/<project_id>', methods=['GET'])
 def get_project_details(project_id):
-    project = db.session.query(Project).filter_by(id=project_id).first()
+    # ✅ CORRECTION: Remplacer la syntaxe obsolète de SQLAlchemy 1.x par la syntaxe 2.0.
+    # db.session.get() est la méthode optimisée pour récupérer un objet par sa clé primaire.
+    project = db.session.get(Project, project_id)
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
     return jsonify(project.to_dict()), 200

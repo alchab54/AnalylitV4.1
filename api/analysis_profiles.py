@@ -3,7 +3,7 @@
 import logging
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
-from utils.extensions import db
+from utils.extensions import db # type: ignore
 from utils.models import AnalysisProfile
 
 analysis_profiles_bp = Blueprint('analysis_profiles_bp', __name__)
@@ -38,13 +38,17 @@ def create_analysis_profile():
 @analysis_profiles_bp.route('/analysis-profiles', methods=['GET'])
 def get_all_analysis_profiles():
     """Retourne tous les profils d'analyse."""
-    profiles = db.session.query(AnalysisProfile).all()
+    # ✅ CORRECTION: Remplacer la syntaxe obsolète de SQLAlchemy 1.x par la syntaxe 2.0.
+    from sqlalchemy import select
+    stmt = select(AnalysisProfile)
+    profiles = db.session.execute(stmt).scalars().all()
     return jsonify([p.to_dict() for p in profiles]), 200
 
 @analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['GET'])
 def get_analysis_profile_details(profile_id):
     """Retourne les détails d'un profil d'analyse spécifique."""
-    profile = db.session.query(AnalysisProfile).filter_by(id=profile_id).first()
+    # ✅ CORRECTION: Utiliser db.session.get() pour une récupération optimisée par clé primaire.
+    profile = db.session.get(AnalysisProfile, profile_id)
     if not profile:
         return jsonify({"error": "Profil non trouvé"}), 404
     return jsonify(profile.to_dict()), 200
@@ -52,7 +56,8 @@ def get_analysis_profile_details(profile_id):
 @analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['PUT'])
 def update_analysis_profile(profile_id):
     """Met à jour un profil d'analyse existant."""
-    profile = db.session.query(AnalysisProfile).filter_by(id=profile_id).first()
+    # ✅ CORRECTION: Utiliser db.session.get() pour une récupération optimisée par clé primaire.
+    profile = db.session.get(AnalysisProfile, profile_id)
     if not profile:
         return jsonify({"error": "Profil non trouvé"}), 404
 
@@ -75,7 +80,8 @@ def update_analysis_profile(profile_id):
 @analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['DELETE'])
 def delete_analysis_profile(profile_id):
     """Supprime un profil d'analyse."""
-    profile = db.session.query(AnalysisProfile).filter_by(id=profile_id).first()
+    # ✅ CORRECTION: Utiliser db.session.get() pour une récupération optimisée par clé primaire.
+    profile = db.session.get(AnalysisProfile, profile_id)
     if not profile:
         return jsonify({"error": "Profil non trouvé"}), 404
 
