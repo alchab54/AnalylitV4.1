@@ -116,7 +116,7 @@ clean: ## Nettoyer le système (⚠️ supprime les données)
 
 dev: ## Mode développement avec rechargement automatique
 	@echo "$(BLUE)🔧 Démarrage en mode développement...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) -f docker-compose.dev.yml up
+	@docker-compose -f $(COMPOSE_FILE) -f docker-compose.dev.yml --profile dev up
 
 test: ## Exécuter les tests
 	@echo "$(BLUE)🧪 Exécution des tests...$(NC)"

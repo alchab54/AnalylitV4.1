@@ -110,22 +110,14 @@ services:
         condition: service_completed_successfully
       db:
         condition: service_healthy
-      test-db:
-        condition: service_started
       redis:
         condition: service_started
 
     volumes:
-      # Volumes pour les données persistantes et les logs
+      # En production, seul le code de l'image est utilisé.
+      # Seuls les volumes pour les données persistantes (logs, projets) sont conservés.
       - ./logs:/home/appuser/app/logs
       - ./projects:/home/appuser/app/projects
-      - ./migrations:/home/appuser/app/migrations
-      - ./tests:/home/appuser/app/tests
-      - ./scripts/run_migrations.py:/home/appuser/app/run_migrations.py
-      - ./web:/home/appuser/app/web
-      - ./backend:/home/appuser/app/backend
-      - ./api:/home/appuser/app/api
-      - ./pytest.ini:/home/appuser/app/pytest.ini
 
   # ✅ NOUVEAU SERVICE: 'migrate' pour les commandes de base de données.
   # Ce service partage l'environnement du service 'web' mais ne lance pas de serveur.
@@ -156,7 +148,7 @@ services:
       - |
         # ✅ CORRECTION FINALE: Utiliser 'tr' pour supprimer les fins de ligne Windows (\r)
         # de manière portable et éviter l'erreur "Device or resource busy" avec sed -i.
-        tr -d '\r' < /home/appuser/app/scripts/entrypoint.sh > /tmp/entrypoint_fixed.sh && chmod +x /tmp/entrypoint_fixed.sh &&
+        tr -d '\r' < /home/appuser/app/entrypoint.sh > /tmp/entrypoint_fixed.sh && chmod +x /tmp/entrypoint_fixed.sh &&
         # Exécuter l'entrypoint qui va attendre la DB puis exécuter la commande suivante
         /tmp/entrypoint_fixed.sh python -m alembic -c /home/appuser/app/alembic.ini upgrade head &&
         echo "🔧 Vérification finale des tables..." &&

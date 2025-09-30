@@ -1,0 +1,53 @@
+# Fichier d'override pour le développement local
+# Utilisation: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+# ✅ OPTIMISATION: Utilisation des profils pour séparer les services.
+# Le profil "dev" inclut les services et configurations spécifiques au développement.
+
+services:
+  web:
+    volumes:
+      # Monter le code source pour le rechargement à chaud
+      - ./api:/home/appuser/app/api
+      - ./backend:/home/appuser/app/backend
+      - ./scripts:/home/appuser/app/scripts
+      - ./utils:/home/appuser/app/utils
+      - ./web:/home/appuser/app/web
+      - ./migrations:/home/appuser/app/migrations
+      - ./alembic.ini:/home/appuser/app/alembic.ini
+      - ./pytest.ini:/home/appuser/app/pytest.ini
+    # En mode dev, on attend aussi la base de test
+    depends_on:
+      test-db:
+        condition: service_started
+
+  test-db:
+    # Ce service ne sera démarré qu'avec le profil "dev"
+    profiles:
+      - dev
+
+  worker-fast:
+    volumes:
+      - ./backend:/home/appuser/app/backend
+      - ./api:/home/appuser/app/api
+      - ./utils:/home/appuser/app/utils
+
+  worker-default:
+    volumes:
+      - ./backend:/home/appuser/app/backend
+      - ./api:/home/appuser/app/api
+      - ./utils:/home/appuser/app/utils
+
+  worker-ai:
+    volumes:
+      - ./backend:/home/appuser/app/backend
+      - ./api:/home/appuser/app/api
+      - ./utils:/home/appuser/app/utils
+
+  migrate:
+    # En mode dev, on veut aussi que migrate utilise les derniers fichiers locaux
+    volumes:
+      - .:/home/appuser/app
+    depends_on:
+      test-db:
+        condition: service_started

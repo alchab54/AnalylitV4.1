@@ -132,7 +132,6 @@ worker.log
 .gitattributes.local
 
 # IDEs et éditeurs
-.vscode/
 # ✅ AMÉLIORATION: Ne pas ignorer tout le dossier .vscode pour partager les paramètres.
 # On ignore seulement les fichiers spécifiques à l'utilisateur.
 .vscode/user-data/
