@@ -89,7 +89,7 @@ class TestWorkersIntegration:
             # Si l'endpoint n'existe pas, c'est OK pour ce test
             assert response.status_code in (202, 400, 404, 405) # Accepter 400 si le profil n'est pas set
 
-    def test_background_task_completion_simulation(self, client, setup_project):
+    def test_background_task_completion_simulation(self, client):
         """Simulation de completion d'une tâche en arrière-plan"""
         # Mock d'une tâche qui se termine
         with patch('rq.job.Job.fetch') as mock_fetch:

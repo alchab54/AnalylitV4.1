@@ -62,8 +62,8 @@ def test_calculate_kappa_task_enqueued(mock_enqueue, client, setup_double_coding
     Objectif : Confirmer que l'analyse de l'accord inter-juges peut être lancée.
     """
     project_id = setup_double_coding_data
-    
-    mock_job = io.BytesIO() # Simple mock object
+
+    mock_job = MagicMock()
     mock_job.id = "kappa_task_123"
     mock_enqueue.return_value = mock_job
 

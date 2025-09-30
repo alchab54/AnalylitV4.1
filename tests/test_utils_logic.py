@@ -232,7 +232,7 @@ def test_import_from_zotero_json_task_logic(mock_notify, mock_session, db_sessio
 
     # --- Act ---
     # Appel de la fonction de la tâche (décorateur non inclus)
-    import_from_zotero_json_task(project_id, items_list)
+    import_from_zotero_json_task.__wrapped__(db_session, project_id, items_list)
 
     # --- Assert ---
     # Vérifier la BDD

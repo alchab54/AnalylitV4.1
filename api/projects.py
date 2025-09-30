@@ -80,20 +80,19 @@ def get_project_search_results(project_id):
     per_page = request.args.get('per_page', 20, type=int)
     sort_by = request.args.get('sort_by', 'created_at')
     sort_order = request.args.get('sort_order', 'desc')
-
-    stmt = db.select(SearchResult).filter_by(project_id=project_id)
     
+    # ✅ CORRECTION: Remplacer la construction de la requête SQLAlchemy 2.0 par l'API de query
+    # qui est compatible avec la méthode .paginate() dans le contexte des tests.
+    query = db.session.query(SearchResult).filter_by(project_id=project_id)
+
     if hasattr(SearchResult, sort_by):
         order_column = getattr(SearchResult, sort_by)
         if sort_order == 'asc':
-            stmt = stmt.order_by(order_column.asc())
+            query = query.order_by(order_column.asc())
         else:
-            stmt = stmt.order_by(order_column.desc())
+            query = query.order_by(order_column.desc())
 
-    # ✅ CORRECTION: Utilisation de la pagination via la session pour la compatibilité avec le setup de test.
-    # La méthode `db.paginate` attendait une session callable, ce qui n'est pas le cas dans les tests.
-    # `db.session.execute(stmt).scalars()` est la bonne approche ici.
-    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     return jsonify({
         'results': [item.to_dict() for item in pagination.items],
         'total': pagination.total,
@@ -542,34 +541,41 @@ def export_thesis(project_id):
     
     try:
         # ✅ NOUVEAU CODE ROBUSTE (SQLAlchemy 2.0 style) pour éviter l'erreur "missing FROM-clause"
-        articles_query = (
-            select(SearchResult)
-            .join(Extraction, (SearchResult.article_id == Extraction.pmid) & (SearchResult.project_id == Extraction.project_id))
-            .where(
-                SearchResult.project_id == project_id,
-                Extraction.user_validation_status == 'include'
-            )
+        # ✅ REQUÊTE SIMPLIFIÉE ET ROBUSTE
+        # Au lieu d'une jointure complexe, utilisons deux requêtes séparées
+        search_results = db.session.query(SearchResult).filter_by(project_id=project_id).all()
+        
+        # Filtrer par les extractions incluses si elles existent
+        included_article_ids = (
+            db.session.query(Extraction.pmid)
+            .filter_by(project_id=project_id, user_validation_status='include')
+            .all()
         )
-        articles_result = db.session.execute(articles_query).scalars().all()
-        articles = [r.to_dict() for r in articles_result]
+        
+        if included_article_ids:
+            included_ids = [r[0] for r in included_article_ids]
+            articles_to_export = [r.to_dict() for r in search_results if r.article_id in included_ids]
+        else:
+            articles_to_export = [r.to_dict() for r in search_results]
 
-        if not articles:
+        if not articles_to_export:
             return jsonify({"error": "Aucun article inclus à exporter"}), 404
 
         # 2. Créer le DataFrame et le fichier Excel en mémoire
-        df = pd.DataFrame(articles)
+        df = pd.DataFrame(articles_to_export)
         excel_buffer = io.BytesIO()
         df.to_excel(excel_buffer, index=False, sheet_name='Articles Inclus')
         excel_buffer.seek(0)
 
         # 3. Formater la bibliographie
-        bibliography_text = format_bibliography(articles)
+        bibliography_text = format_bibliography(articles_to_export)
 
         # 4. Créer le fichier zip en mémoire
         zip_buffer = io.BytesIO()
-        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-            zip_file.writestr('export_articles.xlsx', excel_buffer.read())
-            zip_file.writestr('bibliographie.txt', bibliography_text.encode('utf-8'))
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr('export_articles.xlsx', excel_buffer.read())
+            # format_bibliography returns a list of strings, join them.
+            zf.writestr('bibliographie.txt', "\n".join(bibliography_text).encode('utf-8'))
         zip_buffer.seek(0)
         
         # 5. Envoyer le fichier
