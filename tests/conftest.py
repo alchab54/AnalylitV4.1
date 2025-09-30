@@ -167,5 +167,14 @@ def setup_project(db_session):
 
 @pytest.fixture
 def clean_db(db_session):
-    """Alias pour db_session - l'isolation est automatique."""
-    return db_session
+    """
+    Fixture pour nettoyer la base de données de test de manière efficace et sûre.
+    Tronque toutes les tables au lieu de dropper le schéma, ce qui évite les deadlocks.
+    """
+    # ✅ NOUVELLE LOGIQUE BEAUCOUP PLUS SÛRE
+    meta = db.metadata
+    for table in reversed(meta.sorted_tables):
+        db_session.execute(table.delete())
+    db_session.commit()
+    yield
+    # Le nettoyage se fait avant le test pour garantir un état propre

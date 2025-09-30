@@ -853,17 +853,23 @@ def test_index_project_pdfs_task(db_session, mocker, mock_embedding_model):
     mock_notify.assert_any_call(project_id, 'indexing_completed', f'{total_pdfs} PDF(s) ont été traités et indexés.', {'task_name': 'indexation'})
     
 @patch('utils.fetchers.fetch_unpaywall_pdf_url') # <-- CHEMIN CORRIGÉ
-@patch('requests.get')
-def test_fetch_online_pdf_task(mock_requests_get, mock_unpaywall, db_session, mocker):
+@mock.patch('requests.get') # ✅ AJOUTER CETTE LIGNE
+def test_fetch_online_pdf_task(mock_requests_get, mock_unpaywall, db_session, mocker, setup_project):
     """Teste le téléchargement de PDF via Unpaywall."""
     # ARRANGE
-    project_id = str(uuid.uuid4()) # Déjà unique.
-    article_id = f"pmid_doi_{uuid.uuid4().hex[:8]}"
-    
-    project = Project(id=project_id, name="Test Fetch PDF")
-    sr = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id=article_id, doi="10.1234/test")
-    db_session.add_all([project, sr])
+    project_id = setup_project.id
+    article_id = "pmid_for_pdf_fetch"
+    sr = SearchResult(project_id=project_id, article_id=article_id, doi="10.1234/test")
+    db_session.add(sr)
     db_session.flush()
+
+    # Simuler une réponse réussie de l'API externe
+    mock_response = mock.Mock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        'best_oa_location': {'url_for_pdf': 'http://example.com/fake.pdf'}
+    }
+    mock_requests_get.return_value = mock_response
 
     mock_pdf_url = "http://example.com/mock.pdf"
     mock_pdf_content = b'%PDF-1.4...test content...'

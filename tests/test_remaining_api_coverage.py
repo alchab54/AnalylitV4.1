@@ -7,6 +7,7 @@ from unittest.mock import patch, MagicMock
 
 # Import des modèles nécessaires
 from utils.models import Project, Grid, Prompt, Extraction
+from utils.helpers import seed_default_data
 # Import des tâches pour les mocks
 from tasks_v4_complete import pull_ollama_model_task, run_extension_task
 
@@ -118,19 +119,15 @@ def test_api_get_extractions(client, db_session, setup_project):
 # 3. Tests pour les Paramètres et l'Administration
 # =================================================================
 
-def test_api_settings_endpoints(client, mocker):
+def test_api_settings_endpoints(client, db_session):
     """
     Teste les routes de l'API de paramètres (Settings).
     """
-    # --- 1. GET apisettingsprofiles (Mocke la lecture du fichier profiles.json) ---
-    mock_json_data = {"profiles": [{"id": "test_profile", "name": "Test Profile"}]}
-    # Mocker la fonction qui lit le fichier avec mock_open
-    with patch("builtins.open", new_callable=mocker.mock_open, read_data=json.dumps(mock_json_data)) as mock_open:
-        mock_open.return_value.read.return_value = json.dumps(mock_json_data)
-        response_profiles = client.get('/api/analysis-profiles') # La route est dans analysis_profiles.py
-    
-    assert response_profiles.status_code == 200
-    assert response_profiles.json == mock_json_data
+    seed_default_data(db_session) # ✅ AJOUTER CETTE LIGNE pour garantir la présence des données
+    response = client.get('/api/analysis-profiles')
+    assert response.status_code == 200
+    assert len(response.json) > 0 # L'assertion devient plus robuste
+    assert response.json[0]['name'] == 'Standard'
 
 def test_api_admin_endpoints(client):
     """
@@ -166,7 +163,7 @@ def test_api_admin_endpoints(client):
         mock_queue_empty.assert_called_once() # Vérifie que la file a bien été vidée
 
     # --- 3. POST apiqueuesclear (Test échec) ---
-    response_clear_fail = client.post('/api/queues/clear', json={'queue_name': 'file_inexistante'})
+    response_clear_fail = client.post('/api/admin/queues/clear', json={'queue_name': 'file_inexistante'})
     assert response_clear_fail.status_code == 404
     assert "non trouvée" in response_clear_fail.json['error']
 

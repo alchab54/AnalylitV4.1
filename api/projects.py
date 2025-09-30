@@ -35,6 +35,7 @@ from backend.tasks_v4_complete import (
 )
 from utils.helpers import format_bibliography
 from werkzeug.utils import secure_filename
+from sqlalchemy import select
 
 projects_bp = Blueprint('projects_bp', __name__)
 logger = logging.getLogger(__name__)
@@ -79,17 +80,17 @@ def get_project_search_results(project_id):
     sort_by = request.args.get('sort_by', 'created_at')
     sort_order = request.args.get('sort_order', 'desc')
 
-    query = db.session.query(SearchResult).filter_by(project_id=project_id)
+    stmt = db.select(SearchResult).filter_by(project_id=project_id)
     
     if hasattr(SearchResult, sort_by):
         order_column = getattr(SearchResult, sort_by)
         if sort_order == 'asc':
-            query = query.order_by(order_column.asc())
+            stmt = stmt.order_by(order_column.asc())
         else:
-            query = query.order_by(order_column.desc())
+            stmt = stmt.order_by(order_column.desc())
 
     # ✅ CORRECTION: Utilisation de query.paginate() pour la compatibilité avec le setup de test.
-    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    pagination = db.paginate(stmt, page=page, per_page=per_page)
     return jsonify({
         'results': [item.to_dict() for item in pagination.items],
         'total': pagination.total,
@@ -313,8 +314,9 @@ def run_analysis(project_id):
     data = request.get_json()
     analysis_type = data.get('type')
 
-    # Mapping des types d'analyse aux (fonction_tache, file_attente, timeout)
+    # ✅ CORRECTION: Ajout de 'synthesis' pour que le test E2E fonctionne.
     analysis_tasks = {
+        "synthesis": (run_synthesis_task, synthesis_queue, 1800),
         "discussion": (run_discussion_generation_task, discussion_draft_queue, 1800),
         "knowledge_graph": (run_knowledge_graph_task, analysis_queue, 1800),
         "prisma_flow": (run_prisma_flow_task, analysis_queue, 1800),
@@ -379,7 +381,7 @@ def upload_zotero_file(project_id):
             json_file_path=file_path,
             job_timeout=3600 # 1 heure
         )
-        return jsonify({"message": "Importation de fichier Zotero lancée", "imported": len(json.load(open(file_path))['items']), "job_id": job.id}), 202
+        return jsonify({"message": "Importation de fichier Zotero lancée", "job_id": job.id}), 202
     except Exception as e:
         logger.error(f"Erreur lors de l'upload du fichier Zotero: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
@@ -526,17 +528,15 @@ def export_thesis(project_id):
     from flask import send_file
     
     try:
-        # 1. Récupérer les données pertinentes (articles inclus)
+        # ✅ NOUVEAU CODE ROBUSTE (SQLAlchemy 2.0 style) pour éviter l'erreur "missing FROM-clause"
         articles_query = (
-            db.session.query(SearchResult)
+            select(SearchResult)
             .join(Extraction, (SearchResult.article_id == Extraction.pmid) & (SearchResult.project_id == Extraction.project_id))
-            .filter(
+            .where(
                 SearchResult.project_id == project_id,
                 Extraction.user_validation_status == 'include'
             )
         )
-
-        # ✅ CORRECTION: Exécuter la requête correctement pour obtenir les résultats.
         articles_result = db.session.execute(articles_query).scalars().all()
         articles = [r.to_dict() for r in articles_result]
 
