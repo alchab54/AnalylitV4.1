@@ -11,7 +11,8 @@ services:
       bash -c "echo '🔧 Démarrage en mode DÉVELOPPEMENT...' &&
                flask run --host=0.0.0.0 --port=5000"
     environment:
-      - FLASK_ENV=development # Active le mode debug et le rechargement
+      # ✅ OPTIMISATION: Utiliser FLASK_DEBUG=1 est la méthode moderne pour activer le mode debug et le rechargement automatique.
+      - FLASK_DEBUG=1
     volumes:
       # Monter le code source pour le rechargement à chaud
       - ./api:/home/appuser/app/api
