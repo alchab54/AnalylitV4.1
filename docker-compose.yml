@@ -158,7 +158,7 @@ services:
         # de manière portable et éviter l'erreur "Device or resource busy" avec sed -i.
         tr -d '\r' < /home/appuser/app/scripts/entrypoint.sh > /tmp/entrypoint_fixed.sh && chmod +x /tmp/entrypoint_fixed.sh &&
         # Exécuter l'entrypoint qui va attendre la DB puis exécuter la commande suivante
-        /tmp/entrypoint_fixed.sh python -m alembic upgrade head &&
+        /tmp/entrypoint_fixed.sh python -m alembic -c /home/appuser/app/alembic.ini upgrade head &&
         echo "🔧 Vérification finale des tables..." &&
         python /home/appuser/app/scripts/verify_tables.py
     depends_on:
@@ -172,7 +172,8 @@ services:
       - ./scripts/wait_for_db.py:/home/appuser/app/scripts/wait_for_db.py
       - ./scripts/verify_tables.py:/home/appuser/app/scripts/verify_tables.py
       - ./scripts/entrypoint.sh:/home/appuser/app/scripts/entrypoint.sh # ✅ CORRECTION: Monter le script entrypoint manquant.
-      - ./alembic.ini:/home/appuser/app/alembic.ini # ✅ CORRECTION FINALE: Monter le fichier de configuration Alembic.
+      - ./alembic.ini:/home/appuser/app/alembic.ini # ✅ CORRECTION: Monter le fichier de configuration Alembic.
+      - ./utils/db_base.py:/home/appuser/app/utils/db_base.py # ✅ AJOUT: Assurer que la base déclarative est accessible.
   # Workers multiples pour paralléliser les tâches
   worker-fast:
     build:

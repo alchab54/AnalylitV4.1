@@ -17,6 +17,14 @@ from utils.models import Base, Project, SearchResult, Extraction, AnalysisProfil
 # access to the values within the .ini file in use.
 config = context.config
 
+# ✅ CORRECTION: Forcer la lecture de la variable d'environnement DATABASE_URL.
+# Cela résout l'erreur "Could not parse SQLAlchemy URL from string '${DATABASE_URL}'"
+# en s'assurant que la configuration d'Alembic contient la vraie URL avant d'être utilisée.
+db_url = os.getenv('DATABASE_URL')
+if not db_url:
+    raise ValueError("La variable d'environnement DATABASE_URL n'est pas définie.")
+config.set_main_option('sqlalchemy.url', db_url)
+
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:

@@ -25,7 +25,7 @@ install: ## Installation complète d'AnalyLit
 	@echo "$(BLUE)🚀 Installation d'AnalyLit V4.0...$(NC)"
 	@mkdir -p projects web
 	@if [ ! -f .env ]; then cp env.example .env; echo "$(YELLOW)⚠️  Fichier .env créé à partir d'env.example$(NC)"; fi
-	@docker-compose -f $(COMPOSE_FILE) build
+	@docker-compose -f $(COMPOSE_FILE) build --progress=plain
 	@docker-compose -f $(COMPOSE_FILE) up -d
 	@echo "$(GREEN)✅ Installation terminée!$(NC)"
 	@echo "$(BLUE)🌐 Interface web: http://localhost:8080$(NC)"
@@ -96,7 +96,7 @@ shell-redis: ## Accéder au shell Redis
 update: ## Mettre à jour AnalyLit
 	@echo "$(BLUE)🔄 Mise à jour d'AnalyLit...$(NC)"
 	@docker-compose -f $(COMPOSE_FILE) down
-	@docker-compose -f $(COMPOSE_FILE) build --no-cache
+	@docker-compose -f $(COMPOSE_FILE) build --no-cache --progress=plain
 	@docker-compose -f $(COMPOSE_FILE) up -d
 	@echo "$(GREEN)✅ Mise à jour terminée$(NC)"
 
