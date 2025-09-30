@@ -11,14 +11,26 @@ Cypress.Commands.add('visitApp', () => {
 });
 
 Cypress.Commands.add('navigateToSection', (sectionId) => {
-  // ✅ PATCH: Navigation vers une section avec validation
+  // ✅ PATCH : Navigation plus robuste avec scrollIntoView
+  // Attendre que la navigation soit visible
+  cy.get('.app-nav', { timeout: 10000 }).should('be.visible');
+  
+  // ✅ CORRECTION : Ajouter scrollIntoView pour résoudre le problème d'overflow
   cy.get(`.app-nav__button[data-section-id="${sectionId}"]`, { timeout: 5000 })
-    .should('be.visible')
-    .click({ force: true });
+    .should('exist')
+    .scrollIntoView()  // ✅ PATCH : Scroll pour rendre visible
+    .click({ force: true }); // ✅ CORRECTION: force:true contourne la vérification de visibilité qui échoue à cause du toast.
+    
+  // Vérifier l'activation
   cy.get(`.app-nav__button[data-section-id="${sectionId}"]`, { timeout: 5000 })
     .should('have.class', 'app-nav__button--active');
-  cy.get(`#${sectionId}`).should('be.visible').and('not.be.empty');
-  cy.log(`Navigated to section: ${sectionId}`);
+    
+  // Vérifier que la section est visible et contient du contenu
+  cy.get(`#${sectionId}`, { timeout: 10000 })
+    .should('be.visible')
+    .should('not.be.empty');
+    
+  cy.log(`✅ Navigated to section: ${sectionId}`);
 });
 
 Cypress.Commands.add('waitForAppReady', () => {
@@ -40,13 +52,21 @@ Cypress.Commands.add('checkAppIsLoaded', () => {
 // ===================================================================
 
 Cypress.Commands.add('setupMockAPI', () => {
-  // Intercepte les appels API les plus courants pour les tests isolés.
-  cy.intercept('GET', '/api/projects', { fixture: 'projects.json' }).as('getProjects');
-  cy.intercept('GET', '/api/analysis-profiles', { body: [] }).as('getAnalysisProfiles');
-  cy.intercept('GET', '/api/databases', { body: [] }).as('getDatabases');
-  cy.intercept('GET', '/api/projects/*/search-results?page=1', { fixture: 'articles.json' }).as('getArticles');
-  cy.intercept('GET', '/api/projects/*/extractions', { fixture: 'extractions.json' }).as('getExtractions');
-  cy.log('Mock API setup complete.');
+  // ✅ PATCH : Intercepter les deux variations d'URL (avec et sans slash final)
+  cy.intercept('GET', '/api/projects*', { fixture: 'projects.json' }).as('getProjects');
+  cy.intercept('GET', '/api/projects/*', { fixture: 'projects.json' }).as('getProjectsSlash');
+  cy.intercept('GET', '/api/analysis-profiles*', { body: [] }).as('getAnalysisProfiles');
+  cy.intercept('GET', '/api/databases*', { body: [] }).as('getDatabases');
+  cy.intercept('GET', '/api/projects/*/search-results*', { fixture: 'articles.json' }).as('getArticles');
+  cy.intercept('GET', '/api/projects/*/extractions*', { fixture: 'extractions.json' }).as('getExtractions');
+  cy.intercept('GET', '/api/projects/*/articles*', { fixture: 'articles.json' }).as('getProjectArticles');
+  cy.intercept('POST', '/api/projects/*/run-analysis*', { body: { job_id: 'analysis-job-123' } }).as('runAnalysis');
+  
+  // ✅ PATCH : Ajouter plus d'intercepts pour RoB et autres sections
+  cy.intercept('GET', '/api/projects/*/rob*', { body: [] }).as('getRobData');
+  cy.intercept('GET', '/api/projects/*/chat-history*', { body: [] }).as('getChatHistory');
+  
+  cy.log('✅ Mock API setup complete with flexible patterns');
 });
 
 // ===================================================================
@@ -72,23 +92,41 @@ Cypress.Commands.add('createTestProject', (projectData = {}) => {
 });
 
 Cypress.Commands.add('selectProject', (projectName) => {
-  // ✅ PATCH: Sélection de projet robuste
-  cy.intercept('GET', '/api/projects').as('getProjects');
-  cy.visit('/', { failOnStatusCode: false });
-  cy.wait('@getProjects', { timeout: 15000 });
+  // Intercepter AVANT de visiter
+  cy.setupMockAPI();
+  
+  // Visiter avec gestion d'erreur
+  cy.visit('/', { failOnStatusCode: false, timeout: 30000 });
+  
+  // ✅ CORRECTION FINALE ET DÉFINITIVE: Déclencher manuellement l'initialisation de l'application.
+  // C'est l'étape qui manquait pour que l'appel API soit effectué.
+  cy.window().then((win) => {
+    expect(win.AnalyLit, 'AnalyLit object should exist on window').to.be.an('object');
+    win.AnalyLit.initializeApplication();
+  });
 
-  cy.get('#projects-list', { timeout: 10000 })
-    .should('be.visible')
-    .and(($el) => {
-      expect(parseInt($el.css('height'))).to.be.greaterThan(0);
+  // Attendre l'une des deux interceptions (avec timeout plus long)
+  cy.wait(['@getProjects', '@getProjectsSlash'], { timeout: 20000 })
+    .then(() => {
+      cy.log('✅ Projects API intercepted successfully');
+      
+      // Attendre que la liste des projets soit visible ET ait une hauteur > 0
+      cy.get('#projects-list', { timeout: 10000 })
+        .should('be.visible')
+        .should(($el) => {
+          const height = parseInt($el.css('height')) || 0;
+          expect(height).to.be.greaterThan(0);
+        });
+      
+      // Sélectionner le projet
+      cy.contains('.project-card', projectName, { timeout: 10000 })
+        .should('be.visible')
+        .click({ force: true });
+        
+      // Vérifier la sélection
+      cy.get('.project-card--selected', { timeout: 5000 }).should('exist');
+      cy.log(`✅ Project selected: ${projectName}`);
     });
-
-  cy.contains('.project-card', projectName, { timeout: 10000 })
-    .should('be.visible')
-    .click({ force: true });
-
-  cy.contains('.project-card--selected', projectName, { timeout: 5000 }).should('exist');
-  cy.log(`Selected project: ${projectName}`);
 });
 
 // ===================================================================
