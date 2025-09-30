@@ -2,6 +2,7 @@
 
 import logging
 from flask import Blueprint, jsonify, request
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from utils.extensions import db
 from utils.models import Prompt
@@ -12,7 +13,8 @@ logger = logging.getLogger(__name__)
 @prompts_bp.route('/prompts', methods=['GET'])
 def get_all_prompts():
     """Retourne tous les prompts."""
-    prompts = db.session.query(Prompt).all()
+    stmt = select(Prompt)
+    prompts = db.session.execute(stmt).scalars().all()
     return jsonify([p.to_dict() for p in prompts]), 200
 
 @prompts_bp.route('/prompts', methods=['POST'])

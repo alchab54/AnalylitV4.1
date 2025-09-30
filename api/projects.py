@@ -85,22 +85,24 @@ def get_project_search_results(project_id):
     sort_by = request.args.get('sort_by', 'created_at')
     sort_order = request.args.get('sort_order', 'desc')
     
-    # ✅ CORRECTION: Remplacer la construction de la requête SQLAlchemy 2.0 par l'API de query
-    # qui est compatible avec la méthode .paginate() dans le contexte des tests.
-    query = db.session.query(SearchResult).filter_by(project_id=project_id)
+    # ✅ CORRECTION: La méthode .paginate() n'est pas directement compatible avec la fixture de test.
+    # On utilise une pagination manuelle avec la syntaxe SQLAlchemy 2.0 correcte.
+    stmt = select(SearchResult).filter_by(project_id=project_id)
 
     if hasattr(SearchResult, sort_by):
         order_column = getattr(SearchResult, sort_by)
         if sort_order == 'asc':
-            query = query.order_by(order_column.asc())
+            stmt = stmt.order_by(order_column.asc())
         else:
-            query = query.order_by(order_column.desc())
+            stmt = stmt.order_by(order_column.desc())
 
     # ✅ SOLUTION DÉFINITIVE : Pagination manuelle robuste pour contourner l'incompatibilité
     # de la méthode .paginate() avec la fixture de test.
-    total = query.count()
+    total_stmt = select(db.func.count()).select_from(stmt.subquery())
+    total = db.session.execute(total_stmt).scalar_one()
     offset = (page - 1) * per_page
-    items = query.offset(offset).limit(per_page).all()
+    paginated_stmt = stmt.offset(offset).limit(per_page)
+    items = db.session.execute(paginated_stmt).scalars().all()
     total_pages = (total + per_page - 1) // per_page if per_page > 0 else 0
 
     return jsonify({
@@ -116,26 +118,27 @@ def get_project_analyses(project_id):
     """
     Retourne les résultats de toutes les analyses terminées pour un projet.
     """
-    # Cette requête suppose que vous avez un modèle 'Analysis' qui stocke les résultats.
-    analyses = db.session.query(Analysis).filter_by(project_id=project_id).all()
+    stmt = select(Analysis).filter_by(project_id=project_id)
+    analyses = db.session.execute(stmt).scalars().all()
     return jsonify([analysis.to_dict() for analysis in analyses]), 200
 
 @projects_bp.route('/projects/<project_id>/chat-history', methods=['GET'])
 def get_chat_history(project_id):
     """Retourne l'historique du chat pour un projet, trié par date."""
-    messages = db.session.query(ChatMessage).filter_by(project_id=project_id).order_by(ChatMessage.timestamp.asc()).all()
+    stmt = select(ChatMessage).filter_by(project_id=project_id).order_by(ChatMessage.timestamp.asc())
+    messages = db.session.execute(stmt).scalars().all()
     return jsonify([msg.to_dict() for msg in messages])
 
 @projects_bp.route('/projects/<project_id>/extractions', methods=['GET'])
 def get_project_extractions(project_id):
     """Retourne toutes les extractions pour un projet."""
-    # ✅ CORRECTION: Ajout de la route manquante pour récupérer les extractions.
-    extractions = db.session.query(Extraction).filter_by(project_id=project_id).all()
+    stmt = select(Extraction).filter_by(project_id=project_id)
+    extractions = db.session.execute(stmt).scalars().all()
     return jsonify([e.to_dict() for e in extractions]), 200
 
 @projects_bp.route('/projects/<project_id>', methods=['DELETE'])
 def delete_project(project_id):
-    project = db.session.query(Project).filter_by(id=project_id).first()
+    project = db.session.get(Project, project_id)
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
     db.session.delete(project)
@@ -174,7 +177,8 @@ def import_grid(project_id):
 
 @projects_bp.route('/projects/<project_id>/grids', methods=['GET'])
 def get_grids(project_id):
-    grids = db.session.query(Grid).filter_by(project_id=project_id).all()
+    stmt = select(Grid).filter_by(project_id=project_id)
+    grids = db.session.execute(stmt).scalars().all()
     return jsonify([grid.to_dict() for grid in grids]), 200
 
 @projects_bp.route('/projects/<project_id>/grids', methods=['POST'])
@@ -194,7 +198,7 @@ def create_grid(project_id):
 
 @projects_bp.route('/projects/<project_id>/grids/<grid_id>', methods=['PUT'])
 def update_grid(project_id, grid_id):
-    grid = db.session.query(Grid).filter_by(id=grid_id, project_id=project_id).first()
+    grid = db.session.get(Grid, grid_id)
     if not grid:
         return jsonify({"error": "Grille non trouvée"}), 404
 
@@ -218,7 +222,7 @@ def set_extraction_decision(project_id, extraction_id):
     if not all([decision, evaluator]):
         return jsonify({"error": "Les champs 'decision' et 'evaluator' sont requis"}), 400
 
-    extraction = db.session.query(Extraction).filter_by(id=extraction_id, project_id=project_id).first()
+    extraction = db.session.get(Extraction, extraction_id)
     if not extraction:
         return jsonify({"error": "Extraction non trouvée"}), 404
 
@@ -258,7 +262,8 @@ def import_validations(project_id):
             if not article_id or not decision:
                 continue
 
-            extraction = db.session.query(Extraction).filter_by(project_id=project_id, pmid=article_id).first()
+            stmt = select(Extraction).filter_by(project_id=project_id, pmid=article_id)
+            extraction = db.session.execute(stmt).scalar_one_or_none()
             if extraction:
                 validations = json.loads(extraction.validations) if extraction.validations else {}
                 validations['evaluator2'] = decision # Le test suppose 'evaluator2'
@@ -298,7 +303,8 @@ def run_pipeline(project_id):
     if not profile_id:
         return jsonify({"error": "Profil d'analyse requis"}), 400
 
-    profile = db.session.query(AnalysisProfile).filter_by(id=profile_id).first()
+    stmt = select(AnalysisProfile).filter_by(id=profile_id)
+    profile = db.session.execute(stmt).scalar_one_or_none()
     if not profile:
         return jsonify({"error": "Profil d'analyse non trouvé"}), 404
 
@@ -420,7 +426,8 @@ def run_rob_analysis(project_id):
     article_ids = data.get('article_ids', [])
 
     # ✅ CORRECTION: Vérifier que le projet existe avant de lancer les tâches.
-    project = db.session.query(Project).filter_by(id=project_id).first()
+    stmt = select(Project).filter_by(id=project_id)
+    project = db.session.execute(stmt).scalar_one_or_none()
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
 
@@ -448,10 +455,8 @@ def save_rob_assessment(project_id, article_id):
         return jsonify({"error": "Données d'évaluation manquantes"}), 400
 
     # Logique "Upsert" : Mettre à jour si existant, sinon créer.
-    rob_assessment = db.session.query(RiskOfBias).filter_by(
-        project_id=project_id,
-        article_id=article_id
-    ).first()
+    stmt = select(RiskOfBias).filter_by(project_id=project_id, article_id=article_id)
+    rob_assessment = db.session.execute(stmt).scalar_one_or_none()
 
     if rob_assessment:
         # Mettre à jour l'enregistrement existant
@@ -522,7 +527,8 @@ def run_knowledge_graph(project_id):
 @projects_bp.route('/projects/<project_id>/prisma-checklist', methods=['GET'])
 def get_prisma_checklist(project_id):
     from utils.prisma_scr import get_base_prisma_checklist
-    project = db.session.query(Project).filter_by(id=project_id).first()
+    stmt = select(Project).filter_by(id=project_id)
+    project = db.session.execute(stmt).scalar_one_or_none()
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
     
@@ -532,7 +538,8 @@ def get_prisma_checklist(project_id):
 
 @projects_bp.route('/projects/<project_id>/prisma-checklist', methods=['POST'])
 def save_prisma_checklist(project_id):
-    project = db.session.query(Project).filter_by(id=project_id).first()
+    stmt = select(Project).filter_by(id=project_id)
+    project = db.session.execute(stmt).scalar_one_or_none()
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
     
@@ -552,18 +559,16 @@ def export_thesis(project_id):
     try:
         # ✅ NOUVEAU CODE ROBUSTE (SQLAlchemy 2.0 style) pour éviter l'erreur "missing FROM-clause"
         # ✅ REQUÊTE SIMPLIFIÉE ET ROBUSTE
-        # Au lieu d'une jointure complexe, utilisons deux requêtes séparées
-        search_results = db.session.query(SearchResult).filter_by(project_id=project_id).all()
+        stmt_sr = select(SearchResult).filter_by(project_id=project_id)
+        search_results = db.session.execute(stmt_sr).scalars().all()
         
         # Filtrer par les extractions incluses si elles existent
-        included_article_ids = (
-            db.session.query(Extraction.pmid)
-            .filter_by(project_id=project_id, user_validation_status='include')
-            .all()
-        )
+        stmt_ext = select(Extraction.pmid).filter_by(project_id=project_id, user_validation_status='include')
+        included_article_ids = db.session.execute(stmt_ext).scalars().all()
         
         if included_article_ids:
-            included_ids = [r[0] for r in included_article_ids]
+            # ✅ CORRECTION: scalars().all() retourne déjà une liste de valeurs, pas des objets Row.
+            included_ids = included_article_ids
             articles_to_export = [r.to_dict() for r in search_results if r.article_id in included_ids]
         else:
             articles_to_export = [r.to_dict() for r in search_results]
