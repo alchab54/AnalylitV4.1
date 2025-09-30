@@ -32,7 +32,7 @@ def get_task_status(task_id):
         # ✅ CORRECTION: L'attribut est .id, pas la méthode .get_id()
         'task_id': job.id,
         'status': job.get_status(),
-        'result': job.return_value,  # ✅ CORRECTION FINALE: C'est une propriété, pas une méthode.
+        'result': job.return_value,
         'enqueued_at': job.enqueued_at.isoformat() if job.enqueued_at else None,
         'started_at': job.started_at.isoformat() if job.started_at else None,
         'ended_at': job.ended_at.isoformat() if job.ended_at else None,

@@ -98,7 +98,7 @@ class TestWorkersIntegration:
             mock_job.id = 'completed-job'
             mock_job.is_finished = True
             mock_job.is_failed = False
-            # ✅ CORRECTION FINALE: `return_value` est une propriété, pas une méthode.
+            # ✅ CORRECTION FINALE: `return_value` est une propriété qui doit contenir un dictionnaire sérialisable.
             mock_job.return_value = {"status": "completed", "results": "test"}
             mock_job.get_status.return_value = 'finished'
 
