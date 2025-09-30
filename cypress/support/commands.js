@@ -34,10 +34,10 @@ Cypress.Commands.add('setupBasicTest', () => {
               cy.log(`✅ Bouton création trouvé avec: ${selector}`);
               
               // Remplir le formulaire de création
-              cy.get('#project-name, input[name="name"], input[placeholder*="nom"]', { timeout: 5000 })
+              cy.get('#newProjectModal').find('input[name="name"], input[placeholder*="nom"]').first()
                 .type('Projet Test E2E', { force: true });
               
-              cy.get('#project-description, textarea[name="description"], textarea', { timeout: 5000 })
+              cy.get('#newProjectModal').find('textarea[name="description"], textarea[placeholder*="description"]').first()
                 .type('Projet créé automatiquement pour les tests E2E', { force: true });
               
               // Soumettre
