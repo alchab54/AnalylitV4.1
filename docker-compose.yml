@@ -68,6 +68,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.web
     container_name: analylit_web
+    working_dir: /home/appuser/app
     ports:
       - "5000:5000"
       - "8080:5000"
@@ -116,6 +117,7 @@ services:
         condition: service_started
 
     volumes:
+      - .:/home/appuser/app
       # Volumes pour les données persistantes et les logs
       - ./logs:/home/appuser/app/logs
       - ./projects:/home/appuser/app/projects
@@ -142,26 +144,39 @@ services:
       - WAIT_HOSTS=db:5432
       - WAIT_TIMEOUT=30
       - PYTHONPATH=/home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
+      - DATABASE_URL=postgresql://analylit_user:strong_password@db:5432/analylit_db
       # ✅ AJOUTEZ ces variables pour les migrations:
       - POSTGRES_USER=analylit_user
       - POSTGRES_PASSWORD=strong_password
       - POSTGRES_DB=analylit_db
       - DATABASE_URL=postgresql://analylit_user:strong_password@db:5432/analylit_db
     env_file: [".env"]
+    working_dir: /home/appuser/app
     # ✅ CORRECTION: Utiliser une liste pour la commande évite les problèmes d'interprétation du shell.
     # Chaque script est appelé directement.
     command:
+      - /bin/bash
       - /bin/sh
       - -c
       - |
-        echo '🔍 Attente de la base de données...' && python /home/appuser/app/scripts/wait_for_db.py &&
-        echo '📋 Exécution des migrations Alembic...' && python -m alembic upgrade head &&
-        echo '🔧 Vérification des tables...' && python /home/appuser/app/scripts/verify_tables.py &&
-        echo '✅ Base de données prête!'
+        echo '🔍 Attente de la base de données...' &&
+        python scripts/wait_for_db.py &&
+        echo '📋 Exécution des migrations Alembic...' &&
+        python -m alembic upgrade head &&
+        echo '🔧 Vérification des tables...' &&
+        python scripts/verify_tables.py &&
+        echo '✅ Migrations terminées avec succès!'
+        # ✅ CORRECTION DÉFINITIVE: Nettoyer les fins de ligne Windows (\r) des scripts shell
+        sed -i 's/\r$//' /home/appuser/app/scripts/entrypoint.sh &&
+        # Exécuter l'entrypoint qui va attendre la DB puis exécuter la commande suivante
+        /home/appuser/app/scripts/entrypoint.sh python -m alembic upgrade head &&
+        echo "🔧 Vérification finale des tables..." &&
+        python /home/appuser/app/scripts/verify_tables.py
     depends_on:
       db:
         condition: service_healthy
     volumes:
+      - .:/home/appuser/app
       - ./migrations:/home/appuser/app/migrations
       - ./api:/home/appuser/app/api
       - ./backend:/home/appuser/app/backend

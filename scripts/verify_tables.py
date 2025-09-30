@@ -2,7 +2,6 @@
 """
 Vérifier et créer les tables si nécessaire
 """
-
 import os
 import sys
 from sqlalchemy import create_engine, text
@@ -10,9 +9,6 @@ from sqlalchemy import create_engine, text
 # Ajouter le chemin de l'app
 sys.path.append('/home/appuser/app')
 sys.path.append('.')
-
-# Import des modèles au niveau du module pour une meilleure gestion des erreurs
-from utils.models import Base
 
 def verify_and_create_tables():
     """Vérifier que les tables existent, les créer si nécessaire"""
@@ -36,6 +32,8 @@ def verify_and_create_tables():
             conn.execute(text("CREATE SCHEMA analylit_schema"))
             conn.execute(text("GRANT ALL PRIVILEGES ON SCHEMA analylit_schema TO analylit_user"))
             conn.commit()
+        else:
+            print("✅ Schéma analylit_schema existe")
         
         # Vérifier les tables
         tables_check = conn.execute(text("""
@@ -54,9 +52,26 @@ def verify_and_create_tables():
         if missing_tables:
             print(f"⚠️ Tables manquantes: {missing_tables}")
             print("🔧 Création via SQLAlchemy...")
+            
+            # Import et création
+            from utils.models import Base
             Base.metadata.create_all(engine)
             
-            print("✅ Tables créées avec succès!")
+            # Vérifier à nouveau
+            tables_check = conn.execute(text("""
+                SELECT table_name FROM information_schema.tables 
+                WHERE table_schema = 'analylit_schema'
+                ORDER BY table_name
+            """)).fetchall()
+            
+            final_tables = [row[0] for row in tables_check]
+            print(f"📊 Tables après création: {final_tables}")
+            
+            if 'projects' in final_tables:
+                print("✅ Tables créées avec succès!")
+            else:
+                print("❌ Échec de création des tables")
+                return False
         else:
             print("✅ Toutes les tables sont présentes!")
         
@@ -64,8 +79,15 @@ def verify_and_create_tables():
 
 if __name__ == "__main__":
     try:
-        verify_and_create_tables()
-        print("🎉 Vérification terminée avec succès!")
+        success = verify_and_create_tables()
+        if success:
+            print("🎉 Vérification terminée avec succès!")
+            sys.exit(0)
+        else:
+            print("❌ Vérification échouée!")
+            sys.exit(1)
     except Exception as e:
         print(f"❌ Erreur: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
