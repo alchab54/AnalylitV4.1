@@ -18,7 +18,7 @@ def _uuid():
 
 class Project(Base): 
     __tablename__ = 'projects'
-    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+    __table_args__ = {'schema': 'analylit_schema'}
 
     id = Column(String, primary_key=True, default=_uuid)
     name = Column(String, nullable=False) 
@@ -67,7 +67,7 @@ class Project(Base):
 
 class Article(Base):
     __tablename__ = 'articles'
-    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+    __table_args__ = {'schema': 'analylit_schema'}
     
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
@@ -85,7 +85,7 @@ class SearchResult(Base):
     __tablename__ = 'search_results'
     __table_args__ = (
         UniqueConstraint('project_id', 'article_id', name='uq_project_article'),
-        {'schema': SCHEMA} if SCHEMA else {}
+        {'schema': 'analylit_schema'}
     )
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
@@ -108,7 +108,7 @@ class SearchResult(Base):
 
 class Extraction(Base):
     __tablename__ = 'extractions'
-    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+    __table_args__ = {'schema': 'analylit_schema'}
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
@@ -143,7 +143,7 @@ class Extraction(Base):
 
 class Grid(Base):
     __tablename__ = 'extraction_grids'
-    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+    __table_args__ = {'schema': 'analylit_schema'}
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
@@ -161,7 +161,7 @@ class Grid(Base):
 
 class GridField(Base):
     __tablename__ = 'grid_fields'
-    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+    __table_args__ = {'schema': 'analylit_schema'}
 
     grid_id_ref = f"{SCHEMA}.extraction_grids.id" if SCHEMA else "extraction_grids.id"
     id = Column(String, primary_key=True, default=_uuid)
@@ -172,7 +172,7 @@ class GridField(Base):
 
 class Validation(Base):
     __tablename__ = 'validations'
-    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+    __table_args__ = {'schema': 'analylit_schema'}
 
     extraction_id_ref = f"{SCHEMA}.extractions.id" if SCHEMA else "extractions.id"
     id = Column(String, primary_key=True, default=_uuid)
@@ -190,7 +190,7 @@ class Validation(Base):
 
 class Analysis(Base):
     __tablename__ = 'analyses'
-    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+    __table_args__ = {'schema': 'analylit_schema'}
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
@@ -210,7 +210,7 @@ class Analysis(Base):
 
 class ChatMessage(Base):
     __tablename__ = 'chat_messages'
-    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+    __table_args__ = {'schema': 'analylit_schema'}
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
@@ -232,7 +232,7 @@ class ChatMessage(Base):
 
 class AnalysisProfile(Base):
     __tablename__ = 'analysis_profiles'
-    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+    __table_args__ = {'schema': 'analylit_schema'}
 
     id = Column(String, primary_key=True, default=_uuid)
     name = Column(String, nullable=False, unique=True)
@@ -253,7 +253,7 @@ class AnalysisProfile(Base):
 
 class PRISMARecord(Base):
     __tablename__ = 'prisma_records'
-    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+    __table_args__ = {'schema': 'analylit_schema'}
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
@@ -266,7 +266,7 @@ class ScreeningDecision(Base):
     __tablename__ = 'screening_decisions'
     __table_args__ = (
         UniqueConstraint('project_id', 'pmid', name='uq_project_pmid'),
-        {'schema': SCHEMA} if SCHEMA else {}
+        {'schema': 'analylit_schema'}
     )
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
@@ -283,7 +283,7 @@ class RiskOfBias(Base):
     __tablename__ = 'risk_of_bias'
     __table_args__ = (
         UniqueConstraint('project_id', 'article_id', name='uq_rob_project_article'),
-        {'schema': SCHEMA} if SCHEMA else {}
+        {'schema': 'analylit_schema'}
     )
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
@@ -314,7 +314,7 @@ class RiskOfBias(Base):
 
 class Prompt(Base):
     __tablename__ = 'prompts'
-    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+    __table_args__ = {'schema': 'analylit_schema'}
     
     id = Column(String, primary_key=True, default=_uuid)
     name = Column(String, nullable=False, unique=True)
@@ -325,7 +325,7 @@ class Prompt(Base):
 
 class GreyLiterature(Base):
     __tablename__ = 'grey_literature'
-    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+    __table_args__ = {'schema': 'analylit_schema'}
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
@@ -346,7 +346,7 @@ class GreyLiterature(Base):
 
 class ProcessingLog(Base):
     __tablename__ = 'processing_log'
-    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+    __table_args__ = {'schema': 'analylit_schema'}
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
@@ -372,7 +372,7 @@ class ProcessingLog(Base):
 
 class Stakeholder(Base):
     __tablename__ = 'stakeholders'
-    __table_args__ = {'schema': SCHEMA} if SCHEMA else {}
+    __table_args__ = {'schema': 'analylit_schema'}
 
     id = Column(String, primary_key=True, default=_uuid)
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"

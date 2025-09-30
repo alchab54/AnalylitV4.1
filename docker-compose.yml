@@ -149,21 +149,26 @@ services:
       - DATABASE_URL=postgresql://analylit_user:strong_password@db:5432/analylit_db
     env_file:
       - .env
-    # ✅ CORRECTION: Ce service exécute maintenant les migrations puis se termine avec succès.
-    # La commande est maintenant une liste pour que l'argument "migrate-only" soit correctement interprété.
     command: >
-      bash -c "echo 'Applying database migrations...' &&
-               flask db upgrade && echo 'Migrations finished.'"
+      sh -c "
+        echo '🔍 Attente de la base de données...' &&
+        python scripts/wait_for_db.py &&
+        echo '📋 Exécution des migrations Alembic...' &&
+        python -m alembic upgrade head &&
+        echo '🔧 Vérification des tables...' &&
+        python scripts/verify_tables.py &&
+        echo '✅ Base de données prête!'
+      "
     depends_on:
       db:
         condition: service_healthy
     volumes:
-      # ✅ CORRECTION: Le service de migration a besoin d'accéder aux fichiers de migration.
       - ./migrations:/home/appuser/app/migrations
-      # ✅ CORRECTION FINALE: Le service de migration doit aussi voir les autres parties du code
-      # pour que Alembic puisse découvrir les modèles de données.
       - ./api:/home/appuser/app/api
       - ./backend:/home/appuser/app/backend
+      - ./utils:/home/appuser/app/utils
+      - ./scripts/wait_for_db.py:/home/appuser/app/scripts/wait_for_db.py
+      - ./scripts/verify_tables.py:/home/appuser/app/scripts/verify_tables.py
   # Workers multiples pour paralléliser les tâches
   worker-fast:
     build:

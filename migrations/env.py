@@ -10,27 +10,18 @@ from sqlalchemy import engine_from_config, pool, text
 import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-# ✅ CORRECTION: Simplification radicale pour la fiabilité.
-# Nous allons créer une app minimale juste pour Alembic.
-from backend.server_v4_complete import create_app
-from utils.database import db
-from utils.models import SCHEMA # Importer notre variable de schéma
+# ✅ IMPORT DES MODÈLES (c'est ça qui manquait !)
+from utils.models import Base, Project, SearchResult, Extraction, AnalysisProfile, RiskOfBias, Grid, ChatMessage, Prompt, Article, GreyLiterature, ProcessingLog, Stakeholder, ScreeningDecision, PRISMARecord, Analysis, Validation, GridField
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-# ✅ CORRECTION: 1. Créer l'application d'abord.
-# Fournir une configuration minimale pour qu'Alembic puisse se connecter à la DB.
-app = create_app({
-    'SQLALCHEMY_DATABASE_URI': os.getenv('DATABASE_URL', 'postgresql://analylit_user:strong_password@db:5432/analylit_db'),
-    'SQLALCHEMY_TRACK_MODIFICATIONS': False
-})
-
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
+
 logger = logging.getLogger('alembic.env')
 logging.getLogger('alembic').setLevel(logging.DEBUG)
 
@@ -38,24 +29,8 @@ logging.getLogger('alembic').setLevel(logging.DEBUG)
 # add your model's MetaData object here
 # for 'autogenerate' support
 # ✅ CORRECTION: 2. Utiliser le contexte de l'application pour garantir que tout est initialisé.
-# Cela lie les modèles à l'instance SQLAlchemy et configure l'URL pour Alembic.
-with app.app_context():
-    # Importer les modèles ici pour qu'ils soient enregistrés dans les métadonnées de `db`
-    from utils import models
-    target_metadata = db.metadata
-    config.set_main_option('sqlalchemy.url', app.config.get('SQLALCHEMY_DATABASE_URI'))
-
-
-
-def get_metadata_with_schema():
-    """
-    Retourne les métadonnées en forçant le schéma sur TOUTES les tables
-    """
-    meta = target_metadata
-    # ✅ CORRECTION CRITIQUE: Forcer le schéma sur chaque table
-    for table in meta.tables.values():
-        table.schema = SCHEMA
-    return meta
+# ✅ CONFIGURATION CRITIQUE : Référencer les métadonnées de la Base déclarative
+target_metadata = Base.metadata
 
 
 def run_migrations_offline():
@@ -72,7 +47,7 @@ def run_migrations_offline():
     """
     context.configure(
         url=config.get_main_option("sqlalchemy.url"),
-        target_metadata=get_metadata_with_schema(),
+        target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
     )
@@ -80,6 +55,11 @@ def run_migrations_offline():
     with context.begin_transaction():
         context.run_migrations()
 
+
+def create_schema_if_not_exists(connection, schema_name="analylit_schema"):
+    """Créer le schéma s'il n'existe pas"""
+    connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {schema_name}"))
+    connection.execute(text(f"GRANT ALL PRIVILEGES ON SCHEMA {schema_name} TO analylit_user"))
 
 def run_migrations_online():
     """Run migrations in 'online' mode.
@@ -96,25 +76,16 @@ def run_migrations_online():
     )
 
     with connectable.connect() as connection:
-        # 1. Créer le schéma
-        if SCHEMA:
-            logger.info(f"Création/Vérification du schéma : {SCHEMA}")
-            connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
-            # ✅ AJOUT: Définir le search_path pour forcer l'utilisation du schéma
-            connection.execute(text(f"SET search_path TO {SCHEMA}, public"))
-        
-        # 2. Configurer avec le schéma par défaut
+        # ✅ CRÉER LE SCHÉMA AVANT LES MIGRATIONS
+        create_schema_if_not_exists(connection)
+
         context.configure(
             connection=connection,
-            target_metadata=get_metadata_with_schema(),
-            version_table_schema=SCHEMA,
-            include_schemas=True,
-            include_object=lambda obj, name, type_, reflected, compare_to: (
-                obj.schema == SCHEMA if hasattr(obj, 'schema') else True
-            )
+            target_metadata=target_metadata,
+            version_table_schema="analylit_schema",  # ✅ Schéma pour alembic_version
+            include_schemas=True
         )
 
-        # 3. Exécuter les migrations à l'intérieur d'une transaction
         with context.begin_transaction():
             context.run_migrations()
 
