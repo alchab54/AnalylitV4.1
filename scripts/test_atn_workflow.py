@@ -42,7 +42,7 @@ class AnalyLitATNWorkflow:
         
         try:
             response = requests.post(
-                f"{self.api_url}/projects/",
+                f"{self.api_url}/projects",
                 json=payload,
                 headers={"Content-Type": "application/json"},
                 timeout=30
@@ -222,10 +222,10 @@ class AnalyLitATNWorkflow:
             response = requests.get(f"{self.api_url}/projects/{self.project_id}/export/excel", timeout=60)
             response.raise_for_status()
             if 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' in response.headers.get('Content-Type', ''):
-                self.log(f"✓ Export réussi. {len(response.content)} bytes reçus.")
-                # Optionally save the file
-                # with open(f"export_{self.project_id}.xlsx", "wb") as f:
-                #     f.write(response.content)
+                filename = f"export_{self.project_id}.xlsx"
+                with open(filename, "wb") as f:
+                    f.write(response.content)
+                self.log(f"✓ Export réussi. Fichier '{filename}' sauvegardé ({len(response.content)} bytes).")
                 return True
             else:
                 self.log(f"✗ Type de contenu inattendu pour l'export: {response.headers.get('Content-Type')}")

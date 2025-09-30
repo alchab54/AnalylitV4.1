@@ -105,9 +105,9 @@ services:
       bash -c "echo '🚀 Démarrage du serveur Gunicorn...' &&
                exec gunicorn --conf backend/config/gunicorn.conf.py api.gunicorn_entry:app"
     depends_on:
-      # ✅ CORRECTION: Le service web attend maintenant que le service migrate ait terminé.
+      # ✅ CORRECTION FINALE: Le service web attend que le service migrate ait terminé avec succès.
       migrate:
-        condition: service_started
+        condition: service_completed_successfully
       db:
         condition: service_healthy
       test-db:
