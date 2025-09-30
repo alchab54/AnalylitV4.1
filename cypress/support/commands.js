@@ -29,23 +29,39 @@ Cypress.Commands.add('setupBasicTest', () => {
         if (!found) {
           cy.get('body').then($b => {
             if ($b.find(selector).length > 0) {
+              // ✅ CORRECTION : Ajouter .first() pour éviter l'erreur de multiple éléments
               cy.get(selector).first().click({ force: true });
               found = true;
               cy.log(`✅ Bouton création trouvé avec: ${selector}`);
               
+              // Attendre que la modale apparaisse
+              cy.get('#newProjectModal, .modal, [role="dialog"]', { timeout: 5000 })
+                .should('be.visible');
+              
               // Remplir le formulaire de création
-              cy.get('#newProjectModal').find('input[name="name"], input[placeholder*="nom"]').first()
-                .type('Projet Test E2E', { force: true });
-              
-              cy.get('#newProjectModal').find('textarea[name="description"], textarea[placeholder*="description"]').first()
-                .type('Projet créé automatiquement pour les tests E2E', { force: true });
-              
-              // Soumettre
-              cy.get('button[type="submit"], .btn-submit, button:contains("Créer")', { timeout: 5000 })
-                .click({ force: true });
+              cy.get('#newProjectModal').within(() => {
+                cy.get('input[name="name"], input[placeholder*="nom"], #projectName')
+                  .first()
+                  .clear()
+                  .type('Projet Test E2E', { force: true });
                 
-              // Attendre que la modale se ferme et le projet apparaisse
+                cy.get('textarea[name="description"], textarea[placeholder*="description"], #projectDescription')
+                  .first()
+                  .clear()
+                  .type('Projet créé automatiquement pour les tests E2E', { force: true });
+                
+                // ✅ CORRECTION : Soumettre avec sélecteur plus précis
+                cy.get('button[type="submit"], .btn-submit')
+                  .first()
+                  .click({ force: true });
+              });
+                
+              // Attendre que la modale se ferme
+              cy.get('#newProjectModal', { timeout: 10000 }).should('not.be.visible');
+              
+              // Attendre que le projet apparaisse
               cy.wait(2000);
+              cy.get('.project-card', { timeout: 10000 }).should('have.length.gte', 1);
             }
           });
         }
@@ -72,35 +88,35 @@ Cypress.Commands.add('selectProject', (projectName = 'Projet Test E2E') => {
     '.card.project'
   ];
 
-  // ✅ CORRECTION : Utiliser for..of au lieu de forEach pour pouvoir break
+  // ✅ CORRECTION : Approche séquentielle plus simple
   cy.get('body').then($body => {
     let projectFound = false;
 
+    // Tester chaque sélecteur
     for (const selector of projectSelectors) {
-      if ($body.find(selector).length > 0) {
-        cy.log(`✅ Projets trouvés avec sélecteur: ${selector}`);
+      if ($body.find(selector).length > 0 && !projectFound) {
+        cy.log(`✅ Projets trouvés avec sélecteur: ${selector} (${$body.find(selector).length} éléments)`);
 
-        // Si le projet spécifique existe, le sélectionner
+        // ✅ CORRECTION : Toujours utiliser .first() pour éviter les erreurs de multiple éléments
         if ($body.find(selector).text().includes(projectName)) {
-          cy.contains(selector, projectName).click({ force: true });
+          cy.contains(selector, projectName).first().click({ force: true });
         } else {
-          // Sinon, sélectionner le premier projet disponible
           cy.get(selector).first().click({ force: true });
         }
 
         projectFound = true;
         cy.log(`✅ Projet sélectionné avec succès`);
-        break; // ✅ CORRECTION : Sortir de la boucle
+        
+        // Attendre que la sélection soit effective
+        cy.wait(1000);
+        break;
       }
     }
 
-    // Fallback : Si aucun projet trouvé, continuer quand même
+    // ✅ Fallback : Si aucun projet trouvé, continuer quand même (pas d'erreur)
     if (!projectFound) {
       cy.log('⚠️ Aucun projet trouvé - Test continuera sans sélection');
     }
-
-    // Attendre que la sélection soit effective
-    cy.wait(1000);
   });
 });
 
@@ -111,7 +127,7 @@ Cypress.Commands.add('navigateToSection', (sectionId) => {
   // Attendre que la navigation soit visible
   cy.get('nav, .navigation, .app-nav, .sidebar', { timeout: 10000 }).should('be.visible');
   
-  // ✅ CORRECTION : Méthode de navigation séquentielle
+  // ✅ CORRECTION : Navigation plus robuste
   cy.get('body').then($body => {
     const navSelectors = [
       `#nav-${sectionId}`,
@@ -119,10 +135,6 @@ Cypress.Commands.add('navigateToSection', (sectionId) => {
       `[data-section-id="${sectionId}"]`,
       `.nav-${sectionId}`,
       `.nav-item[href*="${sectionId}"]`,
-      `button:contains("${sectionId}")`,
-      `a:contains("${sectionId}")`,
-      `.tab:contains("${sectionId}")`,
-      `[role="tab"]:contains("${sectionId}")`
     ];
 
     let navFound = false;
@@ -130,13 +142,40 @@ Cypress.Commands.add('navigateToSection', (sectionId) => {
     // ✅ CORRECTION : Tester chaque sélecteur de manière séquentielle
     for (const selector of navSelectors) {
       if ($body.find(selector).length > 0 && !navFound) {
+        // ✅ CORRECTION : Toujours utiliser .first() pour éviter les erreurs de multiple éléments
         cy.get(selector)
+          .first()
           .scrollIntoView()
           .should('be.visible')
           .click({ force: true });
         navFound = true;
         cy.log(`✅ Navigation réussie avec: ${selector}`);
         break;
+      }
+    }
+
+    // ✅ Fallback : Navigation par texte (avec .first())
+    if (!navFound) {
+      const textMap = {
+        'results': ['Résultats', 'Articles', 'Results', 'Search'],
+        'analyses': ['Analyses', 'Analysis', 'Statistiques'],
+        'rob': ['RoB', 'Risque', 'Bias', 'Cochrane'],
+        'atn': ['ATN', 'Alliance', 'Thérapeutique'],
+        'thesis': ['Thèse', 'Thesis', 'Export']
+      };
+      
+      const searchTexts = textMap[sectionId] || [sectionId];
+      
+      for (const text of searchTexts) {
+        if ($body.text().includes(text) && !navFound) {
+          cy.contains('button, a, .nav-item, .tab', text)
+            .first()  // ✅ CORRECTION : Ajouter .first()
+            .scrollIntoView()
+            .click({ force: true });
+          navFound = true;
+          cy.log(`✅ Navigation par texte: ${text}`);
+          break;
+        }
       }
     }
 
