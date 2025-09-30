@@ -853,7 +853,8 @@ def test_index_project_pdfs_task(db_session, mocker, mock_embedding_model):
     mock_notify.assert_any_call(project_id, 'indexing_completed', f'{total_pdfs} PDF(s) ont été traités et indexés.', {'task_name': 'indexation'})
     
 @patch('utils.fetchers.fetch_unpaywall_pdf_url') # <-- CHEMIN CORRIGÉ
-def test_fetch_online_pdf_task(mock_unpaywall, db_session, mocker):
+@patch('requests.get')
+def test_fetch_online_pdf_task(mock_requests_get, mock_unpaywall, db_session, mocker):
     """Teste le téléchargement de PDF via Unpaywall."""
     # ARRANGE
     project_id = str(uuid.uuid4()) # Déjà unique.
@@ -868,7 +869,7 @@ def test_fetch_online_pdf_task(mock_unpaywall, db_session, mocker):
     mock_pdf_content = b'%PDF-1.4...test content...'
 
     mock_unpaywall.return_value = mock_pdf_url
-    
+
     mock_http_response = MagicMock()
     mock_http_response.headers = {'content-type': 'application/pdf'}
     mock_http_response.content = mock_pdf_content

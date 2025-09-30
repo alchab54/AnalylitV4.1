@@ -88,8 +88,8 @@ def get_project_search_results(project_id):
         else:
             query = query.order_by(order_column.desc())
 
-    # ✅ CORRECTION: Utilisation de db.paginate() pour la compatibilité avec Flask-SQLAlchemy 3.x
-    pagination = db.paginate(query, page=page, per_page=per_page)
+    # ✅ CORRECTION: Utilisation de query.paginate() pour la compatibilité avec le setup de test.
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     return jsonify({
         'results': [item.to_dict() for item in pagination.items],
         'total': pagination.total,
@@ -528,10 +528,12 @@ def export_thesis(project_id):
     try:
         # 1. Récupérer les données pertinentes (articles inclus)
         articles_query = (
-            db.select(SearchResult)
-            .join(Extraction, (SearchResult.project_id == Extraction.project_id) & (SearchResult.article_id == Extraction.pmid))
-            .where(SearchResult.project_id == project_id)
-            .where(Extraction.user_validation_status == 'include')
+            db.session.query(SearchResult)
+            .join(Extraction, (SearchResult.article_id == Extraction.pmid) & (SearchResult.project_id == Extraction.project_id))
+            .filter(
+                SearchResult.project_id == project_id,
+                Extraction.user_validation_status == 'include'
+            )
         )
 
         # ✅ CORRECTION: Exécuter la requête correctement pour obtenir les résultats.
