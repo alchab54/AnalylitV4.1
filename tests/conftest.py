@@ -12,6 +12,10 @@ sys.path.insert(0, str(root_dir))
 # Set TESTING environment variable
 os.environ['TESTING'] = 'true'
 
+# ✅ CORRECTION CRITIQUE : Importer les modèles pour que SQLAlchemy les découvre.
+# C'est ce qui permet à `db.create_all()` de fonctionner.
+from utils import models  # noqa: F401
+
 # ✅ CORRECTION CRITIQUE : Utiliser un verrou pour éviter les conflits de concurrence
 _db_lock = threading.Lock()
 

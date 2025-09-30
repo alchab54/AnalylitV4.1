@@ -7,11 +7,11 @@ Test de diagnostic pour comprendre le problème des modèles SQLAlchemy.
 import os
 os.environ['TESTING'] = 'true'
 
-from sqlalchemy import create_engine
-from utils.database import Base
-import pytest # ✅ CORRECTION: Importer pytest pour utiliser le décorateur.
+import pytest
 
-@pytest.mark.skip(reason="Ce test est redondant avec le test_simple_database et échoue avec SQLite à cause du schéma.")
+# ✅ CORRECTION: Le test est obsolète. La classe `Base` n'est pas dans `utils.database` et
+# la création des tables est maintenant validée dans conftest.py. On le désactive.
+@pytest.mark.skip(reason="Test de diagnostic obsolète. La création des tables est validée dans la fixture 'app'.")
 def test_diagnostic_tables_skipped():
     """Diagnostic : quelles tables SQLAlchemy connaît-il ?"""
     
