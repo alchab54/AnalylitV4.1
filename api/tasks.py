@@ -31,7 +31,7 @@ def get_task_status(task_id):
     response = {
         # ✅ CORRECTION: L'attribut est .id, pas la méthode .get_id()
         'task_id': job.id,
-        'status': job.get_status(),
+        'status': job.get_status(), # Appel de la méthode
         'result': job.return_value,
         'enqueued_at': job.enqueued_at.isoformat() if job.enqueued_at else None,
         'started_at': job.started_at.isoformat() if job.started_at else None,

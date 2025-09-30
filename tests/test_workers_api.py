@@ -101,6 +101,8 @@ class TestWorkersIntegration:
             # ✅ CORRECTION FINALE: `return_value` est une propriété qui doit contenir un dictionnaire sérialisable.
             mock_job.return_value = {"status": "completed", "results": "test"}
             mock_job.get_status.return_value = 'finished'
+            # ✅ CORRECTION FINALE: Explicitement définir les autres attributs accédés pour éviter la sérialisation d'un MagicMock.
+            mock_job.exc_info = None
 
             mock_fetch.return_value = mock_job
             
