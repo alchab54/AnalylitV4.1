@@ -90,3 +90,17 @@ def format_bibliography(articles: list) -> str:
         journal = article.get('journal', 'N.D.')
         entries.append(f"- {authors} ({year}). {title}. *{journal}*.")
     return "\n".join(sorted(entries))
+
+def seed_default_data(session):
+    """Seed la DB avec des données par défaut."""
+    from utils.models import AnalysisProfile, Project
+    try:
+        if not session.query(AnalysisProfile).filter_by(name='Standard').first():
+            session.add(AnalysisProfile(id='standard', name='Standard', is_custom=False))
+            session.flush() # Make it available for the next query
+        if not session.query(Project).filter_by(name='Projet par défaut').first():
+            session.add(Project(name='Projet par défaut'))
+        session.commit()
+    except Exception as e:
+        logger.error(f"Erreur pendant le seeding : {e}")
+        session.rollback()

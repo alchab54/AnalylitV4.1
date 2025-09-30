@@ -1,7 +1,7 @@
 # tests/test_database.py
 
 import uuid
-from utils.database import seed_default_data
+from utils.helpers import seed_default_data
 from utils.models import AnalysisProfile, Project
 
 # La fixture `session` est automatiquement injectée par conftest.py

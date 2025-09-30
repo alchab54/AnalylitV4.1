@@ -1,7 +1,7 @@
 import json
 import pytest
 from utils.models import AnalysisProfile
-from utils.database import seed_default_data
+from utils.helpers import seed_default_data
 import uuid
 
 def test_api_analysis_profiles_crud_workflow(client, db_session):

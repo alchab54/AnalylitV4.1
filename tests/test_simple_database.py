@@ -14,7 +14,8 @@ from sqlalchemy.orm import sessionmaker
 os.environ['TESTING'] = 'true'
 
 # Import des modèles et de la Base
-from utils.database import Base, seed_default_data
+from utils.db_base import Base
+from utils.helpers import seed_default_data
 from utils.models import AnalysisProfile, Project
 
 def test_database_models_work():

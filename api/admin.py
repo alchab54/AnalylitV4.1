@@ -29,7 +29,7 @@ def get_queues_info():
         
     return jsonify({"queues": queues_info})
 
-@admin_bp.route('/admin/health', methods=['GET'])
+@admin_bp.route('/health', methods=['GET'])
 def health_check():
     """Route simple pour le healthcheck de Docker."""
     return jsonify({"status": "healthy"}), 200
