@@ -1,26 +1,19 @@
-# Hérite de l'image de base (dépendances déjà installées)
+# Image applicative - hérite de la base avec les dépendances
 FROM analylit-base:latest
 
-# Copier le code (copie tout y compris docker/entrypoint.sh)
-COPY --chown=appuser:appuser backend/config/profiles.json ./ 
-COPY --chown=appuser:appuser backend/server_v4_complete.py ./ 
-COPY --chown=appuser:appuser backend/config/config_v4.py ./ 
-COPY --chown=appuser:appuser backend/tasks_v4_complete.py ./ 
-COPY --chown=appuser:appuser scripts/run_migrations.py ./ 
-COPY --chown=appuser:appuser backend/config/gunicorn.conf.py ./ 
-COPY --chown=appuser:appuser api/ api/ 
-COPY --chown=appuser:appuser utils/ utils/ 
-COPY --chown=appuser:appuser web/ web/ 
-COPY --chown=appuser:appuser migrations/ migrations/ 
+# ✅ CORRECTION: Copier les dossiers entiers au lieu de fichiers spécifiques.
+# Cela résout le "ModuleNotFoundError: No module named 'backend'".
+COPY --chown=appuser:appuser backend/ backend/
+COPY --chown=appuser:appuser scripts/ scripts/
+COPY --chown=appuser:appuser api/ api/
+COPY --chown=appuser:appuser utils/ utils/
+COPY --chown=appuser:appuser web/ web/
+COPY --chown=appuser:appuser migrations/ migrations/
 COPY --chown=appuser:appuser scripts/entrypoint.sh ./
 
-# Positionner *le chmod* SUR LE FICHIER avec CHEMIN CORRECT
-USER root
+# ✅ CORRECTION: Copier le fichier alembic.ini manquant dans l'image.
+COPY --chown=appuser:appuser alembic.ini ./
+
 RUN chmod +x entrypoint.sh
 
-# Create logs and projects directories and set permissions
-RUN mkdir -p /home/appuser/app/logs && chown appuser:appuser /home/appuser/app/logs
-RUN mkdir -p /home/appuser/app/projects && chown appuser:appuser /home/appuser/app/projects
-
-EXPOSE 5000
 ENTRYPOINT ["./entrypoint.sh"]
