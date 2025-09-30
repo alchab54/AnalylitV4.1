@@ -9,7 +9,7 @@ from utils.models import Project, SearchResult, Extraction, AnalysisProfile
 # Ce test simule le workflow complet d'un utilisateur.
 # C'est la preuve la plus forte que votre application fonctionne comme un tout cohérent.
 
-def test_full_end_to_end_workflow(client, db_session):
+def test_full_end_to_end_workflow(client, db_session, setup_project):
     """
     Simule un workflow complet :
     1. Création d'un projet.

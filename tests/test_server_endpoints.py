@@ -179,7 +179,7 @@ def test_get_all_projects(client, db_session): # Utilise session
     assert found_project1['name'] == project1_data['name']
     assert found_project1['analysis_mode'] == project1_data['mode']
 
-def test_get_all_projects_empty(client, db_session):
+def test_get_all_projects_empty(client, clean_db):
     """
     Test avec base de données vraiment vide grâce à db_session
     WHEN la route '/api/projects' est appelée

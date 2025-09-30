@@ -976,6 +976,7 @@ def run_atn_stakeholder_analysis_task(session, project_id: str):
         analysis_result["plot_path"] = plot_path
 
     update_project_status(session, project_id, status='completed', analysis_result=analysis_result)
+    session.commit()
     send_project_notification(project_id, 'atn_analysis_completed', 'Analyse ATN multipartie prenante terminée.')
 
 @with_db_session

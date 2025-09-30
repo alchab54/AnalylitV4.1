@@ -1,7 +1,7 @@
 # api/admin.py
 
 import json
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from rq.worker import Worker
 
 # --- Import des variables globales partagées ---

@@ -534,7 +534,9 @@ def export_thesis(project_id):
             .where(Extraction.user_validation_status == 'include')
         )
 
-        articles = [r.to_dict() for r in articles_query.all()]
+        # ✅ CORRECTION: Exécuter la requête correctement pour obtenir les résultats.
+        articles_result = db.session.execute(articles_query).scalars().all()
+        articles = [r.to_dict() for r in articles_result]
 
         if not articles:
             return jsonify({"error": "Aucun article inclus à exporter"}), 404
