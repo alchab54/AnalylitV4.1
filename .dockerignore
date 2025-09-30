@@ -1,11 +1,29 @@
 # ===================================================================
 # == .dockerignore ULTRA-SÉCURISÉ - ANALYLIT v4.1 ==
 # ===================================================================
+#
+# Approche par "liste blanche" : tout ignorer, puis ré-inclure le strict nécessaire.
+# Cela garantit un contexte de build minimal et des builds beaucoup plus rapides.
+
+# 1. Ignorer absolument tout par défaut.
+**
+
+# 2. Ré-inclure les fichiers et dossiers essentiels pour le build.
+!api/
+!backend/
+!database/
+!docker/
+!migrations/
+!scripts/
+!utils/
+!web/
+!alembic.ini
+!docker-compose.yml
+!requirements.txt
 
 # ===============================================
 # == EXCLUSIONS DE SÉCURITÉ CRITIQUES ==
 # ===============================================
-# --- SECRETS CRITIQUES ---
 .env
 .env.*
 !.env.example
@@ -14,159 +32,5 @@
 *.p12
 *.crt
 *.csr
-
-# --- DONNÉES UTILISATEUR ---
-projects/
-user_data/
-uploads/
-exports/
-backups/
-
-# ===============================================
-# == CACHE ET TEMPORAIRES PYTHON ==
-# ===============================================
-# --- CACHE PYTHON ---
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# --- ENVIRONNEMENTS ---
-venv/
-.venv/
-env/
-ENV/
-
-# ===============================================
-# == OUTILS DE DÉVELOPPEMENT ==
-# ===============================================
-# --- OUTILS DÉVELOPPEMENT ---
-.git/
-.gitignore
-.gitattributes
-.github/
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
-
-# ===============================================
-# == TESTS - CONFIGURATION CYPRESS OPTIMISÉE ==
-# ===============================================
-# --- RÉSULTATS DE TESTS SEULEMENT ---
-cypress/videos/
-cypress/screenshots/
-cypress/downloads/
-reports/generated/
-test-results/
-htmlcov/
-.coverage
-.coverage.*
-.pytest_cache/
-.tox/
-.nox/
-coverage.xml
-*.cover
-.hypothesis/
-
-# --- FICHIERS VOLUMINEUX ---
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.bmp
-*.tiff
-*.webp
-*.svg
-*.ico
-*.mp4
-*.avi
-*.mov
-*.wmv
-*.flv
-*.mkv
-*.mp3
-*.wav
-*.flac
-*.aac
-*.ogg
-*.zip
-*.tar.gz
-*.tar.xz
-*.tar.bz2
 *.rar
 *.7z
-*.gz
-*.bz2
-*.xz
-*.sqlite
-*.sqlite3
-*.db
-database/data/
-*.dump
-*.sql.gz
-
-# ===============================================
-# == LOGS ET DONNÉES TEMPORAIRES ==
-# ===============================================
-# --- LOGS ---
-*.log
-logs/
-log/
-tmp/
-temp/
-.tmp/
-
-# --- CACHE MODÈLES ---
-model_cache/
-.ollama/
-huggingface_cache/
-transformers_cache/
-.cache/
-.mypy_cache/
-.ruff_cache/
-
-# ===============================================
-# == EXCEPTIONS IMPORTANTES ==
-# ===============================================
-# --- GARDER LES ESSENTIELS ---
-!docker/
-!Dockerfile*
-!docker-compose*
-!requirements.txt
-!package.json
-!README.md
-!docs/
-!backend/config/profiles.json
-!backend/config/grille-ATN.json
-!migrations/
-!database/init-user-db.sql
-!backend/config/
-
-# --- GARDER CYPRESS STRUCTURE ---
-!cypress.config.js
-!cypress/support/
-!cypress/e2e/
-!cypress/fixtures/
-!jest.config.cjs
-!web/js/**/*.test.js

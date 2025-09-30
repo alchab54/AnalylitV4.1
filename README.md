@@ -53,9 +53,6 @@ Toutes les commandes doivent être exécutées depuis un terminal **Git Bash** s
 git clone https://github.com/alchab54/AnalylitV4.1.git
 cd AnalylitV4.1
 docker-compose up -d --build
-
-# 2. Lancer l'installation complète (crée les images, la base de données, etc.)
-make install
 ```
 
 L'application sera accessible à http://localhost:5000
