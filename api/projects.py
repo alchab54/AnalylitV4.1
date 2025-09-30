@@ -92,13 +92,19 @@ def get_project_search_results(project_id):
         else:
             query = query.order_by(order_column.desc())
 
-    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    # ✅ SOLUTION DÉFINITIVE : Pagination manuelle robuste pour contourner l'incompatibilité
+    # de la méthode .paginate() avec la fixture de test.
+    total = query.count()
+    offset = (page - 1) * per_page
+    items = query.offset(offset).limit(per_page).all()
+    total_pages = (total + per_page - 1) // per_page if per_page > 0 else 0
+
     return jsonify({
-        'results': [item.to_dict() for item in pagination.items],
-        'total': pagination.total,
-        'page': pagination.page,
-        'per_page': pagination.per_page,
-        'total_pages': pagination.pages,
+        'results': [item.to_dict() for item in items],
+        'total': total,
+        'page': page,
+        'per_page': per_page,
+        'total_pages': total_pages,
     })
 
 @projects_bp.route('/projects/<project_id>/analyses', methods=['GET'])

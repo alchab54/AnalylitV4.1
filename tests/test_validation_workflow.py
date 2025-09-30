@@ -2,8 +2,8 @@
 import pytest
 import json
 import uuid
-import io
-from unittest.mock import patch
+import io 
+from unittest.mock import patch, MagicMock
 from utils.models import Project, SearchResult, Extraction
 
 # ----- SETUP DES DONNÉES DE TEST -----
@@ -55,7 +55,7 @@ def test_update_decision_for_second_evaluator(client, db_session, setup_double_c
     assert "evaluator1" in validations and validations["evaluator1"] == "include"
     assert "evaluator2" in validations and validations["evaluator2"] == "exclude"
 
-@patch('api.projects.background_queue.enqueue')
+@patch('api.projects.analysis_queue.enqueue')
 def test_calculate_kappa_task_enqueued(mock_enqueue, client, setup_double_coding_data):
     """
     Vérifie que la tâche de calcul Kappa peut être mise en file d'attente via l'endpoint dédié.

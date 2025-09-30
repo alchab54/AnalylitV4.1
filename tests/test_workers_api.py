@@ -3,7 +3,7 @@ Tests d'intégration workers adaptés aux endpoints AnalyLit existants.
 """
 import pytest
 import json
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 @pytest.mark.integration
 class TestWorkersIntegration:
@@ -93,14 +93,15 @@ class TestWorkersIntegration:
         """Simulation de completion d'une tâche en arrière-plan"""
         # Mock d'une tâche qui se termine
         with patch('rq.job.Job.fetch') as mock_fetch:
-            mock_job = type('Job', (), {
-                'id': 'completed-job',
-                'is_finished': True,
-                'is_failed': False,
-                'return_value': {"status": "completed", "results": "test"},
-                'get_status': lambda: 'finished'
-            })()
-            
+            # ✅ CORRECTION: Utiliser MagicMock pour une simulation plus simple et correcte.
+            mock_job = MagicMock()
+            mock_job.id = 'completed-job'
+            mock_job.is_finished = True
+            mock_job.is_failed = False
+            # ✅ CORRECTION FINALE: `return_value` est une propriété, pas une méthode.
+            mock_job.return_value = {"status": "completed", "results": "test"}
+            mock_job.get_status.return_value = 'finished'
+
             mock_fetch.return_value = mock_job
             
             # Vérifier le statut d'une tâche "terminée"

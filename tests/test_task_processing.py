@@ -886,8 +886,8 @@ def test_fetch_online_pdf_task(mock_requests_get, mock_unpaywall, db_session, mo
     mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
     
     # ACT
-    # ✅ CORRECTION: Appeler la tâche directement. Le décorateur @with_db_session gérera la session.
-    fetch_online_pdf_task(project_id, article_id)
+    # ✅ CORRECTION: Appeler la fonction "wrapped" pour injecter manuellement la session de test.
+    fetch_online_pdf_task.__wrapped__(db_session, project_id, article_id)
 
     # ASSERT
     mock_unpaywall.assert_called_once_with("10.1234/test")

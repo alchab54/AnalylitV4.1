@@ -84,7 +84,6 @@ services:
       - GUNICORN_THREADS=2
       - GUNICORN_TIMEOUT=120
       - PYTHONPATH=/home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
-      - TEST_DATABASE_URL=
     env_file:
       - .env
     deploy:
