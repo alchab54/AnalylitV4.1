@@ -13,9 +13,13 @@ sys.path.insert(0, str(root_dir))
 os.environ['TESTING'] = 'true'
 
 # ✅ CORRECTION CRITIQUE : Importer les modèles pour que SQLAlchemy les découvre.
-# C'est ce qui permet à `db.create_all()` de fonctionner.
-from utils import models  # noqa: F401
-
+# ✅ CORRECTION CRITIQUE : Import explicite de TOUS les modèles
+from utils.models import (
+    Project, Article, SearchResult, Extraction, Grid, GridField, 
+    Validation, Analysis, ChatMessage, AnalysisProfile, PRISMARecord, 
+    ScreeningDecision, RiskOfBias, Prompt, GreyLiterature, 
+    ProcessingLog, Stakeholder
+)
 # ✅ CORRECTION CRITIQUE : Utiliser un verrou pour éviter les conflits de concurrence
 _db_lock = threading.Lock()
 
@@ -70,7 +74,7 @@ def app():
                 db.session.commit()
                 print("✅ Schéma nettoyé")
                 
-            except Exception as e:
+            except Exception as e: # noqa: E722
                 db.session.rollback()
                 print(f"⚠️ Nettoyage: {e}")
             
@@ -78,10 +82,10 @@ def app():
             try:
                 # Créer le schéma
                 db.session.execute(text("CREATE SCHEMA analylit_schema"))
-                db.session.commit()
-                
-                # Créer les tables avec SQLAlchemy (plus fiable que Alembic pour tests)
-                db.create_all()
+
+                # ✅ Créer les tables avec SQLAlchemy (plus fiable que Alembic pour tests)
+                from utils.db_base import Base
+                Base.metadata.create_all(bind=db.engine)
                 db.session.commit()
                 print("✅ Tables de test créées")
                 
@@ -91,11 +95,11 @@ def app():
                     WHERE table_schema = 'analylit_schema'
                 """)).scalar()
                 print(f"✅ {count} tables créées dans analylit_schema")
-                
+
                 if count == 0:
                     pytest.fail("No tables created in test schema")
                 
-            except Exception as e:
+            except Exception as e: # noqa: E722
                 db.session.rollback()
                 print(f"❌ Erreur création test: {e}")
                 pytest.fail(f"Cannot create test tables: {e}")
@@ -106,7 +110,7 @@ def app():
             try:
                 db.session.execute(text("DROP SCHEMA IF EXISTS analylit_schema CASCADE"))
                 db.session.commit()
-                print("✅ Test schema cleaned up")
+                print("✅ Schéma de test nettoyé")
             except Exception as e:
                 print(f"⚠️ Cleanup warning: {e}")
 
