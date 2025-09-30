@@ -3,8 +3,14 @@
 
 .PHONY: help install start stop restart status logs backup clean update models shell
 
-# Configuration
-COMPOSE_FILE=docker-compose.yml
+# --- Configuration & Détection automatique de Docker Compose ---
+COMPOSE_FILE ?= docker-compose.yml
+
+# Détecte si 'docker compose' (v2) ou 'docker-compose' (v1) doit être utilisé.
+COMPOSE := docker-compose
+ifneq (, $(shell docker compose version 2>/dev/null))
+	COMPOSE := docker compose
+endif
 PROJECT_NAME=analylit-v4
 
 # Couleurs pour l'affichage
@@ -22,26 +28,17 @@ help: ## Afficher l'aide
 	@echo ""
 
 install: ## Installation complète d'AnalyLit
-	@echo "$(BLUE)🔎 Vérification des dépendances (docker, docker-compose)...$(NC)"
-	@command -v docker >/dev/null 2>&1 || { echo >&2 "$(RED)Docker n'est pas installé. Veuillez l'installer avant de continuer.$(NC)"; exit 1; }
-	@command -v docker-compose >/dev/null 2>&1 || { echo >&2 "$(RED)Docker Compose n'est pas installé. Veuillez l'installer avant de continuer.$(NC)"; exit 1; }
-	@echo "$(BLUE) Installation d'AnalyLit V4.0...$(NC)"
-	@if not exist projects mkdir projects
-	@if not exist web mkdir web
+	@echo "$(BLUE)🚀 Installation d'AnalyLit V4.0...$(NC)"
+	@mkdir -p projects web
 	@if [ ! -f .env ]; then cp env.example .env; echo "$(YELLOW)⚠️  Fichier .env créé à partir d'env.example$(NC)"; fi
 	@docker-compose -f $(COMPOSE_FILE) build
-	@echo "$(BLUE)⬆️  Lancement des services de base...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) up -d db redis ollama
-	@echo "$(BLUE)🗄️  Application des migrations de base de données...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) run --rm migrate
-	@echo "$(BLUE)🚀 Démarrage de tous les services applicatifs...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) up -d --remove-orphans
+	@docker-compose -f $(COMPOSE_FILE) up -d
 	@echo "$(GREEN)✅ Installation terminée!$(NC)"
 	@echo "$(BLUE)🌐 Interface web: http://localhost:8080$(NC)"
 
 start: ## Démarrer les services
 	@echo "$(BLUE)🚀 Démarrage des services...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) up -d --remove-orphans
+	@docker-compose -f $(COMPOSE_FILE) up -d
 	@echo "$(GREEN)✅ Services démarrés$(NC)"
 
 stop: ## Arrêter les services
@@ -56,7 +53,7 @@ status: ## Afficher l'état des services
 	@docker-compose -f $(COMPOSE_FILE) ps
 	@echo ""
 	@echo "$(BLUE)🔧 Utilisation des ressources:$(NC)"
-	@docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}" $$(docker-compose -f $(COMPOSE_FILE) ps -q)
+	@docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}" | head -6
 
 logs: ## Afficher les logs des services
 	@echo "$(BLUE)📋 Logs des services:$(NC)"
@@ -105,17 +102,16 @@ shell-redis: ## Accéder au shell Redis
 update: ## Mettre à jour AnalyLit
 	@echo "$(BLUE)🔄 Mise à jour d'AnalyLit...$(NC)"
 	@docker-compose -f $(COMPOSE_FILE) down
-	@docker-compose -f $(COMPOSE_FILE) pull --ignore-pull-failures
 	@docker-compose -f $(COMPOSE_FILE) build --no-cache
-	@$(MAKE) install
+	@docker-compose -f $(COMPOSE_FILE) up -d
 	@echo "$(GREEN)✅ Mise à jour terminée$(NC)"
 
 clean: ## Nettoyer le système (⚠️ supprime les données)
 	@echo "$(RED)⚠️  Cette action va supprimer tous les conteneurs et volumes$(NC)"
 	@read -p "Êtes-vous sûr? (y/N): " confirm && [ "$$confirm" = "y" ] || exit 1
 	@echo "$(BLUE)🧹 Nettoyage en cours...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) down -v --remove-orphans
-	@docker system prune -f
+	@docker-compose -f $(COMPOSE_FILE) down -v
+	@docker image prune -f
 	@echo "$(GREEN)✅ Nettoyage terminé$(NC)"
 
 dev: ## Mode développement avec rechargement automatique
@@ -123,9 +119,9 @@ dev: ## Mode développement avec rechargement automatique
 	@docker-compose -f $(COMPOSE_FILE) -f docker-compose.dev.yml up
 
 test: ## Exécuter les tests
-	@mkdir -p logs
 	@echo "$(BLUE)🧪 Exécution des tests...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) run --rm web pytest -v tests/
+	@docker-compose -f $(COMPOSE_FILE) run --rm web pytest -v tests/ > logs/pytest_results.log 2>&1
+	@mkdir -p logs
 
 health: ## Vérifier la santé des services
 	@echo "$(BLUE)🏥 Vérification de la santé des services:$(NC)"

@@ -41,10 +41,14 @@ Ce projet n'existerait pas sans :
 
 ### Prérequis
 - Docker et Docker Compose
+- **Sur Windows :** [Git for Windows](https://git-scm.com/download/win) pour avoir le terminal **Git Bash**.
 - 8 GB RAM minimum
 - GPU NVIDIA recommandé pour Ollama (optionnel)
 
 ### Démarrage Rapide
+
+Toutes les commandes doivent être exécutées depuis un terminal **Git Bash** sur Windows, ou un terminal standard sur macOS/Linux.
+
 ```
 git clone https://github.com/alchab54/AnalylitV4.1.git
 cd AnalylitV4.1
