@@ -13,8 +13,8 @@ services:
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./database/init-user-db.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data/
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # ✅ CORRECTION: Utiliser le nouveau script d'initialisation
       # Monter la configuration personnalisée
       - ./database/postgres.conf:/usr/share/postgresql/postgresql.conf.sample
     ports:
