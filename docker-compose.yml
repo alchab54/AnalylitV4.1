@@ -157,9 +157,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      test-db:
-        condition: service_started
     volumes:
+      # ✅ CORRECTION: Le service de migration a besoin d'accéder aux fichiers de migration.
       - ./migrations:/home/appuser/app/migrations
       - ./backend:/home/appuser/app/backend
   # Workers multiples pour paralléliser les tâches
