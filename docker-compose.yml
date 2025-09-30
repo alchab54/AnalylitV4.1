@@ -160,6 +160,9 @@ services:
     volumes:
       # ✅ CORRECTION: Le service de migration a besoin d'accéder aux fichiers de migration.
       - ./migrations:/home/appuser/app/migrations
+      # ✅ CORRECTION FINALE: Le service de migration doit aussi voir les autres parties du code
+      # pour que Alembic puisse découvrir les modèles de données.
+      - ./api:/home/appuser/app/api
       - ./backend:/home/appuser/app/backend
   # Workers multiples pour paralléliser les tâches
   worker-fast:
