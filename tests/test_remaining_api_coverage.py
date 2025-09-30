@@ -127,7 +127,7 @@ def test_api_settings_endpoints(client, mocker):
     # Mocker la fonction qui lit le fichier avec mock_open
     with patch("builtins.open", new_callable=mocker.mock_open, read_data=json.dumps(mock_json_data)) as mock_open:
         mock_open.return_value.read.return_value = json.dumps(mock_json_data)
-        response_profiles = client.get('/api/analysis-profiles') # La route est dans analysis_profiles.py
+        response_profiles = client.get('/api/analysis-profiles')
     
     assert response_profiles.status_code == 200
     assert response_profiles.json == mock_json_data

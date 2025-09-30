@@ -106,6 +106,9 @@ def create_app(config_override=None):
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        # ✅ CORRECTION DÉFINITIVE: Assurer que TOUTES les connexions SQLAlchemy
+        # (y compris celles de Flask-Migrate CLI) utilisent le bon schéma.
+        # Cela résout le problème où `flask db current` ne trouvait pas la version.
         'pool_size': 10,
         'pool_recycle': 120,
         'pool_pre_ping': True,
