@@ -182,11 +182,11 @@ def test_get_all_projects(client, db_session): # Utilise session
 def test_get_all_projects_empty(client, db_session): # ✅ Utiliser la session transactionnelle
     """
     Test avec base de données vraiment vide grâce à db_session
-    WHEN the '/api/projects' route is called with GET
-    THEN check that the response is 200 OK and contains an empty list.
+    WHEN la route '/api/projects' est appelée
+    THEN la réponse doit être 200 OK et contenir une liste vide.
     """
-    db_session.execute(text("TRUNCATE TABLE analylit_schema.projects CASCADE;"))
-    db_session.commit()
+    # ✅ CORRECTION: Ne jamais utiliser TRUNCATE. La fixture `db_session` garantit
+    # déjà que la base de données est propre pour ce test.
     
     response = client.get('/api/projects/')
     assert response.status_code == 200

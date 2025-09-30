@@ -19,8 +19,11 @@ def get_all_prompts():
 def create_prompt():
     """Crée un nouveau prompt."""
     data = request.get_json()
-    if not data or not data.get('name') or not data.get('content'):
-        return jsonify({"error": "Les champs 'name' et 'content' sont requis"}), 400
+    # ✅ AMÉLIORATION: Validation plus stricte pour éviter les noms/contenus vides.
+    name = data.get('name') if data else None
+    content = data.get('content') if data else None
+    if not name or not content:
+        return jsonify({"error": "Les champs 'name' et 'content' sont requis et ne peuvent être vides"}), 400
 
     new_prompt = Prompt(name=data['name'], content=data['content'])
     db.session.add(new_prompt)
@@ -34,7 +37,8 @@ def create_prompt():
 @prompts_bp.route('/prompts/<prompt_id>', methods=['PUT'])
 def update_prompt(prompt_id):
     """Met à jour un prompt existant."""
-    prompt = db.session.query(Prompt).filter_by(id=prompt_id).first()
+    # ✅ AMÉLIORATION: Utiliser db.session.get() est plus direct pour une recherche par clé primaire.
+    prompt = db.session.get(Prompt, prompt_id)
     if not prompt:
         return jsonify({"error": "Prompt non trouvé"}), 404
 
@@ -42,15 +46,24 @@ def update_prompt(prompt_id):
     if not data:
         return jsonify({"error": "Aucune donnée fournie"}), 400
 
-    prompt.name = data.get('name', prompt.name)
-    prompt.content = data.get('content', prompt.content)
-    db.session.commit()
-    return jsonify(prompt.to_dict()), 200
+    # Mettre à jour les champs s'ils sont fournis et non vides
+    if 'name' in data and data['name']:
+        prompt.name = data['name']
+    if 'content' in data and data['content']:
+        prompt.content = data['content']
+    
+    try:
+        db.session.commit()
+        return jsonify(prompt.to_dict()), 200
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({"error": "Un prompt avec ce nom existe déjà"}), 409
 
 @prompts_bp.route('/prompts/<prompt_id>', methods=['DELETE'])
 def delete_prompt(prompt_id):
     """Supprime un prompt."""
-    prompt = db.session.query(Prompt).filter_by(id=prompt_id).first()
+    # ✅ AMÉLIORATION: Utiliser db.session.get()
+    prompt = db.session.get(Prompt, prompt_id)
     if not prompt:
         return jsonify({"error": "Prompt non trouvé"}), 404
     

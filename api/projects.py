@@ -12,7 +12,7 @@ from utils.app_globals import (
     extension_queue
 )
 from utils.extensions import db
-from utils.models import Project, Grid, Extraction, AnalysisProfile, RiskOfBias, Analysis
+from utils.models import Project, Grid, Extraction, AnalysisProfile, RiskOfBias, Analysis, SearchResult, ChatMessage
 from utils.file_handlers import save_file_to_project_dir
 from backend.tasks_v4_complete import (
     run_discussion_generation_task,
@@ -71,6 +71,32 @@ def get_project_details(project_id):
         return jsonify({"error": "Projet non trouvé"}), 404
     return jsonify(project.to_dict()), 200
 
+@projects_bp.route('/projects/<project_id>/search-results', methods=['GET'])
+def get_project_search_results(project_id):
+    """Retourne les résultats de recherche paginés pour un projet."""
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    sort_by = request.args.get('sort_by', 'created_at')
+    sort_order = request.args.get('sort_order', 'desc')
+
+    query = db.session.query(SearchResult).filter_by(project_id=project_id)
+    
+    if hasattr(SearchResult, sort_by):
+        order_column = getattr(SearchResult, sort_by)
+        if sort_order == 'asc':
+            query = query.order_by(order_column.asc())
+        else:
+            query = query.order_by(order_column.desc())
+
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    return jsonify({
+        'results': [item.to_dict() for item in pagination.items],
+        'total': pagination.total,
+        'page': pagination.page,
+        'per_page': pagination.per_page,
+        'total_pages': pagination.pages
+    })
+
 @projects_bp.route('/projects/<project_id>/analyses', methods=['GET'])
 def get_project_analyses(project_id):
     """
@@ -79,6 +105,19 @@ def get_project_analyses(project_id):
     # Cette requête suppose que vous avez un modèle 'Analysis' qui stocke les résultats.
     analyses = db.session.query(Analysis).filter_by(project_id=project_id).all()
     return jsonify([analysis.to_dict() for analysis in analyses]), 200
+
+@projects_bp.route('/projects/<project_id>/chat-history', methods=['GET'])
+def get_chat_history(project_id):
+    """Retourne l'historique du chat pour un projet, trié par date."""
+    messages = db.session.query(ChatMessage).filter_by(project_id=project_id).order_by(ChatMessage.timestamp.asc()).all()
+    return jsonify([msg.to_dict() for msg in messages])
+
+@projects_bp.route('/projects/<project_id>/extractions', methods=['GET'])
+def get_project_extractions(project_id):
+    """Retourne toutes les extractions pour un projet."""
+    # ✅ CORRECTION: Ajout de la route manquante pour récupérer les extractions.
+    extractions = db.session.query(Extraction).filter_by(project_id=project_id).all()
+    return jsonify([e.to_dict() for e in extractions]), 200
 
 @projects_bp.route('/projects/<project_id>', methods=['DELETE'])
 def delete_project(project_id):

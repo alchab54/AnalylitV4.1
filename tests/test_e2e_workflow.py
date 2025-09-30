@@ -63,7 +63,7 @@ def test_full_end_to_end_workflow(client, db_session):
         mock_job.id = "mock_job_id_123"
         mock_enqueue.return_value = mock_job
 
-        response = client.post(f'/api/projects/{project_id}/run-synthesis', data=json.dumps(synthesis_data), content_type='application/json')
+        response = client.post(f'/api/projects/{project_id}/run-analysis', json={"type": "synthesis"})
         assert response.status_code == 202
         # Vérifie que la fonction `run_synthesis_task` a bien été appelée
         mock_enqueue.assert_called_once()

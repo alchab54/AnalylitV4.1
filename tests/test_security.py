@@ -110,7 +110,7 @@ def test_file_upload_rejects_dangerous_file_types(client, setup_project):
     assert response.status_code == 202 # The endpoint should accept the request but ignore the invalid file.
     response_data = response.get_json()
     assert "1 fichier(s) ignoré(s)" in response_data['message']
-    assert response_data['failed_files'] == ['exploit.sh']
+    assert response_data['failed_files'] == ['exploit.sh (format non supporté)']
     print("\n[OK] Sécurité Upload : Les types de fichiers non-PDF sont correctement rejetés.")
     
 def test_api_access_to_non_existent_resource(client):

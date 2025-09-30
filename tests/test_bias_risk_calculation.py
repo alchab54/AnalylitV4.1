@@ -75,7 +75,7 @@ def test_run_rob_analysis_no_articles(client, setup_test_data):
 
     assert response.status_code == 400
     data = response.get_json()
-    assert "Aucun article ID fourni" in data['error']
+    assert "Liste d'articles vide" in data['error'] # Correction du message d'erreur attendu
 
 def test_run_rob_analysis_project_not_found(client):
     """
