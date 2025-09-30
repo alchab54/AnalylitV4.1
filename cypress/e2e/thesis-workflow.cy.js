@@ -2,20 +2,23 @@ describe('Workflow de Thèse ATN - Version Optimisée', () => {
   const projectName = 'Thèse ATN Test';
 
   beforeEach(() => {
-    cy.intercept('GET', '/api/projects/', { fixture: 'projects-empty.json' }).as('getProjects');
+    // ✅ CORRECTION: Définir les interceptions AVANT de visiter la page.
+    cy.intercept('GET', '/api/projects', { fixture: 'projects.json' }).as('getProjects');
     cy.intercept('POST', '/api/projects/', { fixture: 'test-project.json' }).as('createProject');
-    cy.intercept('GET', '/api/projects/test-project-123/extractions', { fixture: 'extractions.json' }).as('getExtractions');
+    cy.intercept('GET', '/api/projects/test-project-e2e-1/extractions', { fixture: 'extractions.json' }).as('getExtractions');
 
-    cy.visit('/');
-    // ✅ CORRECTION CRITIQUE: Appeler l'initialisation manuellement pour éviter la race condition.
+    // Visiter l'application SANS initialisation automatique
+    cy.visitApp();
+
+    // Initialiser l'application manuellement APRÈS la mise en place des intercepteurs
     cy.window().then((win) => {
       expect(win.AnalyLit).to.be.an('object');
       win.AnalyLit.initializeApplication();
     });
-    cy.waitForAppReady(); // Attend que les projets soient chargés via le mock
 
-    cy.createTestProject(projectName);
-    cy.selectProject(projectName);
+    // Attendre que l'application soit prête et que les projets soient chargés
+    cy.waitForAppReady();
+    cy.wait('@getProjects');
   });
 
   it('devrait permettre une recherche spécialisée ATN', () => {
@@ -30,6 +33,9 @@ describe('Workflow de Thèse ATN - Version Optimisée', () => {
   });
 
   it('devrait afficher les statistiques de validation et permettre le calcul du Kappa', () => {
+    // Sélectionner le projet de test pour ce scénario
+    cy.selectProject('Projet E2E AnalyLit');
+
     cy.intercept('POST', '/api/projects/*/calculate-kappa', { body: { success: true, task_id: 'kappa-task-123' } }).as('calculateKappa');
     cy.navigateToSection('validation');
     cy.wait('@getExtractions');
@@ -44,6 +50,9 @@ describe('Workflow de Thèse ATN - Version Optimisée', () => {
   });
 
   it('devrait permettre la gestion complète de la checklist PRISMA', () => {
+    // Sélectionner le projet de test pour ce scénario
+    cy.selectProject('Projet E2E AnalyLit');
+
     cy.intercept('POST', '/api/projects/*/prisma-checklist', { statusCode: 200, body: { message: 'OK' } }).as('savePrisma');
     cy.navigateToSection('analyses');
 

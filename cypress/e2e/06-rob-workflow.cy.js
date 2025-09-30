@@ -1,50 +1,56 @@
 describe('Workflow de Risk of Bias (RoB)', () => {
 
   beforeEach(() => {
-    // ✅ CORRECTION: Les interceptions doivent être définies AVANT cy.visit()
-    // pour garantir qu'aucun appel API n'est manqué.
+    // ✅ CORRECTION: Définir les interceptions AVANT de visiter la page
+    // pour éviter toute "race condition" où l'appel API se produit avant que l'intercepteur ne soit prêt.
     cy.setupMockAPI();
 
     cy.visitApp();
+    // Initialiser l'application manuellement APRÈS la mise en place des intercepteurs
     cy.window().then((win) => {
       expect(win.AnalyLit).to.be.an('object');
       win.AnalyLit.initializeApplication();
     });
     cy.waitForAppReady();
 
-    // Sélectionner le projet et naviguer vers la section RoB
+    // Sélectionner le projet. La navigation se fera dans chaque test.
     cy.contains('.project-card', 'Projet E2E AnalyLit').click();
-    cy.navigateToSection('rob');
   });
 
   it("devrait afficher l'interface RoB Cochrane", () => {
-    // ✅ CORRECTION: Le titre a été mis à jour dans le code source (rob-manager.js).
+    // Naviguer vers la section RoB
+    cy.navigateToSection('rob');
+
+    // ✅ CORRECTION: Le titre a été mis à jour dans le code source.
     cy.contains('h2', 'Évaluation du Risque de Biais').should('be.visible');
     cy.get('.rob-navigation').should('be.visible');
   });
 
   it("devrait pouvoir charger les articles pour l'évaluation RoB", () => {
-    // L'interception est maintenant prête, l'attente devrait réussir.
+    // Naviguer vers la section RoB DÉCLENCHE l'appel API.
+    cy.navigateToSection('rob');
+
+    // L'interception étant prête avant la navigation, l'attente réussit.
     cy.wait('@getExtractions');
     cy.contains('Mock Article 1').should('be.visible');
     cy.get('.article-item').should('have.length.at.least', 1);
   });
 
   it("devrait afficher le formulaire d'évaluation avec les 7 domaines Cochrane", () => {
+    cy.navigateToSection('rob');
     cy.wait('@getExtractions');
-    // Act
-    // ✅ CORRECTION: Sélecteur plus robuste pour cliquer sur le bouton d'évaluation.
+
+    // Act: Cliquer sur le bouton d'évaluation
     cy.contains('.article-item', 'Mock Article 1').find('button.btn-assess').click();
-    // Assert
+
+    // Assert: Vérifier que le formulaire est visible et contient un des domaines
     cy.get('.rob-assessment-form').should('be.visible');
-    // Vérifie la présence d'un des domaines Cochrane
     cy.contains('h5', 'Génération de la séquence aléatoire').should('be.visible');
   });
 
   it("devrait permettre d'évaluer le risque et de sauvegarder", () => {
+    cy.navigateToSection('rob');
     cy.wait('@getExtractions');
-    // Arrange
-    // L'interception est déjà dans setupMockAPI, on s'assure juste qu'elle est correcte.
 
     // Act
     cy.contains('.article-item', 'Mock Article 1').find('button.btn-assess').click();

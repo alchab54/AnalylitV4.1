@@ -2,36 +2,40 @@ describe('Workflow des Analyses ATN Spécialisées', () => {
   const projectName = 'Projet ATN Test';
 
   beforeEach(() => {
-    // ✅ CORRECTION: Utiliser les URL sans slash final et les fixtures cohérents.
+    // ✅ CORRECTION: Définir les interceptions AVANT de visiter la page
+    // pour éviter toute "race condition".
     cy.intercept('GET', '/api/projects', { fixture: 'projects.json' }).as('getProjects');
     cy.intercept('POST', '/api/projects', { fixture: 'test-project.json' }).as('createProject');
-    // ✅ CORRECTION: L'ID du projet dans projects.json est 'test-project-e2e-1'.
     cy.intercept('GET', '/api/projects/test-project-e2e-1/extractions', { fixture: 'extractions.json' }).as('getExtractions');
 
-    cy.visit('/');
+    // Visiter l'application SANS initialisation automatique
+    cy.visitApp();
+
+    // Initialiser l'application manuellement APRÈS la mise en place des intercepteurs
     cy.window().then((win) => {
       expect(win.AnalyLit).to.be.an('object');
       win.AnalyLit.initializeApplication();
     });
+
+    // Attendre que l'application soit prête et que les projets soient chargés
     cy.waitForAppReady();
-
-    // ✅ CORRECTION: Attendre la création et le rechargement avant de sélectionner.
-    cy.createTestProject(projectName);
-    cy.wait('@createProject');
     cy.wait('@getProjects');
-
-    // ✅ CORRECTION: Sélectionner le projet qui existe dans le fixture.
-    cy.selectProject('Projet ATN Test'); // Le fixture projects.json contient ce projet.
-    cy.navigateToSection('atn-analysis');
   });
 
   it("devrait afficher l'interface ATN complète", () => {
+    // Sélectionner le projet et naviguer vers la section
+    cy.selectProject('Projet ATN Test');
+    cy.navigateToSection('atn-analysis');
+
     cy.get('.atn-header h2').should('contain', 'Analyses ATN Spécialisées');
     cy.get('.atn-nav').should('be.visible');
     cy.get('.atn-tab').should('have.length', 4);
   });
 
   it('devrait permettre de charger les articles pour l\'extraction ATN', () => {
+    cy.selectProject('Projet ATN Test');
+    cy.navigateToSection('atn-analysis');
+
     cy.get('.atn-tab[data-tab="extraction"]').click();
     cy.get('button').contains('Charger Articles').click();
     cy.wait('@getExtractions'); // ✅ CORRECTION: Attendre explicitement que les données arrivent.
@@ -40,6 +44,9 @@ describe('Workflow des Analyses ATN Spécialisées', () => {
   });
 
   it('devrait switcher entre les onglets ATN', () => {
+    cy.selectProject('Projet ATN Test');
+    cy.navigateToSection('atn-analysis');
+
     cy.get('.atn-tab[data-tab="empathy"]').click();
     cy.get('#atn-empathy.atn-panel.active').should('be.visible');
     cy.contains('h3', 'Analyse Comparative Empathie').should('be.visible');
@@ -50,6 +57,9 @@ describe('Workflow des Analyses ATN Spécialisées', () => {
   });
 
   it("devrait pouvoir lancer une analyse d'empathie", () => {
+    cy.selectProject('Projet ATN Test');
+    cy.navigateToSection('atn-analysis');
+
     cy.intercept('POST', '/api/projects/*/run-analysis', { body: { task_id: 'empathy-task-123' } }).as('runEmpathy');
 
     cy.get('.atn-tab[data-tab="empathy"]').click();

@@ -2,35 +2,30 @@ describe('Workflow de Gestion des Articles - Version Optimisée', () => {
   const projectName = 'Projet Articles Test';
   
   beforeEach(() => {
-    // Isoler les tests avec des interceptions API
-    cy.intercept('GET', '/api/projects', { fixture: 'projects.json' }).as('getProjects'); // This fixture contains the project we need to find
-    // ✅ CORRECTION: L'API de création retourne un SEUL objet projet, pas un tableau.
-    // On utilise un fixture qui représente un seul projet.
-    cy.intercept('POST', '/api/projects', { fixture: 'test-project.json' }).as('createProject');
+    // ✅ CORRECTION: Définir les interceptions AVANT de visiter la page
+    // pour éviter toute "race condition" où l'appel API se produit avant que l'intercepteur ne soit prêt.
+    cy.intercept('GET', '/api/projects', { fixture: 'projects.json' }).as('getProjects');
     cy.intercept('GET', `/api/projects/test-project-e2e-1/search-results?page=1`, { fixture: 'articles.json' }).as('getArticles');
     cy.intercept('GET', `/api/projects/test-project-e2e-1/extractions`, { body: [] }).as('getExtractions');
-
-    cy.visit('/');
-    // ✅ CORRECTION CRITIQUE: Appeler l'initialisation manuellement pour éviter la race condition.
+ 
+    // Visiter l'application SANS initialisation automatique
+    cy.visitApp();
+ 
+    // Initialiser l'application manuellement APRÈS la mise en place des intercepteurs
     cy.window().then((win) => {
       expect(win.AnalyLit).to.be.an('object');
       win.AnalyLit.initializeApplication();
     });
+ 
+    // Attendre que l'application soit prête et que les projets soient chargés
     cy.waitForAppReady();
-    
-    cy.createTestProject(projectName);
-    // ✅ CORRECTION: Attendre que l'API de création ET le rechargement des projets soient terminés
-    // avant de tenter de sélectionner le projet. C'est ce qui corrige l'erreur "never did".
-    cy.wait('@createProject');
     cy.wait('@getProjects');
-    // ✅ CORRECTION FINALE: Attendre que le nouveau projet soit visible dans le DOM avant de le sélectionner.
-    // Cela résout la race condition entre la réponse API et le rendu de l'UI.
-    cy.contains('.project-card', 'Projet E2E AnalyLit').should('be.visible'); // Use the name from the fixture
-    // ✅ CORRECTION: On doit sélectionner le projet qui existe dans le fixture, pas celui qu'on a "créé" en mémoire.
-    // Le nom du projet dans `projects.json` est 'Projet E2E AnalyLit'. Le projet créé en mémoire est ignoré car la liste est rechargée depuis le fixture.
+ 
+    // Sélectionner le projet de test et naviguer vers la section des résultats
     cy.selectProject('Projet E2E AnalyLit');
     cy.navigateToSection('results');
-    
+ 
+    // Attendre que les articles soient chargés pour ce projet
     cy.wait('@getArticles', { timeout: 10000 });
   });
 
