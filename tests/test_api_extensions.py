@@ -63,7 +63,7 @@ def test_api_prompts_get_and_update(client: FlaskClient, db_session: Session):
     Teste la récupération (GET) et la mise à jour (POST) des Prompts.
     """
     # 1. GET /prompts (doit retourner une liste, même si vide)
-    response_get = client.get('/api/settings/prompts')
+    response_get = client.get('/api/prompts')
     assert response_get.status_code == 200
     assert isinstance(response_get.json, list)
     
@@ -72,7 +72,7 @@ def test_api_prompts_get_and_update(client: FlaskClient, db_session: Session):
         "name": f"test_prompt_unique_{uuid.uuid4()}",
         "content": "This is a test template: {{context}}"
     }
-    response_post = client.post('/api/settings/prompts', json=prompt_payload)
+    response_post = client.post('/api/prompts', json=prompt_payload)
     assert response_post.status_code == 201
     assert response_post.json['name'] == prompt_payload['name']
     assert response_post.json['content'] == prompt_payload['content']

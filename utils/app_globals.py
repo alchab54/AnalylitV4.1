@@ -1,24 +1,27 @@
 import os
-from redis import Redis
+from redis import from_url
 from rq import Queue
 from backend.config.config_v4 import get_config
 
-REDIS_HOST = os.getenv("REDIS_HOST", "analylit_redis")
-REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+# --- Configuration de la connexion Redis ---
+redis_url = os.getenv('REDIS_URL', 'redis://redis:6379/0')
+redis_conn = from_url(redis_url)
 
-redis_conn = Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)
+# ✅ CORRECTION DÉFINITIVE: Détecter si on est en mode test pour rendre les tâches synchrones.
+# Cela évite les timeouts et les dépendances externes pendant les tests en exécutant les tâches immédiatement.
+is_testing = os.getenv('TESTING') == 'true'
 
-# Queues RQ nommées selon convention v4
-processing_queue = Queue("analylit_processing_v4", connection=redis_conn, default_timeout=1800)
-synthesis_queue = Queue("analylit_synthesis_v4", connection=redis_conn, default_timeout=3600)
-analysis_queue = Queue("analylit_analysis_v4", connection=redis_conn, default_timeout=3600)
-background_queue = Queue("analylit_background_v4", connection=redis_conn, default_timeout=1800)
+# --- Initialisation des files d'attente (queues) RQ ---
+# ✅ CORRECTION: Noms de files alignés avec docker-compose.yml et ajout de la logique de test (is_async).
+# En mode test (is_testing=True), is_async devient False, et les tâches s'exécutent sur-le-champ.
+processing_queue = Queue('default_queue', connection=redis_conn, is_async=not is_testing, default_timeout=1800)
+synthesis_queue = Queue('ai_queue', connection=redis_conn, is_async=not is_testing, default_timeout=3600)
+analysis_queue = Queue('analysis_queue', connection=redis_conn, is_async=not is_testing, default_timeout=3600)
+background_queue = Queue('background_queue', connection=redis_conn, is_async=not is_testing, default_timeout=1800)
+extension_queue = Queue('extension_queue', connection=redis_conn, is_async=not is_testing, default_timeout=1800)
+models_queue = Queue('background_queue', connection=redis_conn, is_async=not is_testing, default_timeout=3600)
 
-# Pour l’endpoint /api/extensions
-extension_queue = processing_queue
-models_queue = Queue("models", connection=redis_conn, default_timeout=3600)
-
-# Alias pour compatibilité des tests et flexibilité
+# Alias pour la clarté du code
 discussion_draft_queue = analysis_queue
 
 # Compatibilité pour file_handlers qui attend cette variable

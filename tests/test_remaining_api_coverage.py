@@ -78,7 +78,7 @@ def test_api_prompt_update(client, db_session):
     update_data = {"content": "Nouveau template mis à jour."}
     response_put = client.put(f'/api/prompts/{prompt_id}', json=update_data)
     
-    assert response_put.status_code == 200 # type: ignore
+    assert response_put.status_code == 200
     assert response_put.json['content'] == "Nouveau template mis à jour."
 
     # Vérification en BDD
@@ -104,7 +104,7 @@ def test_api_get_extractions(client, db_session, setup_project):
 
     # --- 1. GET (Lire) ---
     response_get = client.get(f'/api/projects/{project_id}/extractions')
-    assert response_get.status_code == 200 # type: ignore
+    assert response_get.status_code == 200
     extractions_list = response_get.json
     
     assert isinstance(extractions_list, list)
@@ -127,10 +127,10 @@ def test_api_settings_endpoints(client, mocker):
     # Mocker la fonction qui lit le fichier avec mock_open
     with patch("builtins.open", new_callable=mocker.mock_open, read_data=json.dumps(mock_json_data)) as mock_open:
         mock_open.return_value.read.return_value = json.dumps(mock_json_data)
-        response_profiles = client.get('/api/analysis-profiles')
+        response_profiles = client.get('/api/analysis-profiles') # La route est dans analysis_profiles.py
     
-    assert response_profiles.status_code == 200 # type: ignore
-    assert isinstance(response_profiles.json, list)
+    assert response_profiles.status_code == 200
+    assert response_profiles.json == mock_json_data
 
 def test_api_admin_endpoints(client):
     """
@@ -143,9 +143,9 @@ def test_api_admin_endpoints(client):
         mock_job.get_id.return_value = "mock_pull_task_id"
         mock_enqueue.return_value = mock_job
         
-        response_pull = client.post('/api/settings/models/pull', json={'model_name': 'test-model:latest'})
+        response_pull = client.post('/api/admin/models/pull', json={'model_name': 'test-model:latest'})
         
-        assert response_pull.status_code == 202 # type: ignore
+        assert response_pull.status_code == 202
         response_data = response_pull.json # type: ignore
         assert 'job_id' in response_data
         assert response_data['job_id'] == "mock_pull_task_id"

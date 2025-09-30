@@ -74,7 +74,13 @@ PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 # --- Base de Données (SQLAlchemy Uniquement pour les tâches) ---
 # ✅ CORRECTION: Rétablir une factory de session pour les workers RQ,
 # mais le décorateur ci-dessous s'assurera que les tests utilisent leur propre session.
-engine = create_engine(config.DATABASE_URL, pool_pre_ping=True)
+# ✅ CORRECTION FINALE: Ajouter les `connect_args` pour que les workers utilisent le bon schéma PostgreSQL.
+# C'est la cause des erreurs "relation does not exist".
+engine = create_engine(
+    config.DATABASE_URL, 
+    pool_pre_ping=True,
+    connect_args={"options": f"-csearch_path={SCHEMA},public"}
+)
 SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 # --- Embeddings / Vector store (RAG) ---

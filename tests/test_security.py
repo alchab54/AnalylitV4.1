@@ -74,7 +74,7 @@ def test_file_upload_path_traversal_is_prevented(client, setup_project):
 
     # On utilise "patch" pour espionner l'appel à secure_filename
     # ✅ CORRECTION: La route est dans `server_v4_complete`, donc on patche là où `secure_filename` est importé et utilisé.
-    with patch('utils.file_handlers.secure_filename', return_value="safe_filename.pdf") as mock_secure_filename:
+    with patch('api.projects.secure_filename') as mock_secure_filename:
         mock_secure_filename.return_value = "etc_passwd"
         # Tenter d'uploader le fichier
         response = client.post(
@@ -101,7 +101,7 @@ def test_file_upload_rejects_dangerous_file_types(client, setup_project):
     dangerous_file = (io.BytesIO(b'echo "hacked"'), 'exploit.sh')
     data = {'files': dangerous_file}
     
-    response = client.post( # The user request is to fix the test, but the test is correct. The server code is wrong.
+    response = client.post(
         f"/api/projects/{project_id}/upload-pdfs-bulk",
         content_type='multipart/form-data',
         data=data

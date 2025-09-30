@@ -41,6 +41,7 @@ from api.projects import projects_bp
 from api.reporting import reporting_bp
 from api.search import search_bp
 from api.selection import selection_bp
+from api.prompts import prompts_bp # ✅ CORRECTION: Import du blueprint manquant pour les prompts
 from api.settings import settings_bp
 from api.stakeholders import stakeholders_bp
 from flask_cors import CORS
@@ -127,6 +128,7 @@ def create_app(config_override=None):
     app.register_blueprint(reporting_bp, url_prefix='/api')
     app.register_blueprint(search_bp, url_prefix='/api')
     app.register_blueprint(selection_bp, url_prefix='/api')
+    app.register_blueprint(prompts_bp, url_prefix='/api') # ✅ CORRECTION: Enregistrement du blueprint
     app.register_blueprint(settings_bp, url_prefix='/api')
     app.register_blueprint(stakeholders_bp, url_prefix='/api')
     app.register_blueprint(tasks_bp, url_prefix='/api')

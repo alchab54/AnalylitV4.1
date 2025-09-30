@@ -73,7 +73,7 @@ def test_run_rob_analysis_no_articles(client, setup_test_data):
         content_type='application/json'
     )
 
-    assert response.status_code == 400 # type: ignore
+    assert response.status_code == 400
     data = response.get_json()
     assert "Aucun article ID fourni" in data['error']
 
