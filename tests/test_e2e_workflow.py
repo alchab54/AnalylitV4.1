@@ -54,10 +54,13 @@ def test_full_end_to_end_workflow(client, db_session):
     db_session.add(profile)
     db_session.flush()
     profile_id = profile.id
+    # ✅ CORRECTION: Associer le profil au projet pour que la tâche de synthèse le trouve.
+    setup_project.profile_used = profile_id
+    db_session.add(setup_project)
+    db_session.flush()
     
-    synthesis_data = {"profile": profile_id}
     # On utilise "patch" pour vérifier que la bonne tâche est appelée, sans l'exécuter.
-    with patch('server_v4_complete.synthesis_queue.enqueue') as mock_enqueue:
+    with patch('api.projects.synthesis_queue.enqueue') as mock_enqueue:
         # CORRECTION: Le mock doit retourner un objet avec un attribut .id sérialisable
         mock_job = MagicMock()
         mock_job.id = "mock_job_id_123"
@@ -68,7 +71,7 @@ def test_full_end_to_end_workflow(client, db_session):
         # Vérifie que la fonction `run_synthesis_task` a bien été appelée
         mock_enqueue.assert_called_once()
         # On peut même vérifier les arguments si besoin
-        args, kwargs = mock_enqueue.call_args
+        _, kwargs = mock_enqueue.call_args
         assert kwargs['project_id'] == project_id
         
     # === ÉTAPE 5: Export des résultats pour la thèse ===

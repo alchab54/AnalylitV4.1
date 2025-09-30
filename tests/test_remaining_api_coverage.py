@@ -127,7 +127,7 @@ def test_api_settings_endpoints(client, mocker):
     # Mocker la fonction qui lit le fichier avec mock_open
     with patch("builtins.open", new_callable=mocker.mock_open, read_data=json.dumps(mock_json_data)) as mock_open:
         mock_open.return_value.read.return_value = json.dumps(mock_json_data)
-        response_profiles = client.get('/api/analysis-profiles')
+        response_profiles = client.get('/api/analysis-profiles') # La route est dans analysis_profiles.py
     
     assert response_profiles.status_code == 200
     assert response_profiles.json == mock_json_data
@@ -138,7 +138,7 @@ def test_api_admin_endpoints(client):
     """
     from unittest.mock import ANY
     # --- 1. POST /api/ollama/pull (Vérifie la mise en file) ---
-    with patch('backend.server_v4_complete.models_queue.enqueue') as mock_enqueue:
+    with patch('api.admin.models_queue.enqueue') as mock_enqueue:
         mock_job = MagicMock()
         mock_job.get_id.return_value = "mock_pull_task_id"
         mock_enqueue.return_value = mock_job
@@ -158,7 +158,7 @@ def test_api_admin_endpoints(client):
 
     # --- 2. POST /api/queues/clear (Vérifie l'appel .empty()) ---
     # On mock la méthode .empty() de l'objet 'processing_queue' là où elle est utilisée
-    with patch('backend.server_v4_complete.processing_queue.empty') as mock_queue_empty:
+    with patch('api.admin.processing_queue.empty') as mock_queue_empty:
         response_clear = client.post('/api/admin/queues/clear', json={'queue_name': 'analylit_processing_v4'})
         
         assert response_clear.status_code == 200

@@ -437,6 +437,7 @@ def run_synthesis_task(session, project_id: str, profile: dict):
     try:
         if output and isinstance(output, dict):
             update_project_status(session, project_id, status='completed', result=output)
+            session.commit() # Commit the status update
             send_project_notification(project_id, 'synthesis_completed', 'Synthèse générée.')
         else:
             update_project_status(session, project_id, status='failed')
@@ -469,6 +470,7 @@ def run_discussion_generation_task(session, project_id: str):
         draft = generate_discussion_draft(df, lambda p, m: call_ollama_api(p, m, temperature=0.7), model_name)
 
         update_project_status(session, project_id, status='completed', discussion=draft)
+        session.commit() # Commit the status update
         send_project_notification(project_id, 'analysis_completed', 'Le brouillon de discussion a été généré.', {'discussion_draft': draft})
     except Exception as e:
         update_project_status(session, project_id, status='failed')
@@ -502,6 +504,7 @@ Titres:
     
     if graph and isinstance(graph, dict) and 'nodes' in graph and 'edges' in graph:
         update_project_status(session, project_id, status='completed', graph=graph)
+        session.commit() # Commit the status update
         send_project_notification(project_id, 'analysis_completed', 'Le graphe de connaissances est prêt.', {'analysis_type': 'knowledge_graph'})
     else:
         update_project_status(session, project_id, status='failed')
@@ -542,6 +545,7 @@ def run_prisma_flow_task(session, project_id: str):
     plt.close(fig)
 
     update_project_status(session, project_id, status='completed', prisma_path=image_path)
+    session.commit() # Commit the status update
     send_project_notification(project_id, 'analysis_completed', 'Le diagramme PRISMA est prêt.', {'analysis_type': 'prisma_flow'})
 
 @with_db_session
@@ -575,6 +579,7 @@ def run_meta_analysis_task(session, project_id: str):
     ax.legend()
     plt.savefig(plot_path, bbox_inches='tight')
     plt.close(fig)
+    session.commit() # Commit the status update
     update_project_status(session, project_id, status='completed', analysis_result=analysis_result, analysis_plot_path=plot_path)
     send_project_notification(project_id, 'analysis_completed', 'Méta-analyse terminée.')
 
@@ -597,6 +602,7 @@ def run_descriptive_stats_task(session, project_id: str):
     }
     
     update_project_status(session, project_id, status='completed', analysis_result=stats_result)
+    session.commit() # Commit the status update
     send_project_notification(project_id, 'analysis_completed', 'Statistiques descriptives générées')
 
 # ================================================================ 
@@ -1043,6 +1049,7 @@ def run_atn_score_task(session, project_id: str):
         plt.savefig(plot_path, bbox_inches='tight'); plt.close(fig)
     
     update_project_status(session, project_id, status='completed', analysis_result=analysis_result, analysis_plot_path=plot_path)
+    session.commit() # Commit the status update
     send_project_notification(project_id, 'analysis_completed', f'Scores ATN calculés: {mean_atn:.2f} (moyenne)')
 
 # ================================================================ 

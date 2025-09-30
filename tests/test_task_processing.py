@@ -879,8 +879,8 @@ def test_fetch_online_pdf_task(mock_unpaywall, db_session, mocker):
     mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
     
     # ACT
-    # Pas de décorateur @with_db_session, appel direct
-    fetch_online_pdf_task(project_id, article_id)
+    # ✅ CORRECTION: Appeler la version décorée pour utiliser la session de test.
+    fetch_online_pdf_task(db_session, project_id, article_id)
 
     # ASSERT
     mock_unpaywall.assert_called_once_with("10.1234/test")

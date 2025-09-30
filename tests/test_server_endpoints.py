@@ -179,15 +179,12 @@ def test_get_all_projects(client, db_session): # Utilise session
     assert found_project1['name'] == project1_data['name']
     assert found_project1['analysis_mode'] == project1_data['mode']
 
-def test_get_all_projects_empty(client, db_session): # ✅ Utiliser la session transactionnelle
+def test_get_all_projects_empty(client, db_session):
     """
     Test avec base de données vraiment vide grâce à db_session
     WHEN la route '/api/projects' est appelée
     THEN la réponse doit être 200 OK et contenir une liste vide.
     """
-    # ✅ CORRECTION: Ne jamais utiliser TRUNCATE. La fixture `db_session` garantit
-    # déjà que la base de données est propre pour ce test.
-    
     response = client.get('/api/projects/')
     assert response.status_code == 200
     assert len(response.json) == 0
@@ -250,7 +247,7 @@ def test_api_post_chat_message_enqueues_task(mock_enqueue, client, db_session):
         answer_chat_question_task, # <-- Vérifie l'objet fonction, pas le string
         project_id=project_id,
         question="Test question?",
-        job_timeout='15m'
+        job_timeout=900
     )
 
     response_data = json.loads(response.data) # type: ignore
@@ -403,7 +400,7 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
         pmids=["pmid1", "pmid2"],
         zotero_user_id="123",
         zotero_api_key="abc",
-        job_timeout='30m'
+        job_timeout=3600 
     )
 
 @patch('api.projects.background_queue.enqueue')
@@ -438,7 +435,7 @@ def test_api_import_zotero_file_enqueues_task(mock_q_enqueue, client, db_session
             import_from_zotero_file_task,
             project_id=project_id,
             json_file_path='/fake/path/to/test.json',
-            job_timeout='15m'
+            job_timeout=3600
         )
 
 @patch('api.projects.analysis_queue.enqueue')
