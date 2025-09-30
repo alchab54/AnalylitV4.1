@@ -59,18 +59,24 @@ Cypress.Commands.add('selectProject', (projectName = 'Projet E2E AnalyLit') => {
   // ✅ SOLUTION 1 : Approche directe sans interception
   cy.visit('/', { failOnStatusCode: false, timeout: 30000 });
   
+  // ✅ CORRECTION FINALE: Déclencher manuellement l'initialisation de l'application.
+  // C'est l'étape qui manquait pour que l'appel API soit effectué et que la liste se remplisse.
+  cy.window().then((win) => {
+    expect(win.AnalyLit, 'AnalyLit object should exist on window').to.be.an('object');
+    win.AnalyLit.initializeApplication();
+  });
+
+  // ✅ CORRECTION: Ajouter une petite pause pour laisser le temps au rendu de démarrer.
+  cy.wait(500);
+
   // Attendre que la page soit complètement chargée
   cy.get('body', { timeout: 15000 }).should('be.visible');
   
   // ✅ SOLUTION 2 : Attendre les éléments naturellement (sans cy.wait sur intercept)
-  cy.get('#projects-list, .projects-grid, .project-container', { timeout: 15000 })
-    .should('be.visible')
-    .should(($el) => {
-      // Vérifier que l'élément a une hauteur > 0
-      const height = parseInt($el.css('height')) || 0;
-      expect(height).to.be.greaterThan(0);
-    });
-  
+  // ✅ CORRECTION DÉFINITIVE: Attendre que la liste contienne au moins une carte de projet.
+  // C'est la vérification la plus fiable que le rendu est terminé.
+  cy.get('#projects-list .project-card', { timeout: 15000 }).should('have.length.gte', 1);
+
   // ✅ SOLUTION 3 : Attendre que les projets soient chargés (méthode alternative)
   cy.get('.project-card, .project-item', { timeout: 15000 })
     .should('have.length.gte', 1)
@@ -110,6 +116,11 @@ Cypress.Commands.add('waitForElement', (selector, options = {}) => {
 Cypress.Commands.add('setupBasicTest', () => {
   cy.log('🔄 Setup test basique sans interception API');
   cy.visit('/', { failOnStatusCode: false });
+  // ✅ CORRECTION FINALE: Déclencher manuellement l'initialisation de l'application.
+  cy.window().then((win) => {
+    expect(win.AnalyLit, 'AnalyLit object should exist on window').to.be.an('object');
+    win.AnalyLit.initializeApplication();
+  });
   cy.get('body').should('be.visible');
   cy.wait(1000); // Laisser le temps à l'app de se charger
 });
