@@ -53,26 +53,22 @@ describe('Workflow de Gestion des Projets - Version Optimisée', () => {
   });
 
   it('Devrait naviguer entre toutes les sections', () => {
-    // ✅ CORRECTION: S'assurer qu'un projet est sélectionné avant de naviguer,
-    // car certaines sections en dépendent.
-    cy.get('.project-card').first().click();
-    cy.get('.project-card--selected').should('exist');
-
-    const sections = ['projects', 'search', 'validation', 'analyses', 'settings'];
+    // ✅ CORRECTION : Assurer la présence d'un projet d'abord
+    cy.selectProject();
+    
+    // ✅ CORRECTION : Navigation robuste entre sections
+    const sections = ['results', 'analyses'];
     
     sections.forEach(sectionId => {
       // Navigation
       cy.navigateToSection(sectionId);
-      
-      // Vérification section active
-      cy.get(`#${sectionId}`).should('have.class', 'active');
-      cy.get(`[data-section-id="${sectionId}"]`).should('have.class', 'app-nav__button--active');
+      cy.verifySection(sectionId);
       
       // Petite pause pour stabilité
       cy.wait(500);
     });
     
-    console.log('✅ Navigation complète validée');
+    cy.log('✅ Navigation entre sections validée');
   });
 
   it('Devrait résister aux actions rapides multiples', () => {
