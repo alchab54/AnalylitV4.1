@@ -19,7 +19,7 @@ describe('Workflow des Analyses ATN Spécialisées', () => {
 
     // Attendre que l'application soit prête et que les projets soient chargés
     cy.waitForAppReady();
-    cy.wait('@getProjects');
+    cy.wait('@getProjects'); // This was correct, but let's ensure it's here.
   });
 
   it("devrait afficher l'interface ATN complète", () => {

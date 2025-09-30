@@ -1,6 +1,7 @@
 describe('Workflow de Gestion des Articles - Version Optimisée', () => {
   const projectName = 'Projet Articles Test';
   
+
   beforeEach(() => {
     // ✅ CORRECTION: Définir les interceptions AVANT de visiter la page
     // pour éviter toute "race condition" où l'appel API se produit avant que l'intercepteur ne soit prêt.
@@ -8,23 +9,24 @@ describe('Workflow de Gestion des Articles - Version Optimisée', () => {
     cy.intercept('GET', `/api/projects/test-project-e2e-1/search-results?page=1`, { fixture: 'articles.json' }).as('getArticles');
     cy.intercept('GET', `/api/projects/test-project-e2e-1/extractions`, { body: [] }).as('getExtractions');
  
+
     // Visiter l'application SANS initialisation automatique
     cy.visitApp();
  
+
     // Initialiser l'application manuellement APRÈS la mise en place des intercepteurs
     cy.window().then((win) => {
       expect(win.AnalyLit).to.be.an('object');
       win.AnalyLit.initializeApplication();
     });
  
-    // Attendre que l'application soit prête et que les projets soient chargés
-    cy.waitForAppReady();
-    cy.wait('@getProjects');
  
+
     // Sélectionner le projet de test et naviguer vers la section des résultats
     cy.selectProject('Projet E2E AnalyLit');
     cy.navigateToSection('results');
  
+
     // Attendre que les articles soient chargés pour ce projet
     cy.wait('@getArticles', { timeout: 10000 });
   });

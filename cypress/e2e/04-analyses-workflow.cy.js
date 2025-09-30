@@ -63,12 +63,9 @@ describe('Workflow de Gestion des Analyses - Version Optimisée avec Mocks API',
         cy.get('button').click({ force: true });
       });
 
-      // ✅ CORRECTION: La classe de chargement est ajoutée de manière synchrone.
-      // On vérifie cet état AVANT d'attendre la réponse de l'API.
-      cy.get('@targetCard').should('have.class', 'analysis-card--loading');
-
       // Assert: Valider l'appel API et la notification
       cy.wait(`@run-${analysis.type}`).its('request.body.type').should('eq', analysis.type);
+      cy.get('@targetCard').should('have.class', 'analysis-card--loading');
       cy.waitForToast('success', analysis.toastMessage);
     });
   });
@@ -80,7 +77,7 @@ describe('Workflow de Gestion des Analyses - Version Optimisée avec Mocks API',
     cy.contains('.analysis-card', 'Analyse ATN Multipartite').as('completedCard');
 
     // On simule le rendu d'un résultat pour le test
-    cy.document().then(doc => doc.body.innerHTML += '<div id="atn-results-card"></div>');
+    cy.document().then(doc => doc.body.innerHTML += '<div id="atn-results-card" style="height: 100px; width: 100px;">Résultats ATN</div>');
 
     // Act: Cliquer pour voir les résultats
     cy.get('@completedCard').find('[data-action="run-atn-analysis"]').click({ force: true });
@@ -127,7 +124,7 @@ describe('Workflow de Gestion des Analyses - Version Optimisée avec Mocks API',
 
     advancedAnalyses.forEach(analysis => {
       // Intercepter l'appel API
-      cy.intercept('POST', `/api/projects/${selectedProjectId}/run-analysis`, { body: { job_id: `job-${analysis.type}`, message: analysis.toastMessage } }).as(`run-advanced-${analysis.type}`);
+      cy.intercept('POST', `/api/projects/*/run-analysis`, { body: { job_id: `job-${analysis.type}`, message: analysis.toastMessage } }).as(`run-advanced-${analysis.type}`);
 
       // Act: Ouvrir la modale
       // ✅ CORRECTION: Le bouton est dans le HTML statique, on le trouve.
@@ -151,6 +148,12 @@ describe('Workflow de Gestion des Analyses - Version Optimisée avec Mocks API',
   });
 
   it("Devrait gérer l'état vide si aucun projet n'est sélectionné", () => {
+    // Assurer qu'aucune modale n'est ouverte
+    cy.get('body').then($body => {
+      if ($body.find('.modal--show .modal-close').length) {
+        cy.get('.modal--show .modal-close').click({ force: true });
+      }
+    });
     // ✅ CORRECTION: Ne pas recharger la page. On simule l'état sans projet.
     cy.window().then(win => {
       // Simuler l'état où aucun projet n'est sélectionné

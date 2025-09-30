@@ -12,6 +12,7 @@ describe('Workflow de Risk of Bias (RoB)', () => {
       win.AnalyLit.initializeApplication();
     });
     cy.waitForAppReady();
+    cy.wait('@getProjects'); // ✅ FIX: Wait for projects to load before interacting.
 
     // Sélectionner le projet. La navigation se fera dans chaque test.
     cy.contains('.project-card', 'Projet E2E AnalyLit').click();
