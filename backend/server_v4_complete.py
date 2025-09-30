@@ -101,11 +101,6 @@ def create_app(config_override=None):
     # Configuration de base
     if config_override:
         app.config.update(config_override)
-    """
-    Factory d'application Flask - VERSION CORRIGÉE ET COMPLÈTE
-    Garantie de retourner une instance Flask valide.
-    """
-    print("🚀 DÉBUT create_app()")
     
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -115,60 +110,8 @@ def create_app(config_override=None):
         'pool_pre_ping': True,
         "connect_args": {
             "options": "-c search_path=analylit_schema,public"
-    try:
-        # 1. Création de l'instance Flask
-        app = Flask(__name__, static_folder='web', static_url_path='')
-        print(f"✅ Instance Flask créée: {app}")
-        
-        # 2. Configuration de base
-        if config_override:
-            app.config.update(config_override)
-        
-        app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://analylit_user:strong_password@db:5432/analylit_db')
-        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-        app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-            'pool_size': 10,
-            'pool_recycle': 120,
-            'pool_pre_ping': True,
-            "connect_args": {
-                "options": "-c search_path=analylit_schema,public"
-            }
         }
     }
-        print("✅ Configuration Flask terminée")
-        
-        # 3. Initialisation des extensions
-        db.init_app(app)
-        migrate.init_app(app, db)
-        socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent')
-        print("✅ Extensions initialisées")
-        
-        # 4. Enregistrement des blueprints
-        try:
-            app.register_blueprint(projects_bp)
-            app.register_blueprint(extensions_bp)
-            print("✅ Blueprints enregistrés")
-        except Exception as e:
-            print(f"⚠️ Erreur blueprints: {e}")
-            # Continuer même si les blueprints échouent
-        
-        # 5. Routes de base (exemple)
-        @app.route('/')
-        def index():
-            return "AnalylitV4.1 - Application démarrée avec succès!"
-        
-        print("✅ Routes de base ajoutées")
-        
-        # 6. RETURN CRITIQUE - TOUJOURS PRÉSENT
-        print("🎯 RETURN app")
-        return app
-        
-    except Exception as e:
-        print(f"❌ EXCEPTION dans create_app(): {e}")
-        import traceback
-        traceback.print_exc()
-        # Retourner None en cas d'erreur pour debug
-        return None
 
     # Initialisation des extensions
     db.init_app(app)
@@ -203,13 +146,11 @@ def create_app(config_override=None):
 
     @app.errorhandler(404)
     def not_found(error):
-        # Si c'est une requête API, retourner du JSON
-        if not request.path.startswith('/api/'):
-            return jsonify({"error": "Page non trouvée", "message": "Application backend fonctionnelle"}), 404
-        
-        # Pour les autres requêtes, retourner un simple message
-        return jsonify({"error": "Endpoint API non trouvé", "path": request.path}), 404
+        if request.path.startswith('/api/'):
+            return jsonify({"error": "Endpoint API non trouvé", "path": request.path}), 404
+        return jsonify({"error": "Page non trouvée", "message": "Application backend fonctionnelle"}), 404
 
+    # ✅ RETURN CRITIQUE
     return app
 
 def register_models():
