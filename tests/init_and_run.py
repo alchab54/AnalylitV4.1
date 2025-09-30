@@ -23,8 +23,10 @@ def main():
 
     # --- CORRECTION DÉFINITIVE POUR LE DÉVELOPPEMENT LOCAL ---
     # Forcer l'utilisation de la base de données locale (localhost) exposée par Docker,
-    # en ignorant la variable DATABASE_URL du fichier .env qui est destinée à l'intérieur de Docker.
-    os.environ['DATABASE_URL'] = 'postgresql+psycopg2://analylit_user:strong_password@localhost:5433/analylit_db'
+    # en ignorant la variable DATABASE_URL du fichier .env qui est destinée à l'intérieur de Docker. 
+    # ✅ CORRECTION CYPRESS: Utiliser la base de données de test pour les tests E2E.
+    os.environ['DATABASE_URL'] = os.getenv('TEST_DATABASE_URL', 'postgresql+psycopg2://analylit_user:strong_password@localhost:5434/analylit_test_db')
+    os.environ['TESTING'] = 'true'
 
     # ✅ CORRECTION: Importer la factory et l'utiliser pour créer l'app ici.
     # Cela évite les problèmes d'initialisation double.

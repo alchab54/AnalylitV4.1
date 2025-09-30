@@ -13,7 +13,8 @@ describe('AnalyLit V4.1 - Rapport de Tests Complet', () => {
   });
 
   it('✅ API Backend Accessible', () => {
-    cy.request('http://localhost:5000/api/admin/health').then((response) => {
+    // CORRECTION: La route de santé est /api/health, et non /api/admin/health
+    cy.request('http://localhost:5000/api/health').then((response) => {
       expect(response.status).to.eq(200);
       expect(response.body).to.have.property('status', 'healthy');
     });

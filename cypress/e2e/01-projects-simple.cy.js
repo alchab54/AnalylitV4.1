@@ -34,15 +34,23 @@ describe('Workflow Projets - Version Simplifiée', () => {
       win.AnalyLit.initializeApplication(); 
     });
     cy.waitForAppReady();
-    cy.createTestProject({
-      name: projectName,
-      description: 'Description du projet de test automatisé'
-    });
-    
-    // Vérifie que la requête de création a été envoyée.
-    // ✅ CORRECTION: Attendre l'alias de création de projet.
-    cy.wait('@createProject', { timeout: 10000 });
-    
+
+    // ✅ AJOUT: Intercepter la requête de création de projet AVANT de la déclencher.
+    cy.intercept('POST', '/api/projects', {
+      statusCode: 201,
+      body: { id: 'new-proj-123', name: projectName, description: 'Description...' }
+    }).as('createProject');
+
+    // Rendre le test plus explicite au lieu d'utiliser une commande personnalisée
+    cy.get('[data-action="create-project-modal"]').click();
+    cy.get('#newProjectModal').should('be.visible');
+    cy.get('#projectName').type(projectName);
+    cy.get('#projectDescription').type('Description du projet de test automatisé');
+    cy.get('#createProjectForm button[type="submit"]').click();
+
+    // Attendre que la requête API soit terminée
+    cy.wait('@createProject');
+
     // Vérifie que l'application affiche une notification de succès.
     cy.contains('Projet créé avec succès').should('be.visible');
   });

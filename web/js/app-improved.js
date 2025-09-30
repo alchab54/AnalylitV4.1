@@ -123,11 +123,15 @@ export async function initializeApplication() {
 // ============================
 
 if (typeof document !== 'undefined') {
-	// ✅ CORRECTION: Ne pas initialiser automatiquement en environnement de test Cypress.
-	// Cypress appellera `window.AnalyLit.initializeApplication()` manuellement.
-	if (!window.Cypress) {
-		document.addEventListener('DOMContentLoaded', initializeApplication);
-	}
+	// ✅ CORRECTION: Ne pas initialiser automatiquement en environnement de test Cypress
+    // Cypress appellera `window.AnalyLit.initializeApplication()` manuellement.
+    // Cette vérification empêche la "race condition" où les appels API partent
+    // avant que `cy.intercept` ne soit prêt.
+    if (window.Cypress) {
+        console.log('CYPRESS DETECTED: Automatic initialization disabled.');
+    } else {
+        document.addEventListener('DOMContentLoaded', initializeApplication);
+    }
 }
 
 // ============================
