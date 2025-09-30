@@ -365,6 +365,11 @@ def run_rob_analysis(project_id):
     data = request.get_json()
     article_ids = data.get('article_ids', [])
 
+    # ✅ CORRECTION: Vérifier que le projet existe avant de lancer les tâches.
+    project = db.session.query(Project).filter_by(id=project_id).first()
+    if not project:
+        return jsonify({"error": "Projet non trouvé"}), 404
+
     if not article_ids:
         return jsonify({"error": "Liste d'articles vide"}), 400
 

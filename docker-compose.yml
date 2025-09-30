@@ -207,7 +207,8 @@ services:
       dockerfile: docker/Dockerfile.worker
     container_name: analylit_worker_ai
     # ✅ CORRECTION: Ajout de 'analysis_queue' pour que les tâches d'analyse soient traitées.
-    command: rq worker --url redis://redis:6379/0 ai_queue background_queue analysis_queue
+    # ✅ CORRECTION FINALE: Ajout de 'extension_queue' pour traiter les tâches d'extension et débloquer les tests.
+    command: rq worker --url redis://redis:6379/0 ai_queue background_queue analysis_queue extension_queue
     env_file:
       - .env
     runtime: nvidia

@@ -24,7 +24,7 @@ def test_full_end_to_end_workflow(client, db_session):
         "description": "A full workflow test",
         "mode": "screening"
     }
-    response = client.post('/api/projects/', data=json.dumps(project_data), content_type='application/json')
+    response = client.post('/api/projects', data=json.dumps(project_data), content_type='application/json')
     assert response.status_code == 201
     project_id = response.get_json()['id']
     

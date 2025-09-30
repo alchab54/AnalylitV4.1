@@ -19,7 +19,7 @@ def test_create_project_with_xss_payload(client):
     }
     
     # 1. Créer le projet avec le payload
-    response = client.post("/api/projects/", json=xss_payload)
+    response = client.post("/api/projects", json=xss_payload)
     assert response.status_code == 201
     project_data = response.get_json()
     project_id = project_data['id']
@@ -46,7 +46,7 @@ def test_create_project_with_sql_injection_payload(client, db_session):
     }
 
     # 1. Tenter de créer un projet avec ce nom
-    response = client.post("/api/projects/", json=sql_injection_payload)
+    response = client.post("/api/projects", json=sql_injection_payload)
     assert response.status_code == 201 # Doit réussir, car l'ORM gère la chaîne
     project_data = response.get_json()
     
