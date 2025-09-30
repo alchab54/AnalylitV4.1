@@ -39,7 +39,8 @@ from backend.config.config_v4 import get_config
 
 # --- Importer les modèles de la base de données ---
 from utils.models import (
-    Project, SearchResult, Extraction, Grid, ChatMessage, AnalysisProfile, RiskOfBias
+    Project, SearchResult, Extraction, Grid, ChatMessage, AnalysisProfile, RiskOfBias,
+    SCHEMA  # ✅ CORRECTION: Importer la variable SCHEMA pour la configuration de l'engine.
 )
 from sqlalchemy.orm import Session # Explicitly import Session for type hinting if needed, though Session is already defined below
 
