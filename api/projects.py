@@ -15,6 +15,7 @@ from utils.extensions import db
 from utils.models import Project, Grid, Extraction, AnalysisProfile, RiskOfBias, Analysis, SearchResult, ChatMessage
 from utils.file_handlers import save_file_to_project_dir
 from backend.tasks_v4_complete import (
+    run_synthesis_task,
     run_discussion_generation_task,
     answer_chat_question_task,
     process_single_article_task,
@@ -80,17 +81,19 @@ def get_project_search_results(project_id):
     sort_by = request.args.get('sort_by', 'created_at')
     sort_order = request.args.get('sort_order', 'desc')
 
-    query = db.session.query(SearchResult).filter_by(project_id=project_id)
+    stmt = db.select(SearchResult).filter_by(project_id=project_id)
     
     if hasattr(SearchResult, sort_by):
         order_column = getattr(SearchResult, sort_by)
         if sort_order == 'asc':
-            query = query.order_by(order_column.asc())
+            stmt = stmt.order_by(order_column.asc())
         else:
-            query = query.order_by(order_column.desc())
+            stmt = stmt.order_by(order_column.desc())
 
-    # ✅ CORRECTION: Utilisation de query.paginate() pour la compatibilité avec le setup de test.
-    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    # ✅ CORRECTION: Utilisation de la pagination via la session pour la compatibilité avec le setup de test.
+    # La méthode `db.paginate` attendait une session callable, ce qui n'est pas le cas dans les tests.
+    # `db.session.execute(stmt).scalars()` est la bonne approche ici.
+    pagination = db.session.execute(stmt).scalars().paginate(page=page, per_page=per_page, error_out=False)
     return jsonify({
         'results': [item.to_dict() for item in pagination.items],
         'total': pagination.total,

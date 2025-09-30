@@ -73,7 +73,7 @@ def test_analysis_task_on_large_dataset(db_session, large_project, mocker):
     # On mock la requête SQL pour ne pas réellement insérer 10k extractions
     mock_scores = MagicMock(all=MagicMock(return_value=[7.5 + (i % 3 - 1) * 0.1 for i in range(10000)]))
     mocker.patch('sqlalchemy.orm.session.Session.execute').return_value.scalars.return_value = mock_scores
-    mocker.patch('tasks_v4_complete.call_ollama_api', return_value=json.dumps({"analysis": "successful"}))
+    mocker.patch('backend.tasks_v4_complete.call_ollama_api', return_value=json.dumps({"analysis": "successful"}))
     mocker.patch('matplotlib.pyplot.savefig') # Mock saving the plot
     mocker.patch('tasks_v4_complete.send_project_notification')
 

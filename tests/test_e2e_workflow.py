@@ -60,7 +60,7 @@ def test_full_end_to_end_workflow(client, db_session, setup_project):
     db_session.flush()
     
     # On utilise "patch" pour vérifier que la bonne tâche est appelée, sans l'exécuter.
-    with patch('api.projects.synthesis_queue.enqueue') as mock_enqueue:
+    with patch('utils.app_globals.synthesis_queue.enqueue') as mock_enqueue:
         # CORRECTION: Le mock doit retourner un objet avec un attribut .id sérialisable
         mock_job = MagicMock()
         mock_job.id = "mock_job_id_123"
