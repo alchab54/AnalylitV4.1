@@ -11,6 +11,9 @@ from sqlalchemy import create_engine, text
 sys.path.append('/home/appuser/app')
 sys.path.append('.')
 
+# Import des modèles au niveau du module pour une meilleure gestion des erreurs
+from utils.models import Base
+
 def verify_and_create_tables():
     """Vérifier que les tables existent, les créer si nécessaire"""
     
@@ -51,9 +54,6 @@ def verify_and_create_tables():
         if missing_tables:
             print(f"⚠️ Tables manquantes: {missing_tables}")
             print("🔧 Création via SQLAlchemy...")
-            
-            # Import et création
-            from utils.models import Base
             Base.metadata.create_all(engine)
             
             print("✅ Tables créées avec succès!")

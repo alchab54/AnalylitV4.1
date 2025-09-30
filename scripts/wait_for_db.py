@@ -6,7 +6,7 @@ Attendre que PostgreSQL soit prêt
 import os
 import time
 import sys
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError
 
 def wait_for_database(max_attempts=30):
@@ -22,7 +22,7 @@ def wait_for_database(max_attempts=30):
                 conn.execute(text("SELECT 1"))
             print("✅ Base de données accessible!")
             return True
-        except (OperationalError, NameError): # NameError for text not being defined
+        except OperationalError:
             print(f"⏳ Tentative {attempt + 1}/{max_attempts} - Base non prête...")
             time.sleep(2)
     
@@ -30,7 +30,6 @@ def wait_for_database(max_attempts=30):
     return False
 
 if __name__ == "__main__":
-    from sqlalchemy import text
     if wait_for_database():
         sys.exit(0)
     else:

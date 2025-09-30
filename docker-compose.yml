@@ -147,18 +147,17 @@ services:
       - POSTGRES_PASSWORD=strong_password
       - POSTGRES_DB=analylit_db
       - DATABASE_URL=postgresql://analylit_user:strong_password@db:5432/analylit_db
-    env_file:
-      - .env
-    command: >
-      sh -c "
-        echo '🔍 Attente de la base de données...' &&
-        python scripts/wait_for_db.py &&
-        echo '📋 Exécution des migrations Alembic...' &&
-        python -m alembic upgrade head &&
-        echo '🔧 Vérification des tables...' &&
-        python scripts/verify_tables.py &&
+    env_file: [".env"]
+    # ✅ CORRECTION: Utiliser une liste pour la commande évite les problèmes d'interprétation du shell.
+    # Chaque script est appelé directement.
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo '🔍 Attente de la base de données...' && python /home/appuser/app/scripts/wait_for_db.py &&
+        echo '📋 Exécution des migrations Alembic...' && python -m alembic upgrade head &&
+        echo '🔧 Vérification des tables...' && python /home/appuser/app/scripts/verify_tables.py &&
         echo '✅ Base de données prête!'
-      "
     depends_on:
       db:
         condition: service_healthy
