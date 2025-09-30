@@ -53,19 +53,28 @@ describe('Workflow de Gestion des Projets - Version Optimisée', () => {
   });
 
   it('Devrait naviguer entre toutes les sections', () => {
-    // ✅ CORRECTION : Assurer la présence d'un projet d'abord
+    // ✅ CORRECTION : Vérifier d'abord qu'au moins un projet existe
+    cy.get('body').then($body => {
+      if ($body.find('.project-card').length === 0) {
+        cy.log('⚠️ Aucun projet - Création automatique');
+        cy.get('#create-project-btn').click({ force: true });
+        cy.get('#newProjectModal input[name="name"]').type('Projet Test Navigation');
+        cy.get('#newProjectModal textarea').type('Projet pour test navigation');
+        cy.get('#newProjectModal button[type="submit"]').click({ force: true });
+        cy.wait(2000);
+      }
+    });
+    
+    // ✅ CORRECTION : Sélection robuste du projet
     cy.selectProject();
     
-    // ✅ CORRECTION : Navigation robuste entre sections
+    // ✅ CORRECTION : Navigation entre sections avec vérifications
     const sections = ['results', 'analyses'];
     
     sections.forEach(sectionId => {
-      // Navigation
       cy.navigateToSection(sectionId);
       cy.verifySection(sectionId);
-      
-      // Petite pause pour stabilité
-      cy.wait(500);
+      cy.wait(500); // Délai pour stabilité
     });
     
     cy.log('✅ Navigation entre sections validée');

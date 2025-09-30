@@ -64,45 +64,44 @@ Cypress.Commands.add('selectProject', (projectName = 'Projet Test E2E') => {
   // ✅ SOLUTION : Sélecteurs multiples et flexibles
   const projectSelectors = [
     '#projects-list .project-card',
-    '.projects-grid .project-card', 
+    '.projects-grid .project-card',
     '.project-container .project-card',
     '.project-item',
     '.project',
     '[data-project-id]',
     '.card.project'
   ];
-  
-  let projectFound = false;
-  
-  // Essayer chaque sélecteur
-  projectSelectors.forEach(selector => {
-    if (!projectFound) {
-      cy.get('body').then($body => {
-        if ($body.find(selector).length > 0) {
-          cy.log(`✅ Projets trouvés avec sélecteur: ${selector}`);
-          
-          // Si le projet spécifique existe, le sélectionner
-          if ($body.find(selector).text().includes(projectName)) {
-            cy.contains(selector, projectName).click({ force: true });
-          } else {
-            // Sinon, sélectionner le premier projet disponible
-            cy.get(selector).first().click({ force: true });
-          }
-          
-          projectFound = true;
-          
-          // Attendre que la sélection soit effective
-          cy.wait(1000);
-          cy.log(`✅ Projet sélectionné avec succès`);
+
+  // ✅ CORRECTION : Utiliser for..of au lieu de forEach pour pouvoir break
+  cy.get('body').then($body => {
+    let projectFound = false;
+
+    for (const selector of projectSelectors) {
+      if ($body.find(selector).length > 0) {
+        cy.log(`✅ Projets trouvés avec sélecteur: ${selector}`);
+
+        // Si le projet spécifique existe, le sélectionner
+        if ($body.find(selector).text().includes(projectName)) {
+          cy.contains(selector, projectName).click({ force: true });
+        } else {
+          // Sinon, sélectionner le premier projet disponible
+          cy.get(selector).first().click({ force: true });
         }
-      });
+
+        projectFound = true;
+        cy.log(`✅ Projet sélectionné avec succès`);
+        break; // ✅ CORRECTION : Sortir de la boucle
+      }
     }
+
+    // Fallback : Si aucun projet trouvé, continuer quand même
+    if (!projectFound) {
+      cy.log('⚠️ Aucun projet trouvé - Test continuera sans sélection');
+    }
+
+    // Attendre que la sélection soit effective
+    cy.wait(1000);
   });
-  
-  // Fallback : Si aucun projet trouvé, continuer quand même
-  if (!projectFound) {
-    cy.log('⚠️ Aucun projet trouvé - Test continuera sans sélection');
-  }
 });
 
 // ✅ COMMANDE : Navigation robuste avec multiples sélecteurs
@@ -112,66 +111,38 @@ Cypress.Commands.add('navigateToSection', (sectionId) => {
   // Attendre que la navigation soit visible
   cy.get('nav, .navigation, .app-nav, .sidebar', { timeout: 10000 }).should('be.visible');
   
-  // ✅ SOLUTION : Sélecteurs de navigation multiples
-  const navSelectors = [
-    `#nav-${sectionId}`,
-    `[data-section="${sectionId}"]`,
-    `[data-section-id="${sectionId}"]`,
-    `.nav-${sectionId}`,
-    `.nav-item[href*="${sectionId}"]`,
-    `button:contains("${sectionId}")`,
-    `a:contains("${sectionId}")`,
-    `.tab:contains("${sectionId}")`,
-    `[role="tab"]:contains("${sectionId}")`
-  ];
-  
-  let navFound = false;
-  
-  navSelectors.forEach(selector => {
-    if (!navFound) {
-      cy.get('body').then($body => {
-        if ($body.find(selector).length > 0) {
-          cy.get(selector)
-            .scrollIntoView()
-            .should('be.visible')
-            .click({ force: true });
-          navFound = true;
-          cy.log(`✅ Navigation réussie avec: ${selector}`);
-        }
-      });
-    }
-  });
-  
-  // Fallback : chercher par texte partiel
-  if (!navFound) {
-    const textMap = {
-      'results': ['Résultats', 'Articles', 'Results', 'Search'],
-      'analyses': ['Analyses', 'Analysis', 'Statistiques'],
-      'rob': ['RoB', 'Risque', 'Bias', 'Cochrane'],
-      'atn': ['ATN', 'Alliance', 'Thérapeutique'],
-      'thesis': ['Thèse', 'Thesis', 'Export']
-    };
-    
-    const searchTexts = textMap[sectionId] || [sectionId];
-    
-    searchTexts.forEach(text => {
-      if (!navFound) {
-        cy.get('body').then($body => {
-          if ($body.text().includes(text)) {
-            cy.contains('button, a, .nav-item, .tab', text)
-              .first()
-              .scrollIntoView()
-              .click({ force: true });
-            navFound = true;
-            cy.log(`✅ Navigation par texte: ${text}`);
-          }
-        });
+  // ✅ CORRECTION : Méthode de navigation séquentielle
+  cy.get('body').then($body => {
+    const navSelectors = [
+      `#nav-${sectionId}`,
+      `[data-section="${sectionId}"]`,
+      `[data-section-id="${sectionId}"]`,
+      `.nav-${sectionId}`,
+      `.nav-item[href*="${sectionId}"]`,
+      `button:contains("${sectionId}")`,
+      `a:contains("${sectionId}")`,
+      `.tab:contains("${sectionId}")`,
+      `[role="tab"]:contains("${sectionId}")`
+    ];
+
+    let navFound = false;
+
+    // ✅ CORRECTION : Tester chaque sélecteur de manière séquentielle
+    for (const selector of navSelectors) {
+      if ($body.find(selector).length > 0 && !navFound) {
+        cy.get(selector)
+          .scrollIntoView()
+          .should('be.visible')
+          .click({ force: true });
+        navFound = true;
+        cy.log(`✅ Navigation réussie avec: ${selector}`);
+        break;
       }
-    });
-  }
-  
-  // Attendre que la navigation soit effective
-  cy.wait(1000);
+    }
+
+    // Attendre que la navigation soit effective
+    cy.wait(1000);
+  });
 });
 
 // ✅ COMMANDE : Vérification flexible d'éléments
