@@ -144,10 +144,17 @@ describe('Analyses - Coverage Boost', () => {
     it('handleDeleteAnalysis devrait appeler showConfirmModal', () => {
         analyses.handleDeleteAnalysis('discussion');
 
-        expect(window.confirm).toHaveBeenCalledWith("Êtes-vous sûr de vouloir supprimer les résultats de l'analyse discussion pour ce projet ?");
+        expect(ui.showConfirmModal).toHaveBeenCalledWith(
+            "Confirmer la suppression",
+            "Êtes-vous sûr de vouloir supprimer les résultats de l'analyse discussion pour ce projet ?",
+            expect.any(Object)
+        );
     });
 
     it('exportAnalyses devrait télécharger toutes les analyses', async () => {
+        // Mock la fonction getApiUrl qui est maintenant utilisée dans exportAnalyses
+        jest.spyOn(require('./api'), 'getApiUrl').mockResolvedValue('/api/projects/test-project/export/analyses');
+
         await analyses.exportAnalyses();
 
         expect(window.open).toHaveBeenCalledWith('/api/projects/test-project/export/analyses', '_blank');

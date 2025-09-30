@@ -65,10 +65,10 @@ describe('Module Settings', () => {
     it('devrait appeler toutes les fonctions de chargement de données', async () => {
       api.fetchAPI.mockResolvedValue([]); // Mock pour tous les appels
       await settings.loadSettingsData();
-      expect(api.fetchAPI).toHaveBeenCalledWith('/api/analysis-profiles');
-      expect(api.fetchAPI).toHaveBeenCalledWith('/api/prompts');
-      expect(api.fetchAPI).toHaveBeenCalledWith('/api/ollama/models');
-      expect(api.fetchAPI).toHaveBeenCalledWith('/api/queues/info');
+      expect(api.fetchAPI).toHaveBeenCalledWith('/analysis-profiles');
+      expect(api.fetchAPI).toHaveBeenCalledWith('/prompts');
+      expect(api.fetchAPI).toHaveBeenCalledWith('/ollama/models');
+      expect(api.fetchAPI).toHaveBeenCalledWith('/queues/info');
     });
 
     it('devrait gérer une erreur lors du chargement des profils', async () => {
@@ -103,7 +103,7 @@ describe('Module Settings', () => {
 
       await settings.handleSaveProfile(mockEvent);
 
-      expect(api.fetchAPI).toHaveBeenCalledWith('/api/analysis-profiles', expect.objectContaining({ method: 'POST' }));
+      expect(api.fetchAPI).toHaveBeenCalledWith('/analysis-profiles', expect.objectContaining({ method: 'POST' }));
       expect(ui.showToast).toHaveBeenCalledWith("Profil 'Nouveau Profil' sauvegardé.", 'success');
     });
 
@@ -117,7 +117,7 @@ describe('Module Settings', () => {
 
       await settings.handleSaveProfile(mockEvent);
 
-      expect(api.fetchAPI).toHaveBeenCalledWith('/api/analysis-profiles/existing-id', expect.objectContaining({ method: 'PUT' }));
+      expect(api.fetchAPI).toHaveBeenCalledWith('/analysis-profiles/existing-id', expect.objectContaining({ method: 'PUT' }));
       expect(ui.showToast).toHaveBeenCalledWith("Profil 'Profil Mis à Jour' sauvegardé.", 'success');
     });
   });
@@ -152,7 +152,7 @@ describe('Module Settings', () => {
 
       await settings.downloadModel('llama3');
 
-      expect(api.fetchAPI).toHaveBeenCalledWith('/api/ollama/pull', expect.objectContaining({
+      expect(api.fetchAPI).toHaveBeenCalledWith('/ollama/pull', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ model: 'llama3' })
       }));

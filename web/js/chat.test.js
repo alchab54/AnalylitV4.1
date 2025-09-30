@@ -44,7 +44,7 @@ describe('Module Chat', () => {
 
       await chat.loadChatMessages();
 
-      expect(api.fetchAPI).toHaveBeenCalledWith('/api/projects/proj-1/chat-history');
+      expect(api.fetchAPI).toHaveBeenCalledWith('/projects/proj-1/chat-history');
       expect(state.setChatMessages).toHaveBeenCalledWith(mockMessages);
       expect(document.querySelector('.chat-message--ai')).not.toBeNull();
       expect(document.body.innerHTML).toContain('Bonjour !');
@@ -69,7 +69,7 @@ describe('Module Chat', () => {
       expect(document.body.innerHTML).toContain('Ma question');
 
       // Vérifie que l'API a été appelée
-      expect(api.fetchAPI).toHaveBeenCalledWith('/api/projects/proj-1/chat', expect.any(Object));
+      expect(api.fetchAPI).toHaveBeenCalledWith('/projects/proj-1/chat', expect.any(Object));
       expect(ui.showToast).toHaveBeenCalledWith('Question envoyée. Réponse en cours...', 'info');
     });
 

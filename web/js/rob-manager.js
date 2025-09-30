@@ -388,7 +388,9 @@ class RiskOfBiasManager {
             this.robAssessments[articleId] = assessment;
 
             // Sauvegarder sur serveur
-            await fetchAPI(API_ENDPOINTS.projectRobAnalysis(articleId), { // Assuming a new or adjusted endpoint
+            // ✅ CORRECTION: L'endpoint utilisé était incorrect. On utilise l'endpoint de sauvegarde RoB
+            // qui correspond à la route POST /api/projects/<project_id>/rob/<article_id>
+            await fetchAPI(`/projects/${appState.currentProject.id}/rob/${articleId}`, {
                 method: 'POST',
                 body: {
                     rob_assessment: assessment,

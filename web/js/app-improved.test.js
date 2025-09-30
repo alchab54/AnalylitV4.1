@@ -54,8 +54,8 @@ describe('Module App Improved - Initialisation', () => {
       expect(core.setupDelegatedEventListeners).toHaveBeenCalledTimes(1);
       expect(core.initializeWebSocket).toHaveBeenCalledTimes(1);
       expect(projects.loadProjects).toHaveBeenCalledTimes(1);
-      expect(api.fetchAPI).toHaveBeenCalledWith('/api/analysis-profiles');
-      expect(api.fetchAPI).toHaveBeenCalledWith('/api/databases');
+      expect(api.fetchAPI).toHaveBeenCalledWith('/analysis-profiles');
+      expect(api.fetchAPI).toHaveBeenCalledWith('/databases');
       expect(core.showSection).toHaveBeenCalledWith('projects');
     });
 

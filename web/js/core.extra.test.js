@@ -84,17 +84,17 @@ describe('Core - Coverage Boost', () => {
         expect(() => core.initializeWebSocket()).not.toThrow();
     });
 
-    it('initializeWebSocket devrait créer une connexion si io est disponible', () => {
+    it('initializeWebSocket devrait créer une connexion si io est disponible', async () => {
         const mockSocket = {
             on: jest.fn(),
             emit: jest.fn()
         };
         
         global.io = jest.fn().mockReturnValue(mockSocket);
+        // ✅ CORRECTION: La fonction est maintenant asynchrone, il faut l'attendre.
+        await core.initializeWebSocket();
         
-        core.initializeWebSocket();
-        
-        expect(global.io).toHaveBeenCalledWith('http://localhost:5000', expect.any(Object));
+        expect(global.io).toHaveBeenCalledWith('http://localhost:5000', { path: '/socket.io/', transports: [ 'websocket', 'polling' ] });
         expect(mockSocket.on).toHaveBeenCalledWith('connect', expect.any(Function));
         expect(mockSocket.on).toHaveBeenCalledWith('disconnect', expect.any(Function));
         expect(mockSocket.on).toHaveBeenCalledWith('notification', expect.any(Function));

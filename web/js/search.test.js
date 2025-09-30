@@ -58,7 +58,7 @@ describe('Module Search', () => {
 
       await search.handleMultiDatabaseSearch({ preventDefault: jest.fn(), target: form });
 
-      expect(api.fetchAPI).toHaveBeenCalledWith('/api/search', expect.objectContaining({
+      expect(api.fetchAPI).toHaveBeenCalledWith('/search', expect.objectContaining({
         method: 'POST',
         body: {
           project_id: 'proj-1',
@@ -93,7 +93,7 @@ describe('Module Search', () => {
 
       await search.handleExpertSearch({ preventDefault: jest.fn(), target: form });
 
-      expect(api.fetchAPI).toHaveBeenCalledWith('/api/search', expect.objectContaining({
+      expect(api.fetchAPI).toHaveBeenCalledWith('/search', expect.objectContaining({
         body: {
           project_id: 'proj-1',
           expert_queries: { pubmed: 'pubmed query' },

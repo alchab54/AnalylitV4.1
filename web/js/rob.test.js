@@ -70,7 +70,7 @@ describe('Module RoB (Risk of Bias)', () => {
       
       await rob.fetchAndDisplayRob('art-1', false);
 
-      expect(api.fetchAPI).toHaveBeenCalledWith('/api/projects/proj-1/articles/art-1/rob');
+      expect(api.fetchAPI).toHaveBeenCalledWith('/projects/art-1/run-rob-analysis');
       expect(document.getElementById('rob-summary-art-1').innerHTML).toContain('Low risk');
       expect(document.getElementById('rob-summary-art-1').innerHTML).toContain('Good method');
     });

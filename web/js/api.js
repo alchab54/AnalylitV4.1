@@ -19,8 +19,14 @@ export async function getApiUrl(endpoint) {
 export async function fetchAPI(endpoint, options = {}) {
     // ✅ CORRECTION SYSTÉMIQUE: Assurer que tous les appels API sont préfixés par /api.
     // Cela corrige la majorité des échecs de tests Jest.
-    const { CONFIG } = await import('./constants.js');
-    const url = `${CONFIG.API_BASE_URL}/api${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+    const { CONFIG } = await import('./constants.js'); // This was already correct
+    let url;
+    if (endpoint.startsWith('/api/')) {
+        url = `${CONFIG.API_BASE_URL}${endpoint}`;
+    } else {
+        const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+        url = `${CONFIG.API_BASE_URL}/api${cleanEndpoint}`;
+    }
 
     const isFormData = options.body instanceof FormData;
 
@@ -70,10 +76,7 @@ export async function fetchAPI(endpoint, options = {}) {
         
         const text = await response.text();
         if (!text) {
-            if (endpoint.includes('/articles') || endpoint.includes('/results')) {
-                return [];
-            }
-            return {};
+            return {}; // Retourner un objet vide pour les réponses 204 No Content
         }
         return JSON.parse(text);
 

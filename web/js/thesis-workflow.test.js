@@ -84,7 +84,7 @@ describe('Module ThesisWorkflow', () => {
 
       await workflow.handleThesisSearch(mockEvent);
 
-      expect(fetchAPI).toHaveBeenCalledWith('/api/search', expect.any(Object));
+      expect(fetchAPI).toHaveBeenCalledWith('/search', expect.any(Object));
       expect(pollSpy).toHaveBeenCalledWith('task-123');
     });
   });

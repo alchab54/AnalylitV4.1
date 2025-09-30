@@ -25,7 +25,10 @@ function render(items) {
 }
 
 async function toggle(id, included) {
-    await fetchAPI(API_ENDPOINTS.projectExtractionDecision(appState.currentProject.id, id), { method: 'PUT', body: { decision: included ? 'include' : 'exclude' } }); // Assuming this is the correct endpoint
+    await fetchAPI(API_ENDPOINTS.projectExtractionDecision(appState.currentProject.id, id), {
+        method: 'PUT',
+        body: { decision: included ? 'include' : 'exclude' }
+    });
     await load();
 }
 

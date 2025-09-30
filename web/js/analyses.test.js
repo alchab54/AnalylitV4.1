@@ -14,6 +14,7 @@ jest.mock('./ui-improved.js', () => ({
   showLoadingOverlay: jest.fn(),
   closeModal: jest.fn(),
   openModal: jest.fn(),
+  showConfirmModal: jest.fn(),
 }));
 jest.mock('./state.js', () => ({
   setAnalysisResults: jest.fn(),
@@ -50,8 +51,8 @@ describe('Module Analyses', () => {
     it('devrait charger les analyses et rendre la section', async () => {
       // ✅ CORRECTION: The function now fetches an array of analyses, not the whole project.
       const mockAnalysesArray = [
-        { type: 'discussion', content: 'This is a discussion.' },
-        { type: 'knowledge_graph', content: { nodes: [], edges: [] } }
+        { analysis_type: 'discussion', content: 'This is a discussion.' },
+        { analysis_type: 'knowledge_graph', content: { nodes: [], edges: [] } }
       ];
       api.fetchAPI.mockResolvedValue(mockAnalysesArray);
 
@@ -86,7 +87,7 @@ describe('Module Analyses', () => {
 
   describe('runProjectAnalysis', () => {
     it("devrait appeler l'API pour lancer une analyse", async () => {
-      api.fetchAPI.mockResolvedValue({ job_id: 'job-123' });
+      api.fetchAPI.mockResolvedValue({ job_id: 'job-123', message: "Tâche de génération du brouillon de discussion lancée" });
 
       await analyses.runProjectAnalysis('discussion');
 
@@ -97,7 +98,7 @@ describe('Module Analyses', () => {
           body: { type: 'discussion' },
         })
       );
-      expect(ui.showToast).toHaveBeenCalledWith('Tâche de génération du brouillon de discussion lancée', 'success');
+      expect(ui.showToast).toHaveBeenCalledWith("Tâche de génération du brouillon de discussion lancée", 'success');
     });
 
     it("ne devrait rien faire si aucun projet n'est sélectionné", async () => {
@@ -118,22 +119,23 @@ describe('Module Analyses', () => {
 
   describe('handleDeleteAnalysis', () => {
     it("devrait appeler l'API de suppression après confirmation", async () => {
-      window.confirm = jest.fn(() => true); // Simuler le clic sur "OK"
+      // Simuler la confirmation dans la modale
+      ui.showConfirmModal.mockImplementation((title, msg, options) => options.onConfirm());
       api.fetchAPI.mockResolvedValue({});
 
       await analyses.handleDeleteAnalysis('atn_scores');
 
-      expect(window.confirm).toHaveBeenCalled();
+      expect(ui.showConfirmModal).toHaveBeenCalled();
       expect(api.fetchAPI).toHaveBeenCalledWith('/projects/proj-1/analyses/atn_scores', { method: 'DELETE' });
       expect(ui.showToast).toHaveBeenCalledWith('Résultats de l\'analyse atn_scores supprimés avec succès.', 'success');
     });
 
     it("ne devrait rien faire si l'utilisateur annule", async () => {
-      window.confirm = jest.fn(() => false); // Simuler le clic sur "Annuler"
+      ui.showConfirmModal.mockImplementation(() => {}); // Ne fait rien
 
       await analyses.handleDeleteAnalysis('atn_scores');
 
-      expect(window.confirm).toHaveBeenCalled();
+      expect(ui.showConfirmModal).toHaveBeenCalled();
       expect(api.fetchAPI).not.toHaveBeenCalled();
     });
   });

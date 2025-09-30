@@ -48,8 +48,8 @@ describe('App Improved - Extra Coverage', () => {
  
         await appImproved.loadInitialData();
  
-        expect(api.fetchAPI).toHaveBeenCalledWith('/api/analysis-profiles');
-        expect(api.fetchAPI).toHaveBeenCalledWith('/api/databases');
+        expect(api.fetchAPI).toHaveBeenCalledWith('/analysis-profiles');
+        expect(api.fetchAPI).toHaveBeenCalledWith('/databases');
         expect(state.setAnalysisProfiles).toHaveBeenCalledWith([{ id: 'profile1', name: 'Test Profile' }]);
         expect(state.setAvailableDatabases).toHaveBeenCalledWith([{ id: 'db1', name: 'Test Database' }]);
         expect(projects.loadProjects).toHaveBeenCalledTimes(1);

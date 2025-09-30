@@ -159,7 +159,7 @@ describe('Module Articles', () => {
       await articles.handleDeleteSelectedArticles();
 
       expect(window.confirm).toHaveBeenCalled();
-      expect(api.fetchAPI).toHaveBeenCalledWith('/api/articles/batch-delete', expect.any(Object));
+      expect(api.fetchAPI).toHaveBeenCalledWith('/articles/batch-delete', expect.any(Object));
       expect(uiImproved.showToast).toHaveBeenCalledWith('Suppression lancée (Job ID: job-delete)', 'success');
     });
   });

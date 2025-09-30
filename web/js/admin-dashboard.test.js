@@ -39,8 +39,8 @@ describe('Module AdminDashboard', () => {
 
     expect(document.querySelector('.admin-header')).not.toBeNull();
     expect(document.querySelector('.admin-panels')).not.toBeNull();
-    expect(fetchAPI).toHaveBeenCalledWith('/api/tasks/status');
-    expect(fetchAPI).toHaveBeenCalledWith('/api/queues/info');
+    expect(fetchAPI).toHaveBeenCalledWith('/tasks/status');
+    expect(fetchAPI).toHaveBeenCalledWith('/queues/info');
   });
 
   test('devrait rafraîchir les données périodiquement', async () => {
@@ -125,7 +125,7 @@ describe('Module AdminDashboard', () => {
     await dashboard.cancelTask('task-to-cancel');
 
     expect(window.confirm).toHaveBeenCalled();
-    expect(fetchAPI).toHaveBeenCalledWith('/api/tasks/task-to-cancel/cancel', { method: 'POST' });
+    expect(fetchAPI).toHaveBeenCalledWith('/tasks/task-to-cancel/cancel', { method: 'POST' });
   });
 
   test('ne devrait pas annuler une tâche si l\'utilisateur annule', async () => {

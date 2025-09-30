@@ -16,7 +16,7 @@ def main():
 
     # --- CORRECTION DÉFINITIVE ---
     # Ajoute manuellement le répertoire parent (la racine du projet) au sys.path.
-    # Cela garantit que l'import de 'server_v4_complete' fonctionnera toujours.
+    # Cela garantit que l'import de 'backend.server_v4_complete' fonctionnera toujours.
     project_root = Path(__file__).resolve().parent.parent
     if str(project_root) not in sys.path:
         sys.path.insert(0, str(project_root))

@@ -54,10 +54,10 @@ describe('Module Selection', () => {
 
     expect(fetchAPI).toHaveBeenCalledWith(
       '/projects/proj-test/extractions/1/decision',
-      expect.objectContaining({ method: 'PUT', body: { decision: true } })
+      expect.objectContaining({ method: 'PUT', body: { decision: 'include' } })
     );
     // Vérifie que `load` est appelé à nouveau après le toggle
-    expect(fetchAPI).toHaveBeenCalledTimes(2);
+    expect(fetchAPI).toHaveBeenCalledTimes(3);
   });
 
   test('devrait appeler toggle avec "exclude" lors du clic sur le bouton Exclure', async () => {
@@ -73,9 +73,9 @@ describe('Module Selection', () => {
 
     expect(fetchAPI).toHaveBeenCalledWith(
       '/projects/proj-test/extractions/1/decision',
-      expect.objectContaining({ method: 'PUT', body: { decision: false } })
+      expect.objectContaining({ method: 'PUT', body: { decision: 'exclude' } })
     );
-    expect(fetchAPI).toHaveBeenCalledTimes(2);
+    expect(fetchAPI).toHaveBeenCalledTimes(3);
   });
 
   test('devrait afficher un conteneur vide si aucune donnée n\'est retournée', async () => {

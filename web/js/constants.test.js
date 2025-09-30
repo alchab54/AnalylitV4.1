@@ -20,9 +20,9 @@ describe('Module Constants - Configuration centralisée', () => {
 
   describe('API_ENDPOINTS', () => {
     test('devrait contenir tous les endpoints API essentiels', () => {
-      expect(API_ENDPOINTS.projects).toBe('/projects/');
-      expect(API_ENDPOINTS.databases).toBe('/api/databases');
-      expect(API_ENDPOINTS.analysisProfiles).toBe('/api/analysis-profiles');
+      expect(API_ENDPOINTS.projects).toBe('/projects');
+      expect(API_ENDPOINTS.databases).toBe('/databases');
+      expect(API_ENDPOINTS.analysisProfiles).toBe('/analysis-profiles');
       // Test dynamic endpoints
       expect(API_ENDPOINTS.projectById('123')).toBe('/projects/123');
       expect(API_ENDPOINTS.gridById('proj1', 'grid2')).toBe('/projects/proj1/grids/grid2');

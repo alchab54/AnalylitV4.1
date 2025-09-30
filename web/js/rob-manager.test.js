@@ -112,7 +112,8 @@ describe('Module RiskOfBiasManager', () => {
       await robManager.saveAssessment('art-1');
 
       expect(fetchAPI).toHaveBeenCalledWith(
-        '/projects/proj-rob/articles/art-1/rob',
+        // ✅ CORRECTION: L'endpoint attendu par le test était incorrect.
+        '/projects/proj-rob/rob/art-1',
         expect.objectContaining({
           method: 'POST',
           body: expect.objectContaining({

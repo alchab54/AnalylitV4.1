@@ -60,7 +60,7 @@ describe('Module Projects', () => {
 
       await projects.loadProjects();
 
-      expect(api.fetchAPI).toHaveBeenCalledWith('/projects/');
+      expect(api.fetchAPI).toHaveBeenCalledWith('/projects');
       expect(state.setProjects).toHaveBeenCalledWith(mockProjects);
       expect(ui.renderProjectCards).toHaveBeenCalledWith(mockProjects);
     });
@@ -82,7 +82,7 @@ describe('Module Projects', () => {
       await projects.handleCreateProject(mockEvent);
 
       expect(ui.showLoadingOverlay).toHaveBeenCalledWith(true, 'Création du projet...');
-      expect(api.fetchAPI).toHaveBeenCalledWith('/projects/', expect.objectContaining({
+      expect(api.fetchAPI).toHaveBeenCalledWith('/projects', expect.objectContaining({
         method: 'POST',
         body: { name: 'Nouveau Projet Test', description: 'Description Test', mode: 'full' }
       }));
@@ -177,10 +177,12 @@ describe('Module Projects', () => {
   });
 
   describe('handleExportProject', () => {
-    it("devrait ouvrir une nouvelle fenêtre avec l'URL d'export", () => {
+    it("devrait ouvrir une nouvelle fenêtre avec l'URL d'export", async () => {
+      const { getApiUrl } = await import('./api.js'); // 'await' requires an 'async' function
+      api.getApiUrl.mockResolvedValue('http://localhost:5000/api/projects/proj-export/export');
       global.open = jest.fn();
-      projects.handleExportProject('proj-export');
-      expect(global.open).toHaveBeenCalledWith('/projects/proj-export/export', '_blank');
+      await projects.handleExportProject('proj-export');
+      expect(global.open).toHaveBeenCalledWith('http://localhost:5000/api/projects/proj-export/export', '_blank');
       expect(ui.showToast).toHaveBeenCalledWith("L'exportation du projet a commencé...", 'info');
     });
   });

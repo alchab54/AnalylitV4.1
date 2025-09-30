@@ -32,7 +32,7 @@ describe('fetchAPI Utility', () => {
     const result = await fetchAPI('/test-endpoint');
     
     expect(result).toEqual(mockData);
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:5000/test-endpoint', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:5000/api/test-endpoint', {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -40,16 +40,14 @@ describe('fetchAPI Utility', () => {
     });
   });
 
-  test('devrait retourner un tableau vide pour une réponse vide sur un endpoint de collection', async () => {
+  test('devrait retourner un objet vide pour une réponse vide', async () => {
     global.fetch.mockResolvedValue({
       ok: true,
       text: () => Promise.resolve(''), // Réponse vide
     });
-
-    // /results est un endpoint de collection
-    const result = await fetchAPI('/projects/123/results');
     
-    expect(result).toEqual([]);
+    const result = await fetchAPI('/empty-endpoint');
+    expect(result).toEqual({});
   });
 
   test('devrait gérer une erreur API (ex: 500) avec un message JSON', async () => {
