@@ -123,6 +123,12 @@ test: ## Exécuter les tests
 	@docker-compose -f $(COMPOSE_FILE) run --rm web pytest -v tests/ > logs/pytest_results.log 2>&1
 	@mkdir -p logs
 
+test-workflow: ## Exécuter le test de workflow ATN de bout en bout
+	@echo "$(BLUE)🧪 Exécution du test de workflow ATN...$(NC)"
+	@echo "$(YELLOW)Assurez-vous que les services sont démarrés avec 'make start'$(NC)"
+	@python scripts/test_atn_workflow.py
+	@echo "$(GREEN)✅ Test de workflow terminé.$(NC)"
+
 health: ## Vérifier la santé des services
 	@echo "$(BLUE)🏥 Vérification de la santé des services:$(NC)"
 	@curl -f http://localhost:8080/api/health && echo "$(GREEN)✅ API Web: OK$(NC)" || echo "$(RED)❌ API Web: Erreur$(NC)"

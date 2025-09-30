@@ -164,16 +164,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      - ./migrations:/home/appuser/app/migrations
-      - ./api:/home/appuser/app/api
-      - ./backend:/home/appuser/app/backend
-      - ./utils:/home/appuser/app/utils
-      - ./scripts/wait_for_db.py:/home/appuser/app/scripts/wait_for_db.py
-      - ./scripts/verify_tables.py:/home/appuser/app/scripts/verify_tables.py
-      - ./scripts/entrypoint.sh:/home/appuser/app/scripts/entrypoint.sh # ✅ CORRECTION: Monter le script entrypoint manquant.
-      - ./alembic.ini:/home/appuser/app/alembic.ini # ✅ CORRECTION: Monter le fichier de configuration Alembic.
-      - ./utils/db_base.py:/home/appuser/app/utils/db_base.py # ✅ AJOUT: Assurer que la base déclarative est accessible.
+    # ✅ CORRECTION FINALE: Suppression des volumes redondants.
+    # L'image Docker contient déjà tout le code nécessaire.
+    # Cette simplification radicale fiabilise le démarrage et évite les conflits.
+    volumes: []
   # Workers multiples pour paralléliser les tâches
   worker-fast:
     build:

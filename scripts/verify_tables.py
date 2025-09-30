@@ -43,7 +43,7 @@ def verify_and_create_tables():
         """)).fetchall()
         
         existing_tables = [row[0] for row in tables_check]
-        required_tables = ['projects', 'search_results', 'extractions', 'analysis_profiles']
+        required_tables = ['projects', 'search_results', 'extractions', 'analysis_profiles', 'risk_of_bias', 'grid_fields', 'articles', 'chat_messages', 'extraction_grids', 'grey_literature', 'processing_log', 'prisma_records', 'screening_decisions', 'stakeholders', 'validations', 'analyses', 'prompts']
         
         print(f"📋 Tables existantes: {existing_tables}")
         
