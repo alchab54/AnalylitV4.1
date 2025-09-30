@@ -193,16 +193,22 @@ def create_app(config_override=None):
     def index():
         return send_from_directory(app.static_folder, 'index.html')
 
+    @app.route("/api/health", methods=["GET"])
+    def api_health_check():
+        return jsonify({"status": "healthy", "message": "AnalyLit v4.1 opérationnelle"}), 200
+
     @app.route('/<path:path>')
     def serve_static(path):
         return send_from_directory(app.static_folder, path)
 
     @app.errorhandler(404)
     def not_found(error):
-        # Si le chemin n'est pas une API, renvoyer l'index pour le routage côté client
+        # Si c'est une requête API, retourner du JSON
         if not request.path.startswith('/api/'):
-            return send_from_directory(app.static_folder, 'index.html')
-        return jsonify({"error": "Not Found"}), 404
+            return jsonify({"error": "Page non trouvée", "message": "Application backend fonctionnelle"}), 404
+        
+        # Pour les autres requêtes, retourner un simple message
+        return jsonify({"error": "Endpoint API non trouvé", "path": request.path}), 404
 
     return app
 
