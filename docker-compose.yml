@@ -125,6 +125,7 @@ services:
       - POSTGRES_USER=analylit_user
       - POSTGRES_PASSWORD=strong_password
       - POSTGRES_DB=analylit_db
+      - SCHEMA_NAME=analylit_schema # Variable explicite
       - DATABASE_URL=postgresql://analylit_user:strong_password@db:5432/analylit_db
     env_file: [".env"]
     # ✅ CORRECTION: Utiliser une liste pour la commande évite les problèmes d'interprétation du shell.

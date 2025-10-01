@@ -12,6 +12,7 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 # ✅ IMPORT DES MODÈLES (c'est ça qui manquait !)
 from utils.models import Base, Project, SearchResult, Extraction, AnalysisProfile, RiskOfBias, Grid, ChatMessage, Prompt, Article, GreyLiterature, ProcessingLog, Stakeholder, ScreeningDecision, PRISMARecord, Analysis, Validation, GridField
+from utils.extensions import db
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -33,12 +34,20 @@ if config.config_file_name is not None:
 logger = logging.getLogger('alembic.env')
 logging.getLogger('alembic').setLevel(logging.DEBUG)
 
+# --- CONFIGURATION CRITIQUE DU SCHÉMA ---
+# ✅ OPTIMISATION: Utiliser la variable d'environnement pour le nom du schéma.
+SCHEMA = os.getenv("SCHEMA_NAME", "analylit_schema")
+
+def get_metadata_with_schema():
+    """Force le schéma sur chaque table de la metadata."""
+    meta = db.metadata
+    for table in meta.tables.values():
+        table.schema = SCHEMA
+    return meta
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-# ✅ CORRECTION: 2. Utiliser le contexte de l'application pour garantir que tout est initialisé.
-# ✅ CONFIGURATION CRITIQUE : Référencer les métadonnées de la Base déclarative
-target_metadata = Base.metadata
+target_metadata = get_metadata_with_schema()
 
 
 def run_migrations_offline():
@@ -64,10 +73,10 @@ def run_migrations_offline():
         context.run_migrations()
 
 
-def create_schema_if_not_exists(connection, schema_name="analylit_schema"):
+def create_schema_if_not_exists(connection, schema_name=SCHEMA):
     """Créer le schéma s'il n'existe pas"""
     connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {schema_name}"))
-    connection.execute(text(f"GRANT ALL PRIVILEGES ON SCHEMA {schema_name} TO analylit_user"))
+    connection.execute(text(f"GRANT ALL PRIVILEGES ON SCHEMA {schema_name} TO CURRENT_USER"))
 
 def run_migrations_online():
     """Run migrations in 'online' mode.
@@ -91,7 +100,7 @@ def run_migrations_online():
             context.configure(
                 connection=connection,
                 target_metadata=target_metadata,
-                version_table_schema="analylit_schema",
+                version_table_schema=SCHEMA,
                 include_schemas=True
             )
             context.run_migrations()
