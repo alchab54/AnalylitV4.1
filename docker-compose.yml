@@ -89,8 +89,9 @@ services:
     # ✅ CORRECTION: La commande est maintenant gérée directement ici, après l'attente de la DB par l'entrypoint.
     # L'entrypoint exécutera simplement cette commande.
     command: >
-      bash -c "echo '🚀 Démarrage du serveur Gunicorn...' &&
-               exec gunicorn --conf backend/config/gunicorn.conf.py 'backend.manage:app'"
+      bash -c "tr -d '\r' < /home/appuser/app/entrypoint.sh > /tmp/entrypoint_fixed.sh && chmod +x /tmp/entrypoint_fixed.sh &&
+               echo '🚀 Démarrage du serveur Gunicorn...' &&
+               /tmp/entrypoint_fixed.sh exec gunicorn --conf backend/config/gunicorn.conf.py 'backend.manage:app'"
     depends_on:
       # ✅ CORRECTION FINALE: Le service web attend que le service migrate ait terminé avec succès.
       migrate:
