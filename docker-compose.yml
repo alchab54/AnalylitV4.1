@@ -97,6 +97,8 @@ services:
         condition: service_completed_successfully
       db:
         condition: service_healthy
+      ollama: # ✅ CORRECTION: Attendre qu'Ollama soit pleinement opérationnel.
+        condition: service_healthy
       redis:
         condition: service_started
 

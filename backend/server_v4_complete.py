@@ -97,7 +97,11 @@ socketio = SocketIO()
 
 def create_app(config_override=None):
     """Factory pour créer et configurer l'application Flask."""
-    app = Flask(__name__, static_folder='web', static_url_path='')
+    # ✅ CORRECTION: Utiliser une configuration standard pour les fichiers statiques.
+    # 'static_folder' pointe vers le dossier 'web'.
+    # 'static_url_path' est le préfixe URL pour y accéder (ex: /static/css/style.css).
+    # Cela évite les conflits de routes.
+    app = Flask(__name__, static_folder='../web', static_url_path='/static')
 
     # Configuration de base
     if config_override:
@@ -116,6 +120,11 @@ def create_app(config_override=None):
             "options": "-c search_path=analylit_schema,public"
         }
     }
+
+    # ✅ CORRECTION CORS: Initialiser Flask-CORS pour autoriser les requêtes cross-origin
+    # depuis le frontend de développement (ex: localhost:8080) vers le backend (localhost:5000).
+    # Ceci résout l'erreur "blocked by CORS policy".
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     # Initialisation des extensions
     db.init_app(app)
@@ -140,17 +149,12 @@ def create_app(config_override=None):
     @app.route('/')
     def serve_frontend():
         """Sert l'interface frontend HTML."""
-        # ✅ CORRECTION: Servir le fichier index.html du dossier 'web'
-        # au lieu de la page de statut statique.
-        return send_from_directory(app.static_folder, 'index.html')
+        # Sert explicitement le fichier index.html depuis le dossier 'web'.
+        return send_from_directory('../web', 'index.html')
 
     @app.route("/api/health", methods=["GET"])
     def api_health_check():
         return jsonify({"status": "healthy", "message": "AnalyLit v4.1 opérationnelle"}), 200
-
-    @app.route('/<path:path>')
-    def serve_static(path):
-        return send_from_directory(app.static_folder, path)
 
     @app.errorhandler(404)
     def not_found(error):
