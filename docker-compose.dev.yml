@@ -72,6 +72,10 @@ services:
       - ./migrations:/home/appuser/app/migrations
       - ./alembic.ini:/home/appuser/app/alembic.ini
       - ./scripts/entrypoint.sh:/home/appuser/app/entrypoint.sh # ✅ CORRECTION: Utiliser le bon chemin source pour le script.
+    # ✅ CORRECTION DEV: Surcharger l'environnement pour pointer vers la base de test.
+    environment:
+      - DATABASE_URL=postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      - SCHEMA_NAME=analylit_schema
     depends_on:
       test-db:
         condition: service_started
