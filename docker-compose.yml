@@ -137,9 +137,7 @@ services:
         # de manière portable et éviter l'erreur "Device or resource busy" avec sed -i.
         tr -d '\r' < /home/appuser/app/entrypoint.sh > /tmp/entrypoint_fixed.sh && chmod +x /tmp/entrypoint_fixed.sh &&
         # Exécuter l'entrypoint qui va attendre la DB puis exécuter la commande suivante
-        /tmp/entrypoint_fixed.sh python -m alembic -c /home/appuser/app/alembic.ini upgrade head &&
-        echo "🔧 Vérification finale des tables..." &&
-        python /home/appuser/app/scripts/verify_tables.py
+        /tmp/entrypoint_fixed.sh python -m alembic -c /home/appuser/app/alembic.ini upgrade head
     depends_on:
       db:
         condition: service_healthy

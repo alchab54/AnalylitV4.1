@@ -84,17 +84,16 @@ def run_migrations_online():
     )
 
     with connectable.connect() as connection:
-        # ✅ CRÉER LE SCHÉMA AVANT LES MIGRATIONS
-        create_schema_if_not_exists(connection)
+        with connection.begin():
+            # ✅ CRÉER LE SCHÉMA AVANT LES MIGRATIONS
+            create_schema_if_not_exists(connection)
 
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata,
-            version_table_schema="analylit_schema",  # ✅ Schéma pour alembic_version
-            include_schemas=True
-        )
-
-        with context.begin_transaction():
+            context.configure(
+                connection=connection,
+                target_metadata=target_metadata,
+                version_table_schema="analylit_schema",
+                include_schemas=True
+            )
             context.run_migrations()
 
 
