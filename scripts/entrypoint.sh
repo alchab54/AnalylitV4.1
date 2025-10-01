@@ -1,8 +1,12 @@
 #!/bin/bash
 set -e
 
+# ✅ CORRECTION: Utiliser une variable d'environnement pour le nom d'hôte de la DB.
+# 'db' sera la valeur par défaut si la variable n'est pas définie.
+DB_HOST=${DB_HOST:-db}
+
 echo "🔍 Attente de la base de données..."
-until pg_isready -h db -p 5432 -U "${POSTGRES_USER:-postgres}"; do
+until pg_isready -h "$DB_HOST" -p 5432 -U "${POSTGRES_USER:-postgres}"; do
   echo "Base de données indisponible - attente..."
   sleep 2
 done

@@ -90,7 +90,7 @@ services:
     # L'entrypoint exécutera simplement cette commande.
     command: >
       bash -c "echo '🚀 Démarrage du serveur Gunicorn...' &&
-               exec gunicorn --conf backend/config/gunicorn.conf.py api.gunicorn_entry:app"
+               exec gunicorn --conf backend/config/gunicorn.conf.py 'backend.manage:app'"
     depends_on:
       # ✅ CORRECTION FINALE: Le service web attend que le service migrate ait terminé avec succès.
       migrate:

@@ -13,6 +13,9 @@ services:
     environment:
       # ✅ OPTIMISATION: Utiliser FLASK_DEBUG=1 est la méthode moderne pour activer le mode debug et le rechargement automatique.
       - FLASK_DEBUG=1
+      # ✅ CORRECTION: Indiquer à Flask quelle application lancer en mode développement.
+      - FLASK_APP=backend/manage.py
+      - DB_HOST=test-db # Pointer vers la base de données de test
     volumes:
       # Monter le code source pour le rechargement à chaud
       - ./api:/home/appuser/app/api
@@ -23,9 +26,17 @@ services:
       - ./migrations:/home/appuser/app/migrations
       - ./alembic.ini:/home/appuser/app/alembic.ini
       - ./pytest.ini:/home/appuser/app/pytest.ini
-    # En mode dev, on attend aussi la base de test
+    # ✅ CORRECTION: Fusionner les dépendances de dev avec celles de prod.
+    # La section 'depends_on' dans ce fichier remplace celle du fichier de base,
+    # il faut donc ré-inclure toutes les dépendances nécessaires.
     depends_on:
+      migrate:
+        condition: service_completed_successfully
       test-db:
+        condition: service_started
+      ollama:
+        condition: service_healthy
+      redis:
         condition: service_started
 
   test-db:
@@ -46,21 +57,30 @@ services:
 
   worker-fast:
     volumes:
+      # ✅ CORRECTION: Ajouter les volumes pour le rechargement à chaud du code des workers.
       - ./backend:/home/appuser/app/backend
       - ./api:/home/appuser/app/api
       - ./utils:/home/appuser/app/utils
 
   worker-default:
     volumes:
+      # ✅ CORRECTION: Ajouter les volumes pour le rechargement à chaud du code des workers.
       - ./backend:/home/appuser/app/backend
       - ./api:/home/appuser/app/api
       - ./utils:/home/appuser/app/utils
 
   worker-ai:
     volumes:
+      # ✅ CORRECTION: Ajouter les volumes pour le rechargement à chaud du code des workers.
       - ./backend:/home/appuser/app/backend
       - ./api:/home/appuser/app/api
       - ./utils:/home/appuser/app/utils
+    # ✅ CORRECTION: S'assurer que le worker IA attend aussi les services critiques.
+    depends_on:
+      redis:
+        condition: service_started
+      ollama:
+        condition: service_healthy
 
   migrate:
     # En mode dev, on veut aussi que migrate utilise les derniers fichiers locaux
@@ -76,6 +96,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       - SCHEMA_NAME=analylit_schema
+      - DB_HOST=test-db # Pointer vers la base de données de test
     depends_on:
       test-db:
         condition: service_started
