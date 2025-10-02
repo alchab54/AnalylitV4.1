@@ -4,6 +4,6 @@ FROM analylit-base:latest
 # Définir le répertoire de travail
 WORKDIR /home/appuser/app
 
-# Copier les fichiers et répertoires essentiels pour le worker
-COPY --chown=appuser:appuser api/ api/ backend/ backend/ utils/ utils/ migrations/ migrations/ ./
-COPY --chown=appuser:appuser scripts/run_migrations.py requirements.txt .env.example backend/server_v4_complete.py ./
+# ✅ CORRECTION: Copier l'intégralité du code source de l'application.
+# Cela garantit que les workers ont accès à tous les modules, y compris les tâches.
+COPY --chown=appuser:appuser . .

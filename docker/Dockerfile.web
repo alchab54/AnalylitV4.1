@@ -9,9 +9,9 @@ COPY --chown=appuser:appuser . .
 # COPY --chown=appuser:appuser alembic.ini ./
 
 # Corrige les fins de ligne Windows (\r) et rend le script exécutable
-RUN tr -d '\r' < entrypoint.sh > entrypoint-fixed.sh && \
-    rm entrypoint.sh && \
-    mv entrypoint-fixed.sh entrypoint.sh && \
-    chmod +x entrypoint.sh
+RUN tr -d '\r' < scripts/entrypoint.sh > /tmp/entrypoint-fixed.sh && \
+    chmod +x /tmp/entrypoint-fixed.sh && \
+    # Remplace le script original par la version corrigée
+    mv /tmp/entrypoint-fixed.sh scripts/entrypoint.sh
 
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["./scripts/entrypoint.sh"]
