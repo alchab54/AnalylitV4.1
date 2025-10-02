@@ -17,9 +17,9 @@ class AnalyLitATNWorkflow:
         self.project_id = None
         self.results = {}
         
-    def log(self, message):
+    def log(self, message, **kwargs):
         timestamp = datetime.now().strftime("%H:%M:%S")
-        print(f"[{timestamp}] {message}")
+        print(f"[{timestamp}] {message}", **kwargs)
         
     def check_health(self):
         """Vérifier que l'application répond"""
@@ -72,12 +72,13 @@ class AnalyLitATNWorkflow:
         search_payload = {
             "query": atn_query,
             "databases": ["pubmed"],
-            "max_results_per_db": 50
+            "max_results_per_db": 50,
+            "project_id": self.project_id
         }
         
         try:
             response = requests.post(
-                f"{self.api_url}/projects/{self.project_id}/search",
+                f"{self.api_url}/search",
                 json=search_payload,
                 timeout=300
             )
@@ -125,14 +126,17 @@ class AnalyLitATNWorkflow:
                     elif status in ['queued', 'running']:
                         progress = task_data.get('progress')
                         if progress:
-                            self.log(f"⏳ {task_name} en cours... ({progress:.1%})")
-                        time.sleep(5)
-                        continue
+                            self.log(f"⏳ {task_name} en cours... ({progress:.1%})", end='\r')
+                        else:
+                            self.log(f"⏳ {task_name} en cours...", end='\r')
                         
             except Exception as e:
                 self.log(f"⚠️ Erreur vérification statut: {e}")
-                time.sleep(5)
+                # Petite pause en cas d'erreur réseau avant de réessayer
+                time.sleep(2)
                 
+            time.sleep(5) # Pause entre chaque vérification
+
         self.log(f"⏰ Timeout: {task_name} trop longue")
         return False
 
