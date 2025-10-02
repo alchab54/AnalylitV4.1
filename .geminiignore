@@ -1,0 +1,24 @@
+# Dépendances et environnements
+node_modules/
+.venv/
+venv/
+htmlcov/
+
+# Caches et logs
+.pytest_cache/
+__pycache__/
+model_cache/
+logs/
+.locks/
+
+# Données de projet et artefacts de test
+projects/
+cypress/screenshots/
+cypress/downloads/
+reports/
+
+# Fichiers de configuration locaux et de build
+.env
+*.lock
+dist/
+build/

@@ -55,10 +55,7 @@ services:
     # L'utilisation de la liste garantit que les guillemets sont correctement interprétés.
     command: ["postgres", "-c", "default_transaction_isolation=read committed", "-c", "log_statement=all"]
     tmpfs:
-      - /var/lib/postgresql/data # Base temporaire en RAM
-    # Ce service ne sera démarré qu'avec le profil "dev"
-    profiles:
-      - dev
+      - /var/lib/postgresql/data # Base temporaire en RAM    
 
   worker-fast:
     volumes:
