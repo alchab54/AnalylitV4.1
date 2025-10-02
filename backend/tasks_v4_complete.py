@@ -330,12 +330,15 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
                     )
                     record = Entrez.read(handle)
                     handle.close()
+
                     ids = record.get("IdList", [])
+                    logger.info(f"Appel PubMed (retstart={retstart}, retmax={min(page_size, max_results - retstart)}): {len(ids)} IDs récupérés.")
+
                     if not ids:
                         break
                     all_ids.extend(ids)
                     retstart += len(ids)
-                    if len(ids) < page_size:
+                    if len(ids) < min(page_size, max_results - retstart):
                         break
                 
                 results = db_manager.fetch_details_for_ids(all_ids)

@@ -137,6 +137,23 @@ class DatabaseManager:
             logger.error(f"Erreur recherche PubMed: {e}", exc_info=True)
             return []
 
+    def fetch_details_for_ids(self, pmids: List[str]) -> List[Dict[str, Any]]:
+        """Récupère les détails pour une liste de PMIDs."""
+        if not pmids:
+            return []
+        try:
+            fetch_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+            # On récupère en mode XML pour avoir tous les détails
+            # POST est plus robuste pour un grand nombre d'IDs
+            fetch_params = {"db": "pubmed", "id": ",".join(pmids), "retmode": "xml"}
+            fetch_response = requests.post(fetch_url, data=fetch_params, timeout=180) # Timeout plus long
+            fetch_response.raise_for_status()
+            
+            return self._parse_pubmed_xml(fetch_response.text)
+        except Exception as e:
+            logger.error(f"Erreur lors du fetch des détails PubMed pour {len(pmids)} IDs: {e}", exc_info=True)
+            return []
+
     def search_arxiv(self, query: str, max_results: int = 50) -> List[Dict[str, Any]]:
         """Recherche dans arXiv via son API."""
         try:
