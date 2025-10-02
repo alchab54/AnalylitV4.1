@@ -7,13 +7,16 @@
 services:
   web:
     # ✅ DEV MODE: Utiliser le serveur de développement Flask avec rechargement automatique.
-    command: flask run --host=0.0.0.0 --port=5000 --debug
+    # ✅ CORRECTION: Exécuter directement le script serveur pour une initialisation correcte de gevent-websocket.
+    command: python backend/server_v4_complete.py
     environment:
       # ✅ OPTIMISATION: FLASK_ENV=development active le mode debug, le reloader, etc.
       - FLASK_ENV=development
       # ✅ CORRECTION: Indiquer à Flask quelle application lancer en mode développement.
       - FLASK_APP=backend/manage.py
       - DB_HOST=test-db # Pointer vers la base de données de test
+      # ✅ CORRECTION: Définir PYTHONPATH pour que pytest trouve les modules de l'application.
+      - PYTHONPATH=/home/appuser/app
     volumes:
       # Monter le code source pour le rechargement à chaud
       - ./api:/home/appuser/app/api
@@ -23,6 +26,8 @@ services:
       - ./web:/home/appuser/app/web
       - ./migrations:/home/appuser/app/migrations
       - ./alembic.ini:/home/appuser/app/alembic.ini
+      # ✅ CORRECTION: Monter le répertoire des tests pour pouvoir les exécuter dans le conteneur.
+      - ./tests:/home/appuser/app/tests
       - ./pytest.ini:/home/appuser/app/pytest.ini
     # ✅ CORRECTION: Fusionner les dépendances de dev avec celles de prod.
     # La section 'depends_on' dans ce fichier remplace celle du fichier de base,
