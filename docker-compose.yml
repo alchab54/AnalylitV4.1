@@ -13,6 +13,9 @@ services:
       args:
         BASE_IMAGE: analylit-base-cpu:latest
     image: analylit-base-gpu:latest
+    # ✅ CORRECTION: Assurer que l'image de base CPU est construite avant l'image GPU.
+    depends_on:
+      - base-cpu
 
   db:
     image: postgres:15-alpine

@@ -28,8 +28,6 @@ services:
       - ./tests:/home/appuser/app/tests
       - ./pytest.ini:/home/appuser/app/pytest.ini
     depends_on:
-      migrate:
-        condition: service_completed_successfully
       test-db:
         condition: service_started
       ollama:
