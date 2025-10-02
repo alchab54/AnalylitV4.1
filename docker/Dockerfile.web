@@ -1,9 +1,9 @@
 # Image applicative - hérite de la base avec les dépendances
 FROM analylit-base:latest
 
-# Copier le code de l'application
-COPY --chown=appuser:appuser backend/ backend/ scripts/ scripts/ api/ api/ utils/ utils/ web/ web/ migrations/ migrations/ ./
-COPY --chown=appuser:appuser alembic.ini ./ # Fichier de configuration Alembic
+# Copier tout le code de l'application en une seule commande pour plus de clarté et de robustesse.
+# La destination doit se terminer par un / pour garantir que c'est bien un répertoire.
+COPY --chown=appuser:appuser backend/ scripts/ api/ utils/ web/ migrations/ alembic.ini ./
 
 # Corrige les fins de ligne Windows (\r) et rend le script exécutable
 RUN tr -d '\r' < entrypoint.sh > entrypoint-fixed.sh && \
