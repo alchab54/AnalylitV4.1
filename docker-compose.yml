@@ -5,6 +5,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.base-cpu
     image: analylit-base-cpu:latest
+    profiles: ["build-only"]
 
   base-gpu:
     build:
@@ -13,9 +14,7 @@ services:
       args:
         BASE_IMAGE: analylit-base-cpu:latest
     image: analylit-base-gpu:latest
-    # ✅ CORRECTION: Assurer que l'image de base CPU est construite avant l'image GPU.
-    depends_on:
-      - base-cpu
+    profiles: ["build-only"]
 
   db:
     image: postgres:15-alpine
@@ -25,14 +24,14 @@ services:
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # ✅ CORRECTION: Utiliser le nouveau script d'initialisation
+      - postgres_data:/var/lib/postgresql/data
       # Monter la configuration personnalisée
-      - ./database/postgres.conf:/usr/share/postgresql/postgresql.conf.sample
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./database/postgres.conf:/usr/share/postgresql/postgresql.conf.sample:ro
     ports:
       - "5433:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-analylit_user} -d ${POSTGRES_DB:-analylit_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -41,34 +40,37 @@ services:
         limits:
           memory: 1500M
         reservations:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 1000M
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
     container_name: analylit_redis
-    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    command: ["redis-server", "--maxmemory", "512mb", "--maxmemory-policy", "allkeys-lru"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 256M
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
+    restart: unless-stopped
 
   web:
     build:
       context: .
       # ✅ OPTIMISATION: Utiliser l'image de base CPU, beaucoup plus légère.
+      dockerfile: docker/Dockerfile.web
       args:
         BASE_IMAGE: analylit-base-cpu:latest
-      dockerfile: docker/Dockerfile.web
+    image: analylit-web:latest
     container_name: analylit_web
     ports:
       - "5000:5000"
@@ -76,30 +78,18 @@ services:
     environment:
       # ✅ CORRECTION: Utiliser le nouveau script 'manage.py' comme point d'entrée pour les commandes Flask.
       # Cela suit le pattern standard et évite les initialisations doubles.
-      - FLASK_APP=backend/manage.py
+      FLASK_APP: backend/manage.py
       # Essentiel pour que `flask db upgrade` dans entrypoint.sh fonctionne.
-      - FLASK_ENV=production
-      - WAIT_HOSTS=db:5432,redis:6379,ollama:11434
-      - WAIT_TIMEOUT=60
-      - WAIT_HOSTS_TIMEOUT=10
-      - GUNICORN_WORKERS=2
-      - GUNICORN_THREADS=2
-      - GUNICORN_TIMEOUT=120
-      - PYTHONPATH=/home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
+      FLASK_ENV: production
+      WAIT_HOSTS: db:5432,redis:6379,ollama:11434
+      WAIT_TIMEOUT: "60"
+      WAIT_HOSTS_TIMEOUT: "10"
+      GUNICORN_WORKERS: "2"
+      GUNICORN_THREADS: "2"
+      GUNICORN_TIMEOUT: "120"
+      PYTHONPATH: /home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
     env_file:
       - .env
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-        max_attempts: 5
-        window: 120s
-      resources:
-        limits:
-          memory: 8000M
-        reservations:
-          cpus: '1.5'
-          memory: 4000M
     # La commande est maintenant aussi dans entrypoint.sh
     # ✅ CORRECTION: La commande est maintenant gérée directement ici, après l'attente de la DB par l'entrypoint.
     # L'entrypoint exécutera simplement cette commande.
@@ -115,12 +105,19 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-
     volumes:
       # En production, seul le code de l'image est utilisé.
       # Seuls les volumes pour les données persistantes (logs, projets) sont conservés.
       - ./logs:/home/appuser/app/logs
       - ./projects:/home/appuser/app/projects
+    deploy:
+      resources:
+        limits:
+          memory: 8000M
+        reservations:
+          cpus: "1.5"
+          memory: 4000M
+    restart: unless-stopped
 
   # ✅ NOUVEAU SERVICE: 'migrate' pour les commandes de base de données.
   # Ce service partage l'environnement du service 'web' mais ne lance pas de serveur.
@@ -129,31 +126,32 @@ services:
     build:
       context: .
       # ✅ OPTIMISATION: Utiliser l'image de base CPU.
+      dockerfile: docker/Dockerfile.web
       args:
         BASE_IMAGE: analylit-base-cpu:latest
-      dockerfile: docker/Dockerfile.web
+    image: analylit-migrate:latest
     container_name: analylit_migrate
     # Pas de ports exposés, car ce service ne sert qu'à exécuter des commandes.
     environment:
-      - FLASK_APP=backend/manage.py
-      - FLASK_ENV=production
-      - WAIT_HOSTS=db:5432
-      - WAIT_TIMEOUT=30
-      - PYTHONPATH=/home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
+      FLASK_APP: backend/manage.py
+      FLASK_ENV: production
+      WAIT_HOSTS: db:5432
+      WAIT_TIMEOUT: "30"
+      PYTHONPATH: /home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
       # ✅ AJOUTEZ ces variables pour les migrations:
-      - POSTGRES_USER=analylit_user
-      - POSTGRES_PASSWORD=strong_password
-      - POSTGRES_DB=analylit_db
-      - SCHEMA_NAME=analylit_schema # Variable explicite
-      - DATABASE_URL=postgresql://analylit_user:strong_password@db:5432/analylit_db
-    env_file: [".env"]
+      POSTGRES_USER: analylit_user
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: analylit_db
+      SCHEMA_NAME: analylit_schema
+      DATABASE_URL: postgresql://analylit_user:strong_password@db:5432/analylit_db
+    env_file:
+      - .env
     # ✅ CORRECTION: Utiliser une liste pour la commande évite les problèmes d'interprétation du shell.
     # Chaque script est appelé directement.
     command:
       - /bin/sh
       - -c
-      - |
-        python -m alembic -c /home/appuser/app/alembic.ini upgrade head
+      - "python -m alembic -c /home/appuser/app/alembic.ini upgrade head"
     depends_on:
       db:
         condition: service_healthy
@@ -161,75 +159,88 @@ services:
     # L'image Docker contient déjà tout le code nécessaire.
     # Cette simplification radicale fiabilise le démarrage et évite les conflits.
     volumes: []
+    restart: "no"
+
   # Workers multiples pour paralléliser les tâches
   worker-fast:
     build:
       context: .
       # ✅ OPTIMISATION: Utiliser l'image de base CPU.
+      dockerfile: docker/Dockerfile.worker
       args:
         BASE_IMAGE: analylit-base-cpu:latest
-      dockerfile: docker/Dockerfile.worker
+    image: analylit-worker-fast:latest
     container_name: analylit_worker_fast
-    command: rq worker --url redis://redis:6379/0 fast_queue
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "fast_queue"]
     env_file:
       - .env
     deploy:
       resources:
         limits:
           memory: 800M
-      restart_policy:
-        condition: on-failure
-        delay: 5s
+    depends_on:
+      redis:
+        condition: service_started
+      db:
+        condition: service_started
+    restart: unless-stopped
 
   worker-default:
     build:
       context: .
       # ✅ OPTIMISATION: Utiliser l'image de base CPU.
+      dockerfile: docker/Dockerfile.worker
       args:
         BASE_IMAGE: analylit-base-cpu:latest
-      dockerfile: docker/Dockerfile.worker
+    image: analylit-worker-default:latest
     container_name: analylit_worker_default
-    command: rq worker --url redis://redis:6379/0 default_queue
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "default_queue"]
     env_file:
       - .env
     deploy:
       resources:
         limits:
           memory: 1000M
-      restart_policy:
-        condition: on-failure
-        delay: 5s
+    depends_on:
+      redis:
+        condition: service_started
+      db:
+        condition: service_started
+    restart: unless-stopped
 
   # Worker dédié à l'IA, avec accès au GPU
   worker-ai:
     build:
       context: .
       # ✅ OPTIMISATION: Utiliser l'image de base GPU, qui contient PyTorch.
+      dockerfile: docker/Dockerfile.worker
       args:
         BASE_IMAGE: analylit-base-gpu:latest
-      dockerfile: docker/Dockerfile.worker
+    image: analylit-worker-ai:latest
     container_name: analylit_worker_ai
     # ✅ CORRECTION: Ajout de 'analysis_queue' pour que les tâches d'analyse soient traitées.
     # ✅ CORRECTION FINALE: Ajout de 'extension_queue' pour traiter les tâches d'extension et débloquer les tests.
-    command: rq worker --url redis://redis:6379/0 ai_queue background_queue analysis_queue extension_queue
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "ai_queue", "background_queue", "analysis_queue", "extension_queue"]
     env_file:
       - .env
-    runtime: nvidia
     environment:
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      NVIDIA_VISIBLE_DEVICES: "all"
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
               count: 1
-              capabilities: [gpu]
+              capabilities: ["gpu"]
         limits:
           memory: 1500M
-      restart_policy:
-        condition: on-failure
-        delay: 5s
+    depends_on:
+      redis:
+        condition: service_started
+      db:
+        condition: service_started
+    restart: unless-stopped
 
   ollama:
     image: ollama/ollama:latest
@@ -239,24 +250,18 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     environment:
-      - OLLAMA_HOST=0.0.0.0
-      - OLLAMA_ORIGINS=*
-      - CUDA_VISIBLE_DEVICES=0
-      - OLLAMA_FLASH_ATTENTION=true
-      - OLLAMA_NUM_PARALLEL=2
-      - OLLAMA_MAX_LOADED_MODELS=1
-    runtime: nvidia
+      OLLAMA_HOST: 0.0.0.0
+      OLLAMA_ORIGINS: "*"
+      CUDA_VISIBLE_DEVICES: "0"
+      OLLAMA_FLASH_ATTENTION: "true"
+      OLLAMA_NUM_PARALLEL: "2"
+      OLLAMA_MAX_LOADED_MODELS: "1"
     deploy:
       resources:
         reservations:
           # FIX: Augmenter la mémoire réservée pour Ollama pour éviter les crashs en mode VRAM faible.
           memory: 4000M
-          cpus: '1.0'
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-        max_attempts: 5
-        window: 300s
+          cpus: "1.0"
     healthcheck:
       # ✅ CORRECTION: The official ollama image does not have 'curl'.
       # Use the 'ollama' binary itself to check the health of the service.
@@ -265,6 +270,8 @@ services:
       timeout: 20s
       retries: 10
       start_period: 120s
+    profiles: ["default", "gpu"]
+    restart: unless-stopped
 
 volumes:
   postgres_data:
