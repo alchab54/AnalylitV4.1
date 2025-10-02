@@ -309,7 +309,36 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
         logger.info(f"ðŸ“š Recherche dans {db_name}...")
         try:
             if db_name == 'pubmed':
-                results = db_manager.search_pubmed(current_query, max_results_per_db)
+                # ✅ CORRECTION: Implémentation de la pagination pour PubMed
+                from Bio import Entrez
+                Entrez.email = config.UNPAYWALL_EMAIL
+                
+                max_results = min(max_results_per_db, config.MAX_PUBMED_RESULTS)
+                page_size = config.PAGE_SIZE_PUBMED
+                retstart = 0
+                all_ids = []
+
+                logger.info(f"Récupération de jusqu'à {max_results} articles de PubMed par pages de {page_size}...")
+
+                while retstart < max_results:
+                    handle = Entrez.esearch(
+                        db="pubmed",
+                        term=current_query,
+                        retstart=retstart,
+                        retmax=min(page_size, max_results - retstart),
+                        usehistory="y"
+                    )
+                    record = Entrez.read(handle)
+                    handle.close()
+                    ids = record.get("IdList", [])
+                    if not ids:
+                        break
+                    all_ids.extend(ids)
+                    retstart += len(ids)
+                    if len(ids) < page_size:
+                        break
+                
+                results = db_manager.fetch_details_for_ids(all_ids)
             elif db_name == 'arxiv':
                 results = db_manager.search_arxiv(current_query, max_results_per_db)
             elif db_name == 'crossref':

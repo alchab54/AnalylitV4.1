@@ -59,6 +59,11 @@ class Settings(BaseSettings):
     # --- Paramètres de performance et de robustesse ---
     REQUEST_TIMEOUT: int = 900
     HTTP_MAX_RETRIES: int = 3
+
+    # --- Paramètres de recherche ---
+    # ✅ AJOUT: Paramètres pour la pagination PubMed
+    MAX_PUBMED_RESULTS: int = 1000
+    PAGE_SIZE_PUBMED: int = 200
     
     # --- Configuration des Modèles IA ---
     # Chargé depuis profiles.json via la fonction `load_default_models`
