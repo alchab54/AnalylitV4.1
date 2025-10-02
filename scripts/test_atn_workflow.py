@@ -88,7 +88,7 @@ class AnalyLitATNWorkflow:
                 job_id = job_data.get('job_id')
                 self.log(f"✓ Recherche lancée (Job: {job_id})")
                 
-                return self.wait_for_task(job_id, "recherche ATN", timeout=300)
+                return self.wait_for_task(job_id, "recherche ATN", timeout=3600) # ✅ TIMEOUT AUGMENTÉ
             else:
                 self.log(f"✗ Échec recherche: {response.status_code}")
                 
@@ -97,7 +97,7 @@ class AnalyLitATNWorkflow:
             
         return False
 
-    def wait_for_task(self, job_id, task_name="tâche", timeout=300):
+    def wait_for_task(self, job_id, task_name="tâche", timeout=900): # ✅ TIMEOUT PAR DÉFAUT AUGMENTÉ
         """Attendre qu'une tâche asynchrone se termine"""
         if not job_id:
             return False
@@ -115,23 +115,24 @@ class AnalyLitATNWorkflow:
                 if response.status_code == 200:
                     task_data = response.json()
                     status = task_data.get('status')
+                    queue_name = task_data.get('queue_name', 'N/A') # Pour le debug
                     
-                    if status == 'completed':
+                    if status == 'finished': # ✅ CORRECTION: RQ utilise 'finished'
                         self.log(f"✓ {task_name} terminée avec succès")
                         return True
                     elif status == 'failed':
-                        error = task_data.get('error', 'Erreur inconnue')
+                        error = task_data.get('exc_info', 'Erreur inconnue') # ✅ CORRECTION: Utiliser exc_info
                         self.log(f"✗ {task_name} échouée: {error}")
                         return False
-                    elif status in ['queued', 'running']:
+                    elif status in ['queued', 'started']: # ✅ CORRECTION: RQ utilise 'started'
                         progress = task_data.get('progress')
                         if progress:
                             self.log(f"⏳ {task_name} en cours... ({progress:.1%})", end='\r')
                         else:
-                            self.log(f"⏳ {task_name} en cours...", end='\r')
+                            self.log(f"⏳ {task_name} en cours (statut: {status}, file: {queue_name})...", end='\r')
                         
             except Exception as e:
-                self.log(f"⚠️ Erreur vérification statut: {e}")
+                self.log(f"⚠️ Erreur vérification statut ({job_id}): {e}")
                 # Petite pause en cas d'erreur réseau avant de réessayer
                 time.sleep(2)
                 
@@ -200,7 +201,7 @@ class AnalyLitATNWorkflow:
                     job_data = response.json()
                     job_id = job_data.get('job_id')
                     
-                    if self.wait_for_task(job_id, f"analyse {analysis_type}", timeout=600):
+                    if self.wait_for_task(job_id, f"analyse {analysis_type}", timeout=900): # ✅ TIMEOUT AUGMENTÉ
                         results[analysis_type] = "success"
                     else:
                         results[analysis_type] = "failed"
@@ -221,18 +222,20 @@ class AnalyLitATNWorkflow:
 
     def export_results(self):
         """Exporte les résultats du projet."""
-        self.log("Lancement de l'export des résultats en Excel...")
+        self.log("Lancement de la tâche d'export Excel...")
         try:
-            response = requests.get(f"{self.api_url}/projects/{self.project_id}/export/excel", timeout=60)
-            response.raise_for_status()
-            if 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' in response.headers.get('Content-Type', ''):
-                filename = f"export_{self.project_id}.xlsx"
-                with open(filename, "wb") as f:
-                    f.write(response.content)
-                self.log(f"✓ Export réussi. Fichier '{filename}' sauvegardé ({len(response.content)} bytes).")
-                return True
+            # ✅ CORRECTION: Utiliser le bon endpoint qui enfile une tâche
+            response = requests.post(f"{self.api_url}/projects/{self.project_id}/reports/excel-export", timeout=60)
+            
+            if response.status_code == 202:
+                job_data = response.json()
+                job_id = job_data.get('job_id')
+                self.log(f"✓ Tâche d'export lancée (Job: {job_id})")
+                
+                # Attendre la fin de la tâche d'export
+                return self.wait_for_task(job_id, "export Excel", timeout=300)
             else:
-                self.log(f"✗ Type de contenu inattendu pour l'export: {response.headers.get('Content-Type')}")
+                self.log(f"✗ Échec du lancement de l'export: {response.status_code} - {response.text}")
                 return False
         except Exception as e:
             self.log(f"✗ Échec de l'export: {e}")
