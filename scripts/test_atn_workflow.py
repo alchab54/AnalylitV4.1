@@ -88,7 +88,7 @@ class AnalyLitATNWorkflow:
                 job_id = job_data.get('job_id')
                 self.log(f"✓ Recherche lancée (Job: {job_id})")
                 
-                return self.wait_for_task(job_id, "recherche ATN", timeout=900) # ✅ TIMEOUT AJUSTÉ
+                return self.wait_for_task(job_id, "recherche ATN", timeout=900) # ✅ TIMEOUT AUGMENTÉ
             else:
                 self.log(f"✗ Échec recherche: {response.status_code}")
                 
