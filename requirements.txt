@@ -33,7 +33,7 @@ chromadb==0.4.22
 onnxruntime==1.17.1
 pydantic==2.5.3
 
-# --- Utilitaires ---
+# --- Utilitaires & API Externes ---
 PyPDF2==3.0.1
 requests==2.31.0
 python-dotenv==1.0.0
@@ -50,6 +50,7 @@ werkzeug==3.0.1
 pyzotero==1.5.18
 click==8.1.7
 setuptools>=65.0.0
+biopython==1.83 # ✅ AJOUT: Dépendance requise pour la recherche PubMed (Entrez).
 wheel>=0.38.0
 async_timeout==4.0.3
 feedparser==6.0.11

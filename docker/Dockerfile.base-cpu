@@ -1,0 +1,24 @@
+# ===================================================================
+# == Dockerfile.base-cpu - Image de base LÉGÈRE ==
+# ===================================================================
+# Cette image contient toutes les dépendances SAUF PyTorch.
+
+FROM python:3.11-slim
+
+# Installer les dépendances système
+RUN apt-get update && \
+    apt-get install -y postgresql-client curl iproute2 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copier uniquement le fichier de dépendances pour optimiser le cache
+WORKDIR /deps
+COPY requirements.txt .
+
+# Installer toutes les dépendances SAUF PyTorch et ses dérivés.
+# On utilise grep pour les exclure.
+RUN grep -v "torch" requirements.txt > requirements-cpu.txt && \
+    pip install --no-cache-dir -r requirements-cpu.txt
+
+# Définir le PATH pour inclure les binaires installés par pip
+ENV PATH="/root/.local/bin:${PATH}"
+ENV PYTHONPATH="/root/.local/lib/python3.11/site-packages"

@@ -1,0 +1,15 @@
+# ===================================================================
+# == Dockerfile.base-gpu - Image de base LOURDE (IA) ==
+# ===================================================================
+# Cette image hérite de la base-cpu et ajoute PyTorch.
+
+ARG BASE_IMAGE=analylit-base-cpu:latest
+FROM ${BASE_IMAGE}
+
+# Copier le fichier de dépendances
+WORKDIR /deps
+COPY requirements.txt .
+
+# Installer uniquement PyTorch et ses dérivés
+RUN grep "torch" requirements.txt > requirements-gpu.txt && \
+    pip install --no-cache-dir -r requirements-gpu.txt

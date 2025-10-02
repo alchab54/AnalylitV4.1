@@ -1,9 +1,18 @@
 services:
-  base:
+  # ✅ OPTIMISATION: Définition de deux images de base distinctes.
+  base-cpu:
     build:
       context: .
-      dockerfile: docker/Dockerfile.base
-    image: analylit-base:latest
+      dockerfile: docker/Dockerfile.base-cpu
+    image: analylit-base-cpu:latest
+
+  base-gpu:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.base-gpu
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    image: analylit-base-gpu:latest
 
   db:
     image: postgres:15-alpine
@@ -53,6 +62,9 @@ services:
   web:
     build:
       context: .
+      # ✅ OPTIMISATION: Utiliser l'image de base CPU, beaucoup plus légère.
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
       dockerfile: docker/Dockerfile.web
     container_name: analylit_web
     ports:
@@ -113,6 +125,9 @@ services:
   migrate:
     build:
       context: .
+      # ✅ OPTIMISATION: Utiliser l'image de base CPU.
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
       dockerfile: docker/Dockerfile.web
     container_name: analylit_migrate
     # Pas de ports exposés, car ce service ne sert qu'à exécuter des commandes.
@@ -146,7 +161,10 @@ services:
   # Workers multiples pour paralléliser les tâches
   worker-fast:
     build:
-      context: .  
+      context: .
+      # ✅ OPTIMISATION: Utiliser l'image de base CPU.
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
       dockerfile: docker/Dockerfile.worker
     container_name: analylit_worker_fast
     command: rq worker --url redis://redis:6379/0 fast_queue
@@ -159,12 +177,13 @@ services:
       restart_policy:
         condition: on-failure
         delay: 5s
-    depends_on:
-      - base
 
   worker-default:
     build:
-      context: .  
+      context: .
+      # ✅ OPTIMISATION: Utiliser l'image de base CPU.
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
       dockerfile: docker/Dockerfile.worker
     container_name: analylit_worker_default
     command: rq worker --url redis://redis:6379/0 default_queue
@@ -177,13 +196,14 @@ services:
       restart_policy:
         condition: on-failure
         delay: 5s
-    depends_on:
-      - base
 
   # Worker dédié à l'IA, avec accès au GPU
   worker-ai:
     build:
-      context: .  
+      context: .
+      # ✅ OPTIMISATION: Utiliser l'image de base GPU, qui contient PyTorch.
+      args:
+        BASE_IMAGE: analylit-base-gpu:latest
       dockerfile: docker/Dockerfile.worker
     container_name: analylit_worker_ai
     # ✅ CORRECTION: Ajout de 'analysis_queue' pour que les tâches d'analyse soient traitées.
@@ -207,8 +227,6 @@ services:
       restart_policy:
         condition: on-failure
         delay: 5s
-    depends_on:
-      - base
 
   ollama:
     image: ollama/ollama:latest

@@ -348,8 +348,23 @@ def run_analysis(project_id):
 
     if analysis_type in analysis_tasks:
         task_func, queue, timeout = analysis_tasks[analysis_type]
+        
+        # ✅ CORRECTION: Récupérer le profil du projet et le passer aux tâches qui en ont besoin.
+        # Cela résout le TypeError: missing 1 required positional argument: 'profile'.
+        kwargs = {'project_id': project_id}
+        if analysis_type == 'synthesis':
+            project = db.session.get(Project, project_id)
+            if not project:
+                return jsonify({"error": "Projet non trouvé"}), 404
+            
+            profile_id = project.profile_used or 'standard'
+            profile = db.session.get(AnalysisProfile, profile_id)
+            if not profile:
+                return jsonify({"error": f"Profil d'analyse '{profile_id}' non trouvé"}), 404
+            kwargs['profile'] = profile.to_dict()
+
         job = queue.enqueue(
-            task_func, project_id=project_id, job_timeout=timeout
+            task_func, kwargs=kwargs, job_timeout=timeout
         )
         return jsonify({"message": f"Analyse '{analysis_type}' lancée", "job_id": str(job.id)}), 202
     else:
