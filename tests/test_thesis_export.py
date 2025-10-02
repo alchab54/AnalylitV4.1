@@ -101,7 +101,7 @@ class TestThesisExport:
         db_session.flush()
 
         # --- ACT & ASSERT ---
-        with patch('server_v4_complete.analysis_queue.enqueue') as mock_enqueue:
+        with patch('backend.server_v4_complete.analysis_queue.enqueue') as mock_enqueue:
             mock_job = MagicMock()
             mock_job.id = "fake_prisma_task_id"
             mock_enqueue.return_value = mock_job

@@ -360,7 +360,7 @@ def test_run_atn_stakeholder_analysis_task_aggregation_logic(db_session, mocker)
     db_session.add_all([ext1, ext2])
     db_session.flush()
 
-    mocker.patch('tasks_v4_complete.send_project_notification')
+    mocker.patch('backend.tasks_v4_complete.send_project_notification')
     mocker.patch('matplotlib.pyplot.savefig') 
     mocker.patch('matplotlib.pyplot.close')
 
@@ -438,7 +438,7 @@ def test_answer_chat_question_task_rag_logic(db_session, mocker, mock_embedding_
     mock_collection.query.return_value = mock_query_results
     mock_chroma_instance.get_collection.return_value = mock_collection
 
-    mocker.patch('tasks_v4_complete.chromadb.Client', return_value=mock_chroma_instance)
+    mocker.patch('backend.tasks_v4_complete.chromadb.Client', return_value=mock_chroma_instance)
 
     # Configurer le mock (fourni par la fixture autouse) pour ce test spécifique
     mock_encode_return = MagicMock()
