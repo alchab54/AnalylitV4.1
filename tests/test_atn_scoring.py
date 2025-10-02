@@ -3,7 +3,7 @@ import pytest
 import json
 import uuid
 from sqlalchemy import text
-from tasks_v4_complete import run_atn_score_task
+from backend.tasks_v4_complete import run_atn_score_task
 
 def test_run_atn_score_task_no_extractions(db_session):
     """Test that the task handles projects with no extractions."""

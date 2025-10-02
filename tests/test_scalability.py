@@ -8,7 +8,7 @@ from unittest.mock import patch, MagicMock
 
 # Imports des modèles et tâches
 from utils.models import Project, SearchResult
-from tasks_v4_complete import add_manual_articles_task, run_meta_analysis_task
+from backend.tasks_v4_complete import add_manual_articles_task, run_meta_analysis_task
 
 # Ce fichier teste la capacité de l'application à gérer de grands volumes de données.
 

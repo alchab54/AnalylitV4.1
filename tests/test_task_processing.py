@@ -33,7 +33,7 @@ from utils.models import Project, SearchResult, Extraction, Grid, ChatMessage, A
 from utils.file_handlers import sanitize_filename # <-- CORRECTION 4 : IMPORT MANQUANT AJOUTÉ
 
 # Bloc d'importation consolidé
-from tasks_v4_complete import (
+from backend.tasks_v4_complete import (
     multi_database_search_task,
     process_single_article_task,
     run_synthesis_task,

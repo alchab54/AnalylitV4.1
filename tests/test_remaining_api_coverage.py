@@ -9,7 +9,7 @@ from unittest.mock import patch, MagicMock
 from utils.models import Project, Grid, Prompt, Extraction
 from utils.helpers import seed_default_data
 # Import des tâches pour les mocks
-from tasks_v4_complete import pull_ollama_model_task, run_extension_task
+from backend.tasks_v4_complete import pull_ollama_model_task, run_extension_task
 
 
 

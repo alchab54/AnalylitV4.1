@@ -2,7 +2,7 @@
 import pytest
 from pytest_mock import MockerFixture
 import requests
-from tasks_v4_complete import pull_ollama_model_task
+from backend.tasks_v4_complete import pull_ollama_model_task
 
 @pytest.mark.gpu 
 @pytest.mark.slow

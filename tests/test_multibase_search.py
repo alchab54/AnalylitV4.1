@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock
 from sqlalchemy import text
 
 # Import de la tâche à tester
-from tasks_v4_complete import multi_database_search_task
+from backend.tasks_v4_complete import multi_database_search_task
 
 @pytest.fixture
 def mock_db_session(db_session):

@@ -6,7 +6,7 @@ import re
 
 # Imports des fonctions et templates à tester
 from utils.prompt_templates import get_scoping_atn_template
-from tasks_v4_complete import run_atn_stakeholder_analysis_task
+from backend.tasks_v4_complete import run_atn_stakeholder_analysis_task
 
 # Imports des modèles pour le setup
 from utils.models import Project, Extraction

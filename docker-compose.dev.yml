@@ -15,6 +15,8 @@ services:
       # ✅ CORRECTION: Indiquer à Flask quelle application lancer en mode développement.
       - FLASK_APP=backend/manage.py
       - DB_HOST=test-db # Pointer vers la base de données de test
+      # ✅ CORRECTION: Fournir l'URL de la base de données de test à l'application Flask.
+      - DATABASE_URL=postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       # ✅ CORRECTION: Définir PYTHONPATH pour que pytest trouve les modules de l'application.
       - PYTHONPATH=/home/appuser/app
     volumes:

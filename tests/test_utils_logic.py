@@ -10,7 +10,7 @@ from unittest.mock import patch, MagicMock
 from utils.analysis import generate_discussion_draft
 from utils.file_handlers import extract_text_from_pdf
 from utils.fetchers import db_manager
-from tasks_v4_complete import import_from_zotero_json_task
+from backend.tasks_v4_complete import import_from_zotero_json_task
 
 # Modèles nécessaires
 from utils.models import Project, SearchResult

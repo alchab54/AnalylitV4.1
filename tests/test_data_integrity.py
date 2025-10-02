@@ -11,7 +11,7 @@ import os
 
 # Imports des modèles et tâches
 from utils.models import Project, SearchResult
-from tasks_v4_complete import multi_database_search_task, import_from_zotero_json_task
+from backend.tasks_v4_complete import multi_database_search_task, import_from_zotero_json_task
 
 # Ce fichier teste la capacité de l'application à maintenir l'intégrité des données.
 
