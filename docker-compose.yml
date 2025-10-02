@@ -1,5 +1,5 @@
 services:
-  # ✅ OPTIMISATION: Définition de deux images de base distinctes.
+  # Images de base construites localement (profil build-only pour GPU)
   base-cpu:
     build:
       context: .
@@ -25,7 +25,6 @@ services:
       POSTGRES_DB: analylit_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # Monter la configuration personnalisée
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
       - ./database/postgres.conf:/usr/share/postgresql/postgresql.conf.sample:ro
     ports:
@@ -63,10 +62,10 @@ services:
           memory: 256M
     restart: unless-stopped
 
+  # Backend web
   web:
     build:
       context: .
-      # ✅ OPTIMISATION: Utiliser l'image de base CPU, beaucoup plus légère.
       dockerfile: docker/Dockerfile.web
       args:
         BASE_IMAGE: analylit-base-cpu:latest
@@ -76,10 +75,7 @@ services:
       - "5000:5000"
       - "8080:5000"
     environment:
-      # ✅ CORRECTION: Utiliser le nouveau script 'manage.py' comme point d'entrée pour les commandes Flask.
-      # Cela suit le pattern standard et évite les initialisations doubles.
       FLASK_APP: backend/manage.py
-      # Essentiel pour que `flask db upgrade` dans entrypoint.sh fonctionne.
       FLASK_ENV: production
       WAIT_HOSTS: db:5432,redis:6379,ollama:11434
       WAIT_TIMEOUT: "60"
@@ -90,24 +86,18 @@ services:
       PYTHONPATH: /home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
     env_file:
       - .env
-    # La commande est maintenant aussi dans entrypoint.sh
-    # ✅ CORRECTION: La commande est maintenant gérée directement ici, après l'attente de la DB par l'entrypoint.
-    # L'entrypoint exécutera simplement cette commande.
     command: >
       gunicorn --conf backend/config/gunicorn.conf.py 'backend.manage:app'
     depends_on:
-      # ✅ CORRECTION FINALE: Le service web attend que le service migrate ait terminé avec succès.
       migrate:
         condition: service_completed_successfully
       db:
         condition: service_healthy
-      ollama: # ✅ CORRECTION: Attendre qu'Ollama soit pleinement opérationnel.
+      ollama:
         condition: service_healthy
       redis:
         condition: service_started
     volumes:
-      # En production, seul le code de l'image est utilisé.
-      # Seuls les volumes pour les données persistantes (logs, projets) sont conservés.
       - ./logs:/home/appuser/app/logs
       - ./projects:/home/appuser/app/projects
     deploy:
@@ -119,26 +109,21 @@ services:
           memory: 4000M
     restart: unless-stopped
 
-  # ✅ NOUVEAU SERVICE: 'migrate' pour les commandes de base de données.
-  # Ce service partage l'environnement du service 'web' mais ne lance pas de serveur.
-  # Il est utilisé pour exécuter des commandes ponctuelles comme `flask db migrate`.
+  # Migrations DB (one-shot)
   migrate:
     build:
       context: .
-      # ✅ OPTIMISATION: Utiliser l'image de base CPU.
       dockerfile: docker/Dockerfile.web
       args:
         BASE_IMAGE: analylit-base-cpu:latest
     image: analylit-migrate:latest
     container_name: analylit_migrate
-    # Pas de ports exposés, car ce service ne sert qu'à exécuter des commandes.
     environment:
       FLASK_APP: backend/manage.py
       FLASK_ENV: production
       WAIT_HOSTS: db:5432
       WAIT_TIMEOUT: "30"
       PYTHONPATH: /home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
-      # ✅ AJOUTEZ ces variables pour les migrations:
       POSTGRES_USER: analylit_user
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_db
@@ -146,26 +131,21 @@ services:
       DATABASE_URL: postgresql://analylit_user:strong_password@db:5432/analylit_db
     env_file:
       - .env
-    # ✅ CORRECTION: Utiliser une liste pour la commande évite les problèmes d'interprétation du shell.
-    # Chaque script est appelé directement.
     command:
       - /bin/sh
       - -c
-      - "python -m alembic -c /home/appuser/app/alembic.ini upgrade head"
+      - |
+        python -m alembic -c /home/appuser/app/alembic.ini upgrade head
     depends_on:
       db:
         condition: service_healthy
-    # ✅ CORRECTION FINALE: Suppression des volumes redondants.
-    # L'image Docker contient déjà tout le code nécessaire.
-    # Cette simplification radicale fiabilise le démarrage et évite les conflits.
     volumes: []
     restart: "no"
 
-  # Workers multiples pour paralléliser les tâches
+  # Workers RQ
   worker-fast:
     build:
       context: .
-      # ✅ OPTIMISATION: Utiliser l'image de base CPU.
       dockerfile: docker/Dockerfile.worker
       args:
         BASE_IMAGE: analylit-base-cpu:latest
@@ -188,7 +168,6 @@ services:
   worker-default:
     build:
       context: .
-      # ✅ OPTIMISATION: Utiliser l'image de base CPU.
       dockerfile: docker/Dockerfile.worker
       args:
         BASE_IMAGE: analylit-base-cpu:latest
@@ -208,24 +187,18 @@ services:
         condition: service_started
     restart: unless-stopped
 
-  # Worker dédié à l'IA, avec accès au GPU
+  # Worker IA avec GPU
   worker-ai:
     build:
       context: .
-      # ✅ OPTIMISATION: Utiliser l'image de base GPU, qui contient PyTorch.
       dockerfile: docker/Dockerfile.worker
       args:
         BASE_IMAGE: analylit-base-gpu:latest
     image: analylit-worker-ai:latest
     container_name: analylit_worker_ai
-    # ✅ CORRECTION: Ajout de 'analysis_queue' pour que les tâches d'analyse soient traitées.
-    # ✅ CORRECTION FINALE: Ajout de 'extension_queue' pour traiter les tâches d'extension et débloquer les tests.
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "ai_queue", "background_queue", "analysis_queue", "extension_queue"]
     env_file:
       - .env
-    environment:
-      NVIDIA_VISIBLE_DEVICES: "all"
-      NVIDIA_DRIVER_CAPABILITIES: compute,utility
     deploy:
       resources:
         reservations:
@@ -235,6 +208,9 @@ services:
               capabilities: ["gpu"]
         limits:
           memory: 1500M
+    environment:
+      NVIDIA_VISIBLE_DEVICES: "all"
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
     depends_on:
       redis:
         condition: service_started
@@ -259,12 +235,9 @@ services:
     deploy:
       resources:
         reservations:
-          # FIX: Augmenter la mémoire réservée pour Ollama pour éviter les crashs en mode VRAM faible.
           memory: 4000M
           cpus: "1.0"
     healthcheck:
-      # ✅ CORRECTION: The official ollama image does not have 'curl'.
-      # Use the 'ollama' binary itself to check the health of the service.
       test: ["CMD-SHELL", "ollama list"]
       interval: 45s
       timeout: 20s

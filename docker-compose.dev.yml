@@ -1,37 +1,32 @@
 # Fichier d'override pour le développement local
-# Utilisation: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Utilisation: docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
 services:
   web:
-    # ✅ AMÉLIORATION DEV: Utiliser Gunicorn avec rechargement à chaud.
-    # C'est plus robuste, plus proche de la production et résout le MonkeyPatchWarning.
-    # Le flag --reload active le rechargement automatique des fichiers modifiés.
+    # Gunicorn en dev avec rechargement à chaud
     command: >
       gunicorn --conf backend/config/gunicorn.conf.py --reload 'backend.manage:app'
     environment:
-      - FLASK_ENV=development
-      - FLASK_APP=backend/manage.py
-      - DB_HOST=test-db
-      - DATABASE_URL=postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      - PYTHONPATH=/home/appuser/app
+      FLASK_ENV: development
+      FLASK_APP: backend/manage.py
+      DB_HOST: test-db
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      PYTHONPATH: /home/appuser/app
     volumes:
       - ./api:/home/appuser/app/api
       - ./backend:/home/appuser/app/backend
       - ./scripts:/home/appuser/app/scripts
       - ./utils:/home/appuser/app/utils
-      # ✅ AMÉLIORATION: Ajouter les volumes manquants pour une cohérence totale en dev.
-      # Cela garantit que toutes les parties de l'application (web, workers)
-      # utilisent le même code source à jour.
       - ./web:/home/appuser/app/web
       - ./migrations:/home/appuser/app/migrations
-      - ./alembic.ini:/home/appuser/app/alembic.ini
+      - ./alembic.ini:/home/appuser/app/alembic.ini:ro
       - ./tests:/home/appuser/app/tests
-      - ./pytest.ini:/home/appuser/app/pytest.ini
+      - ./pytest.ini:/home/appuser/app/pytest.ini:ro
     depends_on:
       test-db:
         condition: service_started
       ollama:
-        condition: service_healthy
+        condition: service_started
       redis:
         condition: service_started
 
@@ -42,63 +37,77 @@ services:
       POSTGRES_USER: analylit_user
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_test_db
-    command: ["postgres", "-c", "default_transaction_isolation=read committed", "-c", "log_statement=all"]
-    # DB de test persistante en dev
+    command:
+      [
+        "postgres",
+        "-c", "default_transaction_isolation=read committed",
+        "-c", "log_statement=all"
+      ]
     volumes:
       - test_postgres_data:/var/lib/postgresql/data
 
   worker-fast:
     environment:
-      - DATABASE_URL=postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      - DB_HOST=test-db
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      DB_HOST: test-db
     volumes:
       - ./backend:/home/appuser/app/backend
       - ./api:/home/appuser/app/api
       - ./utils:/home/appuser/app/utils
-      - ./scripts:/home/appuser/app/scripts # ✅ CORRECTION: Assurer que le worker utilise les derniers scripts.
+      - ./scripts:/home/appuser/app/scripts
+    depends_on:
+      test-db:
+        condition: service_started
+      redis:
+        condition: service_started
 
   worker-default:
     environment:
-      - DATABASE_URL=postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      - DB_HOST=test-db
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      DB_HOST: test-db
     volumes:
       - ./backend:/home/appuser/app/backend
       - ./api:/home/appuser/app/api
       - ./utils:/home/appuser/app/utils
-      - ./scripts:/home/appuser/app/scripts # ✅ CORRECTION: Assurer que le worker utilise les derniers scripts.
+      - ./scripts:/home/appuser/app/scripts
+    depends_on:
+      test-db:
+        condition: service_started
+      redis:
+        condition: service_started
 
   worker-ai:
     environment:
-      - DATABASE_URL=postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      - DB_HOST=test-db
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      DB_HOST: test-db
     volumes:
       - ./backend:/home/appuser/app/backend
       - ./api:/home/appuser/app/api
       - ./utils:/home/appuser/app/utils
-      - ./scripts:/home/appuser/app/scripts # ✅ CORRECTION: Assurer que le worker utilise les derniers scripts.
+      - ./scripts:/home/appuser/app/scripts
     depends_on:
-      # ✅ CORRECTION: Le worker doit aussi attendre que la base de données de test soit prête.
       test-db:
         condition: service_started
       redis:
         condition: service_started
       ollama:
-        condition: service_healthy
+        condition: service_started
 
   migrate:
-    # En mode dev, on veut aussi que migrate utilise les derniers fichiers locaux
+    # En dev, on exécute les migrations contre la DB de test
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      SCHEMA_NAME: analylit_schema
+      DB_HOST: test-db
+      PYTHONPATH: /home/appuser/app
     volumes:
       - ./api:/home/appuser/app/api
       - ./backend:/home/appuser/app/backend
       - ./scripts:/home/appuser/app/scripts
       - ./utils:/home/appuser/app/utils
       - ./migrations:/home/appuser/app/migrations
-      - ./alembic.ini:/home/appuser/app/alembic.ini
-      - ./scripts/entrypoint.sh:/home/appuser/app/entrypoint.sh
-    environment:
-      - DATABASE_URL=postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      - SCHEMA_NAME=analylit_schema
-      - DB_HOST=test-db
+      - ./alembic.ini:/home/appuser/app/alembic.ini:ro
+      - ./scripts/entrypoint.sh:/home/appuser/app/entrypoint.sh:ro
     depends_on:
       test-db:
         condition: service_started
