@@ -69,7 +69,9 @@ from utils.logging_config import setup_logging
 config = get_config()
 
 logger = logging.getLogger(__name__)
-PROJECTS_DIR = Path(getattr(config, 'PROJECTS_DIR', '/tmp/projects')) # type: ignore
+# ✅ CORRECTION: The project data directory should be at the root of the app workspace,
+# not inside the backend config. This resolves the PermissionError in tests.
+PROJECTS_DIR = Path('/home/appuser/app/projects')
 PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 
 # --- Base de Données (SQLAlchemy Uniquement pour les tâches) ---

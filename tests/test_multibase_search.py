@@ -34,7 +34,7 @@ def test_multi_database_search_task_expert_mode(mock_db_session, mocker):
     # Mock des méthodes de recherche du db_manager
     mock_search_pubmed = mocker.patch('utils.fetchers.DatabaseManager.search_pubmed', return_value=[])
     mock_search_arxiv = mocker.patch('utils.fetchers.DatabaseManager.search_arxiv', return_value=[])
-    mocker.patch('tasks_v4_complete.send_project_notification')
+    mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # Exécute la tâche
     multi_database_search_task.__wrapped__(
@@ -74,7 +74,7 @@ def test_multi_database_search_task_expert_mode_partial(mock_db_session, mocker)
     # Mock des méthodes de recherche
     mock_search_pubmed = mocker.patch('utils.fetchers.DatabaseManager.search_pubmed', return_value=[])
     mock_search_arxiv = mocker.patch('utils.fetchers.DatabaseManager.search_arxiv', return_value=[])
-    mocker.patch('tasks_v4_complete.send_project_notification')
+    mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # Exécute la tâche
     multi_database_search_task.__wrapped__(

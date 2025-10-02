@@ -56,8 +56,8 @@ def test_deduplication_on_conflict_during_search(db_session, project_for_dedup, 
         {'id': '1234567', 'title': 'Titre Dupliqué', 'abstract': 'Résumé dupliqué.', 'database_source': 'pubmed'},
         {'id': 'PMID456', 'title': 'Nouveau Titre', 'abstract': 'Nouveau résumé.', 'database_source': 'pubmed'}
     ]
-    mocker.patch('tasks_v4_complete.db_manager.search_pubmed', return_value=mock_search_results)
-    mocker.patch('tasks_v4_complete.send_project_notification')
+    mocker.patch('backend.tasks_v4_complete.db_manager.search_pubmed', return_value=mock_search_results)
+    mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # Exécuter la tâche de recherche
     multi_database_search_task.__wrapped__(
@@ -85,7 +85,7 @@ def test_deduplication_in_zotero_import_logic(db_session, project_for_dedup, moc
         {"data": {"PMID": "1234567", "title": "Titre Zotero Dupliqué"}}, # Use the same valid PMID
         {"data": {"DOI": "10.123/new", "PMID": "PMID789", "title": "Nouveau Titre Zotero"}}
     ]
-    mocker.patch('tasks_v4_complete.send_project_notification')
+    mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # Exécuter la tâche d'import
     import_from_zotero_json_task.__wrapped__(db_session, project_id, zotero_items)

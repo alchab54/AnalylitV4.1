@@ -73,7 +73,7 @@ def mock_embedding_model(mocker):
     mock_instance.encode.return_value = mock_result_default
     
     # 2. Appliquer le patch pour la durée de chaque test
-    patcher = mocker.patch('tasks_v4_complete.embedding_model', mock_instance, create=True)
+    patcher = mocker.patch('backend.tasks_v4_complete.embedding_model', mock_instance, create=True)
     
     yield mock_instance
     
@@ -99,8 +99,8 @@ def test_search_task_adds_articles_to_db(db_session, mocker):
         {'id': 'pmid2', 'title': 'Article 2', 'abstract': 'Abstract 2', 'database_source': 'pubmed'}
     ]
     
-    mocker.patch('tasks_v4_complete.db_manager.search_pubmed', return_value=mock_search_results)
-    mocker.patch('tasks_v4_complete.send_project_notification')
+    mocker.patch('backend.tasks_v4_complete.db_manager.search_pubmed', return_value=mock_search_results)
+    mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # ACT
     multi_database_search_task(
@@ -131,9 +131,9 @@ def test_multi_database_search_task_resilience_on_fetcher_failure(db_session, mo
     db_session.flush()
 
     # Simuler une erreur pour PubMed, mais un succès pour arXiv
-    mocker.patch('tasks_v4_complete.db_manager.search_pubmed', side_effect=Exception("PubMed API down"))
-    mocker.patch('tasks_v4_complete.db_manager.search_arxiv', return_value=[{'id': 'arxiv1', 'title': 'Arxiv Article'}])
-    mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
+    mocker.patch('backend.tasks_v4_complete.db_manager.search_pubmed', side_effect=Exception("PubMed API down"))
+    mocker.patch('backend.tasks_v4_complete.db_manager.search_arxiv', return_value=[{'id': 'arxiv1', 'title': 'Arxiv Article'}])
+    mock_notify = mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # ACT
     multi_database_search_task(db_session, project_id, "test", ['pubmed', 'arxiv'])
@@ -157,9 +157,9 @@ def test_process_single_article_task_insufficient_content(db_session, mocker):
     db_session.add(search_result)
     db_session.flush()
 
-    mocker.patch('tasks_v4_complete.extract_text_from_pdf', return_value=None)
-    mock_log_status = mocker.patch('tasks_v4_complete.log_processing_status')
-    mock_increment_processed_count = mocker.patch('tasks_v4_complete.increment_processed_count')
+    mocker.patch('backend.tasks_v4_complete.extract_text_from_pdf', return_value=None)
+    mock_log_status = mocker.patch('backend.tasks_v4_complete.log_processing_status')
+    mock_increment_processed_count = mocker.patch('backend.tasks_v4_complete.increment_processed_count')
 
     # ACT
     process_single_article_task(
@@ -199,9 +199,9 @@ def test_process_single_article_task_full_extraction_with_pdf_and_grid(db_sessio
     mock_pdf_text = "Texte PDF contenant des infos sur la population: 500 patients. Ce texte doit être suffisamment long pour passer la validation de 100 caractères, sinon la tâche utilisera le résumé (abstract) qui est trop court."
     mock_ai_response = {"population": "500 patients"}
 
-    mocker.patch('tasks_v4_complete.extract_text_from_pdf', return_value=mock_pdf_text)
+    mocker.patch('backend.tasks_v4_complete.extract_text_from_pdf', return_value=mock_pdf_text)
     mocker.patch('pathlib.Path.exists', return_value=True)
-    mock_ollama_api = mocker.patch('tasks_v4_complete.call_ollama_api', return_value=mock_ai_response)
+    mock_ollama_api = mocker.patch('backend.tasks_v4_complete.call_ollama_api', return_value=mock_ai_response)
 
     # ACT
     process_single_article_task(
@@ -223,7 +223,7 @@ def test_process_single_article_task_full_extraction_with_pdf_and_grid(db_sessio
     assert mock_pdf_text in mock_ollama_api.call_args[0][0]
     
 @pytest.mark.gpu
-@patch('tasks_v4_complete.call_ollama_api') # <-- CHEMIN CORRIGÉ
+@patch('backend.tasks_v4_complete.call_ollama_api') # <-- CHEMIN CORRIGÉ
 def test_process_single_article_task_screening_mode(mock_ollama_api, db_session, mocker):
     """
     Vérifie le mode 'screening' : appel au bon modèle et insertion des données de screening.
@@ -277,8 +277,8 @@ def test_run_synthesis_task_filters_by_score(db_session, mocker):
     db_session.flush()
 
     mock_ai_response = {"synthesis_summary": "Synthèse basée sur 2 articles."}
-    mock_ollama_api = mocker.patch('tasks_v4_complete.call_ollama_api', return_value=mock_ai_response)
-    mocker.patch('tasks_v4_complete.send_project_notification')
+    mock_ollama_api = mocker.patch('backend.tasks_v4_complete.call_ollama_api', return_value=mock_ai_response)
+    mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # ACT
     run_synthesis_task(db_session, project_id, {"synthesis_model": "test-model"})
@@ -326,8 +326,8 @@ def test_run_discussion_generation_task(db_session, mocker):
     mock_draft_text = "Ceci est le brouillon de discussion généré."
     
     # Mocker la fonction d'analyse (qui appelle l'IA) importée dans le namespace des tâches
-    mock_gen_draft = mocker.patch('tasks_v4_complete.generate_discussion_draft', return_value=mock_draft_text)
-    mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
+    mock_gen_draft = mocker.patch('backend.tasks_v4_complete.generate_discussion_draft', return_value=mock_draft_text)
+    mock_notify = mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # ACT
     run_discussion_generation_task(db_session, project_id)
@@ -399,8 +399,8 @@ def test_add_manual_articles_task_ignores_duplicates(db_session, mocker):
             return {"id": "67890", "title": "Article récupéré", **common_data}
         return {} 
 
-    mock_fetch = mocker.patch('tasks_v4_complete.fetch_article_details', side_effect=dynamic_fetch_side_effect)
-    mocker.patch('tasks_v4_complete.send_project_notification')
+    mock_fetch = mocker.patch('backend.tasks_v4_complete.fetch_article_details', side_effect=dynamic_fetch_side_effect)
+    mocker.patch('backend.tasks_v4_complete.send_project_notification')
     mocker.patch('time.sleep')
 
     # ACT
@@ -445,7 +445,7 @@ def test_answer_chat_question_task_rag_logic(db_session, mocker, mock_embedding_
     mock_encode_return.tolist.return_value = mock_embedding_vector_list # RAG attend une liste 2D
     mock_embedding_model.encode.return_value = mock_encode_return 
 
-    mock_ollama_api = mocker.patch('tasks_v4_complete.call_ollama_api', return_value=mock_ai_response)
+    mock_ollama_api = mocker.patch('backend.tasks_v4_complete.call_ollama_api', return_value=mock_ai_response)
 
     question = "Question sur A"
 
@@ -487,7 +487,7 @@ def test_import_pdfs_from_zotero_task(db_session, mocker):
 
     # Mocker la classe Zotero (qui est importée localement dans la tâche)
     mock_zotero_instance = MagicMock()
-    mock_zotero_class = mocker.patch('tasks_v4_complete.zotero.Zotero', return_value=mock_zotero_instance)
+    mock_zotero_class = mocker.patch('backend.tasks_v4_complete.zotero.Zotero', return_value=mock_zotero_instance)
     
     # Simuler la chaîne d'appels Zotero
     mock_zotero_instance.items.return_value = [{'key': 'ZOTERO_KEY'}]
@@ -496,9 +496,9 @@ def test_import_pdfs_from_zotero_task(db_session, mocker):
     ]
     
     # Mocker Path.exists pour forcer le téléchargement (simule que le fichier n'existe pas)
-    mocker.patch('tasks_v4_complete.Path.exists', return_value=False)
-    mocker.patch('tasks_v4_complete.Path.mkdir') # Mocker aussi la création de dossier
-    mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
+    mocker.patch('backend.tasks_v4_complete.Path.exists', return_value=False)
+    mocker.patch('backend.tasks_v4_complete.Path.mkdir') # Mocker aussi la création de dossier
+    mock_notify = mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # ACT
     # Cette tâche n'est pas décorée par @with_db_session, nous l'appelons donc directement.
@@ -538,10 +538,10 @@ def test_run_risk_of_bias_task(db_session, mocker):
         "overall_justification": "Globalement OK."
     }
 
-    mocker.patch('tasks_v4_complete.Path.exists', return_value=True)
-    mocker.patch('tasks_v4_complete.extract_text_from_pdf', return_value=mock_pdf_text)
-    mock_ollama_api = mocker.patch('tasks_v4_complete.call_ollama_api', return_value=mock_rob_response)
-    mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
+    mocker.patch('backend.tasks_v4_complete.Path.exists', return_value=True)
+    mocker.patch('backend.tasks_v4_complete.extract_text_from_pdf', return_value=mock_pdf_text)
+    mock_ollama_api = mocker.patch('backend.tasks_v4_complete.call_ollama_api', return_value=mock_rob_response)
+    mock_notify = mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # ACT
     run_risk_of_bias_task(db_session, project_id, article_id)
@@ -585,8 +585,8 @@ def test_run_knowledge_graph_task(db_session, mocker):
     db_session.flush()
 
     mock_graph_json = {"nodes": [{"id": "pmid1"}, {"id": "pmid2"}], "edges": [{"from": "pmid1", "to": "pmid2"}]}
-    mock_ollama = mocker.patch('tasks_v4_complete.call_ollama_api', return_value=mock_graph_json)
-    mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
+    mock_ollama = mocker.patch('backend.tasks_v4_complete.call_ollama_api', return_value=mock_graph_json)
+    mock_notify = mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # ACT
     run_knowledge_graph_task(db_session, project_id)
@@ -619,8 +619,8 @@ def test_run_prisma_flow_task(db_session, mocker):
 
     mock_savefig = mocker.patch('matplotlib.pyplot.savefig')
     mocker.patch('matplotlib.pyplot.close')
-    mocker.patch('tasks_v4_complete.Path.mkdir')
-    mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
+    mocker.patch('backend.tasks_v4_complete.Path.mkdir')
+    mock_notify = mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # ACT
     run_prisma_flow_task(db_session, project_id)
@@ -655,8 +655,8 @@ def test_run_meta_analysis_task(db_session, mocker):
 
     mock_savefig = mocker.patch('matplotlib.pyplot.savefig')
     mocker.patch('matplotlib.pyplot.close')
-    mocker.patch('tasks_v4_complete.Path.mkdir')
-    mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
+    mocker.patch('backend.tasks_v4_complete.Path.mkdir')
+    mock_notify = mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # ACT
     run_meta_analysis_task(db_session, project_id)
@@ -686,7 +686,7 @@ def test_run_descriptive_stats_task(db_session, mocker):
     ext3 = Extraction(id=str(uuid.uuid4()), project_id=project_id, pmid="pmid3", relevance_score=0.0)
     db_session.add_all([ext1, ext2, ext3])
     db_session.flush()
-    mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
+    mock_notify = mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # ACT
     run_descriptive_stats_task(db_session, project_id)
@@ -724,8 +724,8 @@ def test_run_atn_score_task(db_session, mocker):
 
     mock_savefig = mocker.patch('matplotlib.pyplot.savefig')
     mocker.patch('matplotlib.pyplot.close')
-    mocker.patch('tasks_v4_complete.Path.mkdir')
-    mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
+    mocker.patch('backend.tasks_v4_complete.Path.mkdir')
+    mock_notify = mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # ACT
     run_atn_score_task(db_session, project_id)
@@ -765,7 +765,7 @@ def test_calculate_kappa_task(db_session, mocker):
     
     db_session.add_all([ext1, ext2, ext3, ext4])
     db_session.flush()
-    mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
+    mock_notify = mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # ACT
     # ✅ CORRECTION: Appeler la tâche directement. Le décorateur @with_db_session gérera l'injection de la session.
@@ -803,19 +803,19 @@ def test_index_project_pdfs_task(db_session, mocker, mock_embedding_model):
     mock_chroma_instance = MagicMock()
     mock_collection = MagicMock()
     mock_chroma_instance.get_or_create_collection.return_value = mock_collection
-    mocker.patch('tasks_v4_complete.chromadb.Client', return_value=mock_chroma_instance)
+    mocker.patch('backend.tasks_v4_complete.chromadb.Client', return_value=mock_chroma_instance)
     
     # Mocks pour les fichiers
     mock_pdf_path = MagicMock(spec=Path)
     mock_pdf_path.stem = "mock_pdf_stem"
     mock_pdf_path.name = "mock_pdf.pdf"
-    mocker.patch('tasks_v4_complete.Path.exists', return_value=True)
+    mocker.patch('backend.tasks_v4_complete.Path.exists', return_value=True)
     
-    total_pdfs = len(mocker.patch('tasks_v4_complete.Path.glob', return_value=[mock_pdf_path]).return_value) # Define total_pdfs
+    total_pdfs = len(mocker.patch('backend.tasks_v4_complete.Path.glob', return_value=[mock_pdf_path]).return_value) # Define total_pdfs
 
     # Mock lecture PDF (assez long pour 18 chunks, basé sur le log d'échec précédent)
     mock_text = ("Chunk texte. " * 200) * 7 # Env. 18200 chars -> 18 chunks
-    mocker.patch('tasks_v4_complete.extract_text_from_pdf', return_value=mock_text)
+    mocker.patch('backend.tasks_v4_complete.extract_text_from_pdf', return_value=mock_text)
 
     # --- CORRECTION DU MOCK EMBEDDING (ISOLATION) ---
     # Nous reconfigurons le mock fourni par la fixture 'mock_embedding_model'
@@ -830,7 +830,7 @@ def test_index_project_pdfs_task(db_session, mocker, mock_embedding_model):
     mock_embedding_model.encode.return_value = mock_np_array_return_2D
     # --- FIN CORRECTION MOCK ---
     
-    mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
+    mock_notify = mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # ACT
     index_project_pdfs_task(db_session, project_id)
@@ -852,8 +852,8 @@ def test_index_project_pdfs_task(db_session, mocker, mock_embedding_model):
     
     mock_notify.assert_any_call(project_id, 'indexing_completed', f'{total_pdfs} PDF(s) ont été traités et indexés.', {'task_name': 'indexation'})
     
-@patch('tasks_v4_complete.fetch_unpaywall_pdf_url') # <-- CHEMIN CORRIGÉ
-@mock.patch('requests.get') # ✅ AJOUTER CETTE LIGNE
+@patch('backend.tasks_v4_complete.fetch_unpaywall_pdf_url') # <-- CHEMIN CORRIGÉ
+@patch('requests.get') # ✅ AJOUTER CETTE LIGNE
 def test_fetch_online_pdf_task(mock_requests_get, mock_unpaywall, db_session, mocker, setup_project):
     """Teste le téléchargement de PDF via Unpaywall."""
     # ARRANGE
@@ -879,11 +879,11 @@ def test_fetch_online_pdf_task(mock_requests_get, mock_unpaywall, db_session, mo
     mock_http_response = MagicMock()
     mock_http_response.headers = {'content-type': 'application/pdf'}
     mock_http_response.content = mock_pdf_content
-    mock_http_get = mocker.patch('tasks_v4_complete.http_get_with_retries', return_value=mock_http_response)
+    mock_http_get = mocker.patch('backend.tasks_v4_complete.http_get_with_retries', return_value=mock_http_response)
 
     mock_write_bytes = mocker.patch('pathlib.Path.write_bytes')
-    mocker.patch('tasks_v4_complete.Path.mkdir')
-    mock_notify = mocker.patch('tasks_v4_complete.send_project_notification')
+    mocker.patch('backend.tasks_v4_complete.Path.mkdir')
+    mock_notify = mocker.patch('backend.tasks_v4_complete.send_project_notification')
     
     # ACT
     # ✅ CORRECTION: Appeler la fonction "wrapped" pour injecter manuellement la session de test.

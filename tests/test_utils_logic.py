@@ -181,8 +181,8 @@ def test_fetchers_arxiv_and_crossref(mock_get):
 # =================================================================
 
 # Patch pour la session BDD interne de la tâche et la notification
-@patch('tasks_v4_complete.Session') 
-@patch('tasks_v4_complete.send_project_notification')
+@patch('backend.tasks_v4_complete.Session') 
+@patch('backend.tasks_v4_complete.send_project_notification')
 def test_import_from_zotero_json_task_logic(mock_notify, mock_session, db_session, setup_project):
     """
     Teste la logique de la tâche 'import_from_zotero_json_task'

@@ -85,7 +85,7 @@ def test_atn_scoring_algorithms_validation(db_session, setup_atn_project, mocker
     (moyennes, distributions) sont corrects avec des données de référence.
     """
     project_id = setup_atn_project
-    mocker.patch('tasks_v4_complete.send_project_notification') # Empêche les notifications
+    mocker.patch('backend.tasks_v4_complete.send_project_notification') # Empêche les notifications
     mocker.patch('matplotlib.pyplot.savefig') # Empêche la création de fichiers image
 
     # Exécuter la tâche d'analyse ATN
