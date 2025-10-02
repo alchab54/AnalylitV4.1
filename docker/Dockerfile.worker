@@ -1,5 +1,5 @@
 # Hérite de l'image de base (dépendances déjà installées)
-FROM analylit-base:latest
+FROM analylit-base-cpu:latest
 
 # Définir le répertoire de travail
 WORKDIR /home/appuser/app

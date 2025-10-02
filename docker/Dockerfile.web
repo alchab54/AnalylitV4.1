@@ -1,12 +1,8 @@
 # Image applicative - hérite de la base avec les dépendances
-FROM analylit-base:latest
+FROM analylit-base-cpu:latest
 
-# ✅ CORRECTION ROBUSTE: Copier tous les fichiers et répertoires du contexte de build.
-# Cela garantit que la structure des dossiers (y compris 'migrations') est préservée sans ambiguïté.
-COPY --chown=appuser:appuser . .
-
-# La commande ci-dessus a déjà copié alembic.ini, donc la ligne suivante n'est plus nécessaire.
-# COPY --chown=appuser:appuser alembic.ini ./
+# Copier le code de l'application. L'utilisateur 'appuser' est déjà défini dans l'image de base.
+COPY . .
 
 # Corrige les fins de ligne Windows (\r) et rend le script exécutable
 RUN tr -d '\r' < scripts/entrypoint.sh > /tmp/entrypoint-fixed.sh && \
