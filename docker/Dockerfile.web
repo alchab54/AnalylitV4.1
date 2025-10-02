@@ -1,19 +1,14 @@
 # Image applicative - hérite de la base avec les dépendances
 FROM analylit-base:latest
 
-# ✅ CORRECTION: Copier les dossiers entiers au lieu de fichiers spécifiques.
-# Cela résout le "ModuleNotFoundError: No module named 'backend'".
-COPY --chown=appuser:appuser backend/ backend/
-COPY --chown=appuser:appuser scripts/ scripts/
-COPY --chown=appuser:appuser api/ api/
-COPY --chown=appuser:appuser utils/ utils/
-COPY --chown=appuser:appuser web/ web/
-COPY --chown=appuser:appuser migrations/ migrations/
-COPY --chown=appuser:appuser scripts/entrypoint.sh ./
+# Copier le code de l'application
+COPY --chown=appuser:appuser backend/ backend/ scripts/ scripts/ api/ api/ utils/ utils/ web/ web/ migrations/ migrations/ ./
+COPY --chown=appuser:appuser alembic.ini ./ # Fichier de configuration Alembic
 
-# ✅ CORRECTION: Copier le fichier alembic.ini manquant dans l'image.
-COPY --chown=appuser:appuser alembic.ini ./
-
-RUN chmod +x entrypoint.sh
+# Corrige les fins de ligne Windows (\r) et rend le script exécutable
+RUN tr -d '\r' < entrypoint.sh > entrypoint-fixed.sh && \
+    rm entrypoint.sh && \
+    mv entrypoint-fixed.sh entrypoint.sh && \
+    chmod +x entrypoint.sh
 
 ENTRYPOINT ["./entrypoint.sh"]

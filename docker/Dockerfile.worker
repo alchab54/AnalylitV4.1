@@ -5,12 +5,5 @@ FROM analylit-base:latest
 WORKDIR /home/appuser/app
 
 # Copier les fichiers et répertoires essentiels pour le worker
-COPY --chown=appuser:appuser api/ api/
-COPY --chown=appuser:appuser backend/ backend/
-COPY --chown=appuser:appuser backend/config/ backend/config/
-COPY --chown=appuser:appuser utils/ utils/
-COPY --chown=appuser:appuser migrations/ migrations/
-COPY --chown=appuser:appuser scripts/run_migrations.py ./
-COPY --chown=appuser:appuser requirements.txt ./
-COPY --chown=appuser:appuser .env.example ./
-COPY --chown=appuser:appuser backend/server_v4_complete.py ./
+COPY --chown=appuser:appuser api/ api/ backend/ backend/ utils/ utils/ migrations/ migrations/ ./
+COPY --chown=appuser:appuser scripts/run_migrations.py requirements.txt .env.example backend/server_v4_complete.py ./
