@@ -3,11 +3,12 @@
 import logging
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
-from utils.extensions import db # type: ignore
+from utils.extensions import db
 from utils.models import AnalysisProfile
 
 analysis_profiles_bp = Blueprint('analysis_profiles_bp', __name__)
 logger = logging.getLogger(__name__)
+
 
 @analysis_profiles_bp.route('/analysis-profiles', methods=['POST'])
 def create_analysis_profile():
@@ -35,28 +36,28 @@ def create_analysis_profile():
         db.session.rollback()
         return jsonify({"error": "Un profil avec ce nom existe déjà"}), 409
 
+
 @analysis_profiles_bp.route('/analysis-profiles', methods=['GET'])
 def get_all_analysis_profiles():
     """Retourne tous les profils d'analyse."""
-    # ✅ CORRECTION: Remplacer la syntaxe obsolète de SQLAlchemy 1.x par la syntaxe 2.0.
     from sqlalchemy import select
     stmt = select(AnalysisProfile)
     profiles = db.session.execute(stmt).scalars().all()
     return jsonify([p.to_dict() for p in profiles]), 200
 
+
 @analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['GET'])
 def get_analysis_profile_details(profile_id):
     """Retourne les détails d'un profil d'analyse spécifique."""
-    # ✅ CORRECTION: Utiliser db.session.get() pour une récupération optimisée par clé primaire.
     profile = db.session.get(AnalysisProfile, profile_id)
     if not profile:
         return jsonify({"error": "Profil non trouvé"}), 404
     return jsonify(profile.to_dict()), 200
 
+
 @analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['PUT'])
 def update_analysis_profile(profile_id):
     """Met à jour un profil d'analyse existant."""
-    # ✅ CORRECTION: Utiliser db.session.get() pour une récupération optimisée par clé primaire.
     profile = db.session.get(AnalysisProfile, profile_id)
     if not profile:
         return jsonify({"error": "Profil non trouvé"}), 404
@@ -65,7 +66,6 @@ def update_analysis_profile(profile_id):
     if not data:
         return jsonify({"error": "Aucune donnée fournie pour la mise à jour"}), 400
 
-    # Mettre à jour tous les champs fournis
     for key, value in data.items():
         if hasattr(profile, key):
             setattr(profile, key, value)
@@ -77,9 +77,11 @@ def update_analysis_profile(profile_id):
         db.session.rollback()
         return jsonify({"error": "Erreur lors de la mise à jour du profil"}), 500
 
+
 @analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['DELETE'])
-def delete_analysis_profile(profile_id):    """Supprime un profil d'analyse."""
-    # ✅ CORRECTION: Utiliser db.session.get() pour une récupération optimisée par clé primaire.
+def delete_analysis_profile(profile_id):
+    """Supprime un profil d'analyse."""
+    # ✅ CORRECTION: L'indentation a été supprimée des lignes suivantes
     profile = db.session.get(AnalysisProfile, profile_id)
     if not profile:
         return jsonify({"error": "Profil non trouvé"}), 404
@@ -90,3 +92,4 @@ def delete_analysis_profile(profile_id):    """Supprime un profil d'analyse."""
     db.session.delete(profile)
     db.session.commit()
     return jsonify({"message": "Profil supprimé"}), 200
+
