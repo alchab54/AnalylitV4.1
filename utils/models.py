@@ -8,6 +8,7 @@ from datetime import datetime
 import uuid
 import json
 from .db_base import Base  # Importer la Base partagée
+from decimal import Decimal # ✅ IMPORT NÉCESSAIRE POUR LA CORRECTION
 
 # ✅ SIMPLIFICATION: Le schéma est maintenant défini de manière statique.
 # La gestion des environnements est gérée par la configuration de la base de données.
@@ -45,9 +46,6 @@ class Project(Base):
     prisma_checklist = Column(Text)
 
     # --- Relations avec suppression en cascade ---
-    # ✅ CORRECTION: Ajout de relations avec cascade pour garantir l'intégrité des données.
-    # Lorsqu'un projet est supprimé, toutes les données associées (résultats, extractions, etc.)
-    # seront également supprimées automatiquement de la base de données.
     search_results = relationship("SearchResult", backref="project", cascade="all, delete-orphan")
     extractions = relationship("Extraction", backref="project", cascade="all, delete-orphan")
     grids = relationship("Grid", backref="project", cascade="all, delete-orphan")
@@ -57,12 +55,16 @@ class Project(Base):
     stakeholders = relationship("Stakeholder", backref="project", cascade="all, delete-orphan")
     articles = relationship("Article", backref="project", cascade="all, delete-orphan")
 
-
     def to_dict(self):
         data = {}
         for c in self.__table__.columns:
             v = getattr(self, c.name)
-            data[c.name] = v.isoformat() if isinstance(v, datetime) else v
+            if isinstance(v, datetime):
+                data[c.name] = v.isoformat()
+            elif isinstance(v, Decimal):
+                data[c.name] = float(v)
+            else:
+                data[c.name] = v
         return data
 
 class Article(Base):
@@ -78,7 +80,12 @@ class Article(Base):
         data = {}
         for c in self.__table__.columns:
             v = getattr(self, c.name)
-            data[c.name] = v.isoformat() if isinstance(v, datetime) else v
+            if isinstance(v, datetime):
+                data[c.name] = v.isoformat()
+            elif isinstance(v, Decimal):
+                data[c.name] = float(v)
+            else:
+                data[c.name] = v
         return data
 
 class SearchResult(Base):
@@ -248,7 +255,12 @@ class AnalysisProfile(Base):
         data = {}
         for c in self.__table__.columns:
             v = getattr(self, c.name)
-            data[c.name] = v.isoformat() if isinstance(v, datetime) else v
+            if isinstance(v, datetime):
+                data[c.name] = v.isoformat()
+            elif isinstance(v, Decimal):
+                data[c.name] = float(v)
+            else:
+                data[c.name] = v
         return data
 
 class PRISMARecord(Base):
@@ -388,5 +400,10 @@ class Stakeholder(Base):
         data = {}
         for c in self.__table__.columns:
             v = getattr(self, c.name)
-            data[c.name] = v.isoformat() if isinstance(v, datetime) else v
+            if isinstance(v, datetime):
+                data[c.name] = v.isoformat()
+            elif isinstance(v, Decimal):
+                data[c.name] = float(v)
+            else:
+                data[c.name] = v
         return data

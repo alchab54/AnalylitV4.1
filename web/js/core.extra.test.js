@@ -94,7 +94,7 @@ describe('Core - Coverage Boost', () => {
         // ✅ CORRECTION: La fonction est maintenant asynchrone, il faut l'attendre.
         await core.initializeWebSocket();
         
-        expect(global.io).toHaveBeenCalledWith('', { path: '/socket.io/', transports: [ 'websocket', 'polling' ] });
+        expect(global.io).toHaveBeenCalledWith('http://localhost:8080', { path: '/socket.io/', transports: [ 'websocket', 'polling' ] });
         expect(mockSocket.on).toHaveBeenCalledWith('connect', expect.any(Function));
         expect(mockSocket.on).toHaveBeenCalledWith('disconnect', expect.any(Function));
         expect(mockSocket.on).toHaveBeenCalledWith('notification', expect.any(Function));
