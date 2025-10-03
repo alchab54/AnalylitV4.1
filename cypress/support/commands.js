@@ -9,39 +9,15 @@ Cypress.Commands.add('setupBasicTest', () => {
   cy.get('body', { timeout: 15000 }).should('be.visible');
   
   // ✅ PATCH : Créer un projet si aucun n'existe
-  /* cy.get('body').then($body => {
+  cy.get('body').then($body => {
     // Vérifier si des projets existent déjà
     if ($body.find('.project-card').length === 0) {
-      cy.log('⚠️ Aucun projet trouvé - Création d\'un projet de test via interception API');
-
-      // Intercepter la requête de création de projet pour la simuler
-      cy.intercept('POST', '/api/projects', {
-        statusCode: 201,
-        body: {
-          id: 'fake-project-id-123',
-          name: 'Projet Test E2E',
-          description: 'Projet créé automatiquement pour les tests E2E',
-          article_count: 0,
-          created_at: new Date().toISOString(),
-        },
-      }).as('createProject');
-      
-      // Intercepter la requête qui recharge les projets après la création
-      cy.intercept('GET', '/api/projects', {
-        statusCode: 200,
-        body: [
-          {
-            id: 'fake-project-id-123',
-            name: 'Projet Test E2E',
-            description: 'Projet créé automatiquement pour les tests E2E',
-            article_count: 0,
-            created_at: new Date().toISOString(),
-          }
-        ],
-      }).as('getProjects');
+      cy.log('⚠️ Aucun projet trouvé - Création d\'un projet de test');
 
       // Ouvrir la modale de création
-      cy.get('[data-action="create-project-modal"]', { timeout: 10000 }).should('be.visible').click({ force: true });
+      cy.get('[data-action="create-project-modal"]', { timeout: 10000 }).should('be.visible').click();
+
+      // Attendre que la modale apparaisse
       cy.get('#newProjectModal', { timeout: 5000 }).should('be.visible');
 
       // Remplir et soumettre le formulaire
@@ -51,17 +27,13 @@ Cypress.Commands.add('setupBasicTest', () => {
         cy.get('button[type="submit"]').click();
       });
 
-      // Attendre que la requête de création soit interceptée et que la modale se ferme
-      cy.wait('@createProject');
+      // Attendre que la modale se ferme
       cy.get('#newProjectModal', { timeout: 10000 }).should('not.be.visible');
 
-      // Attendre que la liste des projets soit rechargée
-      cy.wait('@getProjects');
-
-      // Vérifier que le projet simulé est bien affiché
+      // Vérifier que le projet est bien affiché
       cy.contains('.project-card', 'Projet Test E2E', { timeout: 10000 }).should('be.visible');
     }
-  }); */
+  });
   
   // Attendre un délai pour que tout se charge
   cy.wait(1000);
