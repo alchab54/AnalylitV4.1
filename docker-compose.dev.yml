@@ -8,8 +8,9 @@ services:
     ports:
       - "8080:8080" # Expose Nginx sur le port 8080
     volumes:
-      - ./web:/usr/share/nginx/html:ro # Monte le code frontend
-      - ./docker/nginx.dev.conf:/etc/nginx/conf.d/default.conf:ro # Monte la configuration Nginx
+      - ./web:/usr/share/nginx/html:ro # Le code frontend reste en lecture seule
+      # ✅ CORRECTION: On monte la config comme un template pour que Nginx puisse la modifier au démarrage.
+      - ./docker/nginx.dev.conf:/etc/nginx/templates/default.conf.template
     depends_on:
       - web
     restart: unless-stopped
