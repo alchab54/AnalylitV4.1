@@ -42,8 +42,9 @@ services:
       - ./alembic.ini:/home/appuser/app/alembic.ini:ro
       - ./tests:/home/appuser/app/tests
       - ./pytest.ini:/home/appuser/app/pytest.ini:ro
-    # On n'expose plus le port 5000 directement, Nginx s'en occupe.
-    ports: []
+    # On expose le port 5000 pour le développement direct du frontend, mappé au port 80 du conteneur.
+    ports:
+      - "5000:80"
 
     depends_on:
       # ✅ CORRECTION: Le service web doit attendre que les migrations soient terminées

@@ -41,7 +41,7 @@ from sqlalchemy import select
 projects_bp = Blueprint('projects_bp', __name__)
 logger = logging.getLogger(__name__)
 
-@projects_bp.route('/projects/', methods=['GET', 'POST'])
+@projects_bp.route('/projects', methods=['GET', 'POST'])
 def projects():
     if request.method == 'POST':
         data = request.get_json()

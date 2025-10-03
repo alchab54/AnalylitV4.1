@@ -349,12 +349,11 @@ noTasksInProgress: 'Aucune tâche en cours.',
 };
 
 // Configuration de l'application
+const isDevelopment = window.location.hostname === 'localhost' && window.location.port === '8080';
+
 export const CONFIG = {
-    // ✅ CORRECTION: Utiliser des chemins relatifs. Le navigateur construira l'URL complète
-    // en se basant sur l'origine actuelle (ex: localhost:8080), ce qui fonctionnera avec Nginx.
-    // Cela simplifie la configuration et la rend universelle pour tous les environnements.
-    API_BASE_URL: '/api', // Base URL pour fetchAPI.
-    WEBSOCKET_URL: '', // URL pour Socket.IO.
+    API_BASE_URL: isDevelopment ? 'http://localhost:5000/api' : '/api',
+    WEBSOCKET_URL: isDevelopment ? 'http://localhost:5000' : '',
 
     // Clés pour le stockage local
     LOCAL_STORAGE_LAST_SECTION: 'analylit_last_section',
