@@ -122,11 +122,22 @@ clean: ## Nettoyer le système (⚠️ supprime les données)
 	@docker image prune -f
 	@echo "$(GREEN)✅ Nettoyage terminé$(NC)"
 
-dev: build-base ## Mode développement avec rechargement automatique
+dev: ## Mode développement (sans rebuild). Utiliser 'make build' avant si nécessaire.
 	@echo "$(BLUE)🔧 Démarrage en mode développement...$(NC)"
 	@echo "$(YELLOW)Les fichiers locaux seront synchronisés avec les conteneurs.$(NC)"
-	@$(COMPOSE) -f $(COMPOSE_FILE) -f docker-compose.dev.yml up -d --build
+	@$(COMPOSE) -f $(COMPOSE_FILE) -f docker-compose.dev.yml --profile default --profile gpu up -d
 	@echo "$(GREEN)✅ Mode développement démarré. Interface web: http://localhost:5000$(NC)"
+
+build: build-base build-app ## Construit toutes les images nécessaires
+
+build-app: ## Construit les images applicatives (web, workers)
+	@echo "$(BLUE)🛠️  Construction des images applicatives (web, workers)...$(NC)"
+	@$(COMPOSE) -f $(COMPOSE_FILE) build web worker-fast worker-default worker-ai
+	@echo "$(GREEN)✅ Images applicatives construites.$(NC)"
+
+rebuild: ## Force la reconstruction de toutes les images (sans cache)
+	@echo "$(YELLOW)⚠️  Forçage de la reconstruction de toutes les images sans cache...$(NC)"
+	@$(COMPOSE) -f $(COMPOSE_FILE) build --no-cache
 
 test: ## Exécuter les tests
 	@echo "$(BLUE)🧪 Exécution des tests...$(NC)"
