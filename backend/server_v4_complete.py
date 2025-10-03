@@ -138,15 +138,15 @@ def create_app(config_override=None):
     app.register_blueprint(admin_bp, url_prefix='/api')
     app.register_blueprint(analysis_profiles_bp, url_prefix='/api')
     app.register_blueprint(extensions_bp, url_prefix='/api')
+    app.register_blueprint(settings_bp, url_prefix='/api')
     app.register_blueprint(files_bp, url_prefix='/api')
     app.register_blueprint(projects_bp, url_prefix='/api')
     app.register_blueprint(reporting_bp, url_prefix='/api')
     app.register_blueprint(search_bp, url_prefix='/api')
     app.register_blueprint(selection_bp, url_prefix='/api')
     app.register_blueprint(prompts_bp, url_prefix='/api')
-    app.register_blueprint(settings_bp, url_prefix='/api')
-    app.register_blueprint(stakeholders_bp, url_prefix='/api')
     app.register_blueprint(tasks_bp, url_prefix='/api')
+
 
     # Routes de base
     @app.route('/')

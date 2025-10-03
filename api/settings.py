@@ -3,12 +3,13 @@
 from flask import Blueprint, jsonify
 import logging
 from utils.extensions import db
+
 import requests
 import os
 
 logger = logging.getLogger(__name__)
 
-# ✅ BLUEPRINT UNIQUE
+# Blueprint Configuration
 settings_bp = Blueprint("settings", __name__, url_prefix="/api")
 
 @settings_bp.route("/settings/debug", methods=["GET"])
@@ -24,8 +25,8 @@ def get_settings_models():
         response = requests.get(f"{ollama_url}/api/tags", timeout=2)
         if response.status_code == 200:
             data = response.json()
-            return jsonify({"models": data.get("models", [])}), 200
-        return jsonify({"models": []}), 200
+            return jsonify(data.get("models", [])), 200
+        return jsonify([]), 200
     except Exception as e:
         logger.error(f"Erreur lors de la récupération des modèles: {e}")
         return jsonify({"error": "Erreur serveur"}), 500

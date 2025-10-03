@@ -11,12 +11,12 @@ selection_bp = Blueprint("selection", __name__)
 # This is a temporary solution to make the feature operational without database changes.
 selection_store = []
 
-@selection_bp.route("/api/selection", methods=["GET"])
+@selection_bp.route("/selection", methods=["GET"])
 def get_selection():
     """Returns the list of selected items."""
     return jsonify(selection_store)
 
-@selection_bp.route("/api/selection/add", methods=["POST"])
+@selection_bp.route("/selection/add", methods=["POST"])
 def add_to_selection():
     """Adds an item to the selection."""
     item = request.get_json()
@@ -34,7 +34,7 @@ def add_to_selection():
     logger.info(f"Added item to selection: {item['title']}")
     return jsonify(item), 201
 
-@selection_bp.route("/api/selection/toggle", methods=["POST"])
+@selection_bp.route("/selection/toggle", methods=["POST"])
 def toggle_selection():
     """Toggles the inclusion status of a selected item."""
     data = request.get_json()
