@@ -366,7 +366,7 @@ def run_analysis(project_id):
                 kwargs['profile'] = profile.to_dict()
 
         job = queue.enqueue(
-            task_func, kwargs=kwargs, job_timeout=timeout
+            task_func, **kwargs, job_timeout=timeout
         )
         return jsonify({"message": f"Analyse '{analysis_type}' lancée", "job_id": str(job.id)}), 202
     else:
