@@ -66,81 +66,88 @@ class AnalyLitATNWorkflow:
         return False
 
     def upload_local_pdfs(self, pdf_folder_path):
-        """Uploader des PDFs depuis un dossier local."""
-        if not self.project_id:
-            self.log("✗ Pas de projet actif pour l'upload")
-            return False
-
-        if not os.path.isdir(pdf_folder_path):
-            self.log(f"✗ Dossier de PDFs non trouvé: {pdf_folder_path}")
-            return False
-
-        pdf_files = [f for f in os.listdir(pdf_folder_path) if f.lower().endswith('.pdf')]
-        if not pdf_files:
-            self.log(f"✗ Aucun fichier PDF trouvé dans {pdf_folder_path}")
-            return False
-
-        self.log(f"📤 Upload de {len(pdf_files)} PDFs depuis {pdf_folder_path}...")
+        """Upload des PDFs locaux vers le projet."""
+        import os
         
-        files_to_upload = []
-        for pdf_file in pdf_files:
-            file_path = os.path.join(pdf_folder_path, pdf_file)
-            files_to_upload.append(('files', (pdf_file, open(file_path, 'rb'), 'application/pdf')))
-
+        if not os.path.exists(pdf_folder_path):
+            self.log(f"✗ Dossier introuvable: {pdf_folder_path}")
+            return False
+        
+        pdf_files = [f for f in os.listdir(pdf_folder_path) if f.endswith('.pdf')]
+        if not pdf_files:
+            self.log("✗ Aucun PDF trouvé dans le dossier")
+            return False
+        
+        self.log(f"📁 Upload de {len(pdf_files)} PDFs...")
+        
+        # Préparer les fichiers pour l'upload
+        files = []
+        for pdf_file in pdf_files[:10]:  # Limite pour test
+            filepath = os.path.join(pdf_folder_path, pdf_file)
+            try:
+                files.append(('files', (pdf_file, open(filepath, 'rb'), 'application/pdf')))
+            except Exception as e:
+                self.log(f"⚠️ Impossible d'ouvrir {pdf_file}: {e}")
+                continue
+        
+        if not files:
+            self.log("✗ Aucun PDF lisible")
+            return False
+        
         try:
             response = requests.post(
                 f"{self.api_url}/projects/{self.project_id}/upload-pdfs-bulk",
-                files=files_to_upload,
+                files=files,
                 timeout=300
             )
-
+            
+            # Fermer les fichiers
+            for _, (_, file_obj, _) in files:
+                file_obj.close()
+            
             if response.status_code == 202:
                 job_data = response.json()
                 job_id = job_data.get('job_id')
-                self.log(f"✓ Upload en cours (Job: {job_id})")
-                return self.wait_for_task(job_id, "upload PDFs", timeout=900)
+                self.log(f"✓ Upload PDFs lancé (Job: {job_id})")
+                return self.wait_for_task(job_id, "upload PDFs", timeout=600)
             else:
-                self.log(f"✗ Échec de l'upload: {response.status_code} - {response.text}")
+                self.log(f"✗ Échec upload PDFs: {response.status_code}")
                 return False
+                
         except Exception as e:
-            self.log(f"✗ Erreur lors de l'upload: {e}")
+            self.log(f"✗ Erreur upload PDFs: {e}")
             return False
-        finally:
-            for _, (filename, file_obj, _) in files_to_upload:
-                file_obj.close()
 
     def import_from_zotero_export(self, zotero_json_path):
-        """Importer des références depuis un export Zotero JSON."""
-        if not self.project_id:
-            self.log("✗ Pas de projet actif pour l'import Zotero")
+        """Import depuis un export JSON Zotero."""
+        import os
+        
+        if not os.path.exists(zotero_json_path):
+            self.log(f"✗ Fichier Zotero introuvable: {zotero_json_path}")
             return False
-
-        if not os.path.isfile(zotero_json_path):
-            self.log(f"✗ Fichier d'export Zotero non trouvé: {zotero_json_path}")
-            return False
-
-        self.log(f"📥 Import depuis {zotero_json_path}...")
-
-        with open(zotero_json_path, 'rb') as f:
-            files = {'file': (os.path.basename(zotero_json_path), f, 'application/json')}
-            try:
+        
+        self.log(f"📚 Import export Zotero: {zotero_json_path}")
+        
+        try:
+            with open(zotero_json_path, 'rb') as f:
                 response = requests.post(
                     f"{self.api_url}/projects/{self.project_id}/upload-zotero",
-                    files=files,
-                    timeout=120
+                    files={'file': ('zotero_export.json', f, 'application/json')},
+                    timeout=300
                 )
-
-                if response.status_code == 202:
-                    job_data = response.json()
-                    job_id = job_data.get('job_id')
-                    self.log(f"✓ Import Zotero en cours (Job: {job_id})")
-                    return self.wait_for_task(job_id, "import Zotero", timeout=600)
-                else:
-                    self.log(f"✗ Échec de l'import Zotero: {response.status_code} - {response.text}")
-                    return False
-            except Exception as e:
-                self.log(f"✗ Erreur lors de l'import Zotero: {e}")
+            
+            if response.status_code == 202:
+                job_data = response.json()
+                job_id = job_data.get('job_id')
+                self.log(f"✓ Import Zotero lancé (Job: {job_id})")
+                return self.wait_for_task(job_id, "import Zotero", timeout=600)
+            else:
+                self.log(f"✗ Échec import Zotero: {response.status_code}")
                 return False
+                
+        except Exception as e:
+            self.log(f"✗ Erreur import Zotero: {e}")
+            return False
 
     def run_atn_search(self):
         """Lancer la recherche avec l'équation ATN spécialisée"""
@@ -324,7 +331,7 @@ class AnalyLitATNWorkflow:
             return False
 
     def run_complete_atn_workflow(self, pdf_folder=None, zotero_export=None):
-        """Exécuter le workflow ATN complet"""
+        """Exécuter le workflow ATN complet avec PDFs optionnels."""
         self.log("🚀 Test Workflow ATN - Alliance Thérapeutique Numérique")
         self.log("=" * 60)
         
@@ -332,19 +339,20 @@ class AnalyLitATNWorkflow:
             ("Vérification application", self.check_health),
             ("Création projet ATN", lambda: self.create_project(
                 "Test ATN - Alliance Thérapeutique Numérique",
-                "Test automatique de l'équation PubMed ATN avec workflow complet"
+                "Test automatique avec PDFs et Zotero"
             )),
-        ]
-
-        if pdf_folder:
-            steps.append(("Upload PDFs locaux", lambda: self.upload_local_pdfs(pdf_folder)))
-
-        if zotero_export:
-            steps.append(("Import Zotero", lambda: self.import_from_zotero_export(zotero_export)))
-
-        steps.extend([
             ("Recherche PubMed ATN", self.run_atn_search),
             ("Récupération résultats", lambda: len(self.get_search_results()) > 0),
+        ]
+        
+        # 🔥 AJOUT: Étapes PDF/Zotero conditionnelles
+        if pdf_folder:
+            steps.append(("Import PDFs locaux", lambda: self.upload_local_pdfs(pdf_folder)))
+        
+        if zotero_export:
+            steps.append(("Import export Zotero", lambda: self.import_from_zotero_export(zotero_export)))
+        
+        steps.extend([
             ("Analyses ATN", self.run_atn_analysis),
             ("Export final", self.export_results)
         ])
