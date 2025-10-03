@@ -21,11 +21,11 @@ def settings_debug():
 def get_settings_models():
     """Retourne la liste des modèles Ollama disponibles."""
     try:
-        ollama_url = os.environ.get("OLLAMA_URL", "http://localhost:11434")
+        ollama_url = os.environ.get("OLLAMA_BASE_URL", "http://ollama:11434")
         response = requests.get(f"{ollama_url}/api/tags", timeout=2)
         if response.status_code == 200:
             data = response.json()
-            return jsonify(data.get("models", [])), 200
+            return jsonify({"models": data.get("models", [])}), 200
         return jsonify([]), 200
     except Exception as e:
         logger.error(f"Erreur lors de la récupération des modèles: {e}")
