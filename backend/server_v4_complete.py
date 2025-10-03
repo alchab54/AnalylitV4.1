@@ -138,7 +138,7 @@ def create_app(config_override=None):
     app.register_blueprint(admin_bp, url_prefix='/api')
     app.register_blueprint(analysis_profiles_bp, url_prefix='/api')
     app.register_blueprint(extensions_bp, url_prefix='/api')
-    app.register_blueprint(settings_bp, url_prefix='/api')
+    app.register_blueprint(settings_bp, url_prefix='/api', name='settings_api')
     app.register_blueprint(files_bp, url_prefix='/api')
     app.register_blueprint(projects_bp, url_prefix='/api')
     app.register_blueprint(reporting_bp, url_prefix='/api')
