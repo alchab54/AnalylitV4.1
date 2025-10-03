@@ -100,7 +100,7 @@ export const API_ENDPOINTS = {
     analysisProfileById: (id) => `/analysis-profiles/${id}`,
     prompts: '/prompts',
     promptById: (id) => `/prompts/${id}`,
-    ollamaModels: '/ollama/models',
+    ollamaModels: '/settings/models',
     zoteroSettings: '/settings/zotero',
     ollamaPull: '/ollama/pull',
     databases: '/databases',
