@@ -1004,36 +1004,6 @@ function renderQueueStatus(status, container) {
     
     container.innerHTML = html;
 }
-
-/**
- * ✅ **PATCH n°3 : Afficher correctement le statut des files d'attente** (new)
- */
-async function loadQueuesStatus() {
-    try {
-        const queues = await fetchAPI('/api/queues/info');
-        const container = document.getElementById('queue-status-container');
-        if (!container) return;
-
-        container.innerHTML = ''; // Vider avant de remplir
-
-        if (Array.isArray(queues) && queues.length > 0) {
-            const list = document.createElement('ul');
-            queues.forEach(queue => {
-                const item = document.createElement('li');
-                // S'assurer que les valeurs sont définies
-                const queueName = queue.name || 'File inconnue';
-                const jobCount = queue.count !== undefined ? queue.count : 'N/A';
-                
-                item.innerHTML = `<strong>${queueName}:</strong> ${jobCount} tâche(s) en attente`;
-                list.appendChild(item);
-            });
-            container.appendChild(list);
-        } else {
-            container.innerHTML = '<p>Aucune information sur les files d\'attente disponible.</p>';
-        }
-    } catch (error) {
-        console.error('Erreur lors du chargement du statut des files:', error);
-        if (container) container.innerHTML = '<p class="error-message">Impossible de charger le statut des files d\'attente.</p>';
     }
 /**
  * Gère le vidage d'une file d'attente spécifique.
@@ -1142,6 +1112,7 @@ export async function downloadModel(modelName) {
         showToast(`${MESSAGES.downloadError}: ${error.message}`, 'error');
     } finally {
         hideDownloadProgress();
+    }
     }
 }
 
