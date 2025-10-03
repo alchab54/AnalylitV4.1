@@ -1,27 +1,31 @@
 # api/settings.py
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 import logging
 from utils.extensions import db
+import requests
+import os
 
 logger = logging.getLogger(__name__)
 
-# Le frontend appelle /api/analysis-profiles, donc nous utilisons ce préfixe.
-settings_bp = Blueprint("settings_bp", __name__)
+# ✅ BLUEPRINT UNIQUE
+settings_bp = Blueprint("settings", __name__, url_prefix="/api")
+
+@settings_bp.route("/settings/debug", methods=["GET"])
+def settings_debug():
+    """Route de debug."""
+    return jsonify({"status": "OK", "blueprint": "settings_bp"}), 200
 
 @settings_bp.route("/settings/models", methods=["GET"])
-def get_available_models():
+def get_settings_models():
     """Retourne la liste des modèles Ollama disponibles."""
     try:
-        # TODO: Implémenter la logique pour récupérer les modèles depuis Ollama
-        # Pour l'instant, retournons une liste statique pour la démonstration.
-        models = [
-            "llama3.1:8b",
-            "llama3.1:70b",
-            "mistral:7b",
-            "codellama:7b"
-        ]
-        return jsonify({"models": models})
+        ollama_url = os.environ.get("OLLAMA_URL", "http://localhost:11434")
+        response = requests.get(f"{ollama_url}/api/tags", timeout=2)
+        if response.status_code == 200:
+            data = response.json()
+            return jsonify({"models": data.get("models", [])}), 200
+        return jsonify({"models": []}), 200
     except Exception as e:
         logger.error(f"Erreur lors de la récupération des modèles: {e}")
         return jsonify({"error": "Erreur serveur"}), 500

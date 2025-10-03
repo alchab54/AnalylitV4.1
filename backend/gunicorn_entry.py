@@ -3,7 +3,7 @@
 import gevent.monkey
 
 # CRITICAL: Perform monkey-patching before any other modules are imported.
-# This is the earliest possible point and resolves the MonkeyPatchWarning.
+# This is the earliest possible point and resolves the MonkeyPatchWarning
 gevent.monkey.patch_all()
 
 # Now that patching is done, import the Flask app factory and create the app.

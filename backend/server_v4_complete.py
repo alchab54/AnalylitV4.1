@@ -5,6 +5,7 @@ import logging
 # permettant ainsi aux imports absolus (ex: `from api.admin import admin_bp`) de fonctionner.
 import sys
 from pathlib import Path
+
 project_root = Path(__file__).resolve().parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
@@ -44,6 +45,7 @@ from api.selection import selection_bp
 from api.prompts import prompts_bp # ✅ CORRECTION: Import du blueprint manquant pour les prompts
 from api.settings import settings_bp
 from api.stakeholders import stakeholders_bp
+
 from flask_cors import CORS
 from sqlalchemy.exc import IntegrityError
 from rq.worker import Worker 
@@ -58,6 +60,7 @@ from utils.app_globals import (
     processing_queue, synthesis_queue, analysis_queue, background_queue,
     extension_queue, redis_conn, models_queue
 )
+
 from utils.models import Project, Grid, Extraction, Prompt, AnalysisProfile, SearchResult, ChatMessage, RiskOfBias
 from api.tasks import tasks_bp # type: ignore
 from utils.file_handlers import save_file_to_project_dir
@@ -156,7 +159,7 @@ def create_app(config_override=None):
     def api_health_check():
         return jsonify({"status": "healthy", "message": "AnalyLit v4.1 opérationnelle"}), 200
 
-    @app.errorhandler(404)
+    @app.errorhandler(404)    
     def not_found(error):
         if request.path.startswith('/api/'):
             return jsonify({"error": "Endpoint API non trouvé", "path": request.path}), 404
@@ -176,7 +179,7 @@ def post_fork(server, worker):
     Cela évite les problèmes de partage de connexion entre les processus.
     """
     import gevent.monkey
-    gevent.monkey.patch_all()
+
     server.log.info("Worker %s forked.", worker.pid)
 
 if __name__ == "__main__":

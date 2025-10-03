@@ -10,7 +10,7 @@ def load_default_models() -> Dict[str, Any]:
     """Charge les profils de modèles depuis un fichier JSON externe."""
     try:
         # ✅ CORRECTION: Utiliser un chemin absolu pour trouver profiles.json.
-        # Le chemin relatif échouait lors de l'exécution des tests avec pytest,
+        # Le chemin relatif echouait lors de l'execution des tests avec pytest,
         # car le répertoire de travail n'était pas le même.
         config_path = Path(__file__).resolve().parent / "profiles.json"
         with open(config_path, 'r', encoding='utf-8') as f:
