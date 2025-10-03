@@ -81,7 +81,7 @@ def get_all_tasks_status():
 def cancel_task(task_id):
     """Annule une tâche en cours."""
     try:
-        job = Job.fetch(task_id, connection=redis_conn)
+        job = Job.fetch(task_id, connection=redis_conn)        
         job.cancel()
         return jsonify({"message": "Demande d_annulation envoyée."}), 200
     except NoSuchJobError:

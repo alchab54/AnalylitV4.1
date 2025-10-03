@@ -41,7 +41,7 @@ from sqlalchemy import select
 projects_bp = Blueprint('projects_bp', __name__)
 logger = logging.getLogger(__name__)
 
-@projects_bp.route('/projects', methods=['GET', 'POST'])
+@projects_bp.route('/', methods=['GET', 'POST'])
 def projects():
     if request.method == 'POST':
         data = request.get_json()
@@ -66,7 +66,7 @@ def projects():
         projects = db.session.execute(stmt).scalars().all()
         return jsonify([p.to_dict() for p in projects]), 200
 
-@projects_bp.route('/projects/<project_id>', methods=['GET'])
+@projects_bp.route('/<project_id>', methods=['GET'])
 def get_project_details(project_id):
     # ✅ CORRECTION: Remplacer la syntaxe obsolète de SQLAlchemy 1.x par la syntaxe 2.0.
     # db.session.get() est la méthode optimisée pour récupérer un objet par sa clé primaire.
@@ -75,7 +75,7 @@ def get_project_details(project_id):
         return jsonify({"error": "Projet non trouvé"}), 404
     return jsonify(project.to_dict()), 200
 
-@projects_bp.route('/projects/<project_id>/search-results', methods=['GET'])
+@projects_bp.route('/<project_id>/search-results', methods=['GET'])
 def get_project_search_results(project_id):
     """Retourne les résultats de recherche paginés pour un projet."""
     page = request.args.get('page', 1, type=int)
@@ -109,7 +109,7 @@ def get_project_search_results(project_id):
         'total_pages': total_pages,
     })
 
-@projects_bp.route('/projects/<project_id>/analyses', methods=['GET'])
+@projects_bp.route('/<project_id>/analyses', methods=['GET'])
 def get_project_analyses(project_id):
     """
     Retourne les résultats de toutes les analyses terminées pour un projet.
@@ -118,7 +118,7 @@ def get_project_analyses(project_id):
     analyses = db.session.scalars(select(Analysis).filter_by(project_id=project_id)).all()
     return jsonify([analysis.to_dict() for analysis in analyses]), 200
 
-@projects_bp.route('/projects/<project_id>/chat-history', methods=['GET'])
+@projects_bp.route('/<project_id>/chat-history', methods=['GET'])
 def get_chat_history(project_id):
     """Retourne l'historique du chat pour un projet, trié par date."""
     # ✅ CORRECTION: Utiliser la syntaxe SQLAlchemy 2.0
@@ -127,14 +127,14 @@ def get_chat_history(project_id):
     ).all()
     return jsonify([msg.to_dict() for msg in messages])
 
-@projects_bp.route('/projects/<project_id>/extractions', methods=['GET'])
+@projects_bp.route('/<project_id>/extractions', methods=['GET'])
 def get_project_extractions(project_id):
     """Retourne toutes les extractions pour un projet."""
     # ✅ CORRECTION: Utiliser la syntaxe SQLAlchemy 2.0
     extractions = db.session.scalars(select(Extraction).filter_by(project_id=project_id)).all()
     return jsonify([e.to_dict() for e in extractions]), 200
 
-@projects_bp.route('/projects/<project_id>', methods=['DELETE'])
+@projects_bp.route('/<project_id>', methods=['DELETE'])
 def delete_project(project_id):
     project = db.session.get(Project, project_id)
     if not project:
@@ -143,7 +143,7 @@ def delete_project(project_id):
     db.session.commit()
     return '', 204
 
-@projects_bp.route('/projects/<project_id>/grids/import', methods=['POST'])
+@projects_bp.route('/<project_id>/grids/import', methods=['POST'])
 def import_grid(project_id):
     if 'file' not in request.files:
         return jsonify({"error": "Aucun fichier fourni"}), 400
@@ -173,13 +173,13 @@ def import_grid(project_id):
         logger.error(f"Erreur lors de l'import de la grille: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
 
-@projects_bp.route('/projects/<project_id>/grids', methods=['GET'])
+@projects_bp.route('/<project_id>/grids', methods=['GET'])
 def get_grids(project_id):
     # ✅ CORRECTION: Utiliser la syntaxe SQLAlchemy 2.0
     grids = db.session.scalars(select(Grid).filter_by(project_id=project_id)).all()
     return jsonify([grid.to_dict() for grid in grids]), 200
 
-@projects_bp.route('/projects/<project_id>/grids', methods=['POST'])
+@projects_bp.route('/<project_id>/grids', methods=['POST'])
 def create_grid(project_id):
     data = request.get_json()
     if not data or not data.get('name') or not isinstance(data.get('fields'), list):
@@ -194,7 +194,7 @@ def create_grid(project_id):
     db.session.commit()
     return jsonify(new_grid.to_dict()), 201
 
-@projects_bp.route('/projects/<project_id>/grids/<grid_id>', methods=['PUT'])
+@projects_bp.route('/<project_id>/grids/<grid_id>', methods=['PUT'])
 def update_grid(project_id, grid_id):
     grid = db.session.get(Grid, grid_id)
     if not grid:
@@ -211,7 +211,7 @@ def update_grid(project_id, grid_id):
     db.session.commit()
     return jsonify(grid.to_dict()), 200
 
-@projects_bp.route('/projects/<project_id>/extractions/<extraction_id>/decision', methods=['PUT'])
+@projects_bp.route('/<project_id>/extractions/<extraction_id>/decision', methods=['PUT'])
 def set_extraction_decision(project_id, extraction_id):
     data = request.get_json()
     decision = data.get('decision')
@@ -236,7 +236,7 @@ def set_extraction_decision(project_id, extraction_id):
     db.session.commit()
     return jsonify(extraction.to_dict()), 200
 
-@projects_bp.route('/projects/<project_id>/import-validations', methods=['POST'])
+@projects_bp.route('/<project_id>/import-validations', methods=['POST'])
 def import_validations(project_id):
     if 'file' not in request.files:
         return jsonify({"error": "Aucun fichier fourni"}), 400
@@ -274,15 +274,15 @@ def import_validations(project_id):
         logger.error(f"Erreur lors de l'import des validations: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
 
-@projects_bp.route('/projects/<project_id>/run-discussion-draft', methods=['POST'])
+@projects_bp.route('/<project_id>/run-discussion-draft', methods=['POST'])
 def run_discussion_draft(project_id):
     job = discussion_draft_queue.enqueue(run_discussion_generation_task, project_id=project_id, job_timeout=1800)
     return jsonify({"message": "Génération du brouillon de discussion lancée", "job_id": job.id}), 202
 
-@projects_bp.route('/projects/<project_id>/chat', methods=['POST'])
+@projects_bp.route('/<project_id>/chat', methods=['POST'])
 def chat_with_project(project_id):
     data = request.get_json()
-    question = data.get('question')
+    question = data.get('question')    
     if not question:
         return jsonify({"error": "Question is required"}), 400
     job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout=900) # 15 minutes
@@ -320,7 +320,7 @@ def run_pipeline(project_id):
         task_ids.append(job.id)
     return jsonify({"message": f"{len(task_ids)} tâches de traitement lancées", "job_ids": [str(tid) for tid in task_ids]}), 202
 
-@projects_bp.route('/projects/<project_id>/run-analysis', methods=['POST'])
+@projects_bp.route('/<project_id>/run-analysis', methods=['POST'])
 def run_analysis(project_id):
     """
     Lance une analyse avancée (méta-analyse, graphe, etc.).
@@ -370,7 +370,7 @@ def run_analysis(project_id):
     else:
         return jsonify({"error": f"Type d'analyse inconnu: {analysis_type}"}), 400
 
-@projects_bp.route('/projects/<project_id>/import-zotero-pdfs', methods=['POST'])
+@projects_bp.route('/<project_id>/import-zotero-pdfs', methods=['POST'])
 def import_zotero_pdfs(project_id):
     data = request.get_json()
     pmids = data.get('articles', [])
@@ -393,7 +393,7 @@ def import_zotero_pdfs(project_id):
     return jsonify({"message": "Importation Zotero lancée", "job_id": job.id}), 202
 
 # ✅ CORRECTION: Renommage de la route pour éviter le conflit avec l'import JSON
-@projects_bp.route('/projects/<project_id>/upload-zotero', methods=['POST'])
+@projects_bp.route('/<project_id>/upload-zotero', methods=['POST'])
 def upload_zotero_file(project_id):
     if 'file' not in request.files:
         return jsonify({"error": "Données JSON invalides"}), 400 # Message attendu par le frontend

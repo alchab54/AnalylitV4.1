@@ -83,7 +83,7 @@ def update_stakeholder(project_id, stakeholder_id):
 
 @stakeholders_bp.route('/projects/<project_id>/stakeholders/<stakeholder_id>', methods=['DELETE'])
 def delete_stakeholder(project_id, stakeholder_id):
-    project = db.session.get(Project, project_id)
+    project = db.session.get(Project, project_id)    
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
 

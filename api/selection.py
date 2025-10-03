@@ -13,7 +13,7 @@ selection_store = []
 
 @selection_bp.route("/selection", methods=["GET"])
 def get_selection():
-    """Returns the list of selected items."""
+    """Returns the list of selected items."""    
     return jsonify(selection_store)
 
 @selection_bp.route("/selection/add", methods=["POST"])

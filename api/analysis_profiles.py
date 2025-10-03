@@ -78,8 +78,7 @@ def update_analysis_profile(profile_id):
         return jsonify({"error": "Erreur lors de la mise à jour du profil"}), 500
 
 @analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['DELETE'])
-def delete_analysis_profile(profile_id):
-    """Supprime un profil d'analyse."""
+def delete_analysis_profile(profile_id):    """Supprime un profil d'analyse."""
     # ✅ CORRECTION: Utiliser db.session.get() pour une récupération optimisée par clé primaire.
     profile = db.session.get(AnalysisProfile, profile_id)
     if not profile:

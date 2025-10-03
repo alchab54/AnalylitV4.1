@@ -63,7 +63,7 @@ def update_prompt(prompt_id):
 
 @prompts_bp.route('/prompts/<prompt_id>', methods=['DELETE'])
 def delete_prompt(prompt_id):
-    """Supprime un prompt."""
+    """Supprime un prompt."""    
     # ✅ AMÉLIORATION: Utiliser db.session.get()
     prompt = db.session.get(Prompt, prompt_id)
     if not prompt:

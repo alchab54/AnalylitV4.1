@@ -34,7 +34,7 @@ def health_check():
     """Route simple pour le healthcheck de Docker."""
     return jsonify({"status": "healthy"}), 200
 
-@admin_bp.route('/admin/models/pull', methods=['POST'])
+@admin_bp.route('/models/pull', methods=['POST'])
 def pull_model():
     data = request.get_json()
     model_name = data.get('model_name')
@@ -45,7 +45,7 @@ def pull_model():
     job = models_queue.enqueue(pull_ollama_model_task, model_name, job_timeout='30m')
     return jsonify({"message": f"Téléchargement du modèle '{model_name}' lancé.", "job_id": job.get_id()}), 202
 
-@admin_bp.route('/admin/queues/clear', methods=['POST'])
+@admin_bp.route('/queues/clear', methods=['POST'])
 def clear_queue():
     data = request.get_json()
     queue_name = data.get('queue_name')

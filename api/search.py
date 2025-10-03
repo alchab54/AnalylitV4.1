@@ -77,7 +77,7 @@ def get_project_search_stats(project_id):
     """), {"pid": project_id}).mappings().all()
     
     total = sum(r['count'] for r in stats)
-
+    
     return jsonify({
         "total_results": total,
         "results_by_database": {r["database_source"]: r["count"] for r in stats}

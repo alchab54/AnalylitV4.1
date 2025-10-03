@@ -31,8 +31,7 @@ def generate_bibliography(project_id):
 
 @reporting_bp.route('/projects/<project_id>/reports/summary-table', methods=['POST'])
 def generate_summary_table(project_id):
-    """
-    Génère les données pour un tableau de synthèse pour le projet spécifié.
+    """    Génère les données pour un tableau de synthèse pour le projet spécifié.
     Peut enfiler une tâche de fond si la génération est complexe.
     """
     project = db.session.query(Project).filter_by(id=project_id).first()

@@ -9,7 +9,7 @@ from backend.tasks_v4_complete import run_extension_task
 extensions_bp = Blueprint('extensions', __name__)
 logger = logging.getLogger(__name__)
 
-@extensions_bp.route('/extensions/run', methods=['POST'])
+@extensions_bp.route('/run', methods=['POST'])
 def run_extension():
     """Exécute une extension personnalisée via une tâche de fond."""
     data = request.get_json()
