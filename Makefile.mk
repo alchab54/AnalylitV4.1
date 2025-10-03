@@ -150,6 +150,16 @@ test-workflow: ## Exécuter le test de workflow ATN de bout en bout
 	@python scripts/test_atn_workflow.py
 	@echo "$(GREEN)✅ Test de workflow terminé.$(NC)"
 
+seed-project: ## Crée un projet de test dans l'environnement de production
+	@echo "$(BLUE)🌱 Création d'un projet de démonstration dans la base de données de production...$(NC)"
+	@echo "$(YELLOW)Assurez-vous que les services sont démarrés avec 'make start' ou 'make install'$(NC)"
+	@echo "$(YELLOW)Cette opération peut prendre plusieurs minutes...$(NC)"
+	# ✅ CORRECTION: On passe les variables d'environnement pour que le script
+	# sache qu'il doit communiquer avec le service 'web' sur son port interne.
+	@docker-compose exec -e API_HOST=web -e API_PORT=5000 web python scripts/test_atn_workflow.py
+	@echo "$(GREEN)✅ Projet de démonstration créé avec succès !$(NC)"
+	@echo "$(BLUE)➡️  Rafraîchissez votre navigateur pour voir le projet 'Test ATN'.$(NC)"
+
 health: ## Vérifier la santé des services
 	@echo "$(BLUE)🏥 Vérification de la santé des services:$(NC)"
 	@curl -f http://localhost:8080/api/health && echo "$(GREEN)✅ API Web: OK$(NC)" || echo "$(RED)❌ API Web: Erreur$(NC)"

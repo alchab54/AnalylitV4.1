@@ -7,11 +7,17 @@ Teste l'équation PubMed spécialisée Alliance Thérapeutique Numérique
 import requests
 import time
 import json
+import os # ✅ AJOUT: Pour lire les variables d'environnement
 import sys
 from datetime import datetime
 
 class AnalyLitATNWorkflow:
-    def __init__(self, base_url="http://localhost:5000"):
+    def __init__(self):
+        # ✅ AMÉLIORATION: Utiliser les variables d'environnement pour déterminer l'URL de l'API.
+        # Cela rend le script compatible avec tous les environnements (local, dev, prod).
+        host = os.environ.get("API_HOST", "localhost")
+        port = os.environ.get("API_PORT", "5000")
+        base_url = f"http://{host}:{port}"
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.project_id = None
@@ -118,8 +124,13 @@ class AnalyLitATNWorkflow:
                     queue_name = task_data.get('queue_name', 'N/A') # Pour le debug
                     
                     if status == 'finished': # ✅ CORRECTION: RQ utilise 'finished'
-                        self.log(f"✓ {task_name} terminée avec succès")
-                        return True
+                        # ✅ AMÉLIORATION: Vérifier s'il y a une exception, même si le statut est 'finished'.
+                        if task_data.get('exc_info'):
+                            self.log(f"✗ {task_name} terminée avec une erreur: {task_data.get('exc_info')}")
+                            return False
+                        else:
+                            self.log(f"✓ {task_name} terminée avec succès")
+                            return True
                     elif status == 'failed':
                         error = task_data.get('exc_info', 'Erreur inconnue') # ✅ CORRECTION: Utiliser exc_info
                         self.log(f"✗ {task_name} échouée: {error}")
@@ -286,7 +297,7 @@ class AnalyLitATNWorkflow:
             return False
 
 if __name__ == "__main__":
-    workflow = AnalyLitATNWorkflow()
+    workflow = AnalyLitATNWorkflow() # Le constructeur n'a plus besoin d'argument
     
     print("\n" + "="*60)
     print("🔬 TEST WORKFLOW ATN - ANALYLIT V4.1")

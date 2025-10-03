@@ -66,6 +66,18 @@ services:
           memory: 256M
     restart: unless-stopped
 
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: analylit_nginx_prod
+    ports:
+      - "8080:80" # Expose Nginx sur le port 8080 de l'hôte
+    volumes:
+      - ./web:/usr/share/nginx/html:ro
+      - ./docker/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - web
+    restart: unless-stopped
+
   # Backend web
   web:
     build:
@@ -75,9 +87,7 @@ services:
         BASE_IMAGE: analylit-base-cpu:latest
     image: analylit-web:latest
     container_name: analylit_web
-    ports:
-      - "5000:5000"
-      - "8080:5000"
+    ports: [] # Nginx gère l'exposition des ports
     environment:
       FLASK_APP: backend/manage.py
       FLASK_ENV: production

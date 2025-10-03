@@ -2,6 +2,18 @@
 # Utilisation: docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
 services:
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: analylit_nginx_dev
+    ports:
+      - "8080:8080" # Expose Nginx sur le port 8080
+    volumes:
+      - ./web:/usr/share/nginx/html:ro # Monte le code frontend
+      - ./docker/nginx.dev.conf:/etc/nginx/conf.d/default.conf:ro # Monte la configuration Nginx
+    depends_on:
+      - web
+    restart: unless-stopped
+
   web:
     # Gunicorn en dev avec rechargement à chaud
     command: >
@@ -10,6 +22,8 @@ services:
       FLASK_ENV: development
       FLASK_APP: backend/manage.py
       DB_HOST: test-db
+      # ✅ CORRECTION: L'URL de la DB de test doit utiliser le nom du service 'test-db'
+      # et non 'analylit_test_db' qui est le nom du conteneur.
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       PYTHONPATH: /home/appuser/app
     volumes:
@@ -22,6 +36,9 @@ services:
       - ./alembic.ini:/home/appuser/app/alembic.ini:ro
       - ./tests:/home/appuser/app/tests
       - ./pytest.ini:/home/appuser/app/pytest.ini:ro
+    # On n'expose plus le port 5000 directement, Nginx s'en occupe.
+    ports: []
+
     depends_on:
       test-db:
         condition: service_started
@@ -37,6 +54,8 @@ services:
       POSTGRES_USER: analylit_user
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_test_db
+    # On n'a pas besoin d'exposer le port de la base de test à l'hôte
+    ports: []
     command:
       [
         "postgres",
@@ -48,7 +67,7 @@ services:
 
   worker-fast:
     environment:
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db # Assurer la cohérence
       DB_HOST: test-db
     volumes:
       - ./backend:/home/appuser/app/backend
@@ -63,7 +82,7 @@ services:
 
   worker-default:
     environment:
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db # Assurer la cohérence
       DB_HOST: test-db
     volumes:
       - ./backend:/home/appuser/app/backend
@@ -78,7 +97,7 @@ services:
 
   worker-ai:
     environment:
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db # Assurer la cohérence
       DB_HOST: test-db
     volumes:
       - ./backend:/home/appuser/app/backend
@@ -95,7 +114,7 @@ services:
 
   migrate:
     # En dev, on exécute les migrations contre la DB de test
-    environment:
+    environment: # Assurer la cohérence
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       SCHEMA_NAME: analylit_schema
       DB_HOST: test-db

@@ -15,7 +15,8 @@ USER root
 # Copier le fichier de dépendances depuis le contexte de build
 COPY requirements.txt .
 
-# Installer uniquement PyTorch et ses dérivés. grep -i est plus robuste.
+# ✅ CORRECTION DÉFINITIVE: L'image de base a déjà toutes les dépendances CPU.
+# On installe UNIQUEMENT les dépendances GPU manquantes.
 RUN grep -i "torch" requirements.txt > requirements-gpu.txt && \
     pip install --no-cache-dir \
         --retries 10 \
