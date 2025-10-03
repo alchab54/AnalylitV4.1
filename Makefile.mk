@@ -27,14 +27,22 @@ help: ## Afficher l'aide
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-15s$(NC) %s\n", $$1, $$2}'
 	@echo ""
 
+build-base: ## Construit les images de base (cpu puis gpu) dans le bon ordre
+	@echo "$(BLUE)🛠️  Construction de l'image de base CPU...$(NC)"
+	@$(COMPOSE) -f $(COMPOSE_FILE) build base-cpu
+	@echo "$(BLUE)🛠️  Construction de l'image de base GPU...$(NC)"
+	@$(COMPOSE) -f $(COMPOSE_FILE) build base-gpu
+	@echo "$(GREEN)✅ Images de base construites avec succès.$(NC)"
+
 install: ## Installation complète d'AnalyLit
 	@echo "$(BLUE)🚀 Installation d'AnalyLit V4.0...$(NC)"
 	@mkdir -p projects web
 	@if [ ! -f .env ]; then cp env.example .env; echo "$(YELLOW)⚠️  Fichier .env créé à partir d'env.example$(NC)"; fi
-	@docker-compose -f $(COMPOSE_FILE) build
-	@docker-compose -f $(COMPOSE_FILE) up -d
+	@$(MAKE) build-base
+	@echo "$(BLUE)🚀 Démarrage des services en mode production...$(NC)"
+	@$(COMPOSE) -f $(COMPOSE_FILE) up -d --build
 	@echo "$(GREEN)✅ Installation terminée!$(NC)"
-	@echo "$(BLUE)🌐 Interface web: http://localhost:8080$(NC)"
+	@echo "$(BLUE)🌐 Interface web: http://localhost:5000$(NC)"
 
 start: ## Démarrer les services
 	@echo "$(BLUE)🚀 Démarrage des services...$(NC)"
@@ -114,9 +122,11 @@ clean: ## Nettoyer le système (⚠️ supprime les données)
 	@docker image prune -f
 	@echo "$(GREEN)✅ Nettoyage terminé$(NC)"
 
-dev: ## Mode développement avec rechargement automatique
+dev: build-base ## Mode développement avec rechargement automatique
 	@echo "$(BLUE)🔧 Démarrage en mode développement...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) -f docker-compose.dev.yml --profile dev up
+	@echo "$(YELLOW)Les fichiers locaux seront synchronisés avec les conteneurs.$(NC)"
+	@$(COMPOSE) -f $(COMPOSE_FILE) -f docker-compose.dev.yml up -d --build
+	@echo "$(GREEN)✅ Mode développement démarré. Interface web: http://localhost:5000$(NC)"
 
 test: ## Exécuter les tests
 	@echo "$(BLUE)🧪 Exécution des tests...$(NC)"
