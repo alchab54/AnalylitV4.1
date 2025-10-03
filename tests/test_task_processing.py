@@ -22,6 +22,7 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock
 from sqlalchemy import text
 from sklearn.metrics import cohen_kappa_score # Ajout pour le test Kappa
+import io
 
 # --- Imports de Config (Corrigé pour importer la fonction) ---
 from backend.config.config_v4 import get_config
@@ -94,12 +95,16 @@ def test_search_task_adds_articles_to_db(db_session, mocker):
     db_session.add(project)
     db_session.flush() 
 
+    # 1. Mock Entrez calls
+    mocker.patch('Bio.Entrez.esearch', return_value=MagicMock())
+    mocker.patch('Bio.Entrez.read', return_value={'IdList': ['pmid1', 'pmid2']})
+
+    # 2. Mock fetch_details_for_ids
     mock_search_results = [
         {'id': 'pmid1', 'title': 'Article 1', 'abstract': 'Abstract 1', 'database_source': 'pubmed'},
         {'id': 'pmid2', 'title': 'Article 2', 'abstract': 'Abstract 2', 'database_source': 'pubmed'}
     ]
-    
-    mocker.patch('backend.tasks_v4_complete.db_manager.search_pubmed', return_value=mock_search_results)
+    mocker.patch('utils.fetchers.db_manager.fetch_details_for_ids', return_value=mock_search_results)
     mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # ACT

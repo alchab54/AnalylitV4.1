@@ -12,26 +12,51 @@ Cypress.Commands.add('setupBasicTest', () => {
   cy.get('body').then($body => {
     // Vérifier si des projets existent déjà
     if ($body.find('.project-card').length === 0) {
-      cy.log('⚠️ Aucun projet trouvé - Création d\'un projet de test');
+      cy.log('⚠️ Aucun projet trouvé - Création d\'un projet de test via interception API');
 
-      // ✅ CORRECTION DÉFINITIVE: Utiliser un sélecteur unique et robuste pour éviter l'erreur "multiple elements".
-      // On cible le bouton par son data-attribute, qui est la meilleure pratique.
+      // Intercepter la requête de création de projet pour la simuler
+      cy.intercept('POST', '/api/projects', {
+        statusCode: 201,
+        body: {
+          id: 'fake-project-id-123',
+          name: 'Projet Test E2E',
+          description: 'Projet créé automatiquement pour les tests E2E',
+          article_count: 0,
+          created_at: new Date().toISOString(),
+        },
+      }).as('createProject');
+      
+      // Intercepter la requête qui recharge les projets après la création
+      cy.intercept('GET', '/api/projects', {
+        statusCode: 200,
+        body: [
+          {
+            id: 'fake-project-id-123',
+            name: 'Projet Test E2E',
+            description: 'Projet créé automatiquement pour les tests E2E',
+            article_count: 0,
+            created_at: new Date().toISOString(),
+          }
+        ],
+      }).as('getProjects');
+
+      // Ouvrir la modale de création
       cy.get('[data-action="create-project-modal"]', { timeout: 10000 }).should('be.visible').click({ force: true });
-
-      // Attendre que la modale apparaisse
       cy.get('#newProjectModal', { timeout: 5000 }).should('be.visible');
 
-      // Remplir le formulaire de création
-      cy.get('#newProjectModal').within(() => {
-        cy.get('input[name="name"]').first().clear().type('Projet Test E2E', { force: true });
-        cy.get('textarea[name="description"]').first().clear().type('Projet créé automatiquement pour les tests E2E', { force: true });
-        cy.get('button[type="submit"]').first().click({ force: true });
-      });
+      // Remplir et soumettre le formulaire
+      cy.get('#projectName').clear().type('Projet Test E2E');
+      cy.get('#projectDescription').clear().type('Projet créé automatiquement pour les tests E2E');
+      cy.get('#newProjectForm').submit();
 
-      // Attendre que la modale se ferme
+      // Attendre que la requête de création soit interceptée et que la modale se ferme
+      cy.wait('@createProject');
       cy.get('#newProjectModal', { timeout: 10000 }).should('not.be.visible');
 
-      // Attendre que le projet apparaisse dans la liste
+      // Attendre que la liste des projets soit rechargée
+      cy.wait('@getProjects');
+
+      // Vérifier que le projet simulé est bien affiché
       cy.contains('.project-card', 'Projet Test E2E', { timeout: 10000 }).should('be.visible');
     }
   });

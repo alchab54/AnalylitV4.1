@@ -25,8 +25,6 @@ describe('AnalyLit V4.1 - Rapport de Tests Complet', () => {
       } else {
         cy.log(`⚠️ Backend non accessible (Status: ${response.status}) - Frontend fonctionne en mode standalone`);
       }
-    }).catch(() => {
-      cy.log('⚠️ Backend non accessible - Frontend fonctionne en mode standalone');
     });
   });
 
