@@ -333,7 +333,16 @@ class Prompt(Base):
     content = Column(Text, nullable=False, default="")  # Colonne obligatoire
     
     def to_dict(self):
-        return {c.name: getattr(self, c.name, None) for c in self.__table__.columns}
+        data = {}
+        for c in self.__table__.columns:
+            v = getattr(self, c.name)
+            if isinstance(v, datetime):
+                data[c.name] = v.isoformat()
+            elif isinstance(v, Decimal):
+                data[c.name] = float(v)
+            else:
+                data[c.name] = v
+        return data
 
 class GreyLiterature(Base):
     __tablename__ = 'grey_literature'
