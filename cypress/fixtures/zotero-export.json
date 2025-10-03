@@ -1,0 +1,12 @@
+[
+  {
+    "key": "ABC123XYZ",
+    "itemType": "journalArticle",
+    "title": "Digital Therapeutics in Mental Health",
+    "creators": [{ "creatorType": "author", "firstName": "Jane", "lastName": "Doe" }],
+    "publicationTitle": "Journal of Digital Health",
+    "date": "2024",
+    "DOI": "10.1234/jdh.2024.001",
+    "abstractNote": "This article explores..."
+  }
+]

@@ -29,7 +29,19 @@ export default defineConfig({
     numTestsKeptInMemory: 5,
 
     setupNodeEvents(on, config) {
-      // implémentez ici les écouteurs d'événements du nœud
+      // Implémente les écouteurs d'événements du nœud, y compris les tâches de seed et clean de la base de données
+      on('task', {
+        'db:seed': () => {
+          // Remplacez cette ligne par le code nécessaire pour initialiser votre base de données
+          console.log('Seeding the database...');
+          return null;
+        },
+        'db:clean': () => {
+          // Remplacez cette ligne par le code nécessaire pour nettoyer votre base de données
+          console.log('Cleaning the database...');
+          return null;
+        }
+      });
     },
   },
 });

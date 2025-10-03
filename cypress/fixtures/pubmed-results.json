@@ -1,0 +1,8 @@
+{
+  "results": [
+    { "pmid": "12345", "title": "Article 1", "abstract": "Abstract 1" },
+    { "pmid": "67890", "title": "Article 2", "abstract": "Abstract 2" }
+  ],
+  "total": 100,
+  "query": "alliance thérapeutique"
+}

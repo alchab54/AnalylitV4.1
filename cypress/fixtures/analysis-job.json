@@ -1,0 +1,5 @@
+{
+  "jobId": "unique-job-id-123",
+  "status": "completed",
+  "results": { "keyMetrics": "example data" }
+}
