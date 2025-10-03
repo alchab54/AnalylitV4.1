@@ -1,7 +1,8 @@
 # gunicorn.conf.py
 
 # Configuration optimisée pour 16GB RAM
-bind = "0.0.0.0:5000"
+# ✅ CORRECTION: On bind sur le port 80, qui est le port que Nginx attend.
+bind = "0.0.0.0:80"
 workers = 4  # ✅ AUGMENTÉ: Plus de workers pour gérer les requêtes simultanées.
 # ✅ CORRECTION: Le nom du worker était incorrect. 'gevent_websocket' n'est pas un alias valide.
 # Il faut utiliser le chemin complet vers la classe du worker fournie par la bibliothèque gevent-websocket.

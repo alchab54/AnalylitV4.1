@@ -3,10 +3,11 @@
 
 services:
   nginx:
+    profiles: ["default", "gpu"] # ✅ CORRECTION: Assigner le même profil que sa dépendance 'web'
     image: nginx:1.25-alpine
     container_name: analylit_nginx_dev
     ports:
-      - "8080:8080" # Expose Nginx sur le port 8080
+      - "8081:80" # Expose Nginx sur le port 8081
     volumes:
       - ./web:/usr/share/nginx/html:ro # Le code frontend reste en lecture seule
       # ✅ CORRECTION: On monte la config comme un template pour que Nginx puisse la modifier au démarrage.
@@ -16,12 +17,16 @@ services:
     restart: unless-stopped
 
   web:
+    profiles: ["default", "gpu"] # ✅ CORRECTION: Assigner le même profil que sa dépendance 'ollama'
     # Gunicorn en dev avec rechargement à chaud
     command: >
       gunicorn --conf backend/config/gunicorn.conf.py --reload 'backend.manage:app'
     environment:
       FLASK_ENV: development
       FLASK_APP: backend/manage.py
+      # ✅ CORRECTION: Le worker 'gevent' est incompatible avec l'option '--reload' de Gunicorn.
+      # On le désactive en développement pour permettre le rechargement à chaud.
+      GUNICORN_WORKER_CLASS: "sync"
       DB_HOST: test-db
       # ✅ CORRECTION: L'URL de la DB de test doit utiliser le nom du service 'test-db'
       # et non 'analylit_test_db' qui est le nom du conteneur.
@@ -41,8 +46,10 @@ services:
     ports: []
 
     depends_on:
-      test-db:
-        condition: service_started
+      # ✅ CORRECTION: Le service web doit attendre que les migrations soient terminées
+      # pour s'assurer que les tables de la base de données existent avant de démarrer.
+      migrate:
+        condition: service_completed_successfully
       ollama:
         condition: service_started
       redis:
@@ -109,8 +116,6 @@ services:
       test-db:
         condition: service_started
       redis:
-        condition: service_started
-      ollama:
         condition: service_started
 
   migrate:

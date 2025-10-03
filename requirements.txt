@@ -68,9 +68,11 @@ selenium==4.21.0
 locust==2.27.0
 
 # --- PyTorch CPU CORRIGÉ ---
-torch==2.3.1              # ✅ SYNTAXE RÉPARÉE !
-torchvision==0.18.1       # ✅ AJOUTÉ pour compatibilité
-torchaudio==2.3.1         # ✅ AJOUTÉ pour compatibilité
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.3.1+cpu
+torchvision==0.18.1+cpu
+torchaudio==2.3.1+cpu
+
 
 # --- Configuration PyTest ---
 pytest-xdist==3.5.0       # ✅ Tests parallèles

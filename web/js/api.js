@@ -18,15 +18,9 @@ export async function getApiUrl(endpoint) {
 
 export async function fetchAPI(endpoint, options = {}) {
     // ✅ CORRECTION SYSTÉMIQUE: Assurer que tous les appels API sont préfixés par /api.
-    // Cela corrige la majorité des échecs de tests Jest.
     const { CONFIG } = await import('./constants.js'); // This was already correct
-    let url;
-    if (endpoint.startsWith('/api/')) {
-        url = `${CONFIG.API_BASE_URL}${endpoint}`;
-    } else {
-        const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-        url = `${CONFIG.API_BASE_URL}/api${cleanEndpoint}`;
-    }
+    // ✅ CORRECTION: Simplifier la construction de l'URL. La base URL contient déjà '/api'.
+    const url = `${CONFIG.API_BASE_URL}${endpoint}`;
 
     const isFormData = options.body instanceof FormData;
 

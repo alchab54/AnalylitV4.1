@@ -112,13 +112,13 @@ export const API_ENDPOINTS = {
     // Tasks
     taskCancel: (id) => `/tasks/${id}/cancel`,
     taskRetry: (id) => `/tasks/${id}/retry`,
+    tasksStatus: '/tasks/status',
+    // Stakeholders
+    projectStakeholders: (projectId) => `/projects/${projectId}/stakeholders`,
+    stakeholderById: (projectId, stakeholderId) => `/projects/${projectId}/stakeholders/${stakeholderId}`,
+    projectStakeholderGroups: (projectId) => `/projects/${projectId}/stakeholder-groups`,
+    stakeholderGroupById: (projectId, groupId) => `/projects/${projectId}/stakeholder-groups/${groupId}`,
 };
-
-API_ENDPOINTS.tasksStatus = '/tasks/status';
-API_ENDPOINTS.projectStakeholders = (projectId) => `/projects/${projectId}/stakeholders`;
-API_ENDPOINTS.stakeholderById = (projectId, stakeholderId) => `/projects/${projectId}/stakeholders/${stakeholderId}`;
-API_ENDPOINTS.projectStakeholderGroups = (projectId) => `/projects/${projectId}/stakeholder-groups`;
-API_ENDPOINTS.stakeholderGroupById = (projectId, groupId) => `/projects/${projectId}/stakeholder-groups/${groupId}`;
 
 // Messages d'état
 export const MESSAGES = {
@@ -350,9 +350,11 @@ noTasksInProgress: 'Aucune tâche en cours.',
 
 // Configuration de l'application
 export const CONFIG = {
-    // ✅ AMÉLIORATION: Centralisation de la configuration depuis config.js
-    API_BASE_URL: 'http://localhost:5000', // Base URL pour fetchAPI
-    WEBSOCKET_URL: 'http://localhost:5000', // URL pour Socket.IO
+    // ✅ CORRECTION: Utiliser des chemins relatifs. Le navigateur construira l'URL complète
+    // en se basant sur l'origine actuelle (ex: localhost:8080), ce qui fonctionnera avec Nginx.
+    // Cela simplifie la configuration et la rend universelle pour tous les environnements.
+    API_BASE_URL: '/api', // Base URL pour fetchAPI.
+    WEBSOCKET_URL: '', // URL pour Socket.IO.
 
     // Clés pour le stockage local
     LOCAL_STORAGE_LAST_SECTION: 'analylit_last_section',

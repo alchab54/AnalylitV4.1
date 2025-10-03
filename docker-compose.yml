@@ -69,15 +69,21 @@ services:
   nginx:
     image: nginx:1.25-alpine
     container_name: analylit_nginx_prod
+    profiles: ["default", "gpu"]
     ports:
       - "8080:80" # Expose Nginx sur le port 8080 de l'hôte
     volumes:
       - ./web:/usr/share/nginx/html:ro # Le code frontend reste en lecture seule
-      # ✅ CORRECTION: On monte la config comme un template pour que Nginx puisse la modifier au démarrage.
+      # ✅ CORRECTION: Mounts the configuration as a file and not a template. This ensures Nginx will find the host.
       - ./docker/nginx.prod.conf:/etc/nginx/templates/default.conf.template
     depends_on:
       - web
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   # Backend web
   web:
@@ -88,6 +94,7 @@ services:
         BASE_IMAGE: analylit-base-cpu:latest
     image: analylit-web:latest
     container_name: analylit_web
+    profiles: ["default", "gpu"] # ✅ CORRECTION: Assigner le même profil que sa dépendance 'ollama'
     ports: [] # Nginx gère l'exposition des ports
     environment:
       FLASK_APP: backend/manage.py
@@ -98,15 +105,23 @@ services:
       GUNICORN_WORKERS: "2"
       GUNICORN_THREADS: "2"
       GUNICORN_TIMEOUT: "120"
+      # ✅ CORRECTION: Force Gunicorn to bind to port 80 inside the container,
+      # which is the port Nginx expects to proxy to.
+      GUNICORN_CMD_ARGS: "--bind=0.0.0.0:80"
       PYTHONPATH: /home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
     env_file:
       - .env
-    command: >
-      gunicorn --conf backend/config/gunicorn.conf.py 'backend.manage:app'
+    # ✅ CORRECTION: On supprime la commande hardcodée pour laisser l'entrypoint.sh
+    # du conteneur construire la commande Gunicorn dynamiquement à partir des variables d'environnement.
+    # Cela garantit que GUNICORN_CMD_ARGS (pour le port) et --reload (en dev) sont bien appliqués.
     depends_on:
+      # ✅ CORRECTION: The web service must wait for BOTH the migration to complete
+      # AND the database to be healthy to prevent a race condition where Gunicorn
+      # workers start before the DB is fully ready.
       migrate:
         condition: service_completed_successfully
-      db:
+      # ✅ CORRECTION: Le service web dépend d'Ollama, il faut donc l'attendre.
+      ollama:
         condition: service_healthy
       redis:
         condition: service_started
@@ -152,7 +167,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    volumes: []
+    volumes: [] # No volumes needed for a one-shot task
     restart: "no"
 
   # Workers RQ

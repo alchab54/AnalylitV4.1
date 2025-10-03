@@ -46,39 +46,41 @@ install: ## Installation complète d'AnalyLit
 
 start: ## Démarrer les services
 	@echo "$(BLUE)🚀 Démarrage des services...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) up -d
+	# ✅ CORRECTION: On active le profil 'default' pour démarrer les services web et nginx.
+	@$(COMPOSE) -f $(COMPOSE_FILE) --profile default up -d
 	@echo "$(GREEN)✅ Services démarrés$(NC)"
 
 stop: ## Arrêter les services
 	@echo "$(BLUE)🛑 Arrêt des services...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) down
+	# ✅ CORRECTION: Arrête les services de production ET de développement pour un nettoyage complet.
+	@$(COMPOSE) -f $(COMPOSE_FILE) down --remove-orphans
 	@echo "$(GREEN)✅ Services arrêtés$(NC)"
 
 restart: stop start ## Redémarrer les services
 
 status: ## Afficher l'état des services
 	@echo "$(BLUE)📊 État des services:$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) ps
+	@$(COMPOSE) -f $(COMPOSE_FILE) ps
 	@echo ""
 	@echo "$(BLUE)🔧 Utilisation des ressources:$(NC)"
 	@docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}" | head -6
 
 logs: ## Afficher les logs des services
 	@echo "$(BLUE)📋 Logs des services:$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) logs --tail=50
+	@$(COMPOSE) -f $(COMPOSE_FILE) logs --tail=50
 
 logs-follow: ## Suivre les logs en temps réel
 	@echo "$(BLUE)📋 Suivi des logs en temps réel (Ctrl+C pour arrêter):$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) logs -f
+	@$(COMPOSE) -f $(COMPOSE_FILE) logs -f
 
 logs-web: ## Logs du serveur web uniquement
-	@docker-compose -f $(COMPOSE_FILE) logs -f web
+	@$(COMPOSE) -f $(COMPOSE_FILE) logs -f web
 
 logs-worker: ## Logs des workers uniquement
-	@docker-compose -f $(COMPOSE_FILE) logs -f worker
+	@$(COMPOSE) -f $(COMPOSE_FILE) logs -f worker-fast worker-default worker-ai
 
 logs-ollama: ## Logs d'Ollama uniquement
-	@docker-compose -f $(COMPOSE_FILE) logs -f ollama
+	@$(COMPOSE) -f $(COMPOSE_FILE) logs -f ollama
 
 backup: ## Créer une sauvegarde des données
 	@echo "$(BLUE)💾 Création de la sauvegarde...$(NC)"
@@ -91,34 +93,34 @@ models: ## Télécharger les modèles IA essentiels
 	@echo "$(YELLOW)⏳ Attente du démarrage d'Ollama...$(NC)"
 	@until curl -f http://localhost:11434/api/version >/dev/null 2>&1; do sleep 2; done
 	@echo "$(BLUE)📥 Téléchargement de llama3.1:8b...$(NC)"
-	@docker exec $$(docker-compose -f $(COMPOSE_FILE) ps -q ollama) ollama pull llama3.1:8b
+	@docker exec $$($(COMPOSE) -f $(COMPOSE_FILE) ps -q ollama) ollama pull llama3.1:8b
 	@echo "$(BLUE)📥 Téléchargement de phi3:mini...$(NC)"
-	@docker exec $$(docker-compose -f $(COMPOSE_FILE) ps -q ollama) ollama pull phi3:mini
+	@docker exec $$($(COMPOSE) -f $(COMPOSE_FILE) ps -q ollama) ollama pull phi3:mini
 	@echo "$(BLUE)📥 Téléchargement de gemma:2b...$(NC)"
-	@docker exec $$(docker-compose -f $(COMPOSE_FILE) ps -q ollama) ollama pull gemma:2b
+	@docker exec $$($(COMPOSE) -f $(COMPOSE_FILE) ps -q ollama) ollama pull gemma:2b
 	@echo "$(GREEN)✅ Modèles essentiels téléchargés$(NC)"
 
 shell-web: ## Accéder au shell du conteneur web
-	@docker-compose -f $(COMPOSE_FILE) exec web /bin/bash
+	@$(COMPOSE) -f $(COMPOSE_FILE) exec web /bin/bash
 
 shell-worker: ## Accéder au shell du conteneur worker
-	@docker-compose -f $(COMPOSE_FILE) exec worker /bin/bash
+	@$(COMPOSE) -f $(COMPOSE_FILE) exec worker-default /bin/bash
 
 shell-redis: ## Accéder au shell Redis
-	@docker-compose -f $(COMPOSE_FILE) exec redis redis-cli
+	@$(COMPOSE) -f $(COMPOSE_FILE) exec redis redis-cli
 
 update: ## Mettre à jour AnalyLit
 	@echo "$(BLUE)🔄 Mise à jour d'AnalyLit...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) down
-	@docker-compose -f $(COMPOSE_FILE) build --no-cache
-	@docker-compose -f $(COMPOSE_FILE) up -d
+	@$(COMPOSE) -f $(COMPOSE_FILE) down
+	@$(COMPOSE) -f $(COMPOSE_FILE) build --no-cache
+	@$(COMPOSE) -f $(COMPOSE_FILE) up -d
 	@echo "$(GREEN)✅ Mise à jour terminée$(NC)"
 
 clean: ## Nettoyer le système (⚠️ supprime les données)
 	@echo "$(RED)⚠️  Cette action va supprimer tous les conteneurs et volumes$(NC)"
 	@read -p "Êtes-vous sûr? (y/N): " confirm && [ "$$confirm" = "y" ] || exit 1
 	@echo "$(BLUE)🧹 Nettoyage en cours...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) down -v
+	@$(COMPOSE) -f $(COMPOSE_FILE) down -v
 	@docker image prune -f
 	@echo "$(GREEN)✅ Nettoyage terminé$(NC)"
 
@@ -126,7 +128,7 @@ dev: ## Mode développement (sans rebuild). Utiliser 'make build' avant si néce
 	@echo "$(BLUE)🔧 Démarrage en mode développement...$(NC)"
 	@echo "$(YELLOW)Les fichiers locaux seront synchronisés avec les conteneurs.$(NC)"
 	@$(COMPOSE) -f $(COMPOSE_FILE) -f docker-compose.dev.yml --profile default --profile gpu up -d
-	@echo "$(GREEN)✅ Mode développement démarré. Interface web: http://localhost:5000$(NC)"
+	@echo "$(GREEN)✅ Mode développement démarré. Interface web: http://localhost:8080$(NC)"
 
 build: build-base build-app ## Construit toutes les images nécessaires
 
@@ -141,7 +143,7 @@ rebuild: ## Force la reconstruction de toutes les images (sans cache)
 
 test: ## Exécuter les tests
 	@echo "$(BLUE)🧪 Exécution des tests...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) run --rm web pytest -v tests/ > logs/pytest_results.log 2>&1
+	@$(COMPOSE) -f $(COMPOSE_FILE) run --rm web pytest -v tests/ > logs/pytest_results.log 2>&1
 	@mkdir -p logs
 
 test-workflow: ## Exécuter le test de workflow ATN de bout en bout
@@ -154,9 +156,7 @@ seed-project: ## Crée un projet de test dans l'environnement de production
 	@echo "$(BLUE)🌱 Création d'un projet de démonstration dans la base de données de production...$(NC)"
 	@echo "$(YELLOW)Assurez-vous que les services sont démarrés avec 'make start' ou 'make install'$(NC)"
 	@echo "$(YELLOW)Cette opération peut prendre plusieurs minutes...$(NC)"
-	# ✅ CORRECTION: On passe les variables d'environnement pour que le script
-	# sache qu'il doit communiquer avec le service 'web' sur son port interne.
-	@docker-compose exec -e API_HOST=web -e API_PORT=5000 web python scripts/test_atn_workflow.py
+	@$(COMPOSE) exec web python scripts/test_atn_workflow.py
 	@echo "$(GREEN)✅ Projet de démonstration créé avec succès !$(NC)"
 	@echo "$(BLUE)➡️  Rafraîchissez votre navigateur pour voir le projet 'Test ATN'.$(NC)"
 
@@ -170,6 +170,12 @@ monitor: ## Surveiller les ressources en temps réel
 	@watch -n 2 'docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}"'
 
 reset: clean install ## Reset complet (supprime tout et réinstalle)
+
+# ✅ AJOUT: Commande pour nettoyer les ressources Docker non utilisées (réseaux, etc.)
+prune: ## Nettoyer les ressources Docker non utilisées (réseaux, volumes, etc.)
+	@echo "$(YELLOW)🧹 Nettoyage des ressources Docker non utilisées...$(NC)"
+	@docker system prune -f
+	@echo "$(GREEN)✅ Nettoyage terminé.$(NC)"
 
 # Commande par défaut
 .DEFAULT_GOAL := help
