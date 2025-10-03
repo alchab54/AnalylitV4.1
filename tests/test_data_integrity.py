@@ -51,16 +51,23 @@ def test_deduplication_on_conflict_during_search(db_session, project_for_dedup, 
     """
     project_id = project_for_dedup
     
-    # Simuler une recherche qui retourne l'article existant (PMID123) et un nouveau (PMID456)
-    mock_search_results = [
+    # Simuler une recherche qui retourne l'article existant (1234567) et un nouveau (PMID456)
+    # 1. Simuler l'appel à Entrez pour retourner les IDs
+    mock_entrez_ids = ['1234567', 'PMID456']
+    # Utiliser MagicMock pour simuler le gestionnaire de contexte si nécessaire
+    mocker.patch('Bio.Entrez.esearch', return_value=io.StringIO(json.dumps({"IdList": mock_entrez_ids})))
+    mocker.patch('Bio.Entrez.read', return_value={"IdList": mock_entrez_ids})
+
+    # 2. Simuler l'appel à fetch_details_for_ids qui est réellement utilisé
+    mock_details_results = [
         {'id': '1234567', 'title': 'Titre Dupliqué', 'abstract': 'Résumé dupliqué.', 'database_source': 'pubmed'},
         {'id': 'PMID456', 'title': 'Nouveau Titre', 'abstract': 'Nouveau résumé.', 'database_source': 'pubmed'}
     ]
-    mocker.patch('backend.tasks_v4_complete.db_manager.search_pubmed', return_value=mock_search_results)
+    mocker.patch('utils.fetchers.db_manager.fetch_details_for_ids', return_value=mock_details_results)
     mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # Exécuter la tâche de recherche
-    multi_database_search_task.__wrapped__(
+    multi_database_search_task(
         db_session, project_id=project_id, query="test", databases=['pubmed']
     )
 

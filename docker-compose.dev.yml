@@ -20,7 +20,7 @@ services:
     profiles: ["default", "gpu"] # ✅ CORRECTION: Assigner le même profil que sa dépendance 'ollama'
     # Gunicorn en dev avec rechargement à chaud
     command: >
-      gunicorn --conf backend/config/gunicorn.conf.py --reload 'backend.manage:app'
+      gunicorn --conf backend/config/gunicorn.conf.py 'backend.manage:app'
     environment:
       FLASK_ENV: development
       FLASK_APP: backend/manage.py
