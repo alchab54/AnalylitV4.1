@@ -8,6 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 import sqlite3
 import os
+import io
 
 # Imports des modèles et tâches
 from utils.models import Project, SearchResult

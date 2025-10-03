@@ -131,8 +131,8 @@ def test_multi_database_search_task_resilience_on_fetcher_failure(db_session, mo
     db_session.flush()
 
     # Simuler une erreur pour PubMed, mais un succès pour arXiv
-    mocker.patch('backend.tasks_v4_complete.db_manager.search_pubmed', side_effect=Exception("PubMed API down"))
-    mocker.patch('backend.tasks_v4_complete.db_manager.search_arxiv', return_value=[{'id': 'arxiv1', 'title': 'Arxiv Article'}])
+    mocker.patch('Bio.Entrez.esearch', side_effect=Exception("PubMed API down"))
+    mocker.patch('utils.fetchers.db_manager.search_arxiv', return_value=[{'id': 'arxiv1', 'title': 'Arxiv Article'}])
     mock_notify = mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # ACT

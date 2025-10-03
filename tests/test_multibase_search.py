@@ -31,13 +31,17 @@ def test_multi_database_search_task_expert_mode(mock_db_session, mocker):
         "arxiv": 'ti:"diabetes" AND abs:"treatment"'
     }
 
-    # Mock des méthodes de recherche du db_manager
-    mock_search_pubmed = mocker.patch('utils.fetchers.DatabaseManager.search_pubmed', return_value=[])
-    mock_search_arxiv = mocker.patch('utils.fetchers.DatabaseManager.search_arxiv', return_value=[])
+    # Mock des appels pour PubMed
+    mock_esearch = mocker.patch('Bio.Entrez.esearch', return_value=MagicMock())
+    mocker.patch('Bio.Entrez.read', return_value={'IdList': []})
+    mocker.patch('utils.fetchers.db_manager.fetch_details_for_ids', return_value=[])
+
+    # Mock pour arxiv
+    mock_search_arxiv = mocker.patch('utils.fetchers.db_manager.search_arxiv', return_value=[])
     mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # Exécute la tâche
-    multi_database_search_task.__wrapped__(
+    multi_database_search_task(
         mock_db_session, 
         project_id=project_id, 
         query=simple_query, 
@@ -47,8 +51,14 @@ def test_multi_database_search_task_expert_mode(mock_db_session, mocker):
     )
 
     # Assertions
-    # Vérifie que search_pubmed a été appelé avec la requête experte pubmed
-    mock_search_pubmed.assert_called_once_with(expert_queries["pubmed"], 50)
+    # Vérifie que Entrez.esearch a été appelé avec la requête experte pubmed
+    mock_esearch.assert_called_once_with(
+        db="pubmed",
+        term=expert_queries["pubmed"],
+        retstart=0,
+        retmax=50,
+        usehistory="y"
+    )
     
     # Vérifie que search_arxiv a été appelé avec la requête experte arxiv
     mock_search_arxiv.assert_called_once_with(expert_queries["arxiv"], 50)
@@ -71,13 +81,17 @@ def test_multi_database_search_task_expert_mode_partial(mock_db_session, mocker)
         "arxiv": "  " # Champ laissé vide ou avec des espaces
     }
 
-    # Mock des méthodes de recherche
-    mock_search_pubmed = mocker.patch('utils.fetchers.DatabaseManager.search_pubmed', return_value=[])
-    mock_search_arxiv = mocker.patch('utils.fetchers.DatabaseManager.search_arxiv', return_value=[])
+    # Mock des appels pour PubMed
+    mock_esearch = mocker.patch('Bio.Entrez.esearch', return_value=MagicMock())
+    mocker.patch('Bio.Entrez.read', return_value={'IdList': []})
+    mocker.patch('utils.fetchers.db_manager.fetch_details_for_ids', return_value=[])
+
+    # Mock pour arxiv
+    mock_search_arxiv = mocker.patch('utils.fetchers.db_manager.search_arxiv', return_value=[])
     mocker.patch('backend.tasks_v4_complete.send_project_notification')
 
     # Exécute la tâche
-    multi_database_search_task.__wrapped__(
+    multi_database_search_task(
         mock_db_session, 
         project_id=project_id, 
         query=simple_query, 
@@ -87,7 +101,13 @@ def test_multi_database_search_task_expert_mode_partial(mock_db_session, mocker)
     )
 
     # Vérifie que pubmed a bien été appelé
-    mock_search_pubmed.assert_called_once_with("expert query for pubmed", 50)
+    mock_esearch.assert_called_once_with(
+        db="pubmed",
+        term="expert query for pubmed",
+        retstart=0,
+        retmax=50,
+        usehistory="y"
+    )
     
     # Vérifie que arxiv n'a PAS été appelé, car sa requête était vide
     mock_search_arxiv.assert_not_called()
