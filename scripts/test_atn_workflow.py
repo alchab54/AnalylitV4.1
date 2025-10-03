@@ -387,31 +387,28 @@ class AnalyLitATNWorkflow:
             return False
 
 if __name__ == "__main__":
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Test Workflow ATN - AnalyLit v4.1")
+    parser.add_argument("--pdf-folder", help="Dossier contenant les PDFs à importer")
+    parser.add_argument("--zotero-export", help="Fichier JSON d'export Zotero")
+    args = parser.parse_args()
+    
     workflow = AnalyLitATNWorkflow()
     
-    pdf_folder_arg = None
-    zotero_export_arg = None
-    
-    if len(sys.argv) > 1:
-        for arg in sys.argv[1:]:
-            if arg.startswith('--pdf-folder='):
-                pdf_folder_arg = arg.split('=', 1)[1]
-            elif arg.startswith('--zotero-export='):
-                zotero_export_arg = arg.split('=', 1)[1]
-
     print("\n" + "="*60)
     print("🔬 TEST WORKFLOW ATN - ANALYLIT V4.1")
     print("Équation PubMed: Alliance Thérapeutique Numérique")
-    if pdf_folder_arg:
-        print(f"📁 Avec upload de PDFs depuis: {pdf_folder_arg}")
-    if zotero_export_arg:
-        print(f"📚 Avec import Zotero depuis: {zotero_export_arg}")
+    if args.pdf_folder:
+        print(f"📁 Avec PDFs: {args.pdf_folder}")
+    if args.zotero_export:
+        print(f"📚 Avec Zotero: {args.zotero_export}")
     print("⚠️  IMPORTANT: Résultats à valider manuellement")
     print("="*60 + "\n")
     
     success = workflow.run_complete_atn_workflow(
-        pdf_folder=pdf_folder_arg,
-        zotero_export=zotero_export_arg
+        pdf_folder=args.pdf_folder,
+        zotero_export=args.zotero_export
     )
     
     print("\n" + "="*60)
