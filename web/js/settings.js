@@ -90,7 +90,7 @@ function displayOllamaConnectionError() {
 }
 
 /**
- * Récupère le statut actuel des files d'attente RQ.
+ * ✅ **PATCH n°3 : Afficher correctement le statut des files d'attente**
  */
 export async function loadQueuesStatus() {
     try {
@@ -1006,6 +1006,36 @@ function renderQueueStatus(status, container) {
 }
 
 /**
+ * ✅ **PATCH n°3 : Afficher correctement le statut des files d'attente** (new)
+ */
+async function loadQueuesStatus() {
+    try {
+        const queues = await fetchAPI('/api/queues/info');
+        const container = document.getElementById('queue-status-container');
+        if (!container) return;
+
+        container.innerHTML = ''; // Vider avant de remplir
+
+        if (Array.isArray(queues) && queues.length > 0) {
+            const list = document.createElement('ul');
+            queues.forEach(queue => {
+                const item = document.createElement('li');
+                // S'assurer que les valeurs sont définies
+                const queueName = queue.name || 'File inconnue';
+                const jobCount = queue.count !== undefined ? queue.count : 'N/A';
+                
+                item.innerHTML = `<strong>${queueName}:</strong> ${jobCount} tâche(s) en attente`;
+                list.appendChild(item);
+            });
+            container.appendChild(list);
+        } else {
+            container.innerHTML = '<p>Aucune information sur les files d\'attente disponible.</p>';
+        }
+    } catch (error) {
+        console.error('Erreur lors du chargement du statut des files:', error);
+        if (container) container.innerHTML = '<p class="error-message">Impossible de charger le statut des files d\'attente.</p>';
+    }
+/**
  * Gère le vidage d'une file d'attente spécifique.
  * @param {string} queueName - Le nom de la file à vider.
  */
@@ -1135,6 +1165,15 @@ export async function loadInstalledModels() {
             indicator.classList.replace('status-indicator--success', 'status-indicator--error');
             indicator.querySelector('span:last-child').textContent = 'Connexion échouée';
         }
+}
+
+// Assurer que cette fonction est appelée lorsque la section des paramètres est affichée.
+// Par exemple, dans la fonction renderSettings() :
+
+// Ajouter un bouton pour rafraîchir manuellement
+document.querySelector('#refresh-queues-btn')?.addEventListener('click', async () => {
+    showToast(MESSAGES.refreshingQueuesStatus, 'info');
+    await loadQueuesStatus();
     }
 }
 
