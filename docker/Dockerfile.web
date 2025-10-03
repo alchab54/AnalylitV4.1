@@ -4,10 +4,17 @@ FROM analylit-base-cpu:latest
 # Copier le code de l'application. L'utilisateur 'appuser' est déjà défini dans l'image de base.
 COPY . .
 
-# Corrige les fins de ligne Windows (\r) et rend le script exécutable
+# --- Correction des permissions et des fins de ligne ---
+# 1. Basculer temporairement vers l'utilisateur root pour avoir les droits de modification.
+USER root
+
+# 2. Corriger les fins de ligne Windows (\r) et rendre le script exécutable.
 RUN tr -d '\r' < scripts/entrypoint.sh > /tmp/entrypoint-fixed.sh && \
     chmod +x /tmp/entrypoint-fixed.sh && \
-    # Remplace le script original par la version corrigée
     mv /tmp/entrypoint-fixed.sh scripts/entrypoint.sh
+
+# 3. Revenir à l'utilisateur non-root pour la sécurité, en s'assurant qu'il est propriétaire des fichiers.
+RUN chown -R appuser:appuser /home/appuser/app
+USER appuser
 
 ENTRYPOINT ["./scripts/entrypoint.sh"]
