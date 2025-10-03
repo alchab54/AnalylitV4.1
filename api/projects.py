@@ -41,32 +41,30 @@ from sqlalchemy import select
 projects_bp = Blueprint('projects_bp', __name__)
 logger = logging.getLogger(__name__)
 
-@projects_bp.route('/projects', methods=['POST'])
-def create_project():
-    data = request.get_json()
-    if not data or not data.get('name'):
-        return jsonify({"error": "Le nom du projet est requis"}), 400
-    
-    new_project = Project(
-        name=data['name'],
-        description=data.get('description', ''),
-        analysis_mode=data.get('mode', 'screening')
-    )
-    db.session.add(new_project)
-    try:
-        db.session.commit()
-        return jsonify(new_project.to_dict()), 201
-    except IntegrityError:
-        db.session.rollback()
-        return jsonify({"error": "Un projet avec ce nom existe déjà"}), 409
-
-@projects_bp.route('/projects/', methods=['GET'])
-def get_all_projects():
-    """Retourne la liste de tous les projets."""
-    # ✅ CORRECTION: Remplacer la syntaxe obsolète de SQLAlchemy 1.x par la syntaxe 2.0.
-    stmt = select(Project).order_by(Project.created_at.desc())
-    projects = db.session.execute(stmt).scalars().all()
-    return jsonify([p.to_dict() for p in projects]), 200
+@projects_bp.route('/projects', methods=['GET', 'POST'])
+def projects():
+    if request.method == 'POST':
+        data = request.get_json()
+        if not data or not data.get('name'):
+            return jsonify({"error": "Le nom du projet est requis"}), 400
+        
+        new_project = Project(
+            name=data['name'],
+            description=data.get('description', ''),
+            analysis_mode=data.get('mode', 'screening')
+        )
+        db.session.add(new_project)
+        try:
+            db.session.commit()
+            return jsonify(new_project.to_dict()), 201
+        except IntegrityError:
+            db.session.rollback()
+            return jsonify({"error": "Un projet avec ce nom existe déjà"}), 409
+    else: # GET
+        """Retourne la liste de tous les projets."""
+        stmt = select(Project).order_by(Project.created_at.desc())
+        projects = db.session.execute(stmt).scalars().all()
+        return jsonify([p.to_dict() for p in projects]), 200
 
 @projects_bp.route('/projects/<project_id>', methods=['GET'])
 def get_project_details(project_id):
