@@ -42,6 +42,7 @@ from utils.models import (
     Project, SearchResult, Extraction, Grid, ChatMessage, AnalysisProfile, RiskOfBias,
     SCHEMA  # ✅ CORRECTION: Importer la variable SCHEMA pour la configuration de l'engine.
 )
+
 from sqlalchemy.orm import Session # Explicitly import Session for type hinting if needed, though Session is already defined below
 
 
@@ -76,6 +77,8 @@ PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 
 # --- Base de Données (SQLAlchemy Uniquement pour les tâches) ---
 # ✅ CORRECTION: Rétablir une factory de session pour les workers RQ,
+from rq import Queue
+from redis import Redis
 # mais le décorateur ci-dessous s'assurera que les tests utilisent leur propre session.
 # ✅ CORRECTION FINALE: La connexion DB des workers doit être sensible au mode de test.
 # Si la variable d'environnement TESTING est 'true', on utilise la base de données de test.
@@ -90,6 +93,9 @@ if is_testing and not db_url:
 engine = create_engine(db_url, pool_pre_ping=True, connect_args={"options": f"-csearch_path={SCHEMA},public"})
 SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
+config = get_config()
+redis_conn = Redis.from_url(config.REDIS_URL)
+analysis_queue = Queue('analysis_queue', connection=redis_conn)
 # --- Embeddings / Vector store (RAG) ---
 EMBEDDING_MODEL_NAME = getattr(config, "EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 EMBED_BATCH = getattr(config, "EMBED_BATCH", 32)
@@ -377,7 +383,30 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
 
         """), all_records_to_insert)
         session.commit() # Commit the transaction
-        """), all_records_to_insert)
+
+        # Enqueue screening tasks
+        logger.info(f"🚀 Enqueuing {len(all_records_to_insert)} screening tasks...")
+
+        # Récupérer le projet et le profil associé pour obtenir les modèles
+        project = session.get(Project, project_id)
+        profile_id = project.profile_used if project else 'standard'  # Fallback au profil standard
+
+        analysis_profile = session.query(AnalysisProfile).filter_by(name=profile_id).first()
+        if not analysis_profile:
+            analysis_profile = session.query(AnalysisProfile).filter_by(name='standard').first()
+
+        profile_dict = analysis_profile.to_dict() if analysis_profile else config.DEFAULT_MODELS['standard']
+
+        for record in all_records_to_insert:
+            analysis_queue.enqueue(
+                'backend.tasks_v4_complete.process_single_article_task',
+                project_id=project_id,
+                article_id=record['aid'],
+                profile=profile_dict,
+                analysis_mode='screening'  # On fait du screening !!
+            )
+        logger.info("✅ Screening tasks enqueued.")
+
 
     session.execute(text("UPDATE projects SET status = 'search_completed', pmids_count = :n, updated_at = :ts WHERE id = :id"), {"n": total_found, "ts": datetime.now().isoformat(), "id": project_id})
     
