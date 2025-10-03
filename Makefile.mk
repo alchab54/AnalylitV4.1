@@ -143,8 +143,8 @@ rebuild: ## Force la reconstruction de toutes les images (sans cache)
 
 test: ## Exécuter les tests
 	@echo "$(BLUE)🧪 Exécution des tests...$(NC)"
-	@$(COMPOSE) -f $(COMPOSE_FILE) run --rm web pytest -v tests/ > logs/pytest_results.log 2>&1
-	@mkdir -p logs
+	@$(COMPOSE) -f $(COMPOSE_FILE) run --rm web pytest -v 2>&1 | tee logs/pytest_results.log
+	@mkdir -p logs	
 
 test-workflow: ## Exécuter le test de workflow ATN de bout en bout
 	@echo "$(BLUE)🧪 Exécution du test de workflow ATN...$(NC)"

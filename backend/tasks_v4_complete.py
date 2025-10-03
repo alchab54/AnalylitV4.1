@@ -394,12 +394,15 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
         profile_name = 'standard' # Toujours commencer avec le défaut
         if project and project.profile_used:
             # Chercher le profil par son nom/id dans la DB
-            profile_from_db = session.query(AnalysisProfile).filter_by(id=project.profile_used).first()
+            profile_from_db = session.query(AnalysisProfile).filter_by(name=project.profile_used).first()
             if profile_from_db:
                 profile_name = profile_from_db.name.lower()
+            else:
+                logger.warning(f"Profil '{project.profile_used}' non trouvé dans la base de données. Using default 'standard'.")
 
         # Utiliser le nom du profil pour obtenir les modèles depuis la config
-        profile_dict = config.DEFAULT_MODELS.get(profile_name, config.DEFAULT_MODELS['standard'])
+        profile_name = profile_name.strip()  # Trim leading/trailing whitespace from profile_name
+        profile_dict = config.DEFAULT_MODELS.get(profile_name, config.DEFAULT_MODELS.get('standard',{'preprocess': 'phi3:mini', 'extract': 'llama3.1:8b', 'synthesis': 'llama3.1:8b'}))
         
         # Trim leading/trailing whitespace from profile_name
         profile_name = profile_name.strip()
