@@ -372,7 +372,7 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
     if all_records_to_insert:
         session.execute(text("""
             INSERT INTO search_results (id, project_id, article_id, title, abstract, authors, publication_date, journal, doi, url, database_source, created_at)
-            VALUES (:id, :pid, :aid, :title, :abstract, :authors, :pub_date, :journal, :doi, :url, :src, :ts)
+            VALUES (:id, :pid, :aid, :title, :abstract, :authors, :pub_date, :journal, :doi, :url, :src, :ts) 
             ON CONFLICT (project_id, article_id) DO NOTHING
         """), all_records_to_insert)
 
