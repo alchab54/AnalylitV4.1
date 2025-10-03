@@ -374,6 +374,9 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
             INSERT INTO search_results (id, project_id, article_id, title, abstract, authors, publication_date, journal, doi, url, database_source, created_at)
             VALUES (:id, :pid, :aid, :title, :abstract, :authors, :pub_date, :journal, :doi, :url, :src, :ts) 
             ON CONFLICT (project_id, article_id) DO NOTHING
+
+        """), all_records_to_insert)
+        session.commit() # Commit the transaction
         """), all_records_to_insert)
 
     session.execute(text("UPDATE projects SET status = 'search_completed', pmids_count = :n, updated_at = :ts WHERE id = :id"), {"n": total_found, "ts": datetime.now().isoformat(), "id": project_id})
@@ -381,6 +384,7 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
     session.commit() # Commit the status update
     # Amélioration de la notification finale
     final_message = f'Recherche terminée: {total_found} articles trouvés.'
+
     if failed_databases:
         final_message += f" Échec pour: {', '.join(failed_databases)}."
 
