@@ -351,14 +351,14 @@ noTasksInProgress: 'Aucune tâche en cours.',
 };
 
 // Configuration de l'application
-const isDevelopment = window.location.hostname === 'localhost' && window.location.port === '8080';
 export const CONFIG = {
 
-    API_BASE_URL: isDevelopment ? 'http://localhost:5000/api' : '/api',
-    WEBSOCKET_URL: isDevelopment ? 'http://localhost:5000' : '',
+    API_BASE_URL: '/api',
+    WEBSOCKET_URL: '',
 
     // Clés pour le stockage local
     LOCAL_STORAGE_LAST_SECTION: 'analylit_last_section',
+
     LOCAL_STORAGE_THEME: 'analylit_theme', // Moved from config.js
     LOCAL_STORAGE_LAST_PROJECT: 'analylit_last_project_id',
     LOCAL_STORAGE_USER_PREFS: 'analylit_user_prefs',
@@ -368,6 +368,7 @@ export const CONFIG = {
     DEBUG_MODE: true,
     DEFAULT_THEME: 'light',
 };
+
 
 // Messages pour le ThemeManager
 export const THEME_MESSAGES = {
