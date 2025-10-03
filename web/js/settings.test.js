@@ -67,7 +67,7 @@ describe('Module Settings', () => {
       await settings.loadSettingsData();
       expect(api.fetchAPI).toHaveBeenCalledWith('/analysis-profiles');
       expect(api.fetchAPI).toHaveBeenCalledWith('/prompts');
-      expect(api.fetchAPI).toHaveBeenCalledWith('/ollama/models');
+      expect(api.fetchAPI).toHaveBeenCalledWith('/settings/models');
       expect(api.fetchAPI).toHaveBeenCalledWith('/queues/info');
     });
 
