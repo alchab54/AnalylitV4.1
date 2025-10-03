@@ -109,7 +109,7 @@ export const API_ENDPOINTS = {
     
     // Queues
     queuesInfo: '/queues/info',
-    queuesClear: '/queues/clear',
+    queuesClear: '/queues/clear', // Ensure that this route really exists
 
     // Tasks
     taskCancel: (id) => `/tasks/${id}/cancel`,

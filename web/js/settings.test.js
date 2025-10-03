@@ -65,6 +65,7 @@ describe('Module Settings', () => {
     it('devrait appeler toutes les fonctions de chargement de données', async () => {
       api.fetchAPI.mockResolvedValue([]); // Mock pour tous les appels
       await settings.loadSettingsData();
+      expect(api.fetchAPI).toHaveBeenCalledTimes(4);
       expect(api.fetchAPI).toHaveBeenCalledWith('/analysis-profiles');
       expect(api.fetchAPI).toHaveBeenCalledWith('/prompts');
       expect(api.fetchAPI).toHaveBeenCalledWith('/settings/models');
@@ -73,7 +74,6 @@ describe('Module Settings', () => {
 
     it('devrait gérer une erreur lors du chargement des profils', async () => {
       jest.spyOn(console, 'error').mockImplementation(() => {}); // Masquer l'erreur dans la console de test
-      api.fetchAPI.mockImplementation((url) => (url === '/api/analysis-profiles' ? Promise.reject('API Error') : Promise.resolve([])));
       await settings.loadAnalysisProfiles();
       expect(state.setAnalysisProfiles).toHaveBeenCalledWith([]);
     });
@@ -84,6 +84,7 @@ describe('Module Settings', () => {
       appState.analysisProfiles = [{ id: '1', name: 'Default' }];
       appState.prompts = [{ id: 'p1', name: 'Prompt 1' }];
       appState.queuesInfo = { queues: [] };
+      appState.queuesInfo = { queues: [] };
       api.fetchAPI.mockResolvedValue({ models: [] }); // pour loadOllamaModels
 
       await settings.renderSettings();
@@ -92,6 +93,7 @@ describe('Module Settings', () => {
       expect(document.querySelector('.tab-btn[data-tab="profiles"]')).not.toBeNull();
     });
   });
+
 
   describe('handleSaveProfile', () => {
     it('devrait sauvegarder un nouveau profil (POST)', async () => {
@@ -192,5 +194,45 @@ describe('Module Settings', () => {
       expect(state.setSelectedProfileId).not.toHaveBeenCalled();
       expect(document.querySelector('.list-item.active')).toBeNull();
     });
+
+      describe('loadQueuesStatus', () => {
+    beforeEach(() => {
+      // Réinitialiser le mock avant chaque test
+      api.fetchAPI.mockClear();
+      // Mettre en place un conteneur de base dans le DOM
+      document.body.innerHTML = '<div id="queue-status-container"></div>';
+    });
+
+    it('devrait afficher les files d\'attente quand l\'API renvoie des données', async () => {
+      // Scénario 1: L'API fonctionne
+      const mockQueues = [
+        { name: 'ai_queue', count: 5 },
+        { name: 'default_queue', count: 0 }
+      ];
+      api.fetchAPI.mockResolvedValue(mockQueues);
+
+      await settings.loadQueuesStatus(); // La fonction que vous testez
+
+      const container = document.getElementById('queue-status-container');
+      expect(container.innerHTML).toContain('File: ai_queue');
+      expect(container.innerHTML).toContain('Tâches: 5');
+      expect(container.innerHTML).toContain('File: default_queue');
+      expect(container.innerHTML).toContain('Tâches: 0');
+    });
+
+    it('devrait afficher un message quand l\'API ne renvoie aucune file', async () => {
+      // Scénario 2: L'API renvoie un tableau vide
+      api.fetchAPI.mockResolvedValue([]);
+
+      await settings.loadQueuesStatus();
+
+      const container = document.getElementById('queue-status-container');
+      expect(container.innerHTML).toContain('Aucune information sur les files d\'attente disponible.');
+    });
+
+  
+  });
+
+
   });
 });

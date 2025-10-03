@@ -64,6 +64,9 @@ def create_app(config_override=None):
         }
     }
 
+    # Set the database URI from the configuration
+    app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_URL
+
     CORS(app, resources={r"/api/*": {"origins": "*"}})
     
     # Initialisation des extensions
@@ -141,4 +144,3 @@ if __name__ == "__main__":
     gevent.monkey.patch_all()
     app = create_app()
     socketio.run(app, host="0.0.0.0", port=5000, debug=True, use_reloader=False)
-

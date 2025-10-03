@@ -98,7 +98,7 @@ export async function loadQueuesStatus() {
         setQueuesStatus(status);
     } catch (error) {
         console.error("Erreur lors du chargement du statut des files:", error);
-        setQueuesStatus({ queues: [] }); // État par défaut en cas d'erreur
+        setQueuesStatus([]); // État par défaut en cas d'erreur
     }
 }
 
@@ -108,72 +108,59 @@ export function deleteProfile() { /* Logic to delete profile */ }
 
 export function showPullModelModal() {}
 
-
 /**
  * Fonction principale pour afficher la page des paramètres.
  * --- REFACTORISÉE POUR LE RENDU DYNAMIQUE ---
  */
 export async function renderSettings() {
-    const container = document.querySelector(SELECTORS.settingsContainer); // Already correct
+    const container = document.querySelector(SELECTORS.settingsContainer);
     if (!container) return;
     
     // S'assurer que les données sont chargées avant de continuer
     await loadSettingsData();
 
-    const profiles = appState.analysisProfiles; // Read from state
+    const profiles = appState.analysisProfiles;
 
-    // Vérification que les données critiques sont là
     if (!profiles || !appState.prompts || !appState.queuesInfo) {
-        container.innerHTML = `<div class="placeholder">${MESSAGES.loadingSettingsData}</div>`; // Already correct
-        console.warn(MESSAGES.settingsDataNotReady); // Already correct
+        container.innerHTML = `<div class="placeholder">${MESSAGES.loadingSettingsData}</div>`;
+        console.warn(MESSAGES.settingsDataNotReady);
         return; 
     }
 
-    // 1. Générer le layout HTML dynamique
-    // ✅ CORRECTION: createSettingsLayout modifie le DOM directement, il ne retourne rien.
     createSettingsLayout();
-
-    // 2. Remplir les conteneurs maintenant qu'ils existent dans le DOM (read from appState)
     renderAnalysisProfilesList(profiles, document.querySelector('#profile-list-container'));
     renderPromptTemplates(appState.prompts, document.querySelector('#prompt-templates-list'));
     renderQueueStatus(appState.queuesInfo, document.querySelector('#queue-status-container'));
 
-    // ✅ CORRECTION : Gestion plus robuste de l'échec de connexion à Ollama.
-    // On tente de charger les modèles une seule fois.
     const ollamaConnected = await loadOllamaModels();
     if (ollamaConnected) {
         populateModelSelects(appState.ollamaModels);
         loadInstalledModels();
     } else {
-        displayOllamaConnectionError(); // Affiche un message d'erreur clair.
+        displayOllamaConnectionError();
     }
 
-    // 3. Initialiser les composants interactifs
-    // initializeAllEditors(); // ✅ CORRECTION: Différer l'initialisation des éditeurs
-    setupSettingsEventListeners(); // Attacher les écouteurs aux éléments fraîchement créés
+    setupSettingsEventListeners();
 
-    // 4. Sélectionner le premier profil par défaut
     const defaultProfile = profiles.find(p => p.is_default) || profiles[0];
-    if (defaultProfile && !appState.selectedProfileId) { // Only select if no profile is already selected
+    if (defaultProfile && !appState.selectedProfileId) {
         selectProfile(defaultProfile.id);
     }
 }
 
 /**
  * NOUVELLE FONCTION: Crée le HTML de la structure de la page des paramètres.
- * @returns {string} Le HTML de la grille des paramètres.
  */
 function createSettingsLayout() {
     const mount = document.querySelector(SELECTORS.settingsContainer);
     if (mount && !mount.dataset.initialized) {
-    mount.dataset.initialized = '1';
-    mount.innerHTML = `<div class="grid-2"> <aside class="card"> <div class="card__header"><div class="h3">Paramètres</div></div> <div class="card__body"> <div class="tabs"> <div class="tab-list"> <button class="tab-btn active" data-tab="profiles">Profils</button> <button class="tab-btn" data-tab="models">Modèles</button> <button class="tab-btn" data-tab="templates">Templates</button> <button class="tab-btn" data-tab="queues">Files</button> <button class="tab-btn" data-tab="prefs">Préférences</button> </div> </div> </div> </aside> <section class="card"> <div class="card__header"><div class="h3" id="settingsTitle">Profils d’analyse</div></div> <div class="card__body" id="settingsContent"> <div class="text-muted">Sélectionnez une catégorie à gauche.</div> </div> </section> </div>` ;
+        mount.dataset.initialized = '1';
+        mount.innerHTML = `<div class="grid-2"> <aside class="card"> <div class="card__header"><div class="h3">Paramètres</div></div> <div class="card__body"> <div class="tabs"> <div class="tab-list"> <button class="tab-btn active" data-tab="profiles">Profils</button> <button class="tab-btn" data-tab="models">Modèles</button> <button class="tab-btn" data-tab="templates">Templates</button> <button class="tab-btn" data-tab="queues">Files</button> <button class="tab-btn" data-tab="prefs">Préférences</button> </div> </div> </div> </aside> <section class="card"> <div class="card__header"><div class="h3" id="settingsTitle">Profils d’analyse</div></div> <div class="card__body" id="settingsContent"> <div class="text-muted">Sélectionnez une catégorie à gauche.</div> </div> </section> </div>`;
     }
 }
 
 /**
  * NOUVELLE FONCTION: Crée le HTML pour la section des profils.
- * @returns {string} Le HTML de la section.
  */
 function createProfilesSection() {
     return `
@@ -223,7 +210,6 @@ function createProfilesSection() {
                             </div>
                         </div>
                     </div>
-
                     <div class="form-section">
                         <h4 class="form-section-title">
                             <span class="icon">🤖</span>
@@ -281,7 +267,6 @@ function createProfilesSection() {
 
 /**
  * NOUVELLE FONCTION: Crée le HTML pour la section des modèles IA.
- * @returns {string} Le HTML de la section.
  */
 function createModelsSection() {
     return `
@@ -295,10 +280,10 @@ function createModelsSection() {
                         <label for="available-models-select">Modèles Disponibles</label>
                         <select id="available-models-select" class="form-control--enhanced">
                             <option value="llama3:8b">Llama 3 8B (Recommandé)</option>
-                            <option value="llama3.2:3b">Llama 3.2 3B (Rapide)</option>
-                            <option value="mistral:7b-instruct">Mistral 7B (Analyse)</option>
+                            <option value="phi3:mini">Phi 3 Mini (Très Rapide)</option>
+                            <option value="mistral:7b">Mistral 7B (Analyse)</option>
                             <option value="qwen2:7b">Qwen2 7B (Code)</option>
-                            <option value="tinyllama:1.1b">TinyLlama 1.1B (Tests)</option>
+                            <option value="gemma:2b">Gemma 2B (Léger)</option>
                         </select>
                     </div>
                     <div class="form-group--enhanced">
@@ -334,7 +319,6 @@ function createModelsSection() {
 
 /**
  * NOUVELLE FONCTION: Crée le HTML pour la section des templates.
- * @returns {string} Le HTML de la section.
  */
 function createTemplatesSection() {
     return `
@@ -356,7 +340,6 @@ function createTemplatesSection() {
 
 /**
  * NOUVELLE FONCTION: Crée le HTML pour la section des files d'attente.
- * @returns {string} Le HTML de la section.
  */
 function createQueuesSection() {
     return `
@@ -378,7 +361,6 @@ function createQueuesSection() {
 
 /**
  * NOUVELLE FONCTION: Crée le HTML pour la section des préférences.
- * @returns {string} Le HTML de la section.
  */
 function createPreferencesSection() {
     return `
@@ -434,68 +416,16 @@ function createPreferencesSection() {
     `;
 }
 
-
-/**
- * NOUVELLE FONCTION: Crée le HTML pour les onglets des éditeurs Ace.
- * @returns {string} Le HTML des onglets et des panneaux d'éditeur.
- */
-function createPromptEditorTabs() {
-    // Crée les en-têtes des onglets
-    const tabs = promptTypes.map((type, index) => `
-        <button 
-            type="button" 
-            class="tab-link ${index === 0 ? 'active' : ''}" 
-            data-tab="tab-prompt-${type}"
-        >
-            ${type.charAt(0).toUpperCase() + type.slice(1)}
-        </button>
-    `).join('');
-
-    // Crée les panneaux de contenu pour chaque onglet
-    const panels = promptTypes.map((type, index) => `
-        <div id="tab-prompt-${type}" class="tab-content ${index === 0 ? 'active' : ''}">
-            <div class="form-group">
-                <label for="profile-${type}-model">Modèle LLM</label>
-                <select id="profile-${type}-model" name="${type}_model" class="form-control model-select">
-                    </select>
-            </div>
-            <div class="form-group">
-                <label for="${type}-prompt-system">Prompt Système</label>
-                <div id="${type}-prompt-system" class="ace-editor"></div>
-            </div>
-            <div class="form-group">
-                <label for="${type}-prompt-user">Prompt Utilisateur (Template)</label>
-                <div id="${type}-prompt-user" class="ace-editor"></div>
-            </div>
-        </div>
-    `).join('');
-
-    return `
-        <div class="tabs">
-            <div class="tab-header">
-                ${tabs}
-            </div>
-            <div class="tab-body">
-                ${panels}
-            </div>
-        </div>
-    `;
-}
-
-
 /**
  * Renders the list of analysis profiles.
- * @param {Array} profiles - The list of analysis profiles.
- * @param {HTMLElement} container - The container element to render the list into.
  */
 function renderAnalysisProfilesList(profiles, container) {
     if (!container) return;
     if (!profiles || profiles.length === 0) {
-        container.innerHTML = `<p class="placeholder">${MESSAGES.noAnalysisProfileFound}</p>`; // Already correct
+        container.innerHTML = `<p class="placeholder">${MESSAGES.noAnalysisProfileFound}</p>`;
         return;
     }
 
-    // Utilisation des classes CSS du nouveau design system
     const listHtml = profiles.map(profile => `
         <div class="list-item" data-profile-id="${profile.id}">
             <div class="list-item__content">
@@ -507,7 +437,6 @@ function renderAnalysisProfilesList(profiles, container) {
     
     container.innerHTML = `<div class="list-group">${listHtml}</div>`;
     
-    // Attacher les écouteurs de clic
     container.querySelectorAll('.list-item').forEach(item => {
         item.addEventListener('click', () => selectProfile(item.dataset.profileId));
     });
@@ -515,7 +444,6 @@ function renderAnalysisProfilesList(profiles, container) {
 
 /**
  * Gère le rendu du contenu de la section Paramètres en fonction de l'onglet actif.
- * @param {string} tabId - L'ID de l'onglet à afficher ('profiles', 'models', etc.).
  */
 function renderSettingsSection(tabId) {
     const contentContainer = document.getElementById('settingsContent');
@@ -543,8 +471,6 @@ function renderSettingsSection(tabId) {
     }
     contentContainer.innerHTML = html;
 
-    // Après avoir injecté le HTML, il faut réinitialiser les composants et écouteurs
-    // qui dépendent de ce contenu.
     if (tabId === 'profiles') {
         renderAnalysisProfilesList(appState.analysisProfiles, document.querySelector('#profile-list-container'));
         populateModelSelects(appState.ollamaModels);
@@ -553,21 +479,19 @@ function renderSettingsSection(tabId) {
         if (defaultProfile) selectProfile(defaultProfile.id);
     } else if (tabId === 'models') {
         loadInstalledModels();
-        populateModelSelects(appState.ollamaModels); // Pour le sélecteur de téléchargement
+        populateModelSelects(appState.ollamaModels);
     } else if (tabId === 'templates') {
         renderPromptTemplates(appState.prompts, document.querySelector('#prompt-templates-list'));
     } else if (tabId === 'queues') {
         renderQueueStatus(appState.queuesInfo, document.querySelector('#queue-status-container'));
     }
 
-    // Ré-attacher les écouteurs d'événements globaux de la section
     setupSettingsEventListeners();
 }
 
 function initSettingsTabs() {
   const tabBtns = document.querySelectorAll('.tab-btn');
   const title = document.getElementById('settingsTitle');
-  const contentContainer = document.getElementById('settingsContent');
 
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -575,7 +499,6 @@ function initSettingsTabs() {
       btn.classList.add('active');
       const tab = btn.dataset.tab;
       
-      // ✅ CORRECTION : Mettre à jour le titre et appeler la fonction de rendu de section.
       const titles = {
         profiles: "Profils d’analyse",
         models: "Modèles IA",
@@ -591,10 +514,8 @@ function initSettingsTabs() {
 
 /**
  * Configure tous les écouteurs d'événements pour la page des paramètres.
- * NOTE: Cette fonction est maintenant appelée APRÈS la création du DOM.
  */
 function setupSettingsEventListeners() {
-    // Écouteurs pour les boutons principaux
     document.querySelector('#new-profile-btn')?.addEventListener('click', handleNewProfile); 
     document.querySelector('#delete-profile-btn')?.addEventListener('click', handleDeleteProfile); 
     document.querySelector('#apply-template-btn')?.addEventListener('click', () => {
@@ -606,17 +527,15 @@ function setupSettingsEventListeners() {
     document.querySelector(SELECTORS.refreshQueuesBtn)?.addEventListener('click', async () => {
         showToast(MESSAGES.refreshingQueuesStatus, 'info');
         await loadQueuesStatus();
-        renderQueueStatus(appState.queuesInfo, document.querySelector('#queue-status-container')); // Rerender only the queue status part
+        renderQueueStatus(appState.queuesInfo, document.querySelector('#queue-status-container'));
     });
 
-    // Écouteur pour le formulaire
     const profileEditForm = document.querySelector(SELECTORS.settingsForm);
     if (profileEditForm) {
         profileEditForm.addEventListener('submit', handleSaveProfile);
     }
 
     initSettingsTabs();
-
 }
 
 /**
@@ -663,7 +582,7 @@ function populateModelSelects(models) {
  */
 function initializeAllEditors(retryCount = 0) {
     if (typeof ace === 'undefined') {
-        if (retryCount > 50) { // Limite de 5 secondes
+        if (retryCount > 50) {
             console.error(MESSAGES.aceNotLoaded);
             return;
         }
@@ -708,9 +627,8 @@ export function selectProfile(profileId) {
         return;
     }
     
-    setSelectedProfileId(profileId); // Stocker l'ID sélectionné via state.js
+    setSelectedProfileId(profileId);
 
-    // Mettre à jour la liste pour afficher la sélection
     document.querySelectorAll(`${SELECTORS.settingsContainer} .list-item`).forEach(item => {
         item.classList.remove('active');
         if (item.dataset.profileId === profileId) {
@@ -718,7 +636,6 @@ export function selectProfile(profileId) {
         }
     });
 
-    // Charger les données dans le formulaire
     renderProfileForm(profile);
 }
 
@@ -734,7 +651,6 @@ function renderProfileForm(profile) {
     form.querySelector('#profile-description').value = profile.description || ''; 
     form.querySelector('#profile-is_default').checked = profile.is_default || false; 
 
-    // Définir les valeurs des sélecteurs de modèles
     promptTypes.forEach(type => {
         const select = form.querySelector(`#profile-${type}-model`);
         if (select) {
@@ -742,9 +658,8 @@ function renderProfileForm(profile) {
         }
     });
 
-    // Gérer le bouton de suppression
     const deleteBtn = document.querySelector('#delete-profile-btn');
-    if (profile.is_default || profile.id.startsWith('new_')) {
+    if (profile.is_default || (profile.id && profile.id.startsWith('new_'))) {
         deleteBtn.disabled = true;
         deleteBtn.title = profile.is_default ? MESSAGES.cannotDeleteDefaultProfile : "";
     } else {
@@ -752,10 +667,9 @@ function renderProfileForm(profile) {
         deleteBtn.title = MESSAGES.deleteThisProfile;
     }
 
-    // Charger les prompts dans les éditeurs Ace
     promptTypes.forEach(type => {
         const promptKey = (type === 'stakeholder') ? 'stakeholder_analysis_prompt' : `${type}_prompt`;
-        const dbContent = profile[promptKey] || "{}"; // Assuming it's a JSON string
+        const dbContent = profile[promptKey] || "{}";
         let promptData = { system: "", user: "" };
 
         try {
@@ -763,7 +677,6 @@ function renderProfileForm(profile) {
             promptData.system = parsedData.system || "";
             promptData.user = parsedData.user || "";
         } catch (e) {
-            // If parsing fails, assume it's plain text for system prompt and empty user prompt
             promptData.system = dbContent;
             promptData.user = "";
         }
@@ -777,7 +690,6 @@ function renderProfileForm(profile) {
     });
 }
 
-
 /**
  * Applique un modèle de prompt (template) aux éditeurs de prompts actuellement actifs.
  */
@@ -786,14 +698,12 @@ function applyPromptTemplate(templateId) {
     const template = templates.find(t => t.id === templateId);
     if (!template) return;
 
-    // Trouver l'onglet actif pour deviner où appliquer le template
     const activeTab = document.querySelector('.tab-content.active');
     let targetType = null;
     if (activeTab) {
         targetType = activeTab.id.replace('tab-prompt-', '');
     }
 
-    // Si aucun onglet n'est actif ou si on ne peut pas deviner, essayer de deviner par le nom
     if (!targetType) {
         targetType = promptTypes.find(type => template.name.toLowerCase().includes(type));
     }
@@ -857,10 +767,6 @@ function collectProfileData() {
     return data;
 }
 
-
-/**
- * Gestionnaire pour la création d'un nouveau profil.
- */ // This function is not exported, so it's fine
 function handleNewProfile() {
     const newProfile = {
         id: `new_${Date.now()}`,
@@ -869,13 +775,9 @@ function handleNewProfile() {
         is_default: false,
     };
     
-    // Remplir le formulaire avec le profil vide
     renderProfileForm(newProfile);
-
-    // Mettre l'ID à "" pour indiquer à l'API qu'il s'agit d'un POST (Créer)
     document.querySelector('#profile-id').value = ""; 
     
-    // Désélectionner dans la liste
     document.querySelectorAll(`${SELECTORS.settingsContainer} .list-item`).forEach(item => {
         item.classList.remove('active');
     });
@@ -883,9 +785,6 @@ function handleNewProfile() {
     document.querySelector('#profile-name').focus();
 }
 
-/**
- * Gestionnaire pour la sauvegarde (POST ou PUT) d'un profil.
- */
 export async function handleSaveProfile(e) {
     e.preventDefault();
     const form = e.target;
@@ -905,7 +804,7 @@ export async function handleSaveProfile(e) {
             url = API_ENDPOINTS.analysisProfileById(profileId);
             method = 'PUT';
         } else {
-            delete profileData.id; // Assurez-vous que l'ID n'est pas envoyé pour la création
+            delete profileData.id;
         }
 
         const updatedProfile = await fetchAPI(url, {
@@ -915,10 +814,9 @@ export async function handleSaveProfile(e) {
 
         showToast(MESSAGES.profileSaved(updatedProfile.name), 'success');
         
-        await loadAnalysisProfiles(); // This now updates state via setAnalysisProfiles
-        renderSettings(); // Re-render complet
+        await loadAnalysisProfiles();
+        renderSettings();
         
-        // Resélectionner le profil qui vient d'être sauvegardé/créé
         selectProfile(updatedProfile.id);
 
     } catch (error) {
@@ -930,12 +828,8 @@ export async function handleSaveProfile(e) {
     }
 }
 
-/**
- * Gestionnaire pour la suppression d'un profil (après confirmation).
- * --- REFACTORISÉ AVEC showConfirmModal ---
- */
 export async function handleDeleteProfile() {
-    const profileId = appState.selectedProfileId; // Read from state
+    const profileId = appState.selectedProfileId;
     const profiles = appState.analysisProfiles;
     const profile = profiles.find(p => p.id === profileId);
 
@@ -944,7 +838,6 @@ export async function handleDeleteProfile() {
         return;
     }
 
-    // Utilisation de la nouvelle modale de confirmation
     showConfirmModal(
         MESSAGES.confirmProfileDeleteTitle,
         MESSAGES.confirmDeleteBody('le profil', profile.name),
@@ -956,8 +849,8 @@ export async function handleDeleteProfile() {
                     await fetchAPI(API_ENDPOINTS.analysisProfileById(profileId), { method: 'DELETE' });
                     showToast(MESSAGES.profileDeleted(profile.name), 'success');
                     
-                    await loadAnalysisProfiles(); // This now updates state via setAnalysisProfiles
-                    renderSettings(); // Re-render (sélectionnera le nouveau profil par défaut)
+                    await loadAnalysisProfiles();
+                    renderSettings();
 
                 } catch (error) {
                     console.error(MESSAGES.errorDeletingProfile, error);
@@ -968,47 +861,38 @@ export async function handleDeleteProfile() {
     );
 }
 
-
 /**
  * Affiche le statut des files d'attente RQ.
  */
-function renderQueueStatus(status, container) {
-    if (!container || !status || !status.queues) return;
+function renderQueueStatus(queues, container) {
+    if (!container || !queues) {
+        return;
+    }
+
+    // ✅ CORRECTION: Gérer le cas où 'queues' n'est pas un tableau ou est vide.
+    if (!Array.isArray(queues) || queues.length === 0) {
+        container.innerHTML = '<p class="placeholder">Aucune information sur les files d\'attente disponible.</p>';
+        return;
+    }
 
     let html = '<ul class="list-group list-group--condensed">';
-    Object.keys(status.queues).forEach(qName => {
-        const queue = status.queues[qName];
-         html += `
+    queues.forEach(queue => {
+        const queueName = queue.name || 'undefined';
+        const jobCount = queue.count !== undefined ? queue.count : 'N/A';
+        html += `
             <li class="list-item list-item--condensed">
                 <div class="list-item__content">
-                    File: <strong>${queue.display}</strong>
+                    File: <strong>${queueName}</strong>
                 </div>
-                <span class="badge badge--primary" title="Tâches en attente">${queue.pending}</span>
+                <span class="badge badge--primary" title="Tâches en attente">${jobCount}</span>
             </li>
         `;
     });
     
-    // Vérifier s'il y a des workers
-    if (!status.workers || status.workers.length === 0) {
-        html += `
-            <li class="list-item list-item--condensed">
-                <div class="list-item__content text-danger">
-                    <strong>Aucun worker actif détecté.</strong>
-                    <small>Les tâches ne seront pas traitées.</small>
-                </div>
-            </li>
-        `;
-    }
-    
     html += '</ul>';
-    
     container.innerHTML = html;
 }
-    }
-/**
- * Gère le vidage d'une file d'attente spécifique.
- * @param {string} queueName - Le nom de la file à vider.
- */
+    
 export async function handleClearQueue(queueName) {
     if (!queueName) return;
 
@@ -1021,22 +905,12 @@ export async function handleClearQueue(queueName) {
             onConfirm: async () => {
                 await fetchAPI(API_ENDPOINTS.queuesClear, { method: 'POST', body: { queue_name: queueName } });
                 showToast(MESSAGES.queueCleared(queueName), 'success');
-                await loadQueuesStatus(); // Recharger le statut
+                await loadQueuesStatus();
             }
         }
     );
 }
 
-/**
- * Gère le téléchargement (pull) d'un nouveau modèle Ollama.
- */
-export async function handlePullModel() {
-    // This function is now handled by downloadModel
-}
-
-/**
- * Gère la sauvegarde d'un modèle de prompt.
- */
 export async function handleSavePrompt(event) {
     event.preventDefault();
     const form = event.target;
@@ -1062,29 +936,22 @@ export async function handleSavePrompt(event) {
     await loadPrompts();
 }
 
-/**
- * Ouvre la modale d'édition de profil, soit pour un nouveau profil, soit pour un profil existant.
- * @param {string|null} profileId - L'ID du profil à éditer, ou null pour un nouveau.
- */
 export function openProfileEditor(profileId = null) {
     if (profileId) {
-        const profile = appState.analysisProfiles.find(p => p.id === profileId); // Read from state
+        const profile = appState.analysisProfiles.find(p => p.id === profileId);
         if (profile) {
-            // Logique pour pré-remplir le formulaire avec les données du profil
             console.log('Editing profile:', profile);
         }
     } else {
-        // Logique pour réinitialiser le formulaire pour un nouveau profil
         console.log('Creating new profile');
     }
-    openModal('profileEditorModal'); // Assurez-vous que ce modal existe dans votre HTML
+    openModal('profileEditorModal');
 }
 
 export function handleDownloadSelectedModel() {
     const select = document.querySelector('#available-models-select'); 
     if (select) {
         const modelName = select.value;
-        // Appelle la logique que Gemini a écrite
         downloadModel(modelName); 
     } else {
         console.error(MESSAGES.selectNotFound);
@@ -1092,9 +959,6 @@ export function handleDownloadSelectedModel() {
     }
 }
 
-// --- New functions from GEMINI.md ---
-
-// Fonction pour démarrer le téléchargement d'un modèle
 export async function downloadModel(modelName) {
     try {
         showDownloadProgress(modelName);
@@ -1112,7 +976,6 @@ export async function downloadModel(modelName) {
         showToast(`${MESSAGES.downloadError}: ${error.message}`, 'error');
     } finally {
         hideDownloadProgress();
-    }
     }
 }
 
@@ -1133,28 +996,30 @@ export async function loadInstalledModels() {
         console.error('Erreur chargement modèles installés :', error);
         const indicator = document.querySelector('#ollama-status-indicator');
         if (indicator) {
-            indicator.classList.replace('status-indicator--success', 'status-indicator--error');
             indicator.querySelector('span:last-child').textContent = 'Connexion échouée';
         }
+    }
 }
 
-// Assurer que cette fonction est appelée lorsque la section des paramètres est affichée.
-// Par exemple, dans la fonction renderSettings() :
 
-// Ajouter un bouton pour rafraîchir manuellement
 document.querySelector('#refresh-queues-btn')?.addEventListener('click', async () => {
     showToast(MESSAGES.refreshingQueuesStatus, 'info');
     await loadQueuesStatus();
-    }
-}
+});
+
 
 function showDownloadProgress(modelName) {
     const progressContainer = document.querySelector('#download-progress'); 
     const statusElement = document.querySelector('#download-status'); 
-    progressContainer.style.display = 'block';
-    statusElement.textContent = MESSAGES.downloadingModel(modelName);
+    if(progressContainer && statusElement) {
+        progressContainer.style.display = 'block';
+        statusElement.textContent = MESSAGES.downloadingModel(modelName);
+    }
 }
 
 function hideDownloadProgress() {
-    document.querySelector('#download-progress').style.display = 'none'; 
+    const progressContainer = document.querySelector('#download-progress');
+    if(progressContainer) {
+        progressContainer.style.display = 'none'; 
+    }
 }

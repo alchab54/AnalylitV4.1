@@ -66,6 +66,9 @@ class Settings(BaseSettings):
     # ✅ AJOUT: Paramètres pour la pagination PubMed
     MAX_PUBMED_RESULTS: int = 1000
     PAGE_SIZE_PUBMED: int = 200
+
+    # --- Paramètres de la base de données ---
+    DB_SCHEMA: str = "analylit_schema"
     
     # --- Configuration des Modèles IA ---
     # Chargé depuis profiles.json via la fonction `load_default_models`
