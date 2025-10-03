@@ -978,7 +978,7 @@ function renderQueueStatus(status, container) {
     let html = '<ul class="list-group list-group--condensed">';
     Object.keys(status.queues).forEach(qName => {
         const queue = status.queues[qName];
-        html += `
+         html += `
             <li class="list-item list-item--condensed">
                 <div class="list-item__content">
                     File: <strong>${queue.display}</strong>

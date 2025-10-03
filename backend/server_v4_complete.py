@@ -1,11 +1,9 @@
 import logging
 # --- CORRECTION CRITIQUE : Résolution du ModuleNotFoundError ---
-# Ce bloc de code est essentiel pour rendre le serveur exécutable directement
-# pour le développement local. Il ajoute la racine du projet au chemin de Python,
-# permettant ainsi aux imports absolus (ex: `from api.admin import admin_bp`) de fonctionner.
 import sys
 from pathlib import Path
 
+# Ajoute la racine du projet au chemin Python
 project_root = Path(__file__).resolve().parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
@@ -13,25 +11,16 @@ if str(project_root) not in sys.path:
 logger = logging.getLogger(__name__)
 
 import feedparser
-
 # --- CORRECTIF DE COMPATIBILITÉ PYZOTERO / FEEDPARSER ---
-# pyzotero tente de patcher une méthode interne de feedparser qui n'existe plus.
-# Nous appliquons manuellement un patch compatible avant d'importer pyzotero.
 if not hasattr(feedparser, '_FeedParserMixin'):
     feedparser._FeedParserMixin = type('_FeedParserMixin', (object,), {})
 
 import os
 import json
 import uuid
-import io
-import csv
-import zipfile
-from pathlib import Path
-import pandas as pd
-import rq
-import subprocess
-import requests
-from flask import Flask, request, jsonify, send_from_directory, abort, send_file, Blueprint, current_app
+from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
+from sqlalchemy.orm import sessionmaker
 
 # --- Import des Blueprints API ---
 from api.admin import admin_bp
@@ -42,152 +31,114 @@ from api.projects import projects_bp
 from api.reporting import reporting_bp
 from api.search import search_bp
 from api.selection import selection_bp
-from api.prompts import prompts_bp # ✅ CORRECTION: Import du blueprint manquant pour les prompts
+from api.prompts import prompts_bp
 from api.settings import settings_bp
 from api.stakeholders import stakeholders_bp
-
-from flask_cors import CORS
-from sqlalchemy.exc import IntegrityError
-from rq.worker import Worker 
-from werkzeug.utils import secure_filename
-
+from api.tasks import tasks_bp
 
 # --- Imports des utilitaires et de la configuration ---
 from flask_socketio import SocketIO
 from utils.extensions import db, migrate
-from utils.database import with_db_session # Importer seulement le décorateur
-from utils.app_globals import (
-    processing_queue, synthesis_queue, analysis_queue, background_queue,
-    extension_queue, redis_conn, models_queue
-)
-
-from utils.models import Project, Grid, Extraction, Prompt, AnalysisProfile, SearchResult, ChatMessage, RiskOfBias
-from api.tasks import tasks_bp # type: ignore
-from utils.file_handlers import save_file_to_project_dir
-from utils.app_globals import PROJECTS_DIR as PROJECTS_DIR_STR
-from utils.prisma_scr import get_base_prisma_checklist
-import utils.models  # noqa
-from datetime import datetime
-from rq.job import Job
-from rq.registry import StartedJobRegistry, FinishedJobRegistry, FailedJobRegistry
-
-# --- Imports des tâches asynchrones ---
-from backend.tasks_v4_complete import (
-    run_extension_task, multi_database_search_task, process_single_article_task,
-    run_synthesis_task, run_discussion_generation_task, run_knowledge_graph_task,
-    run_prisma_flow_task, run_meta_analysis_task, run_descriptive_stats_task, run_atn_score_task,
-    import_from_zotero_file_task, import_pdfs_from_zotero_task, index_project_pdfs_task,
-    answer_chat_question_task, run_risk_of_bias_task,
-    import_from_zotero_json_task,
-    add_manual_articles_task, pull_ollama_model_task, calculate_kappa_task,
-    run_atn_specialized_extraction_task, run_empathy_comparative_analysis_task
-)
-
-# --- Imports pour l_extension Zotero ---
-from utils.importers import process_zotero_item_list
-# Simulez ou remplacez par vos vraies fonctions de BDD et d_export
-# Assurez-vous que 'with_db_session' est importé si vous l_utilisez dans les fonctions ci-dessous
-from utils.database import with_db_session
-
-# Convertir PROJECTS_DIR en objet Path pour assurer la compatibilité
-PROJECTS_DIR = Path(PROJECTS_DIR_STR)
+from utils.app_globals import redis_conn
+from utils.models import Project, Extraction, SearchResult
+from backend.config.config_v4 import get_config
 
 # --- Initialisation des extensions ---
-# On les déclare ici pour qu_elles soient accessibles globalement,
-# mais on les initialise dans create_app()
 socketio = SocketIO()
-
 
 def create_app(config_override=None):
     """Factory pour créer et configurer l'application Flask."""
-    # ✅ CORRECTION: Utiliser une configuration standard pour les fichiers statiques.
-    # 'static_folder' pointe vers le dossier 'web'.
-    # 'static_url_path' est le préfixe URL pour y accéder (ex: /static/css/style.css).
-    # Cela évite les conflits de routes.
     app = Flask(__name__, static_folder='../web', static_url_path='/static')
-
-    # Configuration de base
+    
+    # Configuration
+    config = get_config()
+    app.config.from_object(config)
     if config_override:
         app.config.update(config_override)
-    
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    # Configuration de la base de données avec le schéma
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-        # ✅ CORRECTION DÉFINITIVE: Assurer que TOUTES les connexions SQLAlchemy
-        # (y compris celles de Flask-Migrate CLI) utilisent le bon schéma.
-        # Cela résout le problème où `flask db current` ne trouvait pas la version.
-        'pool_size': 10,
-        'pool_recycle': 120,
         'pool_pre_ping': True,
         "connect_args": {
-            "options": "-c search_path=analylit_schema,public"
+            "options": f"-c search_path={config.DB_SCHEMA},public"
         }
     }
 
-    # ✅ CORRECTION CORS: Initialiser Flask-CORS pour autoriser les requêtes cross-origin
-    # depuis le frontend de développement (ex: localhost:8080) vers le backend (localhost:5000).
-    # Ceci résout l'erreur "blocked by CORS policy".
     CORS(app, resources={r"/api/*": {"origins": "*"}})
-
+    
     # Initialisation des extensions
     db.init_app(app)
     migrate.init_app(app, db)
-    socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent')
+    socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent', message_queue=app.config['REDIS_URL'])
 
     # Enregistrement des blueprints
-    app.register_blueprint(admin_bp, url_prefix='/api')
-    app.register_blueprint(analysis_profiles_bp, url_prefix='/api')
-    app.register_blueprint(extensions_bp, url_prefix='/api')
-    app.register_blueprint(settings_bp, url_prefix='/api', name='settings_api')
-    app.register_blueprint(files_bp, url_prefix='/api')
-    app.register_blueprint(projects_bp, url_prefix='/api')
-    app.register_blueprint(reporting_bp, url_prefix='/api')
-    app.register_blueprint(search_bp, url_prefix='/api')
-    app.register_blueprint(selection_bp, url_prefix='/api')
-    app.register_blueprint(prompts_bp, url_prefix='/api')
-    app.register_blueprint(tasks_bp, url_prefix='/api')
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(analysis_profiles_bp)
+    app.register_blueprint(extensions_bp)
+    app.register_blueprint(files_bp)
+    app.register_blueprint(projects_bp)
+    app.register_blueprint(prompts_bp)
+    app.register_blueprint(reporting_bp)
+    app.register_blueprint(search_bp)
+    app.register_blueprint(selection_bp)
+    app.register_blueprint(settings_bp)
+    app.register_blueprint(stakeholders_bp)
+    app.register_blueprint(tasks_bp)
 
-
-    # Routes de base
+    # --- Routes Spécifiques ---
+    
     @app.route('/')
     def serve_frontend():
         """Sert l'interface frontend HTML."""
-        # Sert explicitement le fichier index.html depuis le dossier 'web'.
-        return send_from_directory('../web', 'index.html')
+        return send_from_directory(app.static_folder, 'index.html')
 
-    @app.route("/api/health", methods=["GET"])
-    def api_health_check():
-        return jsonify({"status": "healthy", "message": "AnalyLit v4.1 opérationnelle"}), 200
+    @app.route('/api/health', methods=['GET'])
+    def health_check():
+        return jsonify({"status": "healthy"})
 
-    @app.errorhandler(404)    
-    def not_found(error):
-        if request.path.startswith('/api/'):
-            return jsonify({"error": "Endpoint API non trouvé", "path": request.path}), 404
-        return jsonify({"error": "Page non trouvée", "message": "Application backend fonctionnelle"}), 404
+    # ✅ **PATCH n°1 : Enrichir l'endpoint des extractions**
+    @app.route('/api/projects/<project_id>/extractions', methods=['GET'])
+    def get_project_extractions(project_id):
+        """Retourne les extractions avec l'abstract de l'article."""
+        Session = sessionmaker(bind=db.engine)
+        session = Session()
+        try:
+            results = session.query(Extraction, SearchResult.abstract, SearchResult.title).\
+                outerjoin(SearchResult, (Extraction.pmid == SearchResult.article_id) & (Extraction.project_id == SearchResult.project_id)).\
+                filter(Extraction.project_id == project_id).\
+                all()
 
-    # ✅ RETURN CRITIQUE
+            combined_results = []
+            for extraction, abstract, title in results:
+                extraction_dict = extraction.to_dict()
+                extraction_dict['abstract'] = abstract or "Abstract non disponible."
+                extraction_dict['title'] = title or extraction.title # Assurer un titre
+                combined_results.append(extraction_dict)
+            
+            return jsonify(combined_results)
+        finally:
+            session.close()
+            
+    # ✅ **PATCH n°2 : Fiabiliser l'endpoint des files d'attente**
+    @app.route('/api/queues/info', methods=['GET'])
+    def get_queues_info():
+        """Retourne le statut des files d'attente RQ."""
+        from rq import Queue
+        queues_to_check = ['ai_queue', 'analysis_queue', 'background_queue', 'default_queue', 'fast_queue', 'extension_queue']
+        queues_info = []
+        for q_name in queues_to_check:
+            q = Queue(q_name, connection=redis_conn)
+            queues_info.append({
+                "name": q_name,
+                "count": q.count, # Nombre de tâches en attente
+            })
+        return jsonify(queues_info)
+
     return app
-
-def register_models():
-    """Force l_enregistrement de tous les modèles."""
-    pass  # Juste le fait d_importer ce module enregistre les modèles
-
-# --- GUNICORN HOOK ---
-def post_fork(server, worker):
-    """
-    Hook Gunicorn pour s_assurer que chaque worker a sa propre initialisation de DB.
-    Cela évite les problèmes de partage de connexion entre les processus.
-    """
-    import gevent.monkey
-
-    server.log.info("Worker %s forked.", worker.pid)
 
 if __name__ == "__main__":
     import gevent.monkey
     gevent.monkey.patch_all()
+    app = create_app()
+    socketio.run(app, host="0.0.0.0", port=5000, debug=True, use_reloader=False)
 
-    # Créer l'application pour le développement local
-    app = create_app() # L'instance est locale à ce bloc
-
-    # Utilise le serveur de développement de SocketIO
-    socketio.run(app, host="0.0.0.0", port=5000, debug=True, allow_unsafe_werkzeug=True)
