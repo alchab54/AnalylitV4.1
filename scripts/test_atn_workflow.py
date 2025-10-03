@@ -7,14 +7,12 @@ Teste l'équation PubMed spécialisée Alliance Thérapeutique Numérique
 import requests
 import time
 import json
-import os # ✅ AJOUT: Pour lire les variables d'environnement
+import os
 import sys
 from datetime import datetime
 
 class AnalyLitATNWorkflow:
     def __init__(self):
-        # ✅ AMÉLIORATION: Utiliser les variables d'environnement pour déterminer l'URL de l'API.
-        # Cela rend le script compatible avec tous les environnements (local, dev, prod).
         host = os.environ.get("API_HOST", "localhost")
         port = os.environ.get("API_PORT", "5000")
         base_url = f"http://{host}:{port}"
@@ -67,6 +65,83 @@ class AnalyLitATNWorkflow:
             
         return False
 
+    def upload_local_pdfs(self, pdf_folder_path):
+        """Uploader des PDFs depuis un dossier local."""
+        if not self.project_id:
+            self.log("✗ Pas de projet actif pour l'upload")
+            return False
+
+        if not os.path.isdir(pdf_folder_path):
+            self.log(f"✗ Dossier de PDFs non trouvé: {pdf_folder_path}")
+            return False
+
+        pdf_files = [f for f in os.listdir(pdf_folder_path) if f.lower().endswith('.pdf')]
+        if not pdf_files:
+            self.log(f"✗ Aucun fichier PDF trouvé dans {pdf_folder_path}")
+            return False
+
+        self.log(f"📤 Upload de {len(pdf_files)} PDFs depuis {pdf_folder_path}...")
+        
+        files_to_upload = []
+        for pdf_file in pdf_files:
+            file_path = os.path.join(pdf_folder_path, pdf_file)
+            files_to_upload.append(('files', (pdf_file, open(file_path, 'rb'), 'application/pdf')))
+
+        try:
+            response = requests.post(
+                f"{self.api_url}/projects/{self.project_id}/upload-pdfs-bulk",
+                files=files_to_upload,
+                timeout=300
+            )
+
+            if response.status_code == 202:
+                job_data = response.json()
+                job_id = job_data.get('job_id')
+                self.log(f"✓ Upload en cours (Job: {job_id})")
+                return self.wait_for_task(job_id, "upload PDFs", timeout=900)
+            else:
+                self.log(f"✗ Échec de l'upload: {response.status_code} - {response.text}")
+                return False
+        except Exception as e:
+            self.log(f"✗ Erreur lors de l'upload: {e}")
+            return False
+        finally:
+            for _, (filename, file_obj, _) in files_to_upload:
+                file_obj.close()
+
+    def import_from_zotero_export(self, zotero_json_path):
+        """Importer des références depuis un export Zotero JSON."""
+        if not self.project_id:
+            self.log("✗ Pas de projet actif pour l'import Zotero")
+            return False
+
+        if not os.path.isfile(zotero_json_path):
+            self.log(f"✗ Fichier d'export Zotero non trouvé: {zotero_json_path}")
+            return False
+
+        self.log(f"📥 Import depuis {zotero_json_path}...")
+
+        with open(zotero_json_path, 'rb') as f:
+            files = {'file': (os.path.basename(zotero_json_path), f, 'application/json')}
+            try:
+                response = requests.post(
+                    f"{self.api_url}/projects/{self.project_id}/upload-zotero",
+                    files=files,
+                    timeout=120
+                )
+
+                if response.status_code == 202:
+                    job_data = response.json()
+                    job_id = job_data.get('job_id')
+                    self.log(f"✓ Import Zotero en cours (Job: {job_id})")
+                    return self.wait_for_task(job_id, "import Zotero", timeout=600)
+                else:
+                    self.log(f"✗ Échec de l'import Zotero: {response.status_code} - {response.text}")
+                    return False
+            except Exception as e:
+                self.log(f"✗ Erreur lors de l'import Zotero: {e}")
+                return False
+
     def run_atn_search(self):
         """Lancer la recherche avec l'équation ATN spécialisée"""
         if not self.project_id:
@@ -94,7 +169,7 @@ class AnalyLitATNWorkflow:
                 job_id = job_data.get('job_id')
                 self.log(f"✓ Recherche lancée (Job: {job_id})")
                 
-                return self.wait_for_task(job_id, "recherche ATN", timeout=900) # ✅ TIMEOUT AUGMENTÉ
+                return self.wait_for_task(job_id, "recherche ATN", timeout=900)
             else:
                 self.log(f"✗ Échec recherche: {response.status_code}")
                 
@@ -103,7 +178,7 @@ class AnalyLitATNWorkflow:
             
         return False
 
-    def wait_for_task(self, job_id, task_name="tâche", timeout=900): # ✅ TIMEOUT PAR DÉFAUT AUGMENTÉ
+    def wait_for_task(self, job_id, task_name="tâche", timeout=900):
         """Attendre qu'une tâche asynchrone se termine"""
         if not job_id:
             return False
@@ -121,10 +196,9 @@ class AnalyLitATNWorkflow:
                 if response.status_code == 200:
                     task_data = response.json()
                     status = task_data.get('status')
-                    queue_name = task_data.get('queue_name', 'N/A') # Pour le debug
+                    queue_name = task_data.get('queue_name', 'N/A')
                     
-                    if status == 'finished': # ✅ CORRECTION: RQ utilise 'finished'
-                        # ✅ AMÉLIORATION: Vérifier s'il y a une exception, même si le statut est 'finished'.
+                    if status == 'finished':
                         if task_data.get('exc_info'):
                             self.log(f"✗ {task_name} terminée avec une erreur: {task_data.get('exc_info')}")
                             return False
@@ -132,10 +206,10 @@ class AnalyLitATNWorkflow:
                             self.log(f"✓ {task_name} terminée avec succès")
                             return True
                     elif status == 'failed':
-                        error = task_data.get('exc_info', 'Erreur inconnue') # ✅ CORRECTION: Utiliser exc_info
+                        error = task_data.get('exc_info', 'Erreur inconnue')
                         self.log(f"✗ {task_name} échouée: {error}")
                         return False
-                    elif status in ['queued', 'started']: # ✅ CORRECTION: RQ utilise 'started'
+                    elif status in ['queued', 'started']:
                         progress = task_data.get('progress')
                         if progress:
                             self.log(f"⏳ {task_name} en cours... ({progress:.1%})", end='\r')
@@ -144,10 +218,9 @@ class AnalyLitATNWorkflow:
                         
             except Exception as e:
                 self.log(f"⚠️ Erreur vérification statut ({job_id}): {e}")
-                # Petite pause en cas d'erreur réseau avant de réessayer
                 time.sleep(2)
                 
-            time.sleep(5) # Pause entre chaque vérification
+            time.sleep(5)
 
         self.log(f"⏰ Timeout: {task_name} trop longue")
         return False
@@ -212,7 +285,7 @@ class AnalyLitATNWorkflow:
                     job_data = response.json()
                     job_id = job_data.get('job_id')
                     
-                    if self.wait_for_task(job_id, f"analyse {analysis_type}", timeout=900): # ✅ TIMEOUT AUGMENTÉ
+                    if self.wait_for_task(job_id, f"analyse {analysis_type}", timeout=900):
                         results[analysis_type] = "success"
                     else:
                         results[analysis_type] = "failed"
@@ -235,7 +308,6 @@ class AnalyLitATNWorkflow:
         """Exporte les résultats du projet."""
         self.log("Lancement de la tâche d'export Excel...")
         try:
-            # ✅ CORRECTION: Utiliser le bon endpoint qui enfile une tâche
             response = requests.post(f"{self.api_url}/projects/{self.project_id}/reports/excel-export", timeout=60)
             
             if response.status_code == 202:
@@ -243,7 +315,6 @@ class AnalyLitATNWorkflow:
                 job_id = job_data.get('job_id')
                 self.log(f"✓ Tâche d'export lancée (Job: {job_id})")
                 
-                # Attendre la fin de la tâche d'export
                 return self.wait_for_task(job_id, "export Excel", timeout=300)
             else:
                 self.log(f"✗ Échec du lancement de l'export: {response.status_code} - {response.text}")
@@ -252,7 +323,7 @@ class AnalyLitATNWorkflow:
             self.log(f"✗ Échec de l'export: {e}")
             return False
 
-    def run_complete_atn_workflow(self):
+    def run_complete_atn_workflow(self, pdf_folder=None, zotero_export=None):
         """Exécuter le workflow ATN complet"""
         self.log("🚀 Test Workflow ATN - Alliance Thérapeutique Numérique")
         self.log("=" * 60)
@@ -263,11 +334,20 @@ class AnalyLitATNWorkflow:
                 "Test ATN - Alliance Thérapeutique Numérique",
                 "Test automatique de l'équation PubMed ATN avec workflow complet"
             )),
+        ]
+
+        if pdf_folder:
+            steps.append(("Upload PDFs locaux", lambda: self.upload_local_pdfs(pdf_folder)))
+
+        if zotero_export:
+            steps.append(("Import Zotero", lambda: self.import_from_zotero_export(zotero_export)))
+
+        steps.extend([
             ("Recherche PubMed ATN", self.run_atn_search),
             ("Récupération résultats", lambda: len(self.get_search_results()) > 0),
             ("Analyses ATN", self.run_atn_analysis),
             ("Export final", self.export_results)
-        ]
+        ])
         
         success_count = 0
         total_steps = len(steps)
@@ -280,8 +360,10 @@ class AnalyLitATNWorkflow:
                     success_count += 1
                 else:
                     self.log(f"✗ {step_name} - Échec")
+                    break
             except Exception as e:
                 self.log(f"✗ {step_name} - Erreur: {e}")
+                break
             
             self.log("-" * 40)
         
@@ -289,7 +371,7 @@ class AnalyLitATNWorkflow:
         self.log("=" * 60)
         self.log(f"📊 RÉSULTATS: {success_count}/{total_steps} étapes réussies ({success_rate:.1f}%)")
         
-        if success_count >= total_steps * 0.8:
+        if success_count == total_steps:
             self.log("🎉 Workflow ATN fonctionnel !")
             return True
         else:
@@ -297,15 +379,32 @@ class AnalyLitATNWorkflow:
             return False
 
 if __name__ == "__main__":
-    workflow = AnalyLitATNWorkflow() # Le constructeur n'a plus besoin d'argument
+    workflow = AnalyLitATNWorkflow()
     
+    pdf_folder_arg = None
+    zotero_export_arg = None
+    
+    if len(sys.argv) > 1:
+        for arg in sys.argv[1:]:
+            if arg.startswith('--pdf-folder='):
+                pdf_folder_arg = arg.split('=', 1)[1]
+            elif arg.startswith('--zotero-export='):
+                zotero_export_arg = arg.split('=', 1)[1]
+
     print("\n" + "="*60)
     print("🔬 TEST WORKFLOW ATN - ANALYLIT V4.1")
     print("Équation PubMed: Alliance Thérapeutique Numérique")
+    if pdf_folder_arg:
+        print(f"📁 Avec upload de PDFs depuis: {pdf_folder_arg}")
+    if zotero_export_arg:
+        print(f"📚 Avec import Zotero depuis: {zotero_export_arg}")
     print("⚠️  IMPORTANT: Résultats à valider manuellement")
     print("="*60 + "\n")
     
-    success = workflow.run_complete_atn_workflow()
+    success = workflow.run_complete_atn_workflow(
+        pdf_folder=pdf_folder_arg,
+        zotero_export=zotero_export_arg
+    )
     
     print("\n" + "="*60)
     if success:
