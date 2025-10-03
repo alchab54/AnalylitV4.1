@@ -161,8 +161,7 @@ def test_get_all_projects(client, db_session): # Utilise session
     assert create_response2.status_code == 201
     created_project2 = json.loads(create_response2.data)
 
-    # 2. Make a GET request
-    response = client.get('/api/projects/')
+    response = client.get('/api/projects')
     data = json.loads(response.data)
 
     # 3. Assertions
@@ -185,7 +184,7 @@ def test_get_all_projects_empty(client, clean_db):
     WHEN la route '/api/projects' est appelée
     THEN la réponse doit être 200 OK et contenir une liste vide.
     """
-    response = client.get('/api/projects/')
+    response = client.get('/api/projects')
     assert response.status_code == 200
     assert len(response.json) == 0
 
