@@ -360,8 +360,10 @@ def run_analysis(project_id):
             profile_id = project.profile_used or 'standard'
             profile = db.session.get(AnalysisProfile, profile_id)
             if not profile:
-                return jsonify({"error": f"Profil d'analyse '{profile_id}' non trouvé"}), 404
-            kwargs['profile'] = profile.to_dict()
+                logger.warning(f"Profil d'analyse '{profile_id}' non trouvé pour la synthèse. Utilisation des valeurs par défaut.")
+                kwargs['profile'] = {}
+            else:
+                kwargs['profile'] = profile.to_dict()
 
         job = queue.enqueue(
             task_func, kwargs=kwargs, job_timeout=timeout
