@@ -72,7 +72,7 @@ class AnalyLitATNWorkflow:
         search_payload = {
             "query": atn_query,
             "databases": ["pubmed"],
-            "max_results_per_db": 50,
+            "max_results_per_db": 500,
             "project_id": self.project_id
         }
         
