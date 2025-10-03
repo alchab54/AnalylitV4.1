@@ -389,14 +389,20 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
 
         # Récupérer le projet et le profil associé pour obtenir les modèles
         project = session.get(Project, project_id)
-        profile_id = project.profile_used if project else 'standard'  # Fallback au profil standard
 
-        analysis_profile = session.query(AnalysisProfile).filter_by(name=profile_id).first()
-        if not analysis_profile:
-            analysis_profile = session.query(AnalysisProfile).filter_by(name='standard').first()
+        # Logique simplifiée et plus robuste
+        profile_name = 'standard' # Toujours commencer avec le défaut
+        if project and project.profile_used:
+            # Chercher le profil par son nom/id dans la DB
+            profile_from_db = session.query(AnalysisProfile).filter_by(id=project.profile_used).first()
+            if profile_from_db:
+                profile_name = profile_from_db.name.lower()
 
-        profile_dict = analysis_profile.to_dict() if analysis_profile else config.DEFAULT_MODELS['standard']
-
+        # Utiliser le nom du profil pour obtenir les modèles depuis la config
+        profile_dict = config.DEFAULT_MODELS.get(profile_name, config.DEFAULT_MODELS['standard'])
+        
+        # Trim leading/trailing whitespace from profile_name
+        profile_name = profile_name.strip()
         for record in all_records_to_insert:
             analysis_queue.enqueue(
                 'backend.tasks_v4_complete.process_single_article_task',

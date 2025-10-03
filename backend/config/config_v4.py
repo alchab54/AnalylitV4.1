@@ -18,7 +18,9 @@ def load_default_models() -> Dict[str, Any]:
             # comme l'indique son annotation de type `-> Dict[str, Any]`.
             # Si profiles.json contient une liste, on la transforme en dictionnaire.
             data = json.load(f)
-            return {item['id']: item for item in data} if isinstance(data, list) else data
+            models = {item['name'].lower(): item for item in data} if isinstance(data, list) else data
+            print(f"Loaded models: {models}")  # Add this line for debugging
+            return models
     except (FileNotFoundError, json.JSONDecodeError):
         # Fournit une configuration de secours si le fichier est manquant ou invalide
         print("WARNING: profiles.json not found or invalid. Using fallback default models.")
