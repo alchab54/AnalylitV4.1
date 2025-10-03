@@ -6,10 +6,21 @@
 ARG BASE_IMAGE=analylit-base-cpu:latest
 FROM ${BASE_IMAGE}
 
-# Copier le fichier de dépendances
+# Toujours travailler dans un répertoire dédié aux dépendances
 WORKDIR /deps
+
+# Basculer vers l'utilisateur root pour avoir les droits d'installation
+USER root
+
+# Copier le fichier de dépendances depuis le contexte de build
 COPY requirements.txt .
 
-# Installer uniquement PyTorch et ses dérivés
-RUN grep "torch" requirements.txt > requirements-gpu.txt && \
+# Installer uniquement PyTorch et ses dérivés. grep -i est plus robuste.
+RUN grep -i "torch" requirements.txt > requirements-gpu.txt && \
     pip install --no-cache-dir -r requirements-gpu.txt
+
+# Revenir à l'utilisateur non-root pour la sécurité
+USER appuser
+
+# Revenir au répertoire de travail de l'application
+WORKDIR /home/appuser/app

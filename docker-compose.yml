@@ -5,6 +5,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.base-cpu
     image: analylit-base-cpu:latest
+    pull_policy: never
     profiles: ["build-only"]
 
   base-gpu:
@@ -14,6 +15,7 @@ services:
       args:
         BASE_IMAGE: analylit-base-cpu:latest
     image: analylit-base-gpu:latest
+    pull_policy: never
     profiles: ["build-only"]
     depends_on:
       - base-cpu
