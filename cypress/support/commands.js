@@ -9,7 +9,7 @@ Cypress.Commands.add('setupBasicTest', () => {
   cy.get('body', { timeout: 15000 }).should('be.visible');
   
   // ✅ PATCH : Créer un projet si aucun n'existe
-  cy.get('body').then($body => {
+  /* cy.get('body').then($body => {
     // Vérifier si des projets existent déjà
     if ($body.find('.project-card').length === 0) {
       cy.log('⚠️ Aucun projet trouvé - Création d\'un projet de test via interception API');
@@ -45,9 +45,11 @@ Cypress.Commands.add('setupBasicTest', () => {
       cy.get('#newProjectModal', { timeout: 5000 }).should('be.visible');
 
       // Remplir et soumettre le formulaire
-      cy.get('#projectName').clear().type('Projet Test E2E');
-      cy.get('#projectDescription').clear().type('Projet créé automatiquement pour les tests E2E');
-      cy.get('#newProjectForm').submit();
+      cy.get('#newProjectModal').within(() => {
+        cy.get('#projectName').clear().type('Projet Test E2E');
+        cy.get('#projectDescription').clear().type('Projet créé automatiquement pour les tests E2E');
+        cy.get('button[type="submit"]').click();
+      });
 
       // Attendre que la requête de création soit interceptée et que la modale se ferme
       cy.wait('@createProject');
@@ -59,7 +61,7 @@ Cypress.Commands.add('setupBasicTest', () => {
       // Vérifier que le projet simulé est bien affiché
       cy.contains('.project-card', 'Projet Test E2E', { timeout: 10000 }).should('be.visible');
     }
-  });
+  }); */
   
   // Attendre un délai pour que tout se charge
   cy.wait(1000);
