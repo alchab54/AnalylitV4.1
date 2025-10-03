@@ -1,4 +1,6 @@
 // web/js/constants.js
+export const API_BASE_URL = '/api';
+export const WEBSOCKET_URL = '';
 
 // Sélecteurs DOM centralisés
 export const SELECTORS = {
@@ -350,8 +352,8 @@ noTasksInProgress: 'Aucune tâche en cours.',
 
 // Configuration de l'application
 const isDevelopment = window.location.hostname === 'localhost' && window.location.port === '8080';
-
 export const CONFIG = {
+
     API_BASE_URL: isDevelopment ? 'http://localhost:5000/api' : '/api',
     WEBSOCKET_URL: isDevelopment ? 'http://localhost:5000' : '',
 
