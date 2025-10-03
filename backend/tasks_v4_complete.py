@@ -42,7 +42,7 @@ from utils.models import (
     Project, SearchResult, Extraction, Grid, ChatMessage, AnalysisProfile, RiskOfBias,
     SCHEMA  # ✅ CORRECTION: Importer la variable SCHEMA pour la configuration de l'engine.
 )
-
+#
 from sqlalchemy.orm import Session # Explicitly import Session for type hinting if needed, though Session is already defined below
 
 
@@ -90,7 +90,11 @@ if is_testing and not db_url:
     # Fallback pour s'assurer que les tests ne touchent jamais la DB de prod par accident
     db_url = 'postgresql://user:pass@localhost:5432/test_db_fallback'
 
-engine = create_engine(db_url, pool_pre_ping=True, connect_args={"options": f"-csearch_path={SCHEMA},public"})
+engine = create_engine(
+    db_url,
+    pool_pre_ping=True,
+    connect_args={"options": f"-csearch_path={SCHEMA},public"}
+)
 SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 config = get_config()
