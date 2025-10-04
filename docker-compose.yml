@@ -100,7 +100,9 @@ services:
       WAIT_HOSTS: db:5432,redis:6379,ollama:11434
       WAIT_TIMEOUT: "60"
 
+
       WAIT_HOSTS_TIMEOUT: "10"
+
 
       GUNICORN_WORKERS: "2"
       GUNICORN_THREADS: "2"
@@ -110,7 +112,7 @@ services:
       # ✅ CORRECTION : Ajout de la variable pour que le backend sache comment contacter Ollama.
       OLLAMA_BASE_URL: "http://ollama:11434"
 
-    command: ["gunicorn", "--conf", "backend/config/gunicorn.conf.py"]
+    command: ["gunicorn", "--conf", "backend/config/gunicorn.conf.py", "backend.server_v4_complete:app"]
     env_file:
       - .env
     depends_on:
@@ -120,6 +122,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+
     volumes:
       - ./logs:/home/appuser/app/logs
       - ./projects:/home/appuser/app/projects
