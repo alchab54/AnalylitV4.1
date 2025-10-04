@@ -56,7 +56,9 @@ services:
         condition: service_started
     networks:
     - analylit-network
-    
+    ports:
+    - "5000:80"
+          
   nginx:
     image: nginx:1.25-alpine
     container_name: analylit_nginx_dev
@@ -74,21 +76,37 @@ services:
     
 
   migrate:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    image: analylit-migrate:latest
     environment:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       FLASK_APP: backend/server_v4_complete.py
       DB_HOST: test-db
       PYTHONPATH: /home/appuser/app
       WAIT_HOSTS: test-db:5432
+    command: |
+      sh -c "
+        ./scripts/wait-for-it.sh test-db:5432 --timeout=60 -- 
+        python -m alembic -c /home/appuser/app/alembic.ini downgrade base && 
+        python -m alembic -c /home/appuser/app/alembic.ini upgrade head
+      "
     volumes:
       - ./backend:/home/appuser/app/backend:ro
       - ./api:/home/appuser/app/api:ro
       - ./utils:/home/appuser/app/utils:ro
       - ./migrations:/home/appuser/app/migrations:ro
       - ./alembic.ini:/home/appuser/app/alembic.ini:ro
+      - ./scripts:/home/appuser/app/scripts:ro
     depends_on:
       test-db:
         condition: service_healthy
+    networks:
+      - analylit-network
+    restart: "no"
 
 volumes:
   test_postgres_data:
