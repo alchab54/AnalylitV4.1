@@ -9,7 +9,6 @@ from utils.models import AnalysisProfile
 analysis_profiles_bp = Blueprint('analysis_profiles_bp', __name__)
 logger = logging.getLogger(__name__)
 
-
 @analysis_profiles_bp.route('/analysis-profiles', methods=['POST'])
 def create_analysis_profile():
     """Crée un nouveau profil d'analyse."""
@@ -36,7 +35,6 @@ def create_analysis_profile():
         db.session.rollback()
         return jsonify({"error": "Un profil avec ce nom existe déjà"}), 409
 
-
 @analysis_profiles_bp.route('/analysis-profiles', methods=['GET'])
 def get_all_analysis_profiles():
     """Retourne tous les profils d'analyse."""
@@ -45,7 +43,6 @@ def get_all_analysis_profiles():
     profiles = db.session.execute(stmt).scalars().all()
     return jsonify([p.to_dict() for p in profiles]), 200
 
-
 @analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['GET'])
 def get_analysis_profile_details(profile_id):
     """Retourne les détails d'un profil d'analyse spécifique."""
@@ -53,7 +50,6 @@ def get_analysis_profile_details(profile_id):
     if not profile:
         return jsonify({"error": "Profil non trouvé"}), 404
     return jsonify(profile.to_dict()), 200
-
 
 @analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['PUT'])
 def update_analysis_profile(profile_id):
@@ -77,11 +73,9 @@ def update_analysis_profile(profile_id):
         db.session.rollback()
         return jsonify({"error": "Erreur lors de la mise à jour du profil"}), 500
 
-
 @analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['DELETE'])
 def delete_analysis_profile(profile_id):
     """Supprime un profil d'analyse."""
-    # ✅ CORRECTION: L'indentation a été supprimée des lignes suivantes
     profile = db.session.get(AnalysisProfile, profile_id)
     if not profile:
         return jsonify({"error": "Profil non trouvé"}), 404

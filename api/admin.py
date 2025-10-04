@@ -4,7 +4,6 @@ import json
 from flask import Blueprint, jsonify, request
 from rq.worker import Worker
 
-# --- Import des variables globales partagées ---
 from utils.app_globals import (
     redis_conn, processing_queue, synthesis_queue, analysis_queue,
     background_queue, models_queue, extension_queue
@@ -26,8 +25,9 @@ def get_queues_info():
             'size': len(q),
             'workers': worker_count
         })
-        
-    return jsonify({"queues": queues_info})
+    
+    # ✅ CORRECTION : Retourner directement la liste pour correspondre aux tests
+    return jsonify(queues_info)
 
 @admin_bp.route('/health', methods=['GET'])
 def health_check():

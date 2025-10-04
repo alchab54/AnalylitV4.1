@@ -9,7 +9,7 @@ from backend.tasks_v4_complete import run_extension_task
 extensions_bp = Blueprint('extensions', __name__)
 logger = logging.getLogger(__name__)
 
-@extensions_bp.route('/', methods=['POST'])
+@extensions_bp.route('/extensions', methods=['POST'])
 def run_extension():
     """Exécute une extension personnalisée via une tâche de fond."""
     data = request.get_json()
@@ -19,7 +19,6 @@ def run_extension():
     if not all([project_id, extension_name]):
         return jsonify({"error": "project_id et extension_name sont requis"}), 400
 
-    # CORRECTION: Utiliser un entier pour le timeout pour correspondre au test.
     job = extension_queue.enqueue(run_extension_task, project_id=project_id, extension_name=extension_name, job_timeout=1800, result_ttl=3600)
     logger.info(f"Job d'extension enqueued: {job.id}")
     return jsonify({"message": "Tâche d'extension lancée", "job_id": job.id}), 202
