@@ -153,8 +153,7 @@ def create_app(config_override=None):
 
     @app.errorhandler(429)
     def ratelimit_handler(e):
-        return jsonify(error="ratelimit exceeded",
-                       description="Too many requests, please try again later."), 429
+        return jsonify(error="ratelimit exceeded", description=str(e.description)), 429
 
     @app.route('/api/projects/<project_id>/extractions', methods=['GET'])
     def get_project_extractions(project_id):

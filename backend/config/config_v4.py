@@ -46,7 +46,14 @@ class Settings(BaseSettings):
     # --- Connexions aux services externes ---
     REDIS_URL: str = 'redis://localhost:6379/0' # Valeur par défaut pour dev local, surchargée par Docker
     OLLAMA_BASE_URL: str = 'http://ollama:11434'
-    DATABASE_URL: str = os.getenv('DATABASE_URL', 'postgresql+psycopg2://analylit_user:strong_password@db:5432/analylit_db')
+    
+    # Construction de l'URL de la base de données à partir des variables d'environnement
+    DB_HOST: str = os.getenv("DATABASE_HOST", "localhost")
+    DB_USER: str = os.getenv("POSTGRES_USER", "analylit_user")
+    DB_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "strong_password")
+    DB_NAME: str = os.getenv("POSTGRES_DB", "analylit_db")
+    DB_PORT: str = os.getenv("POSTGRES_PORT", "5432")
+    DATABASE_URL: str = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     
     # --- Chemins de fichiers ---
     

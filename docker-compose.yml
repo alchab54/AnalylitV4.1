@@ -108,6 +108,11 @@ services:
       GUNICORN_CMD_ARGS: "--bind=0.0.0.0:80"
       PYTHONPATH: /home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
       OLLAMA_BASE_URL: "http://ollama:11434"
+      DATABASE_HOST: db
+      POSTGRES_USER: analylit_user
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: analylit_db
+      POSTGRES_PORT: 5432
 
     command: ["gunicorn", "--conf", "backend/config/gunicorn.conf.py", "backend.server_v4_complete:app"]
     env_file:
@@ -175,6 +180,12 @@ services:
     image: analylit-worker-fast:latest
     container_name: analylit_worker_fast
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "fast_queue"]
+    environment:
+      DATABASE_HOST: db
+      POSTGRES_USER: analylit_user
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: analylit_db
+      POSTGRES_PORT: 5432
     env_file:
       - .env
     deploy:
@@ -197,6 +208,12 @@ services:
     image: analylit-worker-default:latest
     container_name: analylit_worker_default
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "default_queue"]
+    environment:
+      DATABASE_HOST: db
+      POSTGRES_USER: analylit_user
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: analylit_db
+      POSTGRES_PORT: 5432
     env_file:
       - .env
     deploy:
@@ -234,6 +251,11 @@ services:
     # ✅ CORRECTION: Démarrer en root pour changer les permissions
     user: root
     environment:
+      DATABASE_HOST: db
+      POSTGRES_USER: analylit_user
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: analylit_db
+      POSTGRES_PORT: 5432
       NVIDIA_VISIBLE_DEVICES: "all"
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
     depends_on:
