@@ -54,7 +54,11 @@ socketio = SocketIO()
 
 def create_app(config_override=None):
     """Factory pour créer et configurer l'application Flask."""
-    app = Flask(__name__, static_folder='../web', static_url_path='/static')
+    # ✅✅✅ **CORRECTION FINALE POUR LES FICHIERS STATIQUES** ✅✅✅
+    # Définir correctement les dossiers static et template
+    app = Flask(__name__, 
+                static_folder='../web',           # Dossier des fichiers statiques
+                static_url_path='/static')               # URL racine pour les statiques
 
     # Configuration
     config = get_config()
@@ -97,9 +101,15 @@ def create_app(config_override=None):
     # --- Routes Spécifiques ---
     @app.route('/')
     def serve_frontend():
-        """Sert l'interface frontend HTML."""
+        """Serve the index HTML file."""
         return send_from_directory(app.static_folder, 'index.html')
-
+    
+    @app.route('/<path:filename>')
+    def serve_static(filename):
+        """Serves static files (CSS, JS, images) - useful for SPA routing."""
+        return send_from_directory(app.static_folder, filename)
+    
+    
     @app.route('/api/health', methods=['GET'])
     def health_check():
         return jsonify({"status": "healthy"}), 200
