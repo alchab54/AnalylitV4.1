@@ -24,8 +24,10 @@ services:
       FLASK_ENV: development  # ✅ Crucial pour le logging adaptatif
       FLASK_APP: backend/server_v4_complete.py
       DB_HOST: test-db
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db  # ✅ CORRECT
       PYTHONPATH: /home/appuser/app
+      # Wait for it
+      WAIT_HOSTS: test-db:5432
       REDIS_URL: redis://redis:6379/0
 
     volumes:
@@ -44,8 +46,6 @@ services:
       # Volumes séparés pour les donneés
       - dev_logs:/home/appuser/app/logs
       - dev_projects:/home/appuser/app/projects
-    ports:
-      - "5000:80"
     depends_on:
       test-db:
         condition: service_healthy
@@ -76,6 +76,7 @@ services:
       FLASK_APP: backend/server_v4_complete.py
       DB_HOST: test-db
       PYTHONPATH: /home/appuser/app
+      WAIT_HOSTS: test-db:5432
     volumes:
       - ./backend:/home/appuser/app/backend:ro
       - ./api:/home/appuser/app/api:ro
