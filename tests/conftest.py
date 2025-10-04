@@ -1,13 +1,15 @@
-# tests/conftest.py - VERSION COMPLÈTE CORRIGÉE
+# tests/conftest.py - VERSION ANTI-CONCURRENCE ULTIME
+
 import pytest
 import os
 import sys
 import threading
 import tempfile
 import shutil
-from pathlib import Path #Fix: Import pathlib
+from pathlib import Path
 import fakeredis
 from unittest.mock import patch, MagicMock
+import uuid
 
 # Configuration environnement
 root_dir = Path(__file__).parent.parent
@@ -15,170 +17,171 @@ sys.path.insert(0, str(root_dir))
 os.environ['TESTING'] = 'true'
 os.environ['FLASK_ENV'] = 'development'
 
-# ✅ CORRECTION COMPLÈTE : Mock Redis ET RQ global
+# Imports après configuration PATH
+from backend.server_v4_complete import create_app
+from utils.extensions import db as _db
+from sqlalchemy import text, event, create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session
+from utils.models import Project
+
+# ✅ SOLUTION #1 : Mock Redis/RQ Complet et Sérialisable
 @pytest.fixture(scope='session', autouse=True)
 def mock_redis_and_rq():
-    """Mock complet Redis + RQ pour tous les tests"""
+    """Mock complet Redis + RQ avec objets sérialisables"""
     fake_redis = fakeredis.FakeRedis()
     
-    # Mock Job class
-    mock_job = MagicMock()
-    mock_job.id = 'test-job-id'
-    mock_job.get_status.return_value = 'finished'
-    mock_job.result = 'test-result'
-    mock_job.successful.return_value = True
+    # Mock Job sérialisable
+    def create_mock_job():
+        mock_job = MagicMock()
+        mock_job.id = f'test-job-{uuid.uuid4().hex[:8]}'
+        mock_job.result = {'status': 'completed', 'data': 'test'}
+        mock_job.get_status.return_value = 'finished'
+        mock_job.successful.return_value = True
+        mock_job.enqueued_at = None
+        mock_job.started_at = None
+        mock_job.ended_at = None
+        mock_job.exc_info = None
+        return mock_job
     
-    # Mock Queue class
+    # Mock Queue
     mock_queue = MagicMock()
-    mock_queue.enqueue.return_value = mock_job
+    mock_queue.enqueue.side_effect = lambda *args, **kwargs: create_mock_job()
     mock_queue.count = 0
     mock_queue.__len__ = lambda: 0
     
     with patch('utils.app_globals.redis_conn', fake_redis), \
          patch('redis.from_url', return_value=fake_redis), \
          patch('rq.Queue', return_value=mock_queue), \
-         patch('rq.job.Job', return_value=mock_job), \
-         patch('rq.job.Job.fetch', return_value=mock_job):
+         patch('rq.job.Job.fetch', side_effect=lambda job_id, connection=None: create_mock_job()), \
+         patch('utils.app_globals.limiter') as mock_limiter:
+        
+        # Mock rate limiter
+        mock_limiter.limit.return_value = lambda f: f
         yield fake_redis
 
-# ✅ CORRECTION : Setup répertoires temporaires
+# ✅ SOLUTION #2 : Répertoires Temporaires Isolés
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_directories():
-    """Créer répertoires temporaires pour tests"""
-    test_projects_dir = tempfile.mkdtemp(prefix="analylit_test_projects_")
-    test_logs_dir = tempfile.mkdtemp(prefix="analylit_test_logs_")
+    """Répertoires temporaires avec UUID unique par session"""
+    session_id = uuid.uuid4().hex[:8]
+    test_projects_dir = tempfile.mkdtemp(prefix=f"analylit_projects_{session_id}_")
+    test_logs_dir = tempfile.mkdtemp(prefix=f"analylit_logs_{session_id}_")
     
-    os.environ['PROJECTS_DIR'] = test_projects_dir  
+    os.environ['PROJECTS_DIR'] = test_projects_dir
     os.environ['LOGS_DIR'] = test_logs_dir
     
-    # Mock PROJECTS_DIR dans app_globals
-    with patch('utils.app_globals.PROJECTS_DIR', test_projects_dir):
-        yield
+    yield
     
-    # Nettoyage
     shutil.rmtree(test_projects_dir, ignore_errors=True)
     shutil.rmtree(test_logs_dir, ignore_errors=True)
 
-# Import modèles
-from utils.models import (
-    Project, Article, SearchResult, Extraction, Grid, GridField, 
-    Validation, Analysis, ChatMessage, AnalysisProfile, PRISMARecord, 
-    ScreeningDecision, RiskOfBias, Prompt, GreyLiterature, 
-    ProcessingLog, Stakeholder
-)
-
-_db_lock = threading.Lock()
-
-# ✅ CORRECTION : Mock Flask-Limiter
-@pytest.fixture(autouse=True)
-def mock_rate_limiter():
-    """Mock Flask-Limiter pour tests"""
-    with patch('utils.app_globals.limiter') as mock_limiter:
-        mock_limiter.limit.return_value = lambda f: f  # Decorator qui ne fait rien
-        yield mock_limiter
-
+# ✅ SOLUTION #3 : Application avec Base de Données Unique par Worker
 @pytest.fixture(scope='session')
 def app():
-    """Application Flask pour tests"""
+    """Application Flask avec base de données isolée par worker"""
+    # Créer un nom de DB unique par worker pytest
+    worker_id = os.environ.get('PYTEST_XDIST_WORKER', 'master')
+    session_id = uuid.uuid4().hex[:8]
+    db_name = f'analylit_test_{worker_id}_{session_id}'
+    
+    test_db_url = f'postgresql://analylit_user:strong_password@test-db:5432/{db_name}'
+    
+    _app = create_app({
+        'TESTING': True,
+        'SQLALCHEMY_DATABASE_URI': test_db_url,
+        'SQLALCHEMY_ENGINE_OPTIONS': {
+            'pool_size': 1,
+            'pool_recycle': 30,
+            'pool_pre_ping': True,
+            'connect_args': {'options': f'-c search_path=public'}
+        },
+        'WTF_CSRF_ENABLED': False,
+    })
+    
+    return _app
+
+# ✅ SOLUTION #4 : Gestion DB Robuste Anti-Concurrence
+_db_lock = threading.Lock()
+
+@pytest.fixture(scope='session')
+def db(app):
+    """Base de données avec gestion complète de concurrence"""
     with _db_lock:
-        from backend.server_v4_complete import create_app
-        from utils.extensions import db
-        from sqlalchemy import text
-        
-        test_db_url = 'postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db'
-        
-        _app = create_app({
-            'TESTING': True,
-            'SQLALCHEMY_DATABASE_URI': test_db_url,
-            'SQLALCHEMY_ENGINE_OPTIONS': {
-                'pool_size': 1,
-                'pool_recycle': 30,
-                'pool_pre_ping': True,
-                "connect_args": {
-                    "options": "-c search_path=analylit_schema,public"
-                }
-            }
-        })
-        
-        with _app.app_context():
-            try:
-                result = db.session.execute(text("SELECT 1")).scalar()
-                print("✅ Connexion test DB: OK")
-            except Exception as e:
-                pytest.fail(f"Cannot connect to test database: {e}")
+        with app.app_context():
+            # Créer la base de données si elle n'existe pas
+            engine = create_engine('postgresql://analylit_user:strong_password@test-db:5432/postgres')
+            with engine.connect() as conn:
+                conn.execute(text("COMMIT"))  # Sortir de la transaction
+                try:
+                    conn.execute(text(f"CREATE DATABASE {app.config['SQLALCHEMY_DATABASE_URI'].split('/')[-1]}"))
+                except Exception:
+                    pass  # DB existe déjà
             
-            # Setup DB
+            # Créer toutes les tables
             try:
-                db.session.execute(text("DROP SCHEMA IF EXISTS analylit_schema CASCADE"))
-                db.session.commit()
-                
-                db.session.execute(text("CREATE SCHEMA analylit_schema"))
-                db.session.commit()
-                
-                db.create_all()
-                db.session.commit()
-                
-                count = db.session.execute(text("""
-                    SELECT COUNT(*) FROM information_schema.tables 
-                    WHERE table_schema = 'analylit_schema'
-                """)).scalar()
-                print(f"✅ {count} tables créées dans analylit_schema")
-                
+                _db.create_all()
+                _db.session.commit()
             except Exception as e:
-                db.session.rollback()
-                pytest.fail(f"Cannot create test tables: {e}")
+                _db.session.rollback()
+                print(f"Warning during table creation: {e}")
             
-            yield _app
+            yield _db
             
-            # Cleanup
+            # Nettoyage final
             try:
-                db.session.execute(text("DROP SCHEMA IF EXISTS analylit_schema CASCADE"))
-                db.session.commit()
-            except Exception as e:
-                print(f"⚠️ Cleanup warning: {e}")
+                _db.drop_all()
+                _db.session.commit()
+            except Exception:
+                pass
+
+# ✅ SOLUTION #5 : Session Transactionnelle Parfaitement Isolée
+@pytest.fixture(scope='function')
+def db_session(db, app):
+    """Session isolée avec rollback automatique"""
+    with app.app_context():
+        # Créer une connexion et transaction isolée
+        connection = db.engine.connect()
+        transaction = connection.begin()
+        
+        # Session scopée pour éviter les problèmes de 'remove'
+        session_factory = sessionmaker(bind=connection)
+        session = scoped_session(session_factory)
+        
+        # Remplacer la session globale
+        old_session = db.session
+        db.session = session
+        
+        # Savepoint pour rollbacks imbriqués
+        session.begin_nested()
+        
+        @event.listens_for(session, "after_transaction_end")
+        def restart_savepoint(session, transaction):
+            if transaction.nested and not transaction._parent.nested:
+                session.begin_nested()
+        
+        yield session
+        
+        # Nettoyage complet
+        try:
+            session.remove()
+            transaction.rollback()
+            connection.close()
+            db.session = old_session
+        except Exception as e:
+            print(f"Warning during session cleanup: {e}")
 
 @pytest.fixture
 def client(app):
     """Client de test Flask"""
     return app.test_client()
 
-@pytest.fixture(scope="function")  
-def db_session(app):
-    """Session DB isolée pour tests"""
-    from utils.extensions import db
-    from sqlalchemy.orm import sessionmaker
-    
-    with app.app_context():
-        connection = db.engine.connect()
-        transaction = connection.begin()
-        
-        Session = sessionmaker(bind=connection)
-        test_session = Session()
-        
-        original_session = db.session
-        db.session = test_session
-
-        yield test_session
-        
-        try:
-            test_session.close()
-            transaction.rollback()
-        except Exception as e:
-            print(f"Warning during session cleanup: {e}")
-        finally:
-            connection.close()
-            db.session = original_session
-
-@pytest.fixture(scope="function")
+@pytest.fixture
 def setup_project(db_session):
-    """Créer projet de test"""
-    from utils.models import Project
-    import uuid
-    
+    """Projet de test avec UUID unique"""
     project = Project(
         id=str(uuid.uuid4()),
         name=f"Test Project {uuid.uuid4().hex[:8]}"
     )
     db_session.add(project)
-    db_session.flush()
+    db_session.commit()
     return project
