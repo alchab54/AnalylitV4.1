@@ -39,7 +39,7 @@ def mock_redis_and_rq():
 
     def create_mock_job(job_id=None):
         # Utiliser l'ID fourni ou en générer un nouveau
-        job_id = job_id or f'test-job-{uuid.uuid4().hex[:8]}'
+        job_id = job_id or str(uuid.uuid4())
         
         mock_job = MagicMock()
         mock_job.id = job_id
@@ -64,6 +64,9 @@ def mock_redis_and_rq():
         job_id = kwargs.get('job_id')
         return create_mock_job(job_id=job_id)
     
+    # Initialize mock_queue before the with statement
+    mock_queue = MagicMock()
+
     with patch('utils.app_globals.redis_conn', fake_redis), \
          patch('redis.from_url', return_value=fake_redis), \
          patch('rq.Queue', return_value=mock_queue), \
@@ -71,7 +74,6 @@ def mock_redis_and_rq():
          patch('utils.app_globals.limiter') as mock_limiter:
         
         # Mock Queue
-        mock_queue = MagicMock()
         mock_queue.enqueue.side_effect = enqueue_side_effect
         mock_queue.count = 0
         mock_queue.__len__ = lambda: 0
