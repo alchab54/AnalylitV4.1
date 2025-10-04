@@ -18,6 +18,7 @@ from utils.models import Project, AnalysisProfile, SearchResult, ChatMessage
 # 2. Tests pour la Pagination des Résultats de Recherche
 # =================================================================
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_get_search_results_pagination(client, db_session, setup_project):
     """
     Teste la pagination de la route GET /api/projects/<id>/search-results.
@@ -81,6 +82,7 @@ def test_api_get_search_results_pagination(client, db_session, setup_project):
 # 3. Tests pour l'Historique du Chat
 # =================================================================
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_get_chat_history(client, db_session, setup_project):
     """
     Teste la récupération de l'historique du chat pour un projet.

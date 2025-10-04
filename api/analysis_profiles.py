@@ -35,7 +35,7 @@ def create_analysis_profile():
         db.session.rollback()
         return jsonify({"error": "Un profil avec ce nom existe déjà"}), 409
 
-@limiter.limit("50/minute")
+@limiter.limit("50 per minute")
 @analysis_profiles_bp.route('/analysis-profiles', methods=['GET'])
 def get_all_analysis_profiles():
     """Retourne tous les profils d'analyse."""

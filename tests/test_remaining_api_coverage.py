@@ -17,6 +17,7 @@ from backend.tasks_v4_complete import pull_ollama_model_task, run_extension_task
 # 1. Tests pour le CRUD des Grilles et Prompts
 # =================================================================
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_grids_create_and_update(client, db_session, setup_project):
     """
     Teste le workflow de création manuelle (POST) et de mise à jour (PUT) 
@@ -61,6 +62,7 @@ def test_api_grids_create_and_update(client, db_session, setup_project):
     assert grid_from_db.name == "Grille Manuelle Mise à Jour"
     assert len(json.loads(grid_from_db.fields)) == 3
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_prompt_update(client, db_session):
     """
     Teste la mise à jour d'un prompt spécifique via PUT /api/prompts/<id>.
@@ -90,6 +92,7 @@ def test_api_prompt_update(client, db_session):
 # 2. Tests pour la Consultation de Données
 # =================================================================
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_get_extractions(client, db_session, setup_project):
     """
     Teste la route GET apiprojectsidextractions pour lister les extractions.
@@ -119,6 +122,7 @@ def test_api_get_extractions(client, db_session, setup_project):
 # 3. Tests pour les Paramètres et l'Administration
 # =================================================================
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_settings_endpoints(client, db_session):
     """
     Teste les routes de l'API de paramètres (Settings).
@@ -129,6 +133,7 @@ def test_api_settings_endpoints(client, db_session):
     assert len(response.json) > 0 # L'assertion devient plus robuste
     assert response.json[0]['name'] == 'Standard'
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_admin_endpoints(client):
     """
     Teste les routes de l'API d'administration (Ollama pull, Queue clear).
@@ -140,7 +145,7 @@ def test_api_admin_endpoints(client):
         mock_job.get_id.return_value = "mock_pull_task_id"
         mock_enqueue.return_value = mock_job
         
-        response_pull = client.post('/api/admin/pull-models', json={'model_name': 'test-model:latest'}) # Fixed URL
+        response_pull = client.post('/api/pull-models', json={'model_name': 'test-model:latest'}) # Fixed URL
 
         assert response_pull.status_code == 202
         response_data = response_pull.json # type: ignore
@@ -156,14 +161,14 @@ def test_api_admin_endpoints(client):
     # --- 2. POST /api/queues/clear (Vérifie l'appel .empty()) ---
     # On mock la méthode .empty() de l'objet 'processing_queue' là où elle est utilisée
     with patch('api.admin.processing_queue.empty') as mock_queue_empty:
-        response_clear = client.post('/api/admin/queues/clear', json={'queue_name': 'analylit_processing_v4'})
+        response_clear = client.post('/api/queues/clear', json={'queue_name': 'analylit_processing_v4'})
         
         assert response_clear.status_code == 200
         assert "vidés" in response_clear.json['message']
         mock_queue_empty.assert_called_once() # Vérifie que la file a bien été vidée
 
     # --- 3. POST apiqueuesclear (Test échec) ---
-    response_clear_fail = client.post('/api/admin/queues/clear', json={'queue_name': 'file_inexistante'})
+    response_clear_fail = client.post('/api/queues/clear', json={'queue_name': 'file_inexistante'})
     assert response_clear_fail.status_code == 404
     assert "non trouvée" in response_clear_fail.json['error']
 
@@ -171,6 +176,7 @@ def test_api_admin_endpoints(client):
 # 4. Tests pour l'Extension API
 # =================================================================
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_extensions_endpoint(client):
     """
     Teste l'endpoint générique POST /api/extensions.
@@ -184,7 +190,7 @@ def test_api_extensions_endpoint(client):
             "project_id": "projet_ext_123",
             "extension_name": "maSuperExtension"
         }   
-        response = client.post('/api/extensions/extensions', json=payload) # Fixed URL
+        response = client.post('/api/extensions', json=payload) # Fixed URL
 
         assert response.status_code == 202
         assert response.json['job_id'] == "mock_extension_task_id"

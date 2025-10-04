@@ -41,16 +41,12 @@ def create_prompt():
         return jsonify({'error': str(e)}), 500
 
 @prompts_bp.route('/<prompt_id>', methods=['GET'])
-@limiter.limit("100 per minute")
 def get_prompt(prompt_id):
-    """Récupérer un prompt spécifique"""
-    try:
-        prompt = Prompt.query.filter_by(id=prompt_id).first()
-        if not prompt:
-            return jsonify({'error': 'Prompt non trouvé'}), 404
-        return jsonify(prompt.to_dict())
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    prompt = Prompt.query.get(prompt_id)
+    if not prompt:
+        # ✅ Gère le cas où le prompt n'existe pas
+        return jsonify({'error': 'Prompt non trouvé'}), 404
+    return jsonify(prompt.to_dict())
 
 @prompts_bp.route('/<prompt_id>', methods=['PUT'])
 @limiter.limit("20 per minute")

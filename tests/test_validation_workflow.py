@@ -30,6 +30,7 @@ def setup_double_coding_data(db_session, client):
 
 # ----- TESTS DU WORKFLOW DE VALIDATION ET KAPPA -----
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_update_decision_for_second_evaluator(client, db_session, setup_double_coding_data):
     """
     Vérifie que la décision d'un deuxième évaluateur est correctement enregistrée.
@@ -56,6 +57,7 @@ def test_update_decision_for_second_evaluator(client, db_session, setup_double_c
     assert "evaluator2" in validations and validations["evaluator2"] == "exclude"
 
 @patch('api.projects.analysis_queue.enqueue')
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_calculate_kappa_task_enqueued(mock_enqueue, client, setup_double_coding_data):
     """
     Vérifie que la tâche de calcul Kappa peut être mise en file d'attente via l'endpoint dédié.

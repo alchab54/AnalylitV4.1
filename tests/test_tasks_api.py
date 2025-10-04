@@ -18,6 +18,7 @@ def test_project(db_session):
     db_session.flush()
     return project
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_search_returns_task_id(client, test_project):
     """
     Vérifie que la route POST /api/search retourne bien un task_id.
@@ -39,6 +40,7 @@ def test_search_returns_task_id(client, test_project):
     assert isinstance(response_data['job_id'], str), "Le job_id doit être une chaîne de caractères"
     assert len(response_data['job_id']) > 10, "Le job_id doit avoir une longueur raisonnable"
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_run_discussion_draft_returns_task_id(client, test_project):
     """
     Vérifie que la route POST /api/projects/<id>/run-discussion-draft retourne un task_id.
@@ -49,6 +51,7 @@ def test_run_discussion_draft_returns_task_id(client, test_project):
     assert 'job_id' in response_data
     assert response_data['message'] == 'Génération du brouillon de discussion lancée'
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_run_knowledge_graph_returns_task_id(client, test_project):
     """
     Vérifie que la route POST /api/projects/<id>/run-knowledge-graph retourne un job_id.
@@ -59,6 +62,7 @@ def test_run_knowledge_graph_returns_task_id(client, test_project):
     assert 'job_id' in response_data
     assert response_data['message'] == 'Génération du graphe de connaissances lancée'
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_add_manual_articles_returns_task_id(client, test_project):
     """
     Vérifie que la route POST /api/projects/<id>/add-manual-articles retourne un job_id.
@@ -76,6 +80,7 @@ def test_add_manual_articles_returns_task_id(client, test_project):
     assert 'job_id' in response_data
     assert 'Ajout de 2 article(s)' in response_data['message']
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_cancel_task(client):
     """
     Vérifie que la route d'annulation de tâche répond correctement.
@@ -95,6 +100,7 @@ def test_cancel_task(client):
         mock_fetch.assert_called_once_with(fake_task_id, connection=ANY)
         mock_job.cancel.assert_called_once()
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_get_tasks_status(client):
     """
     Vérifie que la route GET /api/tasks/status retourne une liste de tâches.

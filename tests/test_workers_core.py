@@ -77,6 +77,7 @@ def worker_queues(rq_connection):
     low_queue.empty()
     yield default_queue, high_queue, low_queue
 
+@pytest.mark.real_rq
 class TestWorkersCore:
     """Tests core des workers RQ"""
     

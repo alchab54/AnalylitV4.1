@@ -23,7 +23,7 @@ def run_extension():
     logger.info(f"Job d'extension enqueued: {job.id}")
     return jsonify({"message": "Tâche d'extension lancée", "job_id": job.id}), 202
 
-@extensions_bp.route('/', methods=['POST'])  # ✅ Ajouter POST
+@extensions_bp.route('/processed', methods=['POST'])  # ✅ Ajouter POST
 def processed():
     """Logique extension"""
     return jsonify({'status': 'processed'}), 202

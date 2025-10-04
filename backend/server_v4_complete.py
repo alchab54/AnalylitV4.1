@@ -17,6 +17,7 @@ import uuid
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from sqlalchemy.orm import sessionmaker
+from rq.exceptions import NoSuchJobError
 
 # --- Import des Blueprints API ---
 from api.admin import admin_bp
@@ -35,7 +36,7 @@ from api.tasks import tasks_bp
 # --- Imports des utilitaires et de la configuration ---
 from flask_socketio import SocketIO
 from utils.extensions import db, migrate
-from utils.app_globals import redis_conn
+from utils.app_globals import redis_conn, analysis_queue
 from utils.models import Project, Extraction, SearchResult
 from backend.config.config_v4 import get_config
 

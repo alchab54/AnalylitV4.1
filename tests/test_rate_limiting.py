@@ -2,6 +2,7 @@ import pytest
 import time
 from flask import Flask
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_rate_limiting_analysis_profiles(client):
     """
     Tests that the /api/analysis-profiles endpoint is rate-limited correctly.
@@ -15,6 +16,7 @@ def test_rate_limiting_analysis_profiles(client):
     response = client.get('/api/analysis-profiles')
     assert response.status_code == 429  # 429 Too Many Requests
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 @pytest.mark.parametrize("protected_url", ["/api/analysis-profiles"])
 def test_custom_rate_limit_error_message(client, protected_url):
     """

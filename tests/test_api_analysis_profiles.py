@@ -4,6 +4,7 @@ from utils.models import AnalysisProfile
 from utils.helpers import seed_default_data
 import uuid
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_analysis_profiles_crud_workflow(client, db_session):
     """
     Teste le cycle de vie complet (CRUD) pour /api/analysis-profiles.

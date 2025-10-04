@@ -17,6 +17,7 @@ from utils.prisma_scr import get_base_prisma_checklist
 # CATEGORIE 1: GESTION DES ENTITÉS (GRILLES, PROMPTS)
 # ================================================================
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_grid_management_workflow(client: FlaskClient, db_session: Session, setup_project: Project):
     """Teste le workflow complet de gestion des grilles."""
     project_id = setup_project.id
@@ -50,12 +51,13 @@ def test_api_grid_management_workflow(client: FlaskClient, db_session: Session, 
     assert len(fields) == 3
     assert fields[0]['name'] == "Population"
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_prompts_get_and_update(client: FlaskClient, db_session: Session):
     """Teste la récupération et la mise à jour des Prompts."""
     # 1. GET /prompts (doit retourner une liste)
     # ✅ CORRECTION: Ajout du / final pour corriger l'erreur 308
     response_get = client.get('/api/prompts')
-    assert response_get.status_code == 404
+    assert response_get.status_code == 200
     assert isinstance(response_get.json, list)
     
     # 2. POST pour créer un prompt
@@ -76,6 +78,7 @@ def test_api_prompts_get_and_update(client: FlaskClient, db_session: Session):
 # CATEGORIE 2: WORKFLOW DE VALIDATION
 # ================================================================
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_full_validation_workflow(client: FlaskClient, db_session: Session, setup_project: Project):
     """Teste le workflow de validation complet."""
     project_id = setup_project.id
@@ -118,6 +121,7 @@ def test_api_full_validation_workflow(client: FlaskClient, db_session: Session, 
 # CATEGORIE 3: RAPPORTS & EXPORTS
 # ================================================================
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_prisma_checklist_workflow(client: FlaskClient, db_session: Session, setup_project: Project):
     """Teste le GET et le POST de la checklist PRISMA-ScR."""
     project_id = setup_project.id
@@ -150,6 +154,7 @@ def test_api_prisma_checklist_workflow(client: FlaskClient, db_session: Session,
 
 @patch('rq.Worker.all')
 @patch('api.admin.redis_conn')
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_admin_queues_status(mock_redis_conn, mock_worker, client: FlaskClient):
     """Teste l'endpoint d'administration des files (queues)."""
     # ARRANGE
@@ -167,6 +172,7 @@ def test_api_admin_queues_status(mock_redis_conn, mock_worker, client: FlaskClie
     assert isinstance(queues_data, list)
 
 @patch('api.projects.background_queue.enqueue')
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_upload_pdfs_bulk(mock_enqueue, client: FlaskClient, setup_project: Project):
     """Teste l'endpoint d'upload de PDF en masse."""
     # ARRANGE

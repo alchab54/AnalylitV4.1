@@ -37,7 +37,7 @@ def setup_test_data(db_session):
     return project.id, "pmid_rob_123"
 
 # ----- TESTS DU WORKFLOW DE RISQUE DE BIAIS -----
-
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_run_rob_analysis_success(client, setup_test_data):
     """
     Vérifie que l'analyse de risque de biais peut être lancée avec succès pour un article.
@@ -60,6 +60,7 @@ def test_run_rob_analysis_success(client, setup_test_data):
     assert len(data['job_ids']) == 1, "Une tâche doit être créée pour un article."
     assert "tâches d'analyse de risque de biais lancées" in data['message']
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_run_rob_analysis_no_articles(client, setup_test_data):
     """
     Vérifie le comportement de l'API lorsqu'aucun article n'est fourni.
@@ -77,6 +78,7 @@ def test_run_rob_analysis_no_articles(client, setup_test_data):
     data = response.get_json()
     assert "Liste d'articles vide" in data['error'] # Correction du message d'erreur attendu
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_run_rob_analysis_project_not_found(client):
     """
     Vérifie que l'API renvoie une erreur 404 pour un projet inexistant.

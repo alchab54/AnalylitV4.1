@@ -33,6 +33,7 @@ from backend.tasks_v4_complete import (
 # Importer les modèles nécessaires pour la configuration des tests
 from utils.models import AnalysisProfile
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_health_check(client):
     """
     GIVEN un client de test Flask
@@ -44,6 +45,7 @@ def test_health_check(client):
     data = json.loads(response.data)
     assert data.get('status') == 'healthy'
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_create_project(client, db_session): # Utilise session pour l'isolation
     """
     GIVEN un client de test Flask
@@ -63,6 +65,7 @@ def test_create_project(client, db_session): # Utilise session pour l'isolation
     assert response_data['name'] == 'Mon Projet de Test'
     assert response_data['analysis_mode'] == 'screening'
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_get_available_databases(client):
     """
     GIVEN a Flask test client
@@ -75,6 +78,7 @@ def test_get_available_databases(client):
     assert isinstance(data, list)
     assert any(d['id'] == 'pubmed' for d in data)
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_get_project_details(client, db_session): # Utilise session
     """
     GIVEN a Flask test client and an existing project
@@ -96,6 +100,7 @@ def test_get_project_details(client, db_session): # Utilise session
     assert data['id'] == project_id
     assert data['name'] == 'Project Details'
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_get_project_details_not_found(client, db_session): # session garantit que l'ID n'existe pas
     """
     GIVEN a Flask test client
@@ -108,6 +113,7 @@ def test_get_project_details_not_found(client, db_session): # session garantit q
     error_data = json.loads(response.data)
     assert error_data['error'] == 'Projet non trouvé'
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_delete_project(client, db_session): # Utilise session
     """
     GIVEN a Flask test client and an existing project
@@ -131,6 +137,7 @@ def test_delete_project(client, db_session): # Utilise session
     get_response = client.get(f'/api/projects/{project_id}')
     assert get_response.status_code == 404
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_delete_non_existent_project(client, db_session): # Utilise session
     """
     GIVEN a Flask test client
@@ -143,6 +150,7 @@ def test_delete_non_existent_project(client, db_session): # Utilise session
     error_data = json.loads(response.data)
     assert error_data['error'] == 'Projet non trouvé'
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_get_all_projects(client, db_session): # Utilise session
     """
     GIVEN a Flask test client and multiple projects
@@ -178,6 +186,7 @@ def test_get_all_projects(client, db_session): # Utilise session
     assert found_project1['name'] == project1_data['name']
     assert found_project1['analysis_mode'] == project1_data['mode']
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_get_all_projects_empty(client, clean_db):
     """
     Test avec base de données vraiment vide grâce à db_session
@@ -189,6 +198,7 @@ def test_get_all_projects_empty(client, clean_db):
     assert len(response.json) == 0
 
 @patch('api.projects.discussion_draft_queue.enqueue')
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_run_discussion_draft_enqueues_task(mock_enqueue, client, db_session):
     """
     Teste d'intégration API : Vérifie que l'endpoint de discussion met bien en file (enqueue) la bonne tâche.
@@ -218,6 +228,7 @@ def test_api_run_discussion_draft_enqueues_task(mock_enqueue, client, db_session
     assert response_data['job_id'] == "mocked_job_id_123"
 
 @patch('api.projects.background_queue.enqueue')
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_post_chat_message_enqueues_task(mock_enqueue, client, db_session):
     """
     Teste d'intégration API : Vérifie que l'endpoint de chat met bien en file la tâche RAG.
@@ -257,6 +268,7 @@ def test_api_post_chat_message_enqueues_task(mock_enqueue, client, db_session):
 # =================================================================
 
 @patch('api.search.background_queue.enqueue')
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_search_enqueues_task(mock_enqueue, client, db_session):
     """
     Teste POST /api/search et vérifie qu'il met en file la tâche de recherche.
@@ -290,6 +302,7 @@ def test_api_search_enqueues_task(mock_enqueue, client, db_session):
     )
 
 @patch('api.projects.processing_queue.enqueue')
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_run_pipeline_enqueues_tasks(mock_enqueue, client, db_session):
     """
     Teste POST /api/projects/<id>/run et vérifie qu'il met en file plusieurs tâches (une par article).
@@ -338,6 +351,7 @@ def test_api_run_pipeline_enqueues_tasks(mock_enqueue, client, db_session):
     ("prisma_flow", run_prisma_flow_task),
 ])
 @patch('api.projects.analysis_queue.enqueue')
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_run_advanced_analysis_enqueues_tasks(mock_enqueue, analysis_type, expected_task, client, db_session):
     """
     Teste POST /api/projects/<id>/run-analysis pour tous les types d'analyse (paramétré).
@@ -364,6 +378,7 @@ def test_api_run_advanced_analysis_enqueues_tasks(mock_enqueue, analysis_type, e
     )
 
 @patch('api.projects.background_queue.enqueue')
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
     """
     Teste POST /api/projects/<id>/import-zotero (PDF sync)
@@ -404,6 +419,7 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
 
 @patch('api.projects.background_queue.enqueue')
 @patch('api.projects.save_file_to_project_dir')
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_import_zotero_file_enqueues_task(mock_save_file, mock_enqueue, client, setup_project):
     """
     Teste POST /api/projects/<id>/upload-zotero-file (File import)
@@ -428,6 +444,7 @@ def test_api_import_zotero_file_enqueues_task(mock_save_file, mock_enqueue, clie
     mock_enqueue.assert_called_once()
 
 @patch('api.projects.analysis_queue.enqueue')
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_run_rob_analysis_enqueues_task(mock_enqueue, client, db_session):
     """
     Teste POST /api/projects/<id>/run-rob-analysis et vérifie les appels multiples à enqueue.

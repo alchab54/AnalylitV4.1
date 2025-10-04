@@ -36,6 +36,7 @@ def large_project(db_session):
     
     return project.id
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_response_time_with_large_dataset(client, large_project):
     """
     Test de performance : Mesure le temps de réponse de l'API pour lister
@@ -61,7 +62,7 @@ def test_api_response_time_with_large_dataset(client, large_project):
     assert duration < 2.0
     print(f"\n[OK] Performance API : Temps de réponse pour 10k articles paginés : {duration:.2f}s")
 
-
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_analysis_task_on_large_dataset(db_session, large_project, mocker):
     """
     Test de scalabilité : Exécute une tâche d'analyse (méta-analyse)

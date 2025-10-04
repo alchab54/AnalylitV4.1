@@ -9,6 +9,7 @@ from utils.models import Project, SearchResult, Extraction, AnalysisProfile
 # Ce test simule le workflow complet d'un utilisateur.
 # C'est la preuve la plus forte que votre application fonctionne comme un tout cohérent.
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_full_end_to_end_workflow(client, db_session, setup_project):
     """
     Simule un workflow complet :
@@ -80,4 +81,4 @@ def test_full_end_to_end_workflow(client, db_session, setup_project):
     response = client.get(f'/api/projects/{project_id}/export/thesis')
     assert response.status_code == 200
     assert response.mimetype == 'application/zip'
-    assert 'export_these' in response.headers['Content-Disposition']        
+    assert 'export_these' in response.headers['Content-Disposition']

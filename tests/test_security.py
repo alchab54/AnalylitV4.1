@@ -7,6 +7,7 @@ from unittest.mock import patch
 # Ce fichier teste les vulnérabilités de sécurité fondamentales.
 # Il prouve que l'application est robuste contre les attaques communes.
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_create_project_with_xss_payload(client):
     """
     Test de sécurité (XSS) : Vérifie que les payloads contenant des scripts
@@ -34,7 +35,7 @@ def test_create_project_with_xss_payload(client):
     assert stored_data['name'] == "Projet&lt;script&gt;alert('XSS');&lt;/script&gt;"
     print("\n[OK] Sécurité XSS : Les scripts dans les entrées sont stockés littéralement.")
 
-
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_create_project_with_sql_injection_payload(client, db_session):
     """
     Test de sécurité (SQLi) : Vérifie que l'ORM empêche les injections SQL
@@ -57,7 +58,7 @@ def test_create_project_with_sql_injection_payload(client, db_session):
     assert project.name == "Projet' OR '1'='1"
     print("\n[OK] Sécurité SQLi : L'ORM a correctement traité la chaîne malveillante.")
 
-
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_file_upload_path_traversal_is_prevented(client, setup_project):
     """
     Test de sécurité (Path Traversal) : Vérifie que `secure_filename` bloque
@@ -89,7 +90,7 @@ def test_file_upload_path_traversal_is_prevented(client, setup_project):
     assert "1 PDF(s) mis en file pour traitement" in response_data['message']
     print(f"\n[OK] Sécurité Path Traversal : `secure_filename` a bien été appelé sur '{malicious_filename}'.")
 
-
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_file_upload_rejects_dangerous_file_types(client, setup_project):
     """
     Test de sécurité (File Upload) : Vérifie que seuls les fichiers PDF
@@ -113,6 +114,7 @@ def test_file_upload_rejects_dangerous_file_types(client, setup_project):
     assert response_data['failed_files'] == ['exploit.sh (format non supporté)']
     print("\n[OK] Sécurité Upload : Les types de fichiers non-PDF sont correctement rejetés.")
     
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_access_to_non_existent_resource(client):
     """
     Test de robustesse (Accès API) : Vérifie que l'accès à un projet

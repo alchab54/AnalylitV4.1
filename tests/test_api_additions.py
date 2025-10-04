@@ -19,6 +19,7 @@ def new_project(db_session):
     db_session.flush() # Utiliser flush pour obtenir l'ID sans commiter
     return project
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_run_analysis_new_types(client, new_project):
     """Teste l'endpoint /api/projects/<id>/run-analysis avec les nouveaux types d'analyse."""
     project_id = new_project.id
@@ -42,6 +43,7 @@ def test_run_analysis_new_types(client, new_project):
     
     assert json_data_empathy['message'] == "Analyse 'empathy_comparative_analysis' lancée"
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_get_task_status(client, new_project):
     """Teste le nouvel endpoint /api/tasks/<id>/status."""
     project_id = new_project.id
@@ -60,6 +62,8 @@ def test_get_task_status(client, new_project):
     assert status_data['task_id'] == task_id
     assert 'status' in status_data
     assert status_data['status'] in ['queued', 'started', 'finished', 'failed']
+
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_save_rob_assessment(client, db_session, new_project):
     """Teste l'endpoint POST /api/projects/<id>/rob/<article_id>."""
     project_id = new_project.id
@@ -87,6 +91,7 @@ def test_save_rob_assessment(client, db_session, new_project):
     assert saved_assessment_data['random_sequence_generation'] == 'low'
     assert saved_assessment_data['allocation_concealment_notes'] == 'Non mentionné.'
 
+@pytest.mark.usefixtures("mock_redis_and_rq")
 def test_get_task_status_not_found(client):
     """Teste le cas où l'ID de la tâche n'existe pas."""
     non_existent_task_id = 'tache-qui-n-existe-pas'

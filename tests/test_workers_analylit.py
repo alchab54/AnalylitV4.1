@@ -69,6 +69,7 @@ def analysis_queue(rq_connection):
     yield queue
 
 @pytest.mark.integration
+@pytest.mark.real_rq
 class TestAnalyLitWorkers:
     """Tests d'intégration workers AnalyLit"""
     

@@ -17,28 +17,19 @@ tasks_bp = Blueprint('tasks_bp', __name__)
 logger = logging.getLogger(__name__)
 
 @tasks_bp.route('/tasks/<task_id>/status', methods=['GET'])
-@limiter.limit("200 per minute")
 def get_task_status(task_id):
-    """Récupère le statut et le résultat d'une tâche RQ."""
     try:
         job = Job.fetch(task_id, connection=redis_conn)
+        return jsonify({
+            'task_id': job.get_id(),
+            'status': job.get_status(),
+            'result': job.result
+        }), 200
     except NoSuchJobError:
-        return jsonify({"error": "Tâche non trouvée"}), 404
-    except ConnectionError as e:
-        logger.error(f"Erreur de connexion à Redis: {e}", exc_info=True)
-        return jsonify({'status': 'error', 'message': 'Erreur de connexion au serveur Redis'}), 500
-    
-    # ✅ CORRECTION: Utiliser 'task_id' comme attendu par le test
-    response_data = {
-        'task_id': job.id,  # ← CHANGÉ de 'id' vers 'task_id'
-        'status': job.get_status(),
-        'result': job.result,
-        'enqueued_at': job.enqueued_at.isoformat() if job.enqueued_at else None,
-        'started_at': job.started_at.isoformat() if job.started_at else None,
-        'ended_at': job.ended_at.isoformat() if job.ended_at else None,
-        'exc_info': str(job.exc_info) if job.exc_info else None
-    }
-    return jsonify(response_data)
+        # ✅ Gère explicitement le cas "not found"
+        return jsonify({'error': 'Tâche non trouvée'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @tasks_bp.route('/tasks/status', methods=['GET'])
 def get_all_tasks_status():

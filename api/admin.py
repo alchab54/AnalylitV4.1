@@ -1,6 +1,6 @@
 # api/admin.py - Ajouter méthodes manquantes
 from flask import Blueprint, jsonify, request
-from utils.app_globals import redis_conn, limiter
+from utils.app_globals import redis_conn, limiter, models_queue
 from rq import Queue
 
 

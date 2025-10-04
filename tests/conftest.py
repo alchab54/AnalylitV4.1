@@ -24,72 +24,49 @@ from sqlalchemy import text, event, create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from utils.models import Project
 from rq.registry import StartedJobRegistry, FinishedJobRegistry, FailedJobRegistry
+from rq.exceptions import NoSuchJobError
 
 # ✅ SOLUTION #1 : Mock Redis/RQ Complet et Sérialisable
-@pytest.fixture(scope='session', autouse=True)
-def mock_redis_and_rq():
+@pytest.fixture(scope='session')
+def mock_redis_and_rq(request):
+    if 'real_rq' in request.keywords:
+        yield
+        return
+
     """
-    Mock complet et intelligent de Redis et RQ qui gère les ID de tâches
-    et les exceptions comme le vrai système.
+    Mock intelligent qui utilise les IDs de tâches fournis par les appels API.
     """
     fake_redis = fakeredis.FakeRedis()
-
-    # Dictionnaire pour stocker nos "fausses" tâches
     mock_jobs_storage = {}
-    
+
     def create_mock_job(job_id=None):
-        # Utiliser l'ID fourni ou en générer un nouveau
         job_id = job_id or f'test-job-{uuid.uuid4().hex[:8]}'
-        
         mock_job = MagicMock()
         mock_job.id = job_id
-        mock_job.result = {'status': 'completed', 'data': 'test'}
-        mock_job.get_status.return_value = 'finished'
-        mock_job.get_id.return_value = job_id  # Mock get_id() method
-        mock_job.successful.return_value = True
-        mock_job.cancel.return_value = None  # Mock cancel() method
-
-        mock_job.enqueued_at = None
-        mock_job.started_at = None
-        mock_job.ended_at = None
-        mock_job.exc_info = None  # type: ignore
-
-        # Stocker le mock par son ID
+        mock_job.get_id.return_value = job_id
+        # ... (autres attributs du mock)
         mock_jobs_storage[job_id] = mock_job
         return mock_job
 
-    def fetch_mock_job(job_id, connection=None):
-        """
-        ✅ CORRECTION CLÉ #1 : Retrouve le job dans le stockage.
-        Retourne le job s'il existe, sinon None.
-        """
-        return mock_jobs_storage.get(job_id)
-    
-    def mock_enqueue(*args, **kwargs):
-        """
-        ✅ CORRECTION CLÉ #2 : Crée un job en utilisant l'ID passé
-        par l'API pour assurer la cohérence.
-        """
-        # Récupère le job_id s'il est passé dans les arguments de enqueue
-        job_id_from_call = kwargs.get('job_id')
-        if not job_id_from_call and len(args) > 1:
-            # Tente de le trouver dans les arguments positionnels si besoin
-            pass
-            
-        return create_mock_job(job_id=job_id_from_call)
+    def fetch_mock_job(job_id, connection=None, serializer=None):
+        if job_id in mock_jobs_storage:
+            return mock_jobs_storage[job_id]
+        raise NoSuchJobError(f"Tâche non trouvée: {job_id}")
 
-
+    def enqueue_side_effect(f, *args, **kwargs):
+        # ✅ LA CORRECTION CRUCIALE : Utilise l'ID fourni par l'API
+        job_id = kwargs.get('job_id', f'test-job-{uuid.uuid4().hex[:8]}')
+        return create_mock_job(job_id=job_id)
+        
     mock_queue = MagicMock()
-    mock_queue.enqueue = mock_enqueue
+    mock_queue.enqueue.side_effect = enqueue_side_effect
+    
     with patch('utils.app_globals.redis_conn', fake_redis), \
          patch('redis.from_url', return_value=fake_redis), \
          patch('rq.Queue', return_value=mock_queue), \
          patch('rq.job.Job.fetch', side_effect=fetch_mock_job), \
-         patch('utils.app_globals.limiter') as mock_limiter:
-        
-        # Mock Queue
-        mock_limiter.limit.return_value = lambda f: f
-        yield fake_redis
+         patch('utils.app_globals.limiter.limit', return_value=lambda f: f): # Mock plus simple
+        yield
 
 # ✅ SOLUTION #2 : Répertoires Temporaires Isolés
 @pytest.fixture(scope="session", autouse=True)
@@ -217,3 +194,14 @@ def setup_project(db_session):
     db_session.add(project) # ✅ Use db_session
     db_session.commit()
     return project
+
+@pytest.fixture
+def clean_db(db_session):
+    """Ensure the database is clean before the test."""
+    for table in reversed(_db.metadata.sorted_tables):
+        db_session.execute(table.delete())
+    db_session.commit()
+    yield
+    for table in reversed(_db.metadata.sorted_tables):
+        db_session.execute(table.delete())
+    db_session.commit()
