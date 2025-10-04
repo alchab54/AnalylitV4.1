@@ -37,7 +37,11 @@ def create_prompt():
         
         return jsonify(prompt.to_dict()), 201
     except Exception as e:
+        # ✅ Gestion propre des exceptions
         db.session.rollback()
+        logger.exception(f"Error creating prompt: {e}")
+        # ✅ Retourner une réponse JSON avec un code d'erreur approprié
+
         return jsonify({'error': str(e)}), 500
 
 @prompts_bp.route('/<prompt_id>', methods=['GET'])
