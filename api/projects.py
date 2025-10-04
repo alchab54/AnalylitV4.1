@@ -258,7 +258,7 @@ def import_validations(project_id):
 @projects_bp.route('/projects/<project_id>/run-discussion-draft', methods=['POST'])
 def run_discussion_draft(project_id):
     job = discussion_draft_queue.enqueue(run_discussion_generation_task, project_id=project_id, job_timeout=1800)
-    return jsonify({"message": "Génération du brouillon de discussion lancée", "job_id": job.id}), 202
+    return jsonify({"message": "Génération du brouillon de discussion lancée", "task_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/chat', methods=['POST'])
 def chat_with_project(project_id):
@@ -267,7 +267,7 @@ def chat_with_project(project_id):
     if not question:
         return jsonify({"error": "Question is required"}), 400
     job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout=900)
-    return jsonify({"message": "Question soumise", "job_id": job.id}), 202    
+    return jsonify({"message": "Question soumise", "task_id": job.id}), 202    
 
 @projects_bp.route('/projects/<project_id>/run', methods=['POST'])
 def run_pipeline(project_id):
@@ -298,7 +298,7 @@ def run_pipeline(project_id):
             job_timeout=1800
         )
         task_ids.append(job.id)
-    return jsonify({"message": f"{len(task_ids)} tâches de traitement lancées", "job_ids": [str(tid) for tid in task_ids]}), 202
+    return jsonify({"message": f"{len(task_ids)} tâches de traitement lancées", "task_ids": [str(tid) for tid in task_ids]}), 202
 
 @projects_bp.route('/projects/<project_id>/run-analysis', methods=['POST'])
 def run_analysis(project_id):
@@ -337,7 +337,7 @@ def run_analysis(project_id):
                 kwargs['profile'] = profile.to_dict()
 
         job = queue.enqueue(task_func, **kwargs, job_timeout=timeout)
-        return jsonify({"message": f"Analyse '{analysis_type}' lancée", "job_id": str(job.id)}), 202
+        return jsonify({"message": f"Analyse '{analysis_type}' lancée", "task_id": str(job.id)}), 202
     else:
         return jsonify({"error": f"Type d'analyse inconnu: {analysis_type}"}), 400
 
@@ -361,7 +361,7 @@ def import_zotero_pdfs(project_id):
         zotero_api_key=zotero_api_key,
         job_timeout=3600
     )
-    return jsonify({"message": "Importation Zotero lancée", "job_id": job.id}), 202
+    return jsonify({"message": "Importation Zotero lancée", "task_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/upload-zotero', methods=['POST'])
 def upload_zotero_file(project_id):
@@ -383,7 +383,7 @@ def upload_zotero_file(project_id):
             json_file_path=file_path,
             job_timeout=3600
         )
-        return jsonify({"message": "Importation de fichier Zotero lancée", "job_id": job.id}), 202
+        return jsonify({"message": "Importation de fichier Zotero lancée", "task_id": job.id}), 202
     except Exception as e:
         logger.error(f"Erreur lors de l'upload du fichier Zotero: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
@@ -409,7 +409,7 @@ def run_rob_analysis(project_id):
             job_timeout=1200
         )
         task_ids.append(job.id)
-    return jsonify({"message": f"{len(task_ids)} tâches d'analyse de risque de biais lancées", "job_ids": task_ids}), 202
+    return jsonify({"message": f"{len(task_ids)} tâches d'analyse de risque de biais lancées", "task_ids": task_ids}), 202
 
 @projects_bp.route('/projects/<project_id>/rob/<article_id>', methods=['POST'])
 def save_rob_assessment(project_id, article_id):
@@ -464,7 +464,7 @@ def add_manual_articles(project_id):
         identifiers=articles_data,
         job_timeout=3600
     )
-    return jsonify({"message": f"Ajout de {len(articles_data)} article(s) manuel(s) lancé", "job_id": job.id}), 202
+    return jsonify({"message": f"Ajout de {len(articles_data)} article(s) manuel(s) lancé", "task_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/calculate-kappa', methods=['POST'])
 def calculate_kappa(project_id):
@@ -476,7 +476,7 @@ def calculate_kappa(project_id):
 @projects_bp.route('/projects/<project_id>/run-knowledge-graph', methods=['POST'])
 def run_knowledge_graph(project_id):
     job = analysis_queue.enqueue(run_knowledge_graph_task, project_id=project_id, job_timeout=1800)
-    return jsonify({"message": "Génération du graphe de connaissances lancée", "job_id": job.id}), 202
+    return jsonify({"message": "Génération du graphe de connaissances lancée", "task_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/prisma-checklist', methods=['GET', 'POST'])
 def handle_prisma_checklist(project_id):
