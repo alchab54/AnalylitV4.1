@@ -167,9 +167,11 @@ def test_api_admin_queues_status(mock_redis_conn, mock_worker, client: FlaskClie
     response = client.get('/api/queues/info')
     assert response.status_code == 200
     
-    # ✅ CORRECTION: La réponse est maintenant une liste directement
+    # ASSERT
     queues_data = response.json
-    assert isinstance(queues_data, list)
+    assert isinstance(queues_data, dict)
+    assert 'queues' in queues_data
+    assert isinstance(queues_data['queues'], list)
 
 @patch('api.projects.background_queue.enqueue')
 @pytest.mark.usefixtures("mock_redis_and_rq")

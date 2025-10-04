@@ -36,7 +36,7 @@ from api.tasks import tasks_bp
 # --- Imports des utilitaires et de la configuration ---
 from flask_socketio import SocketIO
 from utils.extensions import db, migrate
-from utils.app_globals import redis_conn, analysis_queue
+from utils.app_globals import redis_conn, analysis_queue, limiter
 from utils.models import Project, Extraction, SearchResult
 from backend.config.config_v4 import get_config
 
@@ -83,6 +83,7 @@ def create_app(config_override=None):
     # Initialisation des extensions
     db.init_app(app)
     migrate.init_app(app, db)
+    limiter.init_app(app)
     socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent', message_queue=app.config['REDIS_URL'])
 
     # Enregistrement des blueprints
