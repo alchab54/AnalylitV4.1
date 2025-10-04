@@ -60,10 +60,12 @@ services:
       - "8080:80"
     volumes:
       - ./web:/usr/share/nginx/html:ro
+      - ./docker/nginx.dev.conf:/etc/nginx/conf.d/default.conf:ro  # ✅ AJOUT
     depends_on:
       web:
         condition: service_started
     restart: unless-stopped
+
 
   migrate:
     environment:

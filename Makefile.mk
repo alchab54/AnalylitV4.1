@@ -84,14 +84,13 @@ backup: ## Créer une sauvegarde des données
 models: ## Télécharger les modèles IA essentiels
 	@echo "$(BLUE)🤖 Téléchargement des modèles essentiels...$(NC)"
 	@echo "$(YELLOW)⏳ Attente du démarrage d'Ollama...$(NC)"
-	@until curl -f http://localhost:11434/api/version >/dev/null 2>&1; do sleep 2; done
-	@echo "$(BLUE)📥 Téléchargement de llama3.1:8b...$(NC)"
-	@docker exec $$(docker-compose -f $(COMPOSE_FILE) ps -q ollama) ollama pull llama3.1:8b
-	@echo "$(BLUE)📥 Téléchargement de phi3:mini...$(NC)"
-	@docker exec $$(docker-compose -f $(COMPOSE_FILE) ps -q ollama) ollama pull phi3:mini
-	@echo "$(BLUE)📥 Téléchargement de gemma:2b...$(NC)"
-	@docker exec $$(docker-compose -f $(COMPOSE_FILE) ps -q ollama) ollama pull gemma:2b
-	@echo "$(GREEN)✅ Modèles essentiels téléchargés$(NC)"
+	@echo "$(BLUE)📥 Téléchargement de llama3.1:8b...$(NC)"; \
+	  docker exec analylit_ollama ollama pull llama3.1:8b
+	@echo "$(BLUE)📥 Téléchargement de phi3:mini...$(NC)"; \
+	  docker exec analylit_ollama ollama pull phi3:mini
+	@echo "$(BLUE)📥 Téléchargement de gemma:2b...$(NC)"; \
+	  docker exec analylit_ollama ollama pull gemma:2b
+	@echo "$(GREEN)✅ Modèles essentiels téléchargés$(NC)"	
 
 health: ## Vérifier la santé des services
 	@echo "$(BLUE)🏥 Vérification de la santé des services:$(NC)"

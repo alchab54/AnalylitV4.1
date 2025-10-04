@@ -31,7 +31,6 @@ from api.prompts import prompts_bp
 from api.settings import settings_bp
 from api.stakeholders import stakeholders_bp
 from api.tasks import tasks_bp
-from api.prompts import prompts_bp
 
 # --- Imports des utilitaires et de la configuration ---
 from flask_socketio import SocketIO
@@ -97,6 +96,7 @@ def create_app(config_override=None):
     app.register_blueprint(selection_bp, url_prefix='/api')
     app.register_blueprint(settings_bp, url_prefix='/api')
     app.register_blueprint(stakeholders_bp, url_prefix='/api')
+    app.register_blueprint(tasks_bp, url_prefix='/api')
 
     # --- Routes Spécifiques ---
     @app.route('/')
