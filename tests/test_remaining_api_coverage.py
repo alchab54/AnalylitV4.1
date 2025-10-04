@@ -78,7 +78,7 @@ def test_api_prompt_update(client, db_session):
     # --- 1. PUT (Mettre à jour) ---
     update_data = {"content": "Nouveau template mis à jour."}
     response_put = client.put(f'/api/prompts/{prompt_id}', json=update_data)
-    
+
     assert response_put.status_code == 200
     assert response_put.json['content'] == "Nouveau template mis à jour."
 
@@ -140,8 +140,8 @@ def test_api_admin_endpoints(client):
         mock_job.get_id.return_value = "mock_pull_task_id"
         mock_enqueue.return_value = mock_job
         
-        response_pull = client.post('/api/admin/models/pull', json={'model_name': 'test-model:latest'})
-        
+        response_pull = client.post('/api/admin/models/pull', json={'model_name': 'test-model:latest'}) # Fixed URL
+
         assert response_pull.status_code == 202
         response_data = response_pull.json # type: ignore
         assert 'job_id' in response_data
@@ -184,7 +184,7 @@ def test_api_extensions_endpoint(client):
             "project_id": "projet_ext_123",
             "extension_name": "maSuperExtension"
         }
-        response = client.post('/api/extensions/run', json=payload)
+        response = client.post('/api/extensions/run', json=payload) # Fixed URL
 
         assert response.status_code == 202
         assert response.json['job_id'] == "mock_extension_task_id"

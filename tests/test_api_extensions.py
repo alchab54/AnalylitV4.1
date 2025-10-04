@@ -41,8 +41,8 @@ def test_api_grid_management_workflow(client: FlaskClient, db_session: Session, 
     assert response_get.status_code == 200
     data = response_get.json
     
-    assert isinstance(data, list)
-    assert len(data) == 1
+    assert isinstance(data, list), f"Response data should be a list but got {type(data)}"
+    assert len(data) == 1, f"Expected 1 grid, but got {len(data)}"
     assert data[0]['name'] == "Grille ATN Importée"
     fields = data[0]['fields']
     assert isinstance(fields, list)
@@ -54,7 +54,7 @@ def test_api_prompts_get_and_update(client: FlaskClient, db_session: Session):
     # 1. GET /prompts (doit retourner une liste)
     # ✅ CORRECTION: Ajout du / final pour corriger l'erreur 308
     response_get = client.get('/api/prompts/')
-    assert response_get.status_code == 404
+    assert response_get.status_code == 200
     assert isinstance(response_get.json, list)
     
     # 2. POST pour créer un prompt

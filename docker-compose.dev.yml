@@ -30,15 +30,16 @@ services:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db  # ✅ CORRECT
       PYTHONPATH: /home/appuser/app
       # Wait for it
-      WAIT_HOSTS: test-db:5432
+      WAIT_HOSTS: test-db:5432,redis:6379
       REDIS_URL: redis://redis:6379/0
 
     volumes:
-      # Code en lecture seule
+      # Code en lecture seules
       - ./api:/home/appuser/app/api:ro
       - ./scripts:/home/appuser/app/scripts:ro
       - ./utils:/home/appuser/app/utils:ro
       - ./web:/home/appuser/app/web:ro
+      
       - ./migrations:/home/appuser/app/migrations:ro
       - ./alembic.ini:/home/appuser/app/alembic.ini:ro
       - ./tests:/home/appuser/app/tests:ro
@@ -52,8 +53,6 @@ services:
     depends_on:
       test-db:
         condition: service_healthy
-      redis:
-        condition: service_started
     networks:
     - analylit-network
     ports:
@@ -112,6 +111,7 @@ volumes:
   test_postgres_data:
   dev_logs:      # Volume séparé pour les logs de développement
   dev_projects:  # Volume séparé pour les projets de développement
+
 
 networks:
   analylit-network:

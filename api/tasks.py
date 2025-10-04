@@ -1,4 +1,5 @@
 import logging
+from redis.exceptions import ConnectionError
 from flask import Blueprint, jsonify
 from rq.job import Job
 from rq.exceptions import NoSuchJobError
@@ -22,8 +23,11 @@ def get_task_status(task_id):
         job = Job.fetch(task_id, connection=redis_conn)
     except NoSuchJobError:
         return jsonify({"error": "Tâche non trouvée"}), 404
+    except ConnectionError as e:
+        logger.error(f"Erreur de connexion à Redis: {e}", exc_info=True)
+        return jsonify({"error": "Erreur de connexion au serveur Redis"}), 500
     except Exception as e:
-        logger.error(f"Erreur en récupérant la tâche {task_id} depuis Redis: {e}", exc_info=True)
+        logger.exception(f"Erreur inattendue lors de la récupération de la tâche {task_id}: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
 
     # ✅ CORRECTION: Utiliser job.exc_info qui est la méthode standard pour obtenir les infos d'exception.
