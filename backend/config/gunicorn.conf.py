@@ -12,6 +12,9 @@ max_requests_jitter = 200
 preload_app = False
 reload = False
 
-# ✅✅✅ **LA CORRECTION FINALE EST ICI** ✅✅✅
-# On dit à Gunicorn de charger la variable 'app' depuis le fichier 'backend.server_v4_complete'
+# ✅✅✅ **CORRECTION FINALE** ✅✅✅
+# Cette variable dit EXPLICITEMENT à Gunicorn quelle application charger
+module = "backend.server_v4_complete:app"
+
+# Alternative équivalente (gardons les deux pour être sûr)
 wsgi_app = "backend.server_v4_complete:app"
