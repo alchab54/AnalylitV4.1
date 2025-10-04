@@ -71,12 +71,13 @@ def create_app(config_override=None):
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_pre_ping': True,
         "connect_args": {
-            "options": f"-c search_path={config.DB_SCHEMA},public"
+            "options": f"-c search_path={app.config.get('DB_SCHEMA', config.DB_SCHEMA)},public"
         }
     }
 
-    # Set the database URI from the configuration
-    app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_URL
+    # Set the database URI from the configuration, allowing override
+    if 'SQLALCHEMY_DATABASE_URI' not in (config_override or {}):
+        app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_URL
 
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
@@ -149,6 +150,11 @@ def create_app(config_override=None):
     @app.route('/api/health', methods=['GET'])
     def health_check():
         return jsonify({"status": "healthy"}), 200
+
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        return jsonify(error="ratelimit exceeded",
+                       description="Too many requests, please try again later."), 429
 
     @app.route('/api/projects/<project_id>/extractions', methods=['GET'])
     def get_project_extractions(project_id):

@@ -93,7 +93,7 @@ def app():
     session_id = uuid.uuid4().hex[:8]
     db_name = f'analylit_test_{worker_id}_{session_id}'
     
-    test_db_url = f'postgresql://analylit_user:strong_password@test-db:5432/{db_name}'
+    test_db_url = f'postgresql://analylit_user:strong_password@localhost:5434/{db_name}'
     
     _app = create_app({
         'TESTING': True,
@@ -118,7 +118,7 @@ def db(app):
     with _db_lock:
         with app.app_context():
             # Créer la base de données si elle n'existe pas
-            engine = create_engine('postgresql://analylit_user:strong_password@test-db:5432/postgres')
+            engine = create_engine('postgresql://analylit_user:strong_password@localhost:5434/postgres')
             with engine.connect() as conn:
                 conn.execute(text("COMMIT"))  # Sortir de la transaction
                 try:

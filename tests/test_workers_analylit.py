@@ -4,10 +4,9 @@ Ces tests vérifient l'intégration complète workers + AI + database.
 """
 
 import pytest
-import time
-from threading import Thread
 from unittest.mock import patch, MagicMock
-from rq import Queue, Worker
+from rq import Queue
+from rq.worker import SimpleWorker
 from redis import from_url
 from redis.exceptions import ConnectionError
 from tests.test_workers_core import simple_task # Import task for resilience test
@@ -67,14 +66,6 @@ def analysis_queue(rq_connection):
     queue.empty()
     yield queue
 
-def wait_for_job(job, timeout=5):
-    start_time = time.time()
-    while not job.is_finished and not job.is_failed:
-        if time.time() - start_time > timeout:
-            raise TimeoutError(f"Job {job.id} did not finish in time. Status: {job.get_status()}")
-        time.sleep(0.1)
-        job.refresh()
-
 @pytest.mark.integration
 @pytest.mark.real_rq
 class TestAnalyLitWorkers:
@@ -82,10 +73,6 @@ class TestAnalyLitWorkers:
     
     def test_discussion_analysis_worker(self, analysis_queue, rq_connection):
         """Test worker d'analyse de discussion"""
-        worker = Worker([analysis_queue], connection=rq_connection)
-        worker_thread = Thread(target=worker.work, kwargs={'burst': False})
-        worker_thread.start()
-
         with patch('tests.test_workers_analylit.DiscussionGenerator') as mock_gen_class:
             mock_gen_instance = mock_gen_class.return_value
             mock_gen_instance.generate.return_value = {
@@ -100,22 +87,17 @@ class TestAnalyLitWorkers:
                 meta={"analysis_type": "discussion"}
             )
             
-            wait_for_job(job)
+            worker = SimpleWorker([analysis_queue], connection=rq_connection)
+            worker.work(burst=True)
             
+            job.refresh()
             assert job.is_finished
             result = job.return_value()
             assert "summary" in result
             assert "key_themes" in result
 
-        worker.schedule_for_shutdown()
-        worker_thread.join()
-
     def test_search_worker_with_database(self, analysis_queue, rq_connection):
         """Test worker de recherche avec vraie base"""
-        worker = Worker([analysis_queue], connection=rq_connection)
-        worker_thread = Thread(target=worker.work, kwargs={'burst': False})
-        worker_thread.start()
-
         DatabaseManager.return_value.search_pubmed.return_value = [
             {"pmid": "12345", "title": "Test Article 1"},
             {"pmid": "67890", "title": "Test Article 2"}
@@ -129,22 +111,17 @@ class TestAnalyLitWorkers:
             meta={"search_type": "multi_database"}
         )
         
-        wait_for_job(job)
-
+        worker = SimpleWorker([analysis_queue], connection=rq_connection)
+        worker.work(burst=True)
+        
+        job.refresh()
         assert job.is_finished
         result = job.return_value()
         assert result["count"] == 2
         assert len(result["results"]) == 2
 
-        worker.schedule_for_shutdown()
-        worker_thread.join()
-
     def test_atn_scoring_worker(self, analysis_queue, rq_connection):
         """Test worker spécialisé scoring ATN"""
-        worker = Worker([analysis_queue], connection=rq_connection)
-        worker_thread = Thread(target=worker.work, kwargs={'burst': False})
-        worker_thread.start()
-
         job = analysis_queue.enqueue(
             atn_scoring_task_for_test,
             [
@@ -155,8 +132,10 @@ class TestAnalyLitWorkers:
             meta={"methodology": "ATN"}
         )
         
-        wait_for_job(job)
-
+        worker = SimpleWorker([analysis_queue], connection=rq_connection)
+        worker.work(burst=True)
+        
+        job.refresh()
         assert job.is_finished
         result = job.return_value()
         assert "scores" in result
@@ -164,22 +143,21 @@ class TestAnalyLitWorkers:
         assert result["scores"]["art1"] >= 75
         assert result["scores"]["art2"] >= 60
 
-        worker.schedule_for_shutdown()
-        worker_thread.join()
-
 @pytest.mark.slow
 class TestWorkersResilience:
     """Tests de résilience et robustesse des workers"""
     
     def test_worker_handles_redis_disconnect(self, analysis_queue, rq_connection):
         """Test de résilience à la déconnexion Redis"""
-        default_queue = analysis_queue
-        
-        job = default_queue.enqueue(simple_task, 1, 2)
+        job = analysis_queue.enqueue(simple_task, 1, 2)
         
         with patch.object(rq_connection, 'get') as mock_get:
             mock_get.side_effect = ConnectionError("Redis disconnected")
             
-            worker = Worker([default_queue], connection=rq_connection)
-            result = worker.work(burst=True)
-            assert result in (True, False, None)
+            worker = SimpleWorker([analysis_queue], connection=rq_connection)
+            # The worker should handle the error gracefully and not crash.
+            # It will move the job to the failed queue.
+            worker.work(burst=True)
+
+        job.refresh()
+        assert job.is_failed

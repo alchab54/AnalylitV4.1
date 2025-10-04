@@ -7,8 +7,8 @@ gèrent les erreurs, et maintiennent l'état correct dans Redis.
 import time
 import pytest
 from pathlib import Path
-from threading import Thread
-from rq import Queue, Worker
+from rq import Queue
+from rq.worker import SimpleWorker
 from rq.job import Job, Retry
 from redis import from_url
 
@@ -68,106 +68,70 @@ def worker_queues(rq_connection):
     low_queue.empty()
     yield default_queue, high_queue, low_queue
 
-def wait_for_job(job, timeout=5):
-    start_time = time.time()
-    while not job.is_finished and not job.is_failed:
-        if time.time() - start_time > timeout:
-            raise TimeoutError(f"Job {job.id} did not finish in time. Status: {job.get_status()}")
-        time.sleep(0.1)
-        job.refresh()
-
 @pytest.mark.real_rq
 class TestWorkersCore:
     """Tests core des workers RQ"""
     
     def test_worker_processes_simple_job(self, worker_queues, rq_connection):
         default_queue, _, _ = worker_queues
-        
-        worker = Worker([default_queue], connection=rq_connection)
-        worker_thread = Thread(target=worker.work, kwargs={'burst': False})
-        worker_thread.start()
-        
         job = default_queue.enqueue(simple_task, 5, 10)
-        wait_for_job(job)
         
+        worker = SimpleWorker([default_queue], connection=rq_connection)
+        worker.work(burst=True)
+        
+        job.refresh()
         assert job.is_finished
         assert job.return_value() == 15
-        
-        worker.schedule_for_shutdown()
-        worker_thread.join()
 
     def test_worker_handles_job_failure(self, worker_queues, rq_connection):
         default_queue, _, _ = worker_queues
-        
-        worker = Worker([default_queue], connection=rq_connection)
-        worker_thread = Thread(target=worker.work, kwargs={'burst': False})
-        worker_thread.start()
-
         job = default_queue.enqueue(failing_task, "Test failure")
         
-        with pytest.raises(TimeoutError):
-            wait_for_job(job, timeout=2) # Should not finish successfully
-
+        worker = SimpleWorker([default_queue], connection=rq_connection)
+        worker.work(burst=True)
+        
         job.refresh()
         assert job.is_failed
         assert "ValueError" in job.latest_result().exc_string
 
-        worker.schedule_for_shutdown()
-        worker_thread.join()
-
     def test_worker_priority_queues(self, worker_queues, rq_connection):
         default_queue, high_queue, low_queue = worker_queues
         
-        worker = Worker([high_queue, default_queue, low_queue], connection=rq_connection)
-        worker_thread = Thread(target=worker.work, kwargs={'burst': False})
-        worker_thread.start()
-
         low_job = low_queue.enqueue(simple_task, 1, 1)
         high_job = high_queue.enqueue(simple_task, 2, 2) 
         default_job = default_queue.enqueue(simple_task, 3, 3)
 
-        wait_for_job(high_job)
-        wait_for_job(default_job)
-        wait_for_job(low_job)
+        worker = SimpleWorker([high_queue, default_queue, low_queue], connection=rq_connection)
+        worker.work(burst=True)
+
+        high_job.refresh()
+        default_job.refresh()
+        low_job.refresh()
 
         assert high_job.is_finished
         assert default_job.is_finished
         assert low_job.is_finished
-        
-        worker.schedule_for_shutdown()
-        worker_thread.join()
 
     def test_worker_job_timeout(self, worker_queues, rq_connection):
         default_queue, _, _ = worker_queues
-        
-        worker = Worker([default_queue], connection=rq_connection)
-        worker_thread = Thread(target=worker.work, kwargs={'burst': False})
-        worker_thread.start()
-
         job = default_queue.enqueue(slow_task, 2.0, job_timeout=1)
         
-        with pytest.raises(TimeoutError):
-            wait_for_job(job, timeout=3)
-
+        worker = SimpleWorker([default_queue], connection=rq_connection)
+        worker.work(burst=True)
+        
         job.refresh()
         assert job.is_failed
-        
-        worker.schedule_for_shutdown()
-        worker_thread.join()
 
     def test_worker_retry_on_failure(self, worker_queues, rq_connection):
         default_queue, _, _ = worker_queues
-
-        worker = Worker([default_queue], connection=rq_connection)
-        worker_thread = Thread(target=worker.work, kwargs={'burst': False})
-        worker_thread.start()
-
         job = default_queue.enqueue(flaky, kwargs={'fail_times': 2}, retry=Retry(max=3))
         
-        wait_for_job(job, timeout=10)
+        worker = SimpleWorker([default_queue], connection=rq_connection)
+        # The worker needs to run multiple times to process retries
+        worker.work(burst=True) # 1st attempt -> fail
+        worker.work(burst=True) # 2nd attempt -> fail
+        worker.work(burst=True) # 3rd attempt -> success
 
+        job.refresh()
         assert job.is_finished
         assert job.return_value() == "finally succeeded"
-        
-        worker.schedule_for_shutdown()
-        worker_thread.join()
