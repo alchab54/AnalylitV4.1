@@ -1,52 +1,7 @@
-# Fichier d'override pour le développement local
-# Utilisation: docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+# docker-compose.dev.yml - Version Finale Corrigée
 
 services:
-  nginx:
-    profiles: ["default", "gpu"]
-    image: nginx:1.25-alpine
-    container_name: analylit_nginx_dev
-    ports:
-      - "8081:80"
-    volumes:
-      - ./web:/usr/share/nginx/html:ro
-      - ./docker/nginx.dev.conf:/etc/nginx/templates/default.conf.template
-    depends_on:
-      - web
-    restart: unless-stopped
-
-  web:
-    profiles: ["default", "gpu"]
-    # ✅✅✅ **CORRECTION FINALE** ✅✅✅
-    command: ["gunicorn", "--conf", "backend/config/gunicorn.conf.py", "backend.server_v4_complete:app"]
-    environment:
-      FLASK_ENV: development
-      FLASK_APP: backend/server_v4_complete.py  # ✅ Fichier correct
-      GUNICORN_WORKER_CLASS: "sync"
-      DB_HOST: test-db
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      PYTHONPATH: /home/appuser/app
-    volumes:
-      - ./api:/home/appuser/app/api
-      - ./backend:/home/appuser/app/backend
-      - ./scripts:/home/appuser/app/scripts
-      - ./utils:/home/appuser/app/utils
-      - ./web:/home/appuser/app/web
-      - ./migrations:/home/appuser/app/migrations
-      - ./alembic.ini:/home/appuser/app/alembic.ini:ro
-      - ./tests:/home/appuser/app/tests  # ✅ Crucial pour les tests
-      - ./pytest.ini:/home/appuser/app/pytest.ini:ro
-    ports:
-      - "5000:80"
-    # ✅✅✅ **CORRECTION DÉPENDANCES** ✅✅✅
-    depends_on:
-      test-db:
-        condition: service_started  # Direct vers la DB, pas migrate
-      ollama:
-        condition: service_started
-      redis:
-        condition: service_started
-
+  # ✅ Base de données de développement/test séparée
   test-db:
     image: postgres:15-alpine
     container_name: analylit_test_db
@@ -54,25 +9,86 @@ services:
       POSTGRES_USER: analylit_user
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_test_db
-    ports: []
-    command:
-      [
-        "postgres",
-        "-c", "default_transaction_isolation=read committed",
-        "-c", "log_statement=all"
-      ]
+    ports:
+      - "5434:5432"  # Port différent pour éviter les conflits
     volumes:
       - test_postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U analylit_user -d analylit_test_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # ✅ Service web de développement avec volumes et tests
+  web:
+    environment:
+      FLASK_ENV: development
+      FLASK_APP: backend/server_v4_complete.py
+      DB_HOST: test-db
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      PYTHONPATH: /home/appuser/app
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - ./api:/home/appuser/app/api:ro
+      - ./backend:/home/appuser/app/backend:ro
+      - ./scripts:/home/appuser/app/scripts:ro
+      - ./utils:/home/appuser/app/utils:ro
+      - ./web:/home/appuser/app/web:ro
+      - ./migrations:/home/appuser/app/migrations:ro
+      - ./alembic.ini:/home/appuser/app/alembic.ini:ro
+      - ./tests:/home/appuser/app/tests:ro  # ✅ CRUCIAL pour les tests
+      - ./pytest.ini:/home/appuser/app/pytest.ini:ro
+      - ./logs:/home/appuser/app/logs
+      - ./projects:/home/appuser/app/projects
+    ports:
+      - "5000:80"  # Accès direct au web
+    depends_on:
+      test-db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  # ✅ Nginx de développement simplifié
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: analylit_nginx_dev
+    ports:
+      - "8080:80"  # Interface principale
+    volumes:
+      - ./web:/usr/share/nginx/html:ro
+      - ./docker/nginx.dev.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      web:
+        condition: service_started
+    restart: unless-stopped
+
+  # ✅ Migration adaptée pour la DB de test
+  migrate:
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      FLASK_APP: backend/server_v4_complete.py
+      DB_HOST: test-db
+      PYTHONPATH: /home/appuser/app
+    volumes:
+      - ./backend:/home/appuser/app/backend:ro
+      - ./api:/home/appuser/app/api:ro
+      - ./utils:/home/appuser/app/utils:ro
+      - ./migrations:/home/appuser/app/migrations:ro
+      - ./alembic.ini:/home/appuser/app/alembic.ini:ro
+    depends_on:
+      test-db:
+        condition: service_healthy
+
+  # ✅ Workers connectés à la DB de test
   worker-fast:
     environment:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       DB_HOST: test-db
     volumes:
-      - ./backend:/home/appuser/app/backend
-      - ./api:/home/appuser/app/api
-      - ./utils:/home/appuser/app/utils
-      - ./scripts:/home/appuser/app/scripts
+      - ./backend:/home/appuser/app/backend:ro
+      - ./api:/home/appuser/app/api:ro
+      - ./utils:/home/appuser/app/utils:ro
     depends_on:
       test-db:
         condition: service_started
@@ -84,10 +100,9 @@ services:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       DB_HOST: test-db
     volumes:
-      - ./backend:/home/appuser/app/backend
-      - ./api:/home/appuser/app/api
-      - ./utils:/home/appuser/app/utils
-      - ./scripts:/home/appuser/app/scripts
+      - ./backend:/home/appuser/app/backend:ro
+      - ./api:/home/appuser/app/api:ro
+      - ./utils:/home/appuser/app/utils:ro
     depends_on:
       test-db:
         condition: service_started
@@ -99,33 +114,13 @@ services:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       DB_HOST: test-db
     volumes:
-      - ./backend:/home/appuser/app/backend
-      - ./api:/home/appuser/app/api
-      - ./utils:/home/appuser/app/utils
-      - ./scripts:/home/appuser/app/scripts
+      - ./backend:/home/appuser/app/backend:ro
+      - ./api:/home/appuser/app/api:ro
+      - ./utils:/home/appuser/app/utils:ro
     depends_on:
       test-db:
         condition: service_started
       redis:
-        condition: service_started
-
-  migrate:
-    environment:
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      SCHEMA_NAME: analylit_schema
-      DB_HOST: test-db
-      PYTHONPATH: /home/appuser/app
-      FLASK_APP: backend/server_v4_complete.py  # ✅ Fichier correct
-    volumes:
-      - ./api:/home/appuser/app/api
-      - ./backend:/home/appuser/app/backend
-      - ./scripts:/home/appuser/app/scripts
-      - ./utils:/home/appuser/app/utils
-      - ./migrations:/home/appuser/app/migrations
-      - ./alembic.ini:/home/appuser/app/alembic.ini:ro
-      - ./scripts/entrypoint.sh:/home/appuser/app/entrypoint.sh:ro
-    depends_on:
-      test-db:
         condition: service_started
 
 volumes:
