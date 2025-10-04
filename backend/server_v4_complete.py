@@ -130,13 +130,8 @@ def create_app(config_override=None):
         """Retourne le statut des files d'attente RQ."""
         from rq import Queue
         queues_to_check = ['processing_queue', 'synthesis_queue', 'analysis_queue', 'background_queue', 'models_queue', 'extension_queue']
-        queues_info = []
-        for q_name in queues_to_check:
-            q = Queue(q_name, connection=redis_conn)
-            queues_info.append({
-                "name": q_name,
-                "count": q.count, # Nombre de tâches en attente
-            })
+
+        return jsonify(queues_info)
 
         return jsonify(queues_info)
 
