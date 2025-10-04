@@ -7,8 +7,6 @@ project_root = Path(__file__).resolve().parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
-logger = logging.getLogger(__name__)
-
 import feedparser
 if not hasattr(feedparser, '_FeedParserMixin'):
     feedparser._FeedParserMixin = type('_FeedParserMixin', (object,), {})
@@ -40,6 +38,16 @@ from utils.extensions import db, migrate
 from utils.app_globals import redis_conn
 from utils.models import Project, Extraction, SearchResult
 from backend.config.config_v4 import get_config
+
+# --- Configuration du logging selon l'environnement ---
+if os.getenv('FLASK_ENV') == 'development':
+    from utils.logging_config_dev import setup_logging
+    setup_logging()
+else:
+    from utils.logging_config import setup_logging
+    setup_logging()
+
+logger = logging.getLogger(__name__)
 
 # --- Initialisation des extensions ---
 socketio = SocketIO()
@@ -87,7 +95,6 @@ def create_app(config_override=None):
     app.register_blueprint(tasks_bp, url_prefix='/api')
 
     # --- Routes Spécifiques ---
-
     @app.route('/')
     def serve_frontend():
         """Sert l'interface frontend HTML."""
@@ -97,7 +104,6 @@ def create_app(config_override=None):
     def health_check():
         return jsonify({"status": "healthy"}), 200
 
-    # ✅ **PATCH n°1 : Enrichir l'endpoint des extractions**
     @app.route('/api/projects/<project_id>/extractions', methods=['GET'])
     def get_project_extractions(project_id):
         """Retourne les extractions avec l'abstract de l'article."""
@@ -120,7 +126,6 @@ def create_app(config_override=None):
         finally:
             session.close()
             
-    # ✅ **PATCH n°2 : Fiabiliser l'endpoint des files d'attente**
     @app.route('/api/queues/info', methods=['GET'])
     def get_queues_info():
         """Retourne le statut des files d'attente RQ."""
@@ -134,7 +139,7 @@ def create_app(config_override=None):
                 queues_info.append({
                     'name': queue_name,
                     'size': len(queue),
-                    'workers': 0  # Placeholder
+                    'workers': 0
                 })
             except:
                 queues_info.append({
@@ -147,6 +152,7 @@ def create_app(config_override=None):
 
     return app
 
+# ✅ Créer l'instance de l'application au niveau du module
 app = create_app()
 
 if __name__ == "__main__":
