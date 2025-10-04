@@ -99,7 +99,9 @@ services:
       FLASK_ENV: production
       WAIT_HOSTS: db:5432,redis:6379,ollama:11434
       WAIT_TIMEOUT: "60"
+
       WAIT_HOSTS_TIMEOUT: "10"
+
       GUNICORN_WORKERS: "2"
       GUNICORN_THREADS: "2"
       GUNICORN_TIMEOUT: "120"
@@ -107,6 +109,8 @@ services:
       PYTHONPATH: /home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
       # ✅ CORRECTION : Ajout de la variable pour que le backend sache comment contacter Ollama.
       OLLAMA_BASE_URL: "http://ollama:11434"
+
+    command: ["gunicorn", "--conf", "backend/config/gunicorn.conf.py"]
     env_file:
       - .env
     depends_on:
@@ -137,12 +141,11 @@ services:
     image: analylit-migrate:latest
     container_name: analylit_migrate
     environment:
-      FLASK_APP: backend/manage.py
       FLASK_ENV: production
       WAIT_HOSTS: db:5432
       WAIT_TIMEOUT: "30"
       PYTHONPATH: /home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
-      POSTGRES_USER: analylit_user
+      FLASK_APP: backend/server_v4_complete.py
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_db
       SCHEMA_NAME: analylit_schema
