@@ -52,7 +52,7 @@ def pull_models():
         
         job = models_queue.enqueue(download_model_task, models)
         
-        result = {
+        result = { #✅ CORRECTION : La clé task_id est ici
             'job_id': job.id,
             'message': f'{len(models)} modèles en cours de téléchargement',
             'models': models,

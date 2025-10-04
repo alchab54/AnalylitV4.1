@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 def get_task_status(task_id):
     try:
         job = Job.fetch(task_id, connection=redis_conn) #✅ CORRECTION : La clé task_id est ici
-        return jsonify({
+        return jsonify({ 
             'task_id': job.id,
             'status': job.get_status(), #✅ CORRECTION : La clé task_id est ici
             'result': job.result

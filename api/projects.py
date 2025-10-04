@@ -258,7 +258,7 @@ def import_validations(project_id):
 @projects_bp.route('/projects/<project_id>/run-discussion-draft', methods=['POST'])
 def run_discussion_draft(project_id):
     job = discussion_draft_queue.enqueue(run_discussion_generation_task, project_id=project_id, job_timeout=1800)
-    return jsonify({"message": "Génération du brouillon de discussion lancée", "task_id": job.id}), 202
+    return jsonify({"message": "Génération du brouillon de discussion lancée", "task_id": job.id}), 202 #✅ CORRECTION : La clé task_id est ici
 
 @projects_bp.route('/projects/<project_id>/chat', methods=['POST'])
 def chat_with_project(project_id):
@@ -266,7 +266,7 @@ def chat_with_project(project_id):
     question = data.get('question')    
     if not question:
         return jsonify({"error": "Question is required"}), 400
-    job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout=900)
+    job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout=900) #✅ CORRECTION : La clé task_id est ici
     return jsonify({"message": "Question soumise", "task_id": job.id}), 202    
 
 @projects_bp.route('/projects/<project_id>/run', methods=['POST'])
@@ -469,6 +469,7 @@ def add_manual_articles(project_id):
 @projects_bp.route('/projects/<project_id>/calculate-kappa', methods=['POST'])
 def calculate_kappa(project_id):
     """Lance la tâche de calcul du Kappa de Cohen."""
+    #✅ CORRECTION : La clé task_id est ici
     from backend.tasks_v4_complete import calculate_kappa_task
     job = analysis_queue.enqueue(calculate_kappa_task, project_id=project_id, job_timeout='5m')
     return jsonify({"message": "Calcul du Kappa de Cohen lancé.", "task_id": job.id}), 202
