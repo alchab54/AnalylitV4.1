@@ -12,6 +12,19 @@ sys.path.insert(0, str(root_dir))
 # Set TESTING environment variable
 os.environ['TESTING'] = 'true'
 
+# ✅ CORRECTION CRITIQUE : Mock Redis global
+@pytest.fixture(scope='session', autouse=True)
+def mock_redis_global():
+    """Mock Redis pour tous les tests"""
+    fake_redis = fakeredis.FakeRedis()
+
+    with patch('utils.app_globals.redis_conn', fake_redis), \
+         patch('redis.from_url', return_value=fake_redis), \
+         patch('rq.Queue') as mock_queue:
+
+        mock_queue.return_value.enqueue.return_value.id = 'test-job-id'
+        yield fake_redis
+
 # ✅ CORRECTION CRITIQUE : Importer les modèles pour que SQLAlchemy les découvre.
 # ✅ CORRECTION CRITIQUE : Import explicite de TOUS les modèles
 from utils.models import (
@@ -28,7 +41,6 @@ def setup_test_environment():
     """Configure l'environnement de test."""
     # Force l'environnement de développement
     os.environ['FLASK_ENV'] = 'development'
-    yield
     # Nettoyage après les tests
 # --- IMPORTS DE L'APPLICATION ---
 from backend.server_v4_complete import create_app

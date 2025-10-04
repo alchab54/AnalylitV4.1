@@ -4,7 +4,7 @@ FROM analylit-base-cpu:latest
 # Copier le code de l'application.
 COPY . .
 
-# RUN apt-get update as root
+
 USER root
 
 # ✅ SUPPRIMÉ: Téléchargement wget (plus nécessaire)

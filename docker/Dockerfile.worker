@@ -7,6 +7,8 @@ RUN mkdir -p /home/appuser/app/projects /home/appuser/app/logs && \
 # Définir le répertoire de travail
 WORKDIR /home/appuser/app
 
+USER root
+
 # ✅ CORRECTION: Copier l'intégralité du code source de l'application.
 # Cela garantit que les workers ont accès à tous les modules, y compris les tâches.
 COPY --chown=appuser:appuser . .

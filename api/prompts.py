@@ -36,7 +36,7 @@ def create_prompt():
         db.session.rollback()
         return jsonify({"error": "Un prompt avec ce nom existe déjà"}), 409
 
-@prompts_bp.route('/<prompt_id>', methods=['PUT'])
+@prompts_bp.route('/<prompt_id>', methods=['GET','PUT'])
 def update_prompt(prompt_id):
     """Met à jour un prompt existant."""
     # ✅ AMÉLIORATION: Utiliser db.session.get() est plus direct pour une recherche par clé primaire.
