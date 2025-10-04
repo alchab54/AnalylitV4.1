@@ -2,14 +2,14 @@
 
 import pytest
 import os
-import sys
 import threading
 import tempfile
 import shutil
 from pathlib import Path
 import fakeredis
 from unittest.mock import patch, MagicMock
-import uuid
+import uuid, sys
+from datetime import datetime
 
 # Configuration environnement
 root_dir = Path(__file__).parent.parent
@@ -33,10 +33,10 @@ def mock_redis_and_rq():
     et les exceptions comme le vrai système.
     """
     fake_redis = fakeredis.FakeRedis()
-    
+
     # Dictionnaire pour stocker nos "fausses" tâches
     mock_jobs_storage = {}
-
+    
     def create_mock_job(job_id=None):
         # Utiliser l'ID fourni ou en générer un nouveau
         job_id = job_id or f'test-job-{uuid.uuid4().hex[:8]}'
@@ -45,7 +45,10 @@ def mock_redis_and_rq():
         mock_job.id = job_id
         mock_job.result = {'status': 'completed', 'data': 'test'}
         mock_job.get_status.return_value = 'finished'
+        mock_job.get_id.return_value = job_id  # Mock get_id() method
         mock_job.successful.return_value = True
+        mock_job.cancel.return_value = None  # Mock cancel() method
+
         mock_job.enqueued_at = None
         mock_job.started_at = None
         mock_job.ended_at = None
@@ -62,7 +65,7 @@ def mock_redis_and_rq():
         """
         return mock_jobs_storage.get(job_id)
     
-    def enqueue_side_effect(*args, **kwargs):
+    def mock_enqueue(*args, **kwargs):
         """
         ✅ CORRECTION CLÉ #2 : Crée un job en utilisant l'ID passé
         par l'API pour assurer la cohérence.
@@ -75,9 +78,9 @@ def mock_redis_and_rq():
             
         return create_mock_job(job_id=job_id_from_call)
 
+
     mock_queue = MagicMock()
-    mock_queue.enqueue.side_effect = enqueue_side_effect
-    
+    mock_queue.enqueue = mock_enqueue
     with patch('utils.app_globals.redis_conn', fake_redis), \
          patch('redis.from_url', return_value=fake_redis), \
          patch('rq.Queue', return_value=mock_queue), \
@@ -201,16 +204,16 @@ def db_session(db, app):
 
 @pytest.fixture
 def client(app):
-    """Client de test Flask"""
+    """Flask test client."""
     return app.test_client()
 
 @pytest.fixture
 def setup_project(db_session):
-    """Projet de test avec UUID unique"""
+    """Test project with a unique ID."""
     project = Project(
         id=str(uuid.uuid4()),
         name=f"Test Project {uuid.uuid4().hex[:8]}"
     )
-    db_session.add(project)
+    db_session.add(project) # ✅ Use db_session
     db_session.commit()
     return project

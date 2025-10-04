@@ -37,7 +37,7 @@ def get_queues_info():
         return jsonify({'error': str(e)}), 500
 
 @admin_bp.route('/pull-models', methods=['POST'])
-@limiter.limit("5 per minute")
+@limiter.limit("5/minute")
 def pull_models():
     """Déclencher le téléchargement de modèles"""
     try:
