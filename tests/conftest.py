@@ -39,7 +39,7 @@ def mock_redis_and_rq():
 
     def create_mock_job(job_id=None):
         # Utiliser l'ID fourni ou en générer un nouveau
-        job_id = job_id or str(uuid.uuid4())
+        job_id = job_id or f'test-job-{uuid.uuid4().hex[:8]}'
         
         mock_job = MagicMock()
         mock_job.id = job_id
@@ -56,17 +56,28 @@ def mock_redis_and_rq():
         return mock_job
 
     def fetch_mock_job(job_id, connection=None):
-        # ✅ CORRECTION CLÉ #1 : Retourner le job s'il existe, sinon None
+        """
+        ✅ CORRECTION CLÉ #1 : Retrouve le job dans le stockage.
+        Retourne le job s'il existe, sinon None.
+        """
         return mock_jobs_storage.get(job_id)
     
     def enqueue_side_effect(*args, **kwargs):
-        # ✅ CORRECTION CLÉ #2 : Utiliser l'ID de la tâche s'il est passé
-        job_id = kwargs.get('job_id')
-        return create_mock_job(job_id=job_id)
-    
-    # Initialize mock_queue before the with statement
-    mock_queue = MagicMock()
+        """
+        ✅ CORRECTION CLÉ #2 : Crée un job en utilisant l'ID passé
+        par l'API pour assurer la cohérence.
+        """
+        # Récupère le job_id s'il est passé dans les arguments de enqueue
+        job_id_from_call = kwargs.get('job_id')
+        if not job_id_from_call and len(args) > 1:
+            # Tente de le trouver dans les arguments positionnels si besoin
+            pass
+            
+        return create_mock_job(job_id=job_id_from_call)
 
+    mock_queue = MagicMock()
+    mock_queue.enqueue.side_effect = enqueue_side_effect
+    
     with patch('utils.app_globals.redis_conn', fake_redis), \
          patch('redis.from_url', return_value=fake_redis), \
          patch('rq.Queue', return_value=mock_queue), \
@@ -74,10 +85,6 @@ def mock_redis_and_rq():
          patch('utils.app_globals.limiter') as mock_limiter:
         
         # Mock Queue
-        mock_queue.enqueue.side_effect = enqueue_side_effect
-        mock_queue.count = 0
-        mock_queue.__len__ = lambda: 0
-        # Mock rate limiter
         mock_limiter.limit.return_value = lambda f: f
         yield fake_redis
 
