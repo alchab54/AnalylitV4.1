@@ -1,9 +1,10 @@
 import logging
 from redis.exceptions import ConnectionError
 from flask import Blueprint, jsonify
+from flask_limiter.util import get_remote_address
 from rq.job import Job
 from rq.exceptions import NoSuchJobError
-from utils.app_globals import (
+from utils.app_globals import limiter, redis_conn,  \
     redis_conn, processing_queue, synthesis_queue, analysis_queue, background_queue, extension_queue
 )
 
@@ -15,6 +16,7 @@ tasks_bp = Blueprint('tasks', __name__)
 logger = logging.getLogger(__name__)
 
 @tasks_bp.route('/tasks/<task_id>/status', methods=['GET'])
+@limiter.limit("200 per minute")
 def get_task_status(task_id):
     """
     Récupère le statut d'une tâche spécifique à partir de son ID.
@@ -30,16 +32,14 @@ def get_task_status(task_id):
         logger.exception(f"Erreur inattendue lors de la récupération de la tâche {task_id}: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
 
-    # ✅ CORRECTION: Utiliser job.exc_info qui est la méthode standard pour obtenir les infos d'exception.
-    exc_string = None
-    if job.is_failed:
-        exc_string = job.exc_info
-
+    # ✅ CORRECTION : Construire un dictionnaire sérialisable
     response = {
-        # ✅ CORRECTION: L'attribut est .id, pas la méthode .get_id()
-        'task_id': job.id,
-        'status': job.get_status(), # Appel de la méthode
+        'id': job.id,
+        'status': job.get_status(),
         'result': job.result,
+        # ✅ CORRECTION: Sérialiser les dates en utilisant isoformat()
+        #  Gérer le cas où les attributs de date sont None.
+        # job.enqueued_at.isoformat()
         'enqueued_at': job.enqueued_at.isoformat() if job.enqueued_at else None,
         'started_at': job.started_at.isoformat() if job.started_at else None,
         'ended_at': job.ended_at.isoformat() if job.ended_at else None,

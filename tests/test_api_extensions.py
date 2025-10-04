@@ -8,6 +8,7 @@ from unittest.mock import patch, MagicMock
 from flask.testing import FlaskClient
 from sqlalchemy.orm import Session
 
+from rq import Worker
 # Imports des modèles de la DB nécessaires
 from utils.models import Project, Extraction, Grid, Prompt
 from utils.prisma_scr import get_base_prisma_checklist
@@ -147,7 +148,7 @@ def test_api_prisma_checklist_workflow(client: FlaskClient, db_session: Session,
 # CATEGORIE 4: ADMIN & INFRASTRUCTURE
 # ================================================================
 
-@patch('api.admin.Worker')
+@patch('rq.Worker.all')
 @patch('api.admin.redis_conn')
 def test_api_admin_queues_status(mock_redis_conn, mock_worker, client: FlaskClient):
     """Teste l'endpoint d'administration des files (queues)."""
