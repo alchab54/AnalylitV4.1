@@ -7,6 +7,8 @@ services:
     image: analylit-base-cpu:latest
     pull_policy: never
     profiles: ["build-only"]
+    networks:
+      - analylit-network
 
   base-gpu:
     build:
@@ -19,6 +21,8 @@ services:
     profiles: ["build-only"]
     depends_on:
       - base-cpu
+    networks:
+      - analylit-network
 
   db:
     image: postgres:15-alpine
@@ -46,6 +50,8 @@ services:
           cpus: "1.0"
           memory: 1000M
     restart: unless-stopped
+    networks:
+      - analylit-network
 
   redis:
     image: redis:7-alpine
@@ -65,6 +71,8 @@ services:
           cpus: "0.25"
           memory: 256M
     restart: unless-stopped
+    networks:
+      - analylit-network
 
   nginx:
     image: nginx:1.25-alpine
@@ -83,6 +91,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    networks:
+      - analylit-network
 
   web:
     build:
@@ -102,7 +112,6 @@ services:
       WAIT_TIMEOUT: "60"
       WAIT_HOSTS_TIMEOUT: "10"
       GUNICORN_WORKERS: "2"
-
       GUNICORN_THREADS: "2"
       GUNICORN_TIMEOUT: "120"
       GUNICORN_CMD_ARGS: "--bind=0.0.0.0:80"
@@ -113,20 +122,14 @@ services:
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_db
       POSTGRES_PORT: 5432
-
     command: ["gunicorn", "--conf", "backend/config/gunicorn.conf.py", "backend.server_v4_complete:app"]
     env_file:
       - .env
-    
-    # ✅✅✅ **LA CORRECTION FINALE EST ICI** ✅✅✅
-    # On supprime la dépendance à 'migrate' et on dépend directement
-    # de la base de données et de redis.
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_started
-
     volumes:
       - ./logs:/home/appuser/app/logs
       - ./projects:/home/appuser/app/projects
@@ -138,7 +141,8 @@ services:
           cpus: "1.5"
           memory: 4000M
     restart: unless-stopped
-
+    networks:
+      - analylit-network
 
   migrate:
     build:
@@ -170,6 +174,8 @@ services:
         condition: service_healthy
     volumes: []
     restart: "no"
+    networks:
+      - analylit-network
 
   worker-fast:
     build:
@@ -198,6 +204,8 @@ services:
       db:
         condition: service_started
     restart: unless-stopped
+    networks:
+      - analylit-network
 
   worker-default:
     build:
@@ -226,6 +234,8 @@ services:
       db:
         condition: service_started
     restart: unless-stopped
+    networks:
+      - analylit-network
 
   worker-ai:
     build:
@@ -235,7 +245,6 @@ services:
         BASE_IMAGE: analylit-base-gpu:latest
     image: analylit-worker-ai:latest
     container_name: analylit_worker_ai
-    # ✅ CORRECTION: Une seule commande qui gère les permissions ET lance le worker
     command: sh -c "chown -R appuser:appuser /home/appuser/app/projects && exec su appuser -c 'rq worker --url redis://redis:6379/0 ai_queue background_queue analysis_queue extension_queue'"
     env_file:
       - .env
@@ -248,7 +257,6 @@ services:
               capabilities: ["gpu"]
         limits:
           memory: 1500M
-    # ✅ CORRECTION: Démarrer en root pour changer les permissions
     user: root
     environment:
       DATABASE_HOST: db
@@ -264,6 +272,8 @@ services:
       db:
         condition: service_started
     restart: unless-stopped
+    networks:
+      - analylit-network
 
   ollama:
     image: ollama/ollama:latest
@@ -295,9 +305,46 @@ services:
     profiles: ["default", "gpu"]
     restart: unless-stopped
 
+  # ✅ SERVICE TEST POUR PRODUCTION
+  test:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    command: ["pytest", "-v", "--tb=short", "--maxfail=5"]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      # ✅ Utiliser la DB de production
+      DATABASE_URL: postgresql://analylit_user:strong_password@db:5432/analylit_db
+      DATABASE_HOST: db
+      POSTGRES_USER: analylit_user
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: analylit_db
+      POSTGRES_PORT: 5432
+      # ✅ Configuration Redis
+      REDIS_URL: redis://redis:6379/0
+      REDIS_HOST: redis
+      # ✅ Configuration pour les tests
+      FLASK_ENV: testing
+      TESTING: "true"
+      PYTHONPATH: /home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
+    volumes:
+      - .:/home/appuser/app
+      - ./logs:/home/appuser/app/logs
+      - ./projects:/home/appuser/app/projects
+    networks:
+      - analylit-network
+    profiles: ["test"]
+
 volumes:
   postgres_data:
   ollama_data:
 
 networks:
   analylit-network:
+    driver: bridge
