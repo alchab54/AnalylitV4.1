@@ -13,8 +13,8 @@ from datetime import datetime
 
 class AnalyLitATNWorkflow:
     def __init__(self):
-        host = os.environ.get("API_HOST", "localhost")
-        port = os.environ.get("API_PORT", "5000")
+    	host = os.environ.get("API_HOST", "localhost")
+        port = os.environ.get("API_PORT", "8080")
         base_url = f"http://{host}:{port}"
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
@@ -23,6 +23,7 @@ class AnalyLitATNWorkflow:
         
     def log(self, message, **kwargs):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
         print(f"[{timestamp}] {message}", **kwargs)
 
     def __init__(self):
@@ -31,7 +32,8 @@ class AnalyLitATNWorkflow:
             port = os.environ.get("API_PORT", "80")   # Port interne
         else:  # Depuis l'extérieur
             host = os.environ.get("API_HOST", "localhost")
-            port = os.environ.get("API_PORT", "8080")  # Port exposé
+	    port = os.environ.get("API_PORT", "8080")  # Port exposé
+
         
     def check_health(self):
         """Vérifier que l'application répond"""

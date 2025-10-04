@@ -516,7 +516,7 @@ def run_synthesis_task(session, project_id: str, profile: dict):
 
     data_for_prompt = "\n---\n".join(abstracts)
     tpl = get_effective_prompt_template('synthesis_prompt', get_synthesis_prompt_template())
-    prompt = tpl.format(project_description=project_description, data_for_prompt=data_for_prompt)
+ prompt = tpl.format(project_description=project_description, data_for_prompt=data_for_prompt)
     output = call_ollama_api(prompt, profile.get('synthesis_model', 'llama3.1:8b'), output_format="json")
     try:
         if output and isinstance(output, dict):
