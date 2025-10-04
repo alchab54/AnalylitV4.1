@@ -10,11 +10,11 @@ import os
 logger = logging.getLogger(__name__)
 
 # Blueprint Configuration
-settings_bp = Blueprint("settings_api", __name__, url_prefix="/api")
+settings_bp = Blueprint("settings_api", __name__)
 
-@settings_bp.route("/settings/debug", methods=["GET"])
+@settings_bp.route("/debug", methods=["GET"])
 def settings_debug():
-    """Route de debug."""    
+    """Route de debug."""
     return jsonify({"status": "OK", "blueprint": "settings_bp"}), 200
 
 @settings_bp.route("/settings/models", methods=["GET"])

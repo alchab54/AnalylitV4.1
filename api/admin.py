@@ -35,7 +35,7 @@ def health_check():
     return jsonify({"status": "healthy"}), 200
 
 @admin_bp.route('/models/pull', methods=['POST'])
-def pull_model():
+def pull_model_route():
     data = request.get_json()
     model_name = data.get('model_name')
     if not model_name:

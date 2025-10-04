@@ -10,14 +10,14 @@ from utils.models import Prompt
 prompts_bp = Blueprint('prompts_bp', __name__)
 logger = logging.getLogger(__name__)
 
-@prompts_bp.route('/prompts', methods=['GET'])
+@prompts_bp.route('/', methods=['GET'])
 def get_all_prompts():
     """Retourne tous les prompts."""
     stmt = select(Prompt)
     prompts = db.session.execute(stmt).scalars().all()
     return jsonify([p.to_dict() for p in prompts]), 200
 
-@prompts_bp.route('/prompts', methods=['POST'])
+@prompts_bp.route('/', methods=['POST'])
 def create_prompt():
     """Crée un nouveau prompt."""
     data = request.get_json()
@@ -36,7 +36,7 @@ def create_prompt():
         db.session.rollback()
         return jsonify({"error": "Un prompt avec ce nom existe déjà"}), 409
 
-@prompts_bp.route('/prompts/<prompt_id>', methods=['PUT'])
+@prompts_bp.route('/<prompt_id>', methods=['PUT'])
 def update_prompt(prompt_id):
     """Met à jour un prompt existant."""
     # ✅ AMÉLIORATION: Utiliser db.session.get() est plus direct pour une recherche par clé primaire.
@@ -61,7 +61,7 @@ def update_prompt(prompt_id):
         db.session.rollback()
         return jsonify({"error": "Un prompt avec ce nom existe déjà"}), 409
 
-@prompts_bp.route('/prompts/<prompt_id>', methods=['DELETE'])
+@prompts_bp.route('/<prompt_id>', methods=['DELETE'])
 def delete_prompt(prompt_id):
     """Supprime un prompt."""    
     # ✅ AMÉLIORATION: Utiliser db.session.get()

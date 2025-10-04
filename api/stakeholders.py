@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from utils.extensions import db
 from utils.models import Project, Stakeholder
 
-stakeholders_bp = Blueprint('stakeholders_bp', __name__)
+stakeholders_bp = Blueprint('stakeholders', __name__)
 logger = logging.getLogger(__name__)
 
 @stakeholders_bp.route('/projects/<project_id>/stakeholders', methods=['POST'])

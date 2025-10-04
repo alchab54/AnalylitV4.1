@@ -7,7 +7,7 @@ from utils.app_globals import (
     redis_conn, processing_queue, synthesis_queue, analysis_queue, background_queue, extension_queue
 )
 
-tasks_bp = Blueprint('tasks_bp', __name__)
+tasks_bp = Blueprint('tasks', __name__)
 logger = logging.getLogger(__name__)
 
 @tasks_bp.route('/tasks/<task_id>/status', methods=['GET'])

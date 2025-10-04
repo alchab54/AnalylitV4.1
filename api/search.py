@@ -15,7 +15,7 @@ from utils.fetchers import db_manager
 logger = logging.getLogger(__name__)
 search_bp = Blueprint('search_api', __name__)
 
-@search_bp.route('/databases', methods=['GET'])
+@search_bp.route('/available-databases', methods=['GET'])
 def get_available_databases():
     try:
         return jsonify(db_manager.get_available_databases())

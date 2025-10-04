@@ -6,7 +6,7 @@ import uuid
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
 
-# ✅ CORRECTION FINALE: Imports propres et cohérents
+
 from utils.app_globals import (
     background_queue, processing_queue, analysis_queue, discussion_draft_queue, synthesis_queue,
     extension_queue
@@ -42,11 +42,11 @@ projects_bp = Blueprint('projects_bp', __name__)
 logger = logging.getLogger(__name__)
 
 @projects_bp.route('/', methods=['GET', 'POST'])
-def projects():
+def list_projects():
     if request.method == 'POST':
         data = request.get_json()
         if not data or not data.get('name'):
-            return jsonify({"error": "Le nom du projet est requis"}), 400
+            return jsonify({"error": "Project name is required"}), 400
         
         new_project = Project(
             name=data['name'],
@@ -59,13 +59,13 @@ def projects():
             return jsonify(new_project.to_dict()), 201
         except IntegrityError:
             db.session.rollback()
-            return jsonify({"error": "Un projet avec ce nom existe déjà"}), 409
+            return jsonify({"error": "A project with this name already exists"}), 409
     else: # GET
         """Retourne la liste de tous les projets."""
         stmt = select(Project).order_by(Project.created_at.desc())
         projects = db.session.execute(stmt).scalars().all()
         return jsonify([p.to_dict() for p in projects]), 200
-
+        
 @projects_bp.route('/<project_id>', methods=['GET'])
 def get_project_details(project_id):
     # ✅ CORRECTION: Remplacer la syntaxe obsolète de SQLAlchemy 1.x par la syntaxe 2.0.
@@ -74,6 +74,7 @@ def get_project_details(project_id):
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
     return jsonify(project.to_dict()), 200
+
 
 @projects_bp.route('/<project_id>/search-results', methods=['GET'])
 def get_project_search_results(project_id):
@@ -286,11 +287,11 @@ def chat_with_project(project_id):
     if not question:
         return jsonify({"error": "Question is required"}), 400
     job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout=900) # 15 minutes
-    return jsonify({"message": "Question soumise", "job_id": job.id}), 202
+    return jsonify({"message": "Question soumise", "job_id": job.id}), 202    
 
 @projects_bp.route('/projects/<project_id>/run', methods=['POST'])
 def run_pipeline(project_id):
-    data = request.get_json()
+    data = request.get_json()    
     article_ids = data.get('articles', [])
     profile_id = data.get('profile')
     analysis_mode = data.get('analysis_mode', 'screening')
@@ -509,7 +510,7 @@ def save_rob_assessment(project_id, article_id):
 
 @projects_bp.route('/projects/<project_id>/add-manual-articles', methods=['POST'])
 def add_manual_articles(project_id):
-    data = request.get_json()
+    data = request.get_json()    
     # ✅ CORRECTION: Le test envoie 'items', et non 'identifiers'.
     articles_data = data.get('items', [])
 
@@ -602,7 +603,7 @@ def export_thesis(project_id):
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
             zf.writestr('export_articles.xlsx', excel_buffer.read())
             # format_bibliography returns a list of strings, join them.
-            zf.writestr('bibliographie.txt', "\n".join(bibliography_text).encode('utf-8'))
+            zf.writestr('bibliographie.txt', "\n".join(bibliography_text).encode('utf-8'))            
         zip_buffer.seek(0)
         
         # 5. Envoyer le fichier
