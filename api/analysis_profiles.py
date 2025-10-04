@@ -10,7 +10,7 @@ analysis_profiles_bp = Blueprint('analysis_profiles_bp', __name__)
 logger = logging.getLogger(__name__)
 
 
-@analysis_profiles_bp.route('/', methods=['POST'])
+@analysis_profiles_bp.route('/analysis-profiles', methods=['POST'])
 def create_analysis_profile():
     """Crée un nouveau profil d'analyse."""
     data = request.get_json()
@@ -37,7 +37,7 @@ def create_analysis_profile():
         return jsonify({"error": "Un profil avec ce nom existe déjà"}), 409
 
 
-@analysis_profiles_bp.route('/', methods=['GET'])
+@analysis_profiles_bp.route('/analysis-profiles', methods=['GET'])
 def get_all_analysis_profiles():
     """Retourne tous les profils d'analyse."""
     from sqlalchemy import select
@@ -46,7 +46,7 @@ def get_all_analysis_profiles():
     return jsonify([p.to_dict() for p in profiles]), 200
 
 
-@analysis_profiles_bp.route('/<profile_id>', methods=['GET'])
+@analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['GET'])
 def get_analysis_profile_details(profile_id):
     """Retourne les détails d'un profil d'analyse spécifique."""
     profile = db.session.get(AnalysisProfile, profile_id)
@@ -55,7 +55,7 @@ def get_analysis_profile_details(profile_id):
     return jsonify(profile.to_dict()), 200
 
 
-@analysis_profiles_bp.route('/<profile_id>', methods=['PUT'])
+@analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['PUT'])
 def update_analysis_profile(profile_id):
     """Met à jour un profil d'analyse existant."""
     profile = db.session.get(AnalysisProfile, profile_id)
@@ -78,7 +78,7 @@ def update_analysis_profile(profile_id):
         return jsonify({"error": "Erreur lors de la mise à jour du profil"}), 500
 
 
-@analysis_profiles_bp.route('/<profile_id>', methods=['DELETE'])
+@analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['DELETE'])
 def delete_analysis_profile(profile_id):
     """Supprime un profil d'analyse."""
     # ✅ CORRECTION: L'indentation a été supprimée des lignes suivantes
