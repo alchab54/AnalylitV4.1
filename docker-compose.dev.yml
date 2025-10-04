@@ -3,33 +3,27 @@
 
 services:
   nginx:
-    profiles: ["default", "gpu"] # ✅ CORRECTION: Assigner le même profil que sa dépendance 'web'
+    profiles: ["default", "gpu"]
     image: nginx:1.25-alpine
     container_name: analylit_nginx_dev
     ports:
-      - "8081:80" # Expose Nginx sur le port 8081
+      - "8081:80"
     volumes:
-      - ./web:/usr/share/nginx/html:ro # Le code frontend reste en lecture seule
-      # ✅ CORRECTION: On monte la config comme un template pour que Nginx puisse la modifier au démarrage.
+      - ./web:/usr/share/nginx/html:ro
       - ./docker/nginx.dev.conf:/etc/nginx/templates/default.conf.template
     depends_on:
       - web
     restart: unless-stopped
 
   web:
-    profiles: ["default", "gpu"] # ✅ CORRECTION: Assigner le même profil que sa dépendance 'ollama'
-    # Gunicorn en dev avec rechargement à chaud
-    command: >
-      gunicorn --conf backend/config/gunicorn.conf.py 'backend.manage:app'
+    profiles: ["default", "gpu"]
+    # ✅✅✅ **CORRECTION FINALE** ✅✅✅
+    command: ["gunicorn", "--conf", "backend/config/gunicorn.conf.py", "backend.server_v4_complete:app"]
     environment:
       FLASK_ENV: development
-      FLASK_APP: backend/manage.py
-      # ✅ CORRECTION: Le worker 'gevent' est incompatible avec l'option '--reload' de Gunicorn.
-      # On le désactive en développement pour permettre le rechargement à chaud.
+      FLASK_APP: backend/server_v4_complete.py  # ✅ Fichier correct
       GUNICORN_WORKER_CLASS: "sync"
       DB_HOST: test-db
-      # ✅ CORRECTION: L'URL de la DB de test doit utiliser le nom du service 'test-db'
-      # et non 'analylit_test_db' qui est le nom du conteneur.
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       PYTHONPATH: /home/appuser/app
     volumes:
@@ -40,17 +34,14 @@ services:
       - ./web:/home/appuser/app/web
       - ./migrations:/home/appuser/app/migrations
       - ./alembic.ini:/home/appuser/app/alembic.ini:ro
-      - ./tests:/home/appuser/app/tests
+      - ./tests:/home/appuser/app/tests  # ✅ Crucial pour les tests
       - ./pytest.ini:/home/appuser/app/pytest.ini:ro
-    # On expose le port 5000 pour le développement direct du frontend, mappé au port 80 du conteneur.
     ports:
       - "5000:80"
-
+    # ✅✅✅ **CORRECTION DÉPENDANCES** ✅✅✅
     depends_on:
-      # ✅ CORRECTION: Le service web doit attendre que les migrations soient terminées
-      # pour s'assurer que les tables de la base de données existent avant de démarrer.
-      migrate:
-        condition: service_completed_successfully
+      test-db:
+        condition: service_started  # Direct vers la DB, pas migrate
       ollama:
         condition: service_started
       redis:
@@ -63,7 +54,6 @@ services:
       POSTGRES_USER: analylit_user
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_test_db
-    # On n'a pas besoin d'exposer le port de la base de test à l'hôte
     ports: []
     command:
       [
@@ -76,7 +66,7 @@ services:
 
   worker-fast:
     environment:
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db # Assurer la cohérence
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       DB_HOST: test-db
     volumes:
       - ./backend:/home/appuser/app/backend
@@ -91,7 +81,7 @@ services:
 
   worker-default:
     environment:
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db # Assurer la cohérence
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       DB_HOST: test-db
     volumes:
       - ./backend:/home/appuser/app/backend
@@ -106,7 +96,7 @@ services:
 
   worker-ai:
     environment:
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db # Assurer la cohérence
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       DB_HOST: test-db
     volumes:
       - ./backend:/home/appuser/app/backend
@@ -120,12 +110,12 @@ services:
         condition: service_started
 
   migrate:
-    # En dev, on exécute les migrations contre la DB de test
-    environment: # Assurer la cohérence
+    environment:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       SCHEMA_NAME: analylit_schema
       DB_HOST: test-db
       PYTHONPATH: /home/appuser/app
+      FLASK_APP: backend/server_v4_complete.py  # ✅ Fichier correct
     volumes:
       - ./api:/home/appuser/app/api
       - ./backend:/home/appuser/app/backend
