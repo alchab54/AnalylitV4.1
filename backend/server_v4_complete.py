@@ -158,6 +158,12 @@ def create_app(config_override=None):
             "description": "Too many requests, please try again later." # I think you want this.
         }), 429
 
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        app.logger.error(f"Erreur interne du serveur: {e}")
+        return jsonify(error="Internal server error"), 500
+
+
     @app.route('/api/prompts', methods=['GET', 'POST'])
     def api_prompts():
         try:

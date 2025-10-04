@@ -2,7 +2,9 @@
 from flask import Blueprint, jsonify, request
 from utils.extensions import db
 from utils.models import Prompt
+import logging
 from utils.app_globals import limiter
+import logging
 
 prompts_bp = Blueprint('prompts', __name__)
 
@@ -38,7 +40,7 @@ def create_prompt():
         return jsonify(prompt.to_dict()), 201
     except Exception as e:
         # ✅ Gestion propre des exceptions
-        db.session.rollback()
+        db.session.rollback() #✅ CORRECTION: La clé task_id est ici
         logger.exception(f"Error creating prompt: {e}")
         # ✅ Retourner une réponse JSON avec un code d'erreur approprié
 

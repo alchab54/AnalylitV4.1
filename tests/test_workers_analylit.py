@@ -70,7 +70,7 @@ def analysis_queue(rq_connection):
 
 @pytest.mark.integration
 class TestAnalyLitWorkers:
-    @pytest.mark.skip(reason="Workers tests nécessitent configuration spéciale")
+    # -*- coding: utf-8 -*-
     """Tests d'intégration workers AnalyLit"""
     
     def test_discussion_analysis_worker(self, analysis_queue, rq_connection):

@@ -21,8 +21,8 @@ def get_queues_info():
             'fast_queue', 'default_queue', 'ai_queue'
         ]
         
-        queues_info = []
-        for queue_name in queues_to_check:
+        queues_info = [] 
+        for queue_name in queues_to_check: 
             try:
                 q = Queue(queue_name, connection=redis_conn)
                 queues_info.append({
@@ -61,4 +61,4 @@ def pull_models():
         
         return jsonify(result), 202
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': str(e)}), 500 
