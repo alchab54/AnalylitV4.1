@@ -1,86 +1,69 @@
+# api/tasks.py - VERSION FINALE CORRIGÉE
+
 import logging
 from redis.exceptions import ConnectionError
 from flask import Blueprint, jsonify
-from flask_limiter.util import get_remote_address
 from rq.job import Job
 from rq.exceptions import NoSuchJobError
-from utils.app_globals import limiter, redis_conn,  \
-    redis_conn, processing_queue, synthesis_queue, analysis_queue, background_queue, extension_queue
-)
-
 from rq.registry import StartedJobRegistry, FinishedJobRegistry, FailedJobRegistry
 
+# ✅ CORRECTION : Import propre et sans duplication
+from utils.app_globals import (
+    limiter, redis_conn, processing_queue, synthesis_queue,
+    analysis_queue, background_queue, extension_queue
+)
 
-tasks_bp = Blueprint('tasks', __name__)
-
+tasks_bp = Blueprint('tasks_bp', __name__)
 logger = logging.getLogger(__name__)
 
 @tasks_bp.route('/tasks/<task_id>/status', methods=['GET'])
 @limiter.limit("200 per minute")
 def get_task_status(task_id):
-    """
-    Récupère le statut d'une tâche spécifique à partir de son ID.
-    """
+    """Récupère le statut et le résultat d'une tâche RQ."""
     try:
         job = Job.fetch(task_id, connection=redis_conn)
     except NoSuchJobError:
-        return jsonify({"error": "Tâche non trouvée"}), 404
+        return jsonify({'status': 'not-found'}), 404
     except ConnectionError as e:
         logger.error(f"Erreur de connexion à Redis: {e}", exc_info=True)
-        return jsonify({"error": "Erreur de connexion au serveur Redis"}), 500
-    except Exception as e:
-        logger.exception(f"Erreur inattendue lors de la récupération de la tâche {task_id}: {e}")
-        return jsonify({"error": "Erreur interne du serveur"}), 500
-
-    # ✅ CORRECTION : Construire un dictionnaire sérialisable
-    response = {
+        return jsonify({'status': 'error', 'message': 'Erreur de connexion au serveur Redis'}), 500
+    
+    # Construire un dictionnaire sérialisable
+    response_data = {
         'id': job.id,
         'status': job.get_status(),
         'result': job.result,
-        # ✅ CORRECTION: Sérialiser les dates en utilisant isoformat()
-        #  Gérer le cas où les attributs de date sont None.
-        # job.enqueued_at.isoformat()
         'enqueued_at': job.enqueued_at.isoformat() if job.enqueued_at else None,
         'started_at': job.started_at.isoformat() if job.started_at else None,
         'ended_at': job.ended_at.isoformat() if job.ended_at else None,
-        'exc_info': exc_string # job.exc_info
+        'exc_info': str(job.exc_info) if job.exc_info else None
     }
-    return jsonify(response)
+    return jsonify(response_data)
 
 @tasks_bp.route('/tasks/status', methods=['GET'])
 def get_all_tasks_status():
-    """
-    ✅ NOUVEL ENDPOINT: Retourne une liste de toutes les tâches (en cours, en attente, finies, échouées).
-    Ceci corrige le test `test_get_tasks_status` qui attendait cet endpoint.
-    """
+    """Retourne une liste de toutes les tâches."""
     all_tasks = []
     queues = [processing_queue, synthesis_queue, analysis_queue, background_queue, extension_queue]
 
     for q in queues:
-        # Registres pour les tâches dans des états spécifiques
         started_registry = StartedJobRegistry(queue=q)
         finished_registry = FinishedJobRegistry(queue=q)
         failed_registry = FailedJobRegistry(queue=q)
 
-        # Tâches en cours, en attente, finies, échouées
-        started_jobs = Job.fetch_many(started_registry.get_job_ids(), connection=redis_conn)
-        queued_jobs = Job.fetch_many(q.get_job_ids(), connection=redis_conn)
-        finished_jobs = Job.fetch_many(finished_registry.get_job_ids(end=50), connection=redis_conn) # Limite aux 50 dernières
-        failed_jobs = Job.fetch_many(failed_registry.get_job_ids(end=50), connection=redis_conn)
+        jobs = Job.fetch_many(
+            q.get_job_ids() + started_registry.get_job_ids() + 
+            finished_registry.get_job_ids(end=50) + failed_registry.get_job_ids(end=50),
+            connection=redis_conn
+        )
 
-        for job in started_jobs + queued_jobs + finished_jobs + failed_jobs:
+        for job in jobs:
             if job:
                 all_tasks.append({
-                    'id': job.id,
-                    'queue': q.name,
-                    'description': job.description,
-                    'status': job.get_status(),
-                    'created_at': job.created_at.isoformat() if job.created_at else None,
-                    'started_at': job.started_at.isoformat() if job.started_at else None,
-                    'ended_at': job.ended_at.isoformat() if job.ended_at else None,
+                    'id': job.id, 'queue': q.name, 'description': job.description,
+                    'status': job.get_status(), 'created_at': job.created_at.isoformat() if job.created_at else None,
                 })
 
-    # Trier par date de création, les plus récentes en premier
     all_tasks.sort(key=lambda x: x['created_at'] or '', reverse=True)
     return jsonify(all_tasks)
 
@@ -90,9 +73,6 @@ def cancel_task(task_id):
     try:
         job = Job.fetch(task_id, connection=redis_conn)        
         job.cancel()
-        return jsonify({"message": "Demande d_annulation envoyée."}), 200
+        return jsonify({"message": "Demande d'annulation envoyée."}), 200
     except NoSuchJobError:
         return jsonify({"error": "Tâche non trouvée"}), 404
-    except Exception as e:
-        logger.error(f"Erreur lors de l'annulation de la tâche {task_id}: {e}")
-        return jsonify({"error": "Erreur interne du serveur"}), 500
