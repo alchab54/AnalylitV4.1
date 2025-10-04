@@ -23,6 +23,13 @@ from utils.models import (
 # ✅ CORRECTION CRITIQUE : Utiliser un verrou pour éviter les conflits de concurrence
 _db_lock = threading.Lock()
 
+@pytest.fixture(autouse=True)
+def setup_test_environment():
+    """Configure l'environnement de test."""
+    # Force l'environnement de développement
+    os.environ['FLASK_ENV'] = 'development'
+    yield
+    # Nettoyage après les tests
 # --- IMPORTS DE L'APPLICATION ---
 from backend.server_v4_complete import create_app
 from utils.extensions import db, migrate
@@ -40,7 +47,7 @@ def app():
         _app = create_app({
             'TESTING': True,
             'SQLALCHEMY_DATABASE_URI': test_db_url,
-            'SQLALCHEMY_ENGINE_OPTIONS': {
+                 'SQLALCHEMY_ENGINE_OPTIONS': {
                 'pool_size': 1,  # ✅ Pool réduit pour les tests
                 'pool_recycle': 30,
                 'pool_pre_ping': True,
