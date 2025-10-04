@@ -23,31 +23,46 @@ from utils.extensions import db as _db
 from sqlalchemy import text, event, create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from utils.models import Project
+from rq.registry import StartedJobRegistry, FinishedJobRegistry, FailedJobRegistry
 
 # ✅ SOLUTION #1 : Mock Redis/RQ Complet et Sérialisable
 @pytest.fixture(scope='session', autouse=True)
 def mock_redis_and_rq():
-    """Mock complet Redis + RQ avec objets sérialisables"""
+    """
+    Mock complet et intelligent de Redis et RQ qui gère les ID de tâches
+    et les exceptions comme le vrai système.
+    """
     fake_redis = fakeredis.FakeRedis()
     
-    # Mock Job sérialisable
-    def create_mock_job():
+    # Dictionnaire pour stocker nos "fausses" tâches
+    mock_jobs_storage = {}
+
+    def create_mock_job(job_id=None):
+        # Utiliser l'ID fourni ou en générer un nouveau
+        job_id = job_id or f'test-job-{uuid.uuid4().hex[:8]}'
+        
         mock_job = MagicMock()
-        mock_job.id = f'test-job-{uuid.uuid4().hex[:8]}'
+        mock_job.id = job_id
         mock_job.result = {'status': 'completed', 'data': 'test'}
         mock_job.get_status.return_value = 'finished'
         mock_job.successful.return_value = True
         mock_job.enqueued_at = None
         mock_job.started_at = None
         mock_job.ended_at = None
-        mock_job.exc_info = None
+        mock_job.exc_info = None  # type: ignore
+
+        # Stocker le mock par son ID
+        mock_jobs_storage[job_id] = mock_job
         return mock_job
+
+    def fetch_mock_job(job_id, connection=None):
+        # ✅ CORRECTION CLÉ #1 : Retourner le job s'il existe, sinon None
+        return mock_jobs_storage.get(job_id)
     
-    # Mock Queue
-    mock_queue = MagicMock()
-    mock_queue.enqueue.side_effect = lambda *args, **kwargs: create_mock_job()
-    mock_queue.count = 0
-    mock_queue.__len__ = lambda: 0
+    def enqueue_side_effect(*args, **kwargs):
+        # ✅ CORRECTION CLÉ #2 : Utiliser l'ID de la tâche s'il est passé
+        job_id = kwargs.get('job_id')
+        return create_mock_job(job_id=job_id)
     
     with patch('utils.app_globals.redis_conn', fake_redis), \
          patch('redis.from_url', return_value=fake_redis), \
@@ -55,6 +70,11 @@ def mock_redis_and_rq():
          patch('rq.job.Job.fetch', side_effect=lambda job_id, connection=None: create_mock_job()), \
          patch('utils.app_globals.limiter') as mock_limiter:
         
+        # Mock Queue
+        mock_queue = MagicMock()
+        mock_queue.enqueue.side_effect = enqueue_side_effect
+        mock_queue.count = 0
+        mock_queue.__len__ = lambda: 0
         # Mock rate limiter
         mock_limiter.limit.return_value = lambda f: f
         yield fake_redis
