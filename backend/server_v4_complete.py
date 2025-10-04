@@ -75,18 +75,18 @@ def create_app(config_override=None):
     socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent', message_queue=app.config['REDIS_URL'])
 
     # Enregistrement des blueprints
-    app.register_blueprint(admin_bp, url_prefix='/api/admin')
-    app.register_blueprint(analysis_profiles_bp, url_prefix='/api/analysis_profiles')
-    app.register_blueprint(extensions_bp, url_prefix='/api/extensions')
-    app.register_blueprint(files_bp, url_prefix='/api/files')
-    app.register_blueprint(projects_bp, url_prefix='/api/projects')
-    app.register_blueprint(prompts_bp, url_prefix='/api/prompts')
-    app.register_blueprint(reporting_bp, url_prefix='/api/reporting')
-    app.register_blueprint(search_bp, url_prefix='/api/search')
-    app.register_blueprint(selection_bp, url_prefix='/api/selection')
-    app.register_blueprint(settings_bp, url_prefix='/api/settings')
-    app.register_blueprint(stakeholders_bp, url_prefix='/api/stakeholders')
-    app.register_blueprint(tasks_bp, url_prefix='/api/tasks')
+    app.register_blueprint(admin_bp, url_prefix='/api')
+    app.register_blueprint(analysis_profiles_bp, url_prefix='/api')
+    app.register_blueprint(extensions_bp, url_prefix='/api')
+    app.register_blueprint(files_bp, url_prefix='/api')
+    app.register_blueprint(projects_bp, url_prefix='/api')
+    app.register_blueprint(prompts_bp, url_prefix='/api')
+    app.register_blueprint(reporting_bp, url_prefix='/api')
+    app.register_blueprint(search_bp, url_prefix='/api')
+    app.register_blueprint(selection_bp, url_prefix='/api')
+    app.register_blueprint(settings_bp, url_prefix='/api')
+    app.register_blueprint(stakeholders_bp, url_prefix='/api')
+    app.register_blueprint(tasks_bp, url_prefix='/api')
 
     
     
@@ -136,6 +136,7 @@ def create_app(config_override=None):
         return jsonify(queues_info)
 
     return app
+
 
 
 if __name__ == "__main__":
