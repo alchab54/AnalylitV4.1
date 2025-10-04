@@ -23,14 +23,14 @@ def get_task_status(task_id):
     try:
         job = Job.fetch(task_id, connection=redis_conn)
     except NoSuchJobError:
-        return jsonify({'status': 'not-found'}), 404
+        return jsonify({"error": "Tâche non trouvée"}), 404
     except ConnectionError as e:
         logger.error(f"Erreur de connexion à Redis: {e}", exc_info=True)
         return jsonify({'status': 'error', 'message': 'Erreur de connexion au serveur Redis'}), 500
     
-    # Construire un dictionnaire sérialisable
+    # ✅ CORRECTION: Utiliser 'task_id' comme attendu par le test
     response_data = {
-        'id': job.id,
+        'task_id': job.id,  # ← CHANGÉ de 'id' vers 'task_id'
         'status': job.get_status(),
         'result': job.result,
         'enqueued_at': job.enqueued_at.isoformat() if job.enqueued_at else None,
