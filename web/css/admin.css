@@ -1,0 +1,76 @@
+/* web/css/admin.css */
+.queues-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.queue-controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.queue-item {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    background: white;
+}
+
+.queue-item.queue-busy {
+    border-left: 4px solid #ffc107;
+    background-color: #fff3cd;
+}
+
+.queue-item.queue-failed {
+    border-left: 4px solid #dc3545;
+    background-color: #f8d7da;
+}
+
+.queue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.queue-stats {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.stat {
+    background: #e9ecef;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85em;
+}
+
+.queue-error {
+    color: #dc3545;
+    font-weight: bold;
+    margin-top: 8px;
+    font-size: 0.9em;
+}
+
+.failed-jobs {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 6px;
+    border-radius: 4px;
+    margin-top: 6px;
+    font-size: 0.8em;
+}
+
+.queues-summary {
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}

@@ -6,7 +6,7 @@ import time
 
 admin_bp = Blueprint('admin', __name__)
 
-@admin_bp.route('/admin/queues/stats', methods=['GET'])
+@admin_bp.route('/queues/stats', methods=['GET'])
 @limiter.limit("100 per minute")
 def get_queue_detailed_stats():
     """Statistiques détaillées des queues avec workers"""
@@ -46,7 +46,7 @@ def get_queue_detailed_stats():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@admin_bp.route('/admin/queues/clear', methods=['POST'])
+@admin_bp.route('/queues/clear', methods=['POST'])
 @limiter.limit("10 per minute")
 def clear_queue():
     """Vider complètement une queue spécifiée"""
@@ -67,7 +67,7 @@ def clear_queue():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@admin_bp.route('/admin/queues/clear-all', methods=['POST'])
+@admin_bp.route('/queues/clear-all', methods=['POST'])
 @limiter.limit("5 per minute")
 def clear_all_queues():
     """Vider TOUTES les queues"""
