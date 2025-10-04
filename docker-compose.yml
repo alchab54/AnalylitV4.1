@@ -217,7 +217,8 @@ services:
         BASE_IMAGE: analylit-base-gpu:latest
     image: analylit-worker-ai:latest
     container_name: analylit_worker_ai
-    command: ["rq", "worker", "--url", "redis://redis:6379/0", "ai_queue", "background_queue", "analysis_queue", "extension_queue"]
+    # ✅ CORRECTION: Une seule commande qui gère les permissions ET lance le worker
+    command: sh -c "chown -R appuser:appuser /home/appuser/app/projects && exec su appuser -c 'rq worker --url redis://redis:6379/0 ai_queue background_queue analysis_queue extension_queue'"
     env_file:
       - .env
     deploy:
@@ -229,6 +230,8 @@ services:
               capabilities: ["gpu"]
         limits:
           memory: 1500M
+    # ✅ CORRECTION: Démarrer en root pour changer les permissions
+    user: root
     environment:
       NVIDIA_VISIBLE_DEVICES: "all"
       NVIDIA_DRIVER_CAPABILITIES: compute,utility

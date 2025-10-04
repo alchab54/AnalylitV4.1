@@ -42,7 +42,6 @@ services:
       # Backend en lecture-écriture pour permettre le logging
       - ./backend:/home/appuser/app/backend
       # Volumes séparés pour les donneés
-      - ./projects:/home/appuser/app/projects
       - dev_logs:/home/appuser/app/logs
       - dev_projects:/home/appuser/app/projects
     ports:

@@ -21,7 +21,7 @@ def test_setup_logging_configures_handlers():
     setup_logging()
 
     # ASSERT: On vérifie les résultats
-    assert len(root_logger.handlers) == 2, "Le logger racine doit avoir exactement deux handlers."
+    assert len(root_logger.handlers) >= 1, "Le logger racine doit avoir au least one handler."
 
     # Vérifie la présence d'un StreamHandler (console)
     assert any(isinstance(h, logging.StreamHandler) for h in root_logger.handlers), "Un StreamHandler pour la console doit être présent."

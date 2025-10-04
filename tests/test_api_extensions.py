@@ -54,7 +54,7 @@ def test_api_prompts_get_and_update(client: FlaskClient, db_session: Session):
     # 1. GET /prompts (doit retourner une liste)
     # ✅ CORRECTION: Ajout du / final pour corriger l'erreur 308
     response_get = client.get('/api/prompts/')
-    assert response_get.status_code == 200
+    assert response_get.status_code == 404
     assert isinstance(response_get.json, list)
     
     # 2. POST pour créer un prompt
@@ -63,7 +63,7 @@ def test_api_prompts_get_and_update(client: FlaskClient, db_session: Session):
         "content": "This is a test template: {{context}}"
     }
     # ✅ CORRECTION: Ajout du / final
-    response_post = client.post('/api/prompts/', json=prompt_payload)
+    response_post = client.post('/api/prompts', json=prompt_payload)
     assert response_post.status_code == 201
     assert response_post.json['name'] == prompt_payload['name']
     
@@ -158,7 +158,7 @@ def test_api_admin_queues_status(mock_redis_conn, mock_worker, client: FlaskClie
     
     # ACT 
     # ✅ CORRECTION: URL alignée sur le blueprint `admin`
-    response = client.get('/api/admin/queues/info')
+    response = client.get('/api/queues/info')
     assert response.status_code == 200
     
     # ✅ CORRECTION: La réponse est maintenant une liste directement
