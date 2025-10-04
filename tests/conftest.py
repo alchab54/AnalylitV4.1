@@ -4,6 +4,7 @@ import os
 import sys
 import threading
 from pathlib import Path
+import fakeredis  
 
 # Ajouter le répertoire racine au PATH pour les imports
 root_dir = Path(__file__).parent.parent
