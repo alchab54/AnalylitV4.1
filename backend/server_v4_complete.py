@@ -109,6 +109,40 @@ def create_app(config_override=None):
         """Serves static files (CSS, JS, images) - useful for SPA routing."""
         return send_from_directory(app.static_folder, filename)
     
+    @app.route('/api/databases', methods=['GET'])
+    def get_databases():
+        """Retourne la liste des bases de données disponibles pour la recherche."""
+        databases = [
+            {
+                'id': 'pubmed',
+                'name': 'PubMed',
+                'description': 'Base de données biomédicale principale',
+                'enabled': True,
+                'icon': '🏥'
+            },
+            {
+                'id': 'semantic_scholar',
+                'name': 'Semantic Scholar',
+                'description': 'Recherche académique IA-powered',
+                'enabled': True,
+                'icon': '🎓'
+            },
+            {
+                'id': 'arxiv',
+                'name': 'arXiv',
+                'description': 'Prépublications scientifiques',
+                'enabled': True,
+                'icon': '📄'
+            },
+            {
+                'id': 'crossref',
+                'name': 'CrossRef',
+                'description': 'Métadonnées de publications',
+                'enabled': True,
+                'icon': '🔗'
+            }
+        ]
+        return jsonify(databases)
     
     @app.route('/api/health', methods=['GET'])
     def health_check():
