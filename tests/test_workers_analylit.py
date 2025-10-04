@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Tests spécifiques des workers AnalyLit avec la vraie logique métier.
 Ces tests vérifient l'intégration complète workers + AI + database.
@@ -70,7 +72,6 @@ def analysis_queue(rq_connection):
 
 @pytest.mark.integration
 class TestAnalyLitWorkers:
-    # -*- coding: utf-8 -*-
     """Tests d'intégration workers AnalyLit"""
     
     def test_discussion_analysis_worker(self, analysis_queue, rq_connection):
