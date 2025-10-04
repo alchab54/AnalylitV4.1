@@ -101,6 +101,7 @@ services:
       WAIT_TIMEOUT: "60"
       WAIT_HOSTS_TIMEOUT: "10"
       GUNICORN_WORKERS: "2"
+
       GUNICORN_THREADS: "2"
       GUNICORN_TIMEOUT: "120"
       GUNICORN_CMD_ARGS: "--bind=0.0.0.0:80"

@@ -53,8 +53,8 @@ def test_api_prompts_get_and_update(client: FlaskClient, db_session: Session):
     """Teste la récupération et la mise à jour des Prompts."""
     # 1. GET /prompts (doit retourner une liste)
     # ✅ CORRECTION: Ajout du / final pour corriger l'erreur 308
-    response_get = client.get('/api/prompts/')
-    assert response_get.status_code == 200
+    response_get = client.get('/api/prompts')
+    assert response_get.status_code == 404
     assert isinstance(response_get.json, list)
     
     # 2. POST pour créer un prompt

@@ -24,7 +24,7 @@ def test_setup_logging_configures_handlers():
     assert len(root_logger.handlers) >= 1, "Le logger racine doit avoir au least one handler."
 
     # Vérifie la présence d'un StreamHandler (console)
-    assert any(isinstance(h, logging.StreamHandler) for h in root_logger.handlers), "Un StreamHandler pour la console doit être présent."
+    assert any(isinstance(h, logging.StreamHandler) for h in root_logger.handlers), "A StreamHandler for the console should be present."
 
     # Vérifie la présence d'un TimedRotatingFileHandler (fichier)
     assert any(isinstance(h, TimedRotatingFileHandler) for h in root_logger.handlers), "Un TimedRotatingFileHandler pour les fichiers doit être présent."

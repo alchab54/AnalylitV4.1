@@ -19,6 +19,6 @@ def run_extension():
     if not all([project_id, extension_name]):
         return jsonify({"error": "project_id et extension_name sont requis"}), 400
 
-    job = extension_queue.enqueue(run_extension_task, project_id=project_id, extension_name=extension_name, job_timeout=1800, result_ttl=3600)
+    job = extension_queue.enqueue(run_extension_task, project_id=project_id, extension_name=extension_name, job_timeout=1800)
     logger.info(f"Job d'extension enqueued: {job.id}")
     return jsonify({"message": "Tâche d'extension lancée", "job_id": job.id}), 202
