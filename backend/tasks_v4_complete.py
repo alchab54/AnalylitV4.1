@@ -477,7 +477,7 @@ def process_single_article_task(session, project_id: str, article_id: str, profi
         # Assurer un fallback si database_source est None dans la DB
         prompt = tpl.replace("{text}", text_for_analysis).replace("{database_source}", article.get("database_source") or "unknown")
 
-        extracted = call_ollama_api(prompt, profile["extract_model"], output_format="json")
+        extracted = call_ollama_api(prompt, profile["extract"], output_format="json")
 
         if isinstance(extracted, dict) and extracted:
             session.execute(text("INSERT INTO extractions (id, project_id, pmid, title, extracted_data, relevance_score, relevance_justification, analysis_source, created_at) VALUES (:id, :pid, :pmid, :title, :ex_data, 10, 'Extraction détaillée effectuée', :src, :ts)"), {"id": str(uuid.uuid4()), "pid": project_id, "pmid": article_id, "title": article.get("title", ""), "ex_data": json.dumps(extracted), "src": analysis_source, "ts": datetime.now().isoformat()})
@@ -486,7 +486,7 @@ def process_single_article_task(session, project_id: str, article_id: str, profi
     else: # screening
         tpl = get_effective_prompt_template("screening_prompt", get_screening_prompt_template())
         prompt = tpl.format(title=article.get("title", ""), abstract=article.get("abstract", ""), database_source=article.get("database_source", "unknown"))
-        resp = call_ollama_api(prompt, profile["preprocess_model"], output_format="json")
+        resp = call_ollama_api(prompt, profile["preprocess"], output_format="json")
         score = resp.get("relevance_score", 0) if isinstance(resp, dict) else 0
         justification = resp.get("justification", "N/A") if isinstance(resp, dict) else "Réponse IA invalide."
         session.execute(text("INSERT INTO extractions (id, project_id, pmid, title, relevance_score, relevance_justification, analysis_source, created_at) VALUES (:id, :pid, :pmid, :title, :score, :just, :src, :ts)"), {"id": str(uuid.uuid4()), "pid": project_id, "pmid": article_id, "title": article.get("title", ""), "score": score, "just": justification, "src": analysis_source, "ts": datetime.now().isoformat()})
@@ -516,7 +516,7 @@ def run_synthesis_task(session, project_id: str, profile: dict):
 
     data_for_prompt = "\n---\n".join(abstracts)
     tpl = get_effective_prompt_template('synthesis_prompt', get_synthesis_prompt_template())
-    prompt = tpl.format(project_description=project_description, data_for_prompt=data_for_prompt)    
+    prompt = tpl.format(project_description=project_description, data_for_prompt=data_for_prompt)
     output = call_ollama_api(prompt, profile.get('synthesis_model', 'llama3.1:8b'), output_format="json")
     try:
         if output and isinstance(output, dict):
