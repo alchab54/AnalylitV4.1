@@ -93,7 +93,8 @@ def app():
     session_id = uuid.uuid4().hex[:8]
     db_name = f'analylit_test_{worker_id}_{session_id}'
     
-    test_db_url = f'postgresql://analylit_user:strong_password@localhost:5434/{db_name}'
+    # Utilisez les variables d'environnement ou retomber sur localhost si non définies
+    test_db_url = os.getenv('DATABASE_URL') or f'postgresql://analylit_user:strong_password@localhost:5434/{db_name}'
     
     _app = create_app({
         'TESTING': True,
@@ -118,7 +119,7 @@ def db(app):
     with _db_lock:
         with app.app_context():
             # Créer la base de données si elle n'existe pas
-            engine = create_engine('postgresql://analylit_user:strong_password@localhost:5434/postgres')
+            engine = create_engine(os.getenv('DATABASE_URL', 'postgresql://analylit_user:strong_password@localhost:5434/postgres')) # Utilisez les variables d'environnement
             with engine.connect() as conn:
                 conn.execute(text("COMMIT"))  # Sortir de la transaction
                 try:
