@@ -21,16 +21,15 @@ services:
 
   web:
     environment:
-      FLASK_ENV: development
+      FLASK_ENV: development  # ✅ Crucial pour le logging adaptatif
       FLASK_APP: backend/server_v4_complete.py
       DB_HOST: test-db
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       PYTHONPATH: /home/appuser/app
       REDIS_URL: redis://redis:6379/0
     volumes:
-      # ✅ Code en lecture seule pour éviter les conflits de permissions
+      # Code en lecture seule
       - ./api:/home/appuser/app/api:ro
-      - ./backend:/home/appuser/app/backend:ro
       - ./scripts:/home/appuser/app/scripts:ro
       - ./utils:/home/appuser/app/utils:ro
       - ./web:/home/appuser/app/web:ro
@@ -38,7 +37,10 @@ services:
       - ./alembic.ini:/home/appuser/app/alembic.ini:ro
       - ./tests:/home/appuser/app/tests:ro
       - ./pytest.ini:/home/appuser/app/pytest.ini:ro
-      # ✅ Répertoires d'écriture séparés
+      # ✅✅✅ **CORRECTION FINALE** ✅✅✅
+      # Backend en lecture-écriture pour permettre le logging
+      - ./backend:/home/appuser/app/backend
+      # Volumes séparés pour les données
       - dev_logs:/home/appuser/app/logs
       - dev_projects:/home/appuser/app/projects
     ports:
