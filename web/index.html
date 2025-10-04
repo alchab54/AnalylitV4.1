@@ -440,9 +440,11 @@
     <script type="module" src="/js/app-improved.js"></script>
     
     <!-- Script de diagnostic final -->
+
     <script>
     // Diagnostic final après chargement
     setTimeout(() => {
+
         console.log('🔍 DIAGNOSTIC FINAL FRONTEND');
         console.log('Header visible:', !!document.querySelector('.app-header'));
         console.log('Navigation visible:', !!document.querySelector('.app-nav'));
@@ -463,7 +465,7 @@
         const navButtons = document.querySelectorAll('.app-nav__button');
         console.log('Boutons navigation trouvés:', navButtons.length);
         navButtons.forEach((btn, i) => console.log(`Bouton ${i}:`, btn.textContent.trim()));
-        
+
         console.log('🎯 Diagnostic terminé - Vérifiez l\'affichage');
     }, 2000);
     </script>

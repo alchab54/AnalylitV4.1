@@ -1,19 +1,15 @@
-# api/admin.py - Ajouter méthodes manquantes
+# api/admin.py
 from flask import Blueprint, jsonify, request
-from utils.app_globals import redis_conn, limiter, models_queue
-from rq import Queue
+from utils.app_globals import redis_conn, limiter
+from rq import Queue, Worker
+import time
 
 admin_bp = Blueprint('admin', __name__)
 
-def download_model_task(models):
-    """Dummy task for downloading models."""
-    # In a real scenario, this would contain the download logic.
-    return f"Successfully processed {len(models)} models."
-
-@admin_bp.route('/queues/info', methods=['GET'])
-@limiter.limit("50 per minute")
-def get_queues_info():
-    """Récupérer l'état des files d'attente"""
+@admin_bp.route('/admin/queues/stats', methods=['GET'])
+@limiter.limit("100 per minute")
+def get_queue_detailed_stats():
+    """Statistiques détaillées des queues avec workers"""
     try:
         queues_to_check = [
             'processing_queue', 'synthesis_queue', 'analysis_queue', 
@@ -21,44 +17,71 @@ def get_queues_info():
             'fast_queue', 'default_queue', 'ai_queue'
         ]
         
-        queues_info = [] 
-        for queue_name in queues_to_check: 
+        queues_stats = []
+        workers = Worker.all(connection=redis_conn)
+        
+        for queue_name in queues_to_check:
             try:
                 q = Queue(queue_name, connection=redis_conn)
-                queues_info.append({
+                active_workers = len([w for w in workers if queue_name in [wq.name for wq in w.queues]])
+                running_jobs = q.started_job_registry.get_job_ids()
+                failed_jobs = q.failed_job_registry.get_job_ids()
+                
+                queues_stats.append({
                     'name': queue_name,
                     'size': len(q),
-                    'workers': 0  # Placeholder
+                    'workers': active_workers,
+                    'running': len(running_jobs),
+                    'failed': len(failed_jobs),
+                    'failed_jobs': failed_jobs[:10]
                 })
-            except Exception:
-                queues_info.append({
-                    'name': queue_name,
-                    'size': 0,
-                    'workers': 0
-                })
+            except Exception as e:
+                queues_stats.append({ 'name': queue_name, 'error': str(e) })
         
-        return jsonify({"queues": queues_info, "count": len(queues_info)})
+        return jsonify({
+            "queues": queues_stats, 
+            "total_workers": len(workers),
+            "timestamp": int(time.time())
+        })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@admin_bp.route('/pull-models', methods=['POST'])
-@limiter.limit("5/minute")
-def pull_models():
-    """Déclencher le téléchargement de modèles"""
-
+@admin_bp.route('/admin/queues/clear', methods=['POST'])
+@limiter.limit("10 per minute")
+def clear_queue():
+    """Vider complètement une queue spécifiée"""
     try:
-        data = request.get_json() or {}
-        models = data.get('models', [])
+        data = request.get_json()
+        queue_name = data.get('queue_name')
+        if not queue_name:
+            return jsonify({'error': 'queue_name requis'}), 400
         
-        job = models_queue.enqueue(download_model_task, models)
+        q = Queue(queue_name, connection=redis_conn)
+        cleared_count = q.empty()
         
-        result = { #✅ CORRECTION : La clé task_id est ici
-            'job_id': job.id,
-            'message': f'{len(models)} modèles en cours de téléchargement',
-            'models': models,
-            'status': 'processing'
-        }
-        
-        return jsonify(result), 202
+        return jsonify({
+            'success': True,
+            'message': f'Queue {queue_name} vidée',
+            'cleared_tasks': cleared_count
+        })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500 
+        return jsonify({'error': str(e)}), 500
+
+@admin_bp.route('/admin/queues/clear-all', methods=['POST'])
+@limiter.limit("5 per minute")
+def clear_all_queues():
+    """Vider TOUTES les queues"""
+    try:
+        queues_to_clear = [
+            'processing_queue', 'synthesis_queue', 'analysis_queue', 
+            'background_queue', 'models_queue', 'extension_queue',
+            'fast_queue', 'default_queue', 'ai_queue'
+        ]
+        total_cleared = 0
+        for queue_name in queues_to_clear:
+            q = Queue(queue_name, connection=redis_conn)
+            total_cleared += q.empty()
+        
+        return jsonify({'success': True, 'total_cleared': total_cleared})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
