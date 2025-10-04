@@ -13,8 +13,14 @@ from datetime import datetime
 
 class AnalyLitATNWorkflow:
     def __init__(self):
-    	host = os.environ.get("API_HOST", "localhost")
-        port = os.environ.get("API_PORT", "8080")
+        # ✅ Détection automatique d'environnement
+        if os.path.exists('/.dockerenv'):  # Dans un container
+            host = os.environ.get("API_HOST", "web")  # Service web interne
+            port = os.environ.get("API_PORT", "80")   # Port interne
+        else:  # Depuis l'extérieur
+            host = os.environ.get("API_HOST", "localhost")
+            port = os.environ.get("API_PORT", "8080")  # ✅ Port exposé corrigé
+        
         base_url = f"http://{host}:{port}"
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
@@ -22,18 +28,8 @@ class AnalyLitATNWorkflow:
         self.results = {}
         
     def log(self, message, **kwargs):
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
+        timestamp = datetime.now().strftime("%H:%M:%S")
         print(f"[{timestamp}] {message}", **kwargs)
-
-    def __init__(self):
-        if os.path.exists('/.dockerenv'):  # Dans un container
-            host = os.environ.get("API_HOST", "web")  # Service web interne
-            port = os.environ.get("API_PORT", "80")   # Port interne
-        else:  # Depuis l'extérieur
-            host = os.environ.get("API_HOST", "localhost")
-	    port = os.environ.get("API_PORT", "8080")  # Port exposé
-
         
     def check_health(self):
         """Vérifier que l'application répond"""
@@ -372,7 +368,7 @@ class AnalyLitATNWorkflow:
         
         for step_name, step_func in steps:
             self.log(f"📋 Étape: {step_name}")
-	    try:
+            try:  # ✅ Indentation corrigée
                 if step_func():
                     self.log(f"✓ {step_name} - Succès")
                     success_count += 1
