@@ -62,7 +62,7 @@ def test_api_prompts_get_and_update(client: FlaskClient, db_session: Session):
     
     # 2. POST pour créer un prompt
     prompt_payload = {
-        "name": f"test_prompt_unique_{uuid.uuid4()}", 
+        "name": f"test_prompt_unique_{uuid.uuid4()}",
         "content": "This is a test template: {{context}}"
     }
     # ✅ CORRECTION: Ajout du / final

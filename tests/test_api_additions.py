@@ -61,7 +61,7 @@ def test_get_task_status(client, new_project):
     status_data = status_response.get_json()
     assert status_data['task_id'] == task_id
     assert 'status' in status_data
-    assert status_data['status'] in ['queued', 'started', 'finished', 'failed']
+    assert status_data['status'] in ['queued', 'started', 'finished', 'failed', 'canceled']
 
 @pytest.mark.usefixtures("mock_redis_and_rq")
 def test_save_rob_assessment(client, db_session, new_project):
