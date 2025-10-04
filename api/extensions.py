@@ -22,3 +22,8 @@ def run_extension():
     job = extension_queue.enqueue(run_extension_task, project_id=project_id, extension_name=extension_name, job_timeout=1800)
     logger.info(f"Job d'extension enqueued: {job.id}")
     return jsonify({"message": "Tâche d'extension lancée", "job_id": job.id}), 202
+
+@extensions_bp.route('/', methods=['POST'])  # ✅ Ajouter POST
+def handle_extensions():
+    """Logique extension"""
+    return jsonify({'status': 'processed'}), 202

@@ -33,3 +33,13 @@ discussion_draft_queue = analysis_queue
 
 # Compatibilité pour file_handlers qui attend cette variable
 PROJECTS_DIR = get_config().PROJECTS_DIR
+ # En production : rate limiting normal
+    limiter = Limiter(
+        key_func=get_remote_address,
+        storage_uri=redis_url,
+        default_limits=["100 per minute"]
+    )
+processing_queue = Queue('default_queue', connection=redis_conn, is_async=not is_testing, default_timeout=1800)
+synthesis_queue = Queue('ai_queue', connection=redis_conn, is_async=not is_testing, default_timeout=3600)
+analysis_queue = Queue('analysis_queue', connection=redis_conn, is_async=not is_testing, default_timeout=3600)
+background_queue = Queue('background_queue', connection=redis_conn, is_async=not is_testing, default_timeout=1800)

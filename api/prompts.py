@@ -36,7 +36,7 @@ def create_prompt():
         db.session.rollback()
         return jsonify({"error": "Un prompt avec ce nom existe déjà"}), 409
 
-@prompts_bp.route('/<prompt_id>', methods=['GET','PUT'])
+@prompts_bp.route('/<prompt_id>', methods=['GET', 'PUT'])  # ✅ Ajouter PUT
 def update_prompt(prompt_id):
     """Met à jour un prompt existant."""
     # ✅ AMÉLIORATION: Utiliser db.session.get() est plus direct pour une recherche par clé primaire.
@@ -60,6 +60,12 @@ def update_prompt(prompt_id):
     except IntegrityError:
         db.session.rollback()
         return jsonify({"error": "Un prompt avec ce nom existe déjà"}), 409
+
+@prompts_bp.route('/', methods=['GET'])
+def get_prompts():
+    """Ajouter route pour liste des prompts"""
+    prompts = Prompt.query.all()
+    return jsonify([prompt.to_dict() for prompt in prompts]), 200
 
 @prompts_bp.route('/<prompt_id>', methods=['DELETE'])
 def delete_prompt(prompt_id):

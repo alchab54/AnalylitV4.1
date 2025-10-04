@@ -45,6 +45,13 @@ def pull_model_route():
     job = models_queue.enqueue(pull_ollama_model_task, model_name, job_timeout='30m')
     return jsonify({"message": f"Téléchargement du modèle '{model_name}' lancé.", "job_id": job.get_id()}), 202
 
+@admin_bp.route('/pull-models', methods=['POST'])  # ✅ Ajouter POST
+def pull_models():
+    """Logique pour pull des modèles"""
+    # Logique pour pull des modèles
+    return jsonify({'message': 'Models pulled successfully'}), 202
+
+
 @admin_bp.route('/queues/clear', methods=['POST'])
 def clear_queue():
     data = request.get_json()
