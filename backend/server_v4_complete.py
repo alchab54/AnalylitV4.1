@@ -155,8 +155,24 @@ def create_app(config_override=None):
     def ratelimit_handler(e):
         return jsonify({
             "error": "ratelimit exceeded",
-            "description": "Too many requests, please try again later."
+            "description": "Too many requests, please try again later." # I think you want this.
         }), 429
+
+    @app.route('/api/prompts', methods=['GET', 'POST'])
+    def api_prompts():
+        try:
+            # Your existing code
+            if request.method == 'POST':
+                # Handle POST request
+                result = {} # Replace this with actual result
+            else:
+                # Handle GET request
+                result = {} # Replace this with actual result
+            return jsonify(result)
+        except Exception as e:
+            app.logger.error(f"Error in api_prompts: {e}")
+            return jsonify({'error': 'Erreur interne du serveur'}), 500
+
 
     @app.route('/api/projects/<project_id>/extractions', methods=['GET'])
     def get_project_extractions(project_id):
