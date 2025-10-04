@@ -1,5 +1,4 @@
 import logging
-# --- CORRECTION CRITIQUE : Résolution du ModuleNotFoundError ---
 import sys
 from pathlib import Path
 
@@ -11,7 +10,6 @@ if str(project_root) not in sys.path:
 logger = logging.getLogger(__name__)
 
 import feedparser
-# --- CORRECTIF DE COMPATIBILITÉ PYZOTERO / FEEDPARSER ---
 if not hasattr(feedparser, '_FeedParserMixin'):
     feedparser._FeedParserMixin = type('_FeedParserMixin', (object,), {})
 
@@ -50,7 +48,7 @@ def create_app(config_override=None):
     """Factory pour créer et configurer l'application Flask."""
     app = Flask(__name__, static_folder='../web', static_url_path='/static')
 
-    # Configurationl
+    # Configuration
     config = get_config()
     app.config.from_object(config)
     if config_override:
@@ -88,8 +86,6 @@ def create_app(config_override=None):
     app.register_blueprint(stakeholders_bp, url_prefix='/api')
     app.register_blueprint(tasks_bp, url_prefix='/api')
 
-    
-    
     # --- Routes Spécifiques ---
 
     @app.route('/')
@@ -117,7 +113,7 @@ def create_app(config_override=None):
             for extraction, abstract, title in results:
                 extraction_dict = extraction.to_dict()
                 extraction_dict['abstract'] = abstract or "Abstract non disponible."
-                extraction_dict['title'] = title or extraction.title # Assurer un titre
+                extraction_dict['title'] = title or extraction.title
                 combined_results.append(extraction_dict)
 
             return jsonify(combined_results)
@@ -131,16 +127,29 @@ def create_app(config_override=None):
         from rq import Queue
         queues_to_check = ['processing_queue', 'synthesis_queue', 'analysis_queue', 'background_queue', 'models_queue', 'extension_queue']
 
-        return jsonify(queues_info)
+        queues_info = []
+        for queue_name in queues_to_check:
+            try:
+                queue = Queue(queue_name, connection=redis_conn)
+                queues_info.append({
+                    'name': queue_name,
+                    'size': len(queue),
+                    'workers': 0  # Placeholder
+                })
+            except:
+                queues_info.append({
+                    'name': queue_name,
+                    'size': 0,
+                    'workers': 0
+                })
 
         return jsonify(queues_info)
 
     return app
 
-
+app = create_app()
 
 if __name__ == "__main__":
     import gevent.monkey
     gevent.monkey.patch_all()
-    app = create_app()
     socketio.run(app, host="0.0.0.0", port=5000, debug=True, use_reloader=False)
