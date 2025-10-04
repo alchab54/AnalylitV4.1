@@ -4,12 +4,15 @@ FROM analylit-base-cpu:latest
 # Copier le code de l'application.
 COPY . .
 
-
 USER root
+
+# ✅ CORRECTION CRITIQUE : Créer répertoires avec bonnes permissions
+RUN mkdir -p /home/appuser/app/projects /home/appuser/app/logs && \
+    chown -R appuser:appuser /home/appuser/app && \
+    chmod -R 755 /home/appuser/app/projects /home/appuser/app/logs
 
 # ✅ SUPPRIMÉ: Téléchargement wget (plus nécessaire)
 # Les scripts sont maintenant vendorisés dans le repo
-
 # --- Correction des permissions et des fins de ligne ---
 # 1. Basculer temporairement vers l'utilisateur root.
 USER root

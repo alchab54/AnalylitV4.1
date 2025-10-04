@@ -59,3 +59,6 @@ def ensure_projects_directory():
 
 # Créer le répertoire au démarrage si nécessaire
 ensure_projects_directory()
+
+# Alias pour la clarté du code - ✅ AJOUTER CETTE LIGNE
+discussion_draft_queue = analysis_queue

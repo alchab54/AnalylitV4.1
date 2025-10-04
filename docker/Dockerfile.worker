@@ -7,6 +7,10 @@ RUN mkdir -p /home/appuser/app/projects /home/appuser/app/logs && \
 # Définir le répertoire de travail
 WORKDIR /home/appuser/app
 
+# ✅ CORRECTION IDENTIQUE
+RUN mkdir -p /home/appuser/app/projects /home/appuser/app/logs && \
+    chown -R appuser:appuser /home/appuser/app && \
+    chmod -R 755 /home/appuser/app/projects /home/appuser/app/logs
 USER root
 
 # ✅ CORRECTION: Copier l'intégralité du code source de l'application.
