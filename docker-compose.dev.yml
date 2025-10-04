@@ -27,6 +27,7 @@ services:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       PYTHONPATH: /home/appuser/app
       REDIS_URL: redis://redis:6379/0
+
     volumes:
       # Code en lecture seule
       - ./api:/home/appuser/app/api:ro
@@ -40,7 +41,7 @@ services:
       # ✅✅✅ **CORRECTION FINALE** ✅✅✅
       # Backend en lecture-écriture pour permettre le logging
       - ./backend:/home/appuser/app/backend
-      # Volumes séparés pour les données
+      # Volumes séparés pour les donneés
       - ./projects:/home/appuser/app/projects
       - dev_logs:/home/appuser/app/logs
       - dev_projects:/home/appuser/app/projects

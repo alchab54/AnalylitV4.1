@@ -10,14 +10,14 @@ from utils.models import Prompt
 prompts_bp = Blueprint('prompts_bp', __name__)
 logger = logging.getLogger(__name__)
 
-@prompts_bp.route('/', methods=['GET'])
+@prompts_bp.route('', methods=['GET'])
 def get_all_prompts():
     """Retourne tous les prompts."""
     stmt = select(Prompt)
     prompts = db.session.execute(stmt).scalars().all()
     return jsonify([p.to_dict() for p in prompts]), 200
 
-@prompts_bp.route('/', methods=['POST']) 
+@prompts_bp.route('', methods=['POST'])
 def create_prompt():
     """Crée un nouveau prompt."""
     data = request.get_json()

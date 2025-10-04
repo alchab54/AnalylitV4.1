@@ -97,7 +97,6 @@ def create_app(config_override=None):
     app.register_blueprint(selection_bp, url_prefix='/api')
     app.register_blueprint(settings_bp, url_prefix='/api')
     app.register_blueprint(stakeholders_bp, url_prefix='/api')
-    app.register_blueprint(prompts_bp, url_prefix='/api')
 
     # --- Routes Spécifiques ---
     @app.route('/')

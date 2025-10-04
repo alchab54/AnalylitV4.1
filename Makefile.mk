@@ -54,6 +54,50 @@ logs:
 	@echo "\033[34m📋 Logs des services:\033[0m"
 	@docker-compose -f docker-compose.yml -f docker-compose.dev.yml logs -f
 
+logs-follow: ## Suivre les logs en temps réel
+	@echo "$(BLUE)📋 Suivi des logs en temps réel (Ctrl+C pour arrêter):$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) logs -f
+
 logs-web:
 	@echo "\033[34m📋 Logs du service web:\033[0m"
 	@docker-compose -f docker-compose.yml -f docker-compose.dev.yml logs -f web
+
+status: ## Afficher l'état des services
+	@echo "$(BLUE)📊 État des services:$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) ps
+	@echo ""
+	@echo "$(BLUE)🔧 Utilisation des ressources:$(NC)"
+	@docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}" | head -6
+
+logs-worker: ## Logs des workers uniquement
+	@docker-compose -f $(COMPOSE_FILE) logs -f worker
+
+logs-ollama: ## Logs d'Ollama uniquement
+	@docker-compose -f $(COMPOSE_FILE) logs -f ollama
+
+backup: ## Créer une sauvegarde des données
+	@echo "$(BLUE)💾 Création de la sauvegarde...$(NC)"
+	@mkdir -p backups
+	@tar -czf backups/analylit-backup-$$(date +%Y%m%d-%H%M%S).tar.gz projects/
+	@echo "$(GREEN)✅ Sauvegarde créée dans le dossier backups/$(NC)"
+
+models: ## Télécharger les modèles IA essentiels
+	@echo "$(BLUE)🤖 Téléchargement des modèles essentiels...$(NC)"
+	@echo "$(YELLOW)⏳ Attente du démarrage d'Ollama...$(NC)"
+	@until curl -f http://localhost:11434/api/version >/dev/null 2>&1; do sleep 2; done
+	@echo "$(BLUE)📥 Téléchargement de llama3.1:8b...$(NC)"
+	@docker exec $$(docker-compose -f $(COMPOSE_FILE) ps -q ollama) ollama pull llama3.1:8b
+	@echo "$(BLUE)📥 Téléchargement de phi3:mini...$(NC)"
+	@docker exec $$(docker-compose -f $(COMPOSE_FILE) ps -q ollama) ollama pull phi3:mini
+	@echo "$(BLUE)📥 Téléchargement de gemma:2b...$(NC)"
+	@docker exec $$(docker-compose -f $(COMPOSE_FILE) ps -q ollama) ollama pull gemma:2b
+	@echo "$(GREEN)✅ Modèles essentiels téléchargés$(NC)"
+
+health: ## Vérifier la santé des services
+	@echo "$(BLUE)🏥 Vérification de la santé des services:$(NC)"
+	@curl -f http://localhost:8080/api/health && echo "$(GREEN)✅ API Web: OK$(NC)" || echo "$(RED)❌ API Web: Erreur$(NC)"
+	@curl -f http://localhost:11434/api/version && echo "$(GREEN)✅ Ollama: OK$(NC)" || echo "$(RED)❌ Ollama: Erreur$(NC)"
+
+monitor: ## Surveiller les ressources en temps réel
+	@echo "$(BLUE)📊 Surveillance des ressources (Ctrl+C pour arrêter):$(NC)"
+	@watch -n 2 'docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}"'

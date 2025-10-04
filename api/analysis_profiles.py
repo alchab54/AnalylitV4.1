@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
 from utils.extensions import db
 from utils.models import AnalysisProfile
-
+from utils.app_globals import limiter
 analysis_profiles_bp = Blueprint('analysis_profiles_bp', __name__)
 logger = logging.getLogger(__name__)
 
@@ -35,13 +35,19 @@ def create_analysis_profile():
         db.session.rollback()
         return jsonify({"error": "Un profil avec ce nom existe déjà"}), 409
 
+@limiter.limit("50/minute")
 @analysis_profiles_bp.route('/analysis-profiles', methods=['GET'])
 def get_all_analysis_profiles():
     """Retourne tous les profils d'analyse."""
-    from sqlalchemy import select
-    stmt = select(AnalysisProfile)
-    profiles = db.session.execute(stmt).scalars().all()
-    return jsonify([p.to_dict() for p in profiles]), 200
+    try:
+        from sqlalchemy import select
+        stmt = select(AnalysisProfile)
+        profiles = db.session.execute(stmt).scalars().all()
+        return jsonify([p.to_dict() for p in profiles]), 200
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération des profils d'analyse: {e}", exc_info=True)
+        db.session.rollback()
+        return jsonify({"error": "Erreur interne du serveur"}), 500
 
 @analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['GET'])
 def get_analysis_profile_details(profile_id):
