@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 from utils.app_globals import redis_conn, limiter
 from rq import Queue
 
+
 admin_bp = Blueprint('admin', __name__)
 
 @admin_bp.route('/queues/info', methods=['GET'])
@@ -37,6 +38,7 @@ def get_queues_info():
         return jsonify({'error': str(e)}), 500
 
 @admin_bp.route('/pull-models', methods=['POST'])
+@limiter.limit("5/minute")
 @limiter.limit("5/minute")
 def pull_models():
     """Déclencher le téléchargement de modèles"""

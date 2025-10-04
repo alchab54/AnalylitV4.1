@@ -91,7 +91,7 @@ def test_cancel_task(client):
         response = client.post(f'/api/tasks/{fake_task_id}/cancel') # La route est dans api/tasks.py
         
         assert response.status_code == 200
-        assert response.get_json()['message'] == "Demande d_annulation envoyée."
+        assert response.get_json()['message'] == "Demande d'annulation envoyée."
         mock_fetch.assert_called_once_with(fake_task_id, connection=ANY)
         mock_job.cancel.assert_called_once()
 

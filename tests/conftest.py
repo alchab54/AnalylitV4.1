@@ -84,7 +84,7 @@ def mock_redis_and_rq():
     with patch('utils.app_globals.redis_conn', fake_redis), \
          patch('redis.from_url', return_value=fake_redis), \
          patch('rq.Queue', return_value=mock_queue), \
-         patch('rq.job.Job.fetch', side_effect=lambda job_id, connection=None: create_mock_job()), \
+         patch('rq.job.Job.fetch', side_effect=fetch_mock_job), \
          patch('utils.app_globals.limiter') as mock_limiter:
         
         # Mock Queue

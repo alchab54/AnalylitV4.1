@@ -56,11 +56,9 @@ def ensure_projects_directory():
     except (OSError, PermissionError) as e:
         print(f"⚠️  Impossible de créer {PROJECTS_DIR}: {e}")
         return False
-
+        
 # Créer le répertoire au démarrage si nécessaire
 ensure_projects_directory()
 
 # Alias pour la clarté du code - ✅ AJOUTER CETTE LIGNE À LA FIN
 discussion_draft_queue = analysis_queue
-
-

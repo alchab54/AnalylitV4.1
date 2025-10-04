@@ -7,6 +7,7 @@ from utils.app_globals import limiter
 prompts_bp = Blueprint('prompts', __name__)
 
 @prompts_bp.route('/', methods=['GET'])
+@limiter.limit("50/minute")
 @limiter.limit("50 per minute")
 def get_all_prompts():
     """Récupérer tous les prompts"""
