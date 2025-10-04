@@ -22,7 +22,7 @@ def get_task_status(task_id):
         job = Job.fetch(task_id, connection=redis_conn)
         return jsonify({
             'task_id': job.id,
-            'status': job.get_status(), #✅ CORRECTION: La clé task_id est ici
+            'status': job.get_status(), # ✅ CORRECTION: La clé task_id est ici
             'result': job.result
         }), 200
     except NoSuchJobError:

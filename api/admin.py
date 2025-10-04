@@ -45,6 +45,7 @@ def get_queues_info():
 @limiter.limit("5/minute")
 def pull_models():
     """Déclencher le téléchargement de modèles"""
+
     try:
         data = request.get_json() or {}
         models = data.get('models', [])

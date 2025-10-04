@@ -61,7 +61,7 @@ def update_prompt(prompt_id):
         if not prompt:
             return jsonify({'error': 'Prompt non trouvé'}), 404
             
-        data = request.get_json()
+        data = request.get_json()        
         if not data:
             return jsonify({'error': 'Données requises'}), 400
             
