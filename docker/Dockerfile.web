@@ -1,7 +1,4 @@
 # docker/Dockerfile.web
-
-# Image applicative - hérite de la base avec les dépendances
-
 FROM analylit-base-cpu:latest
 
 # Copier le code de l'application.
@@ -10,26 +7,25 @@ COPY . .
 # RUN apt-get update as root
 USER root
 
-# Télécharger wait-for-it.sh pour une attente robuste de la DB
-RUN apt-get update && apt-get install -y --no-install-recommends wget ca-certificates && rm -rf /var/lib/apt/lists/* 
-RUN wget -qO /usr/local/bin/wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/v2.8.4/wait-for-it.sh
-RUN chmod +x /usr/local/bin/wait-for-it.sh
-
-# Définir le PATH pour inclure wait-for-it.sh
-ENV PATH="/usr/local/bin:${PATH}"
+# ✅ SUPPRIMÉ: Téléchargement wget (plus nécessaire)
+# Les scripts sont maintenant vendorisés dans le repo
 
 # --- Correction des permissions et des fins de ligne ---
 # 1. Basculer temporairement vers l'utilisateur root.
 USER root
 
-# 2. Corriger les fins de ligne Windows (\r) et rendre le script exécutable.
+# 2. Corriger les fins de ligne Windows (\r) et rendre les scripts exécutables.
 RUN tr -d '\r' < scripts/entrypoint.sh > /tmp/entrypoint-fixed.sh && \
     chmod +x /tmp/entrypoint-fixed.sh && \
     mv /tmp/entrypoint-fixed.sh scripts/entrypoint.sh
+
+# ✅ AJOUT: Rendre wait-for-it.sh exécutable
+RUN tr -d '\r' < scripts/wait-for-it.sh > /tmp/wait-for-it-fixed.sh && \
+    chmod +x /tmp/wait-for-it-fixed.sh && \
+    mv /tmp/wait-for-it-fixed.sh scripts/wait-for-it.sh
 
 # 3. Revenir à l'utilisateur non-root et s'assurer qu'il est propriétaire des fichiers.
 RUN chown -R appuser:appuser /home/appuser/app
 USER appuser
 
-
-ENTRYPOINT ["./scripts/entrypoint.sh"]
+ENTRYPOINT ["./scripts/entrypoint.sh"] 
