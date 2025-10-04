@@ -1,69 +1,79 @@
-# api/tasks.py - VERSION FINALE CORRIGÉE
+# api/tasks.py
 
 import logging
-from redis.exceptions import ConnectionError
 from flask import Blueprint, jsonify
-from rq.job import Job
+from utils.app_globals import redis_conn
+from rq import Queue
 from rq.exceptions import NoSuchJobError
-from rq.registry import StartedJobRegistry, FinishedJobRegistry, FailedJobRegistry
+from rq.job import Job
 
-# ✅ CORRECTION : Import propre et sans duplication
-from utils.app_globals import (
-    limiter, redis_conn, processing_queue, synthesis_queue,
-    analysis_queue, background_queue, extension_queue
-)
-
-tasks_bp = Blueprint('tasks_bp', __name__)
+tasks_bp = Blueprint('tasks', __name__)
 logger = logging.getLogger(__name__)
+
+@tasks_bp.route('/queues/info', methods=['GET'])
+def get_queues_info():
+    """Récupérer l'état des files d'attente"""
+    try:
+        queues_to_check = [
+            'processing_queue', 'synthesis_queue', 'analysis_queue',
+            'background_queue', 'models_queue', 'extension_queue',
+            'fast_queue', 'default_queue', 'ai_queue'
+        ]
+
+        queues_info = []
+        for queue_name in queues_to_check:
+            try:
+                q = Queue(queue_name, connection=redis_conn)
+                queues_info.append({
+                    'name': queue_name,
+                    'size': len(q),
+                    'workers': 0  # Placeholder
+                })
+            except Exception as e:
+                logger.error(f"Error getting info for queue {queue_name}: {e}")
+                queues_info.append({
+                    'name': queue_name,
+                    'size': 0,
+                    'workers': 0
+                })
+
+        return jsonify({"queues": queues_info, "count": len(queues_info)})
+    except Exception as e:
+        logger.error(f"Error getting queues info: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
 
 @tasks_bp.route('/tasks/<task_id>/status', methods=['GET'])
 def get_task_status(task_id):
+    """Récupérer le statut d'une tâche spécifique"""
     try:
-        job = Job.fetch(task_id, connection=redis_conn) #✅ CORRECTION : La clé task_id est ici
-        return jsonify({ 
+        job = Job.fetch(task_id, connection=redis_conn)
+        return jsonify({
             'task_id': job.id,
-            'status': job.get_status(), #✅ CORRECTION : La clé task_id est ici
+            'status': job.get_status(),
             'result': job.result
-        }), 200
+        })
     except NoSuchJobError:
-        # ✅ Gère explicitement le cas "not found"
-        return jsonify({'error': 'Tâche non trouvée'}), 404
+        return jsonify({'error': 'Task not found'}), 404
     except Exception as e:
+        logger.error(f"Error getting task status for task_id {task_id}: {e}", exc_info=True)
         return jsonify({'error': str(e)}), 500
 
-@tasks_bp.route('/tasks/status', methods=['GET'])
-def get_all_tasks_status():
-    """Retourne une liste de toutes les tâches."""
-    all_tasks = []
-    queues = [processing_queue, synthesis_queue, analysis_queue, background_queue, extension_queue]
 
-    for q in queues:
-        started_registry = StartedJobRegistry(queue=q)
-        finished_registry = FinishedJobRegistry(queue=q)
-        failed_registry = FailedJobRegistry(queue=q)
+@tasks_bp.route('/tasks/clear/<queue_name>', methods=['POST'])
+def clear_queue(queue_name):
+    q = Queue(queue_name, connection=redis_conn)
+    q.empty()
+    return jsonify({'message': f'Queue {queue_name} cleared'})
 
-        jobs = Job.fetch_many(
-            q.get_job_ids() + started_registry.get_job_ids() + 
-            finished_registry.get_job_ids(end=50) + failed_registry.get_job_ids(end=50),
-            connection=redis_conn
-        )
-
-        for job in jobs:
-            if job:
-                all_tasks.append({
-                    'id': job.id, 'queue': q.name, 'description': job.description,
-                    'status': job.get_status(), 'created_at': job.created_at.isoformat() if job.created_at else None,
-                })
-
-    all_tasks.sort(key=lambda x: x['created_at'] or '', reverse=True)
-    return jsonify(all_tasks)
-
-@tasks_bp.route('/tasks/<task_id>/cancel', methods=['POST'])
-def cancel_task(task_id):
-    """Annule une tâche en cours."""
+@tasks_bp.route('/tasks/<task_id>', methods=['DELETE'])
+def delete_task(task_id):
+    """Supprimer une tâche de la file d'attente"""
     try:
-        job = Job.fetch(task_id, connection=redis_conn)        
-        job.cancel()
-        return jsonify({"message": "Demande d'annulation envoyée."}), 200
+        job = Job.fetch(task_id, connection=redis_conn)
+        job.delete()
+        return jsonify({'message': f'Task {task_id} deleted'})
     except NoSuchJobError:
-        return jsonify({"error": "Tâche non trouvée"}), 404
+        return jsonify({'error': 'Task not found'}), 404
+    except Exception as e:
+        logger.error(f"Error deleting task with task_id {task_id}: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500

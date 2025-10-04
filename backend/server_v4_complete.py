@@ -101,6 +101,7 @@ def create_app(config_override=None):
     app.register_blueprint(stakeholders_bp, url_prefix='/api')
     app.register_blueprint(tasks_bp, url_prefix='/api')
 
+
     # --- Routes Spécifiques ---
     @app.route('/')
     def serve_frontend():
