@@ -5,7 +5,7 @@ import sys
 import threading
 import tempfile
 import shutil
-from pathlib import Path
+from pathlib import Path #Fix: Import pathlib
 import fakeredis
 from unittest.mock import patch, MagicMock
 
