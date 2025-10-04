@@ -1,13 +1,16 @@
 import logging
 from flask import Blueprint, jsonify
 from rq.job import Job
-from rq.registry import StartedJobRegistry, FinishedJobRegistry, FailedJobRegistry
 from rq.exceptions import NoSuchJobError
 from utils.app_globals import (
     redis_conn, processing_queue, synthesis_queue, analysis_queue, background_queue, extension_queue
 )
 
+from rq.registry import StartedJobRegistry, FinishedJobRegistry, FailedJobRegistry
+
+
 tasks_bp = Blueprint('tasks', __name__)
+
 logger = logging.getLogger(__name__)
 
 @tasks_bp.route('/tasks/<task_id>/status', methods=['GET'])
@@ -36,7 +39,7 @@ def get_task_status(task_id):
         'enqueued_at': job.enqueued_at.isoformat() if job.enqueued_at else None,
         'started_at': job.started_at.isoformat() if job.started_at else None,
         'ended_at': job.ended_at.isoformat() if job.ended_at else None,
-        'exc_info': exc_string
+        'exc_info': exc_string # job.exc_info
     }
     return jsonify(response)
 

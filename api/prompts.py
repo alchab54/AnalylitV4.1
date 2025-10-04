@@ -17,7 +17,7 @@ def get_all_prompts():
     prompts = db.session.execute(stmt).scalars().all()
     return jsonify([p.to_dict() for p in prompts]), 200
 
-@prompts_bp.route('/', methods=['POST'])
+@prompts_bp.route('/', methods=['POST']) 
 def create_prompt():
     """Crée un nouveau prompt."""
     data = request.get_json()

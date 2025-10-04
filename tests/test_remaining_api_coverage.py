@@ -21,7 +21,7 @@ def test_api_grids_create_and_update(client, db_session, setup_project):
     """
     Teste le workflow de création manuelle (POST) et de mise à jour (PUT) 
     d'une grille d'extraction.
-    """
+   """
     project_id = setup_project.id
     
     # --- 1. POST (Créer manuellement) ---
@@ -123,7 +123,7 @@ def test_api_settings_endpoints(client, db_session):
     """
     Teste les routes de l'API de paramètres (Settings).
     """
-    seed_default_data(db_session) # ✅ AJOUTER CETTE LIGNE pour garantir la présence des données
+    seed_default_data(db_session)
     response = client.get('/api/analysis-profiles')
     assert response.status_code == 200
     assert len(response.json) > 0 # L'assertion devient plus robuste

@@ -27,7 +27,7 @@ def get_queues_info():
         })
     
     # ✅ CORRECTION : Retourner directement la liste pour correspondre aux tests
-    return jsonify(queues_info)
+    return jsonify({"queues": queues_info}), 200
 
 @admin_bp.route('/health', methods=['GET'])
 def health_check():

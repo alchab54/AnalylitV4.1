@@ -87,6 +87,8 @@ def create_app(config_override=None):
     app.register_blueprint(settings_bp, url_prefix='/api/settings')
     app.register_blueprint(stakeholders_bp, url_prefix='/api/stakeholders')
     app.register_blueprint(tasks_bp, url_prefix='/api/tasks')
+
+    
     
     # --- Routes Spécifiques ---
 
@@ -127,7 +129,7 @@ def create_app(config_override=None):
     def get_queues_info():
         """Retourne le statut des files d'attente RQ."""
         from rq import Queue
-        queues_to_check = ['ai_queue', 'analysis_queue', 'background_queue', 'default_queue', 'fast_queue', 'extension_queue']
+        queues_to_check = ['processing_queue', 'synthesis_queue', 'analysis_queue', 'background_queue', 'models_queue', 'extension_queue']
         queues_info = []
         for q_name in queues_to_check:
             q = Queue(q_name, connection=redis_conn)
@@ -135,6 +137,7 @@ def create_app(config_override=None):
                 "name": q_name,
                 "count": q.count, # Nombre de tâches en attente
             })
+
         return jsonify(queues_info)
 
     return app

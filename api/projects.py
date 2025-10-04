@@ -559,7 +559,7 @@ def upload_pdfs_bulk(project_id):
             try:
                 from utils.app_globals import PROJECTS_DIR
                 filename = secure_filename(file.filename)
-                logger.info(f"Fichier {filename} uploadé, mais aucune tâche de traitement n'est définie pour l'upload de PDF en masse.")
+                    #logger.info(f"Fichier {filename} uploadé, mais aucune tâche de traitement n'est définie pour l'upload de PDF en masse.")
                 job = background_queue.enqueue(add_manual_articles_task, project_id=project_id, identifiers=[filename], job_timeout='10m')
                 task_ids.append(job.id)
                 successful_uploads.append(filename)
@@ -572,5 +572,5 @@ def upload_pdfs_bulk(project_id):
     response_message = f"{len(successful_uploads)} PDF(s) mis en file pour traitement."
     if failed_uploads:
         response_message += f" {len(failed_uploads)} fichier(s) ignoré(s)."
-    
+
     return jsonify({"message": response_message, "job_ids": task_ids, "failed_files": failed_uploads}), 202

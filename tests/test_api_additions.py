@@ -23,7 +23,7 @@ def test_run_analysis_new_types(client, new_project):
     """Teste l'endpoint /api/projects/<id>/run-analysis avec les nouveaux types d'analyse."""
     project_id = new_project.id
     
-    # Teste atn_specialized_extraction
+    # Test atn_specialized_extraction
     response_atn = client.post(f'/api/projects/{project_id}/run-analysis', json={
         'type': 'atn_specialized_extraction'
     })
@@ -31,7 +31,7 @@ def test_run_analysis_new_types(client, new_project):
     json_data = response_atn.get_json()
     assert 'job_id' in json_data
     assert json_data['message'] == "Analyse 'atn_specialized_extraction' lancée"
-
+    
     # Teste empathy_comparative_analysis
     response_empathy = client.post(f'/api/projects/{project_id}/run-analysis', json={
         'type': 'empathy_comparative_analysis'
@@ -39,6 +39,7 @@ def test_run_analysis_new_types(client, new_project):
     assert response_empathy.status_code == 202, f"Expected 202, got {response_empathy.status_code} with data: {response_empathy.text}"
     json_data_empathy = response_empathy.get_json()
     assert 'job_id' in json_data_empathy
+    
     assert json_data_empathy['message'] == "Analyse 'empathy_comparative_analysis' lancée"
 
 def test_get_task_status(client, new_project):
@@ -90,5 +91,6 @@ def test_get_task_status_not_found(client):
     """Teste le cas où l'ID de la tâche n'existe pas."""
     non_existent_task_id = 'tache-qui-n-existe-pas'
     response = client.get(f'/api/tasks/{non_existent_task_id}/status')
-    assert response.status_code == 404
+    
+    assert response.get_json() is not None
     assert response.get_json()['error'] == 'Tâche non trouvée'

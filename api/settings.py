@@ -18,7 +18,7 @@ def settings_debug():
     return jsonify({"status": "OK", "blueprint": "settings_bp"}), 200
 
 @settings_bp.route("/settings/models", methods=["GET"])
-def get_settings_models():
+def get_settings_models():    
     """Retourne la liste des modèles Ollama disponibles."""
     try:
         ollama_url = os.environ.get("OLLAMA_BASE_URL", "http://ollama:11434")
