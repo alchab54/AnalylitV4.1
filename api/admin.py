@@ -37,7 +37,7 @@ def get_queues_info():
                     'workers': 0
                 })
         
-        return jsonify(queues_info)
+        return jsonify({"queues": queues_info, "count": len(queues_info)})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

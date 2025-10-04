@@ -95,6 +95,7 @@ services:
     profiles: ["default", "gpu"]
     ports: []
     environment:
+      REDIS_HOST: redis
       FLASK_APP: backend/server_v4_complete.py
       FLASK_ENV: production
       WAIT_HOSTS: db:5432,redis:6379,ollama:11434
