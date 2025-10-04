@@ -51,7 +51,9 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-
+    networks:
+    - analylit-network
+    
   nginx:
     image: nginx:1.25-alpine
     container_name: analylit_nginx_dev
@@ -64,7 +66,9 @@ services:
       web:
         condition: service_started
     restart: unless-stopped
-
+    networks:
+    - analylit-network
+    
 
   migrate:
     environment:
@@ -86,3 +90,7 @@ volumes:
   test_postgres_data:
   dev_logs:      # Volume séparé pour les logs de développement
   dev_projects:  # Volume séparé pour les projets de développement
+
+networks:
+  analylit-network:
+    driver: bridge
