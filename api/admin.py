@@ -3,8 +3,12 @@ from flask import Blueprint, jsonify, request
 from utils.app_globals import redis_conn, limiter, models_queue
 from rq import Queue
 
-
 admin_bp = Blueprint('admin', __name__)
+
+def download_model_task(models):
+    """Dummy task for downloading models."""
+    # In a real scenario, this would contain the download logic.
+    return f"Successfully processed {len(models)} models."
 
 @admin_bp.route('/queues/info', methods=['GET'])
 @limiter.limit("50 per minute")
@@ -39,15 +43,16 @@ def get_queues_info():
 
 @admin_bp.route('/pull-models', methods=['POST'])
 @limiter.limit("5/minute")
-@limiter.limit("5/minute")
 def pull_models():
     """Déclencher le téléchargement de modèles"""
     try:
         data = request.get_json() or {}
         models = data.get('models', [])
         
-        # Logique pour pull des modèles (simulée)
+        job = models_queue.enqueue(download_model_task, models)
+        
         result = {
+            'job_id': job.id,
             'message': f'{len(models)} modèles en cours de téléchargement',
             'models': models,
             'status': 'processing'

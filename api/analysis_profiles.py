@@ -10,6 +10,7 @@ analysis_profiles_bp = Blueprint('analysis_profiles_bp', __name__)
 logger = logging.getLogger(__name__)
 
 @analysis_profiles_bp.route('/analysis-profiles', methods=['POST'])
+@limiter.limit("5 per minute")
 def create_analysis_profile():
     """Crée un nouveau profil d'analyse."""
     data = request.get_json()
@@ -35,8 +36,8 @@ def create_analysis_profile():
         db.session.rollback()
         return jsonify({"error": "Un profil avec ce nom existe déjà"}), 409
 
-@limiter.limit("50 per minute")
 @analysis_profiles_bp.route('/analysis-profiles', methods=['GET'])
+@limiter.limit("50 per minute")
 def get_all_analysis_profiles():
     """Retourne tous les profils d'analyse."""
     try:
@@ -58,6 +59,7 @@ def get_analysis_profile_details(profile_id):
     return jsonify(profile.to_dict()), 200
 
 @analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['PUT'])
+@limiter.limit("5 per minute")
 def update_analysis_profile(profile_id):
     """Met à jour un profil d'analyse existant."""
     profile = db.session.get(AnalysisProfile, profile_id)
@@ -80,6 +82,7 @@ def update_analysis_profile(profile_id):
         return jsonify({"error": "Erreur lors de la mise à jour du profil"}), 500
 
 @analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['DELETE'])
+@limiter.limit("5 per minute")
 def delete_analysis_profile(profile_id):
     """Supprime un profil d'analyse."""
     profile = db.session.get(AnalysisProfile, profile_id)

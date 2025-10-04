@@ -21,7 +21,7 @@ def get_task_status(task_id):
     try:
         job = Job.fetch(task_id, connection=redis_conn)
         return jsonify({
-            'task_id': job.get_id(),
+            'task_id': job.id,
             'status': job.get_status(),
             'result': job.result
         }), 200

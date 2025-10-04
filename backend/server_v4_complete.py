@@ -91,7 +91,7 @@ def create_app(config_override=None):
     app.register_blueprint(extensions_bp, url_prefix='/api')
     app.register_blueprint(files_bp, url_prefix='/api')
     app.register_blueprint(projects_bp, url_prefix='/api')
-    app.register_blueprint(prompts_bp, url_prefix='/api')
+    app.register_blueprint(prompts_bp, url_prefix='/api/prompts')
     app.register_blueprint(reporting_bp, url_prefix='/api')
     app.register_blueprint(search_bp, url_prefix='/api')
     app.register_blueprint(selection_bp, url_prefix='/api')
@@ -193,7 +193,10 @@ def create_app(config_override=None):
                     'workers': 0
                 })
 
-        return jsonify(queues_info)
+        return jsonify({
+            'queues': queues_info,
+            'total': len(queues_info)
+        })
 
     return app
 

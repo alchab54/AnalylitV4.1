@@ -6,7 +6,7 @@ from utils.app_globals import limiter
 
 prompts_bp = Blueprint('prompts', __name__)
 
-@prompts_bp.route('/', methods=['GET'])
+@prompts_bp.route('', methods=['GET'])
 @limiter.limit("50/minute")
 @limiter.limit("50 per minute")
 def get_all_prompts():
@@ -17,7 +17,7 @@ def get_all_prompts():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@prompts_bp.route('/', methods=['POST'])
+@prompts_bp.route('', methods=['POST'])
 @limiter.limit("10 per minute")
 def create_prompt():
     """Créer un nouveau prompt"""
