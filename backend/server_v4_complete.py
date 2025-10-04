@@ -180,6 +180,16 @@ def create_app(config_override=None):
             app.logger.error(f"Error in api_prompts: {e}")
             return jsonify({'error': 'Erreur interne du serveur'}), 500
 
+    def normalize_profile(profile: dict) -> dict:
+        """
+        Normalizes the profile dictionary to support both old and new keys.
+        """
+        return {
+            'preprocess': profile.get('preprocess') or profile.get('preprocess_model') or 'phi3:mini',
+            'extract': profile.get('extract') or profile.get('extract_model') or 'llama3.1:8b',
+            'synthesis': profile.get('synthesis') or profile.get('synthesis_model') or 'llama3.1:8b'}
+
+
 
     @app.route('/api/projects/<project_id>/extractions', methods=['GET'])
     def get_project_extractions(project_id):
@@ -237,5 +247,5 @@ app = create_app()
 
 if __name__ == "__main__":
     import gevent.monkey
-    gevent.monkey.patch_all()
+    gevent.monkey.patch_all() # Patch all for production and local
     socketio.run(app, host="0.0.0.0", port=5000, debug=True, use_reloader=False)

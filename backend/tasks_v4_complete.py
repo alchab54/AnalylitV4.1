@@ -43,6 +43,7 @@ from utils.models import (
     SCHEMA  # ✅ CORRECTION: Importer la variable SCHEMA pour la configuration de l'engine.
 )
 #
+import traceback
 from sqlalchemy.orm import Session # Explicitly import Session for type hinting if needed, though Session is already defined below
 
 
@@ -211,6 +212,22 @@ def update_project_timing(session, project_id: str, duration: float):
 # ================================================================ 
 # === Tâches RQ (100% SQLAlchemy)
 # ================================================================ 
+
+# === Utilitaires ===
+def normalize_profile(profile: dict) -> dict:
+    """
+    Normalizes the profile dictionary to support both old and new keys.
+    """
+    if not profile:
+        return {'preprocess': 'phi3:mini', 'extract': 'llama3.1:8b', 'synthesis': 'llama3.1:8b'}
+    # Support both old and new keys, defaulting to phi3:mini or llama3.1:8b if not found
+    return {
+        'preprocess': profile.get('preprocess') or profile.get('preprocess_model') or 'phi3:mini',
+        'extract': profile.get('extract') or profile.get('extract_model') or 'llama3.1:8b',
+        'synthesis': profile.get('synthesis') or profile.get('synthesis_model') or 'llama3.1:8b'
+    }
+
+
 
 # --- Mock function for E2E tests ---
 def _mock_multi_database_search_task(session, project_id: str, query: str, databases: list, max_results_per_db: int = 50, *args, **kwargs):
@@ -535,6 +552,7 @@ def run_synthesis_task(session, project_id: str, profile: dict):
 def run_discussion_generation_task(session, project_id: str):
     """Génère le brouillon de la discussion."""
     try:
+
         update_project_status(session, project_id, 'generating_analysis')
         rows = session.execute(text("SELECT e.extracted_data, e.pmid, s.title, e.relevance_score FROM extractions e JOIN search_results s ON e.project_id = s.project_id AND e.pmid = s.article_id WHERE e.project_id = :pid AND e.relevance_score >= 7 AND e.extracted_data IS NOT NULL"), {"pid": project_id}).mappings().all()
         if not rows: # Ne pas lever d'erreur, mais mettre à jour le statut et notifier.
@@ -1480,3 +1498,14 @@ def run_empathy_comparative_analysis_task(session, project_id: str, **kwargs):
     """Dummy task for empathy comparative analysis."""
     logger.info(f"Running empathy comparative analysis for project {project_id}")
     send_project_notification(project_id, 'analysis_completed', 'Empathy comparative analysis completed.', {'analysis_type': 'empathy_comparative_analysis'})
+
+
+@with_db_session
+def process_single_article_task(session, project_id: str, article_id: str, profile: dict, analysis_mode: str, custom_grid_id: str = None):
+    """Traite un article: screening ou extraction complète."""
+    profile = normalize_profile(profile)  # Normalize profile at the start of the task
+    try:
+        # ... existing code ...
+    except Exception as e:
+        logger.exception("process_single_article_task failed: %s", e)
+        raise # Ensure RQ marks the job as failed
