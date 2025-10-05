@@ -106,7 +106,8 @@ services:
       WAIT_HOSTS: test-db:5432
     command: |
       sh -c "
-        ./scripts/wait-for-it.sh test-db:5432 --timeout=60 -- 
+        chmod +x ./scripts/wait-for-test-db.sh &&
+        ./scripts/wait-for-test-db.sh &&
         python -m alembic -c /home/appuser/app/alembic.ini upgrade head
       "
     volumes:
