@@ -1,7 +1,7 @@
 """Ajoute une contrainte unique sur (project_id, pmid) dans extractions
 
 Revision ID: <your_revision_id>
-Revises: <previous_revision_id>
+Revises: d3577afd6bd0
 Create Date: <date_and_time>
 
 """
