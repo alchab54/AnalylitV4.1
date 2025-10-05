@@ -26,6 +26,21 @@ from utils.models import Project
 from rq.registry import StartedJobRegistry, FinishedJobRegistry, FailedJobRegistry
 from rq.exceptions import NoSuchJobError
 
+@pytest.fixture(scope='function')
+def redis_conn():
+    """
+    Provides a connection to the real 'redis_dev' service,
+    using a separate database for test isolation.
+    """
+    # Se connecte au service redis_dev défini dans docker-compose.dev.yml
+    redis_host = os.getenv("REDIS_HOST", "redis_dev")
+
+    # Utilise la base de données n°9 pour isoler les tests des données de dev
+    conn = Redis(host=redis_host, port=6379, db=9, decode_responses=True)
+
+    yield conn
+
+    # Nettoie la base de données de test après chaque test
 # ✅ SOLUTION #1 : Mock Redis/RQ Complet et Sérialisable
 @pytest.fixture(scope='session')
 def mock_redis_and_rq(request):
@@ -190,7 +205,6 @@ def setup_project(db_session):
     """Test project with a unique ID."""
     project = Project(
         id=str(uuid.uuid4()),
-        name=f"Test Project {uuid.uuid4().hex[:8]}"
     )
     db_session.add(project) # ✅ Use db_session
     db_session.commit()
@@ -202,7 +216,9 @@ def clean_db(db_session):
     for table in reversed(_db.metadata.sorted_tables):
         db_session.execute(table.delete())
     db_session.commit()
+
     yield
     for table in reversed(_db.metadata.sorted_tables):
         db_session.execute(table.delete())
+
     db_session.commit()

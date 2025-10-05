@@ -54,11 +54,6 @@ def memory_intensive_task(size=1000):
     return len(data)
 
 @pytest.fixture
-def redis_conn():
-    """Connexion Redis pour les assertions (avec décodage)."""
-    return from_url("redis://redis:6379/0", decode_responses=True)
-
-@pytest.fixture
 def rq_connection():
     """Connexion Redis pour RQ (SANS décodage). C'est la correction clé."""
     return from_url("redis://redis:6379/0", decode_responses=False)
