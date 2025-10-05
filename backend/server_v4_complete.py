@@ -71,7 +71,7 @@ def create_app(config_override=None):
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_pre_ping': True,
         "connect_args": {
-            "options": f"-c search_path={DB_SCHEMA},public"
+            "options": f"-c search_path={config.DB_SCHEMA},public"
         }
     }
 

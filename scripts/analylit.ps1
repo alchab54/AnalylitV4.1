@@ -78,7 +78,7 @@ function Invoke-ModelDownload {
     Write-Host "✅ Modèles téléchargés" -ForegroundColor Green
 }
 
-function Clean-Environment {
+function Clear-Environment {
     Write-Host "🧹 Nettoyage complet de l'environnement (conteneurs, réseaux, volumes)..." -ForegroundColor Yellow
     docker-compose -f $COMPOSE_FILE down -v
     Write-Host "✅ Environnement nettoyé." -ForegroundColor Green
@@ -92,6 +92,6 @@ switch ($action) {
     "status" { Show-Status }
     "logs" { Show-Logs }
     "models" { Invoke-ModelDownload }
-    "clean" { Clean-Environment }
+    "clean" { Clear-Environment }
     default { Show-Help }
 }
