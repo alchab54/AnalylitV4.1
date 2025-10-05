@@ -149,7 +149,7 @@ class ATNTestRunner:
         logger.info("Lancement du screening avec profil explicite...")
         
         # Récupère les profils disponibles
-        profile_id = TEST_PROFILE
+        profile_id = "standard-local"
         
         screening_data = {
             "articles": TEST_ARTICLES,
