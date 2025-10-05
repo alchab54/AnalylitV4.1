@@ -26,7 +26,7 @@ def load_default_models() -> Dict[str, Any]:
         print("WARNING: profiles.json not found or invalid. Using fallback default models.")
         return {
             'fast': {'preprocess': 'phi3:mini', 'extract': 'phi3:mini', 'synthesis': 'llama3.1:8b'},
-            'standard': {'preprocess': 'phi3:mini', 'extract': 'llama3.1:8b', 'synthesis': 'llama3.1:8b'},
+            'standard-local': {'preprocess': 'phi3:mini', 'extract': 'llama3.1:8b', 'synthesis': 'llama3.1:8b'},
             'deep': {'preprocess': 'llama3.1:8b', 'extract': 'mixtral:8x7b', 'synthesis': 'llama3.1:70b'}
         }
 

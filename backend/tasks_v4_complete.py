@@ -1506,8 +1506,21 @@ def add_manual_articles_task(session, project_id: str, identifiers: list):
     # Lancer l'extraction automatique pour tous les articles ajoutés
     project = session.query(Project).filter_by(id=project_id).first()
     profile_used = project.profile_used if project else 'standard'
-    default_profile = config.DEFAULT_MODELS.get(profile_used, config.DEFAULT_MODELS['standard'])
+    default_profile = {
+        'preprocess': 'phi3:mini',
+        'extract': 'llama3:8b', 
+        'synthesis': 'llama3:8b'
+    }
 
+    # Optionnel: utiliser la config si disponible
+    if hasattr(config, 'DEFAULT_MODELS') and config.DEFAULT_MODELS:
+        available_models = list(config.DEFAULT_MODELS.keys())
+        if available_models:
+            model_key = available_models[0]  # Prendre le premier disponible
+            config_profile = config.DEFAULT_MODELS[model_key]
+            if isinstance(config_profile, dict):
+                default_profile = normalize_profile(config_profile)
+            
     for article_id in successful_articles:
         analysis_queue.enqueue(
             'backend.tasks_v4_complete.process_single_article_task',
