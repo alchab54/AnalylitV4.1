@@ -83,8 +83,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-      migrate:
-        condition: service_completed_successfully
+      #migrate:
+        #condition: service_completed_successfully
     networks:
       - analylit-network
     ports:
@@ -103,7 +103,7 @@ services:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       PYTHONPATH: /home/appuser/app
       # ✅ CORRECTION FINALE : La variable doit pointer vers le bon service DB
-      WAIT_HOSTS: test-db:5432
+      WAIT_HOSTS: test-db:5432,redis:6379
     command: |
       sh -c "
         chmod +x ./scripts/wait-for-test-db.sh &&

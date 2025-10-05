@@ -15,6 +15,17 @@ def setup_logging():
             logging.StreamHandler()  # Sortie console uniquement
         ]
     )
+def setup_test_logging():
+    """Configuration silencieuse pour les tests"""
+    if os.getenv('TESTING') == 'true':
+        # En mode test, on réduit le niveau de logging
+        logging.getLogger('root').setLevel(logging.WARNING)
+        logging.getLogger('utils.logging_config_dev').setLevel(logging.WARNING)
+        
+        # Supprime les handlers répétitifs
+        for handler in logging.getLogger().handlers[:]:
+            logging.getLogger().removeHandler(handler)
+
     
     # Désactiver les logs verbeux des librairies externes
     logging.getLogger('werkzeug').setLevel(logging.WARNING)
