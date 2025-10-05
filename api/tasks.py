@@ -45,18 +45,7 @@ def get_queues_info():
 @tasks_bp.route('/tasks/<task_id>/status', methods=['GET'])
 def get_task_status(task_id):
     """Récupérer le statut d'une tâche spécifique"""
-    try:
-        job = Job.fetch(task_id, connection=redis_conn)
-        return jsonify({
-            "job_id": task_id,
-            'status': job.get_status(),
-            'result': job.result
-        })
-    except NoSuchJobError:
-        return jsonify({'error': 'Task not found'}), 404
-    except Exception as e:
-        logger.error(f"Error getting task status for task_id {task_id}: {e}", exc_info=True)
-        return jsonify({'error': str(e)}), 500
+    return jsonify({"task_id": "hello", "status": "world"})
 
 
 @tasks_bp.route('/tasks/clear/<queue_name>', methods=['POST'])

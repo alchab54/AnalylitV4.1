@@ -197,10 +197,7 @@ def create_app(config_override=None):
         Session = sessionmaker(bind=db.engine)
         session = Session()
         try:
-            results = session.query(Extraction, SearchResult.abstract, SearchResult.title).\
-                outerjoin(SearchResult, (Extraction.pmid == SearchResult.article_id) & (Extraction.project_id == SearchResult.project_id)).\
-                filter(Extraction.project_id == project_id).\
-                all()
+            results = session.query(Extraction, SearchResult.abstract, SearchResult.title).outerjoin(SearchResult, (Extraction.pmid == SearchResult.article_id) & (Extraction.project_id == SearchResult.project_id)).filter(Extraction.project_id == project_id).all()
 
             combined_results = []
             for extraction, abstract, title in results:
