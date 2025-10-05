@@ -169,7 +169,7 @@ services:
       FLASK_APP: backend/server_v4_complete.py
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_db
-      SCHEMA_NAME: analylit_schema
+      SCHEMA_NAME: analylit_db
       DATABASE_URL: postgresql://analylit_user:strong_password@db:5432/analylit_db
     env_file:
       - .env
