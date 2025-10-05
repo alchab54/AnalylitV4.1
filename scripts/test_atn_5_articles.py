@@ -147,37 +147,28 @@ class ATNTestRunner:
     def run_screening(self):
         """Lance le screening des articles avec un profil valide"""
         logger.info("Lancement du screening avec profil explicite...")
+
+        # --- DÉBUT DE LA CORRECTION ---
         
-        # Récupère les profils disponibles
-        profile_id = "standard-local"
+        # Récupère les profils disponibles pour trouver un ID valide
+        profiles = self.get_available_profiles()
+        profile_id = None # Initialise à None
+
+        # On cherche l'ID du profil que l'on veut utiliser, par exemple 'standard-local'
+        target_profile_name = 'standard-local' 
+        for profile in profiles:
+            if profile.get('id') == target_profile_name:
+                profile_id = profile['id']
+                break
         
-        screening_data = {
-            "articles": TEST_ARTICLES,
-            "profile": profile_id,  # ✅ Utilise l'ID du profil, pas le dict
-            "analysis_mode": "screening"
-        }
-        
-        try:
-            response = requests.post(
-                f"{API_BASE}/projects/{self.project_id}/run",
-                json=screening_data,
-                params={"profile": profile_id},
-                timeout=15
-            )
-            
-            if response.status_code == 202:
-                job_data = response.json()
-                job_ids = job_data.get('task_ids', [])
-                logger.info(f"✅ Screening démarré - {len(job_ids)} tâches créées")
-                return True
-            else:
-                logger.error(f"❌ Échec screening: {response.status_code} - {response.text}")
-                return False
-                
-        except Exception as e:
-            logger.error(f"❌ Erreur screening: {e}")
+        # Si on n'a pas trouvé le profil, on prend le premier de la liste
+        if not profile_id and profiles:
+            profile_id = profiles[0].get('id')
+            logger.warning(f"Profil '{target_profile_name}' non trouvé. Utilisation du premier profil disponible: {profile_id}")
+        elif not profiles:
+            logger.error("❌ Aucun profil d'analyse disponible. Impossible de lancer le screening.")
             return False
-            
+              
     def run_atn_analyses(self):
         """Lance les 3 analyses ATN cruciales"""
         analyses = ["atn_scores", "descriptive_stats", "synthesis"]
