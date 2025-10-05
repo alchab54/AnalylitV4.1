@@ -161,6 +161,7 @@ class ATNTestRunner:
             response = requests.post(
                 f"{API_BASE}/projects/{self.project_id}/run",
                 json=screening_data,
+                params={"profile": profile_id},
                 timeout=15
             )
             
@@ -394,7 +395,7 @@ class ATNTestRunner:
         self.print_step(4, total_steps, "Screening des articles")
         if self.run_screening():
             success_count += 1
-            # Pause pour laisser le screening démarrer
+                        # Pause pour laisser le screening démarrer
             logger.info("⏳ Pause pour démarrage du screening...")
             time.sleep(15)
         else:

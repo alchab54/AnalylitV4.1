@@ -111,6 +111,12 @@ services:
       WAIT_HOSTS: db:5432,redis:6379,ollama:11434
       WAIT_TIMEOUT: "60"
       WAIT_HOSTS_TIMEOUT: "10"
+      POSTGRES_USER: analylit_user
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: analylit_db
+      POSTGRES_PORT: 5432
+      DATABASE_HOST: db
+      REDIS_HOST: redis
       GUNICORN_WORKERS: "2"
       GUNICORN_THREADS: "2"
       GUNICORN_TIMEOUT: "120"
