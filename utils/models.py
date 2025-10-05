@@ -8,19 +8,16 @@ from datetime import datetime
 import uuid
 import json
 from .db_base import Base  # Importer la Base partagée
-from decimal import Decimal # ✅ IMPORT NÉCESSAIRE POUR LA CORRECTION
-# ✅ SIMPLIFICATION: Le schéma est maintenant défini de manière statique.
-# La gestion des environnements est gérée par la configuration de la base de données.
-SCHEMA = 'analylit_schema'
+from decimal import Decimal
 
 def _uuid():
     return str(uuid.uuid4())
 
-class Project(Base): 
+class Project(Base):
     __tablename__ = 'projects'
- 
+
     id = Column(String, primary_key=True, default=_uuid)
-    name = Column(String, nullable=False) 
+    name = Column(String, nullable=False)
     description = Column(Text)
     status = Column(String, default='pending')
     profile_used = Column(String)
@@ -38,12 +35,12 @@ class Project(Base):
     processed_count = Column(Integer, default=0)
     total_processing_time = Column(Float, default=0)
     indexed_at = Column(DateTime)
-    search_query = Column(Text) 
+    search_query = Column(Text)
     databases_used = Column(Text)
     inter_rater_reliability = Column(Text)
     prisma_checklist = Column(Text)
 
-    # --- Relations avec suppression en cascade ---
+    # --- Relations ---
     search_results = relationship("SearchResult", backref="project", cascade="all, delete-orphan")
     extractions = relationship("Extraction", backref="project", cascade="all, delete-orphan")
     grids = relationship("Grid", backref="project", cascade="all, delete-orphan")
@@ -67,10 +64,9 @@ class Project(Base):
 
 class Article(Base):
     __tablename__ = 'articles'
-     
-    project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
+    
     id = Column(String, primary_key=True, default=_uuid)
-    project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
+    project_id = Column(String, ForeignKey("projects.id"), nullable=False)
     title = Column(Text)
 
     def to_dict(self):
@@ -87,12 +83,12 @@ class Article(Base):
 
 class SearchResult(Base):
     __tablename__ = 'search_results'
+    __table_args__ = (
+        UniqueConstraint('project_id', 'article_id', name='uq_project_article'),
+    )
 
-
-    project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
     project_id = Column(String, ForeignKey("projects.id"), nullable=False)
-    project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
     article_id = Column(String, nullable=False)
     title = Column(Text)
     abstract = Column(Text)
@@ -110,10 +106,9 @@ class SearchResult(Base):
 
 class Extraction(Base):
     __tablename__ = 'extractions'
- 
-    project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
+
     id = Column(String, primary_key=True, default=_uuid)
-    project_id = Column(String, ForeignKey(project_id_ref))
+    project_id = Column(String, ForeignKey("projects.id"))
     pmid = Column(String)
     title = Column(Text)
     validation_score = Column(Float)
@@ -144,10 +139,9 @@ class Extraction(Base):
 
 class Grid(Base):
     __tablename__ = 'extraction_grids'
- 
-    project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
+
     id = Column(String, primary_key=True, default=_uuid)
-    project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
+    project_id = Column(String, ForeignKey("projects.id"), nullable=False)
     name = Column(String, nullable=False)
     fields = Column(Text) 
     created_at = Column(DateTime, default=datetime.utcnow)    
@@ -161,20 +155,18 @@ class Grid(Base):
 
 class GridField(Base):
     __tablename__ = 'grid_fields'
- 
-    grid_id_ref = f"{SCHEMA}.extraction_grids.id" if SCHEMA else "extraction_grids.id"
+
     id = Column(String, primary_key=True, default=_uuid)
-    grid_id = Column(String, ForeignKey(grid_id_ref), nullable=False)
+    grid_id = Column(String, ForeignKey("extraction_grids.id"), nullable=False)
     name = Column(String, nullable=False)
     field_type = Column(String, default='text')
     description = Column(Text)
 
 class Validation(Base):
     __tablename__ = 'validations'
- 
-    extraction_id_ref = f"{SCHEMA}.extractions.id" if SCHEMA else "extractions.id"
+
     id = Column(String, primary_key=True, default=_uuid)
-    extraction_id = Column(String, ForeignKey(extraction_id_ref), nullable=False)
+    extraction_id = Column(String, ForeignKey("extractions.id"), nullable=False)
     user_id = Column(String, nullable=False)
     decision = Column(String) 
 
@@ -188,10 +180,9 @@ class Validation(Base):
 
 class Analysis(Base):
     __tablename__ = 'analyses'
- 
-    project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
+
     id = Column(String, primary_key=True, default=_uuid)
-    project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
+    project_id = Column(String, ForeignKey("projects.id"), nullable=False)
     analysis_type = Column(String)
     results = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -207,10 +198,9 @@ class Analysis(Base):
 
 class ChatMessage(Base):
     __tablename__ = 'chat_messages'
- 
-    project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
+
     id = Column(String, primary_key=True, default=_uuid)
-    project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
+    project_id = Column(String, ForeignKey("projects.id"), nullable=False)
     role = Column(String, nullable=False) 
     content = Column(Text, nullable=False)
     sources = Column(Text)
@@ -228,7 +218,7 @@ class ChatMessage(Base):
 
 class AnalysisProfile(Base):
     __tablename__ = 'analysis_profiles'
- 
+
     id = Column(String, primary_key=True, default=_uuid)
     name = Column(String, nullable=False, unique=True)
     is_custom = Column(Boolean, default=True)
@@ -253,21 +243,21 @@ class AnalysisProfile(Base):
 
 class PRISMARecord(Base):
     __tablename__ = 'prisma_records'
- 
-    project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
+
     id = Column(String, primary_key=True, default=_uuid)
-    project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
+    project_id = Column(String, ForeignKey("projects.id"), nullable=False)
     stage = Column(String)
     count = Column(Integer, default=0)
     details = Column(Text)
 
 class ScreeningDecision(Base):
     __tablename__ = 'screening_decisions'
+    __table_args__ = (
+        UniqueConstraint('project_id', 'pmid', name='uq_project_pmid'),
+    )
 
-
-    project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
-    project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
+    project_id = Column(String, ForeignKey("projects.id"), nullable=False)
     pmid = Column(String, nullable=False)
     title = Column(Text)
     abstract = Column(Text)
@@ -277,12 +267,13 @@ class ScreeningDecision(Base):
 
 class RiskOfBias(Base):
     __tablename__ = 'risk_of_bias'
+    __table_args__ = (
+        UniqueConstraint('project_id', 'article_id', name='uq_rob_project_article'),
+    )
 
-
-    project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
     article_id = Column(String, nullable=True)
-    project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
+    project_id = Column(String, ForeignKey("projects.id"), nullable=False)
     pmid = Column(String, nullable=False)
     domain = Column(String)
     domain_1_bias = Column(String)
@@ -292,7 +283,7 @@ class RiskOfBias(Base):
     judgement = Column(String)
     overall_bias = Column(String)
     overall_justification = Column(Text)
-    created_at = Column(DateTime, default=datetime.utcnow) # ← AJOUTER CETTE LIGNE
+    created_at = Column(DateTime, default=datetime.utcnow)
     assessed_at = Column(DateTime, default=datetime.utcnow)
 
     def to_dict(self):
@@ -307,11 +298,11 @@ class RiskOfBias(Base):
 
 class Prompt(Base):
     __tablename__ = 'prompts'
-     
+    
     id = Column(String, primary_key=True, default=_uuid)
     name = Column(String, nullable=False, unique=True)
-    content = Column(Text, nullable=False, default="")  # Colonne obligatoire
-    
+    content = Column(Text, nullable=False, default="")
+
     def to_dict(self):
         data = {}
         for c in self.__table__.columns:
@@ -326,17 +317,16 @@ class Prompt(Base):
 
 class GreyLiterature(Base):
     __tablename__ = 'grey_literature'
- 
-    project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
+
     id = Column(String, primary_key=True, default=_uuid)
-    project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
+    project_id = Column(String, ForeignKey("projects.id"), nullable=False)
     title = Column(Text, nullable=False)
     institution = Column(String)
     publication_date = Column(String)
     url = Column(String)
     abstract = Column(Text)
     authors = Column(Text)
-    keywords = Column(Text) # Storing as Text, can be JSON string if needed
+    keywords = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     def to_dict(self):
@@ -346,11 +336,10 @@ class GreyLiterature(Base):
 
 class ProcessingLog(Base):
     __tablename__ = 'processing_log'
- 
-    project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
+
     id = Column(String, primary_key=True, default=_uuid)
     pmid = Column(String, nullable=True)
-    project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
+    project_id = Column(String, ForeignKey("projects.id"), nullable=False)
     article_id = Column(String, nullable=True) 
     task_name = Column(String, nullable=False)
     status = Column(String, nullable=False)
@@ -371,10 +360,9 @@ class ProcessingLog(Base):
 
 class Stakeholder(Base):
     __tablename__ = 'stakeholders'
- 
+
     id = Column(String, primary_key=True, default=_uuid)
-    project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
-    project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
+    project_id = Column(String, ForeignKey("projects.id"), nullable=False)
     name = Column(String, nullable=False)
     role = Column(String)
     contact_info = Column(Text)
