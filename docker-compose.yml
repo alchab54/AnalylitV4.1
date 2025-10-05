@@ -201,7 +201,7 @@ services:
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_db
       POSTGRES_PORT: 5432
-      PYTHONPATH: /home/appuser/app:/home/appuser/app/backend
+      PYTHONPATH: /home/appuser/app
     env_file:
       - .env
     deploy:
@@ -232,7 +232,7 @@ services:
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_db
       POSTGRES_PORT: 5432
-      PYTHONPATH: /home/appuser/app:/home/appuser/app/backend
+      PYTHONPATH: /home/appuser/app
     env_file:
       - .env
     deploy:
@@ -275,7 +275,7 @@ services:
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_db
       POSTGRES_PORT: 5432
-      PYTHONPATH: /home/appuser/app:/home/appuser/app/backend
+      PYTHONPATH: /home/appuser/app
       NVIDIA_VISIBLE_DEVICES: "all"
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
     depends_on:
