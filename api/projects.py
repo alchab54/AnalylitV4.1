@@ -6,6 +6,7 @@ import uuid
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
 
+
 from utils.app_globals import (
     background_queue, processing_queue, analysis_queue, discussion_draft_queue, synthesis_queue,
     extension_queue
@@ -14,6 +15,7 @@ from utils.extensions import db
 from utils.models import Project, Grid, Extraction, AnalysisProfile, RiskOfBias, Analysis, SearchResult, ChatMessage
 from utils.file_handlers import save_file_to_project_dir
 from backend.tasks_v4_complete import (
+
     run_synthesis_task,
     run_discussion_generation_task,
     answer_chat_question_task,

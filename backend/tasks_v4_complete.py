@@ -1276,11 +1276,13 @@ def run_atn_score_task(session, project_id: str):
     
     while waited < max_wait:
         extractions_count = session.execute(text("""
-            SELECT COUNT(*) as total FROM extractions 
-            WHERE project_id = :pid AND extracted_data IS NOT NULL
-        """), {"pid": project_id}).mappings().fetchone()
-        
-        if extractions_count and extractions_count.get('total', 0) > 0:
+            SELECT COUNT(*) 
+            FROM extractions e
+            JOIN articles a ON e.article_id = a.id  
+            WHERE a.project_id = :project_id
+        """), {"project_id": project_id}, execution_options={"autocommit": True}).scalar()
+    
+            if extractions_count and extractions_count.get('total', 0) > 0:
             logger.info(f"✅ Extractions trouvées - Démarrage de l'analyse ATN")
             break
     try:
@@ -1347,7 +1349,7 @@ def run_atn_score_task(session, project_id: str):
         # Calculs statistiques
         results = {
             'total_articles_analyzed': total_articles,
-            'atn_mean_score': np.mean(atn_scores) if atn_scores else 0,
+            'atn_mean_score': np.mean([score for score in atn_scores if score is not None]) if atn_scores and any(score is not None for score in atn_scores) else 0,
             'atn_std_score': np.std(atn_scores) if len(atn_scores) > 1 else 0,
             'empathy_scores': {
                 'count': len(empathy_scores),
