@@ -1,7 +1,7 @@
-version: '3.8'
 
 services:
-  # Images de base construites localement (profil build-only pour GPU)
+  # Images de base construites localement (profil build-only pour GPU
+  
   base-cpu:
     build:
       context: .
@@ -180,7 +180,28 @@ services:
     networks:
       - analylit-network
     profiles: ["test"]
-
+  
+  test-worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    # Le worker écoute les files pertinentes pour les tests
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "discussion_draft_queue", "analysis", "default"]
+    depends_on:
+      - redis
+      - test-db
+    environment:
+      # Utilise la DB et le Redis de l'environnement de test
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      PYTHONPATH: /home/appuser/app
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit-network
+      
 volumes:
   test_postgres_data:
   dev_logs:
