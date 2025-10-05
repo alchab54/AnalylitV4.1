@@ -202,6 +202,10 @@ services:
       POSTGRES_DB: analylit_db
       POSTGRES_PORT: 5432
       PYTHONPATH: /home/appuser/app
+    volumes:
+      - .:/home/appuser/app
+      - ./logs:/home/appuser/app/logs
+      - ./projects:/home/appuser/app/projects
     env_file:
       - .env
     deploy:
@@ -233,6 +237,10 @@ services:
       POSTGRES_DB: analylit_db
       POSTGRES_PORT: 5432
       PYTHONPATH: /home/appuser/app
+    volumes:
+      - .:/home/appuser/app
+      - ./logs:/home/appuser/app/logs
+      - ./projects:/home/appuser/app/projects
     env_file:
       - .env
     deploy:
@@ -278,6 +286,11 @@ services:
       PYTHONPATH: /home/appuser/app
       NVIDIA_VISIBLE_DEVICES: "all"
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
+    volumes:
+      - .:/home/appuser/app
+      - ./logs:/home/appuser/app/logs
+      - ./projects:/home/appuser/app/projects
+    
     depends_on:
       redis:
         condition: service_started
