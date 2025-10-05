@@ -71,7 +71,7 @@ def run_screening(project_id):
         article_ids=articles,
         profile=profile_data
     )
-    return jsonify({"message": "Tâche de screening lancée", "task_id": task.id}), 202
+    return jsonify({"message": "Tâche de screening lancée", "job_id": task.id}), 202
 
 @selection_bp.route('/run-extraction', methods=['POST'])
 def run_extraction(project_id):

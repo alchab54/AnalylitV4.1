@@ -260,7 +260,7 @@ def import_validations(project_id):
 @projects_bp.route('/projects/<project_id>/run-discussion-draft', methods=['POST'])
 def run_discussion_draft(project_id):
     job = discussion_draft_queue.enqueue(run_discussion_generation_task, project_id=project_id, job_timeout=1800)
-    return jsonify({"message": "Génération du brouillon de discussion lancée", "task_id": job.id}), 202 #✅ CORRECTION : La clé task_id est ici
+    return jsonify({"message": "Génération du brouillon de discussion lancée", "job_id": job.id}), 202 #✅ CORRECTION : La clé task_id est ici
 
 @projects_bp.route('/projects/<project_id>/chat', methods=['POST'])
 def chat_with_project(project_id):
@@ -268,7 +268,7 @@ def chat_with_project(project_id):
     question = data.get('question')    
     if not question:
         return jsonify({"error": "Question is required"}), 400
-    job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout=900) #✅ CORRECTION : La clé task_id est ici
+    job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout=900)
     return jsonify({"message": "Question soumise", "job_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/run', methods=['POST'])
@@ -300,7 +300,7 @@ def run_pipeline(project_id):
             job_timeout=1800
         )
         task_ids.append(job.id)
-    return jsonify({"message": f"{len(task_ids)} tâches de traitement lancées", "task_ids": [str(tid) for tid in task_ids]}), 202
+    return jsonify({"message": f"{len(task_ids)} tâches de traitement lancées", "job_ids": [str(tid) for tid in task_ids]}), 202
 
 @projects_bp.route('/projects/<project_id>/run-analysis', methods=['POST'])
 def run_analysis(project_id):
@@ -308,6 +308,7 @@ def run_analysis(project_id):
     data = request.get_json()
     analysis_type = data.get('type')
 
+    # ✅ CORRECTION : Définir analysis_tasks APRÈS que toutes les fonctions soient disponibles
     analysis_tasks = {
         "synthesis": (run_synthesis_task, synthesis_queue, 1800),
         "discussion": (run_discussion_generation_task, discussion_draft_queue, 1800),
@@ -324,7 +325,6 @@ def run_analysis(project_id):
     if analysis_type in analysis_tasks:
         task_func, queue, timeout = analysis_tasks[analysis_type]
         
-        from backend.tasks_v4_complete import run_synthesis_task # Import here to avoid circular imports
         kwargs = {'project_id': project_id, 'job_timeout': timeout}
         if analysis_type == 'synthesis':
             project = db.session.get(Project, project_id)            
@@ -337,10 +337,10 @@ def run_analysis(project_id):
                 logger.warning(f"Profil d'analyse '{profile_id}' non trouvé pour la synthèse. Utilisation des valeurs par défaut.")
                 kwargs['profile'] = {}
             else:
-                kwargs['profile'] = profile.to_dict() # &lt;-- Utilise l'objet fonction
+                kwargs['profile'] = profile.to_dict()
 
-        job = queue.enqueue(task_func, **kwargs, job_timeout=timeout)
-        return jsonify({"message": f"Analyse '{analysis_type}' lancée", "task_id": str(job.id)}), 202
+        job = queue.enqueue(task_func, **kwargs)
+        return jsonify({"message": f"Analyse '{analysis_type}' lancée", "job_id": str(job.id)}), 202
     else:
         return jsonify({"error": f"Type d'analyse inconnu: {analysis_type}"}), 400
 
@@ -364,7 +364,7 @@ def import_zotero_pdfs(project_id):
         zotero_api_key=zotero_api_key,
         job_timeout=3600
     )
-    return jsonify({"message": "Importation Zotero lancée", "task_id": job.id}), 202
+    return jsonify({"message": "Importation Zotero lancée", "job_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/upload-zotero', methods=['POST'])
 def upload_zotero_file(project_id):
@@ -386,7 +386,7 @@ def upload_zotero_file(project_id):
             json_file_path=file_path,
             job_timeout=3600
         )
-        return jsonify({"message": "Importation de fichier Zotero lancée", "task_id": job.id}), 202
+        return jsonify({"message": "Importation de fichier Zotero lancée", "job_id": job.id}), 202
     except Exception as e:
         logger.error(f"Erreur lors de l'upload du fichier Zotero: {e}")
         return jsonify({"error": "Erreur interne du serveur"}), 500
@@ -475,7 +475,7 @@ def calculate_kappa(project_id):
     #✅ CORRECTION : La clé task_id est ici
     from backend.tasks_v4_complete import calculate_kappa_task
     job = analysis_queue.enqueue(calculate_kappa_task, project_id=project_id, job_timeout='5m')
-    return jsonify({"message": "Calcul du Kappa de Cohen lancé.", "task_id": job.id}), 202
+    return jsonify({"message": "Calcul du Kappa de Cohen lancé.", "job_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/run-knowledge-graph', methods=['POST'])
 def run_knowledge_graph(project_id):

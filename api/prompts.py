@@ -39,7 +39,7 @@ def create_prompt():
         return jsonify(prompt.to_dict()), 201
     except Exception as e:
         # ✅ Gestion propre des exceptions
-        db.session.rollback() #✅ CORRECTION: La clé task_id est ici
+        db.session.rollback()
         logger.exception(f"Error creating prompt: {e}")
         # ✅ Retourner une réponse JSON avec un code d'erreur approprié
 
