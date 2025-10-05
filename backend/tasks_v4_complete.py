@@ -1520,11 +1520,12 @@ def add_manual_articles_task(session, project_id: str, identifiers: list):
             config_profile = config.DEFAULT_MODELS[model_key]
             if isinstance(config_profile, dict):
                 default_profile = normalize_profile(config_profile)
-            
+
+    logger.info(f"Lancement extraction automatique pour {len(successful_articles)} articles avec profile {default_profile}")
     for article_id in successful_articles:
         analysis_queue.enqueue(
             'backend.tasks_v4_complete.process_single_article_task',
-            project_id=project_id, article_id=article_id,
+            project_id=project_id, article_id=article_id, 
             profile=default_profile, analysis_mode="full_extraction"
         )
 

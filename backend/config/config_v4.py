@@ -81,6 +81,14 @@ class Settings(BaseSettings):
     # Chargé depuis profiles.json via la fonction `load_default_models`
     DEFAULT_MODELS: Dict[str, Any] = load_default_models()
 
+    # --- Dynamic model settings ---
+    FAST_PREPROCESS_MODEL: str = Field(default="phi3:mini", env="FAST_PREPROCESS_MODEL")
+    FAST_EXTRACT_MODEL: str = Field(default="phi3:mini", env="FAST_EXTRACT_MODEL")
+    FAST_SYNTHESIS_MODEL: str = Field(default="llama3.1:8b", env="FAST_SYNTHESIS_MODEL")
+    STANDARD_PREPROCESS_MODEL: str = Field(default="phi3:mini", env="STANDARD_PREPROCESS_MODEL")
+    STANDARD_EXTRACT_MODEL: str = Field(default="llama3.1:8b", env="STANDARD_EXTRACT_MODEL")
+    STANDARD_SYNTHESIS_MODEL: str = Field(default="llama3.1:8b", env="STANDARD_SYNTHESIS_MODEL")
+
     # --- Paramètres divers ---
     UNPAYWALL_EMAIL: str = 'researcher@analylit.com'
 
@@ -97,5 +105,11 @@ def get_config() -> Settings:
         _config_instance = Settings()
         # Créer le répertoire des projets s'il n'existe pas
         _config_instance.LOG_DIR.mkdir(parents=True, exist_ok=True)
-        _config_instance.PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
+        _config_instance.PROJECTS_DIR.mkdir(parents=True, exist_ok=True)        
     return _config_instance
+
+def update_default_models(config: Settings) -> Dict[str, Any]:
+    """Updates the DEFAULT_MODELS dictionary with values from environment variables."""
+    config.DEFAULT_MODELS['fast'] = {'preprocess': config.FAST_PREPROCESS_MODEL, 'extract': config.FAST_EXTRACT_MODEL, 'synthesis': config.FAST_SYNTHESIS_MODEL}
+    config.DEFAULT_MODELS['standard-local'] = {'preprocess': config.STANDARD_PREPROCESS_MODEL, 'extract': config.STANDARD_EXTRACT_MODEL, 'synthesis': config.STANDARD_SYNTHESIS_MODEL}
+    return config.DEFAULT_MODELS

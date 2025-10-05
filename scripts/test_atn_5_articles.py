@@ -149,22 +149,7 @@ class ATNTestRunner:
         logger.info("Lancement du screening avec profil explicite...")
         
         # Récupère les profils disponibles
-        profiles = self.get_available_profiles()
-        profile_id = None
-        
-        if profiles:
-            # Cherche un profil "standard" ou prend le premier
-            for profile in profiles:
-                if 'standard' in profile.get('name', '').lower():
-                    profile_id = profile['id']
-                    break
-            if not profile_id:
-                profile_id = profiles[0]['id']
-                
-            logger.info(f"🎯 Utilisation du profil: {profile_id}")
-        else:
-            logger.error("❌ Aucun profil disponible - abandon du screening")
-            return False
+        profile_id = TEST_PROFILE
         
         screening_data = {
             "articles": TEST_ARTICLES,
