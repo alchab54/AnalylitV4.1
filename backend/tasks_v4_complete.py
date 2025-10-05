@@ -451,67 +451,253 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
     logger.info(f"âœ… Recherche multi-bases: total {total_found}")
 
 @with_db_session
-def process_single_article_task(session, project_id: str, article_id: str, profile: dict,
-                                analysis_mode: str, custom_grid_id: str = None):
+def process_single_article_task(session, project_id: str, article_id: str, profile: dict, analysis_mode: str, custom_grid_id: str = None):
     """Traite un article: screening ou extraction complète."""
+    # 1) Normaliser le profil (compatibilité ancienne/nouvelle nomenclature)
+    profile = normalize_profile(profile)
+    
+    logger.info(f"[process_single_article_task] project={project_id} article={article_id} mode={analysis_mode} profile={profile} grid={custom_grid_id}")
+    
     start_time = time.time()
-    row = session.execute(text("SELECT * FROM search_results WHERE project_id = :pid AND article_id = :aid"), {"pid": project_id, "aid": article_id}).mappings().fetchone()
-    if not row:
-        log_processing_status(session, project_id, article_id, "erreur", "Article introuvable en base.")
-        return
-
-    article = dict(row)
-    text_for_analysis, analysis_source = "", "abstract"
-
-    pdf_path = PROJECTS_DIR / project_id / f"{sanitize_filename(article_id)}.pdf"
-    if pdf_path.exists():
-        pdf_text = extract_text_from_pdf(str(pdf_path))
-        if pdf_text and len(pdf_text) > 100:
-            text_for_analysis, analysis_source = pdf_text, "pdf"
-
-    if not text_for_analysis:
-        text_for_analysis = f"{article.get('title', '')}\n\n{article.get('abstract', '')}"
-
-    if len(text_for_analysis.strip()) < 50:
-        log_processing_status(session, project_id, article_id, "écarté", "Contenu textuel insuffisant.") # Correction UTF-8
-        increment_processed_count(session, project_id)
-        return
-
-    if analysis_mode == "full_extraction":
-        fields_list = []
-        if custom_grid_id:
-            grid_row = session.execute(text("SELECT fields FROM extraction_grids WHERE id = :gid AND project_id = :pid"), {"gid": custom_grid_id, "pid": project_id}).mappings().fetchone()
-            if grid_row and grid_row.get("fields"):
-                fields_list_of_dicts = json.loads(grid_row["fields"])
-                if isinstance(fields_list_of_dicts, list):
-                    fields_list = [d.get("name") for d in fields_list_of_dicts if d.get("name")]
-        if not fields_list:
-            fields_list = ["type_etude", "population", "intervention", "resultats_principaux", "limites", "methodologie"]
-
-        fields = [{"name": f, "description": f} for f in fields_list]
-        tpl = get_effective_prompt_template("full_extraction_prompt", get_full_extraction_prompt_template(fields))
+    
+    try:
+        # 2) Récupérer les données de l'article depuis search_results
+        row = session.execute(
+            text("SELECT * FROM search_results WHERE project_id = :pid AND article_id = :aid"), 
+            {"pid": project_id, "aid": article_id}
+        ).mappings().fetchone()
         
-        # Assurer un fallback si database_source est None dans la DB
-        prompt = tpl.replace("{text}", text_for_analysis).replace("{database_source}", article.get("database_source") or "unknown")
+        if not row:
+            log_processing_status(session, project_id, article_id, "erreur", "Article introuvable en base.")
+            logger.error(f"Article {article_id} non trouvé dans search_results pour project {project_id}")
+            return {"status": "error", "message": "Article not found"}
 
-        extracted = call_ollama_api(prompt, profile["extract"], output_format="json")
+        article = dict(row)
+        
+        # 3) Déterminer le contenu textuel à analyser (PDF si dispo, sinon abstract)
+        text_for_analysis = ""
+        analysis_source = "abstract"
+        
+        # Vérifier si un PDF est disponible
+        pdf_path = PROJECTS_DIR / project_id / f"{sanitize_filename(article_id)}.pdf"
+        if pdf_path.exists():
+            try:
+                pdf_text = extract_text_from_pdf(str(pdf_path))
+                if pdf_text and len(pdf_text) > 100:
+                    text_for_analysis = pdf_text
+                    analysis_source = "pdf"
+                    logger.info(f"[process_single_article_task] Utilisation du PDF pour {article_id}")
+            except Exception as e:
+                logger.warning(f"[process_single_article_task] Erreur lecture PDF {article_id}: {e}")
+        
+        # Fallback sur titre + abstract
+        if not text_for_analysis:
+            text_for_analysis = f"{article.get('title', '')}\n\n{article.get('abstract', '')}"
+            analysis_source = "abstract"
+        
+        # Vérification contenu minimal
+        if len(text_for_analysis.strip()) < 50:
+            log_processing_status(session, project_id, article_id, "écarté", "Contenu textuel insuffisant.")
+            increment_processed_count(session, project_id)
+            logger.warning(f"[process_single_article_task] Contenu insuffisant pour {article_id}")
+            return {"status": "skipped", "reason": "insufficient_content"}
+        
+        # 4) Prétraitement du contenu avec le modèle preprocess
+        if text_for_analysis:
+            prompt_norm = f"Nettoie et normalise ce texte scientifique pour extraction d'informations. Retourne du texte propre.\n---\n{text_for_analysis[:3000]}"
+            try:
+                normalized = call_ollama_api(prompt_norm, profile["preprocess"], output_format=None)
+                if isinstance(normalized, dict):
+                    normalized = normalized.get("text") or json.dumps(normalized)
+                text_for_analysis = normalized if normalized else text_for_analysis
+            except Exception as e:
+                logger.warning(f"[process_single_article_task] Prétraitement échoué pour {article_id}: {e}")
+        
+        # 5) Traitement selon le mode d'analyse
+        if analysis_mode == "screening":
+            # Mode screening : évaluation binaire de pertinence
+            screening_prompt = (
+                "Tu es un assistant pour le screening d'articles sur l'Alliance Thérapeutique Numérique (ATN). "
+                "Analyse ce contenu et détermine s'il est pertinent pour une revue sur l'ATN.\n"
+                "Critères de pertinence :\n"
+                "- Relation patient-IA ou soignant-IA\n"
+                "- Technologies numériques en santé\n"
+                "- Empathie artificielle, confiance algorithmique\n"
+                "- Acceptabilité des plateformes de santé\n\n"
+                "Réponds en JSON avec les clés: is_relevant (bool), score (int 0-10), reason (string).\n---\n"
+                f"{text_for_analysis[:4000]}"
+            )
+            
+            extract_res = call_ollama_api(screening_prompt, profile["extract"], output_format="json")
+            
+            # Parsing sécurisé de la réponse
+            if isinstance(extract_res, str):
+                try:
+                    extract_res = json.loads(extract_res)
+                except Exception as e:
+                    logger.warning(f"[process_single_article_task] Parsing JSON échoué pour {article_id}: {e}")
+                    extract_res = {"is_relevant": False, "score": 0, "reason": "parse_error"}
+            
+            is_relevant = bool(extract_res.get("is_relevant", False))
+            score = int(extract_res.get("score", 0))
+            reason = extract_res.get("reason", "")
+            
+            # Sauvegarde du résultat de screening
+            session.execute(text("""
+                INSERT INTO extractions (id, project_id, pmid, title, relevance_score, relevance_justification, analysis_source, created_at)
+                VALUES (:id, :pid, :pmid, :title, :score, :just, :src, :ts)
+                ON CONFLICT (project_id, pmid) DO UPDATE SET
+                    relevance_score = EXCLUDED.relevance_score,
+                    relevance_justification = EXCLUDED.relevance_justification,
+                    analysis_source = EXCLUDED.analysis_source,
+                    created_at = EXCLUDED.created_at
+            """), {
+                "id": str(uuid.uuid4()), 
+                "pid": project_id, 
+                "pmid": article_id, 
+                "title": article.get("title", ""), 
+                "score": score, 
+                "just": reason, 
+                "src": analysis_source, 
+                "ts": datetime.now().isoformat()
+            })
+            
+            logger.info(f"[process_single_article_task] Screening terminé - {article_id}: relevant={is_relevant}, score={score}")
+            result = {"status": "ok", "mode": "screening", "article_id": article_id, "score": score, "relevant": is_relevant}
+            
+        elif analysis_mode in ("full_extraction", "extraction", "extract"):
+            # Mode extraction complète : extraction structurée pour ATN
+            
+            # Déterminer les champs à extraire
+            fields_list = []
+            if custom_grid_id:
+                grid_row = session.execute(
+                    text("SELECT fields FROM extraction_grids WHERE id = :gid AND project_id = :pid"), 
+                    {"gid": custom_grid_id, "pid": project_id}
+                ).mappings().fetchone()
+                
+                if grid_row and grid_row.get("fields"):
+                    fields_list_of_dicts = json.loads(grid_row["fields"])
+                    if isinstance(fields_list_of_dicts, list):
+                        fields_list = [d.get("name") for d in fields_list_of_dicts if d.get("name")]
+            
+            # Grille par défaut pour ATN si pas de grille custom
+            if not fields_list:
+                fields_list = [
+                    "Population_étudiée", "Type_IA", "Contexte_thérapeutique", 
+                    "Score_empathie_IA", "Score_empathie_humain", "WAI-SR_modifié",
+                    "Taux_adhésion", "Confiance_algorithmique", "Acceptabilité_patients",
+                    "Perspective_multipartie", "Considération_éthique", "RGPD_conformité",
+                    "Résultats_principaux", "Limites_étude"
+                ]
+            
+            # Prompt d'extraction structurée
+            fields_description = "\n".join([f"- {field}" for field in fields_list])
+            extraction_prompt = f"""
+Extrait les informations suivantes de cet article scientifique sur l'Alliance Thérapeutique Numérique (ATN).
+Pour chaque champ, extrait l'information pertinente ou mets "Non spécifié" si l'information n'est pas disponible.
 
-        if isinstance(extracted, dict) and extracted:
-            session.execute(text("INSERT INTO extractions (id, project_id, pmid, title, extracted_data, relevance_score, relevance_justification, analysis_source, created_at) VALUES (:id, :pid, :pmid, :title, :ex_data, 10, 'Extraction détaillée effectuée', :src, :ts)"), {"id": str(uuid.uuid4()), "pid": project_id, "pmid": article_id, "title": article.get("title", ""), "ex_data": json.dumps(extracted), "src": analysis_source, "ts": datetime.now().isoformat()})
+CHAMPS À EXTRAIRE:
+{fields_description}
+
+INSTRUCTIONS:
+- Sois précis et concis
+- Pour les scores numériques, utilise des valeurs numériques quand possible
+- Pour les pourcentages, utilise le format "X%" ou la valeur numérique
+- Retourne un objet JSON avec chaque champ comme clé
+
+TEXTE DE L'ARTICLE:
+---
+{text_for_analysis[:6000]}
+---
+"""
+            
+            extracted = call_ollama_api(extraction_prompt, profile["extract"], output_format="json")
+            
+            # Parsing sécurisé
+            if isinstance(extracted, str):
+                try:
+                    extracted = json.loads(extracted)
+                except Exception as e:
+                    logger.warning(f"[process_single_article_task] Parsing extraction échoué pour {article_id}: {e}")
+                    extracted = {"key_findings": extracted, "extraction_error": str(e)}
+            
+            if not isinstance(extracted, dict):
+                extracted = {"raw_response": str(extracted)}
+            
+            # Sauvegarde de l'extraction complète
+            session.execute(text("""
+                INSERT INTO extractions (id, project_id, pmid, title, extracted_data, relevance_score, relevance_justification, analysis_source, created_at)
+                VALUES (:id, :pid, :pmid, :title, :ex_data, :score, :just, :src, :ts)
+                ON CONFLICT (project_id, pmid) DO UPDATE SET
+                    extracted_data = EXCLUDED.extracted_data,
+                    relevance_score = EXCLUDED.relevance_score,
+                    relevance_justification = EXCLUDED.relevance_justification,
+                    analysis_source = EXCLUDED.analysis_source,
+                    created_at = EXCLUDED.created_at
+            """), {
+                "id": str(uuid.uuid4()),
+                "pid": project_id,
+                "pmid": article_id,
+                "title": article.get("title", ""),
+                "ex_data": json.dumps(extracted),
+                "score": 10,  # Score élevé par défaut pour extraction complète
+                "just": "Extraction détaillée ATN effectuée",
+                "src": analysis_source,
+                "ts": datetime.now().isoformat()
+            })
+            
+            logger.info(f"[process_single_article_task] Extraction complète terminée - {article_id}")
+            result = {"status": "ok", "mode": "full_extraction", "article_id": article_id, "extracted_fields": len(extracted)}
+            
         else:
-            log_processing_status(session, project_id, article_id, "écarté", "Réponse IA invalide (extraction).")
-    else: # screening
-        tpl = get_effective_prompt_template("screening_prompt", get_screening_prompt_template())
-        prompt = tpl.format(title=article.get("title", ""), abstract=article.get("abstract", ""), database_source=article.get("database_source", "unknown"))
-        resp = call_ollama_api(prompt, profile["preprocess"], output_format="json")
-        score = resp.get("relevance_score", 0) if isinstance(resp, dict) else 0
-        justification = resp.get("justification", "N/A") if isinstance(resp, dict) else "Réponse IA invalide."
-        session.execute(text("INSERT INTO extractions (id, project_id, pmid, title, relevance_score, relevance_justification, analysis_source, created_at) VALUES (:id, :pid, :pmid, :title, :score, :just, :src, :ts)"), {"id": str(uuid.uuid4()), "pid": project_id, "pmid": article_id, "title": article.get("title", ""), "score": score, "just": justification, "src": analysis_source, "ts": datetime.now().isoformat()})
-
-    increment_processed_count(session, project_id)
-    update_project_timing(session, project_id, time.time() - start_time)
-    send_project_notification(project_id, 'article_processed', f'Article "{article.get("title","" )[:30]}..." traité.', {'article_id': article_id})
-
+            raise ValueError(f"Mode d'analyse inconnu: {analysis_mode}")
+        
+        # 6) Mise à jour des compteurs de projet
+        increment_processed_count(session, project_id)
+        update_project_timing(session, project_id, time.time() - start_time)
+        
+        # Notification de progression
+        send_project_notification(
+            project_id, 
+            'article_processed', 
+            f'Article "{article.get("title", "")[:30]}..." traité ({analysis_mode})', 
+            {'article_id': article_id, 'mode': analysis_mode}
+        )
+        
+        return result
+        
+    except Exception as e:
+        logger.exception("process_single_article_task failed: %s", e)
+        
+        # Marque l'article en erreur pour traçabilité
+        try:
+            session.execute(text("""
+                INSERT INTO extractions (id, project_id, pmid, title, relevance_score, relevance_justification, analysis_source, created_at)
+                VALUES (:id, :pid, :pmid, :title, :score, :just, :src, :ts)
+                ON CONFLICT (project_id, pmid) DO UPDATE SET
+                    relevance_score = 0,
+                    relevance_justification = :just,
+                    analysis_source = 'error'
+            """), {
+                "id": str(uuid.uuid4()),
+                "pid": project_id,
+                "pmid": article_id,
+                "title": f"ERREUR: {article_id}",
+                "score": 0,
+                "just": f"Erreur traitement: {str(e)}",
+                "src": "error",
+                "ts": datetime.now().isoformat()
+            })
+            
+            increment_processed_count(session, project_id)
+            
+        except Exception as inner:
+            logger.warning(f"[process_single_article_task] Impossible de persister le statut d'erreur: {inner}")
+        
+        # Remonter l'exception pour que RQ marque le job en failed
+        raise
+    
 @with_db_session
 def run_synthesis_task(session, project_id: str, profile: dict):
     """Génère une synthèse à partir des articles pertinents (score >= 7)."""
@@ -1167,9 +1353,12 @@ def run_risk_of_bias_task(session, project_id: str, article_id: str):
     """
     logger.info(f"âš–ï¸  Analyse RoB pour article {article_id} dans projet {project_id}")
     pdf_path = PROJECTS_DIR / project_id / f"{sanitize_filename(article_id)}.pdf"
+
     if not pdf_path.exists():
         send_project_notification(project_id, 'rob_failed', f"PDF non trouvé pour {article_id}.")
         return
+
+
 
     text_content = extract_text_from_pdf(str(pdf_path))
     if not text_content or len(text_content) < 500:
@@ -1190,8 +1379,11 @@ def run_risk_of_bias_task(session, project_id: str, article_id: str):
         TEXTE DE L'ARTICLE :
         ---
         {text_content[:15000]}
+
         ---
         """
+
+
     rob_data = call_ollama_api(prompt, model="llama3.1:8b", output_format="json")
 
     if not rob_data or not isinstance(rob_data, dict):
@@ -1222,6 +1414,7 @@ def run_risk_of_bias_task(session, project_id: str, article_id: str):
 def add_manual_articles_task(session, project_id: str, identifiers: list):
     """
     Tâche d'arrière-plan pour ajouter des articles manuellement.
+
     """
     logger.info(f"ðŸ“  Ajout manuel d'articles pour le projet {project_id}")
     if not identifiers:
@@ -1499,13 +1692,3 @@ def run_empathy_comparative_analysis_task(session, project_id: str, **kwargs):
     logger.info(f"Running empathy comparative analysis for project {project_id}")
     send_project_notification(project_id, 'analysis_completed', 'Empathy comparative analysis completed.', {'analysis_type': 'empathy_comparative_analysis'})
 
-
-@with_db_session
-def process_single_article_task(session, project_id: str, article_id: str, profile: dict, analysis_mode: str, custom_grid_id: str = None):
-    """Traite un article: screening ou extraction complète."""
-    profile = normalize_profile(profile)  # Normalize profile at the start of the task
-    try:
-        # ... existing code ...
-    except Exception as e:
-        logger.exception("process_single_article_task failed: %s", e)
-        raise # Ensure RQ marks the job as failed
