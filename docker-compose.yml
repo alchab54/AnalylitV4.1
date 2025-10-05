@@ -136,6 +136,9 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      migrate: 
+        condition: service_completed_successfully
+
     volumes:
       - ./logs:/home/appuser/app/logs
       - ./projects:/home/appuser/app/projects
