@@ -9,7 +9,6 @@ import uuid
 import json
 from .db_base import Base  # Importer la Base partagée
 from decimal import Decimal # ✅ IMPORT NÉCESSAIRE POUR LA CORRECTION
-
 # ✅ SIMPLIFICATION: Le schéma est maintenant défini de manière statique.
 # La gestion des environnements est gérée par la configuration de la base de données.
 SCHEMA = 'analylit_schema'
@@ -88,10 +87,7 @@ class Article(Base):
 
 class SearchResult(Base):
     __tablename__ = 'search_results'
-    __table_args__ = (
-        UniqueConstraint('project_id', 'article_id', name='uq_project_article'),
-        {'schema': 'analylit_schema'}
-    )
+
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
@@ -266,10 +262,7 @@ class PRISMARecord(Base):
 
 class ScreeningDecision(Base):
     __tablename__ = 'screening_decisions'
-    __table_args__ = (
-        UniqueConstraint('project_id', 'pmid', name='uq_project_pmid'),
-        {'schema': 'analylit_schema'}
-    )
+
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
@@ -283,10 +276,7 @@ class ScreeningDecision(Base):
 
 class RiskOfBias(Base):
     __tablename__ = 'risk_of_bias'
-    __table_args__ = (
-        UniqueConstraint('project_id', 'article_id', name='uq_rob_project_article'),
-        {'schema': 'analylit_schema'}
-    )
+
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
