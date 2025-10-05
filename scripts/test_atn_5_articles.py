@@ -130,7 +130,7 @@ class ATNTestRunner:
     def get_available_profiles(self):
         """Récupère les profils d'analyse disponibles"""
         try:
-            response = requests.get(f"{API_BASE}/profiles", timeout=10)
+            response = requests.get(f"{API_BASE}/analysis-profiles", timeout=10)
             if response.status_code == 200:
                 profiles = response.json()
                 logger.info(f"📋 Profils disponibles: {len(profiles)}")
