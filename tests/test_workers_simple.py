@@ -6,6 +6,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 import fakeredis
 
+import unittest.mock as mock
 def simple_add(a, b):
     return a + b
 
@@ -69,6 +70,7 @@ class TestWorkersBasic:
         
         assert result is True
         mock_worker.work.assert_called_with(burst=True)
+
 
 @pytest.mark.integration
 class TestWorkersHealthCheck:
