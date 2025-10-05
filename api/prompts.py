@@ -31,8 +31,7 @@ def create_prompt():
         prompt = Prompt(
             name=data['name'],
             content=data.get('content', ''),
-            description=data.get('description', '')
-        )
+       )
         
         db.session.add(prompt)
         db.session.commit()

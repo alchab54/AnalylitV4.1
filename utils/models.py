@@ -10,6 +10,8 @@ import json
 from .db_base import Base  # Importer la Base partagée
 from decimal import Decimal
 
+SCHEMA = "analylit_schema"
+
 def _uuid():
     return str(uuid.uuid4())
 

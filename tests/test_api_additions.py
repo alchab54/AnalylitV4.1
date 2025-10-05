@@ -98,4 +98,4 @@ def test_get_task_status_not_found(client):
     response = client.get(f'/api/tasks/{non_existent_task_id}/status')
     
     assert response.get_json() is not None
-    assert response.get_json()['error'] == 'Tâche non trouvée' #Fixed the assertion
+    assert response.get_json()['error'] == 'Task not found' #Fixed the assertion
