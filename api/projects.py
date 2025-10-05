@@ -322,9 +322,10 @@ def run_analysis(project_id):
     if analysis_type in analysis_tasks:
         task_func, queue, timeout = analysis_tasks[analysis_type]
         
-        kwargs = {'project_id': project_id}
+        kwargs = {'project_id': project_id, 'job_timeout': timeout}
         if analysis_type == 'synthesis':
-            project = db.session.get(Project, project_id)
+            from backend.tasks_v4_complete import run_synthesis_task # Import here to avoid circular imports
+            project = db.session.get(Project, project_id)            
             if not project:
                 return jsonify({"error": "Projet non trouvé"}), 404
             
@@ -334,7 +335,8 @@ def run_analysis(project_id):
                 logger.warning(f"Profil d'analyse '{profile_id}' non trouvé pour la synthèse. Utilisation des valeurs par défaut.")
                 kwargs['profile'] = {}
             else:
-                kwargs['profile'] = profile.to_dict()
+                from backend.tasks_v4_complete import run_synthesis_task
+                kwargs['profile'] = profile.to_dict() # &lt;-- Utilise l'objet fonction
 
         job = queue.enqueue(task_func, **kwargs, job_timeout=timeout)
         return jsonify({"message": f"Analyse '{analysis_type}' lancée", "task_id": str(job.id)}), 202
@@ -454,15 +456,15 @@ def save_rob_assessment(project_id, article_id):
 def add_manual_articles(project_id):
     data = request.get_json()    
     articles_data = data.get('items', [])
-
+    from backend.tasks_v4_complete import add_manual_articles_task
     if not articles_data:
         return jsonify({"error": "Aucun article fourni"}), 400
 
-    job = background_queue.enqueue(
-        add_manual_articles_task,
-        project_id=project_id,
-        identifiers=articles_data,
-        job_timeout=3600
+
+    job = background_queue.enqueue(add_manual_articles_task,  # &lt;-- Utilise l'objet fonction
+                                    project_id=project_id,
+                                    items=articles_data,
+                                    job_timeout=3600
     )
     return jsonify({"message": f"Ajout de {len(articles_data)} article(s) manuel(s) lancé", "task_id": job.id}), 202
 

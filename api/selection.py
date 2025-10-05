@@ -2,6 +2,7 @@
 
 from flask import Blueprint, request, jsonify
 import logging
+from utils.app_globals import analysis_queue
 
 logger = logging.getLogger(__name__)
 
@@ -52,3 +53,29 @@ def toggle_selection():
             return jsonify(item), 200
 
     return jsonify({"error": "Item not found"}), 404
+
+@selection_bp.route('/run-screening', methods=['POST'])
+def run_screening(project_id):
+    """Lance le screening pour une liste d'articles."""
+    data = request.get_json()
+    articles = data.get('articles', [])
+    profile_data = data.get('profile', {})
+
+    if not articles:
+        return jsonify({"error": "Liste d'articles vide"}), 400
+
+    from backend.tasks_v4_complete import process_single_article_task
+    task = analysis_queue.enqueue(
+        process_single_article_task, # <-- Use the function object
+        project_id=project_id,
+        article_ids=articles,
+        profile=profile_data
+    )
+    return jsonify({"message": "Tâche de screening lancée", "task_id": task.id}), 202
+
+@selection_bp.route('/run-extraction', methods=['POST'])
+def run_extraction(project_id):
+    """Lance l'extraction pour une liste d'articles."""
+    # TODO: Implement the logic to run the extraction task
+    # This will likely involve enqueuing a task to a queue
+    return jsonify({"message": "Extraction lancée (à implémenter)"}), 202
