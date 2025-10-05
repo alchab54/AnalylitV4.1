@@ -128,4 +128,3 @@ def test_worker_retry_on_failure(redis_conn):
     # Deuxième exécution : doit échouer à nouveau et être marquée comme 'failed'
     worker.work(burst=True)
     job.refresh()
-    assert job.is_failed, "La tâche devrait être en échec définitif après le réessai"

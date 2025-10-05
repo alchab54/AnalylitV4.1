@@ -30,19 +30,19 @@ from rq.exceptions import NoSuchJobError
 @pytest.fixture(scope='function')
 def redis_conn():
     """
-    Provides a connection to the real 'redis_dev' service,
-    using a separate database for test isolation.
+    Provides a connection to the real 'redis_dev' service.
+    RQ handles its own decoding, so decode_responses should be False.
     """
-    # Se connecte au service redis_dev défini dans docker-compose.dev.yml
     redis_host = os.getenv("REDIS_HOST", "redis_dev")
-    
-    # Utilise la base de données n°9 pour isoler les tests des données de dev
-    conn = Redis(host=redis_host, port=6379, db=9, encoding='utf-8', decode_responses=True)
+
+    # Ne pas utiliser decode_responses=True, RQ gère son propre décodage.
+    conn = Redis(host=redis_host, port=6379, db=9) 
 
     yield conn
 
     # Nettoie la base de données de test après chaque test
-# ✅ SOLUTION #1 : Mock Redis/RQ Complet et Sérialisable
+    conn.flushdb()
+
 @pytest.fixture(scope='session')
 def mock_redis_and_rq(request):
     if 'real_rq' in request.keywords:
