@@ -1267,79 +1267,118 @@ def run_atn_stakeholder_analysis_task(session, project_id: str):
     session.commit()
     send_project_notification(project_id, 'atn_analysis_completed', 'Analyse ATN multipartie prenante terminée.')
 
-@with_db_session
+@with_db_session  
 def run_atn_score_task(session, project_id: str):
-    """Calcule des scores ATN à partir des extractions JSON."""
-    logger.info(f"ðŸ“Š Calcul des scores ATN pour le projet {project_id}")
-    update_project_status(session, project_id, 'generating_analysis')
-    extractions = session.execute(text("SELECT pmid, title, extracted_data FROM extractions WHERE project_id = :pid AND extracted_data IS NOT NULL"), {"pid": project_id}).mappings().all()
-    if not extractions:
-        update_project_status(session, project_id, status='failed')
-        send_project_notification(project_id, 'analysis_failed', 'Aucune donnée d\'extraction disponible pour le calcul du score ATN.')
-        return
+    """Calcule les scores ATN pour tous les articles extraits du projet."""
+    logger.info(f"📊 Calcul des scores ATN pour le projet {project_id}")
     
-    scores = []
-    for ext in extractions:
-        try:
-            data = json.loads(ext["extracted_data"])
-            s = 0
-            # Extract text from all string values in the dictionary
-            text_blob = " ".join([str(v) for v in data.values() if isinstance(v, str)]).lower()
-            # logger.debug(f"PMID: {ext['pmid']}, Initial Text Blob: {text_blob}")
-
-            # Category 1: 'alliance', 'therapeutic'
-            if re.search(r'\balliance\b', text_blob):
-                s += 3
-                # logger.debug(f"PMID: {ext['pmid']}, Matched C1 keyword: alliance")
-            if re.search(r'\btherapeutic\b', text_blob):
-                s += 3
-                # logger.debug(f"PMID: {ext['pmid']}, Matched C1 keyword: therapeutic")
-            # logger.debug(f"PMID: {ext['pmid']}, Score after C1: {s}")
-
-            # Category 2: 'numérique', 'digital', 'app', 'plateforme', 'ia'
-            for k in ['numerique', 'digital', 'app', 'plateforme', 'ia']:
-                if re.search(r'\b' + re.escape(k) + r'\b', text_blob, re.IGNORECASE):
-                    s += 3
-                    # logger.debug(f"PMID: {ext['pmid']}, Matched C2 keyword: {k}")
-            # logger.debug(f"PMID: {ext['pmid']}, Score after C2: {s}")
-
-            # Category 3: 'patient', 'soignant', 'développeur'
-            for k in ['patient', 'soignant', 'developpeur']:
-                if re.search(r'\b' + re.escape(k) + r'\b', text_blob):
-                    s += 2
-                    # logger.debug(f"PMID: {ext['pmid']}, Matched C3 keyword: {k}")
-            # logger.debug(f"PMID: {ext['pmid']}, Score after C3: {s}")
-
-            # Category 4: 'empathie', 'adherence', 'confiance'
-            for k in ['empathie', 'adherence', 'confiance']:
-                if re.search(r'\b' + re.escape(k) + r'\b', text_blob):
-                    s += 2
-                    # logger.debug(f"PMID: {ext['pmid']}, Matched C4 keyword: {k}")
-            # logger.debug(f"PMID: {ext['pmid']}, Score after C4: {s}")
-            scores.append({'pmid': ext['pmid'], 'title': ext['title'], 'atn_score': min(s, 10)})
-        except Exception: continue
-    
-    if not scores:
-        update_project_status(session, project_id, status='failed')
-        send_project_notification(project_id, 'analysis_failed', 'Aucun score ATN calculable à partir des données extraites.')
-        return
-    
-    mean_atn = float(np.mean([s['atn_score'] for s in scores]))
-    analysis_result = {"atn_scores": scores, "mean_atn": mean_atn, "total_articles_scored": len(scores)}
-    
-    plot_path = None
-    if scores:
-        p_dir = PROJECTS_DIR / project_id
-        p_dir.mkdir(exist_ok=True)
-        plot_path = str(p_dir / 'atn_scores.png')
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.hist([s['atn_score'] for s in scores], bins=11, range=(-0.5, 10.5), alpha=0.7, color='green', edgecolor='black')
-        ax.set_xlabel('Score ATN'); ax.set_ylabel('Nombre d\'Articles'); ax.set_title('Distribution des Scores ATN'); ax.set_xticks(range(0, 11))
-        plt.savefig(plot_path, bbox_inches='tight'); plt.close(fig)
-    
-    update_project_status(session, project_id, status='completed', analysis_result=analysis_result, analysis_plot_path=plot_path)
-    session.commit() # Commit the status update
-    send_project_notification(project_id, 'analysis_completed', f'Scores ATN calculés: {mean_atn:.2f} (moyenne)')
+    try:
+        # Vérifier s'il y a des extractions à analyser
+        extractions = session.execute(text("""
+            SELECT COUNT(*) as total, 
+                   COUNT(CASE WHEN extracted_data IS NOT NULL THEN 1 END) as with_data
+            FROM extractions 
+            WHERE project_id = :pid
+        """), {"pid": project_id}).mappings().fetchone()
+        
+        if not extractions or extractions.get('total', 0) == 0:
+            logger.warning(f"Aucune extraction trouvée pour le projet {project_id}")
+            send_project_notification(project_id, 'analysis_failed', 
+                'Aucun article extrait pour calculer les scores ATN', {})
+            return {"status": "skipped", "reason": "no_extractions"}
+        
+        # Récupérer toutes les extractions avec données
+        rows = session.execute(text("""
+            SELECT pmid, title, extracted_data, relevance_score
+            FROM extractions 
+            WHERE project_id = :pid AND extracted_data IS NOT NULL
+        """), {"pid": project_id}).mappings().fetchall()
+        
+        if not rows:
+            logger.warning(f"Aucune donnée extraite trouvée pour le projet {project_id}")
+            send_project_notification(project_id, 'analysis_failed',
+                'Aucune donnée extraite disponible pour l\'analyse ATN', {})
+            return {"status": "skipped", "reason": "no_extracted_data"}
+        
+        # Calculer les statistiques ATN
+        total_articles = len(rows)
+        atn_scores = []
+        empathy_scores = []
+        trust_scores = []
+        
+        for row in rows:
+            try:
+                data = json.loads(row['extracted_data']) if isinstance(row['extracted_data'], str) else row['extracted_data']
+                
+                # Extraction des scores numériques
+                if 'Score_empathie_IA' in data:
+                    try:
+                        score = float(str(data['Score_empathie_IA']).replace('%', '').replace(',', '.'))
+                        if 0 <= score <= 100:
+                            empathy_scores.append(score)
+                    except (ValueError, TypeError):
+                        pass
+                
+                if 'Confiance_algorithmique' in data:
+                    try:
+                        score = float(str(data['Confiance_algorithmique']).replace('%', '').replace(',', '.'))
+                        if 0 <= score <= 100:
+                            trust_scores.append(score)
+                    except (ValueError, TypeError):
+                        pass
+                
+                # Score composite basé sur la pertinence
+                atn_scores.append(row.get('relevance_score', 0))
+                
+            except Exception as e:
+                logger.warning(f"Erreur traitement extraction {row['pmid']}: {e}")
+        
+        # Calculs statistiques
+        results = {
+            'total_articles_analyzed': total_articles,
+            'atn_mean_score': np.mean(atn_scores) if atn_scores else 0,
+            'atn_std_score': np.std(atn_scores) if len(atn_scores) > 1 else 0,
+            'empathy_scores': {
+                'count': len(empathy_scores),
+                'mean': np.mean(empathy_scores) if empathy_scores else None,
+                'std': np.std(empathy_scores) if len(empathy_scores) > 1 else None,
+                'min': np.min(empathy_scores) if empathy_scores else None,
+                'max': np.max(empathy_scores) if empathy_scores else None
+            },
+            'trust_scores': {
+                'count': len(trust_scores), 
+                'mean': np.mean(trust_scores) if trust_scores else None,
+                'std': np.std(trust_scores) if len(trust_scores) > 1 else None,
+                'min': np.min(trust_scores) if trust_scores else None,
+                'max': np.max(trust_scores) if trust_scores else None
+            },
+            'analysis_date': datetime.now().isoformat()
+        }
+        
+        # Sauvegarde des résultats
+        session.execute(text("""
+            INSERT INTO analyses (id, project_id, analysis_type, results, created_at)
+            VALUES (:id, :pid, 'atn_scores', :results, :ts)
+            ON CONFLICT (project_id, analysis_type) DO UPDATE SET
+                results = EXCLUDED.results, created_at = EXCLUDED.created_at
+        """), {
+            "id": str(uuid.uuid4()),
+            "pid": project_id, 
+            "results": json.dumps(results),
+            "ts": datetime.now().isoformat()
+        })
+        
+        logger.info(f"✅ Scores ATN calculés pour {total_articles} articles du projet {project_id}")
+        send_project_notification(project_id, 'analysis_completed', 
+            f'Analyse ATN terminée ({total_articles} articles)', results)
+        
+        return {"status": "success", "results": results}
+        
+    except Exception as e:
+        logger.exception(f"Erreur lors du calcul des scores ATN: {e}")
+        send_project_notification(project_id, 'analysis_failed', 
+            f'Erreur analyse ATN: {str(e)}', {})
+        raise
 
 # ================================================================ 
 # === ANALYSE DU RISQUE DE BIAIS (RoB)
@@ -1416,6 +1455,7 @@ def add_manual_articles_task(session, project_id: str, identifiers: list):
     Tâche d'arrière-plan pour ajouter des articles manuellement.
 
     """
+
     logger.info(f"ðŸ“  Ajout manuel d'articles pour le projet {project_id}")
     if not identifiers:
         logger.warning(f"Aucun identifiant fourni pour le projet {project_id}.")
@@ -1424,6 +1464,7 @@ def add_manual_articles_task(session, project_id: str, identifiers: list):
     records_to_insert = []
     for article_id in identifiers:
         try:
+
             details = fetch_article_details(article_id)
         except Exception as e:
             logger.warning(f"Impossible de récupérer les détails pour {article_id}: {e}")
@@ -1431,6 +1472,7 @@ def add_manual_articles_task(session, project_id: str, identifiers: list):
         try:
             exists = session.execute(text("SELECT 1 FROM search_results WHERE project_id = :pid AND article_id = :aid"), {"pid": project_id, "aid": details.get('id') or article_id}).fetchone()
             if exists:
+
                 continue
             
             records_to_insert.append({
@@ -1441,7 +1483,7 @@ def add_manual_articles_task(session, project_id: str, identifiers: list):
                 "url": details.get('url', '') or '', "src": details.get('database_source', 'manual'),
                 "ts": datetime.now().isoformat()
             })
-            time.sleep(0.5)
+
         except Exception as e:
             logger.warning(f"Ajout manuel ignoré pour {article_id}: {e}")
             continue
@@ -1452,9 +1494,26 @@ def add_manual_articles_task(session, project_id: str, identifiers: list):
             VALUES (:id, :pid, :aid, :title, :abstract, :authors, :pub_date, :journal, :doi, :url, :src, :ts)
         """), records_to_insert)
 
-    session.execute(text("UPDATE projects SET pmids_count = (SELECT COUNT(*) FROM search_results WHERE project_id = :pid), updated_at = :ts WHERE id = :pid"), {"pid": project_id, "ts": datetime.now().isoformat()})
-    send_project_notification(project_id, 'import_completed', f'Ajout manuel terminé: {len(records_to_insert)} article(s) ajouté(s).')
-    logger.info(f"âœ… Ajout manuel terminé pour le projet {project_id}. {len(records_to_insert)} articles ajoutés.")
+
+
+    successful_articles = [record['aid'] for record in records_to_insert]
+
+    session.execute(text("UPDATE projects SET pmids_count = (SELECT COUNT(*) FROM search_results WHERE project_id = :pid), updated_at = :ts WHERE id = :pid"), {"pid": project_id, "ts": datetime.now().isoformat()})  # This line was fixed
+
+    send_project_notification(project_id, 'import_completed', f'Ajout manuel terminé: {len(records_to_insert)} article(s) ajouté(s).') # This line was fixed
+
+    logger.info(f"âœ… Ajout manuel terminé pour le projet {project_id}. {len(records_to_insert)} articles ajoutés.") # This line was fixed
+    # Lancer l'extraction automatique pour tous les articles ajoutés
+    project = session.query(Project).filter_by(id=project_id).first()
+    profile_used = project.profile_used if project else 'standard'
+    default_profile = config.DEFAULT_MODELS.get(profile_used, config.DEFAULT_MODELS['standard'])
+
+    for article_id in successful_articles:
+        analysis_queue.enqueue(
+            'backend.tasks_v4_complete.process_single_article_task',
+            project_id=project_id, article_id=article_id,
+            profile=default_profile, analysis_mode="full_extraction"
+        )
 
 @with_db_session
 def import_from_zotero_json_task(session, project_id: str, items_list: list):
@@ -1691,4 +1750,3 @@ def run_empathy_comparative_analysis_task(session, project_id: str, **kwargs):
     """Dummy task for empathy comparative analysis."""
     logger.info(f"Running empathy comparative analysis for project {project_id}")
     send_project_notification(project_id, 'analysis_completed', 'Empathy comparative analysis completed.', {'analysis_type': 'empathy_comparative_analysis'})
-

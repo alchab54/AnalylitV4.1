@@ -36,6 +36,36 @@ def create_analysis_profile():
         db.session.rollback()
         return jsonify({"error": "Un profil avec ce nom existe déjà"}), 409
 
+@analysis_profiles_bp.route('/profiles', methods=['GET'])
+@limiter.limit("50 per minute")
+def get_profiles():
+    """Retourne tous les profils d'analyse (alias pour compatibilité)."""
+    try:
+        from sqlalchemy import select
+        stmt = select(AnalysisProfile)
+        profiles = db.session.execute(stmt).scalars().all()
+        
+        # Conversion au format attendu par le test
+        profiles_dict = []
+        for profile in profiles:
+            profile_dict = profile.to_dict()
+            # Normalisation des clés pour compatibilité
+            if 'preprocess_model' in profile_dict:
+                profile_dict['preprocess'] = profile_dict.get('preprocess_model')
+            if 'extract_model' in profile_dict:
+                profile_dict['extract'] = profile_dict.get('extract_model') 
+            if 'synthesis_model' in profile_dict:
+                profile_dict['synthesis'] = profile_dict.get('synthesis_model')
+                
+            profiles_dict.append(profile_dict)
+            
+        return jsonify(profiles_dict), 200
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération des profils: {e}", exc_info=True)
+        db.session.rollback()
+        return jsonify({"error": "Erreur interne du serveur"}), 500
+    
 @analysis_profiles_bp.route('/analysis-profiles', methods=['GET'])
 @limiter.limit("50 per minute")
 def get_all_analysis_profiles():
