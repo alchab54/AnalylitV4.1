@@ -6,6 +6,7 @@ import threading
 import tempfile
 import shutil
 from pathlib import Path
+from redis import Redis
 import fakeredis
 from unittest.mock import patch, MagicMock
 import uuid, sys
@@ -34,9 +35,9 @@ def redis_conn():
     """
     # Se connecte au service redis_dev défini dans docker-compose.dev.yml
     redis_host = os.getenv("REDIS_HOST", "redis_dev")
-
+    
     # Utilise la base de données n°9 pour isoler les tests des données de dev
-    conn = Redis(host=redis_host, port=6379, db=9, decode_responses=True)
+    conn = Redis(host=redis_host, port=6379, db=9, encoding='utf-8', decode_responses=True)
 
     yield conn
 
