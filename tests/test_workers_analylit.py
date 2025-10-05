@@ -71,6 +71,7 @@ def analysis_queue(rq_connection):
     yield queue
 
 @pytest.mark.integration
+@pytest.mark.usefixtures("mock_redis_and_rq")
 class TestAnalyLitWorkers:
     """Tests d'intégration workers AnalyLit"""
     
@@ -101,7 +102,6 @@ class TestAnalyLitWorkers:
             assert "key_themes" in result
 
     def test_search_worker_with_database(self, analysis_queue, rq_connection):
-        @pytest.mark.skip(reason="Workers tests nécessitent configuration spéciale")
         """Test worker de recherche avec vraie base"""
         # Configure the mock directly at the module level
         DatabaseManager.return_value.search_pubmed.return_value = [
@@ -127,7 +127,6 @@ class TestAnalyLitWorkers:
         assert len(result["results"]) == 2
 
     def test_atn_scoring_worker(self, analysis_queue, rq_connection):
-        @pytest.mark.skip(reason="Workers tests nécessitent configuration spéciale")
         """Test worker spécialisé scoring ATN"""
         
         job = analysis_queue.enqueue(

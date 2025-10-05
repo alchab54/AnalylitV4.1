@@ -41,6 +41,7 @@ class TestWorkersBasic:
             assert queue.name == 'test'
             assert len(queue) == 0
 
+    @patch('rq.Queue.name', new_callable=mock.PropertyMock, return_value='test')
     def test_job_creation_mock(self):
         """Test de création de job avec mock"""
         from rq.job import Job

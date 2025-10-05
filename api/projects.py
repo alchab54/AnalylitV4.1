@@ -267,7 +267,7 @@ def chat_with_project(project_id):
     if not question:
         return jsonify({"error": "Question is required"}), 400
     job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout=900) #✅ CORRECTION : La clé task_id est ici
-    return jsonify({"message": "Question soumise", "task_id": job.id}), 202    
+    return jsonify({"message": "Question soumise", "job_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/run', methods=['POST'])
 def run_pipeline(project_id):
@@ -322,9 +322,9 @@ def run_analysis(project_id):
     if analysis_type in analysis_tasks:
         task_func, queue, timeout = analysis_tasks[analysis_type]
         
+        from backend.tasks_v4_complete import run_synthesis_task # Import here to avoid circular imports
         kwargs = {'project_id': project_id, 'job_timeout': timeout}
         if analysis_type == 'synthesis':
-            from backend.tasks_v4_complete import run_synthesis_task # Import here to avoid circular imports
             project = db.session.get(Project, project_id)            
             if not project:
                 return jsonify({"error": "Projet non trouvé"}), 404
@@ -335,7 +335,6 @@ def run_analysis(project_id):
                 logger.warning(f"Profil d'analyse '{profile_id}' non trouvé pour la synthèse. Utilisation des valeurs par défaut.")
                 kwargs['profile'] = {}
             else:
-                from backend.tasks_v4_complete import run_synthesis_task
                 kwargs['profile'] = profile.to_dict() # &lt;-- Utilise l'objet fonction
 
         job = queue.enqueue(task_func, **kwargs, job_timeout=timeout)
