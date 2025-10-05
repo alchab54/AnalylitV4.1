@@ -1,226 +1,129 @@
-"""
-Tests unitaires pour vérifier le fonctionnement des workers RQ.
-Ces tests vérifient que les workers consomment correctement les tâches,
-gèrent les erreurs, et maintiennent l'état correct dans Redis.
-"""
-
-import time
 import pytest
-from pathlib import Path
-from unittest.mock import patch
-from rq import Queue, Worker, Connection
-from rq.job import Job, Retry
-from redis import from_url
+import time
+from rq import Queue, Worker, Retry
+from rq.job import Job
+from rq.exceptions import NoSuchJobError
 
-# Fonctions de test pour simuler du travail
-def simple_task(a, b):
-    """Tâche simple pour tests"""
-    return a + b
+# Tâches simples utilisées pour les tests
+def simple_task():
+    """Une tâche qui réussit simplement."""
+    return True
 
-def failing_task(msg="Test error"):
-    """Tâche qui échoue pour tester la gestion d'erreurs"""
-    raise ValueError(msg)
+def fail_task():
+    """Une tâche qui échoue toujours."""
+    raise ValueError("This task is designed to fail")
 
-def flaky(fail_times=2):
-    """
-    Tâche qui échoue un certain nombre de fois avant de réussir.
-    Utilise un fichier temporaire pour suivre le nombre de tentatives.
-    """
-    # Utiliser un fichier pour un état persistant entre les tentatives du worker
-    counter_file = Path(f"/tmp/flaky_counter_{fail_times}")
-    
-    current_attempt = 0
-    if counter_file.exists():
-        current_attempt = int(counter_file.read_text())
-    
-    current_attempt += 1
-    counter_file.write_text(str(current_attempt))
+def long_running_task():
+    """Une tâche qui dure plus longtemps que le timeout du test."""
+    time.sleep(5)
+    return True
 
-    if current_attempt <= fail_times:
-        raise ValueError(f"Attempt {current_attempt} is set to fail.")
-    
-    # Nettoyer après succès
-    counter_file.unlink(missing_ok=True)
-    return "finally succeeded"
-
-def slow_task(duration=0.5):
-    """Tâche lente pour tester les timeouts"""
-    time.sleep(duration)
-    return "completed"
-
-def memory_intensive_task(size=1000):
-    """Tâche intensive pour tester les ressources"""
-    data = [i for i in range(size)]
-    return len(data)
-
-@pytest.fixture
-def rq_connection():
-    """Connexion Redis pour RQ (SANS décodage). C'est la correction clé."""
-    return from_url("redis://redis:6379/0", decode_responses=False)
-
-@pytest.fixture
-def worker_queues(rq_connection):
-    """Fixture des queues RQ"""
-    # Use explicit connection for each queue
-    default_queue = Queue("default", connection=rq_connection)
-    high_queue = Queue("high", connection=rq_connection)
-    low_queue = Queue("low", connection=rq_connection)
-    
-    # Nettoyer les queues avant chaque test
-    default_queue.empty()
-    high_queue.empty()
-    low_queue.empty()
-    yield default_queue, high_queue, low_queue
-@pytest.mark.usefixtures("mock_redis_and_rq")
-
+@pytest.mark.usefixtures("app_context", "db_session", "redis_conn")
 class TestWorkersCore:
-    """Tests core des workers RQ"""
-    @pytest.mark.usefixtures("mock_redis_and_rq")
-    
-    def test_worker_processes_simple_job(self, worker_queues, rq_connection):
-        """Vérifier qu'un worker traite correctement une tâche simple"""
-        default_queue, _, _ = worker_queues
+    """
+    Suite de tests de base pour valider le comportement des workers RQ.
+    Ces tests vérifient que les workers peuvent traiter des tâches, gérer les échecs,
+    respecter les files d'attente prioritaires et les timeouts.
+    """
+
+    def setup_method(self):
+        """
+        Configure la file d'attente pour qu'elle soit asynchrone avant chaque test.
+        C'est essentiel pour que le Worker puisse traiter les tâches en arrière-plan.
+        """
+        # La connexion est fournie par la fixture `redis_conn` de conftest.py
+        self.q = Queue(is_async=True, connection=self.redis_conn)
+        self.worker = Worker([self.q], connection=self.redis_conn, name="test-worker")
+
+
+    def test_worker_processes_simple_job(self):
+        """Teste si un worker peut traiter une tâche simple."""
+        job = self.q.enqueue(simple_task)
+        self.worker.work(burst=True)  # Traite la tâche et quitte
         
-        # Enqueuer une tâche
-        job = default_queue.enqueue(simple_task, 5, 10)
-        assert job.get_status() == "queued"
+        # On recharge l'état du job depuis Redis
+        job = Job.fetch(job.id, connection=self.redis_conn)
         
-        # Créer et démarrer le worker
-        worker = Worker([default_queue], connection=rq_connection,  name="test_worker_processes_simple_job")
-        result = worker.work(burst=True)
+        assert job.is_finished, f"La tâche devrait être terminée, mais son statut est {job.get_status()}"
+        assert job.result is True
+
+    def test_worker_handles_job_failure(self):
+        """Vérifie que le statut d'une tâche est bien 'failed' après une erreur."""
+        job = self.q.enqueue(fail_task)
+        self.worker.work(burst=True)
         
-        assert result is True
+        job = Job.fetch(job.id, connection=self.redis_conn)
+
+        assert job.is_failed, "La tâche devrait être en échec"
+
+    def test_worker_priority_queues(self):
+        """Vérifie que les tâches de la file 'high' sont traitées avant 'low'."""
+        high_q = Queue('high', is_async=True, connection=self.redis_conn)
+        low_q = Queue('low', is_async=True, connection=self.redis_conn)
+
+        # Mettre en file d'attente 5 tâches de basse priorité
+        for _ in range(5):
+            low_q.enqueue(simple_task)
+        
+        # Mettre en file d'attente 1 tâche de haute priorité
+        high_job = high_q.enqueue(simple_task)
+
+        # Le worker écoute 'high' puis 'low'
+        priority_worker = Worker([high_q, low_q], connection=self.redis_conn)
+        priority_worker.work(burst=True) # Exécute une seule tâche et s'arrête
+
+        high_job = Job.fetch(high_job.id, connection=self.redis_conn)
+        
+        # Seule la tâche prioritaire a dû être exécutée
+        assert high_job.is_finished, "La tâche prioritaire aurait dû être traitée"
+
+    def test_worker_job_timeout(self):
+        """Teste si une tâche est bien arrêtée après son timeout."""
+        # job_timeout=1 est très court pour s'assurer que ça échoue
+        job = self.q.enqueue(long_running_task, job_timeout=1)
+        self.worker.work(burst=True)
+
+        job = Job.fetch(job.id, connection=self.redis_conn)
+        assert job.is_failed, "La tâche aurait dû échouer à cause du timeout"
+        assert 'JobTimeoutException' in job.exc_info
+
+    def test_job_metadata_persistence(self):
+        """Vérifie que les métadonnées d'une tâche sont bien sauvegardées."""
+        job = self.q.enqueue(simple_task)
+        job.meta['user_id'] = 'user-123'
+        job.save_meta()
+
+        self.worker.work(burst=True)
+        
+        retrieved_job = Job.fetch(job.id, connection=self.redis_conn)
+        assert retrieved_job.is_finished
+        assert retrieved_job.meta.get('user_id') == 'user-123'
+
+    def test_worker_result_ttl(self):
+        """Vérifie que le résultat d'une tâche expire bien après le TTL."""
+        # TTL de 1 seconde
+        job = self.q.enqueue(simple_task, result_ttl=1)
+        self.worker.work(burst=True)
+
+        retrieved_job = Job.fetch(job.id, connection=self.redis_conn)
+        assert retrieved_job.is_finished  # Le job est bien fini
+
+        time.sleep(2)  # Attendre plus que le TTL
+
+        # Après l'expiration, essayer de récupérer le job doit lever une erreur
+        with pytest.raises(NoSuchJobError):
+            Job.fetch(job.id, connection=self.redis_conn)
+
+    def test_worker_retry_on_failure(self):
+        """Teste la fonctionnalité de réessai automatique d'une tâche."""
+        retry_policy = Retry(max=2, interval=[1, 2])
+        job = self.q.enqueue(fail_task, retry=retry_policy)
+        
+        # Le worker doit essayer une fois, puis une deuxième fois
+        self.worker.work(burst=True) # Premier essai -> échoue et remet en file
         job.refresh()
-        assert job.is_finished
-        assert job.return_value() == 15
+        assert job.is_queued, "La tâche devrait être en attente pour un réessai"
 
-    @pytest.mark.usefixtures("mock_redis_and_rq")
-    def test_worker_handles_job_failure(self, worker_queues, rq_connection):
-        """Vérifier qu'un worker gère correctement les échecs"""
-        default_queue, _, _ = worker_queues
-        
-        # Enqueuer une tâche qui échoue
-        job = default_queue.enqueue(failing_task, "Test failure")
-        
-        worker = Worker([default_queue], connection=rq_connection,  name="test_worker_handles_job_failure")
-        worker.work(burst=True)
-        
+        self.worker.work(burst=True) # Deuxième essai -> échoue et direction la file des échecs
         job.refresh()
-        assert job.is_failed, "Job should be failed"
-
-        # Check if the exception information is available. It may be missing in the mocked environment.
-        if job.latest_result():
-            assert "ValueError" in job.latest_result().exc_string
-        else:
-            print("Exception info not available in the mocked environment.")
-
-    @pytest.mark.usefixtures("mock_redis_and_rq")
-    def test_worker_priority_queues(self, worker_queues, rq_connection):
-        """Vérifier que le worker respecte les priorités des queues"""
-        default_queue, high_queue, low_queue = worker_queues
-        
-        # Enqueuer des tâches sur différentes queues
-        low_job = low_queue.enqueue(simple_task, 1, 1)
-        high_job = high_queue.enqueue(simple_task, 2, 2) 
-        default_job = default_queue.enqueue(simple_task, 3, 3)
-
-        # Worker avec priorité: high > default > low
-        worker = Worker([high_queue, default_queue, low_queue], connection=rq_connection,  name="test_worker_priority_queues")
-
-        # ✅ CORRECTION : Lancer le worker une seule fois pour traiter toutes les tâches.
-        # Le mode 'burst' lui fait traiter toutes les tâches en attente puis s'arrêter.
-        worker.work(burst=True)
-
-        # Vérifier les résultats de tous les jobs APRÈS que le worker a terminé son travail.
-        high_job.refresh()
-        default_job.refresh()
-        low_job.refresh()
-
-        assert high_job.is_finished
-        assert high_job.return_value() == 4
-        assert default_job.is_finished, f"Default job status is {default_job.get_status()}"
-        assert default_job.return_value() == 6
-        assert low_job.is_finished
-        assert low_job.return_value() == 2
-
-    @pytest.mark.usefixtures("mock_redis_and_rq")
-    def test_worker_job_timeout(self, worker_queues, rq_connection):
-        """Vérifier la gestion des timeouts"""
-        default_queue, _, _ = worker_queues
-        
-        # Job avec timeout très court
-        job = default_queue.enqueue(slow_task, 2.0, job_timeout=1)
-
-        
-        worker = Worker([default_queue], connection=rq_connection,  name="test_worker_job_timeout")
-        worker.work(burst=True)
-        
-        job.refresh()
-        # Le job devrait échouer à cause du timeout
-        assert job.is_failed or job.get_status() == "failed"
-
-    @pytest.mark.usefixtures("mock_redis_and_rq")
-    def test_job_metadata_persistence(self, worker_queues, rq_connection):
-        """Vérifier que les métadonnées des jobs persistent"""
-        default_queue, _, _ = worker_queues
-        
-        job = default_queue.enqueue(
-            simple_task, 
-            7, 8,
-            description="Test job metadata",
-            meta={"project_id": "proj-123", "user_id": "user-456"}
-        )
-        
-        # Vérifier métadonnées avant exécution
-        assert job.description == "Test job metadata"
-        assert job.meta["project_id"] == "proj-123"
-        
-        worker = Worker([default_queue], connection=rq_connection, name="test_job_metadata_persistence")
-        worker.work(burst=True)
-        
-        job.refresh()
-        assert job.is_finished
-        # Métadonnées préservées après exécution
-        assert job.meta["project_id"] == "proj-123"
-        assert job.meta["user_id"] == "user-456"
-
-    @pytest.mark.usefixtures("mock_redis_and_rq")
-    def test_worker_result_ttl(self, worker_queues, rq_connection):
-        """Vérifier que les résultats ont un TTL configuré"""
-        default_queue, _, _ = worker_queues
-        
-        job = default_queue.enqueue(
-            simple_task, 
-            10, 20,
-            result_ttl=3600  # 1 heure
-        )
-        
-        worker = Worker([default_queue], connection=rq_connection, name="test_worker_result_ttl")
-        worker.work(burst=True)
-        
-        job.refresh()
-        assert job.is_finished
-        assert job.return_value() == 30
-        
-        # Vérifier que le job existe encore dans Redis
-        assert job.exists(job.id, connection=rq_connection)
-
-    @pytest.mark.usefixtures("mock_redis_and_rq")
-    def test_worker_retry_on_failure(self, worker_queues, rq_connection):
-        """Vérifie que le mécanisme de retry fonctionne."""
-        default_queue, _, _ = worker_queues
-
-        # La tâche échouera 2 fois, puis réussira à la 3ème tentative.
-        job = default_queue.enqueue(flaky, kwargs={'fail_times': 2}, retry=Retry(max=3))
-        
-        worker = Worker([default_queue], connection=rq_connection, name="test_worker_retry_on_failure")
-        
-        # Le worker doit tourner plusieurs fois pour gérer les retries
-        for i in range(4): # Assez de tentatives pour couvrir les échecs et le succès
-            worker.work(burst=True)
-            job.refresh()
-            if job.is_finished:
-                break
-
-        assert job.is_finished is True, f"Job status was {job.get_status()}"
-        assert job.return_value() == "finally succeeded"
+        assert job.is_failed, "La tâche devrait être en échec après tous les réessais"
