@@ -91,6 +91,7 @@ class SearchResult(Base):
 
     project_id_ref = f"{SCHEMA}.projects.id" if SCHEMA else "projects.id"
     id = Column(String, primary_key=True, default=_uuid)
+    project_id = Column(String, ForeignKey("projects.id"), nullable=False)
     project_id = Column(String, ForeignKey(project_id_ref), nullable=False)
     article_id = Column(String, nullable=False)
     title = Column(Text)
