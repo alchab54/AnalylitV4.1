@@ -94,7 +94,7 @@ if is_testing and not db_url:
 engine = create_engine(
     db_url,
     pool_pre_ping=True,
-    connect_args={"options": f"-csearch_path={SCHEMA},public"}
+    connect_args={"options": f"-csearch_path={SCHEMA},public"} 
 )
 SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
