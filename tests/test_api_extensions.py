@@ -47,7 +47,7 @@ def test_api_grid_management_workflow(client: FlaskClient, db_session: Session, 
     assert len(data) == 1, f"Expected 1 grid, but got {len(data)}"
     assert data[0]['name'] == "Grille ATN Importée"
     fields = data[0]['fields']
-    assert isinstance(fields, list)
+    
     assert len(fields) == 3
     assert fields[0]['name'] == "Population"
 

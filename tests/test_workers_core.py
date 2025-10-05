@@ -75,7 +75,7 @@ def test_worker_priority_queues(redis_conn):
     job = q.enqueue(simple_task, result_ttl=60)
 
     # Le worker ne doit traiter qu'UNE seule tâche
-        worker.work(burst=True)
+    worker.work(burst=True)
     retrieved_job = Job.fetch(job.id, connection=redis_conn)
     assert retrieved_job.is_finished
 

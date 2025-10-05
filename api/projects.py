@@ -410,7 +410,7 @@ def run_rob_analysis(project_id):
             job_timeout=1200
         )
         task_ids.append(job.id)
-    return jsonify({"message": f"{len(task_ids)} tâches d'analyse de risque de biais lancées", "task_ids": task_ids}), 202
+    return jsonify({"message": f"{len(task_ids)} tâches d'analyse de risque de biais lancées", "job_ids": task_ids}), 202
 
 @projects_bp.route('/projects/<project_id>/rob/<article_id>', methods=['POST'])
 def save_rob_assessment(project_id, article_id):

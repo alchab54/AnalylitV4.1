@@ -219,8 +219,8 @@ def test_api_run_discussion_draft_enqueues_task(mock_enqueue, client, db_session
     # ***** CORRECTION DE L'ÉCHEC DU TEST *****
     # Le serveur appelle enqueue avec l'objet fonctionnel (importé), pas avec un string.
     mock_enqueue.assert_called_once_with(
-        run_discussion_generation_task, # <-- Vérifie l'objet fonction, pas le string
-        project_id=project_id,
+    run_discussion_generation_task, # <-- Vérifie l'objet fonction, pas le string
+    project_id=project_id,
         job_timeout=1800
     )
 
@@ -469,7 +469,7 @@ def test_api_run_rob_analysis_enqueues_task(mock_enqueue, client, db_session):
 
     # ASSERT
     assert response.status_code == 202
-    response_data = response.get_json() # type: ignore
+    response_data = response.get_json()  # type: ignore
     assert 'job_ids' in response_data
     assert len(response_data['job_ids']) == 2 # Vérifie le nombre de tâches, pas les IDs exacts
 
