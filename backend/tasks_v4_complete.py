@@ -697,6 +697,8 @@ TEXTE DE L'ARTICLE:
         
         # Remonter l'exception pour que RQ marque le job en failed
         raise
+    logger.info(f"✅ Extraction terminée pour {article_id} - données sauvées dans extractions")
+    return result
     
 @with_db_session
 def run_synthesis_task(session, project_id: str, profile: dict):
@@ -1272,6 +1274,20 @@ def run_atn_score_task(session, project_id: str):
     """Calcule les scores ATN pour tous les articles extraits du projet."""
     logger.info(f"📊 Calcul des scores ATN pour le projet {project_id}")
     
+    # Attendre que les extractions se terminent (max 2 minutes)
+    max_wait = 120  # secondes
+    wait_interval = 5
+    waited = 0
+    
+    while waited < max_wait:
+        extractions_count = session.execute(text("""
+            SELECT COUNT(*) as total FROM extractions 
+            WHERE project_id = :pid AND extracted_data IS NOT NULL
+        """), {"pid": project_id}).mappings().fetchone()
+        
+        if extractions_count and extractions_count.get('total', 0) > 0:
+            logger.info(f"✅ Extractions trouvées - Démarrage de l'analyse ATN")
+            break
     try:
         # Vérifier s'il y a des extractions à analyser
         extractions = session.execute(text("""
@@ -1379,6 +1395,7 @@ def run_atn_score_task(session, project_id: str):
         send_project_notification(project_id, 'analysis_failed', 
             f'Erreur analyse ATN: {str(e)}', {})
         raise
+
 
 # ================================================================ 
 # === ANALYSE DU RISQUE DE BIAIS (RoB)
