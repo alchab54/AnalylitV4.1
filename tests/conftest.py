@@ -206,6 +206,7 @@ def setup_project(db_session):
     """Test project with a unique ID."""
     project = Project(
         id=str(uuid.uuid4()),
+        name=f"test-project-{uuid.uuid4().hex[:8]}"  # <-- LA CORRECTION
     )
     db_session.add(project) # ✅ Use db_session
     db_session.commit()
