@@ -26,15 +26,15 @@ class TestWorkersCore:
     respecter les files d'attente prioritaires et les timeouts.
     """
 
-    def setup_method(self):
+    def setup_method(self, redis_conn):
         """
         Configure la file d'attente pour qu'elle soit asynchrone avant chaque test.
         C'est essentiel pour que le Worker puisse traiter les tâches en arrière-plan.
         """
         # La connexion est fournie par la fixture `redis_conn` de conftest.py
+        self.redis_conn = redis_conn # Assigne la connexion à l'instance de test
         self.q = Queue(is_async=True, connection=self.redis_conn)
         self.worker = Worker([self.q], connection=self.redis_conn, name="test-worker")
-
 
     def test_worker_processes_simple_job(self):
         """Teste si un worker peut traiter une tâche simple."""
