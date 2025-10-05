@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from utils.extensions import db
 from utils.models import AnalysisProfile
 from utils.app_globals import limiter
+
 analysis_profiles_bp = Blueprint('analysis_profiles_bp', __name__)
 logger = logging.getLogger(__name__)
 
@@ -37,64 +38,67 @@ def create_analysis_profile():
         return jsonify({"error": "Un profil avec ce nom existe déjà"}), 409
 
 @analysis_profiles_bp.route('/profiles', methods=['GET'])
-def get_profiles_alias():
-    """Alias pour /analysis-profiles (compatibilité)."""
+@limiter.limit("50 per minute")
+def get_profiles():
+    """Retourne tous les profils d'analyse avec normalisation des clés."""
     try:
-        # Retourner les profils par défaut hardcodés pour le test
-        profiles = {
-            'fast-local': {
-                'id': 'fast-local',
-                'name': '⚡ Rapide (Local)',
-                'preprocess': 'phi3:mini',
-                'extract': 'phi3:mini',
-                'synthesis': 'llama3:8b'
-            },
-            'standard-local': {
-                'id': 'standard-local',
-                'name': 'Standard (Local)',
+        from sqlalchemy import select
+        
+        # Essayer d'abord de récupérer depuis la DB
+        stmt = select(AnalysisProfile)
+        profiles_from_db = db.session.execute(stmt).scalars().all()
+        
+        if profiles_from_db:
+            # Utiliser les profils de la base de données
+            profiles_list = []
+            for profile in profiles_from_db:
+                profile_dict = profile.to_dict()
+                # Normalisation des clés pour compatibilité
+                if 'preprocess_model' in profile_dict:
+                    profile_dict['preprocess'] = profile_dict.get('preprocess_model')
+                if 'extract_model' in profile_dict:
+                    profile_dict['extract'] = profile_dict.get('extract_model') 
+                if 'synthesis_model' in profile_dict:
+                    profile_dict['synthesis'] = profile_dict.get('synthesis_model')
+                profiles_list.append(profile_dict)
+            return jsonify(profiles_list), 200
+        else:
+            # Fallback sur les profils hardcodés si DB vide
+            logger.info("Aucun profil en DB - Utilisation des profils par défaut")
+            profiles = [
+                {
+                    'id': 'fast-local',
+                    'name': '⚡ Rapide (Local)',
+                    'description': 'Pour tests et développement',
+                    'preprocess': 'phi3:mini',
+                    'extract': 'phi3:mini',
+                    'synthesis': 'llama3:8b'
+                },
+                {
+                    'id': 'standard-local',
+                    'name': 'Standard (Local)',
+                    'description': 'Équilibre vitesse/qualité',
+                    'preprocess': 'phi3:mini',
+                    'extract': 'llama3:8b',
+                    'synthesis': 'llama3:8b'
+                }
+            ]
+            return jsonify(profiles), 200
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération des profils: {e}", exc_info=True)
+        # Fallback d'urgence
+        fallback_profiles = [
+            {
+                'id': 'emergency-fallback',
+                'name': 'Fallback Standard',
                 'preprocess': 'phi3:mini',
                 'extract': 'llama3:8b',
                 'synthesis': 'llama3:8b'
             }
-        }
-        
-        return jsonify(list(profiles.values())), 200
-        
-    except Exception as e:
-        logger.error(f"Erreur profiles: {e}")
-        return jsonify({'error': str(e)}), 500
+        ]
+        return jsonify(fallback_profiles), 200
 
-
-@analysis_profiles_bp.route('/profiles', methods=['GET'])
-@limiter.limit("50 per minute")
-def get_profiles():
-    """Retourne tous les profils d'analyse (alias pour compatibilité)."""
-    try:
-        from sqlalchemy import select
-        stmt = select(AnalysisProfile)
-        profiles = db.session.execute(stmt).scalars().all()
-        
-        # Conversion au format attendu par le test
-        profiles_dict = []
-        for profile in profiles:
-            profile_dict = profile.to_dict()
-            # Normalisation des clés pour compatibilité
-            if 'preprocess_model' in profile_dict:
-                profile_dict['preprocess'] = profile_dict.get('preprocess_model')
-            if 'extract_model' in profile_dict:
-                profile_dict['extract'] = profile_dict.get('extract_model') 
-            if 'synthesis_model' in profile_dict:
-                profile_dict['synthesis'] = profile_dict.get('synthesis_model')
-                
-            profiles_dict.append(profile_dict)
-            
-        return jsonify(profiles_dict), 200
-        
-    except Exception as e:
-        logger.error(f"Erreur lors de la récupération des profils: {e}", exc_info=True)
-        db.session.rollback()
-        return jsonify({"error": "Erreur interne du serveur"}), 500
-    
 @analysis_profiles_bp.route('/analysis-profiles', methods=['GET'])
 @limiter.limit("50 per minute")
 def get_all_analysis_profiles():
@@ -139,7 +143,6 @@ def update_analysis_profile(profile_id):
     except IntegrityError:
         db.session.rollback()
         return jsonify({"error": "Erreur lors de la mise à jour du profil"}), 500
-
 
 @analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['DELETE'])
 @limiter.limit("5 per minute")
