@@ -1,15 +1,20 @@
+# version: '3.8' # La version est obsolète et peut être retirée.
+
 services:
+  # Service worker dédié à l'environnement de test
   test-worker:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
       args:
         BASE_IMAGE: analylit-base-cpu:latest
+    # Le worker écoute les files pertinentes pour les tests
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "discussion_draft_queue", "analysis", "default"]
     depends_on:
       - redis
       - test-db
     environment:
+      # Utilise la DB et le Redis de l'environnement de test
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       REDIS_URL: redis://redis:6379/0
       PYTHONPATH: /home/appuser/app
@@ -18,6 +23,7 @@ services:
     networks:
       - analylit-network
 
+  # Base de données pour les tests
   test-db:
     image: postgres:15-alpine
     container_name: analylit_test_db
@@ -39,6 +45,7 @@ services:
     networks:
       - analylit-network
 
+  # Redis pour les tests
   redis:
     image: redis:7-alpine
     container_name: analylit_redis_dev
@@ -52,6 +59,7 @@ services:
     networks:
       - analylit-network
 
+  # Service web principal pour l'app et l'exécution des tests
   web:
     build:
       context: .
@@ -79,10 +87,10 @@ services:
         condition: service_completed_successfully
     networks:
       - analylit-network
-    # Le port n'est pas nécessaire pour exec, mais on le garde pour le débogage
     ports:
       - "5000:80"
 
+  # Service de migration de base de données pour l'environnement de test
   migrate:
     build:
       context: .
@@ -116,3 +124,4 @@ volumes:
 networks:
   analylit-network:
     driver: bridge
+
