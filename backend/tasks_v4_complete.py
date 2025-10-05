@@ -627,16 +627,14 @@ TEXTE DE L'ARTICLE:
             
             # Sauvegarde de l'extraction complète
             session.execute(text("""
+                DELETE FROM extractions 
+                WHERE project_id = :pid AND pmid = :pmid
+            """), {"pid": project_id, "pmid": article_id})
+            session.execute(text("""
                 INSERT INTO extractions (id, project_id, pmid, title, extracted_data, relevance_score, relevance_justification, analysis_source, created_at)
                 VALUES (:id, :pid, :pmid, :title, :ex_data, :score, :just, :src, :ts)
-                ON CONFLICT (project_id, pmid) DO UPDATE SET
-                    extracted_data = EXCLUDED.extracted_data,
-                    relevance_score = EXCLUDED.relevance_score,
-                    relevance_justification = EXCLUDED.relevance_justification,
-                    analysis_source = EXCLUDED.analysis_source,
-                    created_at = EXCLUDED.created_at
             """), {
-                "id": str(uuid.uuid4()),
+                "id": str(uuid.uuid4()), 
                 "pid": project_id,
                 "pmid": article_id,
                 "title": article.get("title", ""),
@@ -675,12 +673,9 @@ TEXTE DE L'ARTICLE:
             session.execute(text("""
                 INSERT INTO extractions (id, project_id, pmid, title, relevance_score, relevance_justification, analysis_source, created_at)
                 VALUES (:id, :pid, :pmid, :title, :score, :just, :src, :ts)
-                ON CONFLICT (project_id, pmid) DO UPDATE SET
-                    relevance_score = 0,
-                    relevance_justification = :just,
-                    analysis_source = 'error'
             """), {
-                "id": str(uuid.uuid4()),
+                 "id": str(uuid.uuid4()), 
+
                 "pid": project_id,
                 "pmid": article_id,
                 "title": f"ERREUR: {article_id}",

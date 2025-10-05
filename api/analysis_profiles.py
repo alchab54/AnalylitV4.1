@@ -38,7 +38,7 @@ def create_analysis_profile():
         return jsonify({"error": "Un profil avec ce nom existe déjà"}), 409
 
 @analysis_profiles_bp.route('/profiles', methods=['GET'])
-def get_profiles_simple():
+def get_profiles_simple():    
     """Endpoint simplifié pour récupérer les profils sans dépendance DB."""
     try:
         # Profils hardcodés pour éviter les erreurs DB
@@ -63,7 +63,7 @@ def get_profiles_simple():
                     'synthesis': 'llama3:8b'
                 }
             ]
-            return jsonify(profiles), 200
+        return jsonify(profiles), 200
 
     except Exception as e:
         logger.error(f"Erreur lors de la récupération des profils: {e}", exc_info=True)
@@ -124,6 +124,7 @@ def update_analysis_profile(profile_id):
     except IntegrityError:
         db.session.rollback()
         return jsonify({"error": "Erreur lors de la mise à jour du profil"}), 500
+
 
 @analysis_profiles_bp.route('/analysis-profiles/<profile_id>', methods=['DELETE'])
 @limiter.limit("5 per minute")
