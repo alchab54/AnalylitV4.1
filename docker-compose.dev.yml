@@ -13,6 +13,8 @@ services:
     depends_on:
       - redis
       - test-db
+    networks:
+      - analylit-network
     environment:
       # Utilise la DB et le Redis de l'environnement de test
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
@@ -20,8 +22,6 @@ services:
       PYTHONPATH: /home/appuser/app
     volumes:
       - .:/home/appuser/app
-    networks:
-      - analylit-network
 
   # Base de données pour les tests
   test-db:
@@ -36,14 +36,14 @@ services:
     volumes:
       - test_postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - analylit-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U analylit_user -d analylit_test_db"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
-    networks:
-      - analylit-network
 
   # Redis pour les tests
   redis:
@@ -90,6 +90,35 @@ services:
     ports:
       - "5000:80"
 
+  # Service dédié à l'exécution des tests
+  test-runner:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    image: analylit-web-dev:latest
+    container_name: analylit_test_runner
+    environment:
+      FLASK_ENV: development
+      FLASK_APP: backend/server_v4_complete.py
+      DB_HOST: test-db
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      REDIS_HOST: redis
+      PYTHONPATH: /home/appuser/app
+    volumes:
+      - .:/home/appuser/app
+    depends_on:
+      test-db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - analylit-network
+
   # Service de migration de base de données pour l'environnement de test
   migrate:
     container_name: analylit_migrate_dev
@@ -97,20 +126,23 @@ services:
       context: .
       dockerfile: docker/Dockerfile.migrate
     environment:
-      - DATABASE_URL=postgresql://test_user:test_password@test-db:5432/test_db
-      - REDIS_URL=redis://redis:6379/0
-      - PYTHONUNBUFFERED=1
-      - PYTHONPATH=/home/appuser/app
-      # ✅ CORRECTION FINALE : La variable doit pointer vers le bon service DB
-      - WAIT_HOSTS=test-db:5432,redis:6379
-    command: |
-      sh -c "scripts/wait-for-it.sh test-db:5432 -t 0 -- python -m alembic -c alembic.ini upgrade head"
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      PYTHONUNBUFFERED: 1
+      PYTHONPATH: /home/appuser/app
+      WAIT_HOSTS: test-db:5432,redis:6379
+    command: ["python", "-m", "alembic", "-c", "alembic.ini", "upgrade", "head"]
+    depends_on:
+      test-db:
+        condition: service_healthy
     volumes:
       - .:/home/appuser/app:ro
-
-volumes:
-  test_postgres_data:
+    networks:
+      - analylit-network
 
 networks:
   analylit-network:
     driver: bridge
+
+volumes:
+  test_postgres_data:
