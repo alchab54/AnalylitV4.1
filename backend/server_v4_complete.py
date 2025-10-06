@@ -166,7 +166,7 @@ def create_app(config_override=None):
 
 
     @app.route('/api/prompts', methods=['GET', 'POST'])
-    def api_prompts():
+    def api__prompts():
         try:
             # Your existing code
             if request.method == 'POST':
@@ -209,33 +209,6 @@ def create_app(config_override=None):
             return jsonify(combined_results)
         finally:
             session.close()
-            
-    @app.route('/api/queues/info', methods=['GET'])
-    def get_queues_info():
-        """Retourne le statut des files d'attente RQ."""
-        from rq import Queue
-        queues_to_check = ['processing_queue', 'synthesis_queue', 'analysis_queue', 'background_queue', 'models_queue', 'extension_queue']
-
-        queues_info = []
-        for queue_name in queues_to_check:
-            try:
-                queue = Queue(queue_name, connection=redis_conn)
-                queues_info.append({
-                    'name': queue_name,
-                    'size': len(queue),
-                    'workers': 0
-                })
-            except:
-                queues_info.append({
-                    'name': queue_name,
-                    'size': 0,
-                    'workers': 0
-                })
-
-        return jsonify({
-            'queues': queues_info,
-            'total': len(queues_info)
-        })
 
     return app
 
