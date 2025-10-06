@@ -464,7 +464,7 @@ def add_manual_articles(project_id):
 
     job = background_queue.enqueue(add_manual_articles_task,  # &lt;-- Utilise l'objet fonction
                                     project_id=project_id,
-                                    articles_data=articles_data,
+                                    identifiers=[article['pmid'] for article in articles_data],
                                     job_timeout=3600
     )
     return jsonify({"message": f"Ajout de {len(articles_data)} article(s) manuel(s) lancé", "task_id": job.id}), 202
