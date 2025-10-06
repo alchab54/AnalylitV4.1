@@ -144,6 +144,57 @@ services:
     networks: 
       - analylit-network
 
+  # WORKER PRINCIPAL - ANALYSE
+  test-worker-analysis:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python -m rq worker analysis --url redis://analylit_redis_dev:6379/0
+    depends_on:
+      - analylit_redis_dev
+      - analylit_test_db
+    environment:
+      - DATABASE_URL=postgresql://analylit:dev_password123@analylit_test_db:5432/analylit
+      - REDIS_URL=redis://analylit_redis_dev:6379/0
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit_network
+
+  # WORKER SPÉCIALISÉ - SYNTHÈSE
+  test-worker-synthesis:
+    build:
+      context: .
+      dockerfile: Dockerfile  
+    command: python -m rq worker synthesis_queue --url redis://analylit_redis_dev:6379/0
+    depends_on:
+      - analylit_redis_dev
+      - analylit_test_db
+    environment:
+      - DATABASE_URL=postgresql://analylit:dev_password123@analylit_test_db:5432/analylit
+      - REDIS_URL=redis://analylit_redis_dev:6379/0
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit_network
+
+  # WORKER GÉNÉRAL - BACKGROUND
+  test-worker-background:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python -m rq worker default --url redis://analylit_redis_dev:6379/0
+    depends_on:
+      - analylit_redis_dev
+      - analylit_test_db
+    environment:
+      - DATABASE_URL=postgresql://analylit:dev_password123@analylit_test_db:5432/analylit
+      - REDIS_URL=redis://analylit_redis_dev:6379/0
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit_network
+
 networks:
   analylit-network:
     driver: bridge
