@@ -83,8 +83,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-      #migrate:
-        #condition: service_completed_successfully
+      migrate:
+        condition: service_completed_successfully
     networks:
       - analylit-network
     ports:
@@ -105,11 +105,7 @@ services:
       # ✅ CORRECTION FINALE : La variable doit pointer vers le bon service DB
       WAIT_HOSTS: test-db:5432,redis:6379
     command: |
-      sh -c "
-        chmod +x ./scripts/wait-for-test-db.sh &&
-        ./scripts/wait-for-test-db.sh &&
-        python -m alembic -c /home/appuser/app/alembic.ini upgrade head
-      "
+      sh -c "/tmp/wait-for-it-fixed.sh test-db:5432 -t 0 -- python -m alembic -c /home/appuser/app/alembic.ini upgrade head"
     volumes:
       - .:/home/appuser/app:ro
     depends_on:
