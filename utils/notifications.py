@@ -45,7 +45,7 @@ def get_redis_connection():
             _redis_conn = None 
     return _redis_conn
 
-def _publish_notification(payload: Dict[str, Any]):
+def _publish_notification(payload: dict):
     """Publie une notification sur le canal Redis."""
     # Récupère la connexion (ou tente de la créer)
     conn = get_redis_connection()
