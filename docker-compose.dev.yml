@@ -1,30 +1,14 @@
-
 services:
-
-  test-worker:
+  # Images de base
+  base-cpu:
     build:
       context: .
-      dockerfile: docker/Dockerfile.worker
-      args:
-        BASE_IMAGE: analylit-base-cpu:latest
-    # Le worker écoute les files pertinentes pour les tests
-    command: ["rq", "worker", "--url", "redis://redis:6379/0", "discussion_draft_queue", "analysis", "default"]
-    depends_on:
-      redis:
-        condition: service_started
-      test-db:
-        condition: service_healthy
-      migrate:
-        condition: service_completed_successfully
+      dockerfile: docker/Dockerfile.base-cpu
+    image: analylit-base-cpu:latest
+    pull_policy: never
+    profiles: ["build-only"]
     networks:
       - analylit-network
-    environment:
-      # Utilise la DB et le Redis de l'environnement de test
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      REDIS_URL: redis://redis:6379/0
-      PYTHONPATH: /home/appuser/app
-    volumes:
-      - .:/home/appuser/app
 
   # Base de données pour les tests
   test-db:
@@ -38,7 +22,6 @@ services:
       - "5434:5432"
     volumes:
       - test_postgres_data:/var/lib/postgresql/data
-
     networks:
       - analylit-network
     healthcheck:
@@ -54,6 +37,7 @@ services:
     container_name: analylit_redis_dev
     ports:
       - "6380:6379"
+    command: ["redis-server", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -62,7 +46,27 @@ services:
     networks:
       - analylit-network
 
-  # Service web principal pour l'app et l'exécution des tests
+  # Service de migration
+  migrate:
+    container_name: analylit_migrate_dev
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.migrate
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      PYTHONUNBUFFERED: 1
+      PYTHONPATH: /home/appuser/app
+    command: ["python", "-m", "alembic", "-c", "alembic.ini", "upgrade", "head"]
+    depends_on:
+      test-db:
+        condition: service_healthy
+    volumes:
+      - .:/home/appuser/app:ro
+    networks: 
+      - analylit-network
+
+  # Service web principal
   web:
     build:
       context: .
@@ -94,7 +98,7 @@ services:
     ports:
       - "8080:5000"
 
-  # Service dédié à l'exécution des tests
+  # Service de tests
   test-runner:
     build:
       context: .
@@ -123,77 +127,137 @@ services:
     networks:
       - analylit-network
 
-  # Service de migration de base de données pour l'environnement de test
-  migrate:
-    container_name: analylit_migrate_dev
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.migrate
-    environment:
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      REDIS_URL: redis://redis:6379/0
-      PYTHONUNBUFFERED: 1
-      PYTHONPATH: /home/appuser/app
-      WAIT_HOSTS: test-db:5432,redis:6379
-    command: ["python", "-m", "alembic", "-c", "alembic.ini", "upgrade", "head"]
-    depends_on:
-      test-db:
-        condition: service_healthy
-    volumes:
-      - .:/home/appuser/app:ro
-    networks: 
-      - analylit-network
-
-  # WORKER PRINCIPAL - ANALYSE
+  # WORKERS OPTIMISÉS - CONFIGURATIONS CORRECTES
+  
+  # Worker principal - Analyses
   test-worker-analysis:
     build:
       context: .
-      dockerfile: Dockerfile
-    command: python -m rq worker analysis --url redis://analylit_redis_dev:6379/0
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_analysis
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis", "analysis_queue"]
     depends_on:
-      - analylit_redis_dev
-      - analylit_test_db
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     environment:
-      - DATABASE_URL=postgresql://analylit:dev_password123@analylit_test_db:5432/analylit
-      - REDIS_URL=redis://analylit_redis_dev:6379/0
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      PYTHONPATH: /home/appuser/app
+      DATABASE_HOST: test-db
+      POSTGRES_USER: analylit_user
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: analylit_test_db
     volumes:
       - .:/home/appuser/app
     networks:
-      - analylit_network
+      - analylit-network
 
-  # WORKER SPÉCIALISÉ - SYNTHÈSE
+  # Worker synthèse
   test-worker-synthesis:
     build:
       context: .
-      dockerfile: Dockerfile  
-    command: python -m rq worker synthesis_queue --url redis://analylit_redis_dev:6379/0
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_synthesis
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "synthesis_queue"]
     depends_on:
-      - analylit_redis_dev
-      - analylit_test_db
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     environment:
-      - DATABASE_URL=postgresql://analylit:dev_password123@analylit_test_db:5432/analylit
-      - REDIS_URL=redis://analylit_redis_dev:6379/0
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      PYTHONPATH: /home/appuser/app
+      DATABASE_HOST: test-db
+      POSTGRES_USER: analylit_user
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: analylit_test_db
     volumes:
       - .:/home/appuser/app
     networks:
-      - analylit_network
+      - analylit-network
 
-  # WORKER GÉNÉRAL - BACKGROUND
+  # Worker background/général
   test-worker-background:
     build:
       context: .
-      dockerfile: Dockerfile
-    command: python -m rq worker default --url redis://analylit_redis_dev:6379/0
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_background
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "default", "background_queue"]
     depends_on:
-      - analylit_redis_dev
-      - analylit_test_db
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     environment:
-      - DATABASE_URL=postgresql://analylit:dev_password123@analylit_test_db:5432/analylit
-      - REDIS_URL=redis://analylit_redis_dev:6379/0
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      PYTHONPATH: /home/appuser/app
+      DATABASE_HOST: test-db
+      POSTGRES_USER: analylit_user
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: analylit_test_db
     volumes:
       - .:/home/appuser/app
     networks:
-      - analylit_network
+      - analylit-network
+
+  # Worker discussions
+  test-worker-discussion:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_discussion
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "discussion_draft_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      PYTHONPATH: /home/appuser/app
+      DATABASE_HOST: test-db
+      POSTGRES_USER: analylit_user
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: analylit_test_db
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit-network
+
+  # MONITORING - RQ Dashboard
+  rq-dashboard:
+    image: eoranged/rq-dashboard
+    container_name: analylit_rq_dashboard
+    ports:
+      - "9181:9181"
+    environment:
+      RQ_DASHBOARD_REDIS_URL: redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_started
+    networks:
+      - analylit-network
 
 networks:
   analylit-network:
