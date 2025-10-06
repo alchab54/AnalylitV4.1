@@ -71,6 +71,7 @@ services:
         BASE_IMAGE: analylit-base-cpu:latest
     image: analylit-web-dev:latest
     container_name: analylit_web_dev
+    command: ["flask", "run", "--host=0.0.0.0", "--port=5000", "--debug"]
     environment:
       FLASK_ENV: development
       FLASK_APP: backend/server_v4_complete.py
@@ -91,7 +92,7 @@ services:
     networks:
       - analylit-network
     ports:
-      - "5000:80"
+      - "8080:5000"
 
   # Service dédié à l'exécution des tests
   test-runner:
