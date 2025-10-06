@@ -5,6 +5,10 @@ import logging
 import json
 import sys
 import os
+from typing import Dict, Any, Optional  
+from datetime import datetime          
+import redis  
+
 
 # ✅ CORRECTION : S'assurer que le chemin est correct
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -35,7 +39,7 @@ def get_redis_connection():
     global _redis_conn
     if _redis_conn is None:
         try:
-            _redis_conn = redis.from_url(config.REDIS_URL)
+            _redis_conn = Redis.from_url(config.REDIS_URL)
             # Teste la connexion
             _redis_conn.ping() 
             logger.info("Connexion Redis pour notifications établie.")
