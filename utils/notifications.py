@@ -8,7 +8,9 @@ import os
 from typing import Dict, Any, Optional  
 from datetime import datetime          
 from redis import Redis
-
+logger = logging.getLogger(__name__)
+config = get_config()
+REDIS_CHANNEL = "analylit_notifications"
 
 # ✅ CORRECTION : S'assurer que le chemin est correct
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -23,7 +25,7 @@ except ImportError:
             REDIS_URL = "redis://localhost:6379/0"
         return MockConfig()
 
-logger = logging.getLogger(__name__)
+
 config = get_config()
 REDIS_CHANNEL = "analylit_notifications"
 
