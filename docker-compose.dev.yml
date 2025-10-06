@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Service worker dédié à l'environnement de test
   test-worker:
@@ -11,8 +9,12 @@ services:
     # Le worker écoute les files pertinentes pour les tests
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "discussion_draft_queue", "analysis", "default"]
     depends_on:
-      - redis
-      - test-db
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     networks:
       - analylit-network
     environment:
@@ -35,7 +37,7 @@ services:
       - "5434:5432"
     volumes:
       - test_postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
     networks:
       - analylit-network
     healthcheck:
@@ -132,7 +134,7 @@ services:
       PYTHONPATH: /home/appuser/app
       WAIT_HOSTS: test-db:5432,redis:6379
     command: ["python", "-m", "alembic", "-c", "alembic.ini", "upgrade", "head"]
-    depends_on:
+   depends_on:
       test-db:
         condition: service_healthy
     volumes:

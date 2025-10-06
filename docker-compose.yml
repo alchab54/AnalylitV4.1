@@ -177,7 +177,7 @@ services:
       - /bin/sh
       - -c
       - |
-        python -m alembic -c /home/appuser/app/alembic.ini downgrade base && python -m alembic -c /home/appuser/app/alembic.ini upgrade head
+        python -m alembic -c /home/appuser/app/alembic.ini upgrade head
     depends_on:
       db:
         condition: service_healthy

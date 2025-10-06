@@ -94,6 +94,7 @@ if is_testing and not db_url:
 engine = create_engine(
     db_url,
     pool_pre_ping=True,
+    pool_recycle=1800,  # Recycle connections every 30 minutes
     connect_args={"options": f"-csearch_path={SCHEMA},public"} 
 )
 SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
@@ -667,29 +668,6 @@ TEXTE DE L'ARTICLE:
         
     except Exception as e:
         logger.exception("process_single_article_task failed: %s", e)
-        
-        # Marque l'article en erreur pour traçabilité
-        try:
-            session.execute(text("""
-                INSERT INTO extractions (id, project_id, pmid, title, relevance_score, relevance_justification, analysis_source, created_at)
-                VALUES (:id, :pid, :pmid, :title, :score, :just, :src, :ts)
-            """), {
-                 "id": str(uuid.uuid4()), 
-
-                "pid": project_id,
-                "pmid": article_id,
-                "title": f"ERREUR: {article_id}",
-                "score": 0,
-                "just": f"Erreur traitement: {str(e)}",
-                "src": "error",
-                "ts": datetime.now().isoformat()
-            })
-            
-            increment_processed_count(session, project_id)
-            
-        except Exception as inner:
-            logger.warning(f"[process_single_article_task] Impossible de persister le statut d'erreur: {inner}")
-        
         # Remonter l'exception pour que RQ marque le job en failed
         raise
     logger.info(f"✅ Extraction terminée pour {article_id} - données sauvées dans extractions")
@@ -721,13 +699,11 @@ def run_synthesis_task(session, project_id: str, profile: dict):
     try:
         if output and isinstance(output, dict):
             update_project_status(session, project_id, status='completed', result=output)
-            session.commit() # Commit the status update
             send_project_notification(project_id, 'synthesis_completed', 'Synthèse générée.')
         else:
             update_project_status(session, project_id, status='failed')
             send_project_notification(project_id, 'synthesis_failed', 'Réponse IA invalide.')
     except Exception as e:
-        update_project_status(session, project_id, status='failed')
         logger.error(f"Erreur dans la tâche de synthèse : {e}", exc_info=True)
         raise
 
@@ -755,10 +731,8 @@ def run_discussion_generation_task(session, project_id: str):
         draft = generate_discussion_draft(df, lambda p, m: call_ollama_api(p, m, temperature=0.7), model_name)
 
         update_project_status(session, project_id, status='completed', discussion=draft)
-        session.commit() # Commit the status update
         send_project_notification(project_id, 'analysis_completed', 'Le brouillon de discussion a été généré.', {'discussion_draft': draft})
     except Exception as e:
-        update_project_status(session, project_id, status='failed')
         logger.error(f"Erreur dans la tâche de discussion : {e}", exc_info=True)
         raise
 
@@ -789,7 +763,6 @@ Titres:
     
     if graph and isinstance(graph, dict) and 'nodes' in graph and 'edges' in graph:
         update_project_status(session, project_id, status='completed', graph=graph)
-        session.commit() # Commit the status update
         send_project_notification(project_id, 'analysis_completed', 'Le graphe de connaissances est prêt.', {'analysis_type': 'knowledge_graph'})
     else:
         update_project_status(session, project_id, status='failed')
@@ -830,7 +803,6 @@ def run_prisma_flow_task(session, project_id: str):
     plt.close(fig)
 
     update_project_status(session, project_id, status='completed', prisma_path=image_path)
-    session.commit() # Commit the status update
     send_project_notification(project_id, 'analysis_completed', 'Le diagramme PRISMA est prêt.', {'analysis_type': 'prisma_flow'})
 
 @with_db_session
@@ -864,7 +836,6 @@ def run_meta_analysis_task(session, project_id: str):
     ax.legend()
     plt.savefig(plot_path, bbox_inches='tight')
     plt.close(fig)
-    session.commit() # Commit the status update
     update_project_status(session, project_id, status='completed', analysis_result=analysis_result, analysis_plot_path=plot_path)
     send_project_notification(project_id, 'analysis_completed', 'Méta-analyse terminée.')
 
@@ -1088,14 +1059,6 @@ def index_project_pdfs_task(session, project_id: str): # Ajout de 'session'
     
     except Exception as e:
         logger.error(f"Erreur index_project_pdfs_task: {e}", exc_info=True)
-        # Amélioration de la gestion d'erreur : Mettre à jour le statut du projet en cas d'échec
-        try:
-            session.execute(text("UPDATE projects SET status = 'failed' WHERE id = :pid"), {"pid": project_id})
-            session.commit()
-        except Exception as db_err:
-            logger.error(f"Impossible de mettre à jour le statut du projet {project_id} en 'failed' après une erreur d'indexation: {db_err}")
-            session.rollback()
-        
         send_project_notification(project_id, 'indexing_failed', f'Erreur lors de l\'indexation: {e}', {'task_name': 'indexation'})
 
 @with_db_session
@@ -1205,7 +1168,6 @@ def calculate_kappa_task(session, project_id: str):
     }
     
     session.execute(text("UPDATE projects SET inter_rater_reliability = :result WHERE id = :pid"), {"result": json.dumps(result), "pid": project_id})
-    session.commit()
     message = f"Kappa = {kappa:.3f} ({interpretation}), n = {len(eval1_decisions)}"
     send_project_notification(project_id, 'kappa_calculated', message)
 

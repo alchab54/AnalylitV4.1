@@ -47,7 +47,7 @@ def test_run_analysis_new_types(client, new_project):
 
 @pytest.mark.usefixtures("mock_redis_and_rq")
 def test_get_task_status(client, new_project):
-    """Teste le nouvel endpoint /api/tasks/<id>/status avec un mécanisme de polling."""
+    """Teste le nouvel endpoint /api/tasks/<id>/status avec un mécanisme de polling robuste."""
     project_id = new_project.id
     
     # Lance une tâche pour obtenir un ID de tâche valide
@@ -67,18 +67,12 @@ def test_get_task_status(client, new_project):
 
     # Vérifie que la réponse a bien été obtenue et que le statut est 200
     assert status_response is not None, "N'a jamais reçu de réponse valide de l'endpoint de statut."
-    assert status_response.status_code == 200, f"Expected 200 after polling, got {status_response.status_code} with data: {status_response.text}"
+    assert status_response.status_code == 200, f"Expected 200 after polling, got {status_response.status_code} with data: {response.text}"
     
     status_data = status_response.get_json()
-
-    # Si la tâche n'est pas trouvée, c'est acceptable car elle a pu se terminer rapidement.
-    if status_data.get('error') == 'Task not found':
-        pass
-    else:
-        # Sinon, on vérifie la structure normale de la réponse
-        assert status_data.get('task_id') == task_id
-        assert 'status' in status_data
-        assert status_data['status'] in ['queued', 'started', 'finished', 'failed', 'canceled']
+    assert status_data['task_id'] == task_id
+    assert 'status' in status_data
+    assert status_data['status'] in ['queued', 'started', 'finished', 'failed', 'canceled']
 
 @pytest.mark.usefixtures("mock_redis_and_rq")
 def test_save_rob_assessment(client, db_session, new_project):

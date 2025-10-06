@@ -18,6 +18,7 @@ def test_rate_limiting_analysis_profiles(client):
 
 @pytest.mark.usefixtures("mock_redis_and_rq")
 @pytest.mark.timeout(120)
+@pytest.mark.timeout(120)
 @pytest.mark.parametrize("protected_url", ["/api/analysis-profiles"])
 def test_custom_rate_limit_error_message(client, protected_url):
     """
