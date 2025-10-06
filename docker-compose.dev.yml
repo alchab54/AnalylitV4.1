@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   # Images de base
   base-cpu:
@@ -46,6 +48,27 @@ services:
     networks:
       - analylit-network
 
+  # Service Ollama pour l'IA
+  analylit_ollama_dev:
+    image: ollama/ollama:latest
+    container_name: analylit_ollama_dev
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_ORIGINS=*
+    networks:
+      - analylit-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
   # Service de migration
   migrate:
     container_name: analylit_migrate_dev
@@ -83,6 +106,7 @@ services:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       REDIS_URL: redis://redis:6379/0
       REDIS_HOST: redis
+      OLLAMA_BASE_URL: http://analylit_ollama_dev:11434
       PYTHONPATH: /home/appuser/app
     volumes:
       - .:/home/appuser/app
@@ -114,6 +138,7 @@ services:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       REDIS_URL: redis://redis:6379/0
       REDIS_HOST: redis
+      OLLAMA_BASE_URL: http://analylit_ollama_dev:11434
       PYTHONPATH: /home/appuser/app
     volumes:
       - .:/home/appuser/app
@@ -122,12 +147,13 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      
       migrate:
         condition: service_completed_successfully
     networks:
       - analylit-network
 
-  # WORKERS OPTIMISÉS - CONFIGURATIONS CORRECTES
+  # WORKERS OPTIMISÉS AVEC OLLAMA
   
   # Worker principal - Analyses
   test-worker-analysis:
@@ -143,11 +169,13 @@ services:
         condition: service_started
       test-db:
         condition: service_healthy
+
       migrate:
         condition: service_completed_successfully
     environment:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://analylit_ollama_dev:11434
       PYTHONPATH: /home/appuser/app
       DATABASE_HOST: test-db
       POSTGRES_USER: analylit_user
@@ -177,6 +205,7 @@ services:
     environment:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://analylit_ollama_dev:11434
       PYTHONPATH: /home/appuser/app
       DATABASE_HOST: test-db
       POSTGRES_USER: analylit_user
@@ -206,6 +235,7 @@ services:
     environment:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://analylit_ollama_dev:11434
       PYTHONPATH: /home/appuser/app
       DATABASE_HOST: test-db
       POSTGRES_USER: analylit_user
@@ -235,6 +265,7 @@ services:
     environment:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://analylit_ollama_dev:11434
       PYTHONPATH: /home/appuser/app
       DATABASE_HOST: test-db
       POSTGRES_USER: analylit_user
@@ -258,25 +289,6 @@ services:
         condition: service_started
     networks:
       - analylit-network
-
-  analylit_ollama_dev:
-    image: ollama/ollama:latest
-    container_name: analylit_ollama_dev
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-    environment:
-      - OLLAMA_KEEP_ALIVE=24h
-      - OLLAMA_HOST=0.0.0.0
-    networks:
-      - analylit_network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/api/version"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    restart: unless-stopped
 
 networks:
   analylit-network:
