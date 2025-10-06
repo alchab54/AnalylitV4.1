@@ -10,7 +10,14 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from redis import Redis
-from backend.config.config_v4 import get_config
+try:
+    from backend.config.config_v4 import get_config
+except ImportError:
+    # Fallback pour Alembic qui n'a pas accès au module backend
+    def get_config():
+        class MockConfig:
+            REDIS_URL = "redis://localhost:6379/0"
+        return MockConfig()
 
 logger = logging.getLogger(__name__)
 config = get_config()
