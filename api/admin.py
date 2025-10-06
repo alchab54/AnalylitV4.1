@@ -1,8 +1,9 @@
 # api/admin.py
 from flask import Blueprint, jsonify, request
-from utils.app_globals import redis_conn, limiter
+from utils.app_globals import redis_conn, limiter, models_queue
 from rq import Queue, Worker
 import time
+from backend.tasks_v4_complete import pull_ollama_model_task
 
 admin_bp = Blueprint('admin', __name__)
 

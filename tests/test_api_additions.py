@@ -47,20 +47,20 @@ def test_run_analysis_new_types(client, new_project):
 
 @pytest.mark.usefixtures("mock_redis_and_rq")
 def test_get_task_status(client, new_project):
-    """Teste le nouvel endpoint /api/tasks/<id>/status avec un mécanisme de polling robuste."""
+    """Teste le nouvel endpoint /api/jobs/<id>/status avec un mécanisme de polling robuste."""
     project_id = new_project.id
     
-    # Lance une tâche pour obtenir un ID de tâche valide
+    # Lance une tâche pour obtenir un ID de job valide
     response = client.post(f'/api/projects/{project_id}/run-analysis', json={
         'type': 'prisma_flow'
     })
     assert response.status_code == 202, f"Expected 202, got {response.status_code} with data: {response.text}"
-    task_id = response.get_json()['job_id']
+    job_id = response.get_json()['job_id']
     
     status_response = None
     # Boucle de polling pour attendre que la tâche soit initialisée
     for _ in range(5):  # Tente jusqu'à 5 fois
-        status_response = client.get(f'/api/tasks/{task_id}/status')
+        status_response = client.get(f'/api/jobs/{job_id}/status')
         if status_response.status_code == 200:
             break  # La tâche est prête, on sort de la boucle
         time.sleep(1)  # Attend 1 seconde avant de réessayer
@@ -70,7 +70,7 @@ def test_get_task_status(client, new_project):
     assert status_response.status_code == 200, f"Expected 200 after polling, got {status_response.status_code} with data: {response.text}"
     
     status_data = status_response.get_json()
-    assert status_data['task_id'] == task_id
+    assert status_data['job_id'] == job_id
     assert 'status' in status_data
     assert status_data['status'] in ['queued', 'started', 'finished', 'failed', 'canceled']
 
@@ -103,10 +103,11 @@ def test_save_rob_assessment(client, db_session, new_project):
     assert saved_assessment_data['allocation_concealment_notes'] == 'Non mentionné.'
 
 @pytest.mark.usefixtures("mock_redis_and_rq")
-def test_get_task_status_not_found(client):
-    """Teste le cas où l'ID de la tâche n'existe pas."""
-    non_existent_task_id = 'tache-qui-n-existe-pas'
-    response = client.get(f'/api/tasks/{non_existent_task_id}/status')
+def test_get_job_status_not_found(client):
+    """Teste le cas où l'ID du job n'existe pas."""
+    non_existent_job_id = 'job-qui-n-existe-pas'
+    response = client.get(f'/api/jobs/{non_existent_job_id}/status')
     
+    assert response.status_code == 404
     assert response.get_json() is not None
-    assert response.get_json()['error'] == 'Task not found' #Fixed the assertion
+    assert response.get_json()['error'] == 'Job not found'

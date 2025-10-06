@@ -58,6 +58,74 @@ def get_task_status(task_id):
         logger.error(f"Error getting task status for task_id {task_id}: {e}", exc_info=True)
         return jsonify({'error': str(e)}), 500
 
+@tasks_bp.route('/tasks/status', methods=['GET'])
+def get_all_tasks_status():
+    """Retourne le statut de toutes les tâches dans les files d'attente surveillées."""
+    try:
+        queues_to_check = [
+            'processing_queue', 'synthesis_queue', 'analysis_queue',
+            'background_queue', 'models_queue', 'extension_queue',
+            'fast_queue', 'default_queue', 'ai_queue'
+        ]
+        
+        all_jobs = []
+        
+        for queue_name in queues_to_check:
+            q = Queue(queue_name, connection=redis_conn)
+            
+            # Started jobs
+            started_ids = q.started_job_registry.get_job_ids()
+            if started_ids:
+                all_jobs.extend(Job.fetch_many(started_ids, connection=redis_conn))
+            
+            # Queued jobs
+            queued_ids = q.get_job_ids()
+            if queued_ids:
+                all_jobs.extend(Job.fetch_many(queued_ids, connection=redis_conn))
+
+            # Finished jobs
+            finished_ids = q.finished_job_registry.get_job_ids()
+            if finished_ids:
+                all_jobs.extend(Job.fetch_many(finished_ids, connection=redis_conn))
+
+            # Failed jobs
+            failed_ids = q.failed_job_registry.get_job_ids()
+            if failed_ids:
+                all_jobs.extend(Job.fetch_many(failed_ids, connection=redis_conn))
+
+        # Sort jobs by creation date, most recent first
+        all_jobs.sort(key=lambda job: job.created_at, reverse=True)
+        
+        tasks_data = [{
+            'id': job.id,
+            'description': job.description,
+            'status': job.get_status(),
+            'created_at': job.created_at.isoformat() if job.created_at else None,
+            'started_at': job.started_at.isoformat() if job.started_at else None,
+            'ended_at': job.ended_at.isoformat() if job.ended_at else None,
+            'exc_info': str(job.exc_info) if job.exc_info else None
+        } for job in all_jobs]
+        
+        return jsonify(tasks_data)
+        
+    except Exception as e:
+        logger.error(f"Error getting all tasks status: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+@tasks_bp.route('/tasks/<task_id>/cancel', methods=['POST'])
+def cancel_task(task_id):
+    """Annule une tâche spécifique."""
+    try:
+        job = Job.fetch(task_id, connection=redis_conn)
+        job.cancel()
+        return jsonify({'message': "Demande d'annulation envoyée."})
+    except NoSuchJobError:
+        return jsonify({'error': 'Task not found'}), 404
+    except Exception as e:
+        logger.error(f"Error cancelling task {task_id}: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+
 
 @tasks_bp.route('/tasks/clear/<queue_name>', methods=['POST'])
 def clear_queue(queue_name):

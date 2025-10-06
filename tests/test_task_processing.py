@@ -188,12 +188,12 @@ def test_process_single_article_task_full_extraction_with_pdf_and_grid(db_sessio
     Vérifie que la tâche lit le PDF et stocke le JSON extrait basé sur une Grid.
     """
     # ARRANGE
-    project_id = str(uuid.uuid4()) # Déjà unique.
+    project_id = str(uuid.uuid4())
     article_id = f"pmid_pdf_{uuid.uuid4().hex[:8]}"
     grid_id = str(uuid.uuid4())
 
     project = Project(id=project_id, name="Test PDF")
-    search_result = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id=article_id, title="PDF Title", abstract="Abstract") # Note: database_source est None par défaut
+    search_result = SearchResult(id=str(uuid.uuid4()), project_id=project_id, article_id=article_id, title="PDF Title", abstract="Abstract")
     grid = Grid(id=grid_id, project_id=project_id, name="Test Grid", fields=json.dumps([{"name": "population"}]))
 
     db_session.add(project)
@@ -206,11 +206,14 @@ def test_process_single_article_task_full_extraction_with_pdf_and_grid(db_sessio
 
     mocker.patch('backend.tasks_v4_complete.extract_text_from_pdf', return_value=mock_pdf_text)
     mocker.patch('pathlib.Path.exists', return_value=True)
-    mock_ollama_api = mocker.patch('backend.tasks_v4_complete.call_ollama_api', return_value=mock_ai_response)
+    mock_ollama_api = mocker.patch(
+        'backend.tasks_v4_complete.call_ollama_api', 
+        side_effect=[mock_pdf_text, mock_ai_response]
+    )
 
     # ACT
     process_single_article_task(
-        db_session, project_id, article_id, {"extract_model": "test-model"}, "full_extraction", grid_id
+        db_session, project_id, article_id, {"preprocess": "test-preprocess", "extract": "test-model"}, "full_extraction", grid_id
     )
 
     db_session.flush()
@@ -224,41 +227,64 @@ def test_process_single_article_task_full_extraction_with_pdf_and_grid(db_sessio
     assert result is not None
     assert result['analysis_source'] == "pdf"
     assert json.loads(result['extracted_data']) == mock_ai_response
-    mock_ollama_api.assert_called_once()
-    assert mock_pdf_text in mock_ollama_api.call_args[0][0]
     
+    assert mock_ollama_api.call_count == 2
+    
+    # Check first call (preprocessing)
+    assert "Nettoie et normalise" in mock_ollama_api.call_args_list[0][0][0]
+    assert mock_ollama_api.call_args_list[0][0][1] == "test-preprocess"
+
+    # Check second call (extraction)
+    assert "Extrait les informations suivantes" in mock_ollama_api.call_args_list[1][0][0]
+    assert mock_ollama_api.call_args_list[1][0][1] == "test-model"
+    assert mock_pdf_text in mock_ollama_api.call_args_list[1][0][0]
+
 @pytest.mark.gpu
-@patch('backend.tasks_v4_complete.call_ollama_api') # <-- CHEMIN CORRIGÉ
-def test_process_single_article_task_screening_mode(mock_ollama_api, db_session, mocker):
+def test_process_single_article_task_screening_mode(db_session, mocker):
     """
     Vérifie le mode 'screening' : appel au bon modèle et insertion des données de screening.
     """
     # ARRANGE
-    project_id = str(uuid.uuid4()) # Déjà unique.
+    project_id = str(uuid.uuid4())
     article_id = f"pmid_screen_{uuid.uuid4().hex[:8]}"
     project = Project(id=project_id, name="Test Screening")
     search_result = SearchResult(
-    id=str(uuid.uuid4()), 
-    project_id=project_id, 
-    article_id=article_id, 
-    title="Ceci est un titre suffisamment long pour le test de screening", 
-    abstract="Et ceci est un résumé assez long pour que le test passe la vérification de longueur minimale."
+        id=str(uuid.uuid4()), 
+        project_id=project_id, 
+        article_id=article_id, 
+        title="Ceci est un titre suffisamment long pour le test de screening", 
+        abstract="Et ceci est un résumé assez long pour que le test passe la vérification de longueur minimale."
     )   
     db_session.add_all([project, search_result])
     db_session.flush()
 
-    mock_ai_response = {"relevance_score": 8.5, "justification": "Très pertinent."}
-    mock_ollama_api.return_value = mock_ai_response
+    mock_normalized_text = "Texte normalisé"
+    mock_ai_response = {"is_relevant": True, "score": 8, "reason": "Très pertinent."}
+    
+    mock_ollama_api = mocker.patch(
+        'backend.tasks_v4_complete.call_ollama_api', 
+        side_effect=[mock_normalized_text, mock_ai_response]
+    )
 
     # ACT
-    process_single_article_task(db_session, project_id, article_id, {"preprocess_model": "screening-model"}, "screening")
+    process_single_article_task(db_session, project_id, article_id, {"preprocess": "preprocess-model", "extract": "screening-model"}, "screening")
 
     # ASSERT
-    mock_ollama_api.assert_called_once_with(mock.ANY, "screening-model", output_format="json")
+    assert mock_ollama_api.call_count == 2
+    
+    # Check first call (preprocessing)
+    assert "Nettoie et normalise" in mock_ollama_api.call_args_list[0][0][0]
+    assert mock_ollama_api.call_args_list[0][0][1] == "preprocess-model"
+
+    # Check second call (screening)
+    assert "Tu es un assistant pour le screening" in mock_ollama_api.call_args_list[1][0][0]
+    assert mock_ollama_api.call_args_list[1][0][1] == "screening-model"
+    assert mock_normalized_text in mock_ollama_api.call_args_list[1][0][0]
+
     extraction = db_session.query(Extraction).filter_by(project_id=project_id, pmid=article_id).one()
-    assert extraction.relevance_score == 8.5
+    assert extraction.relevance_score == 8
     assert extraction.relevance_justification == "Très pertinent."
-    assert extraction.extracted_data is None # Pas d'extraction détaillée en mode screening
+    assert extraction.extracted_data is None
 
 @pytest.mark.gpu
 def test_run_synthesis_task_filters_by_score(db_session, mocker):
@@ -297,6 +323,7 @@ def test_run_synthesis_task_filters_by_score(db_session, mocker):
     assert "Abstract de 3" not in prompt_arg
 
     updated_project = db_session.get(Project, project_id)
+    db_session.refresh(updated_project)
     assert updated_project.status == 'completed'
     assert json.loads(updated_project.synthesis_result) == mock_ai_response
 
@@ -669,6 +696,7 @@ def test_run_meta_analysis_task(db_session, mocker):
     # ASSERT
     mock_savefig.assert_called_once()
     updated_project = db_session.get(Project, project_id)
+    db_session.refresh(updated_project)
     assert updated_project.status == 'completed'
     
     result = json.loads(updated_project.analysis_result)
@@ -778,6 +806,7 @@ def test_calculate_kappa_task(db_session, mocker):
 
     # ASSERT
     updated_project = db_session.get(Project, project_id)
+    db_session.refresh(updated_project)
     result = json.loads(updated_project.inter_rater_reliability)
     
     # Calcul manuel:

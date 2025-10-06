@@ -19,9 +19,9 @@ def test_project(db_session):
     return project
 
 @pytest.mark.usefixtures("mock_redis_and_rq")
-def test_search_returns_task_id(client, test_project):
+def test_search_returns_job_id(client, test_project):
     """
-    Vérifie que la route POST /api/search retourne bien un task_id.
+    Vérifie que la route POST /api/search retourne bien un job_id.
     """
     search_data = {
         "project_id": test_project.id,
@@ -41,9 +41,9 @@ def test_search_returns_task_id(client, test_project):
     assert len(response_data['job_id']) > 10, "Le job_id doit avoir une longueur raisonnable"
 
 @pytest.mark.usefixtures("mock_redis_and_rq")
-def test_run_discussion_draft_returns_task_id(client, test_project):
+def test_run_discussion_draft_returns_job_id(client, test_project):
     """
-    Vérifie que la route POST /api/projects/<id>/run-discussion-draft retourne un task_id.
+    Vérifie que la route POST /api/projects/<id>/run-discussion-draft retourne un job_id.
     """
     response = client.post(f'/api/projects/{test_project.id}/run-discussion-draft', content_type='application/json')
     assert response.status_code == 202
@@ -52,7 +52,7 @@ def test_run_discussion_draft_returns_task_id(client, test_project):
 
 
 @pytest.mark.usefixtures("mock_redis_and_rq")
-def test_run_knowledge_graph_returns_task_id(client, test_project):
+def test_run_knowledge_graph_returns_job_id(client, test_project):
     """
     Vérifie que la route POST /api/projects/<id>/run-knowledge-graph retourne un job_id.
     """
@@ -63,7 +63,7 @@ def test_run_knowledge_graph_returns_task_id(client, test_project):
 
 
 @pytest.mark.usefixtures("mock_redis_and_rq")
-def test_add_manual_articles_returns_task_id(client, test_project):
+def test_add_manual_articles_returns_job_id(client, test_project):
     """
     Vérifie que la route POST /api/projects/<id>/add-manual-articles retourne un job_id.
     """
@@ -81,9 +81,9 @@ def test_add_manual_articles_returns_task_id(client, test_project):
 
 
 @pytest.mark.usefixtures("mock_redis_and_rq")
-def test_cancel_task(client):
+def test_cancel_job(client):
     """
-    Vérifie que la route d'annulation de tâche répond correctement.
+    Vérifie que la route d'annulation de job répond correctement.
     """
     # Patch Job.fetch et la connexion qu'il utilise en interne.
     mock_get_redis = patch('api.tasks.redis_conn', new=MagicMock())
@@ -92,25 +92,25 @@ def test_cancel_task(client):
         mock_fetch.return_value = mock_job
         mock_job.cancel.return_value = None # simule la méthode cancel()
         
-        fake_task_id = str(uuid.uuid4())
-        response = client.post(f'/api/tasks/{fake_task_id}/cancel') # La route est dans api/tasks.py
+        fake_job_id = str(uuid.uuid4())
+        response = client.post(f'/api/jobs/{fake_job_id}/cancel') # La route est dans api/tasks.py
         
         assert response.status_code == 200
         assert response.get_json()['message'] == "Demande d'annulation envoyée."
-        mock_fetch.assert_called_once_with(fake_task_id, connection=ANY)
+        mock_fetch.assert_called_once_with(fake_job_id, connection=ANY)
         mock_job.cancel.assert_called_once()
 
 @pytest.mark.usefixtures("mock_redis_and_rq")
-def test_get_tasks_status(client):
+def test_get_jobs_status(client):
     """
-    Vérifie que la route GET /api/tasks/status retourne une liste de tâches.
-    Ce test utilise un mock pour simuler des tâches dans les files RQ.
+    Vérifie que la route GET /api/jobs/status retourne une liste de jobs.
+    Ce test utilise un mock pour simuler des jobs dans les files RQ.
     """
     now = datetime.utcnow()
     
     # Créer des objets Job simulés avec des attributs réalistes
     mock_started_job = MagicMock()
-    mock_started_job.id = 'task_started_1'
+    mock_started_job.id = 'job_started_1'
     mock_started_job.description = 'Analyse en cours'
     mock_started_job.get_status.return_value = 'started'
     mock_started_job.started_at = now - timedelta(minutes=1)
@@ -119,7 +119,7 @@ def test_get_tasks_status(client):
     mock_started_job.exc_info = None
     
     mock_queued_job = MagicMock()
-    mock_queued_job.id = 'task_queued_1'
+    mock_queued_job.id = 'job_queued_1'
     mock_queued_job.description = 'Indexation en attente'
     mock_queued_job.get_status.return_value = 'queued'
     mock_queued_job.started_at = None
@@ -152,7 +152,7 @@ def test_get_tasks_status(client):
         ]
         
         # 2. Appeler la route
-        response = client.get('/api/tasks/status')
+        response = client.get('/api/jobs/status')
         
         # 3. Assertions
         assert response.status_code == 200
@@ -161,7 +161,7 @@ def test_get_tasks_status(client):
         assert len(tasks_data) == 2
         
         # Vérifier que la tâche la plus récente (queued) est bien la première
-        assert tasks_data[0]['id'] == 'task_queued_1'
+        assert tasks_data[0]['id'] == 'job_queued_1'
         assert tasks_data[0]['status'] == 'queued'
-        assert tasks_data[1]['id'] == 'task_started_1'
+        assert tasks_data[1]['id'] == 'job_started_1'
         assert tasks_data[1]['status'] == 'started'

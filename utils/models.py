@@ -182,6 +182,9 @@ class Validation(Base):
 
 class Analysis(Base):
     __tablename__ = 'analyses'
+    __table_args__ = (
+        UniqueConstraint('project_id', 'analysis_type', name='uq_project_analysis_type'),
+    )
 
     id = Column(String, primary_key=True, default=_uuid)
     project_id = Column(String, ForeignKey("projects.id"), nullable=False)

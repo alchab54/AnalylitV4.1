@@ -1,5 +1,6 @@
+
 services:
-  # Service worker dédié à l'environnement de test
+
   test-worker:
     build:
       context: .
@@ -134,12 +135,12 @@ services:
       PYTHONPATH: /home/appuser/app
       WAIT_HOSTS: test-db:5432,redis:6379
     command: ["python", "-m", "alembic", "-c", "alembic.ini", "upgrade", "head"]
-   depends_on:
+    depends_on:
       test-db:
         condition: service_healthy
     volumes:
       - .:/home/appuser/app:ro
-    networks:
+    networks: 
       - analylit-network
 
 networks:

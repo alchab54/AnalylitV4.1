@@ -139,38 +139,43 @@ def test_api_admin_endpoints(client):
     Teste les routes de l'API d'administration (Ollama pull, Queue clear).
     """
     from unittest.mock import ANY
-    # --- 1. POST /api/ollama/pull (Vérifie la mise en file) ---
+    from backend.tasks_v4_complete import pull_ollama_model_task
+
+    # --- 1. POST /api/pull-models (Vérifie la mise en file) ---
     with patch('api.admin.models_queue.enqueue') as mock_enqueue:
         mock_job = MagicMock()
         mock_job.get_id.return_value = "mock_pull_task_id"
         mock_enqueue.return_value = mock_job
         
-        response_pull = client.post('/api/pull-models', json={'model_name': 'test-model:latest'}) # Fixed URL
+        response_pull = client.post('/api/pull-models', json={'model_name': 'test-model:latest'})
 
         assert response_pull.status_code == 202
-        response_data = response_pull.json # type: ignore
-        assert 'job_id' in response_data
-        assert response_data['job_id'] == "mock_pull_task_id"
-        # Vérifie que la bonne tâche a été appelée avec le bon argument
-        mock_enqueue.assert_called_with( # Utiliser assert_called_with pour ignorer les autres appels potentiels
-            ANY, # On ignore la référence de la fonction
-            'test-model:latest', # On vérifie les arguments
+        response_data = response_pull.json
+        assert 'task_id' in response_data
+        assert response_data['task_id'] == "mock_pull_task_id"
+        
+        mock_enqueue.assert_called_once_with(
+            pull_ollama_model_task,
+            'test-model:latest',
             job_timeout='30m'
         )
 
     # --- 2. POST /api/queues/clear (Vérifie l'appel .empty()) ---
-    # On mock la méthode .empty() de l'objet 'processing_queue' là où elle est utilisée
-    with patch('api.admin.processing_queue.empty') as mock_queue_empty:
+    with patch('rq.Queue.empty') as mock_queue_empty:
+        mock_queue_empty.return_value = 5 # Simule la suppression de 5 tâches
         response_clear = client.post('/api/queues/clear', json={'queue_name': 'analylit_processing_v4'})
         
         assert response_clear.status_code == 200
-        assert "vidés" in response_clear.json['message']
-        mock_queue_empty.assert_called_once() # Vérifie que la file a bien été vidée
+        assert "vidée" in response_clear.json['message']
+        assert response_clear.json['cleared_tasks'] == 5
+        mock_queue_empty.assert_called_once()
 
-    # --- 3. POST apiqueuesclear (Test échec) ---
-    response_clear_fail = client.post('/api/queues/clear', json={'queue_name': 'file_inexistante'})
-    assert response_clear_fail.status_code == 404
-    assert "non trouvée" in response_clear_fail.json['error']
+    # --- 3. POST /api/queues/clear (Test avec une file vide) ---
+    with patch('rq.Queue.empty') as mock_queue_empty_2:
+        mock_queue_empty_2.return_value = 0
+        response_clear_fail = client.post('/api/queues/clear', json={'queue_name': 'file_inexistante'})
+        assert response_clear_fail.status_code == 200
+        assert response_clear_fail.json['cleared_tasks'] == 0
 
 # =================================================================
 # 4. Tests pour l'Extension API

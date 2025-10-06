@@ -58,7 +58,7 @@ def test_update_decision_for_second_evaluator(client, db_session, setup_double_c
 
 @patch('api.projects.analysis_queue.enqueue')
 @pytest.mark.usefixtures("mock_redis_and_rq")
-def test_calculate_kappa_task_enqueued(mock_enqueue, client, setup_double_coding_data):
+def test_calculate_kappa_job_enqueued(mock_enqueue, client, setup_double_coding_data):
     """
     Vérifie que la tâche de calcul Kappa peut être mise en file d'attente via l'endpoint dédié.
     Objectif : Confirmer que l'analyse de l'accord inter-juges peut être lancée.
@@ -66,7 +66,7 @@ def test_calculate_kappa_task_enqueued(mock_enqueue, client, setup_double_coding
     project_id = setup_double_coding_data
 
     mock_job = MagicMock()
-    mock_job.id = "kappa_task_123"
+    mock_job.id = "kappa_job_123"
     mock_enqueue.return_value = mock_job
 
     # Appel de l'API de calcul Kappa
@@ -75,7 +75,7 @@ def test_calculate_kappa_task_enqueued(mock_enqueue, client, setup_double_coding
     )
     
     assert response.status_code == 202, "L'endpoint de calcul Kappa doit répondre 202."
-    assert response.get_json()['task_id'] == "kappa_task_123"
+    assert response.get_json()['job_id'] == "kappa_job_123"
     
     # Vérifier que la bonne tâche a été mise en file d'attente
     from backend.tasks_v4_complete import calculate_kappa_task

@@ -1241,9 +1241,11 @@ def run_atn_score_task(session, project_id: str):
             SELECT COUNT(*)
             FROM extractions e
             WHERE e.project_id = :project_id
-        """), {"project_id": project_id}, execution_options={"autocommit": True}).scalar()
-        if extractions_count and extractions_count.get('total', 0) > 0:
+        """), {"project_id": project_id}).scalar()
+        if extractions_count and extractions_count > 0:
             break
+        waited += wait_interval
+        time.sleep(wait_interval)
     try:
         # Vérifier s'il y a des extractions à analyser
         extractions = session.execute(text("""
