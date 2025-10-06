@@ -7,13 +7,13 @@ import sys
 import os
 from typing import Dict, Any, Optional  
 from datetime import datetime          
-import redis  
+from redis import Redis
 
 
 # ✅ CORRECTION : S'assurer que le chemin est correct
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from redis import Redis
+
 try:
     from backend.config.config_v4 import get_config
 except ImportError:
