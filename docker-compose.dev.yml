@@ -259,9 +259,30 @@ services:
     networks:
       - analylit-network
 
+  analylit_ollama_dev:
+    image: ollama/ollama:latest
+    container_name: analylit_ollama_dev
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_HOST=0.0.0.0
+    networks:
+      - analylit_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
 networks:
   analylit-network:
     driver: bridge
 
 volumes:
   test_postgres_data:
+  ollama_data:
+    driver: local
