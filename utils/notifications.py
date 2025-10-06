@@ -5,28 +5,22 @@ import logging
 import json
 import sys
 import os
-from typing import Dict, Any, Optional  
-from datetime import datetime          
+from typing import Dict, Any, Optional
+from datetime import datetime
 from redis import Redis
+
 logger = logging.getLogger(__name__)
-config = get_config()
-REDIS_CHANNEL = "analylit_notifications"
 
-# ✅ CORRECTION : S'assurer que le chemin est correct
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-
+# ✅ CORRECTION : Importer AVANT d'utiliser
 try:
     from backend.config.config_v4 import get_config
+    config = get_config()
 except ImportError:
     # Fallback pour Alembic qui n'a pas accès au module backend
-    def get_config():
-        class MockConfig:
-            REDIS_URL = "redis://localhost:6379/0"
-        return MockConfig()
+    class MockConfig:
+        REDIS_URL = "redis://localhost:6379/0"
+    config = MockConfig()
 
-
-config = get_config()
 REDIS_CHANNEL = "analylit_notifications"
 
 # Connexion "lazy" : initialisée à None
