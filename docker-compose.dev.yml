@@ -71,7 +71,7 @@ services:
         BASE_IMAGE: analylit-base-cpu:latest
     image: analylit-web-dev:latest
     container_name: analylit_web_dev
-    command: ["flask", "run", "--host=0.0.0.0", "--port=5000", "--debug"]
+    command: ["python", "backend/server_v4_complete.py"]
     environment:
       FLASK_ENV: development
       FLASK_APP: backend/server_v4_complete.py
