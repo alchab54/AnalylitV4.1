@@ -71,7 +71,7 @@ services:
     environment:
       FLASK_ENV: development
       FLASK_APP: backend/server_v4_complete.py
-      DATABASE_HOST: test-db
+      DB_HOST: test-db
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       REDIS_URL: redis://redis:6379/0
       REDIS_HOST: redis
@@ -92,28 +92,21 @@ services:
 
   # Service de migration de base de données pour l'environnement de test
   migrate:
+    container_name: analylit_migrate_dev
     build:
       context: .
-      dockerfile: docker/Dockerfile.web
-      args:
-        BASE_IMAGE: analylit-base-cpu:latest
-    image: analylit-migrate:latest
-    container_name: analylit_migrate_dev
+      dockerfile: docker/Dockerfile.migrate
     environment:
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      PYTHONPATH: /home/appuser/app
+      - DATABASE_URL=postgresql://test_user:test_password@test-db:5432/test_db
+      - REDIS_URL=redis://redis:6379/0
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/home/appuser/app
       # ✅ CORRECTION FINALE : La variable doit pointer vers le bon service DB
-      WAIT_HOSTS: test-db:5432,redis:6379
+      - WAIT_HOSTS=test-db:5432,redis:6379
     command: |
-      sh -c "/tmp/wait-for-it-fixed.sh test-db:5432 -t 0 -- python -m alembic -c /home/appuser/app/alembic.ini upgrade head"
+      sh -c "scripts/wait-for-it.sh test-db:5432 -t 0 -- python -m alembic -c alembic.ini upgrade head"
     volumes:
       - .:/home/appuser/app:ro
-    depends_on:
-      test-db:
-        condition: service_healthy
-    networks:
-      - analylit-network
-    restart: "no"
 
 volumes:
   test_postgres_data:

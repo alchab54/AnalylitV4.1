@@ -1,0 +1,28 @@
+# This ARG is global and can be used in FROM instructions
+ARG BASE_IMAGE=analylit-base-cpu:latest
+
+# Stage 1: Prepare the script
+FROM alpine as script_copier
+COPY scripts/wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
+
+# Stage 2: Main build
+FROM ${BASE_IMAGE}
+
+# Set the working directory
+WORKDIR /home/appuser/app
+
+# Install migration dependencies
+RUN echo "alembic\npsycopg2-binary\nSQLAlchemy\npython-dotenv\ngreenlet" > requirements-migrate.txt && \
+    pip install -r requirements-migrate.txt
+
+# Copy the wait-for-it script from the first stage
+COPY --from=script_copier /wait-for-it.sh scripts/wait-for-it.sh
+
+# Copy other necessary files
+COPY alembic.ini .
+COPY migrations ./migrations
+COPY utils/ ./utils/
+
+# Set ownership
+RUN chown -R appuser:appuser /home/appuser/app
