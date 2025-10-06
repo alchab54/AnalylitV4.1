@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Script de test ATN - 5 Articles - Version Finale Corrigée
+Script de test ATN - 5 Articles - Version FINALE
 Test automatisé du workflow AnalyLit pour thèse ATN
 """
 
@@ -64,71 +64,73 @@ class ATNTester:
             return False
 
     def add_atn_articles(self) -> bool:
-        """Ajouter les 5 articles ATN de test - FORMAT CORRIGÉ"""
-        # Format corrigé : liste directe d'articles (pas d'objet "articles")
-        articles_data = [
-            {
-                "title": "Digital Therapeutic Alliance in Mental Health: A Systematic Review",
-                "authors": "Smith, J.; Brown, A.; Wilson, R.",
-                "journal": "Journal of Digital Health",
-                "year": 2024,
-                "abstract": "This study examines the effectiveness of digital therapeutic alliances in mental healthcare, focusing on AI-powered interventions and patient outcomes.",
-                "pmid": "38001001",
-                "doi": "10.1000/test.2024.001",
-                "keywords": "digital health, therapeutic alliance, artificial intelligence, mental health",
-                "study_type": "systematic review"
-            },
-            {
-                "title": "AI-Powered Therapeutic Relationships: Evidence from Randomized Trials",
-                "authors": "Brown, A.; Davis, M.; Taylor, S.",
-                "journal": "Digital Medicine Quarterly",
-                "year": 2024,
-                "abstract": "Randomized controlled trial examining the impact of AI-enhanced therapeutic relationships on treatment adherence and clinical outcomes.",
-                "pmid": "38001002",
-                "doi": "10.1000/test.2024.002",
-                "keywords": "randomized trial, AI therapy, patient outcomes, adherence",
-                "study_type": "randomized controlled trial"
-            },
-            {
-                "title": "Machine Learning in Psychotherapy: Building Digital Therapeutic Alliances",
-                "authors": "Johnson, M.; Anderson, K.; Lee, H.",
-                "journal": "Computational Psychiatry",
-                "year": 2023,
-                "abstract": "Investigation of machine learning algorithms designed to enhance therapeutic alliance formation in digital mental health platforms.",
-                "pmid": "38001003",
-                "doi": "10.1000/test.2023.003",
-                "keywords": "machine learning, psychotherapy, digital therapeutics, algorithms",
-                "study_type": "experimental study"
-            },
-            {
-                "title": "Patient-AI Interaction Patterns in Digital Therapeutic Interventions",
-                "authors": "Davis, K.; Wilson, P.; Martinez, L.",
-                "journal": "Nature Digital Medicine",
-                "year": 2024,
-                "abstract": "Analysis of interaction patterns between patients and AI systems in digital therapeutic contexts, with focus on alliance-building mechanisms.",
-                "pmid": "38001004", 
-                "doi": "10.1000/test.2024.004",
-                "keywords": "patient interaction, AI systems, digital therapeutics, alliance building",
-                "study_type": "observational study"
-            },
-            {
-                "title": "Measuring Digital Therapeutic Alliance: A Validation Study",
-                "authors": "Wilson, R.; Thompson, G.; Clark, N.",
-                "journal": "Journal of Medical Internet Research",
-                "year": 2024,
-                "abstract": "Development and validation of measurement tools for assessing the quality of digital therapeutic alliances in AI-mediated healthcare interventions.",
-                "pmid": "38001005",
-                "doi": "10.1000/test.2024.005",
-                "keywords": "measurement validation, therapeutic alliance, digital health assessment",
-                "study_type": "validation study"
-            }
-        ]
+        """Ajouter les 5 articles ATN de test - FORMAT API CORRECT"""
+        # FORMAT CORRECT : objet avec clé "items"
+        articles_data = {
+            "items": [
+                {
+                    "title": "Digital Therapeutic Alliance in Mental Health: A Systematic Review",
+                    "authors": "Smith, J.; Brown, A.; Wilson, R.",
+                    "journal": "Journal of Digital Health",
+                    "year": 2024,
+                    "abstract": "This study examines the effectiveness of digital therapeutic alliances in mental healthcare, focusing on AI-powered interventions and patient outcomes.",
+                    "pmid": "38001001",
+                    "doi": "10.1000/test.2024.001",
+                    "keywords": "digital health, therapeutic alliance, artificial intelligence, mental health",
+                    "study_type": "systematic review"
+                },
+                {
+                    "title": "AI-Powered Therapeutic Relationships: Evidence from Randomized Trials",
+                    "authors": "Brown, A.; Davis, M.; Taylor, S.",
+                    "journal": "Digital Medicine Quarterly",
+                    "year": 2024,
+                    "abstract": "Randomized controlled trial examining the impact of AI-enhanced therapeutic relationships on treatment adherence and clinical outcomes.",
+                    "pmid": "38001002",
+                    "doi": "10.1000/test.2024.002",
+                    "keywords": "randomized trial, AI therapy, patient outcomes, adherence",
+                    "study_type": "randomized controlled trial"
+                },
+                {
+                    "title": "Machine Learning in Psychotherapy: Building Digital Therapeutic Alliances",
+                    "authors": "Johnson, M.; Anderson, K.; Lee, H.",
+                    "journal": "Computational Psychiatry",
+                    "year": 2023,
+                    "abstract": "Investigation of machine learning algorithms designed to enhance therapeutic alliance formation in digital mental health platforms.",
+                    "pmid": "38001003",
+                    "doi": "10.1000/test.2023.003",
+                    "keywords": "machine learning, psychotherapy, digital therapeutics, algorithms",
+                    "study_type": "experimental study"
+                },
+                {
+                    "title": "Patient-AI Interaction Patterns in Digital Therapeutic Interventions",
+                    "authors": "Davis, K.; Wilson, P.; Martinez, L.",
+                    "journal": "Nature Digital Medicine",
+                    "year": 2024,
+                    "abstract": "Analysis of interaction patterns between patients and AI systems in digital therapeutic contexts, with focus on alliance-building mechanisms.",
+                    "pmid": "38001004", 
+                    "doi": "10.1000/test.2024.004",
+                    "keywords": "patient interaction, AI systems, digital therapeutics, alliance building",
+                    "study_type": "observational study"
+                },
+                {
+                    "title": "Measuring Digital Therapeutic Alliance: A Validation Study",
+                    "authors": "Wilson, R.; Thompson, G.; Clark, N.",
+                    "journal": "Journal of Medical Internet Research",
+                    "year": 2024,
+                    "abstract": "Development and validation of measurement tools for assessing the quality of digital therapeutic alliances in AI-mediated healthcare interventions.",
+                    "pmid": "38001005",
+                    "doi": "10.1000/test.2024.005",
+                    "keywords": "measurement validation, therapeutic alliance, digital health assessment",
+                    "study_type": "validation study"
+                }
+            ]
+        }
 
         try:
             self.log("INFO", "Ajout manuel des 5 articles ATN via /add-manual-articles...")
             response = self.session.post(
                 f"{self.base_url}/api/projects/{self.project_id}/add-manual-articles",
-                json=articles_data  # Format corrigé : liste directe
+                json=articles_data  # Format correct avec "items"
             )
             
             if response.status_code in [200, 202]:
