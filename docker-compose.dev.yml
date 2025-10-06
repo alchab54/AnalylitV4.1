@@ -1,4 +1,4 @@
-# version: '3.8' # La version est obsolète et peut être retirée.
+version: '3.8'
 
 services:
   # Service worker dédié à l'environnement de test
@@ -125,4 +125,3 @@ volumes:
 networks:
   analylit-network:
     driver: bridge
-
