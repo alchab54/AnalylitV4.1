@@ -1,13 +1,15 @@
 import logging
 from logging.config import fileConfig
 import os
+import sys
+sys.path.insert(0, '/home/appuser/app')
+
 from pathlib import Path
 from alembic import context
 from sqlalchemy import engine_from_config, pool, text
 
 # --- AJOUT POUR LA GESTION DU SCHÉMA ---
 # Ajoute le répertoire racine de l'application au path pour trouver 'utils'
-import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 # ✅ IMPORT DES MODÈLES (c'est ça qui manquait !)
