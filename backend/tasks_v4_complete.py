@@ -13,6 +13,7 @@ from datetime import datetime
 import re
 from functools import wraps
 from pathlib import Path
+from typing import Dict, List, Optional, Any
 
 # --- CORRECTIF DE COMPATIBILITÉ PYZOTERO / FEEDPARSER ---
 # pyzotero tente de patcher une méthode interne de feedparser qui n'existe plus.
