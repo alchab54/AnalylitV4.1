@@ -670,6 +670,8 @@ networks:
     driver: bridge
     driver_opts:
       com.docker.network.bridge.name: analylit-bridge
+    external: true
+    name: analylit_analylit-network
 
 volumes:
   test_postgres_data:
