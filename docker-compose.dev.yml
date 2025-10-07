@@ -479,7 +479,7 @@ services:
       args:
         BASE_IMAGE: analylit-base-cpu:latest
     container_name: analylit_worker_analysis_1
-    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue"]
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue", "--job-timeout", "600"]
     depends_on:
       redis:
         condition: service_started
@@ -521,7 +521,7 @@ services:
       args:
         BASE_IMAGE: analylit-base-cpu:latest
     container_name: analylit_worker_analysis_2
-    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue"]
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue", "--job-timeout", "600"]
     depends_on:
       redis:
         condition: service_started
