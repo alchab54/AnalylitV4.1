@@ -479,7 +479,7 @@ services:
       args:
         BASE_IMAGE: analylit-base-cpu:latest
     container_name: analylit_worker_analysis_1
-    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue", "--job-timeout", "600"]
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue"]
     depends_on:
       redis:
         condition: service_started
@@ -499,7 +499,7 @@ services:
       WORKER_TYPE: analysis
       WORKER_ID: analysis-1
       REQUEST_TIMEOUT: "600"        # Au lieu de REQUEST_TIMEOUT=600
-      RQ_JOB_TIMEOUT: "900"
+      RQ_JOB_TIMEOUT: "600"
     volumes:
       - .:/home/appuser/app
     deploy:
@@ -521,7 +521,7 @@ services:
       args:
         BASE_IMAGE: analylit-base-cpu:latest
     container_name: analylit_worker_analysis_2
-    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue", "--job-timeout", "600"]
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue"]
     depends_on:
       redis:
         condition: service_started
@@ -541,7 +541,7 @@ services:
       WORKER_TYPE: analysis
       WORKER_ID: analysis-2
       REQUEST_TIMEOUT: "600"        # Au lieu de REQUEST_TIMEOUT=600
-      RQ_JOB_TIMEOUT: "900"
+      RQ_JOB_TIMEOUT: "600"
     volumes:
       - .:/home/appuser/app
     deploy:
