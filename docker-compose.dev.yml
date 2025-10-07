@@ -51,7 +51,7 @@ services:
     container_name: analylit_redis_dev
     ports:
       - "6380:6379"
-    command: ["redis-server", "--maxmemory", "512mb", "--maxmemory-policy", "allkeys-lru"]
+    command: ["redis-server", "--maxmemory", "1gb", "--maxmemory-policy", "allkeys-lru"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -73,8 +73,8 @@ services:
       - OLLAMA_KEEP_ALIVE=24h
       - OLLAMA_HOST=0.0.0.0
       - OLLAMA_ORIGINS=*
-      - OLLAMA_NUM_PARALLEL=8        # Parallélisation maximale
-      - OLLAMA_MAX_LOADED_MODELS=4   # Modèles en mémoire
+      - OLLAMA_NUM_PARALLEL=4        # Parallélisation maximale
+      - OLLAMA_MAX_LOADED_MODELS=2   # Modèles en mémoire
       - NVIDIA_VISIBLE_DEVICES=all   # GPU complet si disponible
     deploy:
       resources:
