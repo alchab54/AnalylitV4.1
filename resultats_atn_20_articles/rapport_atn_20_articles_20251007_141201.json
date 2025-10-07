@@ -1,0 +1,34 @@
+{
+  "timestamp_start": "2025-10-07T14:11:55.899044",
+  "project_id": null,
+  "pmids_count": 20,
+  "steps": {
+    "health_check": {
+      "success": true,
+      "duration_seconds": 0.02
+    },
+    "metadata_fetch": {
+      "success": true,
+      "articles_count": 20
+    },
+    "fetch_metadata": {
+      "success": true,
+      "duration_seconds": 0.02
+    },
+    "pdf_attachment": {
+      "success": true,
+      "pdfs_found": 0,
+      "pdfs_missing": 20
+    },
+    "attach_pdfs": {
+      "success": true,
+      "duration_seconds": 5.45
+    },
+    "create_project": {
+      "success": false,
+      "duration_seconds": 0.09
+    }
+  },
+  "final_metrics": {},
+  "timestamp_end": "2025-10-07T14:12:01.480524"
+}
