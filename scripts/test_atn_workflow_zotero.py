@@ -290,7 +290,7 @@ class ATNWorkflowZotero:
         article_ids = [article.get('zotero_id') for article in self.articles_data]
         data = {
             "articles": article_ids,
-            "profile": "atn-specialized",
+            "profile_id": "atn-fast-gpu",  # Au lieu de "atn-specialized"
             "analysis_mode": "screening",
             "auto_validate_threshold": 70
         }

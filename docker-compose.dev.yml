@@ -494,13 +494,14 @@ services:
       OLLAMA_BASE_URL: http://ollama:11434
       PYTHONPATH: /home/appuser/app
       WORKER_TYPE: analysis
+      RQ_WORKER_TIMEOUT: "600"
+      OLLAMA_REQUEST_TIMEOUT: "300"
       WORKER_ID: analysis-1
     volumes:
       - .:/home/appuser/app
     networks:
       - analylit-network
     restart: unless-stopped
-
   worker-analysis-2:
     build:
       context: .
@@ -525,6 +526,8 @@ services:
       PYTHONPATH: /home/appuser/app
       WORKER_TYPE: analysis
       WORKER_ID: analysis-2
+      RQ_WORKER_TIMEOUT: "600"
+      OLLAMA_REQUEST_TIMEOUT: "300"
     volumes:
       - .:/home/appuser/app
     networks:
