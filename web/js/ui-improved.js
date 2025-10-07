@@ -626,9 +626,12 @@ export function showConfirmModal(title, message, options = {}) {
     // Gestionnaire temporaire pour la confirmation
     const handleConfirm = (e) => {
         if (e.target.dataset.action === 'confirm-action') {
-            if (onConfirm) onConfirm();
-            closeModal('genericModal');
-            document.removeEventListener('click', handleConfirm);
+            try {
+                if (onConfirm) onConfirm();
+            } finally {
+                closeModal('genericModal');
+                document.removeEventListener('click', handleConfirm);
+            }
         } else if (e.target.dataset.action === 'close-modal') {
             if (onCancel) onCancel();
             document.removeEventListener('click', handleConfirm);

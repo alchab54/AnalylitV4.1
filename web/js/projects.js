@@ -157,7 +157,7 @@ async function confirmDeleteProject(projectId) {
 /**
  * Duplique un projet.
  */
-export async function handleDuplicateProject(projectId) {
+async function handleDuplicateProject(projectId) {
     if (!projectId) {
         showToast('ID de projet manquant pour la duplication.', 'warning');
         return;
