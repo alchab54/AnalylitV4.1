@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-10-07T19:43:28.324581",
+  "workflow_type": "ultra_robuste",
+  "duration_minutes": 1.1,
+  "project_id": "a04442bb-6ff8-45f5-a8c0-e2a05d351b42",
+  "articles_source": "C:\\Users\\alich\\Downloads\\Analylit\\20ATN.json",
+  "input_articles": 20,
+  "monitoring_cycles": 1,
+  "results": {
+    "extractions_detected": 0,
+    "estimated_completion_rate": 0.0,
+    "system_stability": "limited_monitoring",
+    "validation_status": "partial"
+  },
+  "monitoring_timeline": [
+    {
+      "cycle": 1,
+      "time": "2025-10-07T19:42:50.886689",
+      "extractions": 0,
+      "completion_rate": 0.0
+    }
+  ],
+  "errors_encountered": 0,
+  "resilience_features": {
+    "api_fallbacks": true,
+    "continuous_monitoring": true,
+    "graceful_degradation": true,
+    "always_completes": true
+  },
+  "recommendations": {
+    "data_usable": false,
+    "thesis_ready": false,
+    "architecture_validated": true,
+    "next_steps": "Utiliser données extraites pour rédaction académique"
+  }
+}

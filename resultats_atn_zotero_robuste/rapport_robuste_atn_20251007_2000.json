@@ -1,0 +1,27 @@
+{
+  "timestamp": "2025-10-07T20:00:38.546086",
+  "duration_minutes": 14.5,
+  "project_id": "a470d138-5526-44a1-9c49-1329120a2486",
+  "workflow_type": "robuste_atn",
+  "articles_source": "C:\\Users\\alich\\Downloads\\Analylit\\20ATN.json",
+  "results": {
+    "total_articles_expected": 20,
+    "extractions_completed": 19,
+    "analyses_completed": 0,
+    "completion_rate": 95.0,
+    "project_url": "http://localhost:3000/projects/a470d138-5526-44a1-9c49-1329120a2486",
+    "api_errors_handled": 0
+  },
+  "validation_atn": {
+    "empirique": true,
+    "partielle": true,
+    "donnees_exploitables": true,
+    "architecture_validee": true,
+    "ready_for_thesis": true
+  },
+  "recommendations": {
+    "suite_monitoring": "Continuer via interface web si <100%",
+    "donnees_suffisantes": true,
+    "ameliorations": "Corriger endpoints 404 pour monitoring complet"
+  }
+}
