@@ -1,0 +1,14 @@
+{
+  "timestamp": "2025-10-07T18:28:40.501547",
+  "duration_minutes": 10.5,
+  "project_id": "55b6f22a-9a57-4c8e-aa15-a7471f36e919",
+  "results": {
+    "articles_imported": 0,
+    "articles_expected": 20,
+    "status": "pending",
+    "mean_score": 0,
+    "project_url": "http://localhost:3000/projects/55b6f22a-9a57-4c8e-aa15-a7471f36e919"
+  },
+  "articles_source": "C:\\Users\\alich\\Downloads\\Analylit\\20ATN.json",
+  "validation_type": "empirique_finale"
+}
