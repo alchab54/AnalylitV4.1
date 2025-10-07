@@ -1,0 +1,164 @@
+{
+  "project_id": "a47414c0-3e48-4d29-a2e6-78fe934b8457",
+  "timestamp": "2025-10-07T12:49:27.246578",
+  "articles_results": [
+    {
+      "article": {
+        "key": "NQNKTNHL",
+        "title": "Clinicians Attitudes Toward Telepsychology in Addiction and Mental Health Services",
+        "abstract": "telepsychology services therapeutic alliance clinicians attitudes virtual technologies video services telephone services addiction mental health",
+        "tags": [
+          "mental health",
+          "therapeutic alliance",
+          "clinician attitude",
+          "telepsychology",
+          "technology acceptance"
+        ],
+        "year": 2022
+      },
+      "relevance": {
+        "score": 42,
+        "category": "MODÉRÉMENT PERTINENT",
+        "symbol": "[+]",
+        "details": [
+          "Alliance: therapeutic alliance",
+          "Alliance: alliance",
+          "Digital: telepsychology",
+          "Tech: technology acceptance",
+          "Tech: attitudes toward",
+          "Tech: acceptance",
+          "Année: 2020+"
+        ],
+        "criteria_found": 7
+      }
+    },
+    {
+      "article": {
+        "key": "IQ7RGLVV",
+        "title": "Perceptions of Telemental Health Care Delivery During COVID-19",
+        "abstract": "telemental health providers remote patient care telemedicine therapeutic alliance patient-centered communication multicultural counseling",
+        "tags": [
+          "mental health",
+          "COVID-19",
+          "telemedicine",
+          "telemental health",
+          "quality of care"
+        ],
+        "year": 2022
+      },
+      "relevance": {
+        "score": 56,
+        "category": "PERTINENT ATN",
+        "symbol": "[++]",
+        "details": [
+          "Alliance: therapeutic alliance",
+          "Alliance: alliance",
+          "Digital: telemedicine",
+          "Digital: telemental",
+          "Patient: patient-centered",
+          "Patient: patient care",
+          "Patient: quality of care",
+          "Patient: care delivery",
+          "Tech: perceptions",
+          "Comm: communication",
+          "Année: 2020+"
+        ],
+        "criteria_found": 11
+      }
+    },
+    {
+      "article": {
+        "key": "BAZAU2AM",
+        "title": "Digital Components Blended Care Cognitive Behavioral Therapy Intervention Depression Anxiety",
+        "abstract": "blended care therapy digital components cognitive behavioral therapy depression anxiety digital video lessons digital exercises therapy sessions",
+        "tags": [
+          "digital health",
+          "blended care",
+          "cognitive-behavioral therapy",
+          "digital therapy",
+          "depression",
+          "anxiety"
+        ],
+        "year": 2021
+      },
+      "relevance": {
+        "score": 26,
+        "category": "PEU PERTINENT ATN",
+        "symbol": "[-]",
+        "details": [
+          "Digital: digital health",
+          "Digital: digital therapy",
+          "Digital: digital component",
+          "Digital: blended care",
+          "Année: 2020+"
+        ],
+        "criteria_found": 5
+      }
+    },
+    {
+      "article": {
+        "key": "QJTQKZYG",
+        "title": "Communicating With Parents and Preschool Children Dental Professional Interactions",
+        "abstract": "communication interactions dental professionals parents children triadic treatment alliance social talking containing worries task-focusing",
+        "tags": [
+          "communication",
+          "Parent-Child Relations",
+          "dental care",
+          "treatment alliance",
+          "professional interactions"
+        ],
+        "year": 2021
+      },
+      "relevance": {
+        "score": 32,
+        "category": "MODÉRÉMENT PERTINENT",
+        "symbol": "[+]",
+        "details": [
+          "Alliance: treatment alliance",
+          "Alliance: alliance",
+          "Comm: communication",
+          "Comm: interaction",
+          "Année: 2020+"
+        ],
+        "criteria_found": 5
+      }
+    },
+    {
+      "article": {
+        "key": "GPF6TB99",
+        "title": "Dental care of patients exposed to sexual abuse Need for alliance between staff and patients",
+        "abstract": "sexually abused individuals dental patients working alliance patient-centered approach treatment alliance formation power relationship",
+        "tags": [
+          "dental care",
+          "patient-centered",
+          "alliance",
+          "therapeutic relationship",
+          "healthcare alliance"
+        ],
+        "year": 2021
+      },
+      "relevance": {
+        "score": 40,
+        "category": "MODÉRÉMENT PERTINENT",
+        "symbol": "[+]",
+        "details": [
+          "Alliance: treatment alliance",
+          "Alliance: working alliance",
+          "Alliance: alliance",
+          "Alliance: therapeutic relationship",
+          "Alliance: healthcare alliance",
+          "Patient: patient-centered",
+          "Année: 2020+"
+        ],
+        "criteria_found": 7
+      }
+    }
+  ],
+  "summary": {
+    "total_articles": 5,
+    "pertinents": 1,
+    "tres_pertinents": 0,
+    "average_score": 39.2,
+    "success_rate": 20.0
+  }
+}
