@@ -1,0 +1,30 @@
+═══════════════════════════════════════════════════════════════
+   RAPPORT DE VALIDATION EMPIRIQUE ATN - RÉSUMÉ EXÉCUTIF
+═══════════════════════════════════════════════════════════════
+
+📅 Date: 07/10/2025 16:29:12
+🆔 Projet ID: 7f738c2e-4cb9-4b52-9a34-bcdae4e1bc45
+📚 Articles traités: 20
+
+🔄 RÉSULTATS PAR ÉTAPE:
+   health_check         → ✅ SUCCÈS (0.1s)
+   load_data            → ✅ SUCCÈS (0.0s)
+   create_project       → ✅ SUCCÈS (0.1s)
+   add_articles         → ✅ SUCCÈS (30.1s)
+   screening            → ✅ SUCCÈS (0.0s)
+   extraction           → ❌ ÉCHEC  (0.0s)
+
+📊 MÉTRIQUES FINALES:
+   Score ATN moyen: 0.0/100
+   Temps total: 0.5 min
+   Taux de succès: 83.3%
+
+❌ ERREURS (1):
+   • extraction: Échec lancement extraction
+
+⚠️  AVERTISSEMENTS (2):
+   • get_ids: Fallback vers titres d'articles au lieu des IDs
+   • screening: Échec lancement screening - étape ignorée
+
+🔗 Interface web: http://localhost:3000/projects/7f738c2e-4cb9-4b52-9a34-bcdae4e1bc45
+═══════════════════════════════════════════════════════════════

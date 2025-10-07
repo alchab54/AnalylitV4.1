@@ -67,7 +67,7 @@ def call_ollama_api(prompt: str, model: str = "llama3.1:8b", output_format: str 
             payload["format"] = "json"
             payload["prompt"] = prompt + "\n\nRépondez UNIQUEMENT avec un JSON valide et complet:"
             
-        response = session.post(url, json=payload, timeout=config.REQUEST_TIMEOUT)
+        response = session.post(url, json=payload, timeout=600
         response.raise_for_status()
         result = response.json()
         raw_response = result.get("response", "").strip()

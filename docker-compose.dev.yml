@@ -498,6 +498,8 @@ services:
       PYTHONPATH: /home/appuser/app
       WORKER_TYPE: analysis
       WORKER_ID: analysis-1
+      REQUEST_TIMEOUT: "600"        # Au lieu de REQUEST_TIMEOUT=600
+      RQ_JOB_TIMEOUT: "900"
     volumes:
       - .:/home/appuser/app
     deploy:
@@ -511,6 +513,7 @@ services:
     networks:
       - analylit-network
     restart: unless-stopped
+    
   worker-analysis-2:
     build:
       context: .
@@ -537,7 +540,8 @@ services:
       PYTHONPATH: /home/appuser/app
       WORKER_TYPE: analysis
       WORKER_ID: analysis-2
-
+      REQUEST_TIMEOUT: "600"        # Au lieu de REQUEST_TIMEOUT=600
+      RQ_JOB_TIMEOUT: "900"
     volumes:
       - .:/home/appuser/app
     deploy:

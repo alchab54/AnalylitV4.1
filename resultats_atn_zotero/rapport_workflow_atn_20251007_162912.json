@@ -1,0 +1,96 @@
+{
+  "timestamp_start": "2025-10-07T16:28:42.602144",
+  "project_id": "7f738c2e-4cb9-4b52-9a34-bcdae4e1bc45",
+  "articles_count": 20,
+  "steps": {
+    "health_check": {
+      "success": true,
+      "duration_seconds": 0.05,
+      "error": null
+    },
+    "load_data": {
+      "success": true,
+      "duration_seconds": 0.0,
+      "error": null
+    },
+    "create_project": {
+      "success": true,
+      "duration_seconds": 0.12,
+      "error": null
+    },
+    "add_articles": {
+      "success": true,
+      "duration_seconds": 30.14,
+      "error": null
+    },
+    "screening": {
+      "success": true,
+      "duration_seconds": 0.01,
+      "error": null
+    },
+    "extraction": {
+      "success": false,
+      "duration_seconds": 0.02,
+      "error": null
+    }
+  },
+  "final_metrics": {
+    "articles_total": 20,
+    "articles_processed": 0,
+    "mean_atn_score": 0,
+    "status": "pending",
+    "processing_time_minutes": 0.5056666666666667,
+    "success_rate": 83.33333333333334,
+    "errors_count": 1,
+    "warnings_count": 2
+  },
+  "errors": [
+    {
+      "step": "extraction",
+      "error": "Échec lancement extraction",
+      "timestamp": "2025-10-07T16:29:12.952650"
+    }
+  ],
+  "warnings": [
+    {
+      "step": "get_ids",
+      "warning": "Fallback vers titres d'articles au lieu des IDs",
+      "timestamp": "2025-10-07T16:29:12.918328"
+    },
+    {
+      "step": "screening",
+      "warning": "Échec lancement screening - étape ignorée",
+      "timestamp": "2025-10-07T16:29:12.931053"
+    }
+  ],
+  "timestamp_end": "2025-10-07T16:29:12.952650",
+  "performance": {
+    "total_duration_minutes": 0.5058417666666667,
+    "steps_summary": {
+      "health_check": {
+        "success": true,
+        "duration_seconds": 0.05
+      },
+      "load_data": {
+        "success": true,
+        "duration_seconds": 0.0
+      },
+      "create_project": {
+        "success": true,
+        "duration_seconds": 0.12
+      },
+      "add_articles": {
+        "success": true,
+        "duration_seconds": 30.14
+      },
+      "screening": {
+        "success": true,
+        "duration_seconds": 0.01
+      },
+      "extraction": {
+        "success": false,
+        "duration_seconds": 0.02
+      }
+    }
+  }
+}
