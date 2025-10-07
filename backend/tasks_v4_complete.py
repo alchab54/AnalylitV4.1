@@ -102,7 +102,7 @@ SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 config = get_config()
 redis_conn = Redis.from_url(config.REDIS_URL)
-analysis_queue = Queue('analysis_queue', connection=redis_conn)
+analysis_queue = Queue('analysis_queue', connection=redis_conn, job_timeout=600)
 # --- Embeddings / Vector store (RAG) ---
 EMBEDDING_MODEL_NAME = getattr(config, "EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 EMBED_BATCH = getattr(config, "EMBED_BATCH", 32)
@@ -435,7 +435,8 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
                 project_id=project_id,
                 article_id=record['aid'],
                 profile=profile_dict,
-                analysis_mode='screening'  # On fait du screening !!
+                analysis_mode='screening',
+                job_timeout=600
             )
         logger.info("✅ Screening tasks enqueued.")
 
@@ -1502,8 +1503,10 @@ def add_manual_articles_task(session, project_id: str, identifiers: list):
         analysis_queue.enqueue(
             'backend.tasks_v4_complete.process_single_article_task',
             project_id=project_id, article_id=article_id,
-            profile=default_profile, analysis_mode="full_extraction"
+            profile=default_profile, analysis_mode="full_extraction",
+            job_timeout=600
         )
+
 
 @with_db_session
 def import_from_zotero_json_task(session, project_id: str, items_list: list):
