@@ -1,0 +1,17 @@
+{
+  "timestamp_start": "2025-10-07T14:42:41.807597",
+  "project_id": null,
+  "articles_count": 0,
+  "steps": {
+    "health_check": {
+      "success": true,
+      "duration_seconds": 0.02
+    },
+    "load_data": {
+      "success": false,
+      "duration_seconds": 0.01
+    }
+  },
+  "final_metrics": {},
+  "timestamp_end": "2025-10-07T14:42:41.831243"
+}

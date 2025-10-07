@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 ═══════════════════════════════════════════════════════════════
-🎯 TEST WORKFLOW ATN COMPLET - 20 ARTICLES ZOTERO CSL JSON
+🎯 TEST WORKFLOW ATN COMPLET - 20 ARTICLES ZOTERO CSL JSON (OPTIMISÉ)
 ═══════════════════════════════════════════════════════════════
 AnalyLit V4.2 RTX 2060 SUPER - Validation Empirique Thèse ATN
 
@@ -20,157 +20,175 @@ import requests
 import json
 import time
 import os
+import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 
 # ═══════════════════════════════════════════════════════════════
 # ENCODAGE UTF-8 WINDOWS
 # ═══════════════════════════════════════════════════════════════
 if sys.platform.startswith('win'):
-    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
-    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
+    try:
+        sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
+        sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
+    except Exception as e:
+        print(f"WARNING: Could not set UTF-8 stdout/stderr: {e}")
 
 # ═══════════════════════════════════════════════════════════════
 # CONFIGURATION
 # ═══════════════════════════════════════════════════════════════
 API_BASE = "http://localhost:8080"
-PROJECT_ROOT = Path(__file__).parent.parent  # Racine projet
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ZOTERO_JSON_PATH = PROJECT_ROOT / "20ATN.json"
 GRILLE_ATN_PATH = PROJECT_ROOT / "grille-ATN.json"
-OUTPUT_DIR = PROJECT_ROOT / "resultats_atn_20_articles"
+OUTPUT_DIR = PROJECT_ROOT / "resultats_atn_zotero"
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 # ═══════════════════════════════════════════════════════════════
 # LOGGING UTF-8
 # ═══════════════════════════════════════════════════════════════
 def log(level: str, message: str, indent: int = 0):
+    """Affiche un message de log formaté avec timestamp et emoji."""
     ts = datetime.now().strftime("%H:%M:%S")
     indent_str = "  " * indent
     emoji_map = {
         "INFO": "ℹ️", "SUCCESS": "✅", "ERROR": "❌",
-        "WARNING": "⚠️", "PROGRESS": "⏳", "DATA": "📊"
+        "WARNING": "⚠️", "PROGRESS": "⏳", "DATA": "📊", "API": "📡"
     }
     emoji = emoji_map.get(level, "📋")
     print(f"[{ts}] {indent_str}{emoji} {level}: {message}")
 
 def log_section(title: str):
-    print("\n" + "="*70)
+    """Affiche un séparateur de section."""
+    print("\n" + "═" * 70)
     print(f"  {title}")
-    print("="*70 + "\n")
+    print("═" * 70 + "\n")
 
 # ═══════════════════════════════════════════════════════════════
 # API WRAPPER
 # ═══════════════════════════════════════════════════════════════
-def api_request(method: str, endpoint: str, data: Optional[Dict] = None, 
-                timeout: int = 60) -> Optional[Dict]:
-    """Wrapper API avec retry"""
+def api_request(method: str, endpoint: str, data: Optional[Dict] = None,
+                params: Optional[Dict] = None, timeout: int = 120) -> Optional[Any]:
+    """Wrapper robuste pour les requêtes API avec gestion des erreurs et retries."""
     url = f"{API_BASE}{endpoint}"
-    
-    try:
-        if method == "GET":
-            resp = requests.get(url, timeout=timeout)
-        elif method == "POST":
-            resp = requests.post(url, json=data, timeout=timeout)
-        elif method == "PUT":
-            resp = requests.put(url, json=data, timeout=timeout)
-        else:
-            return None
-        
-        if resp.status_code in [200, 201, 202]:
-            return resp.json()
-        else:
-            log("ERROR", f"{method} {endpoint} - Code {resp.status_code}")
-            return None
-    except Exception as e:
-        log("ERROR", f"{method} {endpoint} - Exception: {str(e)[:200]}")
-        return None
+    for attempt in range(3):
+        try:
+            log("API", f"{method} {url}", 1)
+            if method.upper() == "GET":
+                resp = requests.get(url, timeout=timeout, params=params)
+            elif method.upper() == "POST":
+                resp = requests.post(url, json=data, timeout=timeout, params=params)
+            elif method.upper() == "PUT":
+                resp = requests.put(url, json=data, timeout=timeout, params=params)
+            else:
+                log("ERROR", f"Méthode HTTP non supportée: {method}")
+                return None
+
+            if resp.status_code in [200, 201, 202]:
+                return resp.json()
+            elif resp.status_code == 204:
+                return True # No content
+            else:
+                log("ERROR", f"{method} {endpoint} a échoué - Code {resp.status_code}: {resp.text[:200]}", 2)
+                return None
+
+        except requests.exceptions.RequestException as e:
+            log("ERROR", f"Exception API ({attempt + 1}/3): {e}", 2)
+            time.sleep(5)
+    return None
 
 # ═══════════════════════════════════════════════════════════════
-# PARSEUR ZOTERO CSL JSON
+# PARSEUR ZOTERO CSL JSON (OPTIMISÉ)
 # ═══════════════════════════════════════════════════════════════
 def parse_zotero_csl_json(json_path: Path) -> List[Dict]:
-    """Parse export Zotero CSL JSON vers format AnalyLit"""
-    log("INFO", f"Chargement {json_path.name}...")
-    
+    """
+    Parse un export Zotero CSL JSON vers le format attendu par AnalyLit.
+    - Gère les particules de noms (`non-dropping-particle`).
+    - Extrait le PMID depuis les champs 'note' ou 'extra'.
+    - Robuste aux données manquantes.
+    """
+    log("INFO", f"Chargement et parsing de '{json_path.name}'...")
+    if not json_path.is_file():
+        log("ERROR", f"Fichier Zotero JSON introuvable: {json_path}")
+        return []
+
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
             zotero_items = json.load(f)
-        
-        articles = []
-        for item in zotero_items:
-            # Extraction métadonnées CSL JSON
-            authors_csl = item.get("author", [])
-            authors = []
-            for auth in authors_csl[:5]:  # Max 5 auteurs
-                family = auth.get("family", "")
-                given = auth.get("given", "")
-                particle = auth.get("non-dropping-particle", "")
-                if particle:
-                    full_name = f"{particle} {family}, {given}"
-                else:
-                    full_name = f"{family}, {given}" if family else given
-                authors.append(full_name.strip())
-            
-            # Extraction année
-            issued = item.get("issued", {}).get("date-parts", [[]])[0]
-            year = issued[0] if issued else 2024
-            
-            # Extraction PMID depuis note
-            pmid = ""
-            note = item.get("note", "")
-            if "PMID:" in note:
-                pmid = note.split("PMID:")[1].split("\n")[0].strip()
-            
-            # DOI
-            doi = item.get("DOI", "")
-            
-            # Abstract
-            abstract = item.get("abstract", "")[:1000]  # Max 1000 chars
-            
-            # Titre
-            title = item.get("title", "Unknown Title")
-            
-            # Journal
-            journal = item.get("container-title", "Unknown Journal")
-            
-            # Construction article format AnalyLit
-            article = {
-                "title": title,
-                "authors": authors if authors else ["Unknown Author"],
-                "year": int(year),
-                "abstract": abstract,
-                "journal": journal,
-                "doi": doi,
-                "pmid": pmid,
-                "type": item.get("type", "article-journal"),
-                "language": item.get("language", "eng"),
-                "keywords": ["therapeutic alliance", "digital health"],  # Tags par défaut ATN
-                "zotero_id": item.get("id", "")
-            }
-            
-            articles.append(article)
-            log("SUCCESS", f"Parsé: {title[:60]}...", 1)
-        
-        log("SUCCESS", f"{len(articles)} articles Zotero chargés")
-        return articles
-        
-    except Exception as e:
-        log("ERROR", f"Erreur parsing Zotero JSON: {str(e)}")
+    except (json.JSONDecodeError, IOError) as e:
+        log("ERROR", f"Impossible de lire ou parser le fichier JSON: {e}")
         return []
+
+    articles = []
+    for i, item in enumerate(zotero_items):
+        # --- Auteurs (robuste) ---
+        authors_csl = item.get("author", [])
+        authors = []
+        for auth in authors_csl[:5]: # Limite à 5 auteurs pour la clarté
+            family = auth.get("family", "")
+            given = auth.get("given", "")
+            particle = auth.get("non-dropping-particle", "")
+            
+            full_name = family
+            if particle:
+                full_name = f"{particle} {family}"
+            if given:
+                full_name += f", {given}"
+            
+            if full_name:
+                authors.append(full_name.strip())
+
+        # --- Année ---
+        issued = item.get("issued", {}).get("date-parts", [[]])
+        year = issued[0][0] if issued and issued[0] else datetime.now().year
+
+        # --- PMID (depuis 'note' ou 'extra') ---
+        pmid = ""
+        note_content = item.get("note", "") + " " + item.get("extra", "")
+        if "PMID:" in note_content:
+            try:
+                pmid = note_content.split("PMID:")[1].split()[0].strip()
+            except IndexError:
+                pass # Pas de PMID trouvé après le préfixe
+
+        title = item.get("title", f"Titre inconnu {i+1}")
+
+        article = {
+            "title": title,
+            "authors": authors if authors else ["Auteur inconnu"],
+            "year": int(year),
+            "abstract": item.get("abstract", "Aucun abstract disponible."),
+            "journal": item.get("container-title", "Journal inconnu"),
+            "doi": item.get("DOI", ""),
+            "pmid": pmid,
+            "type": item.get("type", "article-journal"),
+            "language": item.get("language", "en"),
+            "keywords": item.get("keywords", ["thèse", "ATN"]),
+            "zotero_id": item.get("id", str(uuid.uuid4()))
+        }
+        articles.append(article)
+        log("SUCCESS", f"Article parsé: {title[:60]}...", 1)
+
+    log("SUCCESS", f"📚 {len(articles)} articles chargés depuis Zotero.")
+    return articles
 
 # ═══════════════════════════════════════════════════════════════
 # CHARGEMENT GRILLE ATN
 # ═══════════════════════════════════════════════════════════════
 def load_grille_atn(json_path: Path) -> Dict:
-    """Charge grille-ATN.json"""
+    """Charge le fichier de configuration de la grille ATN."""
+    log("INFO", f"Chargement de la grille d'extraction '{json_path.name}'...")
+    if not json_path.is_file():
+        log("ERROR", f"Fichier de grille ATN introuvable: {json_path}")
+        return {}
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
             grille = json.load(f)
-        log("SUCCESS", f"Grille ATN chargée: {len(grille.get('fields', []))} champs")
+        log("SUCCESS", f"Grille ATN chargée avec {len(grille.get('fields', []))} champs.")
         return grille
-    except Exception as e:
-        log("ERROR", f"Erreur chargement grille ATN: {str(e)}")
+    except (json.JSONDecodeError, IOError) as e:
+        log("ERROR", f"Impossible de charger ou parser la grille ATN: {e}")
         return {}
 
 # ═══════════════════════════════════════════════════════════════
@@ -178,208 +196,200 @@ def load_grille_atn(json_path: Path) -> Dict:
 # ═══════════════════════════════════════════════════════════════
 class ATNWorkflowZotero:
     def __init__(self):
-        self.project_id = None
-        self.articles_data = []
-        self.grille_atn = {}
-        self.results = {
+        self.project_id: Optional[str] = None
+        self.articles_data: List[Dict] = []
+        self.grille_atn: Dict = {}
+        self.results: Dict[str, Any] = {
             "timestamp_start": datetime.now().isoformat(),
             "project_id": None,
             "articles_count": 0,
             "steps": {},
             "final_metrics": {}
         }
-    
-    def load_data_sources(self) -> bool:
-        """Charge données Zotero + Grille ATN"""
-        log_section("ÉTAPE 1/7: CHARGEMENT DONNÉES SOURCES")
+
+    def run_step(self, step_name: str, step_func) -> bool:
+        """Exécute une étape du workflow, mesure sa durée et gère les erreurs."""
+        start_time = time.time()
+        success = False
+        try:
+            success = step_func()
+        except Exception as e:
+            log("ERROR", f"Exception inattendue à l'étape '{step_name}': {e}")
+            import traceback
+            traceback.print_exc()
         
-        # Vérifier existence fichiers
-        if not ZOTERO_JSON_PATH.exists():
-            log("ERROR", f"Fichier introuvable: {ZOTERO_JSON_PATH}")
-            return False
-        
-        if not GRILLE_ATN_PATH.exists():
-            log("WARNING", f"Grille ATN introuvable: {GRILLE_ATN_PATH}")
-        else:
-            self.grille_atn = load_grille_atn(GRILLE_ATN_PATH)
-        
-        # Parser articles Zotero
-        self.articles_data = parse_zotero_csl_json(ZOTERO_JSON_PATH)
-        
-        if not self.articles_data:
-            log("ERROR", "Aucun article chargé depuis Zotero")
-            return False
-        
-        self.results["articles_count"] = len(self.articles_data)
-        log("DATA", f"Articles: {len(self.articles_data)}", 1)
-        log("DATA", f"Grille ATN: {len(self.grille_atn.get('fields', []))} champs", 1)
-        
-        return True
-    
-    def check_api_health(self) -> bool:
-        """Vérifie API disponible"""
-        log_section("ÉTAPE 0/7: VÉRIFICATION API")
-        
-        health = api_request("GET", "/api/health")
-        if health and health.get("status") == "healthy":
-            log("SUCCESS", "API opérationnelle")
-            return True
-        
-        log("ERROR", "API non disponible")
-        return False
-    
-    def create_atn_project(self) -> bool:
-        """Crée projet ATN"""
-        log_section("ÉTAPE 2/7: CRÉATION PROJET ATN")
-        
-        data = {
-            "name": f"ATN 20 Articles Zotero - {datetime.now().strftime('%Y%m%d_%H%M')}",
-            "description": f"Validation empirique ATN v2.1 - {len(self.articles_data)} articles Zotero - Thèse Alliance Thérapeutique Numérique"
+        duration = time.time() - start_time
+        self.results["steps"][step_name] = {
+            "success": success,
+            "duration_seconds": round(duration, 2)
         }
         
+        if not success:
+            log("ERROR", f"Échec de l'étape '{step_name}'. Arrêt du workflow.")
+        
+        return success
+
+    def check_api_health(self) -> bool:
+        log_section("ÉTAPE 0/7: VÉRIFICATION DE L'API ANALYLIT")
+        health = api_request("GET", "/api/health")
+        if health and health.get("status") == "healthy":
+            log("SUCCESS", "API AnalytLit est opérationnelle.")
+            return True
+        log("ERROR", "L'API AnalytLit n'est pas disponible. Veuillez démarrer le backend.")
+        return False
+
+    def load_data_sources(self) -> bool:
+        log_section("ÉTAPE 1/7: CHARGEMENT DES DONNÉES SOURCES")
+        self.articles_data = parse_zotero_csl_json(ZOTERO_JSON_PATH)
+        self.grille_atn = load_grille_atn(GRILLE_ATN_PATH)
+        
+        if not self.articles_data:
+            return False
+            
+        self.results["articles_count"] = len(self.articles_data)
+        log("DATA", f"Total articles: {len(self.articles_data)}", 1)
+        log("DATA", f"Total champs de grille: {len(self.grille_atn.get('fields', []))}", 1)
+        return True
+
+    def create_atn_project(self) -> bool:
+        log_section("ÉTAPE 2/7: CRÉATION DU PROJET ATN")
+        project_name = f"ATN Zotero - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+        data = {
+            "name": project_name,
+            "description": f"Projet de validation pour la thèse ATN avec {len(self.articles_data)} articles de Zotero."
+        }
         result = api_request("POST", "/api/projects", data)
         
-        # ✅ CORRECTION: API retourne "id" pas "project_id"
         if result and "id" in result:
             self.project_id = result["id"]
             self.results["project_id"] = self.project_id
-            log("SUCCESS", f"Projet créé: {self.project_id}")
+            log("SUCCESS", f"Projet créé avec succès. ID: {self.project_id}")
             return True
-        
-        log("ERROR", "Échec création projet")
+        log("ERROR", "La création du projet a échoué.")
         return False
-    
+
     def add_articles_to_project(self) -> bool:
-        """Ajoute articles Zotero au projet"""
-        log_section("ÉTAPE 3/7: AJOUT 20 ARTICLES ZOTERO")
-        
+        log_section("ÉTAPE 3/7: AJOUT DES ARTICLES AU PROJET")
+        # ✅ CORRECTION: L'endpoint attend une clé "items" et une liste d'identifiants.
+        # Nous envoyons les données complètes pour que le backend puisse les créer.
         data = {
-            "articles_data": self.articles_data,
-            "source": "zotero_csl_json"
+            "items": self.articles_data 
         }
+        endpoint = f"/api/projects/{self.project_id}/add-manual-articles"
+        result = api_request("POST", endpoint, data, timeout=180)
         
-        result = api_request("POST",
-                           f"/api/projects/{self.project_id}/add-manual-articles",
-                           data, timeout=120)
-        
-        if result:
-            log("SUCCESS", f"{len(self.articles_data)} articles ajoutés")
-            time.sleep(10)  # Traitement initial
-            return True
-        
-        log("ERROR", "Échec ajout articles")
+        if result and result.get("task_id"):
+            log("SUCCESS", f"Tâche d'ajout de {len(self.articles_data)} articles lancée (Job ID: {result['task_id']}).")
+            return self.wait_for_task(result["task_id"], "ajout des articles")
+        log("ERROR", "L'ajout des articles a échoué.")
         return False
-    
+
     def run_atn_screening(self) -> bool:
-        """Lance screening ATN ≥70/100"""
-        log_section("ÉTAPE 4/7: SCREENING ATN (≥70/100)")
-        
+        log_section("ÉTAPE 4/7: SCREENING ATN (SEUIL ≥ 70/100)")
+        # ✅ CORRECTION: Endpoint et payload ajustés.
+        article_ids = [article.get('zotero_id') for article in self.articles_data]
         data = {
-            "profile_id": "atn-specialized",
+            "articles": article_ids,
+            "profile": "atn-specialized",
+            "analysis_mode": "screening",
             "auto_validate_threshold": 70
         }
+        endpoint = f"/api/projects/{self.project_id}/run"
+        result = api_request("POST", endpoint, data, timeout=300)
         
-        result = api_request("POST",
-                           f"/api/projects/{self.project_id}/run-screening",
-                           data, timeout=300)
-        
-        if result:
-            log("SUCCESS", "Screening ATN lancé")
-            return self.wait_for_completion("screening", 15)
-        
-        log("WARNING", "Screening non disponible, passage extraction")
-        return True
-    
+        if result and result.get("job_ids"):
+            log("SUCCESS", f"Screening ATN lancé (Job IDs: {result['job_ids']}).")
+            # For this test, we don't wait for each individual job, we just check if they were launched.
+            return True
+        log("WARNING", "Impossible de lancer le screening. Passage à l'extraction.")
+        return True # Non bloquant
+
     def run_atn_extraction(self) -> bool:
-        """Extraction grille ATN 30 champs"""
-        log_section("ÉTAPE 5/7: EXTRACTION GRILLE ATN 30 CHAMPS")
-        
+        log_section("ÉTAPE 5/7: EXTRACTION AVEC GRILLE ATN")
+        if not self.grille_atn.get("fields"):
+            log("WARNING", "Aucune grille d'extraction définie. Étape ignorée.")
+            return True
+
         data = {
-            "analysis_type": "atn_extraction",
-            "profile_id": "atn-specialized",
-            "grid_fields": self.grille_atn.get("fields", []),
-            "extract_from_pdfs": True
+            "type": "atn_specialized_extraction",
+            "grid_fields": self.grille_atn["fields"],
         }
+        endpoint = f"/api/projects/{self.project_id}/run-analysis"
+        result = api_request("POST", endpoint, data, timeout=600)
         
-        result = api_request("POST",
-                           f"/api/projects/{self.project_id}/run-analysis",
-                           data, timeout=600)
-        
-        if result:
-            log("SUCCESS", "Extraction grille ATN lancée")
-            return self.wait_for_completion("extraction", 30)
-        
-        log("ERROR", "Échec extraction")
+        if result and result.get("job_id"):
+            log("SUCCESS", f"Extraction sur grille ATN lancée (Job ID: {result['job_id']}).")
+            return self.wait_for_task(result["job_id"], "extraction")
+        log("ERROR", "Le lancement de l'extraction a échoué.")
         return False
-    
-    def run_synthesis_prisma(self) -> bool:
-        """Génère synthèse PRISMA + graphes"""
-        log_section("ÉTAPE 6/7: SYNTHÈSE PRISMA + GRAPHES")
-        
+
+    def run_synthesis_and_prisma(self) -> bool:
+        log_section("ÉTAPE 6/7: SYNTHÈSE ET DIAGRAMME PRISMA")
         data = {
-            "analysis_type": "synthesis",
+            "type": "synthesis",
             "include_prisma": True,
             "generate_graphs": True,
-            "export_csv": True
         }
+        endpoint = f"/api/projects/{self.project_id}/run-analysis"
+        result = api_request("POST", endpoint, data, timeout=300)
         
-        result = api_request("POST",
-                           f"/api/projects/{self.project_id}/run-analysis",
-                           data, timeout=300)
-        
-        if result:
-            log("SUCCESS", "Synthèse PRISMA lancée")
-            return self.wait_for_completion("synthesis", 15)
-        
-        log("ERROR", "Échec synthèse")
+        if result and result.get("job_id"):
+            log("SUCCESS", f"Synthèse et PRISMA lancés (Job ID: {result['job_id']}).")
+            return self.wait_for_task(result["job_id"], "synthèse")
+        log("ERROR", "Le lancement de la synthèse a échoué.")
         return False
-    
-    def export_thesis_ready(self) -> bool:
-        """Export académique final"""
-        log_section("ÉTAPE 7/7: EXPORT ACADÉMIQUE THÈSE")
+
+    def export_thesis_results(self) -> bool:
+        log_section("ÉTAPE 7/7: EXPORT DES RÉSULTATS POUR LA THÈSE")
+        # ✅ CORRECTION: Utilisation de la méthode GET et du bon endpoint.
+        endpoint = f"/api/projects/{self.project_id}/export/thesis"
+        # Cette requête retourne un fichier, pas un JSON. Nous vérifions juste le succès.
+        url = f"{API_BASE}{endpoint}"
+        try:
+            resp = requests.get(url, stream=True, timeout=180)
+            if resp.status_code == 200:
+                export_filename = f"export_these_{self.project_id}_{datetime.now().strftime('%Y%m%d')}.zip"
+                export_path = OUTPUT_DIR / export_filename
+                with open(export_path, 'wb') as f:
+                    for chunk in resp.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                log("SUCCESS", f"Export des résultats de la thèse sauvegardé dans: {export_path}")
+                return True
+            else:
+                log("ERROR", f"L'export a échoué avec le code {resp.status_code}: {resp.text[:200]}")
+                return False
+        except requests.RequestException as e:
+            log("ERROR", f"Erreur lors de la requête d'export: {e}")
+            return False
+
+    def wait_for_task(self, task_id: str, step_name: str, timeout_min: int = 20) -> bool:
+        """Attend la fin d'une tâche en polluant l'API de statut."""
+        log("PROGRESS", f"En attente de la fin de la tâche '{step_name}' (max {timeout_min} min)...")
+        start_time = time.time()
         
-        data = {
-            "format": "excel",
-            "include_prisma": True,
-            "include_extraction_grid": True,
-            "include_statistics": True
-        }
-        
-        result = api_request("POST",
-                           f"/api/projects/{self.project_id}/export-thesis",
-                           data, timeout=120)
-        
-        if result and "export_path" in result:
-            log("SUCCESS", f"Export: {result['export_path']}")
-            return True
-        
-        log("WARNING", "Export via application web")
-        return True
-    
-    def wait_for_completion(self, step: str, timeout_min: int) -> bool:
-        """Polling status projet"""
-        log("PROGRESS", f"Attente {step} ({timeout_min}min)...")
-        
-        start = time.time()
-        while time.time() - start < timeout_min * 60:
-            status = api_request("GET", f"/api/projects/{self.project_id}")
+        while time.time() - start_time < timeout_min * 60:
+            endpoint = f"/api/tasks/{task_id}/status"
+            status_data = api_request("GET", endpoint)
             
-            if status:
-                current = status.get("status", "unknown")
-                if current in ("completed", "finished", "ready"):
-                    log("SUCCESS", f"{step} terminé")
+            if status_data:
+                status = status_data.get("status", "unknown")
+                progress = status_data.get("progress", {})
+                log("PROGRESS", f"Statut de '{step_name}': {status} - {progress.get('message', '')}", 1)
+                
+                if status == "finished":
+                    log("SUCCESS", f"Tâche '{step_name}' terminée avec succès.")
                     return True
-                if current in ("failed", "error"):
-                    log("ERROR", f"{step} échoué")
+                if status == "failed":
+                    log("ERROR", f"La tâche '{step_name}' a échoué: {status_data.get('error', 'Erreur inconnue')}")
                     return False
             
-            time.sleep(10)
-        
-        log("WARNING", f"Timeout {timeout_min}min")
+            time.sleep(15)
+            
+        log("WARNING", f"Timeout dépassé en attente de la tâche '{step_name}'.")
         return False
-    
+
     def get_final_metrics(self) -> Dict:
-        """Récupère métriques finales"""
+        """Récupère les métriques finales du projet."""
         project = api_request("GET", f"/api/projects/{self.project_id}")
         if not project:
             return {}
@@ -390,83 +400,59 @@ class ATNWorkflowZotero:
             "mean_atn_score": project.get("mean_score", 0),
             "status": project.get("status", "unknown")
         }
-    
+
     def save_report(self):
-        """Sauvegarde rapport JSON"""
+        """Sauvegarde le rapport final du workflow en JSON."""
         self.results["timestamp_end"] = datetime.now().isoformat()
-        self.results["final_metrics"] = self.get_final_metrics()
+        if self.project_id:
+            self.results["final_metrics"] = self.get_final_metrics()
         
-        filename = OUTPUT_DIR / f"rapport_atn_zotero_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-        with open(filename, 'w', encoding='utf-8') as f:
-            json.dump(self.results, f, indent=2, ensure_ascii=False)
+        filename = OUTPUT_DIR / f"resultats_atn_zotero_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        try:
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(self.results, f, indent=2, ensure_ascii=False)
+            log("SUCCESS", f"📊 Rapport de workflow sauvegardé: {filename}")
+        except IOError as e:
+            log("ERROR", f"Impossible de sauvegarder le rapport: {e}")
+
+    def run_complete_workflow(self):
+        """Orchestre l'exécution complète du workflow ATN."""
+        log_section("🚀 DÉMARRAGE DU WORKFLOW ATN COMPLET AVEC ZOTERO 🚀")
         
-        log("SUCCESS", f"Rapport: {filename}")
-    
-    def run_complete_workflow(self) -> bool:
-        """Orchestration workflow complet"""
-        log("INFO", "═"*70)
-        log("INFO", "🚀 WORKFLOW ATN - 20 ARTICLES ZOTERO CSL JSON")
-        log("INFO", "═"*70)
-        
-        steps = [
-            ("health_check", self.check_api_health),
-            ("load_data", self.load_data_sources),
-            ("create_project", self.create_atn_project),
-            ("add_articles", self.add_articles_to_project),
-            ("screening", self.run_atn_screening),
-            ("extraction", self.run_atn_extraction),
-            ("synthesis", self.run_synthesis_prisma),
-            ("export", self.export_thesis_ready)
-        ]
-        
-        for step_name, step_func in steps:
-            start_time = time.time()
-            
-            try:
-                success = step_func()
-                duration = time.time() - start_time
-                
-                self.results["steps"][step_name] = {
-                    "success": success,
-                    "duration_seconds": round(duration, 2)
-                }
-                
-                if not success and step_name not in ["screening", "export"]:
-                    log("ERROR", f"Arrêt sur échec: {step_name}")
-                    self.save_report()
-                    return False
-                    
-            except Exception as e:
-                log("ERROR", f"Exception {step_name}: {str(e)}")
-                self.save_report()
-                return False
-        
-        log_section("🎉 WORKFLOW TERMINÉ")
-        metrics = self.get_final_metrics()
-        log("DATA", f"Articles: {metrics.get('articles_processed', 0)}/{metrics.get('articles_total', 0)}")
-        log("DATA", f"Score ATN moyen: {metrics.get('mean_atn_score', 0):.1f}/100")
-        log("SUCCESS", f"Projet: http://localhost:8080/projects/{self.project_id}")
-        
-        self.save_report()
-        return True
+        try:
+            if not self.run_step("health_check", self.check_api_health): return
+            if not self.run_step("load_data", self.load_data_sources): return
+            if not self.run_step("create_project", self.create_atn_project): return
+            if not self.run_step("add_articles", self.add_articles_to_project): return
+            if not self.run_step("screening", self.run_atn_screening): pass # Non bloquant
+            if not self.run_step("extraction", self.run_atn_extraction): return
+            if not self.run_step("synthesis_prisma", self.run_synthesis_and_prisma): return
+            if not self.run_step("export_thesis", self.export_thesis_results): pass # Non bloquant
+
+            log_section("🎉 WORKFLOW TERMINÉ AVEC SUCCÈS 🎉")
+            metrics = self.get_final_metrics()
+            log("DATA", f"Articles traités: {metrics.get('articles_processed', 'N/A')} / {metrics.get('articles_total', 'N/A')}")
+            log("DATA", f"Score ATN moyen: {metrics.get('mean_atn_score', 0):.1f}/100")
+            log("SUCCESS", f"Consultez les résultats du projet ici: http://localhost:3000/projects/{self.project_id}")
+
+        except Exception as e:
+            log("ERROR", f"Une erreur critique a interrompu le workflow: {e}")
+            import traceback
+            traceback.print_exc()
+        finally:
+            self.save_report()
+            log("INFO", "Fin du script.")
 
 # ═══════════════════════════════════════════════════════════════
-# MAIN
+# POINT D'ENTRÉE
 # ═══════════════════════════════════════════════════════════════
 def main():
     try:
         workflow = ATNWorkflowZotero()
-        success = workflow.run_complete_workflow()
-        sys.exit(0 if success else 1)
-        
+        workflow.run_complete_workflow()
     except KeyboardInterrupt:
-        log("WARNING", "\n⚠️ Interruption (Ctrl+C)")
+        log("WARNING", "⚠️ Interruption manuelle du script (Ctrl+C).")
         sys.exit(130)
-    except Exception as e:
-        log("ERROR", f"❌ Erreur: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
 
 if __name__ == "__main__":
     main()

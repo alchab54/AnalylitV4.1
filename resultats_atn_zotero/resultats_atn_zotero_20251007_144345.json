@@ -1,0 +1,38 @@
+{
+  "timestamp_start": "2025-10-07T14:43:15.680744",
+  "project_id": "e1f8ce25-9662-403c-ad38-900f81882018",
+  "articles_count": 20,
+  "steps": {
+    "health_check": {
+      "success": true,
+      "duration_seconds": 0.01
+    },
+    "load_data": {
+      "success": true,
+      "duration_seconds": 0.0
+    },
+    "create_project": {
+      "success": true,
+      "duration_seconds": 0.12
+    },
+    "add_articles": {
+      "success": true,
+      "duration_seconds": 30.05
+    },
+    "screening": {
+      "success": true,
+      "duration_seconds": 0.01
+    },
+    "extraction": {
+      "success": false,
+      "duration_seconds": 0.01
+    }
+  },
+  "final_metrics": {
+    "articles_total": 20,
+    "articles_processed": 0,
+    "mean_atn_score": 0,
+    "status": "pending"
+  },
+  "timestamp_end": "2025-10-07T14:43:45.885482"
+}
