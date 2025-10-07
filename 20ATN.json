@@ -1,0 +1,1009 @@
+[
+	{
+		"id": "http://zotero.org/groups/6109700/items/B75VT3ID",
+		"type": "article-journal",
+		"abstract": "When studying therapeutic alliance, researchers typically use data with a 'one-with-many' (OWM) nested structure in which each therapist ('one') treats several clients ('many'). The OWM structure offers the opportunity to assess the interdependence in dyadic therapeutic alliance data by disentangling three components: (1) the client's tendency to generally rate the alliance with his therapists ('client perceiver' component); (2) the client's rating of the unique alliance with his therapist ('client relationship' component); and (3) the therapist's characteristics that elicit a consistent alliance rating in his clients ('therapist partner' component). Similarly, three such components can be distinguished for the therapists' alliance ratings. We used the reciprocal OWM design to distinguish these alliance components, pertaining to the first therapeutic session of two hundred and three youths aged 13 to 23 years who entered a youth mental health and youth addiction treatment facility. We found that most of the alliance variance pertained to the relationship component (client-rated alliance: 99.2%; therapist-rated alliance: 56.0%), with virtually no evidence of therapist's characteristics that elicited a consistent (high or low) alliance rating in his clients. Clients who reported a uniquely strong alliance with their therapist were more likely to have a favorable 4-months treatment outcome (Odds ratio 1.10; p < 0.001). None of the other (client/therapist) alliance components were related to treatment outcome, nor did we find evidence of dyadic reciprocity, which would occur when a therapist would report a particularly strong alliance with the client if that client reported a particularly strong alliance with the therapist, and vice versa.",
+		"container-title": "European Child & Adolescent Psychiatry",
+		"DOI": "10.1007/s00787-025-02784-9",
+		"ISSN": "1435-165X",
+		"journalAbbreviation": "Eur Child Adolesc Psychiatry",
+		"language": "eng",
+		"note": "PMID: 40512270",
+		"source": "PubMed",
+		"title": "A dyadic approach of assessing the therapeutic alliance in youth mental health and addiction treatment",
+		"author": [
+			{
+				"family": "Benthem",
+				"given": "Patty",
+				"non-dropping-particle": "van"
+			},
+			{
+				"family": "Spijkerman",
+				"given": "Renske"
+			},
+			{
+				"family": "Blanken",
+				"given": "Peter"
+			},
+			{
+				"family": "Vermeiren",
+				"given": "Robert R. J. M."
+			},
+			{
+				"family": "Hendriks",
+				"given": "Vincent M."
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2025",
+					6,
+					13
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/X7WRVGWQ",
+		"type": "article-journal",
+		"abstract": "OBJECTIVE: Telerehabilitation may overcome accessibility barriers related to the Lee Silverman Voice Treatment (LSVT)-Loud for dysphonia rehabilitation in multiple sclerosis (MS). The present study provides the feasibility evidence on patient-relevant structural and procedure effects of a pilot randomized controlled trial comparing LSVT-Loud telerehabilitation (Tele-LSVT-Loud) versus standard delivery.\nMETHODS: Twenty-one people with MS (six males) with dysphonia were 1:1 randomly allocated to 4 weeks of LSVT-Loud in-site or Tele-LSVT-Loud at home accessing a telemedicine platform. The feasibility of Tele-LSVT-Loud compared to LSVT-Loud was evaluated considering adherence rate, safety (adverse events), technology interaction (User Experience Questionnaire), intrinsic motivation to the treatment (Intrinsic Motivation Inventory), and perceived rehabilitation experience (individual qualitative interviews) during and after the intervention program.\nRESULTS: Thirty-one percent of eligible subjects were unavailable to follow in-site treatment. Drops-outs were higher in the LSVT-Loud than Tele-LSVT-Loud group (4 versus 1). Also, the adherence rate of synchronous sessions was 68.75% in the LSVT-Loud compared to 87.5% in the Tele-LSVT-Loud group, related to greater difficulty in integrating the treatment into a daily routine, as mentioned in the qualitative interview. No relevant adverse events were observed in both groups. The user experience with technology in the Tele-LSVT-Loud group was positive. The interviews revealed a positive therapeutic alliance, regardless of the delivery path. Interestingly, only people in the Tele-LSVT-Loud group judged equivalent the therapist-user relationship in in-site and telerehabilitation settings.\nCONCLUSIONS: Telerehabilitation promotes the feasibility of LSVT-Loud. The modality of delivery is a relevant factor in determining eligibility and adherence to a voice rehabilitation program in MS.",
+		"container-title": "Digital Health",
+		"DOI": "10.1177/20552076251326222",
+		"ISSN": "2055-2076",
+		"journalAbbreviation": "Digit Health",
+		"language": "eng",
+		"note": "PMID: 40433301\nPMCID: PMC12107005",
+		"page": "20552076251326222",
+		"source": "PubMed",
+		"title": "Delivering the Lee Silverman voice treatment-loud method in-site versus telerehabilitation in people with multiple sclerosis: Feasibility evidence of a non-inferiority pilot randomized controlled trial",
+		"title-short": "Delivering the Lee Silverman voice treatment-loud method in-site versus telerehabilitation in people with multiple sclerosis",
+		"volume": "11",
+		"author": [
+			{
+				"family": "Vitali",
+				"given": "Chiara"
+			},
+			{
+				"family": "Fusari",
+				"given": "Giulia"
+			},
+			{
+				"family": "Cacciatore",
+				"given": "Diego Michael"
+			},
+			{
+				"family": "Smecca",
+				"given": "Giulia"
+			},
+			{
+				"family": "Baldanzi",
+				"given": "Cinzia"
+			},
+			{
+				"family": "Carullo",
+				"given": "Alessio"
+			},
+			{
+				"family": "Rovaris",
+				"given": "Marco"
+			},
+			{
+				"family": "Cattaneo",
+				"given": "Davide"
+			},
+			{
+				"family": "Baglio",
+				"given": "Francesca"
+			},
+			{
+				"family": "Isernia",
+				"given": "Sara"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2025"
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/Z7CSH7TM",
+		"type": "article-journal",
+		"abstract": "In any therapeutic setting, the outcome depends in part on the therapeutic alliance, characterized by mutual understanding, empathy and trust among the participants. This also manifests through physiological synchronization (PS) processes involving breathing, heart and brain. This study examined the dynamics of heart rate variability (HRV) synchronization patterns during horse-assisted therapy. We explored the correlations between the therapist's horse preference, levels of early life adversity (ELA), and PS relationships within and across dyads of participants, therapists, and therapy horses. Our sample of 42 female participants engaged in standardized horse-assisted therapy sessions facilitated by three riding therapists and four therapy horses. PS was operationalized through cross-wavelet power analyses across the different dyads. The results showed, that stronger HRV synchronization between the therapist and horse was associated with stronger HRV synchronization between the horse and participant, as well as stronger HRV synchronization between the therapist and participant. We found a correlation between ELA and HRV synchronization between participants and therapists, with individuals experiencing higher levels of ELA showing lower synchronization. However, this effect of ELA was not observed for HRV synchronization between participants and horses. Furthermore, we found a negative correlation between the riding therapist's preference for a particular therapy horse and the HRV synchronization between the therapist and that horse. These findings contribute to a better understanding of the correlational dynamics in horse-human interactions and may have potential implications for optimizing therapeutic interventions in clinical settings.",
+		"container-title": "Journal of Neural Transmission (Vienna, Austria: 1996)",
+		"DOI": "10.1007/s00702-025-02947-7",
+		"ISSN": "1435-1463",
+		"journalAbbreviation": "J Neural Transm (Vienna)",
+		"language": "eng",
+		"note": "PMID: 40423728",
+		"source": "PubMed",
+		"title": "The relationship of early life adversity and physiological synchrony within the therapeutic triad in horse-assisted therapy",
+		"author": [
+			{
+				"family": "Wienhold",
+				"given": "Stella"
+			},
+			{
+				"family": "Bär",
+				"given": "Larissa"
+			},
+			{
+				"family": "Ringleb",
+				"given": "Zoe"
+			},
+			{
+				"family": "Zirpel",
+				"given": "Victoria"
+			},
+			{
+				"family": "Gomolla",
+				"given": "Annette"
+			},
+			{
+				"family": "Denk",
+				"given": "Bernadette F."
+			},
+			{
+				"family": "Volkmer",
+				"given": "Nina"
+			},
+			{
+				"family": "Gaertner",
+				"given": "Raphaela J."
+			},
+			{
+				"family": "Klink",
+				"given": "Elea S. C."
+			},
+			{
+				"family": "Pruessner",
+				"given": "Jens C."
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2025",
+					5,
+					27
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/27DQCQ5C",
+		"type": "article-journal",
+		"abstract": "BACKGROUND: Therapy-accompanying mental health apps can play an important role in the psychotherapeutic treatment of adolescents. They can enhance adolescents' engagement and autonomy, provide immediate support in critical situations, and positively influence the therapeutic working alliance. Nevertheless, mental health apps are rarely used by psychotherapists. Furthermore, due to the limited or nonexistent use of apps in psychotherapy, little is known about the actual barriers and drivers affecting their integration into psychotherapists' daily routines. To better understand how mental health apps should be designed for practical use, it is essential to explore psychotherapists' perspectives on key app features and characteristics, as well as the factors influencing their integration into clinical practice.\nOBJECTIVE: This study aims to analyze which app features and characteristics are essential for psychotherapists to use a mobile app in psychotherapy with adolescents and to identify the key drivers and barriers influencing the integration of a psychotherapeutic app from the psychotherapists' perspectives.\nMETHODS: We conducted 3 feasibility studies using Steps, a transdiagnostic, therapy-accompanying app for adolescents, across 3 different psychotherapeutic treatment contexts: inpatient treatment, treatment in psychiatric outpatient clinics, and outpatient treatment with psychotherapists in private practice. All studies followed a qualitative quasi-experimental design. Participants provided information on their age, occupation, years of work experience, media affinity, attitudes toward psychotherapeutic apps, perceived app quality and feasibility, and the implementation process of the therapy-accompanying app. Qualitative data were analyzed using deductive qualitative content analysis. A total of 40 mental health professionals participated across the 3 studies (study 1: n=18; study 2: n=13; study 3: n=9).\nRESULTS: Study participation and app usage rates were low across all studies. Six core features for a transdiagnostic, therapy-accompanying app were identified: mood checks, library, reminders, goals and tasks, emergency kit, and questionnaires. Additionally, the integration of mental health apps into daily routines was influenced by various drivers and barriers. The most significant barriers included technological issues and practical constraints, such as limited time and resources. The most important driver was the perceived improvement in treatment quality.\nCONCLUSIONS: Overall, psychotherapists were generally open to using a therapy-accompanying mental health app. However, study participation and app usage remained low. As psychotherapists act as gatekeepers for patients' use of mental health apps, their needs should be prioritized in the development and implementation of such apps.\nTRIAL REGISTRATION: German Clinical Trials Register DRKS00031258; https://drks.de/search/en/trial/DRKS00031258/details.",
+		"container-title": "JMIR formative research",
+		"DOI": "10.2196/65788",
+		"ISSN": "2561-326X",
+		"journalAbbreviation": "JMIR Form Res",
+		"language": "eng",
+		"note": "PMID: 40198916\nPMCID: PMC12015344",
+		"page": "e65788",
+		"source": "PubMed",
+		"title": "The Use of Mobile Apps in Adolescent Psychotherapy: Assessment of Psychotherapists' Perspectives",
+		"title-short": "The Use of Mobile Apps in Adolescent Psychotherapy",
+		"volume": "9",
+		"author": [
+			{
+				"family": "Wüllner",
+				"given": "Sarah"
+			},
+			{
+				"family": "Hermenau",
+				"given": "Katharin"
+			},
+			{
+				"family": "Hecker",
+				"given": "Tobias"
+			},
+			{
+				"family": "Siniatchkin",
+				"given": "Michael"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2025",
+					4,
+					8
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/PKX4AHED",
+		"type": "article-journal",
+		"abstract": "Dry eye disease (DED) is a multifactorial, chronic, and often relapsing condition with a significant impact on patient quality of life (QoL). Symptoms such as ocular discomfort and visual disturbances are diverse and frequently misaligned with objective clinical signs, complicating diagnosis and management. DED not only interferes with daily activities like reading, driving, and computer use but also imposes a substantial economic burden due to direct healthcare costs and reduced work productivity. Beyond its ocular manifestations, DED has been associated with higher prevalence rates of depression and anxiety, with a complex bidirectional relationship. Patients with DED may experience psychological distress that exacerbates symptoms, leading to a vicious cycle that further impairs QoL. This underscores the importance of integrating mental health screening into the management of DED, particularly for high-risk populations. Optimizing the care of DED patients requires empathy, effective communication, and the establishment of a therapeutic alliance that acknowledges patient experiences and involves them in personalized treatment plans. Such an approach can improve patient satisfaction, enhance treatment adherence, and address both ocular and psychological dimensions of the disease. This paper highlights current evidence on the impact of DED symptoms and its association with mental health and recommends strategies to improve clinical management through a patient-centered approach.",
+		"container-title": "Journal of Clinical Medicine",
+		"DOI": "10.3390/jcm14010196",
+		"ISSN": "2077-0383",
+		"issue": "1",
+		"journalAbbreviation": "J Clin Med",
+		"language": "eng",
+		"note": "PMID: 39797278\nPMCID: PMC11721487",
+		"page": "196",
+		"source": "PubMed",
+		"title": "From Symptoms to Satisfaction: Optimizing Patient-Centered Care in Dry Eye Disease",
+		"title-short": "From Symptoms to Satisfaction",
+		"volume": "14",
+		"author": [
+			{
+				"family": "Villani",
+				"given": "Edoardo"
+			},
+			{
+				"family": "Barabino",
+				"given": "Stefano"
+			},
+			{
+				"family": "Giannaccare",
+				"given": "Giuseppe"
+			},
+			{
+				"family": "Di Zazzo",
+				"given": "Antonio"
+			},
+			{
+				"family": "Aragona",
+				"given": "Pasquale"
+			},
+			{
+				"family": "Rolando",
+				"given": "Maurizio"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2025",
+					1,
+					1
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/C75XFBL3",
+		"type": "article-journal",
+		"abstract": "Clinical supervision is considered important in psychotherapy training, but little is known about the efficacy of specific supervision methods. We investigate two such methods (video-based vs. verbal report-based supervision) in a randomized controlled trial. Seventy-three supervisees were trained in common cognitive-behavioral therapy methods (i.e. behavioral activation and cognitive restructuring) by means of written information and a modelling video demonstrating the techniques. Supervisees had to apply the techniques in role plays with standardized patients (presenting depressive patients). Subsequently, supervisees were randomized to supervision, based on the video, or supervision based on the verbal report of the supervisees. Subsequently and after a three-month follow-up period, supervisees had to demonstrate the therapeutic techniques again. Therapist competence, therapeutic alliance, empathy, and anxiety were assessed through various different perspectives (i.e. independent raters, standardized patients, and supervisees' self-evaluation). Both supervision conditions lead to a significant improvement of therapeutic competences, therapeutic alliance, and empathy. No significant differences were found between the two supervision conditions. At three-month follow-up, training effects decreased on all perspectives except standardized patients. A training condition without supervision would be necessary to demonstrate that improvements are specific effects of the supervision conditions. Moreover, further supervision seems necessary to maintain training effects over time.",
+		"container-title": "Cognitive Behaviour Therapy",
+		"DOI": "10.1080/16506073.2024.2434016",
+		"ISSN": "1651-2316",
+		"journalAbbreviation": "Cogn Behav Ther",
+		"language": "eng",
+		"note": "PMID: 39606848",
+		"page": "1-19",
+		"source": "PubMed",
+		"title": "Clinical supervision based on video vs. verbal report: a randomized controlled trial",
+		"title-short": "Clinical supervision based on video vs. verbal report",
+		"author": [
+			{
+				"family": "Weck",
+				"given": "Florian"
+			},
+			{
+				"family": "Maaß",
+				"given": "Ulrike"
+			},
+			{
+				"family": "Paunov",
+				"given": "Tatjana"
+			},
+			{
+				"family": "Heinze",
+				"given": "Peter E."
+			},
+			{
+				"family": "Kühne",
+				"given": "Franziska"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2024",
+					11,
+					28
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/8CT35EZB",
+		"type": "article-journal",
+		"abstract": "BACKGROUND: The mobile Agnew Relationship Measure (mARM) is a self-report questionnaire for the evaluation of digital mental health interventions and their interactions with users. With the global increase in digital mental health intervention research, translated measures are required to conduct research with local populations.\nOBJECTIVE: The aim of this study was to translate and validate the original English version of the mARM into a German version (mARM-G).\nMETHODS: A total of 2 native German speakers who spoke English as their second language conducted forward translation of the original items. This version was then back translated by 2 native German speakers with a fluent knowledge of English. An independent bilingual reviewer then compared these drafts and created a final German version. The mARM-G was validated by 15 experts in the field of mobile app development and 15 nonexperts for content validity and face validity; 144 participants were recruited to conduct reliability testing as well as confirmatory factor analysis.\nRESULTS: The content validity index of the mARM-G was 0.90 (expert ratings) and 0.79 (nonexperts). The face validity index was 0.89 (experts) and 0.86 (nonexperts). Internal consistency for the entire scale was Cronbach α=.91. Confirmatory factor analysis results were as follows: the chi-square statistic to df ratio was 1.66. Comparative Fit Index was 0.87 and the Tucker-Lewis Index was 0.86. The root mean square error of approximation was 0.07.\nCONCLUSIONS: The mARM-G is a valid and reliable tool that can be used for future studies in German-speaking countries.",
+		"container-title": "Journal of Medical Internet Research",
+		"DOI": "10.2196/43368",
+		"ISSN": "1438-8871",
+		"journalAbbreviation": "J Med Internet Res",
+		"language": "eng",
+		"note": "PMID: 37955952\nPMCID: PMC10682917",
+		"page": "e43368",
+		"source": "PubMed",
+		"title": "German Version of the Mobile Agnew Relationship Measure: Translation and Validation Study",
+		"title-short": "German Version of the Mobile Agnew Relationship Measure",
+		"volume": "25",
+		"author": [
+			{
+				"family": "Wulffen",
+				"given": "Clemens",
+				"non-dropping-particle": "von"
+			},
+			{
+				"family": "Marciniak",
+				"given": "Marta Anna"
+			},
+			{
+				"family": "Rohde",
+				"given": "Judith"
+			},
+			{
+				"family": "Kalisch",
+				"given": "Raffael"
+			},
+			{
+				"family": "Binder",
+				"given": "Harald"
+			},
+			{
+				"family": "Tuescher",
+				"given": "Oliver"
+			},
+			{
+				"family": "Kleim",
+				"given": "Birgit"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2023",
+					11,
+					13
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/32WA59ZM",
+		"type": "article-journal",
+		"abstract": "We set out to test whether positive non-verbal behaviours of a virtual coach can enhance people's engagement in automated virtual reality therapy. 120 individuals scoring highly for fear of heights participated. In a two-by-two factor, between-groups, randomised design, participants met a virtual coach that varied in warmth of facial expression (with/without) and affirmative nods (with/without). The virtual coach provided a consultation about treating fear of heights. Participants rated the therapeutic alliance, treatment credibility, and treatment expectancy. Both warm facial expressions (group difference = 7.44 [3.25, 11.62], p = 0.001, [Formula: see text]=0.10) and affirmative nods (group difference = 4.36 [0.21, 8.58], p = 0.040, [Formula: see text] = 0.04) by the virtual coach independently increased therapeutic alliance. Affirmative nods increased the treatment credibility (group difference = 1.76 [0.34, 3.11], p = 0.015, [Formula: see text] = 0.05) and expectancy (group difference = 2.28 [0.45, 4.12], p = 0.015, [Formula: see text] = 0.05) but warm facial expressions did not increase treatment credibility (group difference = 0.64 [- 0.75, 2.02], p = 0.363, [Formula: see text] = 0.01) or expectancy (group difference = 0.36 [- 1.48, 2.20], p = 0.700, [Formula: see text] = 0.001). There were no significant interactions between head nods and facial expressions in the occurrence of therapeutic alliance (p = 0.403, [Formula: see text] = 0.01), credibility (p = 0.072, [Formula: see text] = 0.03), or expectancy (p = 0.275, [Formula: see text] = 0.01). Our results demonstrate that in the development of automated VR therapies there is likely to be therapeutic value in detailed consideration of the animations of virtual coaches.",
+		"container-title": "Scientific Reports",
+		"DOI": "10.1038/s41598-023-38499-7",
+		"ISSN": "2045-2322",
+		"issue": "1",
+		"journalAbbreviation": "Sci Rep",
+		"language": "eng",
+		"note": "PMID: 37460586\nPMCID: PMC10352334",
+		"page": "11517",
+		"source": "PubMed",
+		"title": "A randomised controlled test of emotional attributes of a virtual coach within a virtual reality (VR) mental health treatment",
+		"volume": "13",
+		"author": [
+			{
+				"family": "Wei",
+				"given": "Shu"
+			},
+			{
+				"family": "Freeman",
+				"given": "Daniel"
+			},
+			{
+				"family": "Rovira",
+				"given": "Aitor"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2023",
+					7,
+					17
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/JUUII43T",
+		"type": "article-journal",
+		"abstract": "BACKGROUND: A growing body of evidence for digital interventions to improve sleep shows promising effects. The interventions investigated so far have been primarily web-based; however, app-based interventions may reach a wider audience and be more suitable for daily use.\nOBJECTIVE: This study aims to evaluate the intervention effects, adherence, and acceptance of an unguided app-based intervention for individuals who wish to improve their sleep.\nMETHODS: In a randomized controlled trial, we evaluated the effects of an app-based short intervention (Refresh) to improve sleep compared with a waitlist condition. Refresh is an 8-week unguided intervention covering the principles of cognitive behavioral therapy for insomnia (CBT-I) and including a sleep diary. The primary outcome was sleep quality (insomnia symptoms) as self-assessed by the Regensburg Insomnia Scale (RIS). The secondary outcomes were depression (9-item Patient Health Questionnaire [PHQ-9] score) and perceived insomnia-related impairment.\nRESULTS: We included 371 participants, of which 245 reported poor sleep at baseline. About 1 in 3 participants who were allocated to the intervention group never accessed the intervention. Active participants completed on average 4 out of 8 chapters. Retention rates were 67.4% (n=250) at postassessment and 57.7% (n=214) at the 6-month follow-up. At postintervention, insomnia symptoms in the intervention group had improved more than those in the waitlist group, with a small effect (d=0.26) in the whole sample and a medium effect (d=0.45) in the subgroup with poor sleep. Effects in the intervention group were maintained at follow-up. Perceived insomnia-related impairment also improved from pre- to postassessment. No significant intervention effect on depression was detected. Working alliance and acceptance were moderate to good.\nCONCLUSIONS: An app-based, unguided intervention is a feasible and effective option to scale-up CBT-I-based treatment, but intervention uptake and adherence need to be carefully addressed.\nTRIAL REGISTRATION: ISRCTN Registry ISRCTN53553517; https://www.isrctn.com/ISRCTN53553517.",
+		"container-title": "JMIR mental health",
+		"DOI": "10.2196/39052",
+		"ISSN": "2368-7959",
+		"journalAbbreviation": "JMIR Ment Health",
+		"language": "eng",
+		"note": "PMID: 36943337\nPMCID: PMC10131838",
+		"page": "e39052",
+		"source": "PubMed",
+		"title": "Effectiveness of an App-Based Short Intervention to Improve Sleep: Randomized Controlled Trial",
+		"title-short": "Effectiveness of an App-Based Short Intervention to Improve Sleep",
+		"volume": "10",
+		"author": [
+			{
+				"family": "Vollert",
+				"given": "Bianka"
+			},
+			{
+				"family": "Müller",
+				"given": "Luise"
+			},
+			{
+				"family": "Jacobi",
+				"given": "Corinna"
+			},
+			{
+				"family": "Trockel",
+				"given": "Mickey"
+			},
+			{
+				"family": "Beintner",
+				"given": "Ina"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2023",
+					3,
+					21
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/WFNWU9W6",
+		"type": "article-journal",
+		"abstract": "Measures aimed at preventing the COVID-19 virus from spreading restricted all aspects of public life, including possibilities for meeting in-person. Youth care professionals were forced to turn to telehealth tools, such as video calling and e-health methods, to be able to continue support and treatment of children, adolescents, caregivers, and families. This study consists of two qualitative interview studies on the experiences with and transition to telehealth during COVID-19: (1) interviews with youth care professionals (N = 20), and (2) interviews with adolescents who used mental health care support (N = 14). We specifically asked participants about five themes which were selected based on pre-COVID literature on telehealth: (1) tools (i.e., which programs are being used), (2) privacy, (3) methods (i.e., what was the same and what was different compared to in-person sessions), (4) relationship/therapeutic alliance, and (5) effectiveness (i.e., what was their impression of effectiveness of telehealth). The majority of professionals reported that they had very little to no experience with telehealth prior to the pandemic. Both professionals and adolescent clients mentioned benefits and limitations of telehealth. On several themes professionals and adolescent clients mentioned similar barriers in the transition to telehealth during COVID such as limitations of the available hard- and software (theme 1: tools); forced changes in the content and methods of the sessions (theme 3: methods); and difficulties with non-verbal communication (theme 4: alliance). However, whereas most professionals expressed the intention to keep using several aspects of telehealth after restrictions due to COVID are lifted, most adolescent clients expressed they see telehealth as a temporary solution and prefer meeting professionals in person. Their experiences and the barriers and enabling aspects they mentioned may provide important insights in the acceptability and usability of telehealth for youth care organizations, youth care professionals, researchers and higher educational training programs.",
+		"container-title": "Children and Youth Services Review",
+		"DOI": "10.1016/j.childyouth.2023.106874",
+		"ISSN": "0190-7409",
+		"journalAbbreviation": "Child Youth Serv Rev",
+		"language": "eng",
+		"note": "PMID: 36817405\nPMCID: PMC9925417",
+		"page": "106874",
+		"source": "PubMed",
+		"title": "Youth care in time of COVID-19: Experiences of professionals and adolescent clients with telehealth",
+		"title-short": "Youth care in time of COVID-19",
+		"volume": "148",
+		"author": [
+			{
+				"family": "Rooij",
+				"given": "Floor B.",
+				"non-dropping-particle": "van"
+			},
+			{
+				"family": "Weeland",
+				"given": "Joyce"
+			},
+			{
+				"family": "Thonies",
+				"given": "Carlo"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2023",
+					5
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/92VZNXVB",
+		"type": "article-journal",
+		"abstract": "Mitigating the COVID-19 related disruptions in mental health care services is crucial in a time of increased mental health disorders. Numerous reviews have been conducted on the process of implementing technology-based mental health care during the pandemic. The research question of this umbrella review was to examine what the impact of COVID-19 was on access and delivery of mental health services and how mental health services have changed during the pandemic. A systematic search for systematic reviews and meta-analyses was conducted up to August 12, 2022, and 38 systematic reviews were identified. Main disruptions during COVID-19 were reduced access to outpatient mental health care and reduced admissions and earlier discharge from inpatient care. In response, synchronous telemental health tools such as videoconferencing were used to provide remote care similar to pre-COVID care, and to a lesser extent asynchronous virtual mental health tools such as apps. Implementation of synchronous tools were facilitated by time-efficiency and flexibility during the pandemic but there was a lack of accessibility for specific vulnerable populations. Main barriers among practitioners and patients to use digital mental health tools were poor technological literacy, particularly when preexisting inequalities existed, and beliefs about reduced therapeutic alliance particularly in case of severe mental disorders. Absence of organizational support for technological implementation of digital mental health interventions due to inadequate IT infrastructure, lack of funding, as well as lack of privacy and safety, challenged implementation during COVID-19. Reviews were of low to moderate quality, covered heterogeneously designed primary studies and lacked findings of implementation in low- and middle-income countries. These gaps in the evidence were particularly prevalent in studies conducted early in the pandemic. This umbrella review shows that during the COVID-19 pandemic, practitioners and mental health care institutions mainly used synchronous telemental health tools, and to a lesser degree asynchronous tools to enable continued access to mental health care for patients. Numerous barriers to these tools were identified, and call for further improvements. In addition, more high quality research into comparative effectiveness and working mechanisms may improve scalability of mental health care in general and in future infectious disease outbreaks.",
+		"container-title": "Behaviour Research and Therapy",
+		"DOI": "10.1016/j.brat.2022.104226",
+		"ISSN": "1873-622X",
+		"journalAbbreviation": "Behav Res Ther",
+		"language": "eng",
+		"note": "PMID: 36410111\nPMCID: PMC9661449",
+		"page": "104226",
+		"source": "PubMed",
+		"title": "Remote mental health care interventions during the COVID-19 pandemic: An umbrella review",
+		"title-short": "Remote mental health care interventions during the COVID-19 pandemic",
+		"volume": "159",
+		"author": [
+			{
+				"family": "Witteveen",
+				"given": "A. B."
+			},
+			{
+				"family": "Young",
+				"given": "S."
+			},
+			{
+				"family": "Cuijpers",
+				"given": "P."
+			},
+			{
+				"family": "Ayuso-Mateos",
+				"given": "J. L."
+			},
+			{
+				"family": "Barbui",
+				"given": "C."
+			},
+			{
+				"family": "Bertolini",
+				"given": "F."
+			},
+			{
+				"family": "Cabello",
+				"given": "M."
+			},
+			{
+				"family": "Cadorin",
+				"given": "C."
+			},
+			{
+				"family": "Downes",
+				"given": "N."
+			},
+			{
+				"family": "Franzoi",
+				"given": "D."
+			},
+			{
+				"family": "Gasior",
+				"given": "M."
+			},
+			{
+				"family": "John",
+				"given": "A."
+			},
+			{
+				"family": "Melchior",
+				"given": "M."
+			},
+			{
+				"family": "McDaid",
+				"given": "D."
+			},
+			{
+				"family": "Palantza",
+				"given": "C."
+			},
+			{
+				"family": "Purgato",
+				"given": "M."
+			},
+			{
+				"family": "Van der Waerden",
+				"given": "J."
+			},
+			{
+				"family": "Wang",
+				"given": "S."
+			},
+			{
+				"family": "Sijbrandij",
+				"given": "M."
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2022",
+					12
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/DGL4FZQF",
+		"type": "article-journal",
+		"abstract": "BACKGROUND: Shared decision-making (SDM) is a process aimed at facilitating patient-centered care by ensuring that the patient and provider are actively involved in treatment decisions. In mental health care, SDM has been advocated as a means for the patient to gain or regain control and responsibility over their life and recovery process. To support the process of patient-centered care and SDM, digital tools may have advantages in terms of accessibility, structure, and reminders.\nOBJECTIVE: In this randomized controlled trial, we aimed to investigate the effect of a digital tool to support patient activation and SDM.\nMETHODS: The trial was designed as a randomized, assessor-blinded, 2-armed, parallel-group multicenter trial investigating the use of a digital SDM intervention for 6 months compared with treatment as usual. Participants with a diagnosis of schizophrenia, schizotypal or delusional disorder were recruited from 9 outpatient treatment sites in the Capital Region of Denmark. The primary outcome was the self-reported level of activation at the postintervention time point. The secondary outcomes included self-efficacy, hope, working alliance, satisfaction, preparedness for treatment consultation, symptom severity, and level of functioning. Explorative outcomes on the effect of the intervention at the midintervention time point along with objective data on the use of the digital tool were collected.\nRESULTS: In total, 194 participants were included. The intention-to-treat analysis revealed a statistically significant effect favoring the intervention group on patient activation (mean difference 4.39, 95% CI 0.99-7.79; Cohen d=0.33; P=.01), confidence in communicating with one's provider (mean difference 1.85, 95% CI 0.01-3.69; Cohen d=0.24; P=.05), and feeling prepared for decision-making (mean difference 5.12, 95% CI 0.16-10.08; Cohen d=0.27; P=.04). We found no effect of the digital SDM tool on treatment satisfaction, hope, self-efficacy, working alliance, severity of symptoms, level of functioning, use of antipsychotic medicine, and number or length of psychiatric hospital admissions.\nCONCLUSIONS: This trial showed a significant effect of a digital SDM tool on the subjective level of patient activation, confidence in communicating with one's provider, and feeling prepared for decision-making at the postintervention time point. The effect size was smaller than the 0.42 effect size that we had anticipated and sampled for. The trial contributes to the evidence on how digital tools may support patient-centered care and SDM in mental health care.\nTRIAL REGISTRATION: ClinicalTrials.gov NCT03554655; https://clinicaltrials.gov/ct2/show/NCT03554655.\nINTERNATIONAL REGISTERED REPORT IDENTIFIER (IRRID): RR2-doi: 10.1186/s12888-019-2143-2.",
+		"container-title": "Journal of Medical Internet Research",
+		"DOI": "10.2196/40292",
+		"ISSN": "1438-8871",
+		"issue": "10",
+		"journalAbbreviation": "J Med Internet Res",
+		"language": "eng",
+		"note": "PMID: 36287604\nPMCID: PMC9647453",
+		"page": "e40292",
+		"source": "PubMed",
+		"title": "A Smartphone App to Promote Patient Activation and Support Shared Decision-making in People With a Diagnosis of Schizophrenia in Outpatient Treatment Settings (Momentum Trial): Randomized Controlled Assessor-Blinded Trial",
+		"title-short": "A Smartphone App to Promote Patient Activation and Support Shared Decision-making in People With a Diagnosis of Schizophrenia in Outpatient Treatment Settings (Momentum Trial)",
+		"volume": "24",
+		"author": [
+			{
+				"family": "Vitger",
+				"given": "Tobias"
+			},
+			{
+				"family": "Hjorthøj",
+				"given": "Carsten"
+			},
+			{
+				"family": "Austin",
+				"given": "Stephen F."
+			},
+			{
+				"family": "Petersen",
+				"given": "Lone"
+			},
+			{
+				"family": "Tønder",
+				"given": "Esben Sandvik"
+			},
+			{
+				"family": "Nordentoft",
+				"given": "Merete"
+			},
+			{
+				"family": "Korsbek",
+				"given": "Lisa"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2022",
+					10,
+					26
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/IQ7RGLVV",
+		"type": "article-journal",
+		"abstract": "The COVID-19 pandemic accelerated adoption of telemental health (TMH). Providers with limited TMH experience faced challenges during the rapid switch to remote patient care. We investigated TMH providers' perceptions about remote care one year into the pandemic according to when providers adopted telemedicine (i.e., before vs. after March 2020) and how much of their caseloads were served remotely (i.e., < 50% vs. ≥ 50%). Between February-March 2021, 472 TMH providers completed a cross-sectional, web-based survey that measured perceived benefits and satisfaction with telemedicine, therapeutic alliance, patient-centered communication, eHealth literacy, multicultural counseling self-efficacy, and facilitating factors of using telemedicine. Providers who began using telemedicine before the pandemic reported having better training, task-related therapeutic alliance with patients, and ability to conduct multicultural interventions, assessments, and session management. Providers who served ≥ 50% of their caseload remotely reported greater satisfaction with their practice, stronger beliefs about the benefits of telemedicine, and greater perceived effects of telemedicine on alleviating the impact of COVID-19. There were no differences in reports of patient-centered communication nor eHealth literacy. In conclusion, providers who adopted TMH more recently may require additional training and support to successfully establish a working alliance with their patients, especially with multicultural aspects of care.",
+		"container-title": "Frontiers in Psychiatry",
+		"DOI": "10.3389/fpsyt.2022.855138",
+		"ISSN": "1664-0640",
+		"journalAbbreviation": "Front Psychiatry",
+		"language": "eng",
+		"note": "PMID: 35444579\nPMCID: PMC9013879",
+		"page": "855138",
+		"source": "PubMed",
+		"title": "Perceptions of Telemental Health Care Delivery During COVID-19: A Cross-Sectional Study With Providers, February-March 2021",
+		"title-short": "Perceptions of Telemental Health Care Delivery During COVID-19",
+		"volume": "13",
+		"author": [
+			{
+				"family": "Wilczewski",
+				"given": "Hattie"
+			},
+			{
+				"family": "Paige",
+				"given": "Samantha R."
+			},
+			{
+				"family": "Ong",
+				"given": "Triton"
+			},
+			{
+				"family": "Barrera",
+				"given": "Janelle F."
+			},
+			{
+				"family": "Soni",
+				"given": "Hiral"
+			},
+			{
+				"family": "Welch",
+				"given": "Brandon M."
+			},
+			{
+				"family": "Bunnell",
+				"given": "Brian E."
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2022"
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/EL8EQHT7",
+		"type": "article-journal",
+		"abstract": "When the therapist and patient are from different cultures, there may be impediments to the development of empathy and a therapeutic alliance. South India culture provides an example of contrasting values and customs about which patients may be reluctant to discuss. The initial case history is of a South Indian who sought treatment in the United States. The remaining cases, drawn from a village in South India with which the author has had a 55-year history of research, illustrate cultural factors potentially inhibiting or facilitating the development of empathy and a therapeutic alliance.",
+		"container-title": "Psychodynamic Psychiatry",
+		"DOI": "10.1521/pdps.2022.50.1.151",
+		"ISSN": "2162-2604",
+		"issue": "1",
+		"journalAbbreviation": "Psychodyn Psychiatry",
+		"language": "eng",
+		"note": "PMID: 35235408",
+		"page": "151-164",
+		"source": "PubMed",
+		"title": "Culture, Empathy, and the Therapeutic Alliance",
+		"volume": "50",
+		"author": [
+			{
+				"family": "Ullrich",
+				"given": "Helen E."
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2022"
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/BAZAU2AM",
+		"type": "article-journal",
+		"abstract": "BACKGROUND: Depression and anxiety incur significant personal and societal costs. Effective psychotherapies exist, such as cognitive behavioral therapy (CBT); however, timely access to quality care is limited by myriad barriers. Blended care therapy models incorporate traditional face-to-face therapy with scalable, digital components of care, expanding the reach of evidence-based care.\nOBJECTIVE: The aim of this study is to determine the effectiveness of a blended care CBT program (BC-CBT) in real-world settings and examine the unique impacts of the (1) digital components of care (video lessons and digital exercises) and (2) phase of treatment (early versus late) in decreasing symptoms of anxiety and depression.\nMETHODS: This retrospective cohort analysis included 3401 US-based individuals enrolled in a BC-CBT program, who presented with clinical levels of depression and/or anxiety. The treatment program consisted of regular therapy sessions augmented by clinician-assigned digital video lessons and exercises. A growth curve model incorporating time-varying covariates examined the relationship between engagement with BCT components (ie, therapy sessions, digital video lessons, and digital exercises) during the early (weeks 0-7) and late (weeks 8-15) phases of treatment, and weekly symptom reports on depression and anxiety measures.\nRESULTS: On average, a significant decline in depression and anxiety symptoms was observed during the initial weeks of treatment (P<.001), with a continued, though slower, decline over subsequent weeks (P<.001). Each session completed was associated with significant decreases in anxiety (b=-0.72) and depression (b=-0.83) in the early phase, as well as in the late phase (anxiety, b=-0.47; depression, b=-0.27). Significant decreases in anxiety (b=-0.15) and depression (b=-0.12) were observed for time spent on video lessons (measured in 10-minute intervals) in the early phase of treatment. Engaging with exercises was associated with statistically significant increases in anxiety symptoms (b=0.03) during the early phase of treatment. However, sensitivity analyses examining the effects of exercises in isolation revealed significant decreases in anxiety (b=-0.05) in the early phase, suggesting a potential suppression effect in the larger model.\nCONCLUSIONS: Using a retrospective cohort design, therapy sessions and digital video lessons were uniquely predictive of improvements in depression and anxiety symptoms, and their effects were modulated based on the phase of treatment (early vs late). Future research should investigate whether other treatment variables, such as therapeutic alliance or familiarity with technology, are related to differential effects on various components of care.",
+		"container-title": "JMIR formative research",
+		"DOI": "10.2196/33452",
+		"ISSN": "2561-326X",
+		"issue": "12",
+		"journalAbbreviation": "JMIR Form Res",
+		"language": "eng",
+		"note": "PMID: 34927591\nPMCID: PMC8726023",
+		"page": "e33452",
+		"source": "PubMed",
+		"title": "Examining the Impact of Digital Components Across Different Phases of Treatment in a Blended Care Cognitive Behavioral Therapy Intervention for Depression and Anxiety: Pragmatic Retrospective Study",
+		"title-short": "Examining the Impact of Digital Components Across Different Phases of Treatment in a Blended Care Cognitive Behavioral Therapy Intervention for Depression and Anxiety",
+		"volume": "5",
+		"author": [
+			{
+				"family": "Wu",
+				"given": "Monica S."
+			},
+			{
+				"family": "Wickham",
+				"given": "Robert E."
+			},
+			{
+				"family": "Chen",
+				"given": "Shih-Yin"
+			},
+			{
+				"family": "Chen",
+				"given": "Connie"
+			},
+			{
+				"family": "Lungu",
+				"given": "Anita"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2021",
+					12,
+					17
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/AF9GI56A",
+		"type": "article-journal",
+		"abstract": "BACKGROUND: Due to the COVID-19 pandemic, digitalization in healthcare grew rapidly. Auditory training after cochlear implantation usually takes place face-to-face but social distancing interferes with this therapeutic approach.\nMATERIALS AND METHODS: In follow-up treatment, 42 adult cochlear implant (CI) users aged 53.8 (±15.6) years received video therapy 1 x/week for 5 weeks on a certified platform. After each therapy session, the technical process and therapeutic content were assessed. At the end of the study, usability and the relationship between therapist and patient were evaluated by patients and therapists using the System Usability Scale (SUS), a final questionnaire and by the Skala Therapeutische Allianz - Revised (STA-R). Furthermore, a cost-benefit analysis was done.\nRESULTS: Usability for both users was high (87.97 versus 93.0). Despite the lack of personal contact, therapeutic alliance was highly appreciated by patients and therapists (87.8% versus 84.8%). The main advantages for the patients were reductions in time and costs. In contrast, the rehabilitation center faced higher costs initially due to the longer time therapists needed to prepare the lessons. Technical problems had to be solved in > 75% of the first sessions but did not bother training thereafter. In total, 47.6% of the patients believe that teletherapy can completely fulfill their therapeutic needs.\nCONCLUSION: Video therapy has been judged as a useful tool by all users and the majority wants to continue. However, it remains questionable whether the therapist-patient relationship can be sufficiently maintained over a longer period and whether online therapy is as effective as face-to-face therapy.",
+		"container-title": "HNO",
+		"DOI": "10.1007/s00106-021-01124-y",
+		"ISSN": "1433-0458",
+		"issue": "3",
+		"journalAbbreviation": "HNO",
+		"language": "ger",
+		"note": "PMID: 34825919\nPMCID: PMC8620318",
+		"page": "214-223",
+		"source": "PubMed",
+		"title": "[Teletherapy after cochlear implantation during the COVID-19 pandemic]",
+		"volume": "70",
+		"author": [
+			{
+				"family": "Völter",
+				"given": "Christiane"
+			},
+			{
+				"family": "Stöckmann",
+				"given": "Carolin"
+			},
+			{
+				"family": "Klein",
+				"given": "Hannah"
+			},
+			{
+				"family": "Dazert",
+				"given": "Stefan"
+			},
+			{
+				"family": "Thomas",
+				"given": "Jan Peter"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2022",
+					3
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/J6J3T8VA",
+		"type": "article-journal",
+		"abstract": "BACKGROUND AND PURPOSE: Low back pain is a multidimensional disorder and a biopsychosocial management approach is recommended. However, recent data indicates that physiotherapists mainly focus on biomechanical aspects in treatment and struggle with addressing psychosocial barriers for recovery. We wanted to explore how physiotherapists express their experiences of building therapeutic alliances within a biopsychosocial perspective of low back pain.\nMETHODS: Qualitative focus-group interviews were performed with five physiotherapists on two occasions with 6 months in between. Data were analyzed within a hermeneutical perspective with decontextualization and recontextualization, and identification of themes.\nRESULTS: Four main themes were identified from the analyses: (1) An ideal standard: Presence, empathy and applying the biopsychosocial perspective is central for building therapeutic alliance. (2) Time-consuming: Active listening and personally adapted treatment is important and time-consuming. (3) Challenging area: Advanced clinical reasoning is needed to understand and modify complex barriers for recovery. Clinical experience is sometimes necessary to integrate the psychological and social domains into physiotherapy management. (4) The art of balancing: Important to apply sensitive communication to help patients gain new insight. Some heavy psychosocial demands on patients may be outside physiotherapists' professional competence.\nDISCUSSION: The physiotherapists in this focus group study expressed a shared view that therapeutic alliance should build upon person-centering, motivational communication, and facilitation of lifestyle adjustments within a biopsychosocial perspective of low back pain. Complex clinical reasoning necessary as the optimal cause-corrective treatment strategies were often not obvious. Time and tools to uncover and modify relevant psychological obstacles for recovery were perceived challenging and partly dependent on clinical experience. Addressment of psychosocial obstacles for recovery should be included in basic as well as postgraduate curriculums for physiotherapists. Collaborative practice support strategies like peer guidance and better platforms for interprofessional collaboration and decision support could contribute to improve practice in the psychosocial domain.",
+		"container-title": "Physiotherapy Research International: The Journal for Researchers and Clinicians in Physical Therapy",
+		"DOI": "10.1002/pri.1932",
+		"ISSN": "1471-2865",
+		"issue": "1",
+		"journalAbbreviation": "Physiother Res Int",
+		"language": "eng",
+		"note": "PMID: 34739185",
+		"page": "e1932",
+		"source": "PubMed",
+		"title": "Building therapeutic alliances with patients in treatment for low back pain: A focus group study",
+		"title-short": "Building therapeutic alliances with patients in treatment for low back pain",
+		"volume": "27",
+		"author": [
+			{
+				"family": "Unsgaard-Tøndel",
+				"given": "Monica"
+			},
+			{
+				"family": "Søderstrøm",
+				"given": "Sylvia"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2022",
+					1
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/YNE9JUWI",
+		"type": "article-journal",
+		"abstract": "Introduction: Developing a good therapeutic alliance is considered essential for the responsible delivery of psychotherapy. Text-based digital psychotherapy has become increasingly common, yet much remains unclear about the alliance and its importance for delivering mental health care via a digital format. To employ text-based digital therapies responsibly, more insight is needed into the type and strength of the therapeutic alliance online. Methods: A systematic scoping review was performed searching four databases: Scopus, PsycINFO, Web of Science, and Wiley Online Library. A total of 23 studies were selected and data was extracted and tabulated to explore the characteristics of studies on text-based psychotherapy, measurements of the therapeutic alliance and associations of the alliance with treatment outcome. Results: The therapeutic alliance in text-based digital interventions was studied with a variety of client groups, though mostly for clients diagnosed with anxiety and/or depression issues. Treatment modalities were predominantly internet-based cognitive behavioral therapy (ICBT) and tailored platforms for distinct client groups (e.g., PTSD). Almost all treatments used asynchronous text-based communication, such as e-mails and integrated messaging functions, which were mainly used to give feedback on tasks. For measurements, a version of the Working Alliance Inventory (WAI) was used in most studies. Measurements with the WAI or WAI- short form indicated a good therapeutic alliance with a weighted mean score of 5.66 (on a scale of 1 to 7) and a weighted standard deviation of 0.84. Relations between the therapeutic alliance and treatment outcomes were mostly positive, with many studies reporting significant associations (n = 8 out of 10) or significant effects of the therapeutic alliance on treatment outcomes (n = 5 out of 6). Discussion: Our scoping review suggests that a good therapeutic alliance can be established in digital psychotherapy through text-based communication, and shows support for a positive relationship between the alliance and treatment outcomes. These findings illustrate that text-based online psychotherapy can be a responsible treatment option as far as the establishment of the therapeutic alliance is concerned. However, current measures of the therapeutic alliance might miss important aspects of the alliance in digital treatment, such as the presence of empathy or compassion.",
+		"container-title": "Frontiers in Digital Health",
+		"DOI": "10.3389/fdgth.2021.689750",
+		"ISSN": "2673-253X",
+		"journalAbbreviation": "Front Digit Health",
+		"language": "eng",
+		"note": "PMID: 34713164\nPMCID: PMC8521857",
+		"page": "689750",
+		"source": "PubMed",
+		"title": "Responsible Relations: A Systematic Scoping Review of the Therapeutic Alliance in Text-Based Digital Psychotherapy",
+		"title-short": "Responsible Relations",
+		"volume": "3",
+		"author": [
+			{
+				"family": "Lotringen",
+				"given": "Charlotte M.",
+				"non-dropping-particle": "van"
+			},
+			{
+				"family": "Jeken",
+				"given": "Lars"
+			},
+			{
+				"family": "Westerhof",
+				"given": "Gerben J."
+			},
+			{
+				"family": "Ten Klooster",
+				"given": "Peter M."
+			},
+			{
+				"family": "Kelders",
+				"given": "Saskia M."
+			},
+			{
+				"family": "Noordzij",
+				"given": "Matthijs L."
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2021"
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/EPVHM73D",
+		"type": "article-journal",
+		"abstract": "Background: Shared decision-making (SDM) in mental healthcare has received increased attention as a process to reinforce person-centered care. With the rapid development of digital health technology, researchers investigate how digital interventions may be utilized to support SDM. Despite the promise of digital interventions to support SDM, the effect of these in mental healthcare has not been evaluated before. Thus, this paper aims to assess the effect of SDM interventions complimented by digital technology in mental healthcare. Objective: The objective of this review was to systematically examine the effectiveness of digital SDM interventions on patient outcomes as investigated in randomized trials. Methods: We performed a systematic review and meta-analysis of randomized controlled trials on digital SDM interventions for people with a mental health condition. We searched for relevant studies in MEDLINE, PsycINFO, EMBASE, CINAHL, and the Cochrane Central Register of Controlled Trials. The search strategy included terms relating to SDM, digital systems, mental health conditions, and study type. The primary outcome was patient activation or indices of the same (e.g., empowerment and self-efficacy), adherence to treatment, hospital admissions, severity of symptoms, and level of functioning. Secondary outcomes were satisfaction, decisional conflict, working alliance, usage, and adherence of medicine; and adverse events were defined as harms or side effects. Results: Sixteen studies met the inclusion criteria with outcome data from 2,400 participants. Digital SDM interventions had a moderate positive effect as compared with a control condition on patient activation [standardized mean difference (SMD) = 0.56, CI: 0.10, 1.01, p = 0.02], a small effect on general symptoms (SMD = -0.17, CI: -0.31, -0.03, p = 0.02), and working alliance (SMD = 0.21, CI: 0.02, 0.41, p = 0.03) and for improving decisional conflict (SMD = -0.37, CI: -0.70, -0.05, p = 0.02). No effect was found on self-efficacy, other types of mental health symptoms, adverse events, or patient satisfaction. A total of 39 outcomes were narratively synthesized with results either favoring the intervention group or showing no significant differences between groups. Studies were generally assessed to have unclear or high risk of bias, and outcomes had a Grading of Recommendations Assessment, Development and Evaluation (GRADE) rating of low- or very low-quality evidence. Conclusions: Digital interventions to support SDM may be a promising tool in mental healthcare; but with the limited quality of research, we have little confidence in the estimates of effect. More quality research is needed to further assess the effectiveness of digital means to support SDM but also to determine which digital intervention features are most effective to support SDM. Systematic Review Registration: PROSPERO, identifier CRD42020148132.",
+		"container-title": "Frontiers in Psychiatry",
+		"DOI": "10.3389/fpsyt.2021.691251",
+		"ISSN": "1664-0640",
+		"journalAbbreviation": "Front Psychiatry",
+		"language": "eng",
+		"note": "PMID: 34552514\nPMCID: PMC8450495",
+		"page": "691251",
+		"source": "PubMed",
+		"title": "Digital Shared Decision-Making Interventions in Mental Healthcare: A Systematic Review and Meta-Analysis",
+		"title-short": "Digital Shared Decision-Making Interventions in Mental Healthcare",
+		"volume": "12",
+		"author": [
+			{
+				"family": "Vitger",
+				"given": "Tobias"
+			},
+			{
+				"family": "Korsbek",
+				"given": "Lisa"
+			},
+			{
+				"family": "Austin",
+				"given": "Stephen F."
+			},
+			{
+				"family": "Petersen",
+				"given": "Lone"
+			},
+			{
+				"family": "Nordentoft",
+				"given": "Merete"
+			},
+			{
+				"family": "Hjorthøj",
+				"given": "Carsten"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2021"
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/groups/6109700/items/GPF6TB99",
+		"type": "article-journal",
+		"abstract": "The aim was to explore the experiences of sexually abused individuals as dental patients. Purposively selected were 13 informants (11 women) aged 19-56. All had experienced sexual abuse as children or adults and memories of this abuse had been triggered and expressed during a dental appointment. They were encouraged to relate in their own words their experiences of the dental appointment. The interviews were recorded digitally, transcribed verbatim, and analysed according to Qualitative Content Analysis. The overall theme illustrating the latent content was The dental appointment - a volatile base requiring predictability and a secure working alliance. The first category covering the manifest content was The dental care provider \"assumes responsibility,\" with two subcategories: (i) contradictory disclosure, and (ii) alliance formation - a levelling of power. The second category was The patient is \"in focus,\" with two subcategories: (i) alertness to signs of discomfort, and (ii) attention to obvious but subtle expressions of needs. On an understanding that the patient has been sexually abused, an individually tailored, patient-centered approach to treatment is suggested. Dental care providers may also need to be aware of and reflect on their position of power, in relation to the patient and its possible chairside implications.",
+		"container-title": "European Journal of Oral Sciences",
+		"DOI": "10.1111/eos.12782",
+		"ISSN": "1600-0722",
+		"issue": "3",
+		"journalAbbreviation": "Eur J Oral Sci",
+		"language": "eng",
+		"note": "PMID: 33760322",
+		"page": "e12782",
+		"source": "PubMed",
+		"title": "Dental care of patients exposed to sexual abuse: Need for alliance between staff and patients",
+		"title-short": "Dental care of patients exposed to sexual abuse",
+		"volume": "129",
+		"author": [
+			{
+				"family": "Wolf",
+				"given": "Eva"
+			},
+			{
+				"family": "Grinneby",
+				"given": "David"
+			},
+			{
+				"family": "Nilsson",
+				"given": "Petra"
+			},
+			{
+				"family": "Priebe",
+				"given": "Gisela"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2021",
+					6
+				]
+			]
+		}
+	}
+]
