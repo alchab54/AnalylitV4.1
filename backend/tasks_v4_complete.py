@@ -1739,3 +1739,279 @@ def run_empathy_comparative_analysis_task(session, project_id: str, **kwargs):
     """Dummy task for empathy comparative analysis."""
     logger.info(f"Running empathy comparative analysis for project {project_id}")
     send_project_notification(project_id, 'analysis_completed', 'Empathy comparative analysis completed.', {'analysis_type': 'empathy_comparative_analysis'})
+
+# ============================================================================
+# === NOUVELLES TÂCHES SÉQUENTIELLES OPTIMISÉES
+# ============================================================================
+
+@with_db_session
+def run_batch_screening_task(session, project_id: str, profile: Dict):
+    """Screening en lot de tous les articles du projet"""
+    logger.info(f"🔍 Screening en lot pour projet {project_id}")
+    
+    # Récupérer tous les articles non traités
+    articles = session.execute(text("""
+        SELECT sr.article_id, sr.title, sr.abstract, sr.authors
+        FROM search_results sr 
+        LEFT JOIN extractions e ON sr.project_id = e.project_id AND sr.article_id = e.pmid
+        WHERE sr.project_id = :pid AND e.id IS NULL
+        ORDER BY sr.created_at
+    """), {"pid": project_id}).mappings().fetchall()
+    
+    if not articles:
+        logger.warning(f"Aucun article à screener pour {project_id}")
+        return {"status": "completed", "screened": 0}
+    
+    profile = normalize_profile(profile)
+    total_relevant = 0
+    
+    # Screening avec grille standardisée
+    screening_results = []
+    
+    for article in articles:
+        content = f"Titre: {article['title']}\n\nAuteurs: {article['authors']}\n\nRésumé: {article['abstract']}"
+        
+        prompt = f"""
+Tu es un expert en Alliance Thérapeutique Numérique (ATN). 
+Évalue la pertinence de cet article pour une revue systématique sur l'ATN.
+
+CRITÈRES DE PERTINENCE ATN :
+- Relations patient-IA thérapeutique
+- Empathie artificielle en contexte médical
+- Alliance thérapeutique numérique
+- Acceptabilité des solutions IA santé
+- Confiance algorithmique patient-système
+- Technologies conversationnelles médicales
+
+ARTICLE À ÉVALUER :
+{content[:2000]}
+
+Réponds UNIQUEMENT en JSON avec :
+{{"is_relevant": boolean, "relevance_score": number (0-10), "atn_category": "string", "justification": "string"}}
+"""
+        
+        try:
+            result = call_ollama_api(prompt, profile['extract'], output_format='json')
+            if isinstance(result, str):
+                result = json.loads(result)
+            
+            is_relevant = result.get('is_relevant', False)
+            score = int(result.get('relevance_score', 0))
+            
+            if is_relevant and score >= 6:
+                total_relevant += 1
+            
+            screening_results.append({
+                "id": str(uuid.uuid4()),
+                "pid": project_id,
+                "pmid": article['article_id'],
+                "title": article['title'],
+                "score": score,
+                "just": result.get('justification', ''),
+                "src": 'abstract',
+                "ts": datetime.now().isoformat(),
+                "category": result.get('atn_category', 'Non classé')
+            })
+            
+        except Exception as e:
+            logger.warning(f"Erreur screening {article['article_id']}: {e}")
+            continue
+    
+    # Sauvegarde en lot
+    if screening_results:
+        session.execute(text("""
+            INSERT INTO extractions (id, project_id, pmid, title, relevance_score, relevance_justification, analysis_source, created_at, atn_category)
+            VALUES (:id, :pid, :pmid, :title, :score, :just, :src, :ts, :category)
+            ON CONFLICT (project_id, pmid) DO UPDATE SET
+                relevance_score = EXCLUDED.relevance_score,
+                relevance_justification = EXCLUDED.relevance_justification,
+                atn_category = EXCLUDED.atn_category
+        """), screening_results)
+    
+    # Notification avec métriques
+    send_project_notification(
+        project_id,
+        'screening_completed', 
+        f'Screening terminé : {total_relevant}/{len(articles)} articles pertinents',
+        {
+            'total_screened': len(articles),
+            'relevant_count': total_relevant,
+            'relevance_rate': round((total_relevant/len(articles))*100, 1) if articles else 0
+        }
+    )
+    
+    logger.info(f"✅ Screening: {total_relevant}/{len(articles)} articles pertinents")
+    return {"status": "completed", "screened": len(articles), "relevant": total_relevant}
+
+@with_db_session  
+def run_atn_extraction_task(session, project_id: str, profile: Dict, use_atn_grid: bool = True):
+    """Extraction complète avec grille ATN standardisée"""
+    logger.info(f"🔬 Extraction ATN pour projet {project_id}")
+    
+    # Charger la grille ATN depuis le fichier
+    atn_fields = [
+        "ID_étude", "Auteurs", "Année", "Titre", "DOI/PMID", "Type_étude", 
+        "Niveau_preuve_HAS", "Pays_contexte", "Durée_suivi", "Taille_échantillon",
+        "Population_cible", "Type_IA", "Plateforme", "Fréquence_usage",
+        "Instrument_empathie", "Score_empathie_IA", "Score_empathie_humain", 
+        "WAI-SR_modifié", "Taux_adhésion", "Confiance_algorithmique",
+        "Interactions_biomodales", "Considération_éthique", "Acceptabilité_patients",
+        "Risque_biais", "Limites_principales", "Conflits_intérêts", "Financement",
+        "RGPD_conformité", "AI_Act_risque", "Transparence_algo"
+    ]
+    
+    # Articles pertinents seulement (score >= 6)
+    articles = session.execute(text("""
+        SELECT sr.article_id, sr.title, sr.abstract, sr.authors, sr.publication_date, sr.doi
+        FROM search_results sr
+        JOIN extractions e ON sr.project_id = e.project_id AND sr.article_id = e.pmid  
+        WHERE sr.project_id = :pid AND e.relevance_score >= 6
+        ORDER BY e.relevance_score DESC
+    """), {"pid": project_id}).mappings().fetchall()
+    
+    if not articles:
+        logger.warning(f"Aucun article pertinent pour extraction ATN - {project_id}")
+        return {"status": "skipped", "reason": "no_relevant_articles"}
+    
+    profile = normalize_profile(profile)
+    extraction_results = []
+    
+    # Extraction avec grille ATN complète
+    for article in articles:
+        # Recherche de PDF d'abord
+        content = f"Titre: {article['title']}\n\nAuteurs: {article['authors']}\n\nRésumé: {article['abstract']}"
+        pdf_path = PROJECTS_DIR / project_id / f"{sanitize_filename(article['article_id'])}.pdf"
+        
+        if pdf_path.exists():
+            try:
+                pdf_content = extract_text_from_pdf(str(pdf_path))
+                if pdf_content and len(pdf_content) > 500:
+                    content = pdf_content[:8000]  # Texte complet pour meilleure extraction
+                    logger.info(f"✅ PDF utilisé pour extraction: {article['article_id']}")
+            except Exception as e:
+                logger.warning(f"Erreur PDF {article['article_id']}: {e}")
+        
+        # Prompt d'extraction ATN ultra-détaillé
+        fields_str = "\n".join([f"- {field}: [Détail spécifique à extraire]" for field in atn_fields])
+        
+        prompt = f"""
+MISSION : EXTRACTION SYSTÉMATIQUE ALLIANCE THÉRAPEUTIQUE NUMÉRIQUE (ATN)
+
+Tu es un expert en ATN chargé d'extraire des données selon la grille standardisée française.
+L'ATN étudie la relation patient-IA en contexte thérapeutique.
+
+GRILLE D'EXTRACTION ATN (30 CHAMPS) :
+{fields_str}
+
+INSTRUCTIONS PRÉCISES :
+- Pour chaque champ, extrait la valeur EXACTE du texte
+- Si absent : "Non spécifié"
+- Pour les scores : utilise format numérique (ex: 8.5, 75%)  
+- Pour les outils : nom exact de l'instrument
+- Pour les durées : format précis (ex: "6 mois", "1 an")
+
+TEXTE DE L'ÉTUDE À ANALYSER :
+---
+{content}
+---
+
+RÉPONSE ATTENDUE : Objet JSON avec les 30 champs ATN comme clés.
+"""
+        
+        try:
+            extracted = call_ollama_api(prompt, profile['extract'], output_format='json')
+            if isinstance(extracted, str):
+                extracted = json.loads(extracted)
+            
+            if not isinstance(extracted, dict):
+                extracted = {"extraction_error": "Format invalide", "raw_response": str(extracted)}
+            
+            # Enrichissement avec métadonnées
+            extracted.update({
+                "extraction_date": datetime.now().isoformat(),
+                "pdf_available": pdf_path.exists(),
+                "content_source": "pdf" if pdf_path.exists() else "abstract",
+                "atn_grid_version": "1.0"
+            })
+            
+            extraction_results.append({
+                "id": str(uuid.uuid4()),
+                "pid": project_id,
+                "pmid": article['article_id'],
+                "title": article['title'],
+                "data": json.dumps(extracted),
+                "score": 10,  # Score élevé pour extraction complète
+                "just": "Extraction ATN standardisée complète",
+                "src": "pdf" if pdf_path.exists() else "abstract",
+                "ts": datetime.now().isoformat()
+            })
+            
+        except Exception as e:
+            logger.error(f"Erreur extraction ATN {article['article_id']}: {e}")
+            continue
+    
+    # Sauvegarde en lot des extractions
+    if extraction_results:
+        session.execute(text("""
+            INSERT INTO extractions (id, project_id, pmid, title, extracted_data, relevance_score, relevance_justification, analysis_source, created_at)
+            VALUES (:id, :pid, :pmid, :title, :data, :score, :just, :src, :ts)
+            ON CONFLICT (project_id, pmid) DO UPDATE SET
+                extracted_data = EXCLUDED.extracted_data,
+                relevance_score = EXCLUDED.relevance_score,
+                updated_at = EXCLUDED.created_at
+        """), extraction_results)
+    
+    send_project_notification(
+        project_id,
+        'atn_extraction_completed',
+        f'Extraction ATN terminée : {len(extraction_results)} articles analysés avec grille complète',
+        {
+            'total_extracted': len(extraction_results),
+            'atn_fields_count': len(atn_fields),
+            'grid_version': '1.0'
+        }
+    )
+    
+    logger.info(f"✅ Extraction ATN complète: {len(extraction_results)} articles")
+    return {"status": "completed", "extracted": len(extraction_results)}
+
+@with_db_session
+def run_parallel_pdf_fetch_task(session, project_id: str, article_ids: List[str]):
+    """Récupération parallèle des PDFs pour une liste d'articles"""
+    logger.info(f"📄 Récupération parallèle de {len(article_ids)} PDFs")
+    
+    success_count = 0
+    for article_id in article_ids:
+        try:
+            # Récupération via Unpaywall
+            article = session.execute(text("""
+                SELECT doi, url FROM search_results 
+                WHERE project_id = :pid AND article_id = :aid
+            """), {"pid": project_id, "aid": article_id}).mappings().fetchone()
+            
+            if article and article.get('doi'):
+                pdf_url = fetch_unpaywall_pdf_url(article['doi'])
+                if pdf_url:
+                    response = http_get_with_retries(pdf_url, timeout=30)
+                    if response and response.headers.get('content-type', '').startswith('application/pdf'):
+                        
+                        project_dir = PROJECTS_DIR / project_id
+                        project_dir.mkdir(exist_ok=True)
+                        pdf_path = project_dir / f"{sanitize_filename(article_id)}.pdf"
+                        pdf_path.write_bytes(response.content)
+                        
+                        success_count += 1
+                        logger.info(f"✅ PDF récupéré: {article_id}")
+                        
+        except Exception as e:
+            logger.warning(f"Échec PDF {article_id}: {e}")
+            continue
+    
+    send_project_notification(
+        project_id,
+        'pdf_batch_completed', 
+        f'Récupération PDFs terminée: {success_count}/{len(article_ids)} réussies',
+        {'success_rate': round((success_count/len(article_ids))*100, 1)}
+    )
+    
+    return {"status": "completed", "pdfs_fetched": success_count}

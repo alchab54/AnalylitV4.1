@@ -36,6 +36,7 @@ from backend.tasks_v4_complete import (
     run_extension_task
 )
 from utils.helpers import format_bibliography
+from utils.decorators import require_api_key
 from werkzeug.utils import secure_filename
 from sqlalchemy import select
 
@@ -577,4 +578,55 @@ def upload_pdfs_bulk(project_id):
     if failed_uploads:
         response_message += f" {len(failed_uploads)} fichier(s) ignoré(s)."
 
+    return jsonify({"message": response_message, "job_ids": task_ids, "failed_files": failed_uploads}), 202
+
+@projects_bp.route('/<project_id>/launch-atn-workflow', methods=['POST'])
+@require_api_key
+def launch_atn_workflow(project_id):
+    """Lance le workflow ATN séquentiel optimisé"""
+    
+    data = request.get_json()
+    articles_data = data.get('articles_data', [])
+    profile = data.get('profile', {})
+    fetch_pdfs = data.get('fetch_pdfs', True)
+    use_atn_grid = data.get('use_atn_grid', True)
+    
+    if not articles_data:
+        return jsonify({'error': 'articles_data requis'}), 400
+    
+    try:
+        from utils.extensions import db
+        from backend.workflow_orchestrator import orchestrator
+        
+        # Lancement du workflow orchestré
+        job_ids = orchestrator.launch_atn_workflow(
+            project_id=project_id,
+            articles_data=articles_data,
+            profile=profile,
+            fetch_pdfs=fetch_pdfs
+        )
+        
+        # Mise à jour du projet
+        db.session.execute(text("""
+            UPDATE projects SET 
+                status = 'pipeline_started',
+                current_stage = 'import',
+                progress_percentage = 0,
+                workflow_type = 'atn_sequential',
+                updated_at = :ts
+            WHERE id = :pid
+        """), {"pid": project_id, "ts": datetime.now().isoformat()})
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Workflow ATN séquentiel démarré',
+            'project_id': project_id,
+            'pipeline_jobs': job_ids,
+            'expected_stages': ['import', 'pdfs', 'screening', 'extraction', 'analysis', 'synthesis'],
+            'estimated_duration': '10-15 minutes'
+        }), 202
+        
+    except Exception as e:
+        logger.error(f"Erreur lancement workflow ATN: {e}")
+        return jsonify({'error': str(e)}), 500
     return jsonify({"message": response_message, "job_ids": task_ids, "failed_files": failed_uploads}), 202

@@ -1,7 +1,14 @@
-version: '3.8'
+# ================================================================
+# ANALYLIT V4.2 - ARCHITECTURE HAUTE PERFORMANCE
+# ================================================================
+# Workflow séquentiel ATN + Multi-workers + Optimisation GPU
+# ================================================================
 
 services:
-  # Images de base
+  # ================================================================
+  # === IMAGES DE BASE
+  # ================================================================
+  
   base-cpu:
     build:
       context: .
@@ -12,7 +19,11 @@ services:
     networks:
       - analylit-network
 
-  # Base de données pour les tests
+  # ================================================================
+  # === INFRASTRUCTURE DE BASE
+  # ================================================================
+
+  # Base de données PostgreSQL
   test-db:
     image: postgres:15-alpine
     container_name: analylit_test_db
@@ -32,14 +43,15 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    restart: unless-stopped
 
-  # Redis pour les tests
+  # Redis pour les queues RQ
   redis:
     image: redis:7-alpine
     container_name: analylit_redis_dev
     ports:
       - "6380:6379"
-    command: ["redis-server", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    command: ["redis-server", "--maxmemory", "512mb", "--maxmemory-policy", "allkeys-lru"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -47,9 +59,10 @@ services:
       retries: 5
     networks:
       - analylit-network
+    restart: unless-stopped
 
-  # Service Ollama pour l'IA
-  analylit_ollama_dev:
+  # Ollama avec optimisation GPU
+  ollama:
     image: ollama/ollama:latest
     container_name: analylit_ollama_dev
     ports:
@@ -60,14 +73,28 @@ services:
       - OLLAMA_KEEP_ALIVE=24h
       - OLLAMA_HOST=0.0.0.0
       - OLLAMA_ORIGINS=*
+      - OLLAMA_NUM_PARALLEL=8        # Parallélisation maximale
+      - OLLAMA_MAX_LOADED_MODELS=4   # Modèles en mémoire
+      - NVIDIA_VISIBLE_DEVICES=all   # GPU complet si disponible
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     networks:
       - analylit-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:11434/api/version"]
       interval: 30s
-      timeout: 10s
-      retries: 5
+      timeout: 15s
+      retries: 3
     restart: unless-stopped
+
+  # ================================================================
+  # === SERVICES PRINCIPAUX
+  # ================================================================
 
   # Service de migration
   migrate:
@@ -106,7 +133,7 @@ services:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       REDIS_URL: redis://redis:6379/0
       REDIS_HOST: redis
-      OLLAMA_BASE_URL: http://analylit_ollama_dev:11434
+      OLLAMA_BASE_URL: http://ollama:11434
       PYTHONPATH: /home/appuser/app
     volumes:
       - .:/home/appuser/app
@@ -115,12 +142,15 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      ollama:
+        condition: service_healthy
       migrate:
         condition: service_completed_successfully
     networks:
       - analylit-network
     ports:
       - "8080:5000"
+    restart: unless-stopped
 
   # Service de tests
   test-runner:
@@ -138,7 +168,7 @@ services:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       REDIS_URL: redis://redis:6379/0
       REDIS_HOST: redis
-      OLLAMA_BASE_URL: http://analylit_ollama_dev:11434
+      OLLAMA_BASE_URL: http://ollama:11434
       PYTHONPATH: /home/appuser/app
     volumes:
       - .:/home/appuser/app
@@ -147,54 +177,27 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-      
+      ollama:
+        condition: service_healthy
       migrate:
         condition: service_completed_successfully
     networks:
       - analylit-network
 
-  # WORKERS OPTIMISÉS AVEC OLLAMA
+  # ================================================================
+  # === WORKERS SPÉCIALISÉS - PIPELINE SÉQUENTIEL ATN
+  # ================================================================
+
+  # --- ÉTAPE 1: IMPORT ARTICLES + PDFs (2 WORKERS RAPIDES) ---
   
-  # Worker principal - Analyses
-  test-worker-analysis:
+  worker-import-1:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
       args:
         BASE_IMAGE: analylit-base-cpu:latest
-    container_name: analylit_worker_analysis
-    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis", "analysis_queue"]
-    depends_on:
-      redis:
-        condition: service_started
-      test-db:
-        condition: service_healthy
-
-      migrate:
-        condition: service_completed_successfully
-    environment:
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      REDIS_URL: redis://redis:6379/0
-      OLLAMA_BASE_URL: http://analylit_ollama_dev:11434
-      PYTHONPATH: /home/appuser/app
-      DATABASE_HOST: test-db
-      POSTGRES_USER: analylit_user
-      POSTGRES_PASSWORD: strong_password
-      POSTGRES_DB: analylit_test_db
-    volumes:
-      - .:/home/appuser/app
-    networks:
-      - analylit-network
-
-  # Worker synthèse
-  test-worker-synthesis:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.worker
-      args:
-        BASE_IMAGE: analylit-base-cpu:latest
-    container_name: analylit_worker_synthesis
-    command: ["rq", "worker", "--url", "redis://redis:6379/0", "synthesis_queue"]
+    container_name: analylit_worker_import_1
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "import_queue", "--with-scheduler"]
     depends_on:
       redis:
         condition: service_started
@@ -205,26 +208,24 @@ services:
     environment:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       REDIS_URL: redis://redis:6379/0
-      OLLAMA_BASE_URL: http://analylit_ollama_dev:11434
+      OLLAMA_BASE_URL: http://ollama:11434
       PYTHONPATH: /home/appuser/app
-      DATABASE_HOST: test-db
-      POSTGRES_USER: analylit_user
-      POSTGRES_PASSWORD: strong_password
-      POSTGRES_DB: analylit_test_db
+      WORKER_TYPE: import
+      WORKER_ID: import-1
     volumes:
       - .:/home/appuser/app
     networks:
       - analylit-network
+    restart: unless-stopped
 
-  # Worker background/général
-  test-worker-background:
+  worker-import-2:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
       args:
         BASE_IMAGE: analylit-base-cpu:latest
-    container_name: analylit_worker_background
-    command: ["rq", "worker", "--url", "redis://redis:6379/0", "default", "background_queue"]
+    container_name: analylit_worker_import_2
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "import_queue", "background_queue"]
     depends_on:
       redis:
         condition: service_started
@@ -235,19 +236,369 @@ services:
     environment:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       REDIS_URL: redis://redis:6379/0
-      OLLAMA_BASE_URL: http://analylit_ollama_dev:11434
+      OLLAMA_BASE_URL: http://ollama:11434
       PYTHONPATH: /home/appuser/app
-      DATABASE_HOST: test-db
-      POSTGRES_USER: analylit_user
-      POSTGRES_PASSWORD: strong_password
-      POSTGRES_DB: analylit_test_db
+      WORKER_TYPE: import
+      WORKER_ID: import-2
     volumes:
       - .:/home/appuser/app
     networks:
       - analylit-network
+    restart: unless-stopped
 
-  # Worker discussions
-  test-worker-discussion:
+  # --- ÉTAPE 2: SCREENING ATN (3 WORKERS IA LÉGÈRE) ---
+  
+  worker-screening-1:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_screening_1
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: screening
+      WORKER_ID: screening-1
+      # Modèle léger pour screening rapide
+      PREFERRED_MODEL: phi3:mini
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  worker-screening-2:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_screening_2
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: screening
+      WORKER_ID: screening-2
+      PREFERRED_MODEL: phi3:mini
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  worker-screening-3:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_screening_3
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: screening
+      WORKER_ID: screening-3
+      PREFERRED_MODEL: phi3:mini
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  # --- ÉTAPE 3: EXTRACTION ATN (4 WORKERS IA LOURDE + GPU) ---
+  
+  worker-extraction-1:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_extraction_1
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "extraction_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: extraction
+      WORKER_ID: extraction-1
+      PREFERRED_MODEL: llama3:8b  # Modèle lourd pour extractions
+      CUDA_VISIBLE_DEVICES: "0"   # GPU prioritaire
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  worker-extraction-2:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_extraction_2
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "extraction_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: extraction
+      WORKER_ID: extraction-2
+      PREFERRED_MODEL: llama3:8b
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  worker-extraction-3:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_extraction_3
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "extraction_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: extraction
+      WORKER_ID: extraction-3
+      PREFERRED_MODEL: llama3:8b
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  worker-extraction-4:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_extraction_4
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "extraction_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: extraction
+      WORKER_ID: extraction-4
+      PREFERRED_MODEL: llama3:8b
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  # --- ÉTAPE 4: ANALYSES ATN (2 WORKERS CALCULS) ---
+  
+  worker-analysis-1:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_analysis_1
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: analysis
+      WORKER_ID: analysis-1
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  worker-analysis-2:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_analysis_2
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: analysis
+      WORKER_ID: analysis-2
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  # --- ÉTAPE 5: SYNTHÈSE + REPORTING (2 WORKERS) ---
+  
+  worker-synthesis-1:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_synthesis_1
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "synthesis_queue", "reporting_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: synthesis
+      WORKER_ID: synthesis-1
+      PREFERRED_MODEL: llama3:8b  # Modèle performant pour synthèses
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  worker-synthesis-2:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_synthesis_2
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "synthesis_queue", "reporting_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: synthesis
+      WORKER_ID: synthesis-2
+      PREFERRED_MODEL: llama3:8b
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  # --- WORKERS SPÉCIAUX ---
+  
+  # Worker Discussion + Chat RAG
+  worker-discussion:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
@@ -260,23 +611,28 @@ services:
         condition: service_started
       test-db:
         condition: service_healthy
+      ollama:
+        condition: service_healthy
       migrate:
         condition: service_completed_successfully
     environment:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       REDIS_URL: redis://redis:6379/0
-      OLLAMA_BASE_URL: http://analylit_ollama_dev:11434
+      OLLAMA_BASE_URL: http://ollama:11434
       PYTHONPATH: /home/appuser/app
-      DATABASE_HOST: test-db
-      POSTGRES_USER: analylit_user
-      POSTGRES_PASSWORD: strong_password
-      POSTGRES_DB: analylit_test_db
+      WORKER_TYPE: discussion
+      WORKER_ID: discussion-1
     volumes:
       - .:/home/appuser/app
     networks:
       - analylit-network
+    restart: unless-stopped
 
-  # MONITORING - RQ Dashboard
+  # ================================================================
+  # === MONITORING & OUTILS
+  # ================================================================
+
+  # RQ Dashboard - Monitoring des queues
   rq-dashboard:
     image: eoranged/rq-dashboard
     container_name: analylit_rq_dashboard
@@ -289,12 +645,49 @@ services:
         condition: service_started
     networks:
       - analylit-network
+    restart: unless-stopped
+
+  # Portainer - Gestion Docker (optionnel)
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: analylit_portainer
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - analylit-network
+    restart: unless-stopped
+    profiles: ["monitoring"]
+
+# ================================================================
+# === CONFIGURATION RÉSEAU & VOLUMES
+# ================================================================
 
 networks:
   analylit-network:
     driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: analylit-bridge
 
 volumes:
   test_postgres_data:
+    driver: local
   ollama_data:
     driver: local
+  portainer_data:
+    driver: local
+
+# ================================================================
+# === CONFIGURATION AVANCÉE
+# ================================================================
+
+# Pour démarrer avec monitoring complet :
+# docker-compose -f docker-compose.dev.yml --profile monitoring up -d
+
+# Pour build uniquement :  
+# docker-compose -f docker-compose.dev.yml --profile build-only build
+
+# Pour démarrage production :
+# docker-compose -f docker-compose.dev.yml up -d
