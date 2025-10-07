@@ -1,0 +1,237 @@
+{
+  "project_id": "e65b58bc-890e-40d0-94d8-6c53819438af",
+  "timestamp": "2025-10-07T13:44:43.187995",
+  "grille_atn_version": "Grille d'extraction ATN Standardisée",
+  "articles_traites": 5,
+  "articles": [
+    {
+      "metadata": {
+        "key": "NQNKTNHL",
+        "title": "Clinicians' Attitudes Toward Telepsychology in Addiction and Mental Health Services, and Prediction of Postpandemic Telepsychology Uptake",
+        "authors": "Zentner, Kristen; Gaine, Graham; Ethridge, Paige; Surood, Shireen; Abba-Aji, Adam",
+        "year": 2022,
+        "doi": "10.2196/35535",
+        "pmid": "35559793",
+        "journal": "JMIR formative research",
+        "abstract": "BACKGROUND: The COVID-19 pandemic has resulted in unprecedented uptake of telepsychology services...",
+        "pdf_path": "MR3X42KU",
+        "url": "http://www.ncbi.nlm.nih.gov/pubmed/35559793",
+        "tags": [
+          "mental health",
+          "therapeutic alliance",
+          "clinician attitude",
+          "telepsychology",
+          "unified theory of acceptance and use of technology"
+        ]
+      },
+      "relevance_atn": {
+        "score": 14,
+        "category": "Peu pertinent ATN",
+        "keywords_found": 14
+      },
+      "extraction_atn": {
+        "ID_étude": "NQNKTNHL",
+        "Auteurs": "Zentner, Kristen; Gaine, Graham; Ethridge, Paige; Surood, Shireen; Abba-Aji, Adam",
+        "Année": 2022,
+        "Titre": "Clinicians' Attitudes Toward Telepsychology in Addiction and Mental Health Services, and Prediction of Postpandemic Telepsychology Uptake",
+        "DOI/PMID": "10.2196/35535/35559793",
+        "Type_étude": "Non défini",
+        "Pays_contexte": "Non défini",
+        "Population_cible": "Non définie",
+        "Type_IA": "Non défini",
+        "Plateforme": "Non définie",
+        "WAI-SR_modifié": "Alliance thérapeutique mentionnée",
+        "Acceptabilité_patients": "Non mentionnée",
+        "Considération_éthique": "Non mentionnées",
+        "PDF_disponible": "Oui",
+        "Source_PDF": "C:\\Users\\alich\\Zotero\\storage\\MR3X42KU\\Zentner et al. - 2022 - Clinicians' Attitudes Toward Telepsychology in Addiction and Mental Health Services, and Prediction.pdf"
+      },
+      "pdf_path": "C:\\Users\\alich\\Zotero\\storage\\MR3X42KU\\Zentner et al. - 2022 - Clinicians' Attitudes Toward Telepsychology in Addiction and Mental Health Services, and Prediction.pdf",
+      "processed_at": "2025-10-07T13:44:33.178697"
+    },
+    {
+      "metadata": {
+        "key": "IQ7RGLVV",
+        "title": "Perceptions of Telemental Health Care Delivery During COVID-19: A Cross-Sectional Study With Providers, February-March 2021",
+        "authors": "Wilczewski, Hattie; Paige, Samantha R.; Ong, Triton; Barrera, Janelle F.; Soni, Hiral; Welch, Brandon M.; Bunnell, Brian E.",
+        "year": 2022,
+        "doi": "10.3389/fpsyt.2022.855138",
+        "pmid": "35444579",
+        "journal": "Frontiers in Psychiatry",
+        "abstract": "The COVID-19 pandemic accelerated adoption of telemental health (TMH)...",
+        "pdf_path": "U5E6KKUA",
+        "url": "http://www.ncbi.nlm.nih.gov/pubmed/35444579",
+        "tags": [
+          "mental health",
+          "COVID-19",
+          "quality of care",
+          "telemedicine",
+          "telemental health"
+        ]
+      },
+      "relevance_atn": {
+        "score": 12,
+        "category": "Peu pertinent ATN",
+        "keywords_found": 12
+      },
+      "extraction_atn": {
+        "ID_étude": "IQ7RGLVV",
+        "Auteurs": "Wilczewski, Hattie; Paige, Samantha R.; Ong, Triton; Barrera, Janelle F.; Soni, Hiral; Welch, Brandon M.; Bunnell, Brian E.",
+        "Année": 2022,
+        "Titre": "Perceptions of Telemental Health Care Delivery During COVID-19: A Cross-Sectional Study With Providers, February-March 2021",
+        "DOI/PMID": "10.3389/fpsyt.2022.855138/35444579",
+        "Type_étude": "Non défini",
+        "Pays_contexte": "Non défini",
+        "Population_cible": "Non définie",
+        "Type_IA": "Non défini",
+        "Plateforme": "Non définie",
+        "WAI-SR_modifié": "Non mentionné",
+        "Acceptabilité_patients": "Non mentionnée",
+        "Considération_éthique": "Non mentionnées",
+        "PDF_disponible": "Oui",
+        "Source_PDF": "C:\\Users\\alich\\Zotero\\storage\\U5E6KKUA\\Wilczewski et al. - 2022 - Perceptions of Telemental Health Care Delivery During COVID-19 A Cross-Sectional Study With Provide.pdf"
+      },
+      "pdf_path": "C:\\Users\\alich\\Zotero\\storage\\U5E6KKUA\\Wilczewski et al. - 2022 - Perceptions of Telemental Health Care Delivery During COVID-19 A Cross-Sectional Study With Provide.pdf",
+      "processed_at": "2025-10-07T13:44:35.181151"
+    },
+    {
+      "metadata": {
+        "key": "BAZAU2AM",
+        "title": "Examining the Impact of Digital Components Across Different Phases of Treatment in a Blended Care Cognitive Behavioral Therapy Intervention for Depression and Anxiety",
+        "authors": "Wu, Monica S.; Wickham, Robert E.; Chen, Shih-Yin; Chen, Connie; Lungu, Anita",
+        "year": 2021,
+        "doi": "10.2196/33452",
+        "pmid": "34927591",
+        "journal": "JMIR formative research",
+        "abstract": "BACKGROUND: Depression and anxiety incur significant personal and societal costs...",
+        "pdf_path": "CPGZYEKW",
+        "url": "http://www.ncbi.nlm.nih.gov/pubmed/34927591",
+        "tags": [
+          "mental health",
+          "depression",
+          "digital health",
+          "anxiety",
+          "blended care",
+          "cognitive-behavioral therapy",
+          "digital",
+          "digital therapy",
+          "phase"
+        ]
+      },
+      "relevance_atn": {
+        "score": 21,
+        "category": "Peu pertinent ATN",
+        "keywords_found": 21
+      },
+      "extraction_atn": {
+        "ID_étude": "BAZAU2AM",
+        "Auteurs": "Wu, Monica S.; Wickham, Robert E.; Chen, Shih-Yin; Chen, Connie; Lungu, Anita",
+        "Année": 2021,
+        "Titre": "Examining the Impact of Digital Components Across Different Phases of Treatment in a Blended Care Cognitive Behavioral Therapy Intervention for Depression and Anxiety",
+        "DOI/PMID": "10.2196/33452/34927591",
+        "Type_étude": "Non défini",
+        "Pays_contexte": "Non défini",
+        "Population_cible": "Non définie",
+        "Type_IA": "Non défini",
+        "Plateforme": "Non définie",
+        "WAI-SR_modifié": "Non mentionné",
+        "Acceptabilité_patients": "Non mentionnée",
+        "Considération_éthique": "Non mentionnées",
+        "PDF_disponible": "Oui",
+        "Source_PDF": "C:\\Users\\alich\\Zotero\\storage\\CPGZYEKW\\Wu et al. - 2021 - Examining the Impact of Digital Components Across Different Phases of Treatment in a Blended Care Co.pdf"
+      },
+      "pdf_path": "C:\\Users\\alich\\Zotero\\storage\\CPGZYEKW\\Wu et al. - 2021 - Examining the Impact of Digital Components Across Different Phases of Treatment in a Blended Care Co.pdf",
+      "processed_at": "2025-10-07T13:44:37.181691"
+    },
+    {
+      "metadata": {
+        "key": "QJTQKZYG",
+        "title": "Communicating With Parents and Preschool Children: A Qualitative Exploration of Dental Professional-Parent-Child Interactions During Paediatric Dental Consultations to Prevent Early Childhood Caries",
+        "authors": "Yuan, Siyang; Humphris, Gerry; MacPherson, Lorna M. D.; Ross, Alistair L.; Freeman, Ruth",
+        "year": 2021,
+        "doi": "10.3389/fpubh.2021.669395",
+        "pmid": "34055728",
+        "journal": "Frontiers in Public Health",
+        "abstract": "The aim of this study was to explore communication interactions...",
+        "pdf_path": "P4KVG8HN",
+        "url": "http://www.ncbi.nlm.nih.gov/pubmed/34055728",
+        "tags": [
+          "communication",
+          "Parent-Child Relations",
+          "Dental Cares",
+          "paedodontics",
+          "conversational analysis approach"
+        ]
+      },
+      "relevance_atn": {
+        "score": 10,
+        "category": "Peu pertinent ATN",
+        "keywords_found": 10
+      },
+      "extraction_atn": {
+        "ID_étude": "QJTQKZYG",
+        "Auteurs": "Yuan, Siyang; Humphris, Gerry; MacPherson, Lorna M. D.; Ross, Alistair L.; Freeman, Ruth",
+        "Année": 2021,
+        "Titre": "Communicating With Parents and Preschool Children: A Qualitative Exploration of Dental Professional-Parent-Child Interactions During Paediatric Dental Consultations to Prevent Early Childhood Caries",
+        "DOI/PMID": "10.3389/fpubh.2021.669395/34055728",
+        "Type_étude": "Non défini",
+        "Pays_contexte": "Non défini",
+        "Population_cible": "Non définie",
+        "Type_IA": "IA détectée",
+        "Plateforme": "Non définie",
+        "WAI-SR_modifié": "Non mentionné",
+        "Acceptabilité_patients": "Non mentionnée",
+        "Considération_éthique": "Non mentionnées",
+        "PDF_disponible": "Oui",
+        "Source_PDF": "C:\\Users\\alich\\Zotero\\storage\\P4KVG8HN\\Yuan et al. - 2021 - Communicating With Parents and Preschool Children A Qualitative Exploration of Dental Professional-.pdf"
+      },
+      "pdf_path": "C:\\Users\\alich\\Zotero\\storage\\P4KVG8HN\\Yuan et al. - 2021 - Communicating With Parents and Preschool Children A Qualitative Exploration of Dental Professional-.pdf",
+      "processed_at": "2025-10-07T13:44:39.184207"
+    },
+    {
+      "metadata": {
+        "key": "GPF6TB99",
+        "title": "Dental care of patients exposed to sexual abuse: Need for alliance between staff and patients",
+        "authors": "Wolf, Eva; Grinneby, David; Nilsson, Petra; Priebe, Gisela",
+        "year": 2021,
+        "doi": "10.1111/eos.12782",
+        "pmid": "33760322",
+        "journal": "European Journal of Oral Sciences",
+        "abstract": "The aim was to explore the experiences of sexually abused individuals as dental patients...",
+        "pdf_path": "3GDRUN6M",
+        "url": "http://www.ncbi.nlm.nih.gov/pubmed/33760322",
+        "tags": [
+          "dental fear",
+          "dissociation",
+          "patient-centered",
+          "power",
+          "sexual abuse disclosure"
+        ]
+      },
+      "relevance_atn": {
+        "score": 12,
+        "category": "Peu pertinent ATN",
+        "keywords_found": 12
+      },
+      "extraction_atn": {
+        "ID_étude": "GPF6TB99",
+        "Auteurs": "Wolf, Eva; Grinneby, David; Nilsson, Petra; Priebe, Gisela",
+        "Année": 2021,
+        "Titre": "Dental care of patients exposed to sexual abuse: Need for alliance between staff and patients",
+        "DOI/PMID": "10.1111/eos.12782/33760322",
+        "Type_étude": "Non défini",
+        "Pays_contexte": "Non défini",
+        "Population_cible": "Non définie",
+        "Type_IA": "IA détectée",
+        "Plateforme": "Non définie",
+        "WAI-SR_modifié": "Non mentionné",
+        "Acceptabilité_patients": "Non mentionnée",
+        "Considération_éthique": "Non mentionnées",
+        "PDF_disponible": "Oui",
+        "Source_PDF": "C:\\Users\\alich\\Zotero\\storage\\3GDRUN6M\\Wolf et al. - 2021 - Dental care of patients exposed to sexual abuse Need for alliance between staff and patients.pdf"
+      },
+      "pdf_path": "C:\\Users\\alich\\Zotero\\storage\\3GDRUN6M\\Wolf et al. - 2021 - Dental care of patients exposed to sexual abuse Need for alliance between staff and patients.pdf",
+      "processed_at": "2025-10-07T13:44:41.186337"
+    }
+  ]
+}
