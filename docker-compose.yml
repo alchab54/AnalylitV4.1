@@ -103,7 +103,7 @@ services:
     image: analylit-web:latest
     container_name: analylit_web
     healthcheck:
-      test: ["CMD-SHELL", "curl --fail http://localhost:80/api/health || exit 1"]
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -112,6 +112,7 @@ services:
     ports: []
     environment:
       REDIS_HOST: redis
+
       FLASK_APP: backend/server_v4_complete.py
       FLASK_ENV: production
       WAIT_HOSTS: db:5432,redis:6379,ollama:11434
@@ -129,6 +130,7 @@ services:
       PYTHONPATH: /home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
       OLLAMA_BASE_URL: "http://ollama:11434"
     command: ["gunicorn", "--conf", "backend/config/gunicorn.conf.py", "backend.server_v4_complete:app"]
+
     env_file:
       - .env
     depends_on:

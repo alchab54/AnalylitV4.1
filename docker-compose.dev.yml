@@ -135,6 +135,7 @@ services:
       REDIS_HOST: redis
       OLLAMA_BASE_URL: http://ollama:11434
       PYTHONPATH: /home/appuser/app
+    
     volumes:
       - .:/home/appuser/app
     depends_on:
@@ -492,13 +493,21 @@ services:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       REDIS_URL: redis://redis:6379/0
       OLLAMA_BASE_URL: http://ollama:11434
-      PYTHONPATH: /home/appuser/app
-      WORKER_TYPE: analysis
       RQ_WORKER_TIMEOUT: "600"
       OLLAMA_REQUEST_TIMEOUT: "300"
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: analysis
       WORKER_ID: analysis-1
     volumes:
       - .:/home/appuser/app
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
     networks:
       - analylit-network
     restart: unless-stopped
@@ -523,13 +532,22 @@ services:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       REDIS_URL: redis://redis:6379/0
       OLLAMA_BASE_URL: http://ollama:11434
+      RQ_WORKER_TIMEOUT: "600"
+      OLLAMA_REQUEST_TIMEOUT: "300"
       PYTHONPATH: /home/appuser/app
       WORKER_TYPE: analysis
       WORKER_ID: analysis-2
-      RQ_WORKER_TIMEOUT: "600"
-      OLLAMA_REQUEST_TIMEOUT: "300"
+
     volumes:
       - .:/home/appuser/app
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
     networks:
       - analylit-network
     restart: unless-stopped
