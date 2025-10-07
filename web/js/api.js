@@ -79,3 +79,33 @@ export async function fetchAPI(endpoint, options = {}) {
         throw error;
     }
 }
+
+export async function fetchFile(endpoint, options = {}) {
+    const { CONFIG } = await import('./constants.js');
+    const url = `${CONFIG.API_BASE_URL}${endpoint}`;
+
+    console.log(`🔗 File Request: ${options.method || 'GET'} ${url}`);
+
+    try {
+        const response = await fetch(url, options);
+
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const blob = await response.blob();
+        const contentDisposition = response.headers.get('content-disposition');
+        let filename = 'download';
+        if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+            if (filenameMatch.length > 1) {
+                filename = filenameMatch[1];
+            }
+        }
+        return { blob, filename };
+
+    } catch (error) {
+        console.error(`❌ File Error for ${url}:`, error);
+        throw error;
+    }
+}

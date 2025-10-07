@@ -33,7 +33,8 @@ import {
     confirmDeleteProject, // This was already correct
     handleExportProject,
     loadProjects,
-    renderProjectDetail
+    renderProjectDetail,
+    handleDuplicateProject
 } from './projects.js';
 import { handleRunRobAnalysis, fetchAndDisplayRob, loadRobSection, handleSaveRobAssessment } from './rob.js'; 
 import { showSearchModal, handleMultiDatabaseSearch, handleExpertSearch, renderSearchSection } from './search.js';
@@ -135,6 +136,7 @@ const clickActions = {
     'delete-project': (target) => deleteProject(target.dataset.projectId, target.dataset.projectName),
     'export-project': (target) => handleExportProject(target.dataset.projectId),
     'confirm-delete-project': (target) => confirmDeleteProject(target.dataset.projectId),
+    'duplicate-project': (target) => handleDuplicateProject(target.dataset.projectId),
 
     // Articles
     'view-details': (target) => viewArticleDetails(target.dataset.articleId),

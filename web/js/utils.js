@@ -427,6 +427,24 @@ function levenshteinDistance(str1, str2) {
     return matrix[str2.length][str1.length];
 }
 
+/**
+ * Déclenche le téléchargement d'un fichier côté client.
+ * @param {Blob} blob - Le contenu du fichier sous forme de Blob.
+ * @param {string} filename - Le nom du fichier à télécharger.
+ */
+export function downloadFile(blob, filename) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+}
+
+
 // Export de compatibilité globale pour le débogage
 if (typeof window !== 'undefined') {
     window.AnalyLitUtils = {
@@ -452,6 +470,7 @@ if (typeof window !== 'undefined') {
         getRandomColor,
         hexToRgb,
         extractKeywords,
-        stringSimilarity
+        stringSimilarity,
+        downloadFile
     };
 }

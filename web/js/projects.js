@@ -1,10 +1,11 @@
 // web/js/projects.js
 import { appState, elements } from './app-improved.js';
-import { fetchAPI } from './api.js';
+import { fetchAPI, fetchFile } from './api.js';
 import { showLoadingOverlay, closeModal, escapeHtml, showModal, renderProjectCards } from './ui-improved.js';
 import { showToast, showSuccess, showError } from './ui-improved.js';
 import { setProjects, setCurrentProject, setCurrentSection, setCurrentProjectFiles } from './state.js';
 import { API_ENDPOINTS, MESSAGES, SELECTORS } from './constants.js';
+import { downloadFile } from './utils.js';
 
 // ============================
 // Fonctions principales
@@ -154,6 +155,31 @@ async function confirmDeleteProject(projectId) {
 }
 
 /**
+ * Duplique un projet.
+ */
+export async function handleDuplicateProject(projectId) {
+    if (!projectId) {
+        showToast('ID de projet manquant pour la duplication.', 'warning');
+        return;
+    }
+
+    showLoadingOverlay(true, 'Duplication du projet en cours...');
+    try {
+        const duplicatedProject = await fetchAPI(API_ENDPOINTS.projectDuplicate(projectId), {
+            method: 'POST',
+        });
+        showSuccess('Projet dupliqué avec succès !');
+        await loadProjects();
+        await selectProject(duplicatedProject.id);
+    } catch (error) {
+        showError(`Erreur lors de la duplication : ${error.message}`);
+    } finally {
+        showLoadingOverlay(false);
+    }
+}
+
+
+/**
  * Exporte un projet.
  */
 async function handleExportProject(projectId) {
@@ -162,10 +188,16 @@ async function handleExportProject(projectId) {
         return;
     }
     
-    const { getApiUrl } = await import('./api.js');
-    const fullUrl = await getApiUrl(API_ENDPOINTS.projectExport(projectId));
-    window.open(fullUrl, '_blank');
-    showToast(MESSAGES.projectExportStarted, 'info');
+    showLoadingOverlay(true, 'Exportation du projet en cours...');
+    try {
+        const { blob, filename } = await fetchFile(API_ENDPOINTS.projectExport(projectId));
+        downloadFile(blob, filename);
+        showSuccess('Projet exporté avec succès.');
+    } catch (error) {
+        showError(`Erreur lors de l\'exportation : ${error.message}`);
+    } finally {
+        showLoadingOverlay(false);
+    }
 }
 
 /**
@@ -274,8 +306,15 @@ function renderProjectDetail(project) {
                 </div>
                 <div class="section-header__actions">
                     <button class="btn btn--secondary" 
+                            data-action="duplicate-project" 
+                            data-project-id="${project.id}">Dupliquer</button>
+                    <button class="btn btn--secondary" 
                             data-action="export-project" 
                             data-project-id="${project.id}">📥 Export</button>
+                    <button class="btn btn--danger" 
+                            data-action="delete-project" 
+                            data-project-id="${project.id}"
+                            data-project-name="${escapeHtml(project.name)}">Supprimer</button>
                 </div>
             </div>
 
@@ -378,5 +417,6 @@ export {
     renderProjectsList,
     updateProjectListSelection,
     renderProjectDetail,
-    getStatusText
+    getStatusText,
+    handleDuplicateProject
 };

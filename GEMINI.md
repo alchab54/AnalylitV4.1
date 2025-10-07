@@ -1,135 +1,340 @@
-# 🎯 MISSION : Workflow ATN 20 Articles Zotero CSL JSON
+# 🏗️ Architecture AnalyLit v4.1 - Documentation Technique Complète
 
-## 📊 DONNÉES SOURCE
+## 📋 Vue d'Ensemble
 
-### **20 Articles Zotero - Format CSL JSON**
-Fichier: `20ATN.json` (racine projet)
+AnalyLit v4.1 est une application web modulaire pour l'automatisation de revues de littérature scientifique, construite avec une architecture microservices containerisée.
 
-**Structure CSL JSON** (Zotero export):
-[
-{
-"id": "http://zotero.org/groups/6109700/items/B75VT3ID",
-"type": "article-journal",
-"title": "A dyadic approach of assessing the therapeutic alliance...",
-"author": [
-{"family": "Benthem", "given": "Patty", "non-dropping-particle": "van"}
-],
-"issued": {"date-parts": [[2025]]},
-"container-title": "European Child & Adolescent Psychiatry",
-"DOI": "10.1007/s00787-025-02784-9",
-"abstract": "When studying therapeutic alliance...",
-"note": "PMID: 40512270"
-}
-]
+### 🎯 Technologies Principales
+- **Backend** : Flask 3.x, SQLAlchemy 2.x, PostgreSQL 15
+- **Frontend** : JavaScript Vanilla ES6+, CSS3, HTML5 SPA
+- **Cache/Queues** : Redis 7.x, RQ (Redis Queue)
+- **Container** : Docker, Docker Compose
+- **Proxy** : Nginx 1.25
+- **IA/LLM** : Ollama, intégrations cloud
+- **Tests** : Pytest, Coverage
 
-text
+## 🏛️ Architecture Système
 
-### **Grille ATN 30 Champs**
-Fichier: `grille-ATN.json` (racine projet)
+### Architecture Globale
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ANALYLIT V4.1                           │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐     │
+│  │   Nginx     │    │    Web      │    │  Workers    │     │
+│  │  (Proxy)    │◄──►│  (Flask)    │◄──►│    (RQ)     │     │
+│  │ Port: 8080  │    │ Port: 80    │    │             │     │
+│  └─────────────┘    └─────────────┘    └─────────────┘     │
+│         │                   │                   │          │
+│         │                   │                   │          │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐     │
+│  │  Frontend   │    │ PostgreSQL  │    │   Redis     │     │
+│  │  (Static)   │    │  Database   │    │   Cache     │     │
+│  │             │    │ Port: 5432  │    │ Port: 6379  │     │
+│  └─────────────┘    └─────────────┘    └─────────────┘     │
+│                             │                   │          │
+│                             │                   │          │
+│                      ┌─────────────┐    ┌─────────────┐     │
+│                      │   Ollama    │    │   Volumes   │     │
+│                      │   (LLM)     │    │   (Data)    │     │
+│                      │Port: 11434  │    │             │     │
+│                      └─────────────┘    └─────────────┘     │
+└─────────────────────────────────────────────────────────────┘
+```
 
-**Champs extraction**:
-- ID_étude, Auteurs, Année, Titre, DOI/PMID
-- Type_étude, Niveau_preuve_HAS, Pays_contexte
-- Type_IA, Plateforme, Instrument_empathie
-- Score_empathie_IA, Score_empathie_humain, WAI-SR_modifié
-- Confiance_algorithmique, Acceptabilité_patients
-- RGPD_conformité, AI_Act_risque, Transparence_algo
-- ... (30 champs total)
+### Services Docker
 
-## 🔧 PARSING ZOTERO CSL JSON
+#### 🌐 Service Web (Flask)
+```yaml
+Rôle: API REST et application principale
+Port: 80 (interne), 5000 (externe)
+Image: analylit-web:latest
+Dépendances: database, redis, ollama
+Workers Gunicorn: 2-4 (configurable)
+Healthcheck: /api/health
+```
 
-### **Extraction Métadonnées**
+#### 🔄 Workers RQ
+```yaml
+worker-fast: Tâches rapides (< 30s)
+worker-default: Tâches standard (< 300s)  
+worker-ai: Tâches IA/LLM (< 3600s)
+Queues: fast_queue, default_queue, ai_queue, analysis_queue
+```
 
-def parse_zotero_csl_json(json_path: Path) -> List[Dict]:
-with open(json_path, 'r', encoding='utf-8') as f:
-zotero_items = json.load(f)
+#### 🗄️ Base de Données
+```yaml
+Type: PostgreSQL 15
+Schéma: analylit_schema
+Port: 5432 (prod), 5434 (dev)
+Volumes persistants: postgres_data
+Migration: Alembic automatisé
+```
 
-text
-for item in zotero_items:
-    # Auteurs
-    authors = []
-    for auth in item.get("author", []):
-        family = auth.get("family", "")
-        given = auth.get("given", "")
-        particle = auth.get("non-dropping-particle", "")
-        full_name = f"{particle} {family}, {given}" if particle else f"{family}, {given}"
-        authors.append(full_name)
-    
-    # Année
-    issued = item.get("issued", {}).get("date-parts", [[]])
-    year = issued if issued else 2024
-    
-    # PMID (depuis note)
-    note = item.get("note", "")
-    pmid = note.split("PMID:").split("\n").strip() if "PMID:" in note else ""[4]
-    
-    article = {
-        "title": item.get("title", ""),
-        "authors": authors,
-        "year": year,
-        "abstract": item.get("abstract", "")[:1000],
-        "journal": item.get("container-title", ""),
-        "doi": item.get("DOI", ""),
-        "pmid": pmid,
-        "zotero_id": item.get("id", "")
-    }
-text
+#### ⚡ Cache & Queues
+```yaml
+Service: Redis 7
+Configuration: 512MB RAM, policy allkeys-lru
+Utilisation: Cache API, RQ jobs, sessions
+Port: 6379 (interne)
+```
 
-## 📁 STRUCTURE FICHIERS PROJET
+#### 🌐 Proxy Web
+```yaml
+Service: Nginx 1.25
+Configuration: reverse proxy, static files
+Port: 8080 (externe)
+SSL: Prêt (certificats à configurer)
+```
 
-AnalylitV4.1/
-├── 20ATN.json ← Export Zotero 20 articles
-├── grille-ATN.json ← Grille extraction 30 champs
-├── scripts/
-│ └── test_atn_workflow_zotero.py ← Script principal
-├── resultats_atn_20_articles/
-│ ├── rapport_atn_zotero_YYYYMMDD_HHMMSS.json
-│ └── ...
-└── backend/
-├── server_v4_complete.py
-└── api/projects.py
+## 📁 Structure des Dossiers
 
-text
+```
+analylit-v4/
+├── 🏗️ Architecture
+│   ├── docker/                    # Configurations Docker
+│   │   ├── Dockerfile.base-cpu    # Image de base CPU
+│   │   ├── Dockerfile.base-gpu    # Image de base GPU  
+│   │   ├── Dockerfile.web         # Service web principal
+│   │   ├── Dockerfile.worker      # Services workers
+│   │   ├── nginx.prod.conf        # Config Nginx production
+│   │   └── nginx.dev.conf         # Config Nginx développement
+│   ├── docker-compose.yml         # Orchestration production
+│   └── docker-compose.dev.yml     # Orchestration développement
+│
+├── 🔧 Backend
+│   ├── backend/
+│   │   ├── server_v4_complete.py  # Application Flask principale
+│   │   ├── tasks_v4_complete.py   # Tâches asynchrones RQ
+│   │   └── config/
+│   │       ├── config_v4.py       # Configuration par environnement
+│   │       └── gunicorn.conf.py   # Configuration Gunicorn
+│   │
+│   ├── api/                       # Modules API REST
+│   │   ├── __init__.py
+│   │   ├── admin.py              # Administration système
+│   │   ├── analysis_profiles.py   # Profils d'analyse IA
+│   │   ├── extensions.py         # Extensions et plugins
+│   │   ├── files.py              # Gestion fichiers
+│   │   ├── projects.py           # Gestion projets
+│   │   ├── prompts.py            # Gestion prompts IA
+│   │   ├── reporting.py          # Génération rapports
+│   │   ├── search.py             # Recherche multi-bases
+│   │   ├── selection.py          # Sélection articles
+│   │   ├── settings.py           # Paramètres application
+│   │   ├── stakeholders.py       # Analyse parties prenantes
+│   │   └── tasks.py              # Gestion tâches
+│   │
+│   └── utils/                     # Utilitaires partagés
+│       ├── __init__.py
+│       ├── extensions.py         # Extensions Flask (DB, Migration)
+│       ├── models.py             # Modèles SQLAlchemy
+│       ├── app_globals.py        # Variables globales
+│       ├── logging_config.py     # Configuration logging prod
+│       └── logging_config_dev.py # Configuration logging dev
+│
+├── 🎨 Frontend
+│   └── web/                      # Application web SPA
+│       ├── index.html            # Point d'entrée principal
+│       ├── css/
+│       │   └── styles.css        # Styles CSS unified
+│       └── js/
+│           ├── app-improved.js   # Application principale
+│           ├── state.js          # Gestion état global
+│           ├── core.js           # Fonctions core
+│           ├── api.js            # Client API REST
+│           ├── ui-improved.js    # Composants UI
+│           ├── projects.js       # Module projets
+│           ├── search.js         # Module recherche
+│           ├── results.js        # Module résultats
+│           ├── validation.js     # Module validation
+│           ├── analyses.js       # Module analyses
+│           ├── settings.js       # Module paramètres
+│           └── [...].js          # Autres modules
+│
+├── 📊 Data & Tests
+│   ├── migrations/              # Migrations Alembic
+│   ├── tests/                   # Tests automatisés
+│   │   ├── conftest.py          # Configuration pytest
+│   │   ├── test_*.py            # Tests unitaires
+│   │   └── fixtures/            # Données de test
+│   ├── logs/                    # Logs application
+│   └── projects/                # Projets utilisateurs
+│
+└── 🔧 Configuration
+    ├── .env                     # Variables environnement
+    ├── alembic.ini             # Configuration migrations
+    ├── pytest.ini             # Configuration tests
+    ├── requirements.txt        # Dépendances Python
+    ├── Makefile.mk            # Commandes automatisées
+    └── scripts/               # Scripts d'administration
+        ├── entrypoint.sh      # Point d'entrée containers
+        └── wait-for-it.sh     # Attente services
+```
 
-## 🚀 WORKFLOW 7 ÉTAPES
+## 🔄 Flux de Données
 
-1. **Vérification API** → GET `/api/health`
-2. **Chargement données** → Parse `20ATN.json` + `grille-ATN.json`
-3. **Création projet** → POST `/api/projects` (retourne `{"id": "uuid"}`)
-4. **Ajout articles** → POST `/api/projects/{id}/add-manual-articles`
-5. **Screening ATN** → POST `/api/projects/{id}/run-screening` (≥70/100)
-6. **Extraction 30 champs** → POST `/api/projects/{id}/run-analysis` (type: `atn_extraction`)
-7. **Synthèse PRISMA** → POST `/api/projects/{id}/run-analysis` (type: `synthesis`)
+### Workflow Principal
+```
+1. 🌐 Requête HTTP → Nginx (Port 8080)
+2. 🔄 Proxy → Flask Web (Port 80)
+3. 🛡️ Auth/Validation → Middleware
+4. 📍 Routing → Blueprint API
+5. 💾 Database → PostgreSQL
+6. ⚡ Cache → Redis (si applicable)
+7. 🤖 AI Tasks → RQ Workers
+8. 📤 Response → JSON/HTML
+```
 
-## ✅ AVANTAGES ZOTERO CSL JSON
+### Types de Tâches
+```
+🚀 Fast Queue (< 30s):
+- Validation données
+- Exports simples
+- Recherches basiques
 
-| Avantage | Description |
-|----------|-------------|
-| **Métadonnées complètes** | Auteurs, abstracts, DOI, PMID déjà structurés |
-| **Aucun API externe** | Pas besoin PubMed Entrez, données locales |
-| **PDFs disponibles** | Certains articles O.A., chemin Zotero storage |
-| **Validation thèse** | Export direct outil bibliographique standard |
-| **Reproductibilité** | Fichier JSON versionnable, audit trail complet |
+⚙️ Default Queue (< 300s):  
+- Imports fichiers
+- Analyses statistiques
+- Génération rapports
 
-## 🎯 EXÉCUTION
+🧠 AI Queue (< 3600s):
+- Screening automatique
+- Extraction données
+- Synthèse résultats
+- Analyses ATN
+```
 
-Placement fichiers
-cp ~/Downloads/20ATN.json ~/Downloads/Analylit/
-cp ~/Downloads/grille-ATN.json ~/Downloads/Analylit/
+## 🗄️ Modèle de Données
 
-Lancement
-cd ~/Downloads/Analylit
-python scripts/test_atn_workflow_zotero.py
+### Entités Principales
+```sql
+-- Projets de recherche
+projects (id, name, description, created_at, status)
 
-text
+-- Articles scientifiques
+articles (id, title, authors, journal, year, doi)
 
-## 📊 RÉSULTAT ATTENDU
+-- Résultats de recherche  
+search_results (id, project_id, article_id, source, relevance_score)
 
-- **20 articles** chargés depuis Zotero
-- **Score ATN moyen** 65-80/100 (ATN très pertinent)
-- **≥14 articles validés** automatiquement (≥70/100)
-- **Grille 30 champs** complétée pour chaque article
-- **PRISMA Flow** diagramme généré
-- **Export Excel** 5 onglets académiques
-- **Durée totale** 12-18 minutes
+-- Extractions de données
+extractions (id, project_id, article_id, grid_id, data, quality_score)
 
+-- Grilles d'extraction
+grids (id, name, fields, is_atn_specific)
+
+-- Analyses et synthèses
+analyses (id, project_id, type, results, confidence_level)
+
+-- Profils d'analyse IA
+analysis_profiles (id, name, models, prompts, is_custom)
+```
+
+### Relations Clés
+```
+Project 1→∞ SearchResults 1→1 Article
+Project 1→∞ Extractions ∞→1 Grid  
+Project 1→∞ Analyses
+Grid 1→∞ GridFields
+AnalysisProfile 1→∞ Prompts
+```
+
+## 🔐 Sécurité & Performance
+
+### Mesures de Sécurité
+```yaml
+Rate Limiting: Flask-Limiter (Redis backend)
+CORS: Configuré pour domaines autorisés
+Input Validation: Marshmallow schemas
+SQL Injection: SQLAlchemy ORM protection
+XSS: Jinja2 auto-escape
+File Upload: Type/size validation
+Environment: Variables sensibles externalisées
+```
+
+### Optimisations Performance
+```yaml
+Database:
+  - Index sur colonnes fréquentes
+  - Connection pooling (5-10 connexions)
+  - Query optimization avec EXPLAIN
+
+Cache Redis:
+  - TTL adaptatif par type de données
+  - Invalidation intelligente
+  - Session storage
+
+Workers:
+  - Tâches asynchrones pour operations lentes
+  - Retry logic avec backoff
+  - Job monitoring et cleanup
+
+Frontend:
+  - Lazy loading modules
+  - API call batching
+  - Local state management
+```
+
+## 🌍 Environnements
+
+### Développement
+```yaml
+Base URL: http://localhost:5000
+Database: analylit_test_db (port 5434)
+Redis: localhost:6380
+Debug: True
+Workers: Synchronous mode
+Volumes: Code bind-mounted
+```
+
+### Production  
+```yaml
+Base URL: https://your-domain.com
+Database: analylit_db (port 5432)
+Redis: redis:6379 (internal)
+Debug: False
+Workers: 3x containers
+Volumes: Named volumes
+SSL: Nginx terminated
+```
+
+## 📈 Monitoring & Maintenance
+
+### Health Checks
+```yaml
+Web: GET /api/health
+Database: pg_isready
+Redis: PING command
+Workers: RQ status
+Ollama: ollama list
+```
+
+### Logs Structure
+```yaml
+Application: logs/analylit.log (JSON format)
+Workers: logs/workers.log
+Nginx: logs/access.log, logs/error.log
+Database: PostgreSQL logs
+Rotation: Daily, 30 jours retention
+```
+
+### Backup Strategy
+```yaml
+Database: 
+  - Daily automated backup
+  - Point-in-time recovery ready
+  - Test restore mensuel
+
+Projects Data:
+  - Rsync vers stockage externe
+  - Versioning avec Git LFS
+
+Configuration:
+  - Infrastructure as Code (Docker Compose)
+  - Environment configs versionnés
+```
+
+---
+
+**📝 Note** : Cette architecture est évolutive et modulaire. Chaque composant peut être mis à l'échelle indépendamment selon les besoins.
