@@ -82,7 +82,7 @@ def handle_project(project_id):
         db.session.commit()
         return '', 204
 
-@projects_bp.route('/<project_id>/add-manual-articles', methods=['POST'])
+@projects_bp.route('/projects/<project_id>/add-manual-articles', methods=['POST'])
 def add_manual_articles_endpoint(project_id):
     payload = request.get_json()
     items_to_add = payload.get('items', [])

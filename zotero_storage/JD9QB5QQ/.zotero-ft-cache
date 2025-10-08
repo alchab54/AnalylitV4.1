@@ -1,0 +1,312 @@
+Bond University
+Research Repository
+The effectiveness of telehealth versus face-to-face interventions for anxiety disorders: A systematic review and meta-analysis
+Krzyżaniak, Natalia; Greenwood, Hannah; Scott, Anna; Peiris, Ruwani; Cardona, Magnolia; Clark, Justin; Glasziou, Paul P
+Publishedin: Journal of Telemedicine and Telecare
+DOI: 10.1177/1357633X211053738
+Licence: Other
+Link to output in Bond University research repository.
+Recommendedcitation(APA): Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to-face interventions for anxiety disorders: A systematic review and metaanalysis. JournalofTelemedicineandTelecare, 30(2), 250-261. https://doi.org/10.1177/1357633X211053738
+General rights Copyright and moral rights for the publications made accessible in the public portal are retained by the authors and/or other copyright owners and it is a condition of accessing publications that users recognise and abide by the legal requirements associated with these rights.
+For more information, or if you believe that this document breaches copyright, please contact the Bond University research repository coordinator.
+Download date: 16 juil. 2025
+
+
+The effectiveness of telehealth versus face-to face interventions for
+anxiety disorders: A systematic review and meta-analysis
+Authors
+Natalia Krzyzaniak(1), Hannah Greenwood(1), Anna Mae Scott(1), Ruwani Peiris(1), Magnolia Cardona(1), Justin Clark(1), Paul Glasziou(1)
+Author affiliations
+(1) Institute for Evidence-Based Healthcare, Bond University, Australia
+Corresponding author Natalia Krzyzaniak Institute for Evidence-Based Healthcare, Bond University 14 University Drive, Robina, QLD 4226, Australia Email: nkrzyzan@bond.edu.au Phone: +61 7 5595 4182
+COI and Funding statement
+This systematic review was commissioned by the Department of Health, Canberra, Australia, as part of a series of systematic reviews on the effectiveness of telehealth. The funder was involved in the refining of the study question (PICO). The funder was not involved in the conduct, analysis, or interpretation of the systematic review, or in the decision to submit the manuscript for publication. The authors report no other actual or potential conflicts of interest.
+Target journal:
+Journal of Consulting and Clinical Psychology Journal of Telemedicine and Telecare
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+ABSTRACT
+Background
+Worldwide, it is estimated that 264 million people meet the diagnostic criteria for anxiety conditions. Treatment regimens consist of cognitive and behavioural therapies. During the outbreak of the COVID-19 pandemic, treatment delivery relied heavily on telemedicine technologies which enabled remote access to patients via phone or video platforms.
+Objectives
+To identify, appraise and synthesise randomised controlled trials (RCTs) comparing telehealth to face-to-face delivery of care to individuals of any age or gender, diagnosed with anxiety disorders, and disorders with anxiety features.
+Design
+Systematic review and meta-analysis.
+Methods
+We searched three electronic databases, clinical trial registries and citing-cited references of included studies.
+Results
+A total of five RCTs were included; telehealth was conducted by video in three studies, and by phone in two. Overall, risk of bias was low to moderate for most domains. Outcomes related to obsessive compulsive disorder, anxiety, depression symptom severity, function, working alliance and satisfaction were comparable between the two modes of delivery across each follow-up time point (immediately post intervention, 3 months, 6 months and 12 months), with no significant differences reported (p>0.05). None of the trials reported on the costs of telehealth compared to face-to-face care.
+Conclusion
+Telehealth interventions appear to be as effective as conventional therapy delivered in-person for effectively treating anxiety and related conditions. There is a need for further high-quality trials to determine the effectiveness, acceptability, feasibility and cost-effectiveness of telehealth interventions for the management of anxiety disorders.
+Key words
+Telemedicine; telehealth; anxiety; cognitive behavioural therapy
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+Introduction
+Anxiety disorders are the most prevalent mental health conditions in Australia, currently experienced by one in seven Australians, and one in four will be affected in their lifetime.(1, 2) While anxiety disorders manifest in various forms, they all share features of excessive fear, anxiety, and related behavioural disruption, which impacts day-to-day life.(3) Although commonly comorbid with depressive disorders, other frequently comorbid conditions include substance use disorders and chronic physical illnesses.(4, 5) Worldwide, it is estimated that 264 million people meet the diagnostic criteria for anxiety conditions, which include generalised anxiety (GAD), social anxiety, specific phobias such as claustrophobia, and panic disorders. Anxiety is also a predominant feature in obsessive compulsive (OCD) and post-traumatic stress disorders (PTSD).(6) Although previously classed under anxiety disorders, the DSM-V has seen OCD and PTSD re-classified to their own disorder classes, obsessive-compulsive and related disorders and trauma- and stressor-related disorders, respectively.(3) Symptoms of anxiety disorders can impair functioning at home, in interpersonal relationships, in the workplace and community, and anxiety overall has been attributed as the 6th leading contributor to global disability by the World Health Organisation (WHO).(7). Access to effective therapy to treat these debilitating conditions is key to reducing the impairment from anxiety.
+Cognitive and behavioural therapies are considered to be the most effective psychosocial interventions for anxiety conditions, and are often associated with clinically meaningful improvements.(8) Several meta-analyses of well-controlled clinical trials provide evidence for the efficacy of cognitive behavioural therapy (CBT) for anxiety and anxiety-feature disorders including: GAD, social anxiety disorder, panic disorder, OCD and PTSD.(9, 10) Norton et al. further examined the efficacy of CBT across all anxiety conditions and reported that treatments using CBT techniques showed significantly larger treatment effect sizes than no treatment or placebo across all anxiety disorders.(11) Telemedicine technologies enable these effective therapies to be delivered to patients remotely via phone or video platforms.
+During the rapid spread of COVID-19, telehealth became a pivotal tool for medical treatment, facilitating the consistent provision of healthcare during a time when face-to-face contact is restricted.(12) Within mental health, the widespread availability of telehealth is particularly important given the increased levels of psychological distress related to the exceptional circumstances of the pandemic i.e. job losses, illness, death of friends or family, social distancing and isolation etc.(12) Fortney et al. described advantages of telehealth over face-to-face care, including reduced geographic, physical or time-related constraints for patients, potential cost savings to the health-care system, and enhanced opportunities for collaborative care, although this was amongst patients with depression, not anxiety conditions.(13) Fletcher et al. also examined the comparative effectiveness of face-to-face therapies versus video delivery for mental health patients, and found similar efficacy across the two therapy mediums.(14) However, these reviews were unable to conduct meta-analyses.(14) To gain fuller insight into the relative effectiveness of telehealth versus face-to-face services for the treatment of anxiety disorders, we conducted this systematic review, aiming to find, appraise and synthesise RCTs that have compared the clinical and financial impact of telehealth and face-to-face psychological therapies in children, adolescents and adults with anxiety disorders, and disorders with anxiety features.
+Methods
+This systematic review is reported following the Preferred Reporting Items for Systematic Reviews and Meta-Analyses (PRISMA) statement (15) and the review protocol was developed prospectively. Minor deviations from the protocol are reported in the relevant methods section.
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+Inclusion and exclusion criteria
+Study design
+We included randomised controlled trials (RCTs) of any design (e.g., parallel, cluster, crossover, factorial, or mixed), which included more than 10 patients. We excluded all other study designs, such as: controlled non-randomised trials, qualitative studies, and observational studies (cohort, casecontrol, cross-sectional, case series, case reports), as well as reviews (e.g., systematic, literature, scoping, etc.)
+Participants
+We included studies with people of any age or gender that were diagnosed with any type of anxiety disorder including: GAD, panic disorders, specific phobias, social anxiety. Although no longer considered an anxiety disorder in the DSM-V, we also included studies of patients with OCD, since the disorder has strong anxiety features and is often treated with similar psychotherapies. Although PTSD and depression were within scope of this review, there was enough literature to conduct a separate systematic reviews for those conditions (under review). Studies involving hospital patients (e.g., explicitly identified as taking place in hospital wards, or with patients shortly post-discharge) or those consulting a specialist (i.e., psychiatrist) were excluded. Studies in hospital discharged patient populations that explicitly identified provision of therapy by a psychologist, therapist, psychotherapist or counsellor, however, were included.
+Interventions
+We included studies of interventions involving standard care psychological therapies for anxiety and related conditions, such as exposure therapy, cognitive behavioural therapy, family therapy, and other related therapies. Studies examining novel treatments for anxiety conditions were not included. Therapy had to be provided synchronously (i.e., live) – studies providing asynchronous therapies (e.g., via email, SMS, etc.) were excluded.
+Comparators
+We included studies with an equivalent face-to-face comparator or telehealth comparator (i.e., video intervention with telephone comparator), providing the same therapy as the intervention group, that was identical or comparable in dose, duration, and frequency. Any comparator that was a wait-list control, or clinically inequivalent active comparator was excluded.
+Outcomes (primary, secondary)
+Studies were included if they reported on our primary outcomes of interest, comprising OCD severity and anxiety outcomes, such as DASS-A etc. Studies were also eligible if they reported on depression and function outcomes as well as working alliance inventory and satisfaction.
+Scales used to measure outcomes of interest
+- OCD Outcomes
+This outcome assessed results obtained from three OCD severity scales: YBOCS, CY-BOCS and the OCD CSR. The Yale-Brown Obsessive Compulsive Scale (Y-BOCS) is a 10-item scale, administered by health care providers and is designed to rate the severity of OCD symptoms, not establish a diagnosis. The items are scored on a four-point scale ranging from ‘no symptoms’ (0) to
+‘extreme symptoms’ (4). Scores of 0-7 are sub-clinical, and whereas higher scores of 32-40 are classified as extremely severe symptoms of OCD.(16)
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+The Children’s Yale-Brown Obsessive Compulsive Scale (CY-BOCS) is a 10-item questionnaire adapted from the adult scale, and is designed to rate the severity of OCD symptoms in children and teenagers aged 6 to 17 years. The scoring is the same as per the adult questionnaire; the higher the score, the more severe the symptoms.(17) The clinical severity rating (CSR) was involves the completion of a diagnostic interview for OCD: the Anxiety Disorders Interview Schedule for Children and Parents for DSM–IV (ADISIV), after which a CSR is assigned by a clinician.(18) CSRs range from 0-8 where 4 indicates that the DSM diagnostic criteria is met, and the higher the score, the more severe the condition.
+- Anxiety outcomes
+The DASS is a set of three self-report scales designed to measure the negative emotional states of depression, anxiety and stress. The anxiety subscale (DASS-A) contains 14 items and assesses autonomic arousal, skeletal muscle effects, situational anxiety, and subjective experience of anxious affect.(19) Patients self-rate themselves 0 to 3 on a 4-point scale,
+ranging from ‘did not apply to me at all, never’ (0) to ‘applied to me very much, or most of the time’ (3). A score of 0-3 in the anxiety subscale is considered normal, whereas scores 8 10+ are considered severe to extremely severe.(20)
+- Depression outcomes
+Depression outcomes were measured using three scales across three studies. The Beck Depression Inventory (BDI) a 21-item, self-report rating inventory, was utilised by Lovell et al. and aims to measure depression symptoms and severity in persons ages ≥13 years.(21) A 4‐point scale indicates degree of severity; items are rated from 0 (not at all) to 3 (extreme form of each symptom), and there are no arbitrary cut-off scores to classify different degrees of depression; the higher the score, the more severe form of depression.(21) The BDI-Y scale, adapted for use in children and teenagers aged 7 – 18 years old, is a 20-item self-report measure to assess symptom severity of depression. Patients describe how frequently a statement has been true for them over the past two weeks on a three-point scale - items are rated from 0 (Never) to 3 (Always).(22) The higher the score, the higher the severity of depression assessed. The DASS is a set of three self-report scales designed to measure the negative emotional states of depression, anxiety and stress. The depression subscale (DASS-D) contains 14 items and assesses dysphoria, hopelessness, devaluation of life, self-deprecation, lack of interest/involvement, anhedonia, and inertia.(19) Patients self-rate themselves 0 to 3 on a 4point scale, ranging from ‘did not apply to me at all, never’ (0) to ‘applied to me very much, or most of the time’ (3). A score of 0-4 in the depression subscale is considered normal, whereas scores 11 – 14+ are considered severe to extremely severe.(20)
+- Function
+Data for this outcome was obtained from the Children’s Global Assessment Scale (CGAS), which is a rating of functioning aimed specifically at children aged 6-17 years.(23) The scale assesses a patients level of psychological and social functioning, and a score between 1 and 100 is assigned accordingly. A lower score (1-10) indicates extreme impairment, whereas a higher score (91 – 100) indicates a patient is doing very well.(23)
+- Working alliance inventory score
+The working alliance inventory (WAI) score evaluates the collaborative relationship between the health care provider and the patient. There are two types of WAI questionnaires – the full 36-item or the shortened 12-item questionnaire. Patients and health care providers rate
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+items on a 5-point Likert scale ranging from ‘rarely or never’ (1) to ‘always’ (5). Higher scores indicate a better therapeutic alliance.(24)
+- Client satisfaction scale
+The client satisfaction scale is a self-reported measure of satisfaction with health and human services. Patients assess each question on a 4-point Likert scale, ranging from dissatisfied (1) to very satisfied (4). A higher score indicates higher satisfaction.(25)
+Search strategy
+Electronic databases, including PubMed (MEDLINE), Embase, and CENTRAL via the Cochrane Library were searched for potentially relevant primary studies from inception until 18 November 2020. Clinical trial registries were also searched, including the WHO ICTRP and clinicaltrials.gov. The search string (Appendix 1) was translated for use in other databases using the Polyglot Search Translator and screening used the Disputatron feature of the systematic review accelerator.(26) The search strings were deliberately broad, as the present review was conducted as part of a series of systematic reviews on the effectiveness of telehealth compared to face to face for healthcare provision in primary care and allied care.
+Other searches A forward (citing) and backward (cited) citation search of the included studies was performed on the 15th December 2020 to identify any further relevant studies.
+Restriction on publication type No restrictions by language or publication date were imposed. We included only those publications from randomised controlled trials that were published in full. We excluded publications available as abstract only (e.g., conference abstract) with no additional results information available (e.g., from a clinical trial registry record).
+Screening and Data extraction Paired review authors (NK, HG, RP, MC, AMS, JC, PG) independently screened the titles and abstracts for inclusion against the inclusion criteria. One author retrieved full-text (JC), and paired authors screened the full-texts for inclusion (NK, HG). Any disagreements were resolved by discussion, or reference to a third author. Three data extraction forms were used for extracting study information including: Table of Characteristics form, Primary and Secondary Outcomes data form, and Risk of Bias form. Data from included studies were extracted independently by two authors (NK, HG) into the data extraction forms and discrepancies were resolved by discussion or by reference to a third author. (see Box 1).
+Box 1. List of extracted information
+• Methods: Study authors, location, study design, duration of follow-up • Participants: n, age (mean), anxiety disorder diagnosis • Interventions: telehealth • Comparators: face-to-face
+• Primary and secondary outcomes: OCD severity, anxiety outcomes, depression outcomes, function, working alliance inventory, satisfaction
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+Risk of bias
+Risk of bias was assessed with the Cochrane Collaboration’s Risk of Bias tool 1.(27) We used the Risk of Bias Tool 1 rather than Tool 2, as the former allows for the assessment of biases arising from study funding and conflict of interest (under domain 7, other bias).Two authors (NK, HG) independently assessed: the method of random sequence generation and allocation concealment (selection bias), blinding of participants and personnel (performance bias), blinding of outcome assessment (detection bias), outcome reporting (attrition bias), selective reporting (reporting bias), and other bias (from funding or conflict of interest issues). Disagreements were resolved by discussion or a third assessor. For each item, risk was either ‘high’, ‘low’ or ‘unclear’.
+Statistical analysis Review Manager 5.4 was used to calculate the effect of interventions.(28) We used mean differences or standardised mean differences for continuous outcomes. We undertook metaanalyses where data was appropriate to pool (when > 2 studies or comparisons reported the same outcome). We used a random effects model in anticipation of considerable heterogeneity.
+The individual was used as the unit of analysis, where possible. However, where data on the number of individuals with primary and secondary outcomes of interest was not available, we extracted the information as it was presented (e.g., mean scores). We did not contact investigators or study sponsors to provide missing data.
+We used the I2 statistic to measure heterogeneity among the included trials. As fewer than 10 studies were included in the analysis, a funnel plot was not able to be created. Sub-group analyses were conducted by timepoint at which the outcome was reported.
+A pre-specified sensitivity analysis for including versus excluding studies with 3 or more domains rated at high risk of bias was not conducted, as no studies were rated at high risk of bias for 3 or more domains.
+Results
+Search results The electronic search yielded 5,423 references, supplemented with 119 references from forward and backward citations of the included studies and 126 from clinical trial registry search, resulting in 3,904 records to screen after deduplication. Screening these on title and abstract excluded 3,887, leaving 17 articles for which we obtained full-text. Screening of these excluded another 12 to leave 5 randomised controlled trials included in this systematic review. Reasons for exclusions are reported in Appendix 2.
+Characteristics of the five included studies are presented in Table 1. Two studies were conducted in the UK, and the remaining 3 studies were conducted in the USA, Australia and Canada, respectively. Three studies focused on OCD as the primary anxiety condition, one explored GAD and the final study examined a range of anxiety and mood disorders (including OCD). The types of therapies delivered were all CBT-based, and most were delivered as individual therapy sessions. Only one study reported the delivery of family-based CBT for young children diagnosed with OCD. Studies compared conventional therapy in clinic settings versus the home or clinic-based treatment rooms for telehealth interventions. Video medium was used for three studies, while phone was used for 2 studies.
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+Figure 1. PRISMA Flowchart
+Additional records identified from forward/backward citation search (n = 119) Additional records identified from clinical trial registry search (n = 126)
+Records after duplicates removed (n = 3,904)
+Records screened
+(n = 3,904) Records excluded
+(n = 3,887)
+Full-text articles assessed for
+eligibility (n = 17) Full-text articles excluded,
+with reasons (see Appx 2) (n = 12)
+Studies included in qualitative synthesis (n = 5)
+Studies included in quantitative synthesis (metaanalysis) (n = 5)
+Records identified through database searching (n = 5,423)
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+Table 1. Characteristics of included studies Author, year
+Country Type of RCT
+Duration of followup
+Number of participants randomised
+Type of participants (age)
+Ages n years (mean +/- SD; reported by intervention where available)
+Intervention Telehealth type (modality, group/individual, setting)
+Comparator type (modality, group/individual, setting)
+Comer 2017 (29)
+USA Parallel 6 months 22 (11 telehealth, 11 clinic)
+Children (4-8) diagnosed with OCD
+6.65 (1.3) FB-CBT Video, family, home F2F, family, clinic
+Lovell 2006 (30)
+UK Parallel, noninferiority
+6 months 72 (36 telehealth, 36 F2F)
+Adults (16-65) diagnosed with OCD
+Telehealth: 33.4 (9) F2F: 30.4 (10)
+Graded exposure and response prevention therapy
+Phone, individual, mixed clinic and phone (not specified what setting)
+F2F, individual, clinic
+Stubbing s 2013 (31)
+Australia Parallel 6 weeks 26 (14 telehealth, 12 F2F)
+Adults with primary DSM diagnosis of mood or anxiety disorders
+30 (11) CBT Video, individual, onsite clinic treatment room
+F2F, individual, clinic
+Turner 2014 (32)
+UK Parallel, noninferiority
+12 months
+72 (36 telehealth, 36 F2F)
+Adolescents (11 – 18) diagnosed with OCD
+Telehealth: 14.19 (2.07) F2F: 14.50 (2.19)
+CBT Phone, individual, via phone (not specified whether clinic or home setting)
+F2F, individual, clinic
+Watts 2020 (33)
+Canada Parallel None 148 (69 telehealth, 79 F2F)
+Adults (18 75) with a primary diagnosis of GAD
+Telehealth: 43 (15) F2F: 40 (16)
+CBT Video, individual, onsite clinic treatment room
+F2F, individual, clinic
+F2F = face-to-face, OCD = Obsessive Compulsive Disorder, DSM = Diagnostic and Statistical Manual of Mental Disorders, GAD = Generalised Anxiety Disorder, FB-CBT = family based cognitive behavioural therapy - Freeman and Garcia program, CBT = cognitive behavioural therapy
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+Risk of bias
+Overall, over 50% of studies adequately reported on random sequence generation, allocation
+concealment, incomplete outcome data, and selective reporting. The authors’ conflicts of interest and study funding were also satisfactorily described in most of the trials (assessed under the ‘other bias’ domain). Blinding of participants and personnel was at high risk of bias for 100% of studies due to the nature of the compared interventions, which precluded blinding. The blinding of outcome assessors was unclear for over 50% of studies. (See Figure 2)
+Figure 2: Risk of bias graph: review authors' judgements about each risk of bias item presented as percentages across all included studies.
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+Primary Outcomes:
+OCD outcomes
+Figure 3. Telehealth vs. F2F for Anxiety disorders: Severity of OCD symptoms (Y-BOCS, CY-BOCS and CSR scales)
+Three studies reported sufficient data for this outcome. (Figure 3) Data was categorised into four subgroups – immediately post treatment, 3-month, 6-month and 12-month follow up. Data from Comer et.al. was not analysed as means reflected model estimated values rather than raw means.
+There were no significant differences in OCD outcomes between telehealth and face-to-face therapy immediately post treatment (156 participants, MD 0.14 (95% CI -0.17 to 0.45, p = 0.38) or at any of the follow-up time points including: 3 months (124 participants, standardised mean difference: 0.05, 95% CI -0.3 to 0.4, p = 0.78), 6 months (136 participants, standardised mean difference: 0.1, 95% CI 0.24 to 0.44, p = 0.56), and at 12 months (52 participants, standardised mean difference: 0.34, 95% CI -0.21 to 0.89, p = 0.22).
+Anxiety outcomes
+Only one study explored the anxiety-specific component of the DASS-A scale.(31) There were no significant differences identified in the immediately post treatment period between groups (23 participants, mean difference: -0.47, 95% CI -6.94 to 6.0, p = 0.66) or at the 1.5 month follow up (16 participants, mean difference: -1.53, 95% CI -7.93 to 4.87, p = 0.66).
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+Secondary outcome:
+Depression outcomes
+Figure 4. Telehealth vs. F2F for Anxiety disorders: Severity of depression symptoms (BDI, BDI-Y and DASS-D scales)
+Three studies provided data relevant to this outcome. (Figure 4) The data were divided into four prespecified groups. There were no significant differences in depression outcomes between telehealth and face-to-face therapy immediately post treatment (157 participants, standardised mean difference: -0.02 (95% CI -0.44 to 0.39, p = 0.91) or at any of the follow-up time points including: 1.5 to 3 months (140 participants, standardised mean difference: -0.25, 95% CI -0.58 to 0.09, p = 0.15), 6 months (116 participants, standardised mean difference: -0.19, 95% CI -0.67 to 0.29, P = 0.44), and at 12 months (52 participants, standardised mean difference: -0.2, 95% CI -0.74 to 0.35, P = 0.48). Moderately high heterogeneity was reported in the immediately post treatment subgroup (I2 = 36%) and in the 6-month group (I2 = 42%).
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+Function
+Figure 5. Telehealth vs. F2F for Anxiety disorders: assessment of function using the CGAS scale
+Two studies reported sufficient data for this outcome. (Figure 5) There were no significant differences in function outcomes between telehealth and face-to-face therapy immediately post treatment (88 participants, mean difference: -0.15 (95% CI -0.57 to 0.27, p = 0.49) or at any of the follow-up time points including: 3 months (61 participants, standardised mean difference: -0.08, 95% CI -0.59 to 0.42, p = 0.75), 6 months (71 participants, standardised mean difference: 0.11, 95% CI -0.35 to 0.58, p = 0.63), and at 12 months (52 participants, standardised mean difference: -0.18, 95% CI -0.73 to 0.36, p = 0.52).
+Working alliance inventory score
+Therapist working alliance score
+Figure 6. Telehealth vs. F2F for Anxiety disorders: Therapist working alliance inventory score
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+Three studies provided adequate data for this outcome from the perspective of the health care professional, involving a total of 161 participants. (Figure 6) We did not find evidence of a difference between the two treatments in this comparison, standardised mean difference was -0.02 (95% CI: 0.33 to 0.29, p = 0.91).
+Client working alliance score
+Figure 7. Telehealth vs. F2F for Anxiety disorders: Client-reported working alliance inventory score
+For this outcome, we identified three relevant studies, with a total of 160 participants. (Figure 7) Comer et.al. reported mother working alliance score, which was included in the analysis as we considered the mother as a proxy client. This outcome had moderate levels of heterogeneity, I2 = 53%. We did not find evidence of a difference between the two interventions, with a standardised mean difference of 0.15 (95% CI: -0.4 to 0.71, p = 0.59).
+Client satisfaction
+Figure 8. Telehealth vs. F2F for Anxiety disorders: Client satisfaction scale
+Three studies provided adequate data for this outcome, involving 112 participants. Comer et.al. provided data on the mother’s satisfaction, which was included in the analysis as we considered the mother as a proxy client. We did not find evidence of a difference between the two groups, with a standardised mean difference of -0.27 (95% CI -0.65 to 0.1, p = 0.15).
+Discussion
+We identified 5 eligible randomised controlled trials (total of 340 participants) comparing psychotherapy delivered via telehealth versus face-to-face care for patients with anxiety and related conditions. Overall, the quality of the evidence was good, with risk of bias being low or unclear for most domains. The exception was high risk of bias for blinding of the intervention for participants or
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+health care providers, which was impossible given the nature of the interventions. Heterogeneity was low across all outcomes, except two time points for depression severity where there was moderate heterogeneity. Our review found no differences between telehealth and face-to-face psychotherapies for any outcomes; OCD, anxiety, or depression symptom severity, function, therapist- or client-reported working alliance or client satisfaction.
+These findings support previous research suggesting that psychotherapy delivered remotely may be as effective as conventional face-to-face therapy. Fletcher et al conducted a non-systematic literature review for the efficacy of video delivered therapy, which found that video to home treatment of mental health conditions offers a viable option for care access for patients, especially when there are logistical or other barriers to receiving in person care (14). Another systematic review by Coughtrey and Pistrang found that telephone-delivered psychotherapy may be as effective as face-to-face therapy for reducing symptoms of anxiety and depression.(34)
+The present review, with up-to-date data from randomised controlled trials adds weight to these previous findings that psychotherapy delivered remotely is as effective as face-to-face therapy for anxiety disorder treatment. These findings are particularly important in the current world climate, where effective alternatives to face-to-face are required for public health safety.(35) Key challenges during the pandemic of reducing person to person contact, whilst still ensuring continuity of care may be adequately addressed by telehealth treatment, at least in the instance of psychotherapy for anxiety and related conditions.
+While this review supports and extends previous research into the effectiveness of telehealth for anxiety conditions, we have identified some limitations to our findings. First, due to strict eligibility criteria, only five trials were includable in this review. Of these, four studies reported data for OCD patients, and only one focused on generalised anxiety disorder specifically. Since the inception of the DSM-V, OCD is no longer classed as an anxiety disorder and is now considered its own disorder class.(3) Given the anxiety pre-dominant nature of this disorder, overlapping psychotherapies used for treatment, and the paucity of evidence of telehealth for pure anxiety disorders, we justified including OCD as an anxiety-related condition for this review. While this choice allowed us to synthesise the evidence, it does limit the generalisability of the findings to all anxiety conditions. Further high-quality research across the wider scope of anxiety disorders is warranted to solidify these findings.
+Second, although we did not restrict inclusion by psychotherapy, all included studies used either CBT or graded exposure and response prevention therapy. Although these therapies are both effective and recommended treatments for anxiety and related conditions, other therapies such as mindfulness and interpersonal therapies are also often used.(36, 37) Our results are not generalisable beyond CBT and graded exposure and response prevention therapy. It may be beneficial to conduct trials assessing other psychotherapies used to treat anxiety and related conditions
+Despite these limits on generalisability, the strength of our review lies in its rigorous methodology. Our search methods were comprehensive, including multiple databases, forward and backward citation, and clinical trial registry search. We only included randomised controlled trials, which strengthens the conclusions drawn. Although only a small evidence base of five studies exists, these trials are worldwide (USA, UK, Canada and Australia), and with all age groups (children, adolescents and adults), so our findings can be broadly generalised to these settings and patient groups.
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+Conclusions
+Supported by advances in modern technology, telehealth has an important role in increasing access to mental health care. From the direct comparisons in this review, telehealth interventions appear to be as effective as conventional therapy delivered in-person for effectively treating anxiety and related conditions. While further randomised trials in a range of anxiety conditions and psychotherapies are warranted, the current evidence appears sufficient to promote the use of telehealth as an effective alternative to face-to-face care for the treatment of OCD, GAD and potentially other anxiety disorders treated using CBT and graded exposure/response prevention therapy.
+Funding statement
+This systematic review was commissioned by the Department of Health, Canberra, Australia, as part of a series of systematic reviews on the effectiveness of telehealth. The funder was involved in the refining of the study question (PICO). The funder was not involved in the conduct, analysis, or interpretation of the systematic review, or in the decision to submit the manuscript for publication.
+Conflict of interest
+No conflicts of interest to declare.
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+Appendix 1: Search string
+Database searches
+PubMed Search run 18/11/2020
+("Telemedicine"[Mesh] OR "Videoconferencing"[Mesh] OR Telehealth[tiab] OR Telemedicine[tiab] OR Videoconferencing[tiab] OR ((Telephone[tiab]) AND (Consultation[tiab] OR face-to-face[tiab] OR in-person[tiab])) OR telephone-delivered[tiab]) AND ("Primary Health Care"[Mesh] OR "General Practice"[Mesh] OR rehabilitation[sh] OR
+"Outpatients"[Mesh] OR "Speech Therapy"[Mesh] OR Outpatient[tiab] OR “Primary health”[tiab] OR “Primary care”[tiab] OR “General practice”[tiab] OR “General practices”[tiab] OR “General practitioners”[tiab] OR “General practitioner”[tiab] OR “Family practice”[tiab] OR Physician[tiab] OR Physicians[tiab] OR Clinician[tiab] OR Clinicians[tiab] OR Therapist[tiab] OR Nurse[tiab] OR Nurses[tiab] OR Physiotherapist[tiab] OR Rehabilitation[tiab] OR Diabetes[tiab] OR Diabetic[tiab] OR Asthma[tiab] OR Depression[tiab] OR “Ïrritable bowel”[tiab] OR IBS[tiab] OR PTSD[tiab] OR “Chronic fatigue”[tiab]) AND
+((Face-to-face[tiab]) OR “Usual care”[tiab] OR Visits[tiab] OR Visit[tiab] OR In-person[tiab] OR “In person”[tiab] OR ((Clinic[tiab] OR Centre[tiab] OR Home[tiab]) AND (Based[tiab] OR Contact[tiab])) OR Conventional[tiab] OR “Practice-based”[tiab] OR “Practice based”[tiab] OR Traditional[tiab] OR “Standard care”[tiab] OR Homecare[tiab] OR ((Routine[tiab] OR Home[tiab]) AND (Care[tiab]))) AND ("Delivery of Health Care"[Mesh] OR Delivery[tiab] OR Delivered[tiab] OR Via[tiab] OR Received[tiab]) AND ("Treatment Outcome"[Mesh] OR "Patient Satisfaction"[Mesh] OR Therapy[sh] OR Diagnosis[sh] OR “Clinical outcomes”[tiab] OR Treatment[tiab] OR Diagnostic[tiab] OR Efficacy[tiab]) AND (Randomized controlled trial[pt] OR controlled clinical trial[pt] OR randomized[tiab] OR randomised[tiab] OR placebo[tiab] OR "drug therapy"[sh] OR randomly[tiab] OR trial[tiab] OR groups[tiab]) NOT (Animals[Mesh] not (Animals[Mesh] and Humans[Mesh])) NOT
+(“Case Reports”[pt] OR Editorial[pt] OR Letter[pt] OR Meta-Analysis[pt] OR “Observational Study”[pt] OR “Systematic Review”[pt] OR “Case Report”[ti] OR “Case series”[ti] OR MetaAnalysis[ti] OR “Meta Analysis”[ti] OR “Systematic Review”[ti] OR “Systematic Literature Review”[ti] OR “Qualitative study”[ti] OR Protocol[ti])
+CENTRAL via the Cochrane Library run 18/11/2020
+([mh Telemedicine] OR [mh Videoconferencing] OR Telehealth:ti,ab OR Telemedicine:ti,ab OR
+Videoconferencing:ti,ab OR ((Telephone:ti,ab) AND (Consultation:ti,ab OR “ face-to-face”:ti,ab OR “in person”:ti,ab)) OR “telephone delivered”:ti,ab) AND ([mh "Primary Health Care"] OR [mh "General Practice"] OR [mh Outpatients] OR [mh "Speech Therapy"] OR Outpatient:ti,ab OR "Primary health":ti,ab OR "Primary care":ti,ab OR "General practice":ti,ab OR "General practices":ti,ab OR "General practitioners":ti,ab OR "General practitioner":ti,ab OR "Family practice":ti,ab OR Physician:ti,ab OR Physicians:ti,ab OR Clinician:ti,ab OR Clinicians:ti,ab OR Therapist:ti,ab OR Nurse:ti,ab OR Nurses:ti,ab OR Physiotherapist:ti,ab OR
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+Rehabilitation:ti,ab OR Diabetes:ti,ab OR Diabetic:ti,ab OR Asthma:ti,ab OR Depression:ti,ab OR "Ïrritable bowel":ti,ab OR IBS:ti,ab OR PTSD:ti,ab OR "Chronic fatigue":ti,ab) AND (("Face-to-face":ti,ab) OR "Usual care":ti,ab OR Visits:ti,ab OR Visit:ti,ab OR "In person":ti,ab OR ((Clinic:ti,ab OR Centre:ti,ab OR Home:ti,ab) AND (Based:ti,ab OR Contact:ti,ab)) OR Conventional:ti,ab OR "Practice based":ti,ab OR Traditional:ti,ab OR "Standard care":ti,ab OR Homecare:ti,ab OR ((Routine:ti,ab OR Home:ti,ab) AND (Care:ti,ab))) AND ([mh "Delivery of Health Care"] OR Delivery:ti,ab OR Delivered:ti,ab OR Via:ti,ab OR Received:ti,ab) AND ([mh "Treatment Outcome"] OR [mh "Patient Satisfaction"] OR "Clinical outcomes":ti,ab OR Treatment:ti,ab OR Diagnostic:ti,ab OR Efficacy:ti,ab)
+Embase search run 18/11/2020
+('Telemedicine'/exp OR 'Videoconferencing'/exp OR Telehealth:ti,ab OR Telemedicine:ti,ab OR Videoconferencing:ti,ab OR ((Telephone:ti,ab) AND (Consultation:ti,ab OR face-to-face:ti,ab OR inperson:ti,ab)) OR telephone-delivered:ti,ab)
+AND ('Primary Health Care'/exp OR 'General Practice'/exp OR 'Outpatient'/exp OR 'Speech Therapy'/exp OR Outpatient:ti,ab OR "Primary health":ti,ab OR "Primary care":ti,ab OR "General practice":ti,ab OR "General practices":ti,ab OR "General practitioners":ti,ab OR "General practitioner":ti,ab OR "Family practice":ti,ab OR Physician:ti,ab OR Physicians:ti,ab OR Clinician:ti,ab OR Clinicians:ti,ab OR Therapist:ti,ab OR Nurse:ti,ab OR Nurses:ti,ab OR Physiotherapist:ti,ab OR Rehabilitation:ti,ab OR Diabetes:ti,ab OR Diabetic:ti,ab OR Asthma:ti,ab OR Depression:ti,ab OR "Ïrritable bowel":ti,ab OR IBS:ti,ab OR PTSD:ti,ab OR "Chronic fatigue":ti,ab) AND (("Face-to-face":ti,ab) OR "Usual care":ti,ab OR Visits:ti,ab OR Visit:ti,ab OR In-person:ti,ab OR "In person":ti,ab OR ((Clinic:ti,ab OR Centre:ti,ab OR Home:ti,ab) AND (Based:ti,ab OR Contact:ti,ab)) OR Conventional:ti,ab OR Practice-based:ti,ab OR "Practice based":ti,ab OR Traditional:ti,ab OR "Standard care":ti,ab OR Homecare:ti,ab OR ((Routine:ti,ab OR Home:ti,ab) AND (Care:ti,ab))) AND ('health care delivery'/exp OR Delivery:ti,ab OR Delivered:ti,ab OR Via:ti,ab OR Received:ti,ab) AND ('Treatment Outcome'/exp OR 'Patient Satisfaction'/exp OR "Clinical outcomes":ti,ab OR Treatment:ti,ab OR Diagnostic:ti,ab OR Efficacy:ti,ab) AND (random* OR factorial OR crossover OR placebo OR blind OR blinded OR assign OR assigned OR allocate OR allocated OR 'crossover procedure'/exp OR 'double-blind procedure'/exp OR 'randomized controlled trial'/exp OR 'single-blind procedure'/exp NOT ('animal'/exp NOT ('animal'/exp AND 'human'/exp))) AND [embase]/lim
+Clinical trial registry searches
+Clinicaltrials.gov (searched 25/3/2021)
+Intervention field: (Telemedicine OR Videoconferencing OR Telephone OR Telehealth) AND (“Usual care” OR “Standard care” OR Face-to-face OR Face-to-face”) Condition or disease field: Anxiety
+WHO ICTRP (searched 25/3/2021)
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+Telemedicine AND Anxiety OR Telehealth AND Anxiety OR Videoconferencing AND Anxiety
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+Appendix 2: Table of Excluded Studies
+Reference Reason for exclusion Forward and Backward Citation Analysis
+1 Bouchard, S., et al. (2004). "Delivering Cognitive-Behavior Therapy for Panic
+Disorder with Agoraphobia in Videoconference." Telemedicine Journal and eHealth 10(1): 13-25.
+Study design
+2 Burgess, M., et al. (2012). "Cognitive behaviour therapy for chronic fatigue
+syndrome in adults: Face-to-face versus telephone treatment - A randomized controlled trial." Behavioural and Cognitive Psychotherapy 40(2): 175-191.
+Not comparable interventions
+3 Choi, N. G., et al. (2014). "Telehealth problem-solving therapy for depressed
+low-income homebound older adults." American Journal of Geriatric Psychiatry 22(3): 263-271.
+Study outcomes
+4 Day, S. X. and P. L. Schneider (2002). "Psychotherapy using distance technology:
+A comparison of face-to-face, video, and audio treatment." Journal of Counseling Psychology 49(4): 499-503.
+Study outcomes
+5 Frueh, B. C., et al. (2007). "A randomized trial of telepsychiatry for post
+traumatic stress disorder." Journal of Telemedicine and Telecare 13(3): 142147.
+Study outcomes
+6 Mitchell, J. E., et al. (2008). "A randomized trial comparing the efficacy of
+cognitive-behavioral therapy for bulimia nervosa delivered via telemedicine versus face-to-face." Behaviour Research and Therapy 46(5): 581-592.
+Study outcomes
+7 Rowa, K., et al. (2007). "Office-based vs. home-based behavioral treatment for
+obsessive-compulsive disorder: A preliminary study." Behaviour Research and Therapy 45(8): 1883-1892.
+Study design
+8 Ruskin, P. E., et al. (2004). "Treatment outcomes in depression: Comparison of
+remote treatment through telepsychiatry to in-person treatment." American Journal of Psychiatry 161(8): 1471-1476.
+Study outcomes
+9 Tse, S., et al. (2013). "Face-to-Face and Telephone Counseling for Problem
+Gambling: A Pragmatic Multisite Randomized Study." Research on Social Work Practice 23(1): 57-65.
+Study outcomes
+Initial search
+10 Cartwright, M., et al. (2013). "Effect of telehealth on quality of life and
+psychological outcomes over 12 months (Whole Systems Demonstrator telehealth questionnaire study): nested study of patient reported outcomes in a pragmatic, cluster randomised controlled trial." Bmj 346: f653.
+Study intervention
+11 Hirani, S. P., et al. (2014). "The effect of telecare on the quality of life and
+psychological well-being of elderly recipients of social care over a 12-month period: the Whole Systems Demonstrator cluster randomised trial." Age Ageing 43(3): 334-341.
+Study intervention
+12 Robillard, G., et al. (2017). "Efficacy of telepsychotherapy for generalized
+anxiety disorder. Final results at the 6 month follow-up." Journal of Cyber Therapy and Rehabilitation 10(1): 25.
+Study design
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+References
+1. Beyond Blue. Statistics 2020 [Available from: https://www.beyondblue.org.au/media/statistics. 2. Australian Bureau of Statistics. ABS National Survey of Mental Health and Wellbeing: Summary of Results 2007. ABS; 2008. 3. American Psychiatric Association. Diagnostic and Statistical Manual of Mental Disorders 5ed (DSM-5). 5th ed. Washington DC.2013. 4. Bhattacharya R, Shen C, Sambamoorthi U. Excess risk of chronic physical conditions associated with depression and anxiety. BMC Psychiatry. 2014;14(1):10. 5. Noyes R. Comorbidity in Generalized Anxiety Disorder. Psychiatric Clinics of North America. 2001;24(1):41-55. 6. Beyond Blue. Types of anxiety 2020 [Available from: https://www.beyondblue.org.au/thefacts/anxiety/types-of-anxiety. 7. Depression and Other Common Mental Disorders: Global Health Estimates, . Geneva: World Health Organization, ; 2017. 8. Kaczkurkin AN, Foa EB. Cognitive-behavioral therapy for anxiety disorders: an update on the empirical evidence. Dialogues Clin Neurosci. 2015;17(3):337-46. 9. Deacon BJ, Abramowitz JS. Cognitive and behavioral treatments for anxiety disorders: a review of meta-analytic findings. J Clin Psychol. 2004;60(4):429-41. 10. Stewart R, Chambless, Dianne. . Cognitive-Behavioral Therapy for Adult Anxiety Disorders in Clinical Practice: A Meta-Analysis of Effectiveness Studies. J Consult Clin Psychol. 2009;77(4):595-606. 11. Norton PJ, Price EC. A meta-analytic review of adult cognitive-behavioral treatment outcome across the anxiety disorders. J Nerv Ment Dis. 2007;195(6):521-31. 12. Connolly SL, Stolzmann KL, Heyworth L, Weaver KR, Bauer MS, Miller CJ. Rapid Increase in Telemental Health Within the Department of Veterans Affairs During the COVID-19 Pandemic. Telemedicine and e-Health. 2020. 13. Fortney JC, Pyne JM, Mouden SB, Mittal D, Hudson TJ, Schroeder GW, et al. Practice-based versus telemedicine-based collaborative care for depression in rural federally qualified health centers: a pragmatic randomized comparative effectiveness trial. Am J Psychiatry. 2013;170(4):414-25. 14. Fletcher TL, Hogan JB, Keegan F, Davis ML, Wassef M, Day S, et al. Recent Advances in Delivering Mental Health Treatment via Video to Home. Current Psychiatry Reports. 2018;20(8):56. 15. Moher D, Liberati A, Tetzlaff J, Altman DG. Preferred reporting items for systematic reviews and meta-analyses: the PRISMA statement. BMJ. 2009;339:b2535. 16. Stanford Medicine. Obsessive-Compulsive and Related Disorders; Diagnosis 2021 [Available from: https://med.stanford.edu/ocd/about/diagnosis.html. 17. Goodman WK, Scahill L, Price LHR, S.A., Riddle MA, Rapoport JL. Children's Yale-Brown Obsessive Compulsive Scale (CY-BOCS) 2007 [Available from: https://iocdf.org/wpcontent/uploads/2016/04/05-CYBOCS-complete.pdf. 18. Albano A, Silverman W. The Anxiety Disorders Interview Schedule for Children for DSM-IV: Clinician manual (child and parent versions). San Antonio, TX: Psychological Corporation. 1996. 19. University of New South Wales. Overview of the DASS and its uses: UNSW, ; 2020 [Available from: http://www2.psy.unsw.edu.au/dass/over.htm. 20. Black Dog Institute. DASS 21 2020 [Available from: https://www.workcover.wa.gov.au/wpcontent/uploads/sites/2/2015/07/3.dass21withscoringinfo.pdf. 21. Smarr KL, Keefer AL. Measures of depression and depressive symptoms: Beck Depression Inventory‐II (BDI‐II), Center for Epidemiologic Studies Depression Scale (CES‐D), Geriatric
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738
+
+
+Depression Scale (GDS), Hospital Anxiety and Depression Scale (HADS), and Patient Health Questionnaire‐9 (PHQ‐9. Arthritis Care & Research 2011;63(S11):S454-66.
+22. Counseling Youth with Depression. The Beck Depression Inventory Subscale (BDI-Y) 2020 [Available from: https://counselingyouthwithdepression.weebly.com/beck-youthinventories-byi.html. 23. Child Outcomes Research Consortium. Children's Global Assessment Scale 2020 [Available from: https://www.corc.uk.net/outcome-experience-measures/childrens-globalassessment-scale/. 24. Paap D, Dijkstra P. Working Alliance Inventory-Short Form Revised to measure therapeutic alliance. Journal of Physiotherapy. 2017;63. 25. Larsen DL, Attkisson CC, Hargreaves WA, Nguyen TD. Assessment of client/patient satisfaction: development of a general scale. Eval Program Plann. 1979;2(3):197-207. 26. Clark J, Glasziou P, Del Mar C, Bannach-Brown A, Stehlik P, Scott AM. A full systematic review was completed in 2 weeks using automation tools: a case study. J Clin Epidemiol. 2020;121:81-90. 27. Higgins JPT, Altman DG, Gøtzsche PC, Jüni P, Moher D, Oxman AD, et al. The Cochrane
+Collaboration’s tool for assessing risk of bias in randomised trials. BMJ. 2011;343:d5928. 28. Review Manager (RevMan) [Computer Program]. Version 5.4 ed. Copenhagen: The Nordic Cochrane Centre, The Cochrane Collaboration, ; 2020. 29. Comer JS, Furr JM, Kerns CE, Miguel E, Coxe S, Elkins RM, et al. Internet-delivered, familybased treatment for early-onset OCD: A pilot randomized trial. J Consult Clin Psychol. 2017;85(2):178-86. 30. Lovell K, Cox D, Haddock G, Jones C, Raines D, Garvey R, et al. Telephone administered cognitive behaviour therapy for treatment of obsessive compulsive disorder: randomised controlled non-inferiority trial. Bmj. 2006;333(7574):883. 31. Stubbings DR, Rees CS, Roberts LD, Kane RT. Comparing in-person to videoconference-based cognitive behavioral therapy for mood and anxiety disorders: randomized controlled trial. J Med Internet Res. 2013;15(11):e258. 32. Turner CM, Mataix-Cols D, Lovell K, Krebs G, Lang K, Byford S, et al. Telephone cognitivebehavioral therapy for adolescents with obsessive-compulsive disorder: a randomized controlled non-inferiority trial. J Am Acad Child Adolesc Psychiatry. 2014;53(12):1298307.e2. 33. Watts S, Marchand A, Bouchard S, Gosselin P, Langlois F, Belleville G, et al. Telepsychotherapy for generalized anxiety disorder: Impact on the working alliance. Journal of Psychotherapy Integration. 2020;30(2):208-25. 34. Coughtrey AE, Pistrang N. The effectiveness of telephone-delivered psychological therapies for depression and anxiety: A systematic review. J Telemed Telecare. 2018;24(2):65-74. 35. Blandford A, Wesson J, Amalberti R, AlHazme R, Allwihan R. Opportunities and challenges for telehealth within, and beyond, a pandemic. The Lancet. 2020;8(11):E1364-E5. 36. Hofmann SG, Gómez AF. Mindfulness-Based Interventions for Anxiety and Depression. Psychiatr Clin North Am. 2017;40(4):739-49. 37. Mahan RM, Swan SA, Macfie J. Interpersonal Psychotherapy and Mindfulness for Treatment of Major Depression With Anxious Distress. Clinical Case Studies. 2018;17(2):104-19.
+This is the peer reviewed version of the following article: Krzyżaniak, N., Greenwood, H., Scott, A., Peiris, R., Cardona, M., Clark, J., & Glasziou, P. P. (2021). The effectiveness of telehealth versus face-to face interventions for anxiety disorders: A systematic review and meta-analysis. Journal of Telemedicine and Telecare, which has been published in final form at https://doi.org/10.1177/1357633X211053738

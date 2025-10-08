@@ -1,0 +1,1722 @@
+HAL Id: hal-03806040
+https://hal.univ-lorraine.fr/hal-03806040
+Submitted on 7 Oct 2022
+HAL is a multi-disciplinary open access archive for the deposit and dissemination of scientific research documents, whether they are published or not. The documents may come from teaching and research institutions in France or abroad, or from public or private research centers.
+L’archive ouverte pluridisciplinaire HAL, est destinée au dépôt et à la diffusion de documents scientifiques de niveau recherche, publiés ou non, émanant des établissements d’enseignement et de recherche français ou étrangers, des laboratoires publics ou privés.
+Évaluation de l’utilisation des outils d‘aide décisionnelle par les médecins généralistes
+Tigran Stepanian
+To cite this version:
+Tigran Stepanian. Évaluation de l’utilisation des outils d‘aide décisionnelle par les médecins généralistes. Médecine humaine et pathologie. 2020. ￿hal-03806040￿
+
+
+AVERTISSEMENT
+Ce document est le fruit d'un long travail approuvé par le jury de soutenance et mis à disposition de l'ensemble de la communauté universitaire élargie.
+Il est soumis à la propriété intellectuelle de l'auteur. Ceci implique une obligation de citation et de référencement lors de l’utilisation de ce document.
+D'autre part, toute contrefaçon, plagiat, reproduction illicite encourt une poursuite pénale.
+Contact : ddoc-thesesexercice-contact@univ-lorraine.fr
+LIENS
+Code de la Propriété Intellectuelle. articles L 122. 4 Code de la Propriété Intellectuelle. articles L 335.2- L 335.10 http://www.cfcopies.com/V2/leg/leg_droi.php http://www.culture.gouv.fr/culture/infos-pratiques/droits/protection.htm
+
+
+UNIVERSITE DE LORRAINE FACULTE DE MEDECINE DE NANCY
+Année 2020
+THÈSE-MEMOIRE
+Pour le diplôme d’état
+DOCTEUR EN MÉDECINE
+Présentée et soutenue publiquement
+dans le cadre du troisième cycle de Médecine Générale
+Le 3 décembre 2020
+par
+STEPANIAN Tigran
+Membres du jury :
+M. le Professeur Paolo Di PATRIZIO Président du Jury
+M. le Professeur Olivier BOUCHY Directeur de Thèse
+Mme la Professeure Eliane ALBUISSON Juge
+M. le Docteur Edem ALLADO Juge
+Évaluation de l’utilisation des outils d‘aide décisionnelle par les
+médecins généralistes
+
+
+2
+Président de l’Université de Lorraine : Professeur Pierre MUTZENHARDT
+Doyen de la Faculté de Médecine : Professeur Marc BRAUN
+Vice-doyenne Pr Laure JOLY
+Assesseurs :
+Premier cycle : Dr Nicolas GAMBIER Deuxième cycle : Pr Antoine KIMMOUN Troisième cycle : Pr Laure JOLY Formation à la recherche : Pr Nelly AGRINIER Relations Grande Région : Pr Thomas FUCHS-BUDER CUESim : Pr Stéphane ZUILY SIDES : Dr Julien BROSEUS Vie Facultaire : Dr Philippe GUERCI Etudiant : Mme Audrey MOUGEL
+Chargés de mission
+Docimologie : Dr Jacques JONAS Orthophonie : Pr Cécile PARIETTI-WINKLER PACES : Pr Mathias POUSSEL
+Relations internationales : Pr Jacques HUBERT
+Présidente du Conseil de la Pédagogie : Pr Louise TYVAERT Président du Conseil Scientifique : Pr Jean-Michel HASCOET
+========== DOYENS HONORAIRES
+Professeur Jacques ROLAND - Professeur Patrick NETTER - Professeur Henry COUDANE
+========== PROFESSEURS HONORAIRES
+Etienne ALIOT - Jean-Marie ANDRE - Alain AUBREGE - Gérard BARROCHE - Alain BERTRAND - Pierre BEY Marc-André BIGARD - Patrick BOISSEL – Pierre BORDIGONI - Jacques BORRELLY - Michel BOULANGE Jean-Louis BOUTROY - Laurent BRESLER - Serge BRIANÇON - Jean-Claude BURDIN - Claude BURLET Daniel BURNEL - Claude CHARDOT - Jean-François CHASSAGNE - François CHERRIER - Henry COUDANE Jean-Pierre CRANCE - Jean-Pierre DESCHAMPS - Gilbert FAURE - Gérard FIEVE - Bernard FOLIGUET Jean FLOQUET - Robert FRISCH -Alain GAUCHER - Pierre GAUCHER - Jean-Luc GEORGE - Alain GERARD Hubert GERARD - Jean-Marie GILGENKRANTZ - Simone GILGENKRANTZ - Gilles GROSDIDIER - François GUILLEMIN - Philippe HARTEMANN - Gérard HUBERT - Claude HURIET - Jean-Pierre KAHN Gilles KARCHER - Michèle KESSLER - François KOHLER - Pierre LANDES - Pierre LASCOMBES - Marie-Claire LAXENAIRE - Michel LAXENAIRE - Alain LE FAOU - Jacques LECLERE - Pierre LEDERLIN - Bernard LEGRAS - Jean-Pierre MALLIÉ - Philippe MANGIN - François MARCHAL - Jean-Claude MARCHAL – Yves MARTINET Pierre MATHIEU - Thierry MAY - Michel MERLE - Daniel MOLÉ - Pierre MONIN - Pierre NABET Patrick NETTER - Jean-Pierre NICOLAS - Francis PENIN - Claude PERRIN - Luc PICARD - François PLENAT Jean-Marie POLU - Jacques POUREL - Francis RAPHAEL - Antoine RASPILLER - Denis REGENT Jacques ROLAND - Daniel SCHMITT - Michel SCHMITT - Jean-Luc SCHMUTZ - Michel SCHWEITZER Daniel SIBERTIN-BLANC - Claude SIMON - Danièle SOMMELET - Jean-François STOLTZ - Michel STRICKER Gilbert THIBAUT - Paul VERT - Hervé VESPIGNANI - Colette VIDAILHET - Michel VIDAILHET Jean-Pierre VILLEMOT - Michel WEBER – Denis ZMIROU - Faïez ZANNAD
+
+
+3
+========== PROFESSEURS ÉMÉRITES
+Etienne ALIOT - Laurent BRESLER - Serge BRIANÇON - Henry COUDANE - Gilbert FAURE - Alain LE FAOU Thierry MAY Patrick NETTER - Luc PICARD - François PLENAT - Paul VERT -Jean-Pierre VILLEMOT - Faiez ZANNAD
+========== PROFESSEURS DES UNIVERSITÉS - PRATICIENS HOSPITALIERS (Disciplines du Conseil National des Universités)
+42e Section : MORPHOLOGIE ET MORPHOGENÈSE
+1re sous-section : (Anatomie)
+Professeur Marc BRAUN – Professeure Manuela PEREZ
+2e sous-section : (Histologie, embryologie et cytogénétique) Professeur Christo CHRISTOV
+3e sous-section : (Anatomie et cytologie pathologiques) Professeur Guillaume GAUCHOTTE
+43e Section : BIOPHYSIQUE ET IMAGERIE MÉDICALE
+1re sous-section : (Biophysique et médecine nucléaire)
+Professeur Pierre-Yves MARIE – Professeur Pierre OLIVIER - Professeur Antoine VERGER
+2e sous-section : (Radiologie et imagerie médicale)
+Professeur René ANXIONNAT - Professeur Alain BLUM - Professeur Serge BRACARD - Professeure Valérie CROISÉ - Professeur Jacques FELBLINGER - Professeur Benjamin GORY - Professeur Damien MANDRY Professeur Pedro GONDIM TEIXEIRA
+44e Section : BIOCHIMIE, BIOLOGIE CELLULAIRE ET MOLÉCULAIRE, PHYSIOLOGIE ET NUTRITION
+1re sous-section : (Biochimie et biologie moléculaire)
+Professeur Jean-Louis GUEANT - Professeur David MEYRE - Professeur Bernard NAMOUR - Professeur JeanLuc OLIVIER - Professeur Abderrahim OUSSALAH
+2e sous-section : (Physiologie)
+Professeur Christian BEYAERT - Professeur Bruno CHENUEL - Professeur Mathias POUSSEL
+3e sous-section (Biologie cellulaire)
+Professeure Véronique DECOT-MAILLERET
+4e sous-section : (Nutrition)
+Professeur Didier QUILLIOT - Professeure Rosa-Maria RODRIGUEZ-GUEANT - Professeur Olivier ZIEGLER
+45e Section : MICROBIOLOGIE, MALADIES TRANSMISSIBLES ET HYGIÈNE
+1re sous-section : (Bactériologie – virologie ; hygiène hospitalière) Professeur Alain LOZNIEWSKI – Professeure Evelyne SCHVOERER
+2e sous-section : (Parasitologie et Mycologie) Professeure Marie MACHOUART
+3e sous-section : (Maladies infectieuses ; maladies tropicales) Professeure Céline PULCINI - Professeur Christian RABAUD
+46e Section : SANTÉ PUBLIQUE, ENVIRONNEMENT ET SOCIÉTÉ
+1re sous-section : (Épidémiologie, économie de la santé et prévention) Professeure Nelly AGRINIER - Professeur Francis GUILLEMIN
+4e sous-section : (Biostatistiques, informatique médicale et technologies de communication) Professeure Eliane ALBUISSON - Professeur Nicolas JAY
+47e Section : CANCÉROLOGIE, GÉNÉTIQUE, HÉMATOLOGIE, IMMUNOLOGIE
+1re sous-section : (Hématologie ; transfusion) Professeur Pierre FEUGIER
+2e sous-section : (Cancérologie ; radiothérapie)
+Professeur Thierry CONROY - Professeur Frédéric MARCHAL - Professeur Didier PEIFFERT – Professeur Guillaume VOGIN
+3e sous-section : (Immunologie)
+Professeur Marcelo DE CARVALHO-BITTENCOURT - Professeure Marie-Thérèse RUBIO
+4e sous-section : (Génétique)
+Professeur Philippe JONVEAUX - Professeur Bruno LEHEUP
+
+
+4
+48e Section : ANESTHÉSIOLOGIE, RÉANIMATION, MÉDECINE D’URGENCE, PHARMACOLOGIE ET THÉRAPEUTIQUE
+1re sous-section : (Anesthésiologie-réanimation et médecine péri-opératoire)
+Professeur Gérard AUDIBERT - Professeur Hervé BOUAZIZ - Professeur Thomas FUCHS-BUDER Professeure Marie-Reine LOSSER - Professeur Claude MEISTELMAN
+2e sous-section : (Médecine intensive-réanimation)
+Professeur Pierre-Édouard BOLLAERT - Professeur Sébastien GIBOT - Professeur Bruno LÉVY - Professeur Antoine KIMMOUN
+3e sous-section : (Pharmacologie fondamentale ; pharmacologie clinique ; addictologie) Professeur Pierre GILLET - Professeur Jean-Yves JOUZEAU
+4e sous-section : (Thérapeutique-médecine de la douleur ; addictologie)
+Professeur Nicolas GIRERD - Professeur François PAILLE - Professeur Patrick ROSSIGNOL
+5e sous-section : (Médecine d'urgence) Professeur Tahar CHOUIHED
+49e Section : PATHOLOGIE NERVEUSE ET MUSCULAIRE, PATHOLOGIE MENTALE, HANDICAP ET RÉÉDUCATION
+1re sous-section : (Neurologie)
+Professeur Marc DEBOUVERIE - Professeur Louis MAILLARD - Professeur Sébastien RICHARD - Professeur Luc TAILLANDIER Professeure Louise TYVAERT
+2e sous-section : (Neurochirurgie)
+Professeur Thierry CIVIT - Professeure Sophie COLNAT-COULBOIS - Professeur Olivier KLEIN
+3e sous-section : (Psychiatrie d'adultes ; addictologie)
+Professeur Vincent LAPREVOTE - Professeur Raymund SCHWAN
+4e sous-section : (Pédopsychiatrie ; addictologie) Professeur Bernard KABUTH
+5e sous-section : (Médecine physique et de réadaptation) Professeur Jean PAYSANT
+50e Section : PATHOLOGIE OSTÉO-ARTICULAIRE, DERMATOLOGIE ET CHIRURGIE PLASTIQUE
+1re sous-section : (Rhumatologie)
+Professeure Isabelle CHARY-VALCKENAERE - Professeur Damien LOEUILLE
+2e sous-section : (Chirurgie orthopédique et traumatologique)
+Professeur Laurent GALOIS - Professeur Didier MAINARD - Professeur François SIRVEAUX
+3e sous-section : (Dermato-vénéréologie) Professeure Anne-Claire BURSZTEJN
+4e sous-section : (Chirurgie plastique, reconstructrice et esthétique ; brûlologie) Professeur François DAP - Professeur Gilles DAUTEL - Professeur Etienne SIMON
+51e Section : PATHOLOGIE CARDIO-RESPIRATOIRE ET VASCULAIRE
+1re sous-section : (Pneumologie ; addictologie)
+Professeur Jean-François CHABOT - Professeur Ari CHAOUAT
+2e sous-section : (Cardiologie)
+Professeur Edoardo CAMENZIND - Professeur Christian de CHILLOU DE CHURET - Professeur Yves JUILLIERE Professeur Batric POPOVIC - Professeur Nicolas SADOUL
+3e sous-section : (Chirurgie thoracique et cardiovasculaire)
+Professeur Juan-Pablo MAUREIRA - Professeur Stéphane RENAUD
+4e sous-section : (Chirurgie vasculaire ; médecine vasculaire)
+Professeur Sergueï MALIKOV - Professeur Denis WAHL – Professeur Stéphane ZUILY
+52e Section : MALADIES DES APPAREILS DIGESTIF ET URINAIRE
+1re sous-section : (Gastroentérologie ; hépatologie ; addictologie)
+Professeur Jean-Pierre BRONOWICKI - Professeur Laurent PEYRIN-BIROULET
+2e sous-section : (Chirurgie viscérale et digestive)
+Professeur Ahmet AYAV - Professeur Laurent BRUNAUD – Professeure Adeline GERMAIN
+3e sous-section : (Néphrologie)
+Professeur Luc FRIMAT - Professeure Dominique HESTIN
+4e sous-section : (Urologie)
+Professeur Pascal ESCHWEGE - Professeur Jacques HUBERT
+
+
+5
+53e Section : MÉDECINE INTERNE, GÉRIATRIE ET MÉDECINE GÉNÉRALE
+1re sous-section : (Médecine interne ; gériatrie et biologie du vieillissement ; addictologie)
+Professeur Athanase BENETOS - Professeur Jean-Dominique DE KORWIN - Professeure Gisèle KANNY Professeure Christine PERRET-GUILLAUME – Professeur Roland JAUSSAUD – Professeure Laure JOLY
+3e sous-section : (Médecine générale)
+Professeur Jean-Marc BOIVIN - Professeur Paolo DI PATRIZIO
+54e Section : DÉVELOPPEMENT ET PATHOLOGIE DE L'ENFANT, GYNÉCOLOGIEOBSTÉTRIQUE, ENDOCRINOLOGIE ET REPRODUCTION
+1re sous-section : (Pédiatrie)
+Professeur Pascal CHASTAGNER - Professeur François FEILLET - Professeur Jean-Michel HASCOET Professeur Cyril SCHWEITZER
+2e sous-section : (Chirurgie infantile)
+Professeur Pierre JOURNEAU - Professeur Jean-Louis LEMELLE
+3e sous-section : (Gynécologie-obstétrique ; gynécologie médicale) Professeur Philippe JUDLIN - Professeur Olivier MOREL
+4e sous-section : (Endocrinologie, diabète et maladies métaboliques ; gynécologie médicale) Professeur Bruno GUERCI - Professeur Marc KLEIN - Professeur Georges WERYHA
+55e Section : PATHOLOGIE DE LA TÊTE ET DU COU
+1re sous-section : (Oto-rhino-laryngologie)
+Professeur Roger JANKOWSKI - Professeure Cécile PARIETTI-WINKLER - Professeure Cécile RUMEAU
+2e sous-section : (Ophtalmologie)
+Professeure Karine ANGIOI - Professeur Jean-Paul BERROD
+3e sous-section : (Chirurgie maxillo-faciale et stomatologie) Professeure Muriel BRIX
+========== PROFESSEURS DES UNIVERSITÉS
+61e Section : GÉNIE INFORMATIQUE, AUTOMATIQUE ET TRAITEMENT DU SIGNAL Professeur Walter BLONDEL
+64e Section : BIOCHIMIE ET BIOLOGIE MOLÉCULAIRE
+Professeure Sandrine BOSCHI-MULLER - Professeur Pascal REBOUL
+65e Section : BIOLOGIE CELLULAIRE Professeure Céline HUSELSTEIN
+66e Section : PHYSIOLOGIE Professeur Nguyen TRAN
+========== PROFESSEUR ASSOCIÉ DE MÉDECINE GÉNÉRALE
+53e Section, 3e sous-section : (Médecine générale) Professeure associée Sophie SIEGRIST Professeur associé Olivier BOUCHY
+========== MAÎTRES DE CONFÉRENCES DES UNIVERSITÉS - PRATICIENS HOSPITALIERS
+42e Section : MORPHOLOGIE ET MORPHOGENÈSE
+1re sous-section : (Anatomie) Docteur Bruno GRIGNON
+2e sous-section : (Histologie, embryologie, et cytogénétique) Docteure Isabelle KOSCINSKI
+44e Section : BIOCHIMIE, BIOLOGIE CELLULAIRE ET MOLÉCULAIRE, PHYSIOLOGIE ET NUTRITION
+1re sous-section : (Biochimie et biologie moléculaire)
+Docteure Shyue-Fang BATTAGLIA - Docteure Sophie FREMONT - Docteure Isabelle GASTIN - Docteure Catherine MALAPLATE - Docteur Marc MERTEN
+2e sous-section : (Physiologie)
+Docteure Silvia DEMOULIN-ALEXIKOVA - Docteur Jacques JONAS
+
+
+6
+45e Section : MICROBIOLOGIE, MALADIES TRANSMISSIBLES ET HYGIÈNE
+1re sous-section : (Bactériologie – Virologie ; hygiène hospitalière)
+Docteure Corentine ALAUZET - Docteure Hélène JEULIN - Docteure Véronique VENARD
+2e sous-section : (Parasitologie et mycologie) Docteure Anne DEBOURGOGNE
+46e Section : SANTÉ PUBLIQUE, ENVIRONNEMENT ET SOCIÉTÉ
+1re sous-section : (Epidémiologie, économie de la santé et prévention)
+Docteur Cédric BAUMANN - Docteure Frédérique CLAUDOT - Docteur Alexis HAUTEMANIÈRE Docteur Arnaud FLORENTIN - Docteur Jonathan EPSTEIN (stagiaire)
+2e sous-section (Médecine et Santé au Travail) Docteure Isabelle THAON
+47e Section : CANCÉROLOGIE, GÉNÉTIQUE, HÉMATOLOGIE, IMMUNOLOGIE
+1re sous-section : (Hématologie ; transfusion)
+Docteur Julien BROSEUS – Docteure Maud D’AVENI
+2e sous-section : (Cancérologie ; radiothérapie) Docteure Lina BOLOTINE
+3e sous-section : (Immunologie) Docteure Alice AARNINK
+4e sous-section : (Génétique)
+Docteure Céline BONNET - Docteure Mathilde RENAUD (stagiaire)
+48e Section : ANESTHÉSIOLOGIE, RÉANIMATION, MÉDECINE D’URGENCE, PHARMACOLOGIE ET THÉRAPEUTIQUE
+1e sous-section : (Anesthésiologie-réanimation et médecine péri-opératoire) Docteur Philippe GUERCI
+3e sous-section : (Pharmacologie fondamentale ; pharmacologie clinique ; addictologie) Docteur Nicolas GAMBIER - Docteure Françoise LAPICQUE - Docteur Julien SCALA-BERTOLA
+49e Section : PATHOLOGIE NERVEUSE ET MUSCULAIRE, PATHOLOGIE MENTALE, HANDICAP ET RÉÉDUCATION
+2e sous-section : (Neurochirurgie) Docteur Fabien RECH
+3e sous-section : (Psychiatrie d'adultes ; addictologie) Docteur Thomas SCHWITZER
+4e sous-section : (Pédopsychiatrie ; addictologie) Docteur Fabienne ROUYER-LIGIER (stagiaire)
+50e Section : PATHOLOGIE OSTÉO-ARTICULAIRE, DERMATOLOGIE ET CHIRURGIE PLASTIQUE
+4e sous-section : (Chirurgie plastique, reconstructrice et esthétique ; brûlologie) Docteure Laetitia GOFFINET-PLEUTRET
+51e Section : PATHOLOGIE CARDIO-RESPIRATOIRE ET VASCULAIRE
+3e sous-section : (Chirurgie thoracique et cardio-vasculaire) Docteur Fabrice VANHUYSE
+4e sous-section : (Chirurgie vasculaire ; Médecine vasculaire) Docteure Nicla SETTEMBRE
+52e Section : MALADIES DES APPAREILS DIGESTIF ET URINAIRE
+1re sous-section : (Gastroentérologie ; hépatologie ; addictologie) Docteur Anthony LOPEZ
+54e Section : DEVELOPPEMENT ET PATHOLOGIE DE L'ENFANT, GYNECOLOGIEOBSTETRIQUE, ENDOCRINOLOGIE ET REPRODUCTION
+1e sous-section : (Pédiatrie)
+Docteure Cécile POCHON (stagiaire)
+4e sous-section : (Endocrinologie, diabète et maladies métaboliques ; Gynécologie médicale) Docteure Eva FEIGERLOVA
+5e sous-section : (Biologie et médecine du développement et de la reproduction ; gynécologie médicale) Docteur Mikaël AGOPIANTZ
+55e Section : PATHOLOGIE DE LA TÊTE ET DU COU
+1re sous-section : (Oto-Rhino-Laryngologie) Docteur Patrice GALLET
+
+
+7
+========== MAÎTRES DE CONFÉRENCES
+5e Section : SCIENCES ÉCONOMIQUES Monsieur Vincent LHUILLIER
+7e Section : SCIENCES DU LANGAGE : LINGUISTIQUE ET PHONETIQUE GENERALES Madame Christine DA SILVA-GENEST
+19e Section : SOCIOLOGIE, DÉMOGRAPHIE Madame Joëlle KIVITS
+63e Section : GÉNIE ÉLECTRIQUE, ÉLECTRONIQUE, PHOTONIQUE ET SYSTÈMES Madame Pauline SOULET LEFEBVRE (stagiaire)
+64e Section : BIOCHIMIE ET BIOLOGIE MOLÉCULAIRE
+Madame Marie-Claire LANHERS - Monsieur Nick RAMALANJAONA
+65e Section : BIOLOGIE CELLULAIRE
+Madame Nathalie AUCHET - Madame Natalia DE ISLA-MARTINEZ - Monsieur Christophe NEMOS
+69e Section : NEUROSCIENCES Madame Sylvie MULTON
+==========
+MAÎTRES DE CONFÉRENCES ASSOCIÉS DE MÉDECINE GÉNÉRALE
+53e Section, 3e sous-section : (Médecine générale) Docteur Cédric BERBE
+==========
+DOCTEURS HONORIS CAUSA
+Professeur Pierre-Marie GALETTI (1982) Brown University, Providence (U.S.A)
+Professeure Mildred T. STAHLMAN (1982) Vanderbilt University, Nashville (U.S.A)
+Professeur Théodore H. SCHIEBLER (1989) Institut d'Anatomie de Würtzburg (R.F.A) Professeur Mashaki KASHIWARA (1996)
+Research Institute for Mathematical Sciences de Kyoto (JAPON)
+Professeur Ralph GRÄSBECK (1996) Université d'Helsinki (FINLANDE)
+Professeur Duong Quang TRUNG (1997) Université d'Hô Chi Minh-Ville (VIÊTNAM) Professeur Daniel G. BICHET (2001) Université de Montréal (Canada)
+Professeur Marc LEVENSTON (2005) Institute of Technology, Atlanta (USA)
+Professeur Brian BURCHELL (2007) Université de Dundee (Royaume-Uni) Professeur Yunfeng ZHOU (2009) Université de Wuhan (CHINE)
+Professeur David ALPERS (2011) Université de Washington (U.S.A) Professeur Martin EXNER (2012) Université de Bonn (ALLEMAGNE)
+
+
+8
+Remerciements
+À mon Maître et Président du jury
+Monsieur le Professeur Paolo Di PATRIZIO
+Professeur des Universités
+Département de Médecine Générale - Nancy
+Université de Lorraine
+C’est pour moi une immense fierté que vous ayez accepté de présider ce jury.
+Je vous suis reconnaissante pour votre soutien, votre disponibilité et votre accompagnement
+tout au long de cette thèse.
+Soyez assuré de mon profond respect et de ma sincère reconnaissance.
+
+
+9
+À mon Maître et Directeur de Thèse
+Monsieur le Professeur Olivier BOUCHY
+Médecin généraliste
+Professeur des Universités
+Faculté de Médecine – Nancy
+Je ne vous remercierai jamais assez d’avoir accepté la direction de cette thèse.
+Votre accompagnement tout au long de cette étude, la patience dont vous avez fait part,
+ainsi que votre enseignement à chaque étape de ce travail m’ont apporté énormément.
+Je vous remercie pour votre sympathie et bienveillance.
+Veuillez trouver dans cette thèse l'assurance de mon profond respect et le témoignage de ma
+sincère reconnaissance.
+
+
+10
+À mon Maître et Juge
+Mme la Professeure Eliane ALBUISSON
+Professeur des Universités
+Praticien Hospitalier Santé Publique – CHRU de Nancy
+Université de Lorraine
+Vous me faites un très grand honneur en ayant accepté de participer à ce jury et de juger ce
+travail.
+Trouvez en retour l’expression de mon profond respect et ma reconnaissance pour l’intérêt
+que vous avez porté à ce travail.
+
+
+11
+À mon Maître et Juge
+Monsieur le Docteur Edem ALLADO
+Praticien Hospitalier Rhumatologue, Médecin du Sport – CHRU de Nancy
+Université de Lorraine
+Je vous suis profondément reconnaissante d’avoir accepté de siéger dans le jury de cette
+thèse.
+Veuillez recevoir ici toute ma considération.
+
+
+12
+À ma famille
+À mes parents
+Pour l’amour immense et pour toutes les valeurs qu’ils m’ont transmises.
+Pour m’avoir donné l’opportunité d’être libre.
+À mon frère
+Pour ta sincérité et ta détermination, pour l’envie de créer le beau.
+À mon amour
+Aubéri, pour ton soutient de chaque instant.
+Pour m’avoir accompagnée tout au long de ces années.
+A toi qui a vue en moi plus grand.
+À mes enfants
+Louis, Léonard et Alexandre, pour tout le bonheur que vous m’apportez à chaque instant.
+Un bonheur qui va s’agrandir encore ...
+
+
+13
+À mes amis
+Pour toutes ces années heureuses passées en votre compagnie.
+Pour toutes nos joies à venir.
+Pour votre soutien dans cette étude et votre aide précieuse.
+À vous que je n’oublie pas
+A tous ceux qui ont participé de près ou de loin à la réalisation de ce travail.
+Merci à tous
+
+
+14
+SERMENT D’HIPPOCRATE
+« Au moment d'être admis à exercer la médecine, je promets et je jure d'être fidèle aux lois
+de l'honneur et de la probité. Mon premier souci sera de rétablir, de préserver ou de
+promouvoir la santé dans tous ses éléments, physiques et mentaux, individuels et sociaux. Je
+respecterai toutes les personnes, leur autonomie et leur volonté, sans aucune discrimination
+selon leur état ou leurs convictions. J’interviendrai pour les protéger si elles sont affaiblies,
+vulnérables ou menacées dans leur intégrité ou leur dignité. Même sous la contrainte, je ne
+ferai pas usage de mes connaissances contre les lois de l'humanité. J'informerai les patients
+des décisions envisagées, de leurs raisons et de leurs conséquences. Je ne tromperai jamais
+leur confiance et n'exploiterai pas le pouvoir hérité des circonstances pour forcer les
+consciences. Je donnerai mes soins à l'indigent et à quiconque me les demandera. Je ne me
+laisserai pas influencer par la soif du gain ou la recherche de la gloire. Admis dans l'intimité
+des personnes, je tairai les secrets qui me sont confiés. Reçu à l'intérieur des maisons, je
+respecterai les secrets des foyers et ma conduite ne servira pas à corrompre les mœurs. Je
+ferai tout pour soulager les souffrances. Je ne prolongerai pas abusivement les agonies. Je ne
+provoquerai jamais la mort délibérément. Je préserverai l'indépendance nécessaire à
+l'accomplissement de ma mission. Je n'entreprendrai rien qui dépasse mes compétences. Je
+les entretiendrai et les perfectionnerai pour assurer au mieux les services qui me seront
+demandés. J'apporterai mon aide à mes confrères ainsi qu'à leurs familles dans l'adversité.
+Que les hommes et mes confrères m'accordent leur estime si je suis fidèle à mes promesses ;
+que je sois déshonoré et méprisé si j'y manque ».
+
+
+15
+TABLE DES MATIÈRES
+LISTE DES ABREVIATIONS ........................................................................................................ 17
+1. INTRODUCTION ................................................................................................................ 18
+1.1. Définition de l’intelligence artificielle ....................................................................... 18
+1.1.1. IA faible............................................................................................................... 19
+1.1.2. IA forte................................................................................................................ 19
+1.2. Les systèmes d’aide à la décision médicale............................................................... 19
+1.3. L’intelligence artificielle en médecine générale........................................................ 19
+2. MATERIEL ET METHODES ................................................................................................. 22
+3. RESULTATS........................................................................................................................ 23
+3.1. Analyse descriptive.................................................................................................... 23
+3.1.1. Profil des répondants ......................................................................................... 23
+3.1.2. L’environnement informatique.......................................................................... 25
+3.1.3. Evaluation de l’utilisation des outils d’aide décisionnelle ................................. 29
+3.2. Analyse bi-variée de l’utilisation des outils d’aide décisionnelle.............................. 31
+3.2.1. Le moment de recours aux outils d’aide décisionnelle lors de la consultation médicale............................................................................................................................ 31
+3.2.2. Jugement de l’utilité des outils d’aide décisionnelle ......................................... 32
+3.2.3. Influence des outils d’aide décisionnelle sur le temps de consultation ............ 32
+4. DISCUSSION ...................................................................................................................... 33
+4.1. A propos des biais de l’étude .................................................................................... 33
+4.1.1. Biais de sélection................................................................................................ 33
+4.1.2. Biais liée au contexte.......................................................................................... 33
+4.1.3. Biais d’évaluation ............................................................................................... 33
+4.2. Axes d’améliorations pour un meilleur accès aux outils d’aide décisionnelle en médecine générale ............................................................................................................... 33
+4.2.1. Formation des médecins aux outils numériques ............................................... 33
+4.2.2. Collaboration médecin-informaticien/web-designer ........................................ 34
+4.2.3. Renforcer la confiance des médecins envers les outils d’aide décisionnelle .... 35
+4.2.4. Création d’une plateforme unique regroupant les outils d’aide à la décision médicale............................................................................................................................ 35
+
+
+16
+4.3. Le rôle central du médecin généraliste dans la pratique médicale .......................... 37
+5. CONCLUSION .................................................................................................................... 38
+BIBLIOGRAPHIE ........................................................................................................................ 39
+ANNEXE .................................................................................................................................... 50
+Annexe 1 : Questionnaire : Evaluation de l’utilisation des outils d’aide à la décision médicale par les médecins généralistes............................................................................... 50
+Annexe 2 : Les résultats bruts .............................................................................................. 55
+Annexe 3: Khi deux : Le moment de recours aux outils d’aide décisionnelle lors de la consultation médicale en fonction du sexe.......................................................................... 72
+Annexe 4: Khi deux : le moment de recours aux outils d’aide décisionnelle lors de la consultation médicale en fonction du statut de médecin remplaçant ................................ 73
+Annexe 5 : Khi deux : Le moment de recours aux outils d’aide décisionnelle lors de la consultation médicale en fonction du lieu d’exercice.......................................................... 74
+Annexe 6 : Khi deux : Analyse en fonction la période de confinement de l’utilisation des outils d’aide décisionnelle .................................................................................................... 75
+Annexe 7 : Khi deux : jugement de l’utilité des outils d’aide décisionnelle en fonction du sexe....................................................................................................................................... 76
+Annexe 8 : Khi deux : Jugement de l’utilité des outils d’aide décisionnelle en fonction du statut de médecin remplaçant ............................................................................................. 77
+Annexe 9 : Khi deux : Jugement de l’utilité des outils d’aide décisionnelle en fonction du lieu d’exercice....................................................................................................................... 78
+Annexe 10 : Khi deux : Analyse en fonction la période de confinement de l’utilisation des outils d’aide décisionnelle .................................................................................................... 79
+Annexe 11 : Khi deux : influence des outils d’aide décisionnelle sur le temps de consultation selon le sexe .................................................................................................... 80
+Annexe 12 : Khi deux : Influence des outils d’aide décisionnelle sur le temps de consultation selon le statut de remplaçant.......................................................................... 81
+Annexe 13 : Khi deux : Influence des outils d’aide décisionnelle sur le temps de consultation selon le lieu d’exercice .................................................................................... 82
+Annexe 14 : Khi deux : Analyse en fonction la période de confinement de l’utilisation des outils d’aide décisionnelle .................................................................................................... 83
+ABSTRACT................................................................................................................................. 84
+
+
+17
+LISTE DES ABREVIATIONS
+AAAPC : Australasian Association for Academic Primary Care
+ApC : Après Consultation
+AvC : Avant Consultation
+CNGE : Collège National des Généralistes Enseignants
+DATA : Synonyme du mot donné
+EGPRN : European General Practice Research Network
+HAS : Haut Autorité de Santé
+IA : Intelligence Artificielle
+Ind : indispensable
+Int : Intéressant
+NAPCRG : North American Primary Care Research Group
+NSP : Ne Se Prononce pas
+PC : Pendant Consultation
+SAPC : Syndicat Autonome des Praticiens Conseils de base
+SIP : Support Informatisé Patient
+WONCA : World Organization of National Colleges, Academies and Academic Associations of
+General Practitioners/Family Physicians
+
+
+18
+1. INTRODUCTION
+Dans une aire où les données numériques (DATA) médicales abondent, les nouvelles technologies se développent rapidement et avec elles, l'intelligence artificielle (IA). En France, la feuille de route de la loi « Ma santé 2022 » datant du 25 avril 2019 a pour objectif une amélioration substantielle du système de santé français grâce à la logique d’Etatplateforme (1). Le numérique est un outil majeur de ce progrès. Une des mesures phare de ce plan est notamment d’augmenter la sécurité et l’interopérabilité des systèmes d’information en santé. Le plan « Médecine France Génomique 2025 » est plan de développement de la génomique française basé sur trois axes : les maladies rares, les cancers, et les maladies chroniques (soins primaires) (2). L’intelligence artificielle et le numérique sont entrés dans le domaine de la santé et y jouent un rôle grandissant (3).
+L’essor de l’intelligence artificielle connaît aussi une croissance exponentielle aux Etats-Unis et au Canada qui investissent afin de développer une médecine personnalisée (4-5). En effet, tout comme d’autres pays (Arabie saoudite, Allemagne et Estonie), ils lancent des programmes gouvernementaux dans le domaine génomique touchant l'ensemble de leur système de soins et en particulier la médecine primaire (6-9). Dans certains pays asiatiques, le système universitaire médical est en train de se transformer, intégrant des formations culturelles et littéraires dans leurs cursus afin de déplacer le rôle du médecin vers celui d’accompagnant du patient (10-11).
+1.1. Définition de l’intelligence artificielle
+Le terme d’intelligence artificielle, est défini par l’un de ses créateurs, John MacCarthy, comme toute activité intellectuelle pouvant « être décrite avec suffisamment de précision pour être simulée par une machine » (12). Elle s’est réellement développée à partir des années 1970 avec l’avancement des systèmes informatiques.
+On y trouve donc le côté « artificiel » atteint par l'usage d’ordinateurs ou de processus électroniques élaborés et le côté « intelligence » qui a pour but d'imiter le raisonnement humain. Cette imitation peut se faire dans des domaines variés comme le raisonnement (par exemple lors de jeux ou de la pratique des mathématiques), la compréhension du langage, ou encore dans la perception visuelle (interprétation des images et des scènes) et auditive (compréhension du langage parlé).
+En 1943, un biologiste et un logicien ont proposé de reproduire le fonctionnement du système nerveux grâce à un réseau de neurones artificiels. Ils réalisèrent un modèle simplifié de neurone biologique, appelé « neurone formel ». Les réseaux de neurones ont connu ces dernières années un essor fulgurant car ce sont des systèmes capables d’apprendre par l’expérience (apprentissage probabiliste s’appuyant sur le théorème de Bayes).
+
+
+19
+Ils sont utilisés dans différents domaines : estimations boursières, reconnaissance de motifs, météorologie, hydraulique, amélioration de l’enseignement (13).
+1.1.1. IA faible
+L'intelligence artificielle faible est une intelligence artificielle non-sensible qui se concentre sur une tâche précise. Tous les systèmes actuellement existants sont considérés comme des intelligences artificielles faibles (14).
+1.1.2. IA forte
+L’intelligence artificielle forte est dotée de conscience, un pouvoir d’auto-apprentissage et d’une fonctionnalité multitâche. A l’heure actuelle une telle IA n’existe pas (15).
+1.2. Les systèmes d’aide à la décision médicale
+Les systèmes d’aide à la décision médicale sont des supports informatiques permettant de faciliter la prise de décision à chaque étape de la démarche médicale. Il en existe trois types (16) :
+ Systèmes DOCUMENTAIRES : Le sémiologiste, Ordilink, Vidal Recos, Thyroideclic, diagnosaurius, diagnosispro, guide de bon usage des examens d’imagerie médicale, CRAT, thérapeutique dermatologique, allergoclic, risque cardio-vasculaire, thromboclic, banque de données thérapeutiques, oncologik, ECGclic, médecine de voyage, pediadoc, gestaclic, memopilules, demenceclic, VIHclic, Hamilton, antibioclic, assistant-médical, e-pansement, limusDx, Prescriptor, Dentaclic, Preventclic
+ Systèmes d’ALERTES concernant une contre-indication ou une interaction médicamenteuse ou encore une conduite à tenir diagnostique ou thérapeutique
+ Systèmes CONSULTANTS basés sur un processus de raisonnement médical et fournissants des conclusions argumentées : Visual DX, ISABEL, DxPlain, clinicalrules, diagnosispro, infermedica, esagil, simulconsult, Watson
+1.3. L’intelligence artificielle en médecine générale
+La médecine générale a un rôle central dans le développement de l’intelligence artificiel médicale (17) et les outils d’aide décisionnelle y sont de plus en plus utilisés (18-21). Les patients pensent que ces outils ont un effet positif sur leur prise en charge (22). Ainsi, la médecine de précision, comprenant l’IA médicale, les outils d’aide décisionnelle, l’e-santé et la génomique, est un nouveau paradigme à adopter (23-34).
+
+
+20
+Certains auteurs considèrent l'arrivée de l'IA inévitable en médecine (3). Les médecins généralistes occupent une position-clé dans le développement de la médecine de précision. L’évolution de leur exercice permettant l’intégration de la génomique dans le système de santé, le développement de la pharmacogénétique ainsi que la diffusion du dossier médicale partagée doté d’une IA (35-39). Ce dernier va permettre de créer un dossier clinique apportant des propositions diagnostiques et thérapeutiques personnalisées (40-43). Dans un avenir relativement proche, le dossier médical doté d’une IA va prendre en compte tout type d’information (écrit, visuel, vidéo) et intégrer le séquençage génomique du patient afin d’affiner la prise de décision dans toutes les étapes de l’accompagnement du patient. En effet, il proposera des outils de dépistage, des hypothèses diagnostiques probables avec la conduite à tenir et la surveillance adaptée ainsi que des conseils thérapeutiques (44-47).
+Les outils aide décisionnelle ont démontré leurs bénéfices en médecine générale dans de nombreux domaines (voir tableau 1). Ces outils ont un rapport coût/efficacité positif (48-59). Les futurs outils d’aide décisionnelle, couplés au dossier informatique, vont intégrer la data clinique, la géolocalisation et les informations génomiques. Différents réseaux mondiaux sont déjà engagés dans ce sens : WONCA, NAPCRG, SAPC, EGPRN, AAAPC (60-62). Il existe des supports informatiques dédiés aux patients (SIP). Grâce à l’intégration des données de santé avec l’historique et la géolocalisation d’un sujet donné, une estimation des différents facteurs de risque peut être calculée (63). Les SIP peuvent notamment permettre une amélioration de la prise en charge nutritionnelle.
+
+
+21
+Tableau 1 : Les applications d’outils d’aide décisionnelle en médecine générale
+Les outils d’aide décisionnelle, en médecine générale
+- Aide à la prise en charge de la douleur (74-75)
+- Aide de la prise en charges des pathologies chroniques (76-78) :  Aide à la prise en charge des patients diabétiques (79,80)  Contrôle et diminution du risque cardio-vasculaire des patients (81)  Aide la gestion d’angors stables (82)  Aide pour la prise en charge de l'hémochromatose transfusionnelle (47)
+- Aide au dépistage des cancers (83)
+- Aide à la prise en charge gérontologique (84,85)
+- Aide à la prise en charge de la maladie rénale (86)
+- Aide de la prise en charge du syndrome dépressif :  Aide pour le dépistage, diagnostique et traitement du syndrome dépressif (87)  Aide pour la gestion du risque suicidaire (88)
+- Diminution des erreurs de préinscriptions médicamenteuses (89-94) :  Amélioration la qualité des prescriptions d’antibiotiques (95-96)  Aide pour des prescriptions médicamenteuse chez l’insuffisant rénal (97-98)
+- Aide des diagnostiques dermatologiques grâce à des logiciels d’analyse d’images (99)
+Les outils simples et faciles à utiliser sont les mieux acceptés (64). L’acceptabilité de l'utilisation des outils d’aide à la décision dépend aussi de l’habitude antérieure des médecins dans le domaine informatique (65, 66). Il existe différents facteurs facilitateurs de l'utilisation des outils et l’évaluation de la convivialité permet de les préciser (67-73).
+Une des priorités en médecine primaire est l'intégration de la pharmacogénétique avec des supports décisionnels. Néanmoins il faut développer les structures nécessaires et effectuer des études de rentabilités (100-106).
+Afin d’améliorer le système de santé français, il est impératif d'augmenter l'implication des praticiens et surtout d’harmoniser l’information médicale (107-111). Des reformes de la formation médicale sont aussi nécessaires afin d'avoir de nouvelles compétences en matière de génomique et médecine de précision (112).
+
+
+22
+2. MATERIEL ET METHODES
+L'objectif de cette étude est d'évaluer l'utilisation des outils d’aide à la décision médicale par les médecins généralistes.
+Nous avons effectué une recherche bibliographique afin d'établir une liste d’outils d’aide à la décision médicale pouvant être utilisés en médecine générale. Le questionnaire a ensuite été élaboré afin de savoir quels outils sont les plus utilisés en médecine générale, à quel moment de la consultation et quels sont leurs avantages et inconvénients (annexe 1).
+Le questionnaire a été diffusé grâce à une application en ligne « Eval and go ». La diffusion a débuté en mars 2020 et a été arrêtée en septembre 2020.
+Afin d’atteindre la population cible, nous avons envoyé le lien du questionnaire par voie informatique :  Aux membres du groupe « Rempla lorraine » sur Facebook (environ 700 membres)
+ Aux médecins généralistes de Lorraine grâce à URPS de Lorraine
+ Aux différents syndicats des médecins généralistes de France
+ Aux internes et nouveaux diplômés de médecine générale par le biais du secrétariat du département de médecine générale
+L’analyse des données a été faite à l’aide de Microsoft Excel. Nous avons d’abord réalisé une analyse descriptive simple. Les réponses manuscrites ont été regroupées, classées et codées. Puis nous avons fait une analyse comparative selon le sexe, le statut de médecin remplaçant, le lieu d’exercice et la période de confinement.
+
+
+23
+3. RESULTATS
+3.1. Analyse descriptive
+Un total de 262 réponses au questionnaire a été recueilli, sur approximativement 2000 généralistes sollicités.
+3.1.1. Profil des répondants
+La majorité des répondants est de sexe féminin. La répartition est de l’ordre de 67,56% femmes et 32,44% hommes (n : 262).
+La majorité de la population (55%) est âgée de 30 et moins (n : 262). Le reste de la cohorte est répartie comme présenté sur la figure 1.
+La moyenne d’âge des participants est de 32,9 ans et la médiane d’âge est de 30 ans.
+Figure 1. Répartition des médecins selon l’âge
+La majorité des répondants est issue de la faculté de médecine Nancy (76,34 %). Les autres (23,66%) sont issus des facultés suivantes : Grenoble, Lyon, Rennes, CAEN, BICETRE PARIS XI, Angers, Montpellier, Nice, Paris, Reims, Bordeaux, Clermont Ferrand, Strasbourg, Saint Étienne, UPEC PARIS 12, Poitiers, Paris Diderot, Amiens, Dijon, Toulouse.
+Dans cette étude 47,7% des répondants déclarent être remplaçants, 34,23 % déclarent être installés (n : 262).
+0%
+10%
+20%
+30%
+40%
+50%
+60%
+0
+20
+40
+60
+80
+100
+120
+140
+160
+30 ans et moins Entre 30 et 40 ans Entre 40 et 50 ans Entre 50 et 60 ans 60 ans et plus
+Nb %
+
+
+24
+Parmi les médecins installés (n : 89) 57,3% sont installés depuis moins de 5 ans et 42,7% depuis plus de 5 ans. Parmi la sous population installée depuis plus de 5 ans (n : 32), les 3 sous-groupes ont la distribution suivante : installés depuis 5 à 10 ans : 25%, installés depuis 10 et 20 ans : 37,5% et installés depuis plus de 20 ans : 37,5%.
+Le lieu d’exercice des médecins installés (n : 89) est urbain pour 41,57%, semi rural pour 38,2 % et rural pour 20,22% des médecins.
+89 % des médecins installés ont une activité libérale. La majorité ayant une activité en cabinet de groupe ou en maison de santé (voir tableau 2).
+Tableau 2. Mode d’exercice des médecins installés :
+Question Nb. % Texte
+Quel est votre mode
+d’exercice : 89 100%
+Seul(e) au cabinet 12 13.48%
+En cabinet de groupe
+de médecins 46 51.69%
+En maison de santé ou pôle de santé pluriprofessionnel
+27 30.34%
+En centre de santé
+pluri professionnel 6 6.74%
+En milieu hospitalier
+public 1 1.12%
+En établissement privé 0 0%
+Autre établissement : 1 1.12% - Sos médecins
+Parmi les répondants qui ont déclaré leur lieu d’exercice (n : 70), 66% exercent en Lorraine, 20% exercent dans la grand est en dehors de la Lorraine et 14% exercent dans le reste de la France.
+
+
+25
+Figure 2. Lieu d’exercice des médecins
+Parmi les répondants (n : 262), 23% sont internes en médecine, dont 13,04% en premier semestre, 1,45% en deuxième semestre, 24,64% en 3e semestre, 4,35% en quatrième semestre, 31, 88% en 5e semestre et 24,64% en 6e sixième.
+3.1.2. L’environnement informatique
+Dans cette étude 98% des médecins interrogés déclarent avoir un lieu d’exercice informatisé (n : 262), et parmi eux seulement 24 % (n : 62) des répondants déclarent être doté d’un outil d’aide décisionnelle.
+Les participants ayant un lieu de travail informatisé et doté d’un outil d’aide décisionnelle ont mentionnés des outils d’aides à la prescription, des protocoles hospitaliers, des logiciels de dossiers médicaux et des sites internet. Les sites internet les plus cités sont : Antibioclic, Vidal et Banque Claude Bernard.
+Les atouts majeurs des outils d’aide décisionnelle cités par les médecins sont qu’ils sont une source d’informations pertinentes ainsi qu’une aide à la prescription médicale, à jour, rapide et ergonomique (n : 56). Les autres avantages sont illustrés dans la figure 3.
+0%
+10%
+20%
+30%
+40%
+50%
+60%
+70%
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+Lorraine Grand Est hors Lorraine Le reste de la France
+NB %
+
+
+26
+Figure 3. Atouts des outils d’aide décisionnelle (n : 56)
+Les inconvénients majeurs des outils d’aide à la décision médicale cités par les médecins sont que l’information n’est pas toujours claire ni mise à jour. Il y a aussi quelques fois des problèmes d’accessibilité et une non prise en compte des situations complexes (n : 24). Les autres inconvénients sont illustrés dans la figure 4.
+0
+2
+4
+6
+8
+10
+12
+14
+16
+
+
+27
+Figure 4. Inconvénients des outils d’aide à la décision médicale (n : 24)
+Le top 6 des outils d’aide à la décision médicale les plus connus et les plus utilisés sont (voir figure 5): Antibioclic/antibioville, Vidal Recos, CRAT, Coronaclic, Pédiadoc, Test d’Hamilton.
+Figure 5. Evaluation de la connaissance et de l’utilisation des outils d’aide décisionnelle les plus connus par les médecins généralistes
+0
+1
+2
+3
+4
+5
+6
+0
+20
+40
+60
+80
+100
+120
+Antibioclic/Antibiovi...
+CRAT
+Vidal Recos
+CoronaClic
+PEDIADOC
+Hamilton
+GESTACLIC
+Risque cardio...
+Thromboclic
+Thérapeutique...
+E-pansement
+Médecine de voyages
+DENTACLIC
+Guide du Bon Usage...
+ECGclic
+Banque de donnée...
+Allergoclic
+InfoThyro/Thyroidec...
+VIHclic
+ONCOLOGIK
+Assistante médicale
+Clinicalrules
+PREVENTCLIC
+DiagnosisPro
+Ordilink
+Visual DX
+Le Sémiologiste
+Démences
+Memopilules/G-...
+Infermedica
+ESAGIL
+LimusDx
+Simulconsult
+Diagnosispro
+Prescriptor
+ISABEL
+WATSON
+DxPlain
+FreeSAM
+Diagnosaurius
+Je connais % (n : 262) J'utilise % (n : 262)
+
+
+28
+Le logiciel préféré des médecins répondants (n : 262) est Antibioclic/Antibioville (53%), puis les médecins plébiscitent le Crat (10,3%), Vidal Recos (8%), Pédiadoc (2,3%), etc. (annexe 2).
+Les avantages majeurs du logiciel préféré des médecins répondants (n : 262) sont les informations pertinentes (31%) et la simplicité d’utilisation, puis la rapidité (19%), (annexe 2).
+D’autres outils, non cités dans notre questionnaire, ont été mentionnés par les participants : - Aide à la prescription : L'application Prescrire, La BCB, Base de données des médicaments. Gouv, sitegpr.com, CBIP.be
+- Cardiologie : www.cardiorisk.fr
+- Dermatologie : Dermatoclic, dermato-info, reco.sfdermato.org,
+- Gynécologie : Formagyn
+- Infectiologie : Vaccinations voyage Pasteur, mesvaccins.net
+- Nutrition : Bariaclic, Obeclic, Diabetoclic
+- Oncologie : Palliaclic, AFSOS, soins de support en oncologie, Oncolor
+- Ophtalmologie : ophtalmoclic.fr
+- Pédiatrie : Pas à pas pédiatrique
+- Pneumologie : www.peakflow-eolys.com, pneumotox
+- Psychiatrie : La déclicviolence
+- Systèmes d’aide décisionnelle : www.aidediag.fr , Medicalcul, Médimento, meddispar, antiseche.wordpress.com, ebmfrance.net, Recomedical, sfmg.org
+Une majorité de médecin, 54% (n : 262) aurait aimé avoir un outil d’aide décisionnelle intégré au dossier médical du patient (voir annexe 2). Concernant la forme de cette aide décisionnelle intégrée au dossier médical, les médecins ont suggéré :
+ Une évaluation automatique du risque CV, prévention (Frottis, vaccins selon recommandation, etc..)
+ Un lien direct maladie-recommandation
+ Un lien redirigeant vers les sites utiles
+ Un moyen de suivre l'évolution des plaies et d’adapter le pansement et la prise en charge (avis spécialisé, prélèvement nécessaire...)
+
+
+29
+3.1.3. Evaluation de l’utilisation des outils d’aide décisionnelle
+La majorité des médecins, 80% (n : 262) a recours aux outils d’aide décisionnelle au cours de la consultation médicale. 31% des médecins consultent les outils après la consultation et 26% avant la consultation (voir annexe 2).
+La majorité des répondants (58,77%) considère que les outils d’aide à la décision médicale sont utiles (figure 6).
+Figure 6. Utilité des outils d’aide à la décision médicale selon les médecins généralistes
+La majorité des médecins (54,96%) considère que le recours aux outils d’aide décisionnelle ne modifie pas le temps de consultation (n : 262), 18,32% pensent que cela allonge le temps de consultation et 7,25% pensent que cela peut écourter le temps de consultation.
+La majorité des répondants (46,9%) déclare avoir recours aux outils d’aide décisionnelle quelques fois dans la journée, 23,2% quelques fois par semaine, 13% quelques fois dans le mois et 4,19% pratiquement à chaque consultation.
+Les outils d’aide décisionnelle sont utilisés principalement pour la prescription médicamenteuse puis pour la hiérarchisation des examens complémentaires et pour établir un diagnostic (tableau 3). La figure 7 illustre le classement des différentes utilisations.
+0%
+10%
+20%
+30%
+40%
+50%
+60%
+70%
+0
+20
+40
+60
+80
+100
+120
+140
+160
+180
+Utile Intéressante Indispensable Ne se prononce pas
+Inutile
+Nb. %
+
+
+30
+Tableau 3. Principales utilisations des outils d’aide décisionnelles par les médecins généralistes (%)
+Echelle de 0 à 5: 0 1 2 3 4 5 Etablir un bon diagnostic 9 18 13 21 14 6 % Etablir des diagnostics différentiels 15 19 21 18 6 1 % La prescription médicamenteuse 0 3 3 18 47 28 % La prescription des examens complémentaires 15 13 15 21 13 4 % Adapter les examens aux patients 18 7 11 16 16 12 % Adapter le coût des examens complémentaires 50 13 10 5 2 1 % Hiérarchiser les examens prioritaires 18 6 9 15 22 11 % Vous tenir à jour des recommandations 2 4 4 13 33 25 %
+Réponse majeure
+Figure 7. Classement des utilisations des outils d’aide à la décision médicale : moyenne sur une échelle de 0 à 5
+3,92
+2,61 2,5 2,37 2,2
+1,82
+0,73
+Prescription médicamenteuse
+Hiérarchisation de la prescription des examens complémentaires.
+Prescription des examens complémentaires adapté au patient.
+Etablir un diagnostic
+Prescription des examens complémentaires
+Etablir un diagnostic différentiel
+Prescription des examens complémentaires adapté au coût
+
+
+31
+3.2. Analyse bi-variée de l’utilisation des outils d’aide
+décisionnelle
+3.2.1. Le moment de recours aux outils d’aide décisionnelle lors de
+la consultation médicale
+En fonction du sexe :
+Le calcul du khi-deux confirme ici un lien significatif (p < 0,05) entre le sexe et le moment de recours aux outils lors de la consultation médicale (annexe 3).
+En effet les femmes auraient tendance à avoir recours aux outils plutôt après/pendant la consultation et les hommes plutôt pendant.
+En fonction statut de médecin remplaçant :
+Le calcul du khi-deux confirme ici un lien significatif (p < 0,05) entre le statut de remplaçant et le moment de recours aux outils d’aide décisionnelle au cours de la consultation (annexe 4).
+En effet les remplaçants auraient tendance à avoir recours aux outils d’aide décisionnelle plutôt pendant la consultation.
+En fonction du lieu d’exercice :
+Le calcul du khi-deux rejetait un lien significatif (p > 0,05) entre le lieu d’exercice et le moment de recours aux outils lors de la consultation médicale (annexe 5).
+En fonction de la période de confinement :
+Le calcul du khi-deux confirme ici un lien significatif (p < 0,05) entre la période confinement et le moment de recours aux outils d’aide décisionnelle lors de la consultation médicale (annexe 6).
+En effet en période post confinement les médecins auraient plus tendance à utiliser les outils d’aide décisionnelle pendant la consultation.
+
+
+32
+3.2.2. Jugement de l’utilité des outils d’aide décisionnelle
+En fonction du sexe :
+Le calcul du khi-deux confirme ici un lien significatif (p < 0,05) entre le sexe et l’utilité des outils d’aide à la décision médicale (annexe 7).
+En effet les femmes auraient plus tendance à considérer que les outils d’aide décisionnelle sont indispensables.
+En fonction statut de médecin remplaçant :
+Le calcul du khi-deux rejetait un lien significatif (p > 0,05) entre le statut de remplaçant et l’utilité des outils d’aide à la décision médicale (annexe 8).
+En fonction du lieu d’exercice :
+Le calcul du khi-deux rejetait un lien significatif (p > 0,05) entre le lieu d’exercice et l’utilité des outils d’aide à la décision médicale (annexe 9).
+En fonction de la période de confinement :
+Le calcul du khi-deux rejetait un lien significatif (p > 0,05) entre la période confinement et l’utilité des outils d’aide à la décision médicale (annexe 10).
+3.2.3. Influence des outils d’aide décisionnelle sur le temps de
+consultation
+Le calcul du khi-deux rejetait un lien significatif (p > 0,05) entre l’appréciation de l’influence de l’utilisation de ces outils sur le temps de consultation et le sexe (annexe 11), le statut de médecin remplaçant (annexe 12), le lieu d’exercice (annexe 13) et la période confinement (annexe 14).
+
+
+33
+4. DISCUSSION
+4.1. A propos des biais de l’étude
+4.1.1. Biais de sélection
+Du fait d’une diffusion du questionnaire par voie électronique et principalement via des réseaux sociaux (Facebook), il y a un biais dans la sélection des médecins. En effet ceux qui ont répondu au questionnaire sont plutôt de jeunes médecins, remplaçants et plus à l’aise avec l’informatique. Les résultats ne sont donc pas extrapolables à une population de médecins plus âgés.
+Par ailleurs, la majorité des répondants a un exercice urbain (80%) et seule une minorité a un exercice rural. Cela peut entrainer un biais de sélection car les résultats reflètent peu l’utilisation des outils d’aide à la décision en milieu rural.
+4.1.2. Biais liée au contexte
+Le questionnaire a été diffusé de mars à septembre 2020. Pendant les mois de mars et avril 2020, il y a eu une période de confinement liée à l’épidémie de covid 19 avec une augmentation non négligeable de la télémédecine. En effet le contexte a pu susciter un intérêt plus important pour le développement du numérique en santé et ainsi biaiser les résultats.
+4.1.3. Biais d’évaluation
+Tous les outils d’aide à la décision médicale non pas pu être évalués car non connus par le thésard au moment de l’élaboration du questionnaire. Les participants ont mentionné des outils pertinents qu’il aurait été utile d’évaluer, notamment : Bariaclic, Dermaclic, Pas à pas pédiatrique, Oncolor, Déclicviolence, Dermato-info, Obeclic, Diabetoclic, Palliaclic, etc.
+4.2. Axes d’améliorations pour un meilleur accès aux outils
+d’aide décisionnelle en médecine générale
+4.2.1. Formation des médecins aux outils numériques
+La majorité des répondants pense que le recours aux outils d’aide décisionnelle ne modifie pas le temps de consultation (54,96%). De plus, 59% des médecins interrogés considèrent
+
+
+34
+que ces outils sont utiles. Cependant seul 24 % des répondants déclarent être dotés d’un outil d’aide décisionnelle. Ces résultats concordent avec d’autres études montrant la préférence des interfaces simples d’utilisation (113-114).
+Les logiciels préférés et les plus utilisés par les participants sont Antibioclic (53%) ainsi que le CRAT et Vidal recos. Ce sont des systèmes d’aide décisionnelle de type documentaires. D’autres systèmes plus complexes de type consultants existent (ISABEL, VisualDX) mais ne sont pas connus par les médecins ayant répondus au questionnaire.
+Ces résultats suggèrent que les outils d’aide à la décision médicale sont peu connus mais gagneraient à l’être. Dans une optique d’amélioration du système de santé français via le numérique, cela serait bénéfique de familiariser les médecins avec ce type d’outils décisionnels. Dans le Grand Est, le programme e-Meuse Santé basé sur le développement des usages du numérique médical, pourrait aider à la promotion des outils d’aide décisionnelle en vue d’une amélioration des soins en médecine générale. D’autre part ce programme pourrait aussi être un moteur d’expérimentation des différents outils d’aide décisionnelle.
+Des formations sur le numérique en santé, afin de mieux maîtriser ces outils et les intégrer à la pratique quotidienne, peuvent s’envisager par la mise en place d’ateliers, au cours de 3ème cycle des études médicales. Les axes suivants pourraient être abordés :
+- L’accès aux outils d’aide décisionnelle - Le fonctionnement des outils d’aide à la décision médicale - Réaliser une recherche documentaire rapide lors d’une consultation - Reconnaitre des données pertinentes
+En effet, l’amélioration du savoir-faire des médecins généralistes en matière de recherche documentaire ainsi que sur l’utilisation des outils d’aide à la décision médicale contribue à améliorer l’expertise médicale et la prise en charge des patients.
+4.2.2. Collaboration médecin-informaticien/web-designer
+Les atouts les plus plébiscités par les répondants, concernant l’utilisation des outils d’aide décisionnelle sont la rapidité et la simplicité d’utilisation. Ces résultats concordent avec d’autres études appuyant sur la nécessité de travailler avec des interfaces simples d’utilisation afin d’améliorer l’adhésion des praticiens (113-116).
+Certains médecins ont aussi suggéré le développement d’un logiciel patient doté d’intelligence artificielle pouvant intégrer différentes informations et ainsi générer des alertes, des scores et des conseils diagnostiques et thérapeutiques. Ainsi, il serait intéressant d’établir une collaboration entre des médecins et des informaticiens/web-designers afin de travailler au développement d’outils plus ergonomiques, utilisables au quotidien.
+
+
+35
+4.2.3. Renforcer la confiance des médecins envers les outils d’aide
+décisionnelle
+Un inconvénient principal lié à l’utilisation des outils d’aide à la décision médicale, cité par les participants est que l’information n’est pas suffisamment claire et la mise à jour. Cela peut s’expliquer par le fait que de nombreux outils d’aide à la décision médicale de type documentaire sont des projets personnels, crées par des bénévoles. Ainsi la fiabilité de certains outils est peu revue dans leur contenu.
+Une des solutions afin de renforcer la confiance des médecins envers ces outils, pourrait être de créer des critères de fiabilité ou des labels garantissant au praticien la validité des informations. Les organismes ayant un potentiel de labélisation pourraient être le CNGE, la HAS ou d’autres sociétés savantes.
+4.2.4. Création d’une plateforme unique regroupant les outils
+d’aide à la décision médicale
+Le problème d’accessibilité aux outils d’aide à la décision médicale est un inconvénient cité par de nombreux répondants. Une piste d’amélioration serait donc la création d’un site plateforme regroupant les différents outils d’aide à la décision médicale.
+C’est dans cette optique, que nous avons créé un site (Hippocrate.mg) permettant d’accéder à un panel important d’outils d’aide décisionnelle avec comme priorité l’ergonomie et la rapidité.
+Le site est composé de deux parties :
+- Une première partie en haut de la page web (Figure 8) a pour but d’offrir un une accessibilité directe et rapide aux outils d’aide décisionnelle les plus consultés. De plus afin d’améliorer l’accès à une documentation scientifique validée, un moteur de recherche intégrant Pubmed, Cismef, EBMFrance est disponible.
+Figure 8 : La partie en haut de la page du site internet Hippocrat.mg, regroupant les sites les plus consultés et les moteurs de recherche.
+
+
+36
+- Une deuxième partie a pour but de classer par ordre alphabétique, les spécialités médicales afin de faciliter l’accès des outils d’aide décisionnelle (Figure 9).
+Figure 9 : Le reste de la page du site internet Hippocrat.mg, comporte différents onglets classant les spécialités médicales.
+Chaque onglet donne accès à l’ensemble des outils concernés par la spécialité (Figure 10).
+Figure 10 : Ensemble des outils d’aide décisionnelle obtenus en cliquant sur l’onglet ‘’Système d’aide décisionnelle’’ sur le site Hippocrate.mg
+
+
+37
+4.3. Le rôle central du médecin généraliste dans la pratique
+médicale
+Nous avons vu que qu’il existe des logiciels très puissants dotés d’IA notamment en radiologie, en cancérologie (avec des aides décisionnelles pour le dépistage du cancer du sein) (117), ainsi qu’en diabétologie (avec des aides décisionnelles pour le diagnostic de rétinopathie diabétique) (118).
+En effet les logiciels dotés d’IA performante se distinguent dans des domaines très spécialisés où la tâche à accomplir est spécifique et précise.
+La médecine générale est une spécialité transversale couvrant différents domaines tels que la médecine de premier recours, la coordination des soins, le dépistage et la prévention. C’est un processus continu et vivant se basant sur la relation médecin – patient.
+L’étendue des compétences requises des médecins généralistes étant vaste, pour le moment l’IA ne peut pas les remplacer. Par contre ces outils peuvent améliorer la qualité des soins en augmentant la précision diagnostique, en évitant la médication inutile, etc.
+Compte tenu de l’importance du facteur humain et de la qualité de la communication au cours de la relation médecin-patient, plusieurs universités du monde ont intégré à leur formation médicale des cours de philosophie et de culture générale (119).
+
+
+38
+5. CONCLUSION
+Ces dernières années, avec l’essor de l’informatique et du numérique, l’intelligence artificielle prend une place grandissante dans notre société. Cela s’illustre dans le domaine de la santé avec le développement de nombreux outils d’aide à la décision médicale. La médecine générale étant une discipline transversale, elle est au cœur de cette évolution.
+Cette étude quantitative descriptive, a pour but d’évaluer l’utilisation des outils d’aide à la décision médicale afin de sensibiliser les médecins et de mieux orienter le développement de l’intelligence artificielle.
+Les résultats de cette étude réalisée auprès de 262 médecins généralistes, confirment que les médecins généralistes trouvent utiles les outils d’aide décisionnelle, sans allonger le temps de consultation. Les outils les plus utilisés sont Antibioclic, le CRAT et VidalRecos. Ce sont en effets des outils plébiscités car ils sont facile d’accès, ergonomiques, contenant des informations claires, pertinentes et à jour. Ils sont utilisés en particulier comme aide à la prescription médicamenteuse. Cependant seulement 24% des médecins généralistes déclarent être équipés d’outils d’aide décisionnelle. Les deux inconvénients majeurs selon les répondants concernant l’utilisation des outils d’aide à la décision médicale sont que les informations ne sont pas toujours pertinentes et peu accessibles.
+Afin d’améliorer le système de santé par le biais du numérique et du développement de l’intelligence artificielle, il est important de sensibiliser les médecins à ces nouvelles pratiques. A cet effet il serait souhaitable que les études médicales intègrent dans leur cursus des formations à l’intelligence artificielle. Des dossiers patients d’utilisation ergonomiques dotés d’intelligence artificielle, intégrant différentes données et créant des rappels ainsi que des aides diagnostiques et thérapeutiques, amélioreraient la pratique médicale. A cet effet, une collaboration médecin-informaticien/web-designer est indispensable. Une autre voie d’amélioration concernant la pertinence des données des outils d’aide à la décision médicale serait de crée un label de fiabilité. Par ailleurs, la création d’un site regroupant ces différents outils améliorerait leur accessibilité (Hippocrate.mg) et pourrait évaluer leur fréquence d’utilisation et leur utilité.
+Enfin l’exercice de la médecine générale regroupant un vaste domaine de compétence, s’articulant autour d’une relation médecin-patient nécessitant une communication optimale, l’intelligence artificielle ne peut supplanter ce rôle. Cependant, les médecins généralistes gagneraient à s’approprier les outils d’aide décisionnelle afin d’améliorer la qualité des soins.
+
+
+39
+BIBLIOGRAPHIE
+1. Santé M des S et de la, Santé M des S et de la. Feuille de route « Accélérer le virage numérique » [Internet]. Ministère des Solidarités et de la Santé. 2020 [cité 28 sept 2020]. Disponible sur: https://solidarites-sante.gouv.fr/actualites/presse/dossiers-depresse/article/feuille-de-route-accelerer-le-virage-numerique
+2. DGOS. Médecine France génomique 2025 [Internet]. Ministère des Solidarités et de la Santé. 2020 [cité 28 sept 2020]. Disponible sur: https://solidaritessante.gouv.fr/systeme-de-sante-et-medico-social/recherche-et-innovation/francegenomique
+3. LOI n° 2019-774 du 24 juillet 2019 relative à l’organisation et à la transformation du système de santé - Dossiers législatifs - Légifrance [Internet]. [cité 28 sept 2020]. Disponible sur: https://www.legifrance.gouv.fr/dossierlegislatif/JORFDOLE000038124322/
+4. Banerjee A, Drumright LN, Mitchell ARJ. Can the NHS be a learning healthcare system in the age of digital technology? BMJ Evid Based Med. oct 2018;23(5):161‐5.
+5. Stoldt J-P, Price M, Weber J. Towards a Clinical Analytics Adoption Maturity Framework for Primary Care. Stud Health Technol Inform. 2019;257:399‐403.
+6. Abu-Elmagd M, Assidi M, Schulten H-J, Dallol A, Pushparaj P, Ahmed F, et al. Individualized medicine enabled by genomics in Saudi Arabia. BMC Med Genomics. 2015;8 Suppl 1:S3.
+7. David SP, Johnson SG, Berger AC, Feero WG, Terry SF, Green LA, et al. Making Personalized Health Care Even More Personalized: Insights From Activities of the IOM Genomics Roundtable. Ann Fam Med. août 2015;13(4):373‐80.
+8. Gottesman O, Kuivaniemi H, Tromp G, Faucett WA, Li R, Manolio TA, et al. The Electronic Medical Records and Genomics (eMERGE) Network: past, present, and future. Genet Med. oct 2013;15(10):761‐71.
+9. Milani L, Leitsalu L, Metspalu A. An epidemiological perspective of personalized medicine: the Estonian experience. J Intern Med. févr 2015;277(2):188‐200.
+10. Chen J. Playing to our human strengths to prepare medical students for the future. Korean J Med Educ. sept 2017;29(3):193‐7.
+
+
+40
+11. Lynn LA. Artificial intelligence systems for complex decision-making in acute care medicine: a review. Patient Saf Surg. 2019;13:6.
+12. Larousse É. Encyclopédie Larousse en ligne - intelligence artificielle [Internet]. [cité 28 sept 2020]. Disponible sur: https://www.larousse.fr/encyclopedie/divers/intelligence_artificielle/187257
+13. Réseau de neurones artificiels. In: Wikipédia [Internet]. 2020 [cité 28 sept 2020]. Disponible sur: https://fr.wikipedia.org/w/index.php?title=R%C3%A9seau_de_neurones_artificiels&ol did=175109300
+14. Intelligence artificielle faible — Wikipédia [Internet]. [cité 28 sept 2020]. Disponible sur: https://fr.wikipedia.org/wiki/Intelligence_artificielle_faible
+15. Dubois DM. Intelligence Naturelle et Intelligence Artificielle Natural Intelligence and Artificial intelligence. :10.
+16. Cléret M, Beux PL, Duff FL. Les systèmes d’aide à la décision médicale. Les Cahiers du numerique. 2001;Vol. 2(2):125‐54.
+17. Liyanage H, Liaw S-T, Jonnagaddala J, Schreiber R, Kuziemsky C, Terry AL, et al. Artificial Intelligence in Primary Health Care: Perceptions, Issues, and Challenges. Yearb Med Inform. 25 avr 2019;
+18. Berner ES, Maisiak RS, Heuderbert GR, Young KR. Clinician performance and prominence of diagnoses displayed by a clinical diagnostic decision support system. AMIA Annu Symp Proc. 2003;76‐80.
+19. Collins GS, Moons KGM. Reporting of artificial intelligence prediction models. Lancet. 20 avr 2019;393(10181):1577‐9.
+20. Cresswell K, Majeed A, Bates DW, Sheikh A. Computerised decision support systems for healthcare professionals: an interpretative review. Inform Prim Care. 2012;20(2):115‐28.
+21. Schiavoni KH, Lehmann LS, Guan W, Rosenthal M, Sequist TD, Chien AT. How Primary Care Physicians Integrate Price Information into Clinical Decision-Making. J Gen Intern Med. 2017;32(1):81‐7.
+22. Blum D, Raj SX, Oberholzer R, Riphagen II, Strasser F, Kaasa S, et al. Computer-Based Clinical Decision Support Systems and Patient-Reported Outcomes: A Systematic Review. Patient. oct 2015;8(5):397‐409.
+
+
+41
+23. Ginsburg GS, Phillips KA. Precision Medicine: From Science To Value. Health Aff (Millwood). 2018;37(5):694‐701.
+24. Ginsburg GS, Willard HF. Genomic and personalized medicine: foundations and applications. Transl Res. déc 2009;154(6):277‐87.
+25. Kessler C. Genomics and Precision Medicine: Implications for Critical Care. AACN Adv Crit Care. 2018;29(1):28‐35.
+26. Marsolo K, Spooner SA. Clinical genomics in the world of the electronic health record. Genet Med. oct 2013;15(10):786‐91.
+27. Morgan AA, Crawford DC, Denny JC, Mooney SD, Aronow BJ, Brenner SE. PRECISION MEDICINE: DATA AND DISCOVERY FOR IMPROVED HEALTH AND THERAPY. Pac Symp Biocomput. 2017;22:348‐55.
+28. Niederlag W, Lemke HU, Rienhoff O. [Personalized medicine and individual healthcare : Medical and information technology aspects]. Bundesgesundheitsblatt Gesundheitsforschung Gesundheitsschutz. août 2010;53(8):776‐82.
+29. Roden DM, Denny JC. Integrating electronic health record genotype and phenotype datasets to transform patient care. Clin Pharmacol Ther. mars 2016;99(3):298‐305.
+30. Schork NJ, Nazor K. Integrated Genomic Medicine: A Paradigm for Rare Diseases and Beyond. Adv Genet. 2017;97:81‐113.
+31. Simon-Bouy B, Caron O. [Genomic medicine for every patient: Dream or reality?]. Gynecol Obstet Fertil Senol. 2017;45(4):187‐9.
+32. Vassy JL, Bates DW, Murray MF. Appropriateness: A Key to Enabling the Use of Genomics in Clinical Practice? Am J Med. 2016;129(6):551‐3.
+33. Welch BM, Kawamoto K. Clinical decision support for genetically guided personalized medicine: a systematic review. J Am Med Inform Assoc. avr 2013;20(2):388‐400.
+34. Williams JK, Cashion AK, Shekar S, Ginsburg GS. Genomics, clinical research, and learning health care systems: Strategies to improve patient care. Nurs Outlook. juin 2016;64(3):225‐8.
+35. Larson EA, Wilke RA. Integration of Genomics in Primary Care. Am J Med. nov 2015;128(11):1251.e1-5.
+36. Oo C, Noveck RJ. Proposed Strategies for the Integration of Genomics in Primary Care. Am J Med. 2016;129(7):e87.
+
+
+42
+37. Pennington JW, Karavite DJ, Krause EM, Miller J, Bernhardt BA, Grundmeier RW. Genomic decision support needs in pediatric primary care. J Am Med Inform Assoc. 1 juill 2017;24(4):851‐6.
+38. Slavkin HC. From Phenotype to Genotype: Enter Genomics and Transformation of Primary Health Care around the World. J Dent Res. juill 2014;93(7 Suppl):3S-6S.
+39. Wilkes MS, Day FC, Fancher TL, McDermott H, Lehman E, Bell RA, et al. Increasing confidence and changing behaviors in primary care providers engaged in genetic counselling. BMC Med Educ. 13 sept 2017;17(1):163.
+40. Coiera E. The Price of Artificial Intelligence. Yearb Med Inform. 25 avr 2019;
+41. Delaney BC, Kostopoulou O. Decision support for diagnosis should become routine in 21st century primary care. Br J Gen Pract. 2017;67(664):494‐5.
+42. Karches KE. Against the iDoctor: why artificial intelligence should not replace physician judgment. Theor Med Bioeth. 2018;39(2):91‐110.
+43. Lin SY, Mahoney MR, Sinsky CA. Ten Ways Artificial Intelligence Will Transform Primary Care. J Gen Intern Med. 14 mai 2019;
+44. Lin SY, Shanafelt TD, Asch SM. Reimagining Clinical Documentation With Artificial Intelligence. Mayo Clin Proc. 2018;93(5):563‐5.
+45. Nurek M, Kostopoulou O, Delaney BC, Esmail A. Reducing diagnostic errors in primary care. A systematic meta-review of computerized diagnostic decision support systems by the LINNEAUS collaboration on patient safety in primary care. Eur J Gen Pract. sept 2015;21 Suppl:8‐13.
+46. Sensmeier J. Harnessing the power of artificial intelligence. Nurs Manage. nov 2017;48(11):14‐9.
+47. Zikos D, DeLellis N. CDSS-RM: a clinical decision support system reference model. BMC Med Res Methodol. 16 2018;18(1):137.
+48. Bright TJ, Wong A, Dhurjati R, Bristow E, Bastian L, Coeytaux RR, et al. Effect of clinical decision-support systems: a systematic review. Ann Intern Med. 3 juill 2012;157(1):29‐43.
+49. Bryan C, Boren SA. The use and effectiveness of electronic clinical decision support tools in the ambulatory/primary care setting: a systematic review of the literature. Inform Prim Care. 2008;16(2):79‐91.
+
+
+43
+50. Capobussi M, Banzi R, Moja L, Bonovas S, González-Lorenzo M, Liberati EG, et al. [Computerized decision support systems: EBM at the bedside]. Recenti Prog Med. nov 2016;107(11):589‐91.
+51. Garg AX, Adhikari NKJ, McDonald H, Rosas-Arellano MP, Devereaux PJ, Beyene J, et al. Effects of computerized clinical decision support systems on practitioner performance and patient outcomes: a systematic review. JAMA. 9 mars 2005;293(10):1223‐38.
+52. Jia PL, Zhang PF, Li HD, Zhang LH, Chen Y, Zhang MM. Literature review on clinical decision support system reducing medical error. J Evid Based Med. août 2014;7(3):219‐26.
+53. Kannry J, McCullagh L, Kushniruk A, Mann D, Edonyabo D, McGinn T. A Framework for Usable and Effective Clinical Decision Support: Experience from the iCPR Randomized Clinical Trial. EGEMS (Wash DC). 2015;3(2):1150.
+54. Al Kawam A, Sen A, Datta A, Dickey N. Understanding the Bioinformatics Challenges of Integrating Genomics into Healthcare. IEEE J Biomed Health Inform. 2018;22(5):1672‐83.
+55. Kostopoulou O, Rosen A, Round T, Wright E, Douiri A, Delaney B. Early diagnostic suggestions improve accuracy of GPs: a randomised controlled trial using computersimulated patients. Br J Gen Pract. janv 2015;65(630):e49-54.
+56. Koutkias V, Bouaud J. Contributions from the 2016 Literature on Clinical Decision Support. Yearb Med Inform. 2017;26(1):133‐8.
+57. Lobach D, Sanders GD, Bright TJ, Wong A, Dhurjati R, Bristow E, et al. Enabling health care decisionmaking through clinical decision support and knowledge management. Evid Rep Technol Assess (Full Rep). avr 2012;(203):1‐784.
+58. Moja L, Kwag KH, Lytras T, Bertizzolo L, Brandt L, Pecoraro V, et al. Effectiveness of computerized decision support systems linked to electronic health records: a systematic review and meta-analysis. Am J Public Health. déc 2014;104(12):e12-22.
+59. Murphy EV. Clinical decision support: effectiveness in improving quality processes and clinical outcomes and factors that may influence success. Yale J Biol Med. juin 2014;87(2):187‐97.
+60. Belard A, Buchman T, Forsberg J, Potter BK, Dente CJ, Kirk A, et al. Precision diagnosis: a view of the clinical decision support systems (CDSS) landscape through the lens of critical care. J Clin Monit Comput. avr 2017;31(2):261‐71.
+
+
+44
+61. Dawes M. How can the « omics » revolution can change primary care. Fam Pract. 01 2017;34(2):125‐6.
+62. Hartzler A, McCarty CA, Rasmussen LV, Williams MS, Brilliant M, Bowton EA, et al. Stakeholder engagement: a key component of integrating genomic information into electronic health records. Genet Med. oct 2013;15(10):792‐801.
+63. Kamel Boulos MN, Le Blond J. On the road to personalised and precision geomedicine: medical geology and a renewed call for interdisciplinarity. Int J Health Geogr. 28 janv 2016;15:5.
+64. Grudniewicz A, Bhattacharyya O, McKibbon KA, Straus SE. User-Centered Design and Printed Educational Materials: A Focus Group Study of Primary Care Physician Preferences. J Contin Educ Health Prof. 2016;36(4):249‐55.
+65. Grout RW, Cheng ER, Carroll AE, Bauer NS, Downs SM. A six-year repeated evaluation of computerized clinical decision support system user acceptability. Int J Med Inform. 2018;112:74‐81.
+66. Helldén A, Al-Aieshy F, Bastholm-Rahmner P, Bergman U, Gustafsson LL, Höök H, et al. Development of a computerised decisions support system for renal risk drugs targeting primary healthcare. BMJ Open. 6 juill 2015;5(7):e006775.
+67. Esmaeilzadeh P, Sambasivan M, Kumar N, Nezakati H. Adoption of clinical decision support systems in a developing country: Antecedents and outcomes of physician’s threat to perceived professional autonomy. Int J Med Inform. août 2015;84(8):548‐60.
+68. McCullagh LJ, Sofianou A, Kannry J, Mann DM, McGinn TG. User centered clinical decision support tools: adoption across clinician training level. Appl Clin Inform. 2014;5(4):1015‐25.
+69. McCullagh L, Mann D, Rosen L, Kannry J, McGinn T. Longitudinal adoption rates of complex decision support tools in primary care. Evid Based Med. déc 2014;19(6):204‐9.
+70. O’Sullivan D, Fraccaro P, Carson E, Weller P. Decision time for clinical decision support systems. Clin Med (Lond). août 2014;14(4):338‐41.
+71. Richardson S, Feldstein D, McGinn T, Park LS, Khan S, Hess R, et al. Live Usability Testing of Two Complex Clinical Decision Support Tools: Observational Study. JMIR Hum Factors. 15 avr 2019;6(2):e12471.
+72. Richardson S, Mishuris R, O’Connell A, Feldstein D, Hess R, Smith P, et al. « Think aloud » and « Near live » usability testing of two complex clinical decision support tools. Int J Med Inform. 2017;106:1‐8.
+
+
+45
+73. Voruganti TR, O’Brien MA, Straus SE, McLaughlin JR, Grunfeld E. Primary care physicians’ perspectives on computer-based health risk assessment tools for chronic diseases: a mixed methods study. J Innov Health Inform. 24 sept 2015;22(3):333‐9.
+74. Knab JH, Wallace MS, Wagner RL, Tsoukatos J, Weinger MB. The use of a computerbased decision support system facilitates primary care physicians’ management of chronic pain. Anesth Analg. sept 2001;93(3):712‐20.
+75. Nair KM, Malaeekeh R, Schabort I, Taenzer P, Radhakrishnan A, Guenter D. A Clinical Decision Support System for Chronic Pain Management in Primary Care: Usability testing and its relevance. J Innov Health Inform. 13 août 2015;22(3):329‐32.
+76. Cleveringa FGW, Gorter KJ, van den Donk M, van Gijsel J, Rutten GEHM. Computerized decision support systems in primary care for type 2 diabetes patients only improve patients’ outcomes when combined with feedback on performance and case management: a systematic review. Diabetes Technol Ther. févr 2013;15(2):180‐92.
+77. Kooij L, Groen WG, van Harten WH. The Effectiveness of Information TechnologySupported Shared Care for Patients With Chronic Disease: A Systematic Review. J Med Internet Res. 22 2017;19(6):e221.
+78. Schnipper JL, Linder JA, Palchuk MB, Yu DT, McColgan KE, Volk LA, et al. Effects of documentation-based decision support on chronic disease management. Am J Manag Care. déc 2010;16(12 Suppl HIT):SP72-81.
+79. Ali SM, Giordano R, Lakhani S, Walker DM. A review of randomized controlled trials of medical record powered clinical decision support system to improve quality of diabetes care. Int J Med Inform. mars 2016;87:91‐100.
+80. Jia P, Zhao P, Chen J, Zhang M. Evaluation of clinical decision support systems for diabetes care: An overview of current evidence. J Eval Clin Pract. févr 2019;25(1):66‐77.
+81. Sperl-Hillen JM, Crain AL, Margolis KL, Ekstrom HL, Appana D, Amundson G, et al. Clinical decision support directed to primary care patients and providers reduces cardiovascular risk: a randomized trial. J Am Med Inform Assoc. 1 sept 2018;25(9):1137‐46.
+82. Johnson R, Evans M, Cramer H, Bennert K, Morris R, Eldridge S, et al. Feasibility and impact of a computerised clinical decision support system on investigation and initial management of new onset chest pain: a mixed methods study. BMC Med Inform Decis Mak. 26 août 2015;15:71.
+
+
+46
+83. Dikomitis L, Green T, Macleod U. Embedding electronic decision-support tools for suspected cancer in primary care: a qualitative study of GPs’ experiences. Prim Health Care Res Dev. nov 2015;16(6):548‐55.
+84. van Weert JCM, van Munster BC, Sanders R, Spijker R, Hooft L, Jansen J. Decision aids to help older people make health decisions: a systematic review and meta-analysis. BMC Med Inform Decis Mak. 21 avr 2016;16:45.
+85. Weltermann B, Kersting C. Feasibility study of a clinical decision support system for the management of multimorbid seniors in primary care: study protocol. Pilot Feasibility Stud. 2016;2:16.
+86. Kashani K. Computer decision support for acute kidney injury: current and future. Curr Opin Crit Care. 2016;22(6):520‐6.
+87. Triñanes Y, Atienza G, Louro-González A, de-las-Heras-Liñero E, Alvarez-Ariza M, Palao DJ. Development and impact of computerised decision support systems for clinical management of depression: A systematic review. Rev Psiquiatr Salud Ment. sept 2015;8(3):157‐66.
+88. Horrocks M, Michail M, Aubeeluck A, Wright N, Morriss R. An Electronic Clinical Decision Support System for the Assessment and Management of Suicidality in Primary Care: Protocol for a Mixed-Methods Study. JMIR Res Protoc. 7 déc 2018;7(12):e11135.
+89. Chana N, Porat T, Whittlesea C, Delaney B. Improving specialist drug prescribing in primary care using task and error analysis: an observational study. Br J Gen Pract. mars 2017;67(656):e157‐67.
+90. Meulendijk M, Spruit M, Drenth-van Maanen C, Numans M, Brinkkemper S, Jansen P. General practitioners’ attitudes towards decision-supported prescribing: an analysis of the Dutch primary care sector. Health Informatics J. déc 2013;19(4):247‐63.
+91. Mollon B, Chong J, Holbrook AM, Sung M, Thabane L, Foster G. Features predicting the success of computerized decision support for prescribing: a systematic review of randomized controlled trials. BMC Med Inform Decis Mak. 11 févr 2009;9:11.
+92. Reis WC, Bonetti AF, Bottacin WE, Reis AS, Souza TT, Pontarolo R, et al. Impact on process results of clinical decision support systems (CDSSs) applied to medication use: overview of systematic reviews. Pharm Pract (Granada). déc 2017;15(4):1036.
+93. Schedlbauer A, Prasad V, Mulvaney C, Phansalkar S, Stanton W, Bates DW, et al. What evidence supports the use of computerized alerts and prompts to improve clinicians’ prescribing behavior? J Am Med Inform Assoc. août 2009;16(4):531‐8.
+
+
+47
+94. Scott IA, Pillans PI, Barras M, Morris C. Using EMR-enabled computerized decision support systems to reduce prescribing of potentially inappropriate medications: a narrative review. Ther Adv Drug Saf. sept 2018;9(9):559‐73.
+95. Holstiege J, Mathes T, Pieper D. Effects of computer-aided clinical decision support systems in improving antibiotic prescribing by primary care providers: a systematic review. J Am Med Inform Assoc. 1 janv 2015;22(1):236‐42.
+96. Shebl NA, Franklin BD, Barber N. Clinical decision support systems and antibiotic use. Pharm World Sci. août 2007;29(4):342‐9.
+97. Desmedt S, Spinewine A, Jadoul M, Henrard S, Wouters D, Dalleur O. Impact of a clinical decision support system for drug dosage in patients with renal failure. Int J Clin Pharm. oct 2018;40(5):1225‐33.
+98. Shemeikka T, Bastholm-Rahmner P, Elinder C-G, Vég A, Törnqvist E, Cornelius B, et al. A health record integrated clinical decision support system to support prescriptions of pharmaceutical drugs in patients with reduced renal function: design, development and proof of concept. Int J Med Inform. juin 2015;84(6):387‐95.
+99. Ferrante di Ruffano L, Takwoingi Y, Dinnes J, Chuchu N, Bayliss SE, Davenport C, et al. Computer-assisted diagnosis techniques (dermoscopy and spectroscopy-based) for diagnosing skin cancer in adults. Cochrane Database Syst Rev. 04 2018;12:CD013186.
+100. Caraballo PJ, Bielinski SJ, St Sauver JL, Weinshilboum RM. Electronic Medical RecordIntegrated Pharmacogenomics and Related Clinical Decision Support Concepts. Clin Pharmacol Ther. août 2017;102(2):254‐64.
+101. Cascorbi I. Significance of Pharmacogenomics in Precision Medicine. Clin Pharmacol Ther. 2018;103(5):732‐5.
+102. Freimuth RR, Formea CM, Hoffman JM, Matey E, Peterson JF, Boyce RD. Implementing Genomic Clinical Decision Support for Drug-Based Precision Medicine. CPT Pharmacometrics Syst Pharmacol. 2017;6(3):153‐5.
+103. Gabriel RA, Burton BN, Urman RD, Waterman RS. Genomics Testing and Personalized Medicine in the Preoperative Setting. Anesthesiol Clin. déc 2018;36(4):639‐52.
+104. Gabriel RA, Ehrenfeld JM, Urman RD. Preoperative Genetic Testing and Personalized Medicine: Changing the Care Paradigm. J Med Syst. 17 oct 2017;41(12):185.
+105. Hicks JK, Dunnenberger HM, Gumpper KF, Haidar CE, Hoffman JM. Integrating pharmacogenomics into electronic health records with clinical decision support. Am J Health Syst Pharm. 1 déc 2016;73(23):1967‐76.
+
+
+48
+106. Hoffman JM, Dunnenberger HM, Kevin Hicks J, Caudle KE, Whirl Carrillo M, Freimuth RR, et al. Developing knowledge resources to support precision medicine: principles from the Clinical Pharmacogenetics Implementation Consortium (CPIC). J Am Med Inform Assoc. 2016;23(4):796‐801.
+107. Lugtenberg M, Pasveer D, van der Weijden T, Westert GP, Kool RB. Exposure to and experiences with a computerized decision support intervention in primary care: results from a process evaluation. BMC Fam Pract. 16 oct 2015;16:141.
+108. Lugtenberg M, Weenink J-W, van der Weijden T, Westert GP, Kool RB. Implementation of multiple-domain covering computerized decision support systems in primary care: a focus group study on perceived barriers. BMC Med Inform Decis Mak. 12 oct 2015;15:82.
+109. Mann D, Hess R, McGinn T, Mishuris R, Chokshi S, McCullagh L, et al. Adaptive design of a clinical decision support tool: What the impact on utilization rates means for future CDS research. Digit Health. déc 2019;5:2055207619827716.
+110. Porat T, Delaney B, Kostopoulou O. The impact of a diagnostic decision support system on the consultation: perceptions of GPs and patients. BMC Med Inform Decis Mak. 2 juin 2017;17(1):79.
+111. Sitapati A, Kim H, Berkovich B, Marmor R, Singh S, El-Kareh R, et al. Integrated precision medicine: the role of electronic health records in delivering personalized treatment. Wiley Interdiscip Rev Syst Biol Med. 2017;9(3).
+112. McGrath S, Ghersi D. Building towards precision medicine: empowering medical professionals for the next revolution. BMC Med Genomics. 10 2016;9(1):23.
+113. Richardson S, Feldstein D, McGinn T, Park LS, Khan S, Hess R, et al. Live Usability Testing of Two Complex Clinical Decision Support Tools: Observational Study. JMIR Hum Factors. 15 avr 2019;6(2):e12471.
+114. Porat T, Delaney B, Kostopoulou O. The impact of a diagnostic decision support system on the consultation: perceptions of GPs and patients. BMC Med Inform Decis Mak. 2 juin 2017;17(1):79.
+115. Richardson S, Mishuris R, O’Connell A, Feldstein D, Hess R, Smith P, et al. « Think aloud » and « Near live » usability testing of two complex clinical decision support tools. Int J Med Inform. 2017;106:1‐8.
+116. Voruganti TR, O’Brien MA, Straus SE, McLaughlin JR, Grunfeld E. Primary care physicians’ perspectives on computer-based health risk assessment tools for chronic diseases: a mixed methods study. J Innov Health Inform. 24 sept 2015;22(3):333‐9.
+
+
+49
+117. Fernandez-Maloigne C, Guillevin R. L’intelligence artificielle au service de l’imagerie et de la santé des femmes. Imagerie de la Femme. 1 déc 2019;29(4):179‐86.
+118. Creuzot-Garcher C. L’optimisation du dépistage de la rétinopathie diabétique face à la pénurie d’ophtalmologistes. Médecine des Maladies Métaboliques. 1 nov 2018;12(7):589‐94.
+119. Chen J. Playing to our human strengths to prepare medical students for the future. Korean J Med Educ. sept 2017;29(3):193‐7.
+
+
+50
+ANNEXE
+Annexe 1 : Questionnaire : Evaluation de l’utilisation des outils d’aide à la
+décision médicale par les médecins généralistes
+1) Vous êtes : a. Homme ⃝ b. Femme ⃝ 2) Quel âge avez-vous ? a. Age : 3) Diplômé (e) de quelle faculté ? i. Nancy 1. Oui ⃝ 2. Non ⃝ ii. Si non : à préciser 4) Est-vous actuellement : a. Interne en médecine générale : i. Oui ⃝ 1. Si oui, précisez le semestre : ii. Non ⃝ 5) Remplaçant(e) en médecine générale : i. Oui : ⃝ ii. Non : ⃝ b. Médecin généraliste installé : i. Depuis 1. Moins de 5 ans : ⃝ 2. Plus de 5 ans : ⃝ ii. Lieu : 1. Rurale : ⃝ 2. Semi rurale : ⃝ 3. Ville : ⃝ iii. Quel est votre mode d’exercice : 1. Seul(e) au cabinet: ⃝ 2. En cabinet de groupe de médecins: ⃝ 3. En centre de santé pluri professionnel: ⃝ 4. En milieu hospitalier public: ⃝ 5. En établissement privé: ⃝ 6. En maison de santé ou pôle de santé pluri-professionnel : ⃝ 7. Autre établissement : (à préciser)
+
+
+51
+iv. Quel est votre mode d’exercice (2) : 1. Liberal: ⃝ 2. Hospitalier: ⃝ 3. Mixte hospitalier et libéral: ⃝ 4. Salarié(e) au cantre de Santé: ⃝ 5. Autre : (à préciser) c. Où exercez-vous ? (Code postal)
+6) Le dossier médical : a. Votre lieu d’exercice est-il Informatisé ? i. Non ⃝ ii. Oui ⃝ 1. Si oui, est-il doté d’un ou plusieurs logiciels d’aide décisionnelle a. Non ⃝ b. Oui ⃝ i. Si oui :
+1. Quel type : (réponse libre) 2. Les atouts : (réponse libre)
+3. Les inconvénients : (réponse libre) 7) Voici une liste d’outils d’aide décisionnelle, cochez si vous connaissez et/ou utilisez. 1) FreeSAM : www.freesam.fr a. Je connais : ⃝ b. J’utilise : ⃝ 2) Le Sémiologiste
+a. Je connais : ⃝ b. J’utilise : ⃝ 3) Ordilink
+a. Je connais : ⃝ b. J’utilise : ⃝ 4) Vidal Recos :
+a. Je connais : ⃝ b. J’utilise : ⃝
+5) InfoThyro: infothyro.pagesperso-orange.fr ; Thyroideclic : aporose.fr/thyroclic/ a. Je connais : ⃝ b. J’utilise : ⃝
+6) Visual DX : www.visualdx.com a. Je connais : ⃝ b. J’utilise : ⃝
+7) ISABEL : www.isabelhealthcare.com a. Je connais : ⃝ b. J’utilise : ⃝
+8) DxPlain : www.mghlcs.org/projects/dxplain a. Je connais : ⃝ b. J’utilise : ⃝
+
+
+52
+9) Diagnosaurius : accessmedicine.mhmedical.com/Diagnosaurus.aspx?categoryid=41309&selectedletter=A
+a. Je connais : ⃝ b. J’utilise : ⃝
+10) Diagnosispro : en.diagnosispro.com a. Je connais : ⃝ b. J’utilise : ⃝
+11) Guide du Bon Usage des examens d'imagerie médicale : gbu.radiologie.fr a. Je connais : ⃝ b. J’utilise : ⃝ 12) CRAT: lecrat.fr
+a. Je connais : ⃝ b. J’utilise : ⃝
+13) Thérapeutique dermatologique : www.therapeutique-dermatologique.org a. Je connais : ⃝ b. J’utilise : ⃝
+14) Allergoclic : allergoclic.fr a. Je connais : ⃝ b. J’utilise : ⃝
+15) Risque cardio vasculaire : www.heartscore.org/fr_FR/access ; chd.bestsciencemedicine.com/calc2.html
+a. Je connais : ⃝ b. J’utilise : ⃝
+16) Thromboclic : www.thromboclic.fr a. Je connais : ⃝ b. J’utilise : ⃝
+17) Banque de donnée thérapeutiques : www.theriaque.org a. Je connais : ⃝ b. J’utilise : ⃝
+18) ONCOLOGIK : oncologik.fr a. Je connais : ⃝ b. J’utilise : ⃝ 19) ECGclic : ecgclic.fr
+a. Je connais : ⃝ b. J’utilise : ⃝
+20) Médecine de voyages : www.medecinedesvoyages.net a. Je connais : ⃝ b. J’utilise : ⃝
+21) PEDIADOC: pediadoc.fr a. Je connais : ⃝ b. J’utilise : ⃝
+22) GESTACLIC : gestaclic.fr a. Je connais : ⃝ b. J’utilise : ⃝
+23) Memopilules : www.memopilules.fr ; www.g-oubliemapilule.com a. Je connais : ⃝ b. J’utilise : ⃝
+
+
+53
+24) Démences : demenceclic.fr a. Je connais : ⃝ b. J’utilise : ⃝ 25) VIHclic : vihclic.fr
+a. Je connais : ⃝ b. J’utilise : ⃝
+26) Hamilton: https://www.mgfrance.org/images/utilitaires-medicaux/test-hamilton.htm a. Je connais : ⃝ b. J’utilise : ⃝
+27) Antibioclic: antibioclic.com ; Antibioville: www.antibioest.org a. Je connais : ⃝ b. J’utilise : ⃝
+28) Assistante médicale: www.assistant-medical.fr a. Je connais : ⃝ b. J’utilise : ⃝
+29) Pansements: e-pansement.fr a. Je connais : ⃝ b. J’utilise : ⃝
+30) Clinicalrules : www.clinicalrules.nl/en a. Je connais : ⃝ b. J’utilise : ⃝
+31) DiagnosisPro : en.diagnosispro.com a. Je connais : ⃝ b. J’utilise : ⃝
+32) Infermedica : blog.infermedica.com a. Je connais : ⃝ b. J’utilise : ⃝ 33) ESAGIL : esagil.com
+a. Je connais : ⃝ b. J’utilise : ⃝
+34) limusDx : www.hellolyf.com/litmusDX/litmusDXuser/litmusDXlogin.jsp a. Je connais : ⃝ b. J’utilise : ⃝
+35) Prescriptor : www.prescriptor.nl/en a. Je connais : ⃝ b. J’utilise : ⃝
+36) Simulconsult : simulconsult.com a. Je connais : ⃝ b. J’utilise : ⃝
+37) DENTACLIC : www.dentaclic.com a. Je connais : ⃝ b. J’utilise : ⃝
+38) PREVENTCLIC : www.prevenclic.fr a. Je connais : ⃝ b. J’utilise : ⃝
+
+
+54
+39) WATSON:
+a. Je connais : ⃝ b. J’utilise : ⃝ 40) Autres : (à préciser)
+8) Utilisation de(s) logiciel(s) d’aide décisionnelle (question à choix multiple) : a. Vous le(s) utilisez i. Avant la consultation ⃝ ii. Après la consultation ⃝ iii. Pendant la consultation ⃝ b. Jugez-vous l’utilisation des logiciels d’aide décisionnelle : i. Indispensable ⃝ ii. Utile ⃝ iii. Intéressante ⃝ iv. Inutile ⃝ v. Ne se prononce pas ⃝ c. Lors de l’utilisation de ces outils, trouvez- vous que la durée de votre consultation: i. Est allongée ⃝ ii. N’est pas modifiée ⃝ iii. Est raccourcie ⃝ d. A quelle fréquence utilisez-vous un/des logiciels d’aide décisionnelle : i. Pratiquement à chaque consultation ⃝ ii. Quelques fois dans la journée ⃝ iii. Quelques fois dans la semaine ⃝ iv. Quelques fois dans le mois ⃝ e. Dans quel but utilisez-vous le(s) logiciels d’aide décisionnelle : i. Pour établir un bon diagnostic : Echelle 0-5 ii. Pour établir des diagnostiques différentiels : Echelle 0-5 iii. Pour la prescription médicamenteuse: Echelle 0-5 iv. Pour la prescription des examens complémentaires : Echelle 0-5 1. Adaptés aux patients : Echelle 0-5 2. Cout économique favorable : Echelle 0-5 3. Hiérarchiser les examens prioritaires : Echelle 0-5 v. Pour se tenir à jour des recommandations : Echelle 0-5 f. Quel est votre logiciel d’aide décisionnelle préféré : i. A préciser le numéro correspondant ii. Pour quelle raison : 1. Rapidité ⃝ 2. Simplicité ⃝ 3. Informations pertinentes ⃝ 4. (Autre) g. Auriez-vous aimé avoir un ou des logiciels d’aide décisionnelle intégré à votre dossier patient ? 1. Oui/ Non 2. Suggestion, sous quelle forme ?
+
+
+55
+Annexe 2 : Les résultats bruts
+Question 1 : Participants selon le sexe :
+N : 262
+Question 2 : Distribution selon l’âge : N :262
+La moyenne d’âge des participants est de 32,9 ans et la médiane d’âge est de 30 ans.
+0
+5
+10
+15
+20
+25
+30
+35
+40
+18
+20
+22
+24
+26
+28
+30
+32
+34
+36
+38
+40
+42
+44
+46
+48
+50
+52
+54
+56
+58
+60
+62
+64
+66
+68
+70
+72
+74
+76
+78
+80 et plus
+Âge
+Nb
+
+
+56
+Question 3 : Diplômé (e) de quelle faculté ?
+N : 262
+Les autres des facultés suivantes : Grenoble, Lyon, Rennes, CAEN, BICETRE PARIS XI, Angers, Montpellier, Nice, Paris, Reims, Bordeaux, Clermont Ferrand, Strasbourg, Saint Étienne, UPEC PARIS 12, Poitiers, Paris Diderot, Amiens, Dijon, Toulouse
+Question 4 : Est-vous actuellement interne en médecine générale ?
+N : 262
+
+
+57
+Question 5 : Précisez le semestre d’internat :
+Question 6 : Est-vous actuellement remplaçant(e) en médecine générale :
+N : 262
+
+
+58
+Question 7 : Est-vous actuellement médecin généraliste installé ?
+Question Nb. %
+Est-vous actuellement médecin
+généraliste installé ? 260 100%
+Oui 89 34.23%
+Non 171 65.77%
+Question 8A : Installé depuis:
+Question Nb. %
+Installé depuis: 89 100%
+Moins de 5 ans 51 57.3%
+Plus de 5 ans 38 42.7%
+Question 8B : Si installé depuis plus de 5 ans :
+Question Nb. %
+Installation depuis plus de 5
+ans : 32 100%
+Entre 5 et 10 ans 8 25%
+Entre 10 et 20 ans 12 37.5%
+Plus de 20 ans 12 37.5%
+
+
+59
+Question 9 : Lieu d'exercice:
+La majorité des répondants (n : 262) a un exercice urbain et une minorité a un exercice rural.
+Question 10A : Quel est votre mode d’exercice :
+Question Nb. % Texte
+Quel est votre mode d’exercice : 89 100%
+Seul(e) au cabinet 12 13.48%
+En cabinet de groupe de médecins 46 51.69%
+En maison de santé ou pôle de santé
+pluri-professionnel 27 30.34%
+En centre de santé pluri professionnel 6 6.74%
+En milieu hospitalier public 1 1.12%
+En établissement privé 0 0%
+Autre établissement : 1 1.12% - Sos médecins
+
+
+60
+Question 10B : Quel est votre mode d’exercice :
+Question Nb. %
+Quel est votre mode d’exercice : 91 100%
+Liberal 81 89.01%
+Hospitalier 2 2.2%
+Mixte hospitalier et libéral 2 2.2%
+Activité mixte libéral et salarié 3 3.3%
+Salarié(e) au cantre de Santé 2 2.2%
+Autre 1 1.1%
+Question 11 : Où exercez-vous ?
+0
+5
+10
+15
+20
+25
+33 38 42 45 51 52 54 55 57 63 67 68 69 74 78 88
+Où exercez-vous ? (département)
+Nb %
+
+
+61
+Question 12A : Votre lieu d’exercice est-il Informatisé ?
+N : 262
+Question 12B : Si oui, est-il doté d’un ou plusieurs logiciels d’aide décisionnelle
+
+
+62
+Question 12C : Précisez quel type :
+Types généraux :
+- aide à la prescription (4) - aide pour les interactions médicamenteuses (2) - Protocoles hospitaliers
+Des logiciels dossier médical :
+- Hellodoc (2) - Nijmegen sur dxcare - Osiris - Axisanté (2) - Maidis - Cristal - Medistory
+Sites Internet :
+- Antibioclic (20) - Moteur de recherche internet (2) - Banque Claude Bernard (6) - dermaclic, - pediadoc (2) - pasapaspediatrique, - le crat (3) - Coronaclic (2) - Banque Claude Bernard - Vidal (13) - ECGclic, - Gestaclic (3) - Tromboclic - Assistant médical (3) - Orphanet - Diabètoclic - Avkclic
+.
+
+
+63
+Question 13 : Précisez les atouts :
+Les atouts majeurs cités sont : source d’informations pertinentes, à jour, la rapidité, l’aide à la prescription et l’ergonomie.
+Question 14 : Précisez les inconvénients de ces outils:
+Les inconvénients majeurs cités sont : Information non claire, non mise à jour, problème d’accessibilité et non prise en compte des situations complexes.
+15
+11
+8
+8
+5
+3
+2
+2
+1
+1
+LES ATOUTS (N : 56)
+0
+1
+2
+3
+4
+5
+6
+Les inconvénients des outils (n : 24)
+
+
+Question 15 : Evaluation de la connaissance et de l’utilisation des outils d’aide décisionnelle les plus connus
+Les outils d’aide à la décision médicale les plus connus et les plus utilisés sont :
+ Antibioclic/antibioville  Vidal Recos
+ CRAT  Coronaclic
+ Pédiadoc  Test d’Hamilton
+0
+20
+40
+60
+80
+100
+120
+Antibioclic/Antibioville
+CRAT
+Vidal Recos
+CoronaClic
+PEDIADOC
+Hamilton
+GESTACLIC
+Risque cardio vasculaire
+Thromboclic
+Thérapeutique...
+E-pansement
+Médecine de voyages
+DENTACLIC
+Guide du Bon Usage des...
+ECGclic
+Banque de donnée...
+Allergoclic
+InfoThyro/Thyroideclic
+VIHclic
+ONCOLOGIK
+Assistante médicale
+Clinicalrules
+PREVENTCLIC
+DiagnosisPro
+Ordilink
+Visual DX
+Le Sémiologiste
+Démences
+Memopilules/G-...
+Infermedica
+ESAGIL
+LimusDx
+Simulconsult
+Diagnosispro
+Prescriptor
+ISABEL
+WATSON
+DxPlain
+FreeSAM
+Diagnosaurius
+Evaluation de l’utilisation des différents aides décisionnelles
+Je connais % (n : 262) J'utilise % (n : 262)
+
+
+65
+Question 15 : Autres outils non cités ci-dessus : Mentionné par les participants.
+- Bariaclic, Obeclic, Diabetoclic - Dermatoclic, dermato-info, reco.sfdermato.org, - Pas à pas pédiatrique - Palliaclic, AFSOS, soins de support en oncologie, Oncolor - L'application Prescrire, La BCB - https://www.peakflow-eolys.com/, pneumotox / http://www.cardiorisk.fr/ - https://ophtalmoclic.fr/ - https://www.aidediag.fr/site/, Medicalcul, Médimento, meddispar - Vaccinations voyage Pasteur - La déclicviolence; - https://antiseche.wordpress.com/, mesvaccins.net, ebmfrance.net - Base de données des médicaments. Gouv - Formagyn, sitegpr.com, Recomedical, DRC de la Sfmg, CBIP.be - Base de données Gouv - Kit Médical
+Question 16 : Vous utilisez le(s) logiciel(s) d’aide décisionnelle :
+Moment d’utilisation des outils d’aide décisionnelle
+Question 16 Nb. %
+Vous utilisez le(s) logiciel(s) d’aide décisionnelle : 262 100%
+Avant la consultation 67 25.57 %
+Pendant la consultation 210 80,15 %
+Après la consultation 81 30.91 %
+80%
+31% 26%
+PENDANT LA CONSULTATION APRÈS LA CONSULTATION AVANT LA CONSULTATION
+Le moment d'utilisation (n : 262)
+
+
+66
+Question 17 : Jugez-vous l’utilisation des logiciels d’aide décisionnelle :
+Question 17 Nb. %
+Jugez-vous l’utilisation des logiciels d’aide décisionnelle : 262 100%
+Indispensable 47 17,93 %
+Utile 154 58,77%
+Intéressante 77 29,38%
+Inutile 0 0%
+Ne se prononce pas 3 1.42%
+Question 18 : Lors de l’utilisation de ces outils, trouvez- vous que la durée de votre consultation :
+Question 18 Nb. %
+Lors de l’utilisation de ces outils, trouvez- vous que la durée de votre consultation : 262 100 %
+Est allongée 48 18,32 %
+N’est pas modifiée 144 54,96 %
+Est raccourcie 19 7,25 %
+Question 19 : A quelle fréquence utilisez-vous un/des logiciels d’aide décisionnelle ?
+Question 19 Nb. %
+A quelle fréquence utilisez-vous un/des logiciels d’aide décisionnelle ? 262 100%
+Pratiquement à chaque consultation 11 4,19847328
+Quelques fois dans la journée 123 46,9465649
+Quelques fois dans la semaine 61 23,2824427
+Quelques fois dans le mois 16 13,0081301
+
+
+67
+0
+10
+20
+30
+40
+50
+60
+012345
+Vous les utilisez pour établir un bon diagnostic, échelle de 0 (jamais) à 5 (toujours):
+Nb %
+0
+20
+40
+60
+012345
+Vous les utilisez pour établir des diagnostiques différentiels, échelle de 0 (jamais) à 5 (toujours):
+Nb %
+0
+20
+40
+60
+80
+100
+120
+012345
+Vous les utilisez pour la prescription médicamenteuse, échelle de 0 (jamais) à 5 (toujours):
+Détail nb %
+Question 20 : Vous les utilisez pour établir un bon diagnostic, échelle de 0 (jamais) à 5 (toujours) :
+La réponse dominante sur une échelle de 0 à 5 est de 3 pour établir un bon diagnostic et la moyenne de 2,37.
+Question 21 : Vous les utilisez pour établir des diagnostiques différentiels, échelle de 0 (jamais) à 5 (toujours) :
+La réponse dominante sur une échelle de 0 à 5 est de 2 pour établir un diagnostic différentiel, et la moyenne 1,82.
+Question 22 : Vous les utilisez pour la prescription médicamenteuse, échelle de 0 à 5 :
+La réponse dominante sur une échelle de 5 est de 4 pour la prescription médicamenteuse et la moyenne 3,92.
+Question 23 : Vous les utilisez pour la
+
+
+68
+0
+10
+20
+30
+40
+50
+60
+012345
+Vous les utilisez pour la prescription des examens complémentaires, échelle de 0 (jamais) à 5 (toujours):
+Nb %
+prescription des examens complémentaires, échelle de 0 (jamais) à 5 (toujours) :
+La réponse dominante sur une échelle de 5 est de 3 pour la prescription des examens complémentaires et la moyenne 2,2.
+Question 24 : Dans le cadre de la prescription des examens complémentaires, vous utilisez les outils d'aide décisionnelle pour adapter les examens aux patients (échelle de 0 à 5):
+Question 24 Nb %
+ADAPTER LES EXAMENS AU PATIENT
+(échelle de 0 à 5): 262
+100 0 48 18,32 1 19 7,25 2 28 10,68 3 42 16,03 4 43 16,41 5 31 11,83
+La moyenne des réponses sur une échelle de 5 est de 2,5 pour la prescription des examens complémentaires adaptés au patient.
+
+
+69
+Question 25 : Dans le cadre de la prescription des examens complémentaires, vous utilisez les outils d'aide décisionnelle pour adapter le coût (échelle de 0 à 5) :
+Question 25 Nb %
+ADAPTER LE COUT (échelle de 0 à 5): 262 100
+0 132 50,38
+1 33 12,59
+2 27 10,30
+3 12 4,58
+4 4 1,52
+5 3 1,14 La moyenne des réponses sur une échelle de 5 est de 0,73 pour la prescription des examens complémentaires adaptés au coût.
+Question 26 : Dans le cadre de la prescription des examens complémentaires, vous utilisez les outils d'aide décisionnelle pour hiérarchiser les examens prioritaires (échelle de 0 à 5) :
+Question 26 Nb %
+HIERARCHISER les examens prioritaires
+(échelle de 0 à 5) : 262
+100
+0 46 17,55
+1 17 6,48 2 23 8,77
+3 40 15,26
+4 57 21,75
+5 28 10,68
+La moyenne des réponses sur une échelle de 5 est de 2,61 pour la hiérarchisation de la prescription des examens complémentaires.
+
+
+70
+0
+20
+40
+60
+80
+100
+012345
+Vous les utilisez pour vous tenir à jour des recommandations (échelle de 0 à 5) :
+Nb %
+Question 27 : Vous les utilisez pour vous tenir à jour des recommandations (échelle de 0 à 5) :
+La réponse dominante sur une échelle de 5 est de 4 pour la prescription médicamenteuse et la moyenne 3,82.
+Question 28 : Quel est votre logiciel d’aide décisionnelle préféré :
+Logiciels d’aide décisionnelle préférés des médecins généralistes Question 29 : Pour quelle raison est-il votre outil préféré ?
+Avantage de l’outil d’aide à la décision médical préféré
+80 67
+50
+14
+31 26 19
+5 0
+20
+40
+60
+80
+100
+Informations pertinentes
+Simplicité Rapidité Autre
+Pour quelle raison est-il votre outil préféré? (n : 262)
+Nb. %
+0
+10
+20
+30
+40
+50
+60
+Quel est votre logiciel d’aide décisionnelle préféré :(n : 262)
+%
+
+
+71
+Question 30 : Auriez-vous aimé avoir un ou des logiciels d’aide décisionnelle intégré(s) à votre dossier patient ?
+Figure 8. Souhait des médecins généralistes par rapport à l’intégration d’un logiciel d’aide décisionnelle au dossier patient
+Suggestions :
+ Evaluation automatique du risque CV, prévention (Frottis, vaccins selon reco, etc...)  Lien directe maladie-reco
+ Lien redirigeant vers les sites présentés utile  Avoir le moyen de suivre l'évolution des plaies et en fonction adapter le pansement, la prise en charge (avis spécialisé, prélèvement nécessaire...)
+142
+68
+12
+54
+26
+5
+OUI NON SUGGESTION, SOUS QUELLE FORME ?
+AURIEZ-VOUS AIMÉ AVOIR UN OU DES LOGICIELS D’AIDE DÉCISIONNELLE INTÉGRÉ À VOTRE DOSSIER PATIENT ? (N : 262)
+Nb. %
+
+
+72
+0%
+50%
+100%
+Une femme
+Un homme
+Moment de recours aux outils d’aide décisionnelle lors de la consultation médicale en fonction du sexe
+Pendant la consultation
+Avant la consultation|Pendant la consultation
+Avant la consultation|Après la consultation|Pendant la
+consultation
+Avant la consultation
+Annexe 3 : Khi deux : Le moment de recours aux outils d’aide décisionnelle lors
+de la consultation médicale en fonction du sexe
+Nous posons deux hypothèses : l'hypothèse H0 selon laquelle il n'y aurait pas de lien entre les variables (indépendance), et l'hypothèse H1 selon laquelle il y a un lien (dépendance). Nous rejetterons H0 si le Khi deux calculé est supérieur au Khi deux critique.
+Obsérvation ApC|PC AvC|ApC|PC AvC|PC PC Total général Une femme 24 36 11 70 141 Un homme 4 17 2 46 69 Total général 28 53 13 116 210 13,3% 25,2% 6,2% 55,2%
+Théorique ApC|PC AvC|ApC|PC AvC|PC PC Total général Une femme 18,8 35,58571429 8,728571 77,88571 141 Un homme 9,2 17,41428571 4,271429 38,11429 69 Total général 28 53 13 116 210
+K2 ApC|PC AvC|ApC|PC AvC|PC PC Total général Une femme 1,4382979 0,004823077 0,591092 0,798407 2,83261971 Un homme 2,9391304 0,009855854 1,207883 1,631527 5,7883968 Total général 4,3774283 0,014678931 1,798975 2,429934 8,62101652
+K2 8,6210165 Oui
+K2 5% 7,8147279
+
+
+73
+Annexe 4 : Khi deux : le moment de recours aux outils d’aide décisionnelle lors de la
+consultation médicale en fonction du statut de médecin remplaçant
+Observé ApC|PC AvC|ApC|PC AvC|PC PC Total général
+NR 15 34 2 50 101 R 13 18 11 63 105 Total général 28 52 13 113 206 13,6% 25,2% 6,3% 54,9%
+Théorique ApC|PC AvC|ApC|PC AvC|PC PC Total général
+NR 13,72816 25,49515 6,373786 55,40291 101 R 14,27184 26,50485 6,626214 57,59709 105 Total général 28 52 13 113 206
+K2
+ApC|PC AvC|ApC|PC AvC|PC PC Total général
+NR 0,11783 2,837111 3,001357 0,526894 6,483191522 R 0,113341 2,72903 2,887019 0,506822 6,236212797 Total général 0,231171 5,566141 5,888376 1,033716 12,71940432
+Khi2 12,7194 Oui
+K2 5% 9,487729
+0%
+20%
+40%
+60%
+80%
+100%
+Non
+Oui
+En effet les remplaçants auraient tendance à avoir recours aux outils d’aide décisionnelle plutôt pendant la consultation
+Pendant la consultation
+Avant la consultation|Pendant la consultation
+Avant la consultation|Après la consultation|Pendant la consultation
+Avant la consultation
+Après la consultation|Pendant la consultation
+
+
+74
+Annexe 5 : Khi deux : Le moment de recours aux outils d’aide décisionnelle lors de
+la consultation médicale en fonction du lieu d’exercice
+Observé AV PC AP Total général
+Rurale 6 15 7 28
+Semi rurale 4 24 7 35
+Ville 12 30 17 59
+Total général 22 69 31 122
+18,03% 56,56% 25,41% 100,00%
+Théorique AV PC AP Total général
+Rurale 5,05 15,84 7,11 28
+Semi rurale 6,31 19,80 8,89 35
+Ville 10,64 33,37 14,99 59
+Total général 22 69 31 122
+K2 AV PC AP Total général
+Rurale 0,18 0,04 0,00 0,23
+Semi rurale 0,85 0,89 0,40 2,14
+Ville 0,17 0,34 0,27 0,78
+Total général 1,20 1,28 0,67 3,15
+K2 5% 9,48772904 NON
+
+
+75
+Annexe 6 : Khi deux : Analyse en fonction la période de confinement de l’utilisation
+des outils d’aide décisionnelle
+Observé ApC|PC AvC AvC|ApC|PC AvC|PC PC
+Total général
+Conf 20 1 38 10 67 136 Post Conf 8 15 3 49 75 Total général 28 1 53 13 116 211
+Observé Av PC AP
+Total général
+Conf 49 135 23 207 Post Conf 18 75 81 174 Total général 67 210 104 381 18% 55% 27% 100%
+Théorique Av PC AP
+Total général
+Conf 36,40 114,09 56,50 207 Post Conf 30,60 95,91 47,50 174 Total général 67 210 104 381
+T K2 Av PC AP
+Total général
+Conf 4,36 3,83 19,87 28,0568892 Post Conf 5,19 4,56 23,63 33,3780233 Total général 9,54746507 8,38750268 43,4999447 61,4349125
+K2 5% 5,99146455 OUI
+0%
+50%
+100%
+Conf
+Post Conf
+Pendant la consultation
+Avant la consultation|Pendant la consultation
+Avant la consultation|Après la consultation|Pendant la consultation
+Avant la consultation
+
+
+76
+Annexe 7 : Khi deux : jugement de l’utilité des outils d’aide décisionnelle en fonction
+du sexe
+Observé Ind Int Utile Utile|Int Total général
+Un homme 6 7 39 12 64 Une femme 29 12 51 40 132 Total général 35 19 90 52 196 0,178571 0,096939 0,459184 0,2653061
+Théorique Ind Int Utile Utile|Int Total général Un homme 11,42857 6,204082 29,38776 16,979592 64 Une femme 23,57143 12,79592 60,61224 35,020408 132 Total général 35 19 90 52 196
+K2 Ind Int Utile Utile|Int Total général Un homme 2,578571 0,102108 3,144005 1,4603611 7,28504555 Une femme 1,250216 0,049507 1,524366 0,7080539 3,5321433 Total général 3,828788 0,151615 4,668371 2,1684149 10,8171888
+K2 10,81719 Oui
+K2 5% 7,814728
+0%
+10%
+20%
+30%
+40%
+50%
+60%
+70%
+80%
+90%
+100%
+Un homme Une femme
+Ind Int Utile Utile|Int
+
+
+77
+Annexe 8 : Khi deux : Jugement de l’utilité des outils d’aide décisionnelle en
+fonction du statut de médecin remplaçant
+Observé Ind Int Utile Utile|Int Total général
+R Non 13 12 44 25 94
+R Oui 21 7 43 27 98
+Total général 34 19 87 52 192
+0,177083 0,098958 0,453125 0,270833 1
+Théorique Ind Int Utile Utile|Int Total général
+R Non 16,64583 9,302083 42,59375 25,45833 94
+R Oui 17,35417 9,697917 44,40625 26,54167 98
+Total général 34 19 87 52 192
+K2
+Ind Int Utile Utile|Int Total général
+R Non 0,798524 0,782486 0,046428 0,008252 1,635690082
+R Oui 0,765931 0,750548 0,044533 0,007915 1,568927222
+Total général 1,564456 1,533035 0,090961 0,016166 3,204617304
+K 2 3,204617 NON
+K2 5% 7,814728
+
+
+78
+Annexe 9 : Khi deux : Jugement de l’utilité des outils d’aide décisionnelle en
+fonction du lieu d’exercice
+Observé Ind Int Utile Total général
+Rurale / semi rurale 6 9 30 45
+Ville 8 8 21 37
+Total général 14 17 51 82
+17% 21% 62% 100%
+Théorique Ind Int Utile Total général
+Rurale/semi-rurale 7,68 9,33 27,99 45
+Ville 6,32 7,67 23,01 37
+Total général 14 17 51 82
+K2 Ind Int Utile Total général
+Rurale/semi-rural 0,37 0,01 0,14 0,52492997
+Ville 0,45 0,01 0,18 0,63842834
+Total général 0,81698842 0,02575517 0,32061473 1,16335832
+K2 5% 5,99146455 NON
+
+
+79
+Annexe 10 : Khi deux : Analyse en fonction la période de
+confinement de l’utilisation des outils d’aide décisionnelle
+Observé Ind Ind|Utile Ind|Utile|Int Int Utile Utile|Int
+Total général Conf 24 2 6 13 58 32 135 Post Conf 11 4 6 32 20 58 Total général 35 6 6 19 90 52 211
+Observé Ind Utile Int
+Total général Conf 32 98 38 168 Post Conf 15 56 20 91 Total général 47 154 58 259 18% 59% 22% 100%
+Théorique Ind Utile Int
+Total général Conf 30,4864865 99,8918919 37,6216216 168 Post Conf 16,5135135 54,1081081 20,3783784 91 Total général 47 154 58 259
+K2 Ind Utile Int
+Total général Conf 0,07513897 0,03583129 0,00380553 0,11477578 Post Conf 0,1387181 0,06615007 0,00702559 0,21189376 Total général 0,21385706 0,10198135 0,01083112 0,32666954
+K2 0,32666954 NON K2 5% 5,99146455
+
+
+80
+Annexe 11 : Khi deux : influence des outils d’aide décisionnelle sur le temps de
+consultation selon le sexe
+Observé Est allongée Est raccourcie N'est pas modifiée Total général
+Un homme 15 5 50 70 Une femme 33 14 94 141 Total général 48 19 144 211 0,22748815 0,090047393 0,682464455 1
+Théorique Est allongée Est raccourcie N'est pas modifiée Total général Un homme 15,9241706 6,303317536 47,77251185 70 Une femme 32,0758294 12,69668246 96,22748815 141 Total général 48 19 144 211
+K2 Est allongée Est raccourcie N'est pas modifiée Total général Un homme 0,0536349 0,269482949 0,103861055 0,426978906 Une femme 0,02662726 0,133785861 0,051562226 0,211975343 Total général 0,08026216 0,40326881 0,15542328 0,638954249
+K2 0,638954249 NON
+K2 5% 5,991464547
+
+
+81
+Annexe 12 : Khi deux : Influence des outils d’aide décisionnelle sur le temps de
+consultation selon le statut de remplaçant
+Observé Est allongée Est raccourcie N'est pas modifiée Total général R Non 22 8 72 102 R Oui 25 11 69 105 Total général 47 19 141 207 0,22705314 0,09178744 0,68115942 1
+Théorique Est allongée Est raccourcie N'est pas modifiée Total général R Non 23,1594203 9,362318841 69,47826087 102 R Oui 23,8405797 9,637681159 71,52173913 105 Total général 47 19 141 207
+K2 Est allongée Est raccourcie N'est pas modifiée Total général R Non 0,05804357 0,198232153 0,091527453 0,34780318 R Oui 0,05638518 0,192568377 0,088912383 0,33786594 Total général 0,11442875 0,390800531 0,180439836 0,68566912
+K2 0,685669116 NON
+K2 5% 5,991464547
+
+
+82
+Annexe 13 : Khi deux : Influence des outils d’aide décisionnelle sur le temps de
+consultation selon le lieu d’exercice
+Observé Est allongée N'est pas modifiée Total général
+Rurale 3 10 15
+Semi rurale 5 19 24
+Ville 4 24 30
+Total général 12 53 69
+Observé Est allongée N'est pas modifiée Total général
+Rurale / Semi rurale 8 29 37
+Ville 4 24 28
+Total général 12 53 65
+18% 82% 100%
+Théorique Est allongée N'est pas modifiée Total général
+Rurale / Semi rurale 6,83 30,17 37
+Ville 5,17 22,83 28
+Total général 12 53 65
+K2 Est allongée N'est pas modifiée Total général
+Rurale / Semi rurale 0,20 0,05 0,245453
+Ville 0,26 0,06 0,324348607
+Total général 0,464607465 0,105194143 0,569801608
+K2 0,569801608 NON
+K2 5% 3,841458821
+
+
+83
+Annexe 14 : Khi deux : Analyse en fonction la période de confinement de
+l’utilisation des outils d’aide décisionnelle
+Observé Est allongé Est raccourci N'est pas modifié Total général
+Conf 28 13 95 136
+Post Conf 20 6 49 75
+Total général 48 19 144 211
+0,22748815 0,090047393 0,682464455 1
+Théorique Est allongé Est raccourci N'est pas modifié Total général
+Conf 30,9383886 12,2464455 92,81516588 102
+Post Conf 17,0616114 6,753554502 51,18483412 105
+Total général 48 19 141 207
+K2
+Est allongé Est raccourci N'est pas modifié Total général
+Conf 0,2790749 0,046368098 0,051430174 0,37687317
+Post Conf 0,50605582 0,084080818 0,093260049 0,68339669
+Total général 0,78513072 0,130448916 0,144690223 1,06026986
+K2 1,060269859 NON
+K2 5% 5,991464547
+
+
+84
+ABSTRACT
+Assessment of the use of decision support tools by general practitioners
+Introduction: Medecine is a field in which artificial intelligence is developing rapidly. The aim of this study is to evaluate the use of medical decision support tools by general practitionners.
+Material and methods: We distributed an online questionnaire through the "Eval and go"application. The broadcast started in March 2020 and ended in September 2020. Data analysis was done by a direct descriptive method followed by bivaried analysis via Excel.
+Results: We had 262 respondents.The majority of respondents have an urban exercise (80%) and a minority have a rural exercise. The median age of respondents is 32 years old. The majority of respondents think that using decision support tools does not affect consultation time (54.96%). Moreover, 59% of the doctors surveyed, consider these these tools to be useful. However, only 24% of respondents say they have a decision support tool. The preferred software and the most used by the participants are Antibioclic / Antibioville (53%) as well as CRAT and Vidal recos. The strenghts concerning the use of decision support tools are speed and ease of use. The disadvantages are the lack of accessibility and reliability of information.
+Conclusion: Medical support tools interest the majority of doctors but seem little known. Adding in the medical curriculum, formations about artificial intelligence could therefore improve medical practice. In order to facilitate the ergonomics of medical decision support tools, it would be necessary to create a collaboration between doctors and web designers. In addition, the creation of a label could improve the relevance of medical information. Finally the creation of an online platform gathering up these different tools would improve their accessibility.
+MEDICAL THESIS: GENERAL MEDECINE - YEAR 2020
+
+
+vu
+NANCY, le 19 octobre 2020 LePrésident de Thèse
+Professeur Paolo Dl PATRIZIO
+NANCY, le 19 octobre 2020 Le Doyen de laFacuhé de Médecine
+Professeur Marc BRAUN
+AUTORISEÀSOllTENIRET ÂIMPRIMER LA THÈSE/ 11~2C
+NANCY, le 22 octobre 2020
+LE PRÊSIOENT OE L'UNIVERSITÉOE LORRAINE,
+Professeur Pierre MUT2ENHAROT
+
+
+RESUME
+Introduction : La médecine est un domaine dans lequel l’intelligence artificielle se développe
+rapidement. L'objectif de cette étude et d'évaluer l'utilisation des outils d’aide à la décision
+médicale par les médecins généralistes.
+Matériel et Méthode : Nous avons diffusé un questionnaire en ligne grâce à l’application
+« Eval and go ». La diffusion a débuté en mars 2020 et a été arrêté en septembre 2020.
+L’analyse des données a été faite par une méthode descriptive directe puis une analyse bi
+variée via Excel.
+Résultats : Nous avons eu un total de 262 répondants. La majorité des répondants a un
+exercice urbain (80%) et seule une minorité a un exercice rural. L’âge médian des
+répondants est de 32 ans. La majorité des répondants pense que le recours aux outils d’aide
+décisionnelle ne modifie pas le temps de consultation (54,96%). De plus, 59% des médecins
+interrogés considèrent que ces outils sont utiles. Cependant seul 24 % des répondants
+déclarent être doté d’un outil d’aide décisionnelle. Les logiciels préférés et les plus utilisés
+par les participants sont Antibioclic/Antibioville (53%) ainsi que le CRAT et Vidal recos. Les
+atouts concernant l’utilisation des outils d’aide décisionnelle sont la rapidité et la simplicité
+d’utilisation. Les freins sont le manque d’accessibilité et de fiabilité des informations.
+Conclusion : Les outils d’aide à la décision médicale sont plébiscités par la majorité des
+médecins mais semblent peu connus. Enrichir le cursus médical d’une formation en
+intelligence artificielle pourrait de ce fait améliorer les pratiques médicales. Afin de faciliter
+l’ergonomie des outils d’aide à la décision médicale, il faudrait créer une collaboration entre
+des médecins et des informaticiens/web-designers. Par ailleurs la création d’un label de
+fiabilité pourrait améliorer la pertinence des informations médicales. Enfin la création d’une
+plateforme en ligne, regroupant ces différents outils améliorerait leur accessibilité.
+THESE : MEDECINE GENERALE - ANNEE 2020
+MOTS CLEFS : Intelligence artificielle ; outils d’aide décisionnelle, médecine générale
+INTITULE ET ADRESSE :
+UNIVERSITE DE LORRAINE
+Faculté de Médecine de Nancy
+9, avenue de la Foret de Haye
+54505 VANDOEUVRE LES NANCY Cedex

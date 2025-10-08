@@ -1,0 +1,89 @@
+Logo Inserm Header
+ENGLISH
+Recherche
+MENU
+Intelligence artificielle : va-t-elle remplacer le diagnostic médical ?
+PUBLIÉ LE : 13/07/2023 TEMPS DE LECTURE : 5 MIN ACTUALITÉ, SCIENCE
+
+L’émergence des systèmes d’intelligence artificielle (IA) représente une révolution dans le domaine médical. Les personnels de santé y ont de plus en plus recours pour affiner leurs diagnostics et prendre des décisions thérapeutiques. Mais ces outils peuvent-ils remplacer l’expertise humaine ? Trois spécialistes exposent leur point de vue sur l’intérêt et les limites de cette technologie.
+
+Un article à retrouver dans le magazine de l’Inserm n°57
+
+En radiologie, en dermatologie, ou encore en ophtalmologie, l’IA permet de détecter des maladies invisibles à l’œil nu et d’établir des prévisions. Elle peut aussi aider à adapter et à personnaliser les traitements. Elle est même utilisée à titre expérimental aux urgences pour orienter plus rapidement les patients. Mais cette technologie amène aussi son lot de questionnements. Jusqu’où peut-on lui faire confiance ? À partir de quelles données est-elle entrainée ? Peut-elle remplacer l’expertise humaine ? Quels critères éthiques faut-il respecter ? Enfin, que change-t-elle dans la relation patient-médecin ? Les applications et les limites de ces systèmes intelligents dans le diagnostic médical restent à définir, d’autant que leurs performances semblent se décupler jour après jour.
+
+L’avis de Gabrielle Chenais : « Quid des responsabilités ? »
+
+L’intelligence artificielle ne remplacera jamais le diagnostic humain. Son objectif n’a jamais été de se substituer aux professionnels de santé, mais de travailler de concert avec eux. Aux urgences, l’IA est testée à titre expérimental pour imputer un degré de gravité sur les patients qui se présentent, ce qui fait gagner du temps aux infirmiers dans le tri des cas. Mais ce système aura du mal à capter les nuances que seul un œil humain peut percevoir.
+
+Par ailleurs, les systèmes intelligents soulèvent plusieurs questions d’ordre éthique. D’une part, si une décision est prise avec l’aide d’un système décisionnel automatique, le professionnel doit en informer son patient, expliquer pourquoi il suit les recommandations et comment il est arrivé à cette conclusion avec ce système. Ensuite, le soignant doit avoir le droit de refuser de suivre les recommandations de l’IA s’il pense qu’elle s’est trompée. De la même manière, le patient doit être libre de refuser une décision qui émane de l’IA. Se pose aussi la question de la responsabilité légale. Si un professionnel de santé suit la préconisation d’une IA qui va à l’inverse des recommandations générales : quid des responsabilités ?
+
+Autre problématique, il faut bien déterminer quelles performances sont attendues de l’IA. Si on prend le cas des urgences, la priorité est la rapidité du diagnostic, au risque de mettre en danger le patient. Le critère de performance n’est donc pas toujours uniquement la précision, mais parfois aussi la vitesse. Dans tous les cas, il est crucial de se poser la question de la formation des professionnels de santé à l’utilisation de l’IA, car même si elle ne les remplace pas, c’est quand même un outil avec lequel ils vont devoir travailler.
+
+Gabrielle Chenais est doctorante-chercheuse au Bordeaux health research center (unité 1219 Inserm/Université de Bordeaux)
+
+L’avis de Michel Dojat : « L’IA doit savoir dire “je ne sais pas” »
+
+L’intelligence artificielle est un outil d’aide à la décision médicale. Elle devient indispensable car il y a de plus en plus d’informations à synthétiser, et elle permet de le faire efficacement. En imagerie notamment, l’IA permet de quantifier et de localiser automatiquement des modifications, par exemple la diminution du volume de la matière grise ou l’apparition de lésions, et de détecter des changements subtils non visibles à l’œil nu. S’appuyant sur de larges bases de données, l’IA peut définir des profils typiques de normalité ou de progression spécifique d’une pathologie permettant de faire des prédictions et au clinicien d’affiner et d’individualiser la thérapie. Pour être intégrés dans la pratique clinique, il est important que ces assistants informatisés soient capables de reconnaître leurs limites lorsque les images à analyser sont ambiguës ou hors des cas appris : l’IA doit savoir dire « je ne sais pas ». Elle doit aussi pouvoir apporter de la nuance à ses résultats et dire : « Ici, il y a une lésion, j’en suis sûre à 80 % », en soulignant les 20 % d’incertitude. Donc est-ce que l’IA peut prendre seule des décisions ?
+
+Une chose est certaine, elle peut en proposer et distinguer les cas faciles et difficiles. Et lorsqu’elle ne parvient pas à dégager une analyse claire, alors l’humain peut se focaliser sur ces cas difficiles et trancher. C’est d’ailleurs l’un des avantages de cet outil : en proposant des diagnostics rapides sur les cas les plus simples, l’IA permet au praticien de dégager du temps pour ses interactions avec le patient. Enfin, pour que ces assistants soient fiables et bénéficient au patient, je pense qu’il est impératif de mettre en place des procédures robustes de test comme pour les médicaments, ce qu’on ne sait pas encore très bien faire.
+
+Michel Dojat est directeur de recherche Inserm dans l’unité Neuro-imagerie fonctionnelle et perfusion cérébrale (unité1216), cofondateur et conseiller scientifique de la start-up Pixyl.
+
+L’avis de Laurence Devilliers : « Pour l’instant nous ne sommes pas prêts à déléguer les décisions à ces systèmes »
+
+Nous devons apprivoiser les systèmes d’intelligence artificielle pour comprendre lorsqu’ils produisent un résultat juste, incertain ou totalement faux. Dans la détection des cancers à l’aide de radios l’IA peut par exemple générer des faux positifs. Or, il faut être expérimenté pour repérer les erreurs du système. C’est ce qui peut être difficile pour les jeunes médecins. Si le soignant suit systématiquement les recommandations de la machine, le risque c’est de demander des interventions et des biopsies supplémentaires qui ont un coût pour la société, à défaut de donner des soins pour les patients qui en ont réellement besoin. Pour l’instant nous ne sommes pas prêts à déléguer les décisions à ces systèmes, d’autant plus quand la vie d’un patient en dépend. En parallèle, il y a un besoin urgent de construire une loi, des normes ainsi que des règles éthiques pour encadrer l’utilisation de systèmes prédictifs, afin de minimiser les risques de manipulation et de dépendance. Il s’agit de vérifier leur robustesse et le respect de critères éthiques comme la liberté et l’autonomie de décision des humains lors des usages de ces outils. Les soignants et les patients doivent pouvoir comprendre les grands principes de ces systèmes s’ils sont développés de façon à rendre plus transparent et explicable leur fonctionnement. Il faut également pouvoir mutualiser les expériences et suivre les usages de ces machines : mesurer les risques, anticiper les erreurs, surveiller le système via des comités d’éthique. Il y a tout un écosystème à créer afin d’encadrer au mieux ces outils et de responsabiliser concepteurs et utilisateurs !
+
+Laurence Devilliers est professeur en IA à Sorbonne Université, chercheuse au LISN (CNRS), membre du Comité national pilote d’éthique du numérique et de l’Afnor, présidente de la fondation Blaise Pascal.
+
+Auteur : L. A.
+
+À lire aussi
+Intelligence artificielle et santé
+
+L’intelligence artificielle (IA) est un domaine de recherche en pleine expansion et promis à…
+
+RECEVOIR NOTRE LETTRE D’INFORMATION
+
+Vous recevrez chaque mois les derniers articles publiés sur ce site. Nous n’utiliserons pas votre e‑mail pour autre chose, et vous pourrez vous désabonner à tout moment. En savoir plus sur vos données et vos droits.
+
+FORMULAIRE D’INSCRIPTION
+
+Adresse e-mail (au format courriel@exemple.fr) :
+
+NOS DÉLÉGATIONS RÉGIONALES
+Auvergne Rhône-Alpes
+Est
+Grand Ouest
+Île-de-France Centre Est
+Île-de-France Centre Nord
+Île-de-France Sud
+Nord-Ouest
+Nouvelle-Aquitaine
+Occitanie Méditerranée
+Occitanie Pyrénées
+PACA et en Corse
+AUTRES SITES INSERM
+Professionnels de la recherche
+Ressources Humaines
+Marchés publics
+Évaluation
+Orphanet
+ACCÈS DIRECT
+Volontaire pour des tests
+ASSOCIÉS À L’INSERM
+ANRS | MIE
+Inserm Transfert
+Aviesan
+QUESTIONS FRÉQUENTES
+NOUS CONTACTER
+MENTIONS LÉGALES
+ACCESSIBILITÉ (PARTIELLEMENT CONFORME)
+DONNÉES PERSONNELLES
+GÉRER MES COOKIES
+© INSERM 2023
+Retour en haut de page
+
+Ce site utilise des cookies. Vous pouvez changer d'avis à tout moment en cliquant le menu "Gérer mes cookies" en bas de page.
+
+ACCEPTERREFUSER
+Paramétrer

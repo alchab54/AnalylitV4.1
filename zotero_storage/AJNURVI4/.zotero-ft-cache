@@ -1,0 +1,2190 @@
+ACADÉMIE DE VERSAILLES
+UNIVERSITÉ DE VERSAILLES SAINT - QUENTIN EN YVELINES
+UFR DES SCIENCES DE LA SANTÉ SIMONE VEIL
+ANNÉE 2016 N°
+THÈSE
+POUR LE DIPLÔME
+D’ÉTAT DE DOCTEUR EN MÉDECINE
+DES DE MÉDECINE GÉNÉRALE
+Présentée et soutenue publiquement le 14/04/2016
+Par
+FREY – GEOFFRET Anne
+Née le 21/08/1969 à Mulhouse
+Critères STOPP/START version 2 : étude de faisabilité de l’utilisation d’une version informatisée en médecine générale
+Président du jury : Monsieur le Professeur Pierre-Louis DRUAIS
+Directeur de thèse : Monsieur le Docteur Pascal CLERC
+
+
+DEDICACES ET REMERCIEMENTS
+A Monsieur le Professeur Pierre-Louis DRUAIS
+Vous m’avez fait l’honneur de présider ce jury. Veuillez trouver ici l’expression de ma
+profonde gratitude et mes sincères remerciements.
+A Monsieur le Docteur Pascal CLERC
+Vous m’avez fait l’honneur de bien vouloir assurer la direction de cette thèse. Je vous
+remercie pour votre soutien, la pertinence de vos conseils, et pour votre patience. Veuillez
+trouver ici l’expression de ma sincère gratitude et mon profond respect.
+Aux membres du jury
+M. le Pr CHEVALLIER, M. le Dr CLERC, Mme le Dr ZABKA. Merci d’avoir accepté de faire
+partie du jury et de juger ce travail.
+Aux médecins qui ont participé à cette étude
+Les groupes de pairs de M. le Dr LANQUE à Saint-Ouen-l’Aumône, de M. le Dr CAVAILLE
+COLL à Guyancourt, de M. le Dr VIONNET à Magny-en-Vexin, de M. Le Dr DREUX à
+Bièvres et de M. le Pr PIRIOU à Marly-le-Roi.
+Mme le Dr LANDRY-CHASSOT, M. le Dr GUIMARD, M. le Dr MENUET-GUILBAUD, M. le Dr
+URBAIN, M. le Dr ALLAIS.
+A Madame le Dr GALLOT
+Vous avez été ma tutrice durant ces trois années d’internat. Je vous remercie pour votre
+écoute, votre soutien et vos précieux conseils.
+A mes enfants
+Merci d’avoir supporté une maman étudiante.
+A Xavier
+Sans qui, ni mes études de médecine, ni cette thèse, n’auraient été possibles.
+
+
+TABLE DES MATIERES
+1 Résumé...........................................................................................................................6
+2 Introduction......................................................................................................................7
+2.1 Le point en 2014/2015 sur la iatrogénie .....................................................................7
+2.1.1 Comment évaluer le rapport bénéfice/risque d'un médicament chez le sujet très âgé ?....................................................................................................................8
+2.1.2 La prescription inappropriée.................................................................................9
+2.2 La lutte contre la iatrogénie en soins primaires en France .......................................11
+2.3 Les outils à disposition.............................................................................................12
+2.3.1 Les critères implicites.........................................................................................12
+2.3.2 Les critères explicites.........................................................................................12
+2.4 STOPP/START........................................................................................................16
+2.4.1 Utilisation de STOPP/START à travers le monde...............................................16
+2.4.2 Utilisation de STOPP/START en France ............................................................17
+2.4.3 Objectifs de l’étude.............................................................................................18
+3 Matériels et méthodes ...................................................................................................19
+3.1 Analyse bibliographique...........................................................................................19
+3.2 Informatisation de STOPP/START version 2 ...........................................................19
+3.2.1 Traduction..........................................................................................................19
+3.2.2 Correspondance classe ATC et critères STOPP/START....................................19
+3.2.3 Création d’un outil informatique..........................................................................20
+3.2.4 Validation de l’outil .............................................................................................25
+3.3 Recueil de données .................................................................................................27
+3.3.1 Objectifs initiaux.................................................................................................27
+3.3.2 Présentation en groupe de pairs ........................................................................27
+3.3.3 Présentation à des médecins individuellement...................................................28
+3.4 Population étudiée ...................................................................................................29
+3.4.1 Médecins consultés pour l’étude ........................................................................29
+3.4.2 Caractéristiques de la population étudiée...........................................................29
+3.5 Analyse des données...............................................................................................30
+3.5.1 Analyse qualitative .............................................................................................30
+3.5.2 Analyse quantitative ...........................................................................................30
+
+
+4 Résultats .......................................................................................................................31
+4.1 Analyse quantitative de l’utilisation de STOPP/START ............................................31
+4.1.1 Résultats bruts sortis par l’outil...........................................................................31
+4.1.2 Résultats après analyse des utilisateurs ............................................................35
+4.2 Discussion de l’analyse quantitative.........................................................................43
+4.2.1 Comparaison des résultats avec la littérature.....................................................43
+4.2.2 Peu de modifications..........................................................................................43
+4.2.3 Discussion sur les sorties les plus fréquentes ....................................................44
+4.2.4 Amélioration de l’outil .........................................................................................46
+4.3 Analyse qualitative de l’utilisation de STOPP/START ..............................................50
+4.3.1 Connaissance des outils d’optimisation d’ordonnance .......................................51
+4.3.2 Evaluation de STOPP/START............................................................................53
+4.3.3 Intérêt d’un outil informatique .............................................................................67
+4.3.4 Place dans la pratique........................................................................................72
+5 Conclusion.....................................................................................................................85
+6 Annexes ........................................................................................................................88
+6.1 Annexe 1 : STOPP/START.v2 adaptation en langue française ................................88
+6.2 Annexe 2 : Liste complète des critères STOPP v2 regroupés par médicaments ......93
+6.3 Annexe 3 : Liste complète des critères START v2 regroupées par situation médicale ................................................................................................................................95
+6.4 Annexe 4 : fichier de correspondance entre critère STOPP/START et molécule ou pathologie ................................................................................................................96
+6.4.1 STOPP...............................................................................................................96
+6.4.2 START .............................................................................................................116
+6.5 Annexe 5 : questionnaire sur l’utilisation et l’intérêt de STOPP/START .................120
+6.5.1 Utilisation STOPP/START sur une ordonnance ...............................................120
+6.5.2 Questionnaire STOPP/START .........................................................................121
+6.6 Annexe 6 : Liste des critères STOPP jamais sortis ................................................122
+6.7 Annexe 7 : Liste des critères START jamais sortis.................................................124
+6.8 Annexe 8 : Liste des critères STOPP sortis avec l’outil et jamais retenus ..............125
+6.9 Annexe 9 : Liste des critères START sortis avec l’outil et jamais retenus...............127
+7 Bibliographie................................................................................................................128
+
+
+TABLE DES FIGURES
+Figure 1 : Nombre d’ordonnances par classe d’âge..............................................................29
+Figure 2 : Nombre de critères sortis par l'outil par ordonnance (boîte à moustaches)...........31
+Figure 3 : Nombre d’ordonnances par nombre de critères sortis par l’outil ...........................31
+Figure 4 : Nombre de critères STOPP sortis par l’outil classés par système.........................32
+Figure 5 : Top 5 des critères STOPP sortis par l’outil ...........................................................33
+Figure 6 : Nombre de critères START sortis par l’outil classés par système .........................34
+Figure 7 : Top 5 des critères START sortis par l’outil............................................................35
+Figure 8 : Nombre de critères retenus par ordonnance (boîte à moustaches) ......................36
+Figure 9 : Nombre d’ordonnances par nombre de critères retenus .......................................36
+Figure 10 : Nombre de critères STOPP retenus classés par système ..................................37
+Figure 11 : Top 5 des critères STOPP retenus .....................................................................38
+Figure 12 : Top 5 des critères STOPP sortis et jamais retenus.............................................38
+Figure 13 : Nombre de critères START retenus classés par système...................................39
+Figure 14 : Top 5 des critères START retenus .....................................................................40
+Figure 15 : Top 5 des critères START sortis mais jamais retenus ........................................41
+Figure 16 : Nombre de médicaments avant et après ............................................................41
+Figure 17 : Nœuds comparés par nombre de références d’encodage ..................................50
+Figure 18 : Carte conceptuelle de l’évaluation de STOPP/START........................................53
+Figure 19 : Carte conceptuelle de l’utilisation de STOPP/START en pratique ......................72
+
+
+Résumé 6
+1 RESUME
+INTRODUCTION ET OBJECTIFS : STOPP (Screening Tool of Older People Prescriptions) /
+START (Screening Tool to Alert doctors to Right Treatment) est un outil d’aide à
+l’optimisation d’ordonnance chez les personnes âgées. L’objectif principal était d’analyser
+l’utilisation de la version 2 informatisée, par des médecins généralistes seuls ou réunis en
+groupe de pairs, en France. L’objectif secondaire était d’évaluer l’application de
+STOPP/START sur 50 ordonnances de patients de plus de 75 ans polypathologiques.
+METHODE : Une version française informatisée a été réalisée et validée. L’outil a ensuite
+été présenté à 5 groupes de pairs et 5 médecins, et testé sur un total de 50 ordonnances.
+L’avis des médecins était ensuite recueilli. L’ensemble des séances était enregistré.
+RESULTATS : Le pourcentage d’ordonnances avec au moins une prescription
+potentiellement inappropriée, était de 80%, et avec au moins une prescription
+potentiellement omise, de 82%. Cependant, le nombre de modifications par ordonnance était
+faible, avec un nombre médian de médicaments prescrits passant de 9 à 8,5. Les
+discussions ont mis en évidence l’intérêt des médecins généralistes pour l’utilisation d’un tel
+outil pour optimiser l’ordonnance, mais aussi pour revoir le dossier. Une version informatisée
+est indispensable, mais des améliorations sont souhaitées, notamment l’intégration au
+logiciel de prescription. Les contextes d’utilisation envisagés sont variables selon les
+médecins, le plus souvent en groupe de pairs ou en bilan annuel.
+CONCLUSION : Cette étude a permis de montrer la faisabilité et l’intérêt de l’utilisation d’une
+version informatisée de STOPP/START. Certaines adaptations de l’outil informatique
+paraissent nécessaires. Des études complémentaires sur l’impact de l’utilisation d’un tel outil
+sur la morbi-mortalité seraient intéressantes.
+
+
+Introduction 7
+2 INTRODUCTION
+2.1 LE POINT EN 2014/2015 SUR LA IATROGENIE
+La prescription inappropriée dans la population âgée est fréquente. En soins primaires,
+environ 20% des prescriptions chez les plus de 65 ans sont inappropriées (1). On note
+cependant une diminution des taux de prescription inappropriée entre 2006-2007 et 2009
+2010 dans une étude américaine (2) qui est peut-être en rapport avec une sensibilisation des
+professionnels de santé sur le sujet.
+La prescription inappropriée est responsable de fréquents effets indésirables,
+potentiellement graves. C’est, en effet, un facteur de risque important de l’apparition d’effets
+indésirables avec un odd-ratio entre 2,14 et 2,32 selon les études (3)(4)(5). Trente à 50%
+des événements indésirables associés aux médicaments auraient pu être évités avec une
+prise en charge appropriée. Les médicaments pris, mal pris ou non pris apparaissent comme
+une cause majeure d’hospitalisations évitables (6)(7)(8)(9). Zhang et al. (2007 & 2009)
+(10)(11) montrent que le nombre d’hospitalisations causées par les médicaments a été
+multiplié par 8 en Australie entre 1981 et 2003 ; en 2003, 30 % des hospitalisations étaient
+itératives. Les personnes les plus exposées à ce risque étaient les plus âgées (80 ans et
+plus).
+C’est également un problème majeur en France (12)(13). En effet dans une étude (14)
+utilisant la base de données de remboursement de l’assurance maladie, 53,6% des plus de
+75 ans avaient au moins une prescription inappropriée sur la période d’étude (mars 2007 à
+février 2008) avec une grande disparité entre les régions. En France, le médicament est
+responsable de :
+ 20 à 25 % de visites aux urgences et contribue à 40 % d’entre elles en France (15) ;
+ 3 à 4 % des hospitalisations ; la fréquence varie avec l’âge de la population observée
+(16)(17)(18) ;
+
+
+Introduction 8
+ 20 à 40 % des réadmissions ; la fréquence dépend de l’âge de la population
+observée et de la durée de la période d’observation : 40 % à 6 mois et 20 % à 12
+mois (9)(19).
+À l’inverse de la iatrogénie médicamenteuse qui bénéficie de très nombreuses publications,
+les conséquences des sous-diagnostics / sous-traitements au seul motif de l’âge sont peu
+étudiées ou minimisées. Or, pour certains experts, ce risque est comparable en fréquence
+(40 à 60 %) au risque iatrogénique et pourrait avoir des conséquences majeures pour le
+patient et le système de santé (20)(21)(7)(22)(23).
+Le risque de sous-traitement est multiplié par 3 en cas de polymédication (24)(25). Il existe
+une sous-utilisation des antidépresseurs, des bêtabloquants et des inhibiteurs de l’enzyme
+de conversion ou antiagrégants liée à l’âge (24)(9). L’insuffisance cardiaque ou
+coronarienne, la fibrillation atriale, la douleur, la dénutrition ou l’ostéoporose fracturaire sont
+insuffisamment traitées, pour ne pas alourdir l’ordonnance ou majorer les risques
+d’interactions médicamenteuses. Les conséquences de ces sous-prescriptions pourraient
+être majeures (20)(23).
+Il existe une attente des professionnels de santé pour des stratégies d’amélioration de la
+qualité de prescription efficaces et réellement applicables.
+2.1.1 Comment évaluer le rapport bénéfice/risque d'un médicament chez le
+sujet très âgé ?
+Le prescripteur est souvent démuni lors de la prescription d'un médicament chez un sujet de
+plus de 75 ans, voire 80 ans (26).
+Les essais cliniques, avant l'obtention d'une autorisation de mise sur le marché (AMM),
+n'incluent toujours pas assez de sujets âgés de plus de 75 ans (27). De plus, les sujets
+inclus ne sont pas polypathologiques et ils ont souvent peu de co-médications. Ils ne sont
+donc pas représentatifs de la population à qui les médicaments seront prescrits. Il n'est donc
+pas possible pour le prescripteur d'extrapoler les résultats des essais cliniques à la pratique
+médicale courante. Ce point a pourtant fait l'objet de recommandations internationales
+
+
+Introduction 9
+communes à l'Europe, aux Etats-Unis et au Japon dès 1993, non mises en place à ce jour
+(28).
+Il faut cependant distinguer l'évaluation du bénéfice de celle du risque. Lorsqu'un
+médicament a une efficacité démontrée chez l'adulte jeune, il est rare que ceci ne soit pas le
+cas chez le sujet plus âgé (29). Le domaine cardiovasculaire en est un excellent exemple
+avec une efficacité reconnue sur la morbi-mortalité des traitements anti-hypertenseurs, de
+l'insuffisance coronaire et de l'insuffisance cardiaque, mais aussi des anticoagulants oraux
+dans la prévention des événements thromboemboliques chez les sujets âgés ayant une
+arythmie chronique par fibrillation auriculaire.
+Par contre, le risque du médicament est très mal évalué avant l'autorisation de mise sur le
+marché du médicament pour deux raisons essentielles : la non inclusion dans les essais de
+phase 3 de sujets polypathologiques et polymédicamentés et l'insuffisance de recueil des
+effets indésirables (30)(31). Ceci doit inciter tout prescripteur à être beaucoup plus vigilant
+lors de la prescription d'un nouveau médicament chez le sujet âgé.
+2.1.2 La prescription inappropriée
+Plusieurs modalités de prescription sub-optimale chez le sujet âgé ont été décrites : l'excès
+de traitements (« overuse »), la prescription inappropriée (« misuse ») et l'insuffisance de
+traitement (« underuse ») (32).
+2.1.2.1 L'excès de traitements (« overuse »)
+Il s'agit de l'utilisation de médicaments prescrits en l'absence d'indication (l'indication n'a
+jamais existé ou n'existe plus), ou qui n'ont pas prouvé leur efficacité (service médical rendu
+insuffisant).
+2.1.2.2 La prescription inappropriée (« misuse »)
+Le « misuse » est l'utilisation de médicaments dont les risques dépassent les bénéfices
+attendus. Le premier à avoir réfléchi sur ce concept est Beers qui a établi, dès 1991, pour les
+
+
+Introduction 10
+personnes âgées en « nursing home », une liste de médicaments dont la prescription n'était
+pas souhaitée (33).
+2.1.2.3 L'insuffisance de traitement (« underuse »)
+Elle est définie comme l'absence d'instauration d'un traitement efficace chez les sujets ayant
+une pathologie pour laquelle une ou plusieurs classes médicamenteuses ont démontré leur
+efficacité.
+
+
+Introduction 11
+2.2 LA LUTTE CONTRE LA IATROGENIE EN SOINS PRIMAIRES EN FRANCE
+En France, les enjeux des prescriptions inadaptées sont identifiés dès les années 2000. De
+nombreuses réflexions sont menées tant par la Haute Autorité de Santé (HAS) que par
+l’Agence Française de Sécurité Sanitaire des Produits de Santé (AFSSAPS). Ainsi un plan
+national d’action est établi, dont l’objectif de réduction de la fréquence des prescriptions
+inadaptées chez la personne âgée et des événements iatrogènes entrainant une
+hospitalisation, a été fixé par la loi n°2004-806 du 9 août 2004.
+En 2006, la HAS propose aux médecins un référentiel dans le cadre de l’évaluation et
+l’amélioration des pratiques chez le sujet âgé. Ce référentiel donne la conduite à tenir pour
+éliminer un accident iatrogène devant tout symptôme, mais également afin de réviser le
+traitement médicamenteux.
+Depuis 2005, de nombreux outils et grilles sont disponibles dans l’espace thématique du
+programme PMSA sur le site de la HAS (34). Il contient :
+ Des grilles d’évaluation de la qualité des ordonnances,
+ Des programmes courts d’évaluation des pratiques professionnelles (EPP).
+En 2012, les réseaux gérontologiques de la Société Française de Gériatrie et de
+Gérontologie ont réfléchi à la justification de la prise en compte de la problématique de la
+PMSA dans leur mission de coordination d’appui et ont proposé une adaptation des outils.
+Ces derniers ont été développés afin d’apporter une aide à l’analyse et au dépistage de
+problématiques d’observance et de iatrogénie et dans le but de proposer des préconisations
+d’actions au prescripteur (35).
+En 2014, la HAS a édité une fiche parcours Points clés et Solutions sur la sécurité des
+prescriptions des médicaments chez la personne âgée (36).
+
+
+Introduction 12
+2.3 LES OUTILS A DISPOSITION
+Plusieurs outils existent pour aider à la revue systématique des prescriptions
+médicamenteuses et détecter les prescriptions potentiellement inappropriée (37).
+2.3.1 Les critères implicites
+Le MAI (« Medication Appropriateness Index ») constitue l’outil basé sur des critères
+implicites le plus répandu ; il n’apporte aucune recommandation de prescription. Il a été
+développé sur le continent nord-américain en 1992 (38). Il est fondé sur l’application à
+chaque médicament de critères de prescription (indication, choix de molécule, de dose, de
+mode d’administration, de durée et risque d’interaction). Il n’est ainsi pas un outil à
+proprement parler de dépistage de la prescription médicamenteuse inappropriée.
+2.3.2 Les critères explicites
+2.3.2.1 Critères de Beers
+Les critères de Beers ont longtemps été la référence. Il s’agit des premiers critères publiés
+aux Etats-Unis en 1991 (33). Ils ont été élaborés pour identifier des prescriptions
+inappropriées chez les personnes âgées fragiles en maison de retraite. Ils sont constitués de
+30 critères qui ont fait consensus auprès d’experts. Une première mise à jour a été réalisée
+en 1997 (39). Elle a permis de réévaluer les critères incluant les nouvelles données de la
+science, de généraliser les critères à la population générale de plus de 65 ans et de
+proposer de nouveaux critères. La nouvelle liste est composée de 43 critères dont 28
+décrivent des médicaments potentiellement inappropriés indépendamment des diagnostics
+et 15 renseignent des associations médicament-pathologie qui devraient être évitées.
+Une seconde mise à jour a été publiée en 2003 en proposant de nouveaux critères, étendant
+la liste des critères à 68 (40).
+En 2012, une dernière mise à jour a été développée avec 53 critères (41). L’évolution
+majeure dans cette mise à jour consiste à répartir les classes médicamenteuses en trois
+
+
+Introduction 13
+catégories : ceux à éviter chez les personnes âgées, ceux qui en présence de certaines
+pathologies peuvent exacerber ces dernières et enfin, ceux qui doivent être utilisés avec
+prudence chez les patients âgés.
+Bien qu’étant les plus connus, ils présentent des inconvénients. Ils font référence à des
+médicaments non commercialisés en Europe, et considèrent uniquement les prescriptions
+inappropriées sans considérer l’omission de prescription, et ne prennent en considération, ni
+les interactions, ni la prescription de plusieurs médicaments d’une même classe (42).
+2.3.2.2 Liste de McLeod
+Au Canada, en 1997, des praticiens n’étaient pas d’accord avec les critères de Beers
+notamment concernant certaines classes médicamenteuses. Ils ont constitué leur propre
+liste (43). C’est ainsi que pour la première fois, McLeod introduit la notion d’interactions
+maladie/médicament et interactions médicament/médicament en s’inspirant néanmoins des
+critères de Beers. Un consensus basé sur la méthode Delphi a permis d’établir une liste de
+38 critères répartis en 4 catégories : les traitements cardio-vasculaires, les traitements
+psychoactifs, les AINS et autres analgésiques et enfin les traitements divers. Les critères
+définissent 18 médicaments contre-indiqués chez les personnes âgées, 16 interactions
+médicaments et pathologies et 4 interactions médicamenteuses. Cette liste propose
+également des alternatives thérapeutiques. Cependant elle ne tient pas compte de l’omission
+ou de la duplication de certains médicaments et n’a pas été réévaluée depuis son
+élaboration.
+2.3.2.3 Improving Prescribing in the Elderly Tool (IPET)
+L’utilisation des précédents critères étant jugée trop longue, Naugler propose en 2000 une
+nouvelle grille au Canada basée sur les critères de McLeod. Il s’agit de la grille IPET
+(Improving Prescribing in the Elderly Tool) (44). Cette grille est composée uniquement de 14
+critères qui apparaissent fondamentaux dans la prise en charge du sujet âgé. Elle a été
+développée pour des patients de plus de 70 ans et définit 10 interactions médicament
+
+
+Introduction 14
+pathologie, 2 classes médicamenteuses inappropriées et les deux derniers font référence à
+la durée de traitement.
+L’outil est adapté à la pratique locale en s’inspirant indirectement des critères de Beers et est
+donc difficilement transposable en Europe. De plus, cette grille ne tient pas compte des
+omissions de prescription.
+2.3.2.4 Liste de Laroche
+Les listes nord-américaines sont utilisées dans de nombreux pays mais elles sont peu
+adaptées aux pratiques européennes et nécessitent une adaptation en fonction de la
+pharmacopée disponible. Ainsi en 2007, des experts français proposent un outil adapté à la
+pratique française. Il s’agit de la liste de Laroche de prescriptions potentiellement
+inappropriées, adaptée à la pratique française (45).
+Après une synthèse de la littérature, des experts ont été consultés pour se prononcer sur
+l’ensemble des critères pris en compte dans les listes déjà publiées et concernant les
+médicaments disponibles en France (46). Les critères sont basés en trois catégories : (a)
+rapport bénéfice/risque défavorable, (b) efficacité discutable, (c) rapport bénéfice/risque
+défavorable et efficacité discutable. Au total, cette liste française contient 36 critères dont 29
+médicaments ou classes médicamenteuses potentiellement inappropriés et cinq situations
+cliniques particulières (hypertrophie de la prostate, glaucome par fermeture de l’angle,
+incontinence urinaire, démence, constipation chronique) applicables aux patients de 75 ans
+et plus.
+Si l’outil propose des alternatives thérapeutiques pour les prescriptions inappropriées, cette
+grille ne tient pas compte de la problématique de la sous-prescription.
+2.3.2.5 L’outil STOPP/START
+Ce n’est qu’en 2008 qu’un premier outil a été développé en prenant compte de la
+problématique de l’ « underuse ». Gallagher propose l’échelle STOPP/START : STOPP
+(Screening Tool of Older Person’s Prescriptions) and START (Screening Tool to Alert
+doctors to Right Treatment) (47). Cette échelle irlandaise s’adresse aux patients de plus de
+
+
+Introduction 15
+65 ans; elle ne tient pas compte des critères de Beers et est donc adaptée à la pratique
+européenne. Elle est composée de deux volets : STOPP et START. L’échelle STOPP
+comprend 65 critères de prescriptions potentiellement inappropriées parmi les plus
+fréquentes chez ces patients. La majorité de ces 65 critères est accompagnée d’une note
+explicative concernant le caractère inapproprié. L’échelle START s’intéresse à l’omission de
+prescriptions en proposant l’introduction de thérapeutiques dans certaines situations grâce à
+22 indications de prescriptions. Les critères ont été validés par une méthode Delphi
+réunissant 18 experts gériatres et/ou pharmacologues cliniciens. Ils sont présentés selon les
+systèmes physiologiques et ont été conçus pour être appliqués conjointement. Cet outil a été
+adapté dans plusieurs langues européennes (48)(49)(50) et notamment en français en 2009
+par un groupe d’experts francophones (51).
+Une réactualisation des critères STOPP/START a été publiée en 2015 par la même équipe
+(52). Par rapport à la première version, certains critères ont été supprimés et de nouveaux
+critères ont été ajoutés. Pour chaque critère est fourni une ou plusieurs références
+permettant d’étayer sa validité. Les critères ont été validés par une méthode Delphi
+réunissant 19 experts de 13 pays européens qui ont une expérience reconnue en gériatrie et
+pharmacothérapie chez les personnes âgées. Dans la nouvelle version, il y a 80 critères
+STOPP et 34 critères START ce qui représente une augmentation de 31%. Une adaptation
+en langue française de STOPP/START version 2 a été publiée en novembre 2015 par un
+groupe d’experts francophones belges, canadiens, français et suisses (53). La liste des
+critères STOPP/START en langue française est fournie en annexe 1. Une présentation plus
+condensée des critères STOPP/START a également été publiée par Dalleur(54) ; elle est
+fournie en annexes 2 et 3.
+
+
+Introduction 16
+2.4 STOPP/START
+2.4.1 Utilisation de STOPP/START à travers le monde
+La première version a été largement utilisée à travers le monde, comme le montre les
+publications du monde entier (55)(56)(57)(58)(59)(60). Il y a eu 123 articles publiés dans la
+base de données PubMed décrivant l’utilisation des critères STOPP/START
+[http://www.ncbi.nlm.nih.gov/pubmed/?term=STOPP+criteria], incluant 5 revues de la
+littérature et 45 articles de recherche utilisant les critères STOPP/START dans différents
+scénarios cliniques. Ces publications viennent de 24 pays différents. Une étude australienne
+récente comparant les critères de Beers, les critères STOPP/START et des critères
+australiens (« prescribing indicators in elderly Australians ») conclue que les critères
+STOPP/START retrouvaient mieux les prescriptions inappropriées identifiées par les
+pharmaciens (61).
+Le fait que les critères STOPP/START aient été utilisés avec succès dans un but à la fois de
+recherche et de pratique clinique dans de nombreux pays en Europe, Asie, Australie,
+Amérique du nord et du sud indique que ces critères ont probablement une vraie pertinence.
+De plus, plusieurs études ont montré l’intérêt clinique des critères STOPP/START, à savoir :
+ Les critères STOPP sont associés de manière significative aux effets indésirables
+médicamenteux (62), à la vulnérabilité et au nombre d’hospitalisations (63).
+ L’application des critères STOPP/START durant l’hospitalisation pour une pathologie
+aiguë chez les personnes âgées améliore de manière significative la qualité des
+prescriptions (64), un effet qui est maintenu 6 mois après l’intervention.
+ L’application des critères STOPP/START dans un établissement de long séjour
+gériatrique réduit le nombre de médicaments, les chutes et les coûts des traitements
+mesurés 1 an après (58).
+
+
+Introduction 17
+2.4.2 Utilisation de STOPP/START en France
+Il n’existe qu’une étude publiée à notre connaissance sur l’utilisation de STOPP/START en
+France. Il s’agit de l’étude de l’impact d’une hospitalisation en médecine aiguë gériatrique sur
+la prescription médicamenteuse selon les critères STOPP/START publiée en 2015 par Frély
+(65).
+En soins primaires, deux thèses ont étudié l’utilisation de STOPP/START. La première
+publiée en 2012 est une étude quantitative sur l’utilisation des critères STOPP uniquement,
+lors du renouvellement des ordonnances en soins primaires par le médecin généraliste (66).
+La deuxième publiée en 2015 est une étude à la fois qualitative et quantitative sur l’utilisation
+des critères STOPP/START pour l’optimisation des ordonnances en EHPAD (67). Les deux
+études montrent une réduction significative des prescriptions inappropriées par l’utilisation
+des critères STOPP/START. L’étude qualitative montre que l’outil STOPP/START apporte un
+regard systématique et rigoureux dans la réévaluation et que son utilisation permet de forcer
+un temps de réévaluation. Dans les limites de l’outil, les médecins pointent surtout la
+surcharge de travail ainsi que la perte de temps qu’il peut engendrer. Une des améliorations
+proposées par les médecins généralistes est une adaptation de l’outil dans une version
+informatisée et notamment sur smartphones. De même, une étude qualitative sur l’utilisation
+de STOPP/START par les médecins généralistes en Belgique en soins primaires (68)
+conclut à une perception variable des médecins généralistes quant à l’utilité, l’exhaustivité et
+la pertinence des critères STOPP/START. Il n’existe pas d’étude réalisée avec la version 2
+des critères STOPP/START, ni d’étude utilisant une version informatisée de STOPP/START,
+ni d’étude réalisée en groupes de pairs.
+Pour conclure cette revue bibliographique, un outil tel que STOPP/START pourrait avoir une
+place dans la pratique générale mais avec certaines adaptations, la plus importante étant le
+développement d’une version informatisée.
+
+
+Introduction 18
+2.4.3 Objectifs de l’étude
+L’objectif principal de l’étude était une analyse qualitative de l’utilisation de STOPP/START
+version française 2 informatisée, par des médecins généralistes seuls ou réunis en groupe
+de pairs, en France.
+L’objectif secondaire était une analyse quantitative de l’utilisation de STOPP/START sur une
+cinquantaine d’ordonnance de patients polypathologiques chroniques de plus de 75 ans.
+
+
+Matériels et méthodes 19
+3 MATERIELS ET METHODES
+3.1 ANALYSE BIBLIOGRAPHIQUE
+J’ai fait une recherche dans PubMed avec les mots-clés suivants : « inappropriate
+prescribing », « aged », « aged 80 and over » et « general practitionner », j’ai obtenu 63
+articles. J’ai complété et affiné avec le mot clé « STOPP and START ».
+J’ai également fait une recherche dans SUDOC avec le mot-clé « déprescription », j’ai
+obtenu 9 résultats et avec le mot-clé « STOPP/START » j’ai obtenu 2 résultats et une
+recherche dans Cairn avec les mots-clés « polyprescription » et « médecine ».
+3.2 INFORMATISATION DE STOPP/START VERSION 2
+3.2.1 Traduction
+La première étape a consisté à traduire les critères STOPP/START de la version 2 parue en
+mars 2015 (52). Pour les critères déjà présents dans la version 1, la traduction faite par
+l’équipe de Lang a été utilisée (51). La traduction de la version 2 par l’équipe de Lang a été
+publiée en novembre 2015 (53), l’outil a alors été modifié pour reprendre la traduction
+publiée, même s’il n’y avait pas de différences majeures.
+3.2.2 Correspondance classe ATC et critères STOPP/START
+La deuxième étape a consisté en la création de la correspondance entre, d’une part, les
+critères STOPP et les classes ATC1 de l’OMS, et d’autre part, les critères START et les
+pathologies. Un fichier de correspondances a été créé mettant en lien chaque critère STOPP
+avec la liste des classes ATC concernées par le critère. Retrouver la liste des classes ATC
+concernées par un critère ne pose en général pas de problèmes.
+1 Anatomique, Thérapeutique et Chimique
+
+
+Matériels et méthodes 20
+Quand il s’agissait d’un médicament, il suffisait de mettre la classe ATC correspondante (par
+exemple : Diltiazem correspond à la classe ATC CO8DB01).
+Quand il s’agissait d’une classe médicamenteuse, il suffisait de mettre la classe ATC
+correspondant à la classe médicamenteuse (par exemple : diurétiques de l’anse correspond
+à la classe C03C). Cependant certaines classes de médicaments correspondaient à
+plusieurs classes ATC, par exemple les bêtabloquants suivant qu’ils sont utilisés pour une
+pathologie cardio-vasculaire (classe ATC C07A) ou en anti-glaucomateux en ophtalmologie
+(classe ATC S01ED).
+Pour les médicaments anticholinergiques, en plus de la classe ATC anticholinergique (N04A)
+il a été décidé de prendre la liste des médicaments ayant des propriétés anticholinergiques
+figurant dans la liste de Laroche (liste française des médicaments potentiellement
+inappropriés chez les personnes de 75 ans et plus) (45). Il a ensuite été vérifié que les
+médicaments de l’échelle du risque anticholinergique (ARS) (69) avec un score de 3 points
+étaient bien présents dans cette liste. Par la suite, dans la version française publiée en
+novembre 2015 (53) pour le critère STOPP N1, il est indiqué une liste non exhaustive de
+médicaments à activité anticholinergique élevée. Il a alors également été vérifié que tous les
+médicaments présents dans cette liste étaient pris en compte.
+Le fichier de correspondance met également en lien chaque critère START avec une liste de
+pathologie. Pour éviter d’avoir une trop longue liste de pathologies il a été décidé d’en
+regrouper certaines sous un dénominateur commun. Par exemple cardiopathie regroupe :
+insuffisance cardiaque systolique et/ou maladie coronarienne, cardiopathie ischémique,
+insuffisance cardiaque systolique stable. Le fichier de correspondance utilisé est fournie en
+annexe 4, il est également disponible sur l’outil informatique en cliquant sur « liens utiles ».
+3.2.3 Création d’un outil informatique
+Cet outil se compose tout d’abord d’une base de données possédant 4 tables : une table de
+critères traduits en français, une table des références citées dans l’étude STOPP/START,
+une table de correspondances entre classe ATC et critère STOPP/START, et une table de
+
+
+Matériels et méthodes 21
+médicaments issue de la base de données des médicaments de la CNAMTS. Cette dernière
+base recense les médicaments commercialisés en France et remboursés par l’assurance
+maladie ; l’outil informatique ne prend donc pas en compte les médicaments non remboursés
+par l’assurance maladie.
+L’outil informatique se présente sous la forme d’une page web respectant les standards
+HTML5 et CSS3. Cette page a été conçue et écrite en PHP (côté serveur) et JavaScript et
+AJAX (côté client). Elle permet la saisie d’une ordonnance en DCI ou en nom commercial et
+fait ressortir les critères correspondants. L’outil a été modifié et amélioré au cours de son
+évaluation auprès des groupes de pairs en tenant notamment compte de leurs remarques.
+Une des évolutions importantes a été de rajouter la possibilité de sauvegarder la page
+résultat en PDF et l’autre de rajouter la possibilité d’afficher les références pour chacun des
+critères sortis.
+
+
+Matériels et méthodes 22
+3.2.3.1 Description de l’outil
+L’outil est accessible librement à l’adresse suivante : http://stoppstart.free.fr/.
+La page d’accueil se présente ainsi :
+On rentre ensuite la liste des médicaments par nom commercial ou par DCI. Pour faciliter la
+saisie, une aide à la saisie prédictive est fournie. Les médicaments saisis apparaissent
+dessous par DCI :
+
+
+Matériels et méthodes 23
+La liste des pathologies apparait en cliquant sur le « plus » et il suffit alors de cocher les
+pathologies concernant le patient :
+
+
+Matériels et méthodes 24
+On clique ensuite sur vérifier et la page de résultats apparait :
+
+
+Matériels et méthodes 25
+En cliquant sur la touche en haut à droite, on modifie la présentation des résultats en
+affichant ou non les références, correspondant aux différents critères, citées par les auteurs
+de l’étude STOPP/START :
+Le bouton Acrobat Reader permet de sauvegarder la page de résultats en format PDF avec
+ou sans les références en fonction du format affiché à l’écran.
+3.2.3.2 Limites de l’outil
+Par conception, l’outil n’est qu’une version informatisée des critères STOPP/START pour
+faciliter leur utilisation par rapport à la version papier.
+3.2.4 Validation de l’outil
+L’outil a été testé et validé de la manière suivante. Le directeur de thèse et le doctorant ont
+appliqué indépendamment les critères STOPP/START sur quinze ordonnances prises au
+hasard au sein des deux clientèles, à la main. Ils ont ensuite comparé leurs résultats, puis
+ont vérifié qu’ils obtenaient le même résultat avec l’outil informatique. Les erreurs trouvées
+ont été analysées et l’outil a été corrigé. Ils ont ensuite recommencé avec quinze nouvelles
+
+
+Matériels et méthodes 26
+ordonnances et ce jusqu’à qu’il n’y ait plus de différence entre l’application à la main et l’outil
+informatique.
+
+
+Matériels et méthodes 27
+3.3 RECUEIL DE DONNEES
+3.3.1 Objectifs initiaux
+Il était prévu d’inclure 8 à 10 groupes de pairs pour toucher entre 50 et 70 médecins et tester
+l’outil sur 50 à 70 ordonnances.
+3.3.2 Présentation en groupe de pairs
+La cible était les groupes de pairs intéressés par la mise en œuvre de STOPP/START
+comme aide à l’optimisation d’ordonnance. Pour ce faire, l’ensemble des groupes de pairs
+d’Ile-de-France membre de la SFMG a été contacté par mail.
+Le déroulé de la réunion était le suivant :
+Présentation par le doctorant de l’outil STOPP/START et son utilisation informatique. Il était
+demandé que chaque membre du groupe de pairs vienne avec le dossier médical d’un
+patient de plus de 75 ans, polypathologique, avec au minimum 6 médicaments sur son
+ordonnance. Puis, utilisation ensemble de l’outil STOPP/START informatisé sur chacune des
+ordonnances apportées par les membres. Les différentes modifications retenues pour
+chaque ordonnance étaient notées, ainsi que le sexe et l’âge du patient et le nombre de
+médicaments sur l’ordonnance initiale. Chacune des séances de groupes de pairs a été
+enregistrée afin de recueillir la réaction des médecins en temps réel face à l’outil. A l’issue de
+la séance, il était également demandé aux médecins de répondre à quelques questions
+ouvertes sur l’utilisation et l’intérêt de STOPP/START. Le questionnaire (annexe 5) a été
+construit en utilisant les résultats de l’ étude qualitative sur l’utilisation de STOPP/START en
+soins primaires en Belgique (68).
+L’outil STOPP/START a été validé pour les patients de plus de 65 ans, conformément aux
+habitudes anglo-saxonnes ; il a cependant été préféré de s’appuyer sur la définition
+gériatrique de l’âge de 75 ans correspondant en général à l’âge à partir duquel les
+modifications physiologiques, la fréquence des comorbidités, la baisse de l’état général et de
+l’autonomie, favorisent une situation de fragilité qui augmente le risque d’effets indésirables
+
+
+Matériels et méthodes 28
+médicamenteux. Dans l’adaptation française de la liste de Beers effectuée par Laroche (45),
+le même choix avait été fait.
+3.3.3 Présentation à des médecins individuellement
+Le nombre de groupes de pairs ayant répondu favorablement étant faible, il a été décidé de
+présenter également l’outil à des médecins à leur cabinet de manière individuelle. Pour des
+raisons de faisabilité, il s’agissait de médecins des Yvelines, parmi les connaissances du
+doctorant. La présentation et le déroulement d’une séance était relativement similaire à ceux
+réalisés en groupe de pairs. L’outil était testé sur 3 à 4 ordonnances du médecin. Ça ne
+reflétait pas forcément l’utilisation que pourrait avoir un médecin seul face à l’outil puisqu’il y
+avait un échange sur le dossier entre le doctorant et le médecin. L’autre différence est que,
+comme on se trouvait dans le cabinet du médecin et qu’il avait alors accès à l’ensemble du
+dossier du patient, il pouvait faire une recherche lorsqu’une question était soulevée et se
+noter des mémos par rapport à des modifications ou des vérifications à faire.
+
+
+Matériels et méthodes 29
+3.4 POPULATION ETUDIEE
+3.4.1 Médecins consultés pour l’étude
+Sur l’ensemble des groupes de pairs d’Ile de France de la SFMG, seuls 3 groupes de pairs
+ont répondu favorablement. Deux autres groupes de pairs contactés via des connaissances
+du doctorant ont également accepté de participer à l’étude. Soit en tout 5 groupes de pairs.
+Comme ce nombre était en deçà de l’objectif visé, il a été décidé de contacter des médecins
+de manière individuelle pour participer à l’étude ; cinq médecins ont participé en entretien
+individuel. Soit au total, 39 médecins ont participé à l’étude, 26 hommes et 13 femmes,
+répartis dans les départements du 78, 91 et 95.
+3.4.2 Caractéristiques de la population étudiée
+Au total 50 ordonnances ont été analysées, correspondant à 26 femmes et 24 hommes, de
+67 à 98 ans avec une moyenne à 83,5 ans. La répartition par classe d’âge montre que
+l’essentiel des patients étaient entre 80 et 90 ans (Figure 1).
+Figure 1 : Nombre d’ordonnances par classe d’âge
+Ils avaient en moyenne 9 médicaments par ordonnance, le minimum étant 3 et le maximum
+16 et le nombre de pathologies chroniques allait de 2 à 12 avec une moyenne à 6.
+
+
+Matériels et méthodes 30
+3.5 ANALYSE DES DONNEES
+3.5.1 Analyse qualitative
+L’analyse de contenu a été effectuée sur NVivo version 11, par le doctorant et le directeur de
+thèse, après retranscription des enregistrements par le doctorant. La méthode d’analyse était
+une approche compréhensive (recherche de la signification des actions des acteurs
+concernés) de l’utilisation de STOPP/START dans les groupes de pairs ou en entretien
+individuel.
+3.5.2 Analyse quantitative
+Une analyse descriptive des résultats obtenus par l’application de STOPP/START et sur la
+modification des ordonnances revues dans les groupes de pairs et par les médecins en
+individuel, a été réalisée à l’aide d’Excel. La médiane et les quartiles ont été utilisés.
+
+
+Résultats 31
+4 RESULTATS
+4.1 ANALYSE QUANTITATIVE DE L’UTILISATION DE STOPP/START
+4.1.1 Résultats bruts sortis par l’outil
+Il y avait entre 4 et 17 critères STOPP sortis par l’outil pour une ordonnance avec une
+médiane de 9,5 et entre 1 à 13 critères START avec une médiane de 7 (Figure 2).
+Figure 2 : Nombre de critères sortis par l'outil par ordonnance (boîte à moustaches)
+La répartition est représentée Figure 3.
+Figure 3 : Nombre d’ordonnances par nombre de critères sortis par l’outil
+
+
+Résultats 32
+4.1.1.1 Critères STOPP
+La répartition des critères STOPP par catégorie montre une large prédominance de
+médicaments à visée cardiovasculaire (système cardiovasculaire et antiagrégant et
+antiplaquettaires) et vient ensuite les médicaments associés à un risque accru de chute
+(Figure 4).
+Figure 4 : Nombre de critères STOPP sortis par l’outil classés par système
+Les cinq critères STOPP les plus souvent sortis par l’outil représentent environ un tiers des
+critères sortis (171/505=34%) (Figure 5) :
+K3 Un vasodilatateur (alpha1-bloquant, inhibiteur calcique, dérivé nitré de longue durée
+d’action, IEC, ARA II) en présence d’une hypotension orthostatique persistante
+(diminution récurrente de la pression artérielle systolique > =20 mmHg ou diastolique >
+=10 mmHg lors de la verticalisation) – (risque de syncopes, de chutes)
+C3 Un antiagrégant plaquettaire (aspirine, clopidogrel, dipyridamole) ou un anticoagulant
+oral (antivitamine K, inhibiteur direct de la thrombine ou du facteur Xa) en présence
+d’un risque hémorragique significatif (hypertension artérielle sévère non contrôlée,
+diathèse hémorragique, ou récent épisode de saignement spontané important) 
+(risque élevé d’hémorragie)
+
+
+Résultats 33
+B11 Un inhibiteur de l’enzyme de conversion (IEC) ou un antagoniste des récepteurs de
+l’angiotensine II (ARA II) en présence d’un antécédent d’hyperkaliémie – (risque de
+récidive)
+C1 De l’aspirine au long cours à dose > 160 mg/jour – (risque accru de saignement, sans
+preuve d’efficacité majorée)
+C2 De l’aspirine en présence d’un antécédent d’ulcère gastroduodénal sans prescription
+d’un IPP – (risque de récidive d’ulcère)
+Figure 5 : Top 5 des critères STOPP sortis par l’outil
+Il y a 27 critères STOPP sur les 81 qui ne sont jamais sortis lors de l’utilisation de l’outil sur
+les 50 ordonnances ; soit un tiers des critères (33% - la liste de ces 27 critères figure en
+annexe 6).
+4.1.1.2 Critères START
+La répartition par catégorie des critères START sortis par l’outil (Figure 6) montre également
+une prédominance des pathologies cardiovasculaires. Vient ensuite la catégorie vaccin qui
+ne contient qu’un seul critère correspondant au vaccin anti-pneumococcique. En effet la
+vaccination antigrippale étant recommandé pour tous les patients, le critère correspondant a
+été retiré de l’outil informatisé. Pour le vaccin anti-pneumococcique, les recommandations
+nationales françaises ont été utilisées ; c'est-à-dire le critère recommandant la vaccination
+anti-pneumococcique apparaît si l’une des pathologies suivantes est cochée : cardiopathie,
+hépathopathie, diabète, immunodépression, insuffisance rénale ou pathologie respiratoire.
+
+
+Résultats 34
+On remarquera que la vaccination anti-pneumococcique est dans ces conditions,
+recommandée pour 40 ordonnances sur 50.
+Figure 6 : Nombre de critères START sortis par l’outil classés par système
+Les cinq critères START les plus fréquemment sortis par l’outil (Figure 7) représentent près
+de le moitié des critères sortis (150/349=43%):
+I2 Vaccination antipneumococcique au moins une fois après l'âge de 65 ans en accord
+avec les recommandations nationales – (prévention des infections invasives à
+pneumocoques)
+A4 Un antihypertenseur, en présence d’une hypertension artérielle persistante (systolique
+> 160 mmHg et/ou diastolique > 90 mmHg). Pour les patients diabétiques, les seuils de
+140 mmHg pour la systolique et de 90 mmHg pour la diastolique sont préférés 
+(réduction de la morbi-mortalité cardiovasculaire)
+A6 Inhibiteur de l’enzyme de conversion (IEC) en présence d’une insuffisance cardiaque
+systolique et/ou d'une maladie coronarienne - (réduction de la morbi-mortalité
+cardiaque)
+A7 Bêtabloquant en présence d’une cardiopathie ischémique – (réduction de la morbi
+mortalité cardiaque)
+A8 Bêtabloquant validé (bisoprolol, nébivolol, métoprolol ou carvédilol) en présence d'une
+insuffisance cardiaque systolique stable – (réduction de la morbi-mortalité cardiaque)
+
+
+Résultats 35
+Figure 7 : Top 5 des critères START sortis par l’outil
+Il y a 6 critères START sur les 34 (soit 18%) qui ne sont jamais sortis lors de l’utilisation de
+l’outil sur les 50 ordonnances ; ces 6 critères correspondaient aux pathologies suivantes :
+maladie de Parkinson, syndrome des jambes sans repos, polyarthrite rhumatoïde et vaginite
+atrophique symptomatique.
+4.1.2 Résultats après analyse des utilisateurs
+On entend par « critère retenu » les critères sortis par l’outil et jugés pertinents par les
+utilisateurs. Pour un critère STOPP, il faut que les conditions décrites dans le critère soient
+effectivement valables pour le patient étudié. Par exemple le critère C2 (De l’aspirine en
+présence d’un antécédent d’ulcère gastroduodénal sans prescription d’un IPP – risque de
+récidive d’ulcère) apparait dès que l’ordonnance contient de l’aspirine. Il ne sera
+éventuellement pertinent que si le patient a effectivement un antécédent d’ulcère et qu’il n’y
+a pas déjà de prescription d’un IPP ; ça n’a jamais été le cas sur les 50 patients étudiés.
+Pour un critère START, il faut que la pathologie décrite dans le critère corresponde
+effectivement à celle du patient et que le médicament conseillé ne soit pas déjà présent sur
+l’ordonnance. En effet, le critère START sort dès que la pathologie concernée est cochée
+sans vérifier si le médicament conseillé est déjà présent sur l’ordonnance.
+Il faut bien comprendre que l’outil est relativement simple, qu’il ne s’apparente en rien à un
+système expert et qu’il a été uniquement fait pour faciliter l’utilisation de STOPP/START
+version papier.
+
+
+Résultats 36
+Il y avait entre 0 et 4 critères STOPP retenus par ordonnance avec une médiane à 2 et entre
+0 et 4 critères START retenus avec une médiane à 1 (Figure 8).
+Figure 8 : Nombre de critères retenus par ordonnance (boîte à moustaches)
+La répartition du nombre de critères STOPP et START est représentée Figure 9.
+Figure 9 : Nombre d’ordonnances par nombre de critères retenus
+4.1.2.1 Critères STOPP
+Le nombre d’ordonnance avec au moins un critère STOPP retenu est de 80%. La répartition
+des critères STOPP retenus par les médecins, par système, est tout à fait différente de celle
+des critères STOPP sortis par l’outil. Le système cardiovasculaire n’apparaît plus qu’en 3e
+position et les antiplaquettaires et anticoagulants en 5e position ; alors que ce sont les
+
+
+Résultats 37
+médicaments du système gastro-intestinal et les médicaments associés à un risque accru de
+chute qui prédominent (Figure 10).
+Figure 10 : Nombre de critères STOPP retenus classés par système
+Les cinq critères STOPP les plus souvent retenus (Figure 11) représentent près de la moitié
+des critères STOPP retenus (42/91=46%) :
+F2 Un IPP à dose maximale pendant plus de huit semaines pour œsophagite peptique ou
+ulcère gastroduodénal non compliqués – (indication d’une réduction de la dose de
+l’IPP, voire de son arrêt avant huit semaines)
+J1 Une sulphonylurée à longue durée d’action (glibenclamide, chlorpropamide,
+glimépiride, gliclazide à libération prolongée) pour un diabète de type 2 – (risque
+d’hypoglycémies prolongées)
+B5 L’amiodarone en première intention pour une tachycardie supraventriculaire – (risque
+d’effets secondaires plus important que celui par bêtabloquant, digoxine, vérapamil ou
+diltiazem)
+K4 Un hypnotique Z (zopiclone, zolpidem, zaleplon) – (risque de sédation, d’ataxie)
+D5 Une benzodiazépine depuis plus de quatre semaines – (un traitement prolongé par
+benzodiazépine n’est pas indiqué (critère A1) ; risques de sédation, de confusion, de
+troubles de l’équilibre, de chutes et/ou d’accident de la route. Après quatre semaines,
+toute prise de benzodiazépine devrait être diminuée progressivement puisqu’il existe
+une tolérance de l’effet thérapeutique et un risque de syndrome de sevrage)
+
+
+Résultats 38
+Figure 11 : Top 5 des critères STOPP retenus
+Il y a au total 25 critères STOPP sur 81 soit près d’un tiers qui sont sortis au moins une fois
+avec l’outil mais qui n’ont jamais été retenus par les utilisateurs (Annexe 8). Les cinq critères
+les plus souvent sortis et jamais retenus représentent 53% des critères sortis jamais retenus
+(Figure 12) :
+B11 Un inhibiteur de l’enzyme de conversion (IEC) ou un antagoniste des récepteurs de
+l’angiotensine II (ARA II) en présence d’un antécédent d’hyperkaliémie – (risque de
+récidive)
+C2 De l’aspirine en présence d’un antécédent d’ulcère gastroduodénal sans prescription
+d’un IPP – (risque de récidive d’ulcère)
+B4 Un bêtabloquant en présence d’une bradycardie (< 50 bpm), d’un bloc atrioventriculaire
+du second degré ou troisième degré – (risque de bloc complet ou d’asystolie)
+B9 Un diurétique de l’anse pour hypertension artérielle en présence d’une incontinence
+urinaire – (exacerbation probable de l’incontinence)
+E6 La metformine lorsque le DFG est < 30 ml/min – (risque d’acidose lactique)
+Figure 12 : Top 5 des critères STOPP sortis et jamais retenus
+
+
+Résultats 39
+4.1.2.2 Critères START
+Le nombre d’ordonnance avec au moins un critère START retenu est de 82%. La répartition
+des critères START retenus par système montre une très nette prédominance de la
+catégorie vaccin (Figure 14).
+Figure 13 : Nombre de critères START retenus classés par système
+Les cinq critères START les plus souvent retenus représentent 70% (50/71) des critères
+retenus :
+I2 Vaccination antipneumococcique au moins une fois après l'âge de 65 ans en accord
+avec les recommandations nationales – (prévention des infections invasives à
+pneumocoques)
+A6 Inhibiteur de l’enzyme de conversion (IEC) en présence d’une insuffisance cardiaque
+systolique et/ou d'une maladie coronarienne - (réduction de la morbi-mortalité
+cardiaque)
+E5 En présence d’un confinement au domicile, de chutes ou d’une ostéopénie
+(densitométrie osseuse : -2.5 < T-score< -1 DS), une supplémentation en vitamine D
+(cholécalciférol 800-1000 UI/jour) – (prévention de l’ostéoporose)
+F1 IEC ou sartans (si intolérance aux IEC) en présence d’une néphropathie diabétique, c.
+à-d. protéinurie manifeste ou micro-albuminurie (> 30mg/24h) avec ou sans
+insuffisance rénale – (protection glomérulaire)
+A8 Bêtabloquant validé (bisoprolol, nébivolol, métoprolol ou carvédilol) en présence d'une
+insuffisance cardiaque systolique stable – (réduction de la morbi-mortalité cardiaque)
+
+
+Résultats 40
+Figure 14 : Top 5 des critères START retenus
+Il y a au total 12 critères START sur 34, soit 35%, qui sont sortis au moins une fois avec
+l’outil, mais qui n’ont jamais été retenus par les utilisateurs. Les cinq critères les plus souvent
+sortis et jamais retenus représentent 73% des critères sortis jamais retenus (Figure 15) :
+A4 Un antihypertenseur, en présence d’une hypertension artérielle persistante (systolique
+> 160 mmHg et/ou diastolique > 90 mmHg). Pour les patients diabétiques, les seuils de
+140 mmHg pour la systolique et de 90 mmHg pour la diastolique sont préférés 
+(réduction de la morbi-mortalité cardiovasculaire)
+A2 Aspirine (75mg-160mg une fois par jour) en présence d’une fibrillation atriale et d'une
+contre-indication majeure à l'anticoagulation – (risque cardio-embolique élevé)
+A3 Antiagrégant plaquettaire (aspirine ou clopidogrel ou prasugrel ou ticagrélor) en
+présence d’une athérosclérose au niveau coronarien, cérébrovasculaire ou
+périphérique – (réduction des événements ischémiques)
+H1 En présence de douleurs modérées à sévères, des agonistes opioïdes forts doivent
+être proposés lorsque le paracétamol, les AINS, les opiacés faibles sont inadaptés à la
+sévérité des douleurs ou ont été inefficaces – (contrôle de la douleur permettant
+d’éviter anxiété, dépression, troubles du comportement, du sommeil et de la mobilité)
+C2 Un antidépresseur non tricyclique, en présence de symptômes dépressifs majeurs
+persistants, – (amélioration des formes sévères de dépression)
+
+
+Résultats 41
+Figure 15 : Top 5 des critères START sortis mais jamais retenus
+4.1.2.3 Modification des ordonnances
+Au final, 82% des ordonnances ont été modifiées suite à l’application de
+STOPP/START, avec 74% de STOPP et 66% de START. Si on enlève la vaccination anti
+pneumococcique, on arrive à 76% d’ordonnances modifiées.
+Même si la plupart des ordonnances sont modifiées il y a peu de modifications par
+ordonnance. Au total, l’application de STOPP/START diminue très légèrement le nombre de
+médicament sur l’ordonnance (hors vaccin) : on passe d’une médiane à 9 à une médiane à
+8,5 (Figure 16).
+Figure 16 : Nombre de médicaments avant et après
+Le temps passé par ordonnance est allé de 5 à 28 minutes, avec une médiane à 13,5
+minutes. Le temps a été mesuré à partir de l’enregistrement. Ce temps prend en compte le
+temps pour discuter de l’ordonnance et du dossier du patient mais aussi de réflexions plus
+
+
+Résultats 42
+générales par rapport à un des critères, voire de digressions sans rapport direct avec le
+sujet.
+
+
+Résultats 43
+4.2 DISCUSSION DE L’ANALYSE QUANTITATIVE
+4.2.1 Comparaison des résultats avec la littérature
+Dans la littérature, on trouve un pourcentage de Prescription Médicamenteuse
+Potentiellement Inappropriée (PIM), en soins primaires, en appliquant STOPP, allant de
+14,8% à 72,9% et un pourcentage de Prescription Potentiellement Omise (PPO), en
+appliquant START, allant de 20,1% à 60,7% (55)(70)(56)(71)(63)(72)(73)(74)(59)(60)(75)
+(76). On retrouve des chiffres plus importants dans cette étude, puisque l’on a 80% de PIM
+et 82% de PPO. Mais cette étude a été réalisée avec la version 2 de STOPP/START, alors
+que dans la littérature, il n’y a que des études réalisées avec la version 1. La version 2 ayant
+31% de critères supplémentaires par rapport à la version 1, on pouvait s’attendre à avoir un
+nombre de PIM et de PPO plus important. D’ailleurs, quand on regarde les 5 critères STOPP
+les plus souvent retenus, 2 d’entre eux sont des nouveaux critères ; de même parmi les 5
+critères START les plus souvent retenus, 3 d’entre eux sont des nouveaux critères et
+notamment celui sur la vaccination anti-pneumococcique, qui était de très loin le plus
+fréquent.
+Une autre raison pouvant expliquer des résultats plus importants de PIM et PPO, est le fait
+qu’il avait été demandé aux médecins de choisir une ordonnance contenant plus de 5
+médicaments, ce qui a été presque toujours respecté. Et dans la mesure où les médecins
+ont choisi l’ordonnance à tester, ils ont souvent pris des patients complexes avec des
+ordonnances particulièrement longues.
+4.2.2 Peu de modifications
+On constate que, même si la plupart des ordonnances ont été modifiées, il y a peu de
+médicaments ajoutés ou supprimés et le nombre de médicaments sur l’ordonnance reste
+globalement le même.
+
+
+Résultats 44
+4.2.3 Discussion sur les sorties les plus fréquentes
+4.2.3.1 Critères STOPP
+Parmi les critères STOPP les plus souvent retenus, les 5 plus fréquents étaient les suivants :
+F2 Un IPP à dose maximale pendant plus de huit semaines pour oesophagite peptique ou
+ulcère gastroduodénal non compliqués – (indication d’une réduction de la dose de
+l’IPP, voire de son arrêt avant huit semaines).
+Il y avait beaucoup de prescription d’IPP dont l’indication n’était pas claire et pas toujours
+facilement retrouvée dans le dossier. Ce sont des médicaments qui avaient tendance à être
+banalisés et dont la réévaluation n’était pas très fréquente.
+J1 Une sulphonylurée à longue durée d’action (glibenclamide, chlorpropamide,
+glimépiride, gliclazide à libération prolongée) pour un diabète de type 2 – (risque
+d’hypoglycémies prolongées)
+Lors de l’étude, des médecins ont fait remarquer que le glibenclamide n’était pas un
+sulfamide à longue durée d’action ; il est effectivement noté dans le Vidal comme un
+sulfonyluré de seconde génération à demi-vie courte. Le critère J1 est pourtant formulé ainsi
+dans la version originale en anglais (52) et dans la traduction française publiée (53). Dans
+l’article en référence pour le critère J1 il est effectivement considéré comme une
+sulphonylurée à longue durée d’action(77). Les sulfamides à longue durée d’action étaient
+souvent présents sur les ordonnances. Les médecins étaient en général bien conscients des
+problèmes qu’ils posent chez les gens âgés ; toute la difficulté était de savoir quand arrêter
+un médicament souvent pris depuis de nombreuses années et souvent bien toléré. Le fait
+que le médicament ait souvent été prescrit par le diabétologue qui ne voyait pas d’intérêt à
+modifier la prescription ne facilitait pas la chose.
+B5 L’amiodarone en première intention pour une tachycardie supraventriculaire – (risque
+d’effets secondaires plus important que celui par bêtabloquant, digoxine, vérapamil ou
+diltiazem)
+
+
+Résultats 45
+Ce critère a souvent été retenu dans le sens où l’amiodarone avait effectivement été prescrit
+en première intention pour une ACFA, mais il était rare que les médecins aient décidé de
+l’arrêter pour autant. Ils n’étaient le plus souvent pas convaincus par la pertinence de ce
+critère ou suivaient la prescription du cardiologue.
+K4 Un hypnotique Z (zopiclone, zolpidem, zaleplon) – (risque de sédation, d’ataxie)
+D5 Une benzodiazépine depuis plus de quatre semaines – (un traitement prolongé par
+benzodiazépine n’est pas indiqué (critère A1) ; risques de sédation, de confusion, de
+troubles de l’équilibre, de chutes et/ou d’accident de la route. Après quatre semaines,
+toute prise de benzodiazépine devrait être diminuée progressivement puisqu’il existe
+une tolérance de l’effet thérapeutique et un risque de syndrome de sevrage)
+Pour ces 2 critères, les médecins étaient bien au courant de la problématique, mais ce sont
+des médicaments difficiles à arrêter dans la pratique.
+4.2.3.2 Critères START
+Parmi les critères START les plus souvent retenus :
+I2 Vaccination antipneumococcique au moins une fois après l'âge de 65 ans en accord
+avec les recommandations nationales – (prévention des infections invasives à
+pneumocoques).
+Ce critère a été retenu de manière largement majoritaire (30 ordonnances sur les 50). La
+recommandation de vaccination anti-pneumococcique chez les adultes était très peu suivie,
+soit par méconnaissance de la recommandation, soit par oubli, soit que le médecin n’était
+pas convaincu de son intérêt. Dans la majorité des cas, le médecin décidait de proposer la
+vaccination à son patient.
+A6 Inhibiteur de l’enzyme de conversion (IEC) en présence d’une insuffisance cardiaque
+systolique et/ou d'une maladie coronarienne - (réduction de la morbi-mortalité
+cardiaque)
+A8 Bêtabloquant validé (bisoprolol, nébivolol, métoprolol ou carvédilol) en présence d'une
+insuffisance cardiaque systolique stable – (réduction de la morbi-mortalité cardiaque)
+
+
+Résultats 46
+Les médecins étaient en accord avec ces critères, mais n’étaient pas toujours capables de
+dire pourquoi le patient n’avait pas ces traitements, et s’ils avaient été essayés ou non, et ce
+d’autant plus que le traitement était souvent géré par un cardiologue.
+E5 En présence d’un confinement au domicile, de chutes ou d’une ostéopénie
+(densitométrie osseuse : -2.5 < T-score< -1 DS), une supplémentation en vitamine D
+(cholécalciférol 800-1000 UI/jour) – (prévention de l’ostéoporose)
+Dans la majorité des cas, les médecins n’étaient pas opposés à rajouter de la vitamine D,
+même s’ils n’étaient pas toujours convaincus de l’intérêt de le faire.
+F1 IEC ou sartans (si intolérance aux IEC) en présence d’une néphropathie diabétique, c.
+à-d. protéinurie manifeste ou micro-albuminurie (> 30mg/24h) avec ou sans
+insuffisance rénale – (protection glomérulaire)
+Les médecins ne se rappelaient pas toujours s’il y avait ou non une néphropathie et se
+proposaient de vérifier.
+4.2.4 Amélioration de l’outil
+4.2.4.1 Diminution du nombre de critère
+4.2.4.1.1 Critères jamais sortis
+On a vu que 27 des 81 critères STOPP ne sont jamais sortis lors de l’étude (Annexe 6). On
+peut se demander s’ils sont pertinents en médecine de ville. Les 2 premiers ne sortent
+jamais de par la construction même de l’outil, car ils sont toujours valables ; il s’agit des
+critères :
+A1 Tous médicaments prescrits sans indication clinique
+A2 Tout médicament prescrit au-delà de la durée recommandée, si elle est définie
+Ce qui ne va pas dire qu’ils ne sont jamais retenus, notamment le critère A1 a été retenu à
+plusieurs reprises au cours de l’analyse des ordonnances.
+Pour les 25 autres critères, ils correspondent à des médicaments moins fréquents en
+médecine générale. Cependant l’étude n’a porté que sur 50 ordonnances ce qui reste limité
+
+
+Résultats 47
+et par ailleurs leur présence n’alourdit pas l’utilisation de l’outil puisqu’ils n’apparaissent pas.
+Je ne vois donc pas l’intérêt qu’il y aurait à supprimer ces critères.
+De même, 6 critères sur les 34 critères START ne sont jamais sortis (Annexe 7). Un de ces
+critères est le critère I1 sur la vaccination de la grippe ; par construction de l’outil, il a été
+décidé qu’il ne sorte jamais car il est toujours valable. D’autre part, la vaccination antigrippale
+étant organisée par la sécurité sociale en France, on ne voit pas l’intérêt qu’il y aurait de le
+rappeler dans l’outil. Les 5 autres critères correspondent aux pathologies suivantes : maladie
+de Parkinson, syndrome des jambes sans repos, polyarthrite rhumatoïde et vaginite
+atrophique symptomatique. Même si ces pathologies ne sont pas très fréquentes en
+médecine de ville, ces critères me semblent intéressants ; seul l’intérêt du critère G3
+concernant la vaginite atrophique me paraît discutable : il y a peu de chance, si cette
+dernière pathologie est présente, que le médecin « oublie » de prescrire des œstrogènes
+locaux.
+4.2.4.1.2 Critères sortant souvent et jamais retenus
+Il y a au total 25 critères STOPP qui sont sortis au moins une fois avec l’outil, mais qui n’ont
+jamais été retenus par les utilisateurs. Ces critères ont tendance à alourdir l’utilisation de
+l’outil et on peut se demander s’il est pertinent de les garder. Si l’on regarde, par exemple,
+les cinq critères les plus souvent sortis et jamais retenus :
+B11 Un inhibiteur de l’enzyme de conversion (IEC) ou un antagoniste des récepteurs de
+l’angiotensine II (ARA II) en présence d’un antécédent d’hyperkaliémie – (risque de
+récidive)
+Le critère B11, même s’il n’a jamais été retenu lors de l’étude, permet de rappeler au
+médecin de contrôler la kaliémie en cas de prescription d’un IEC et d’un ARA2. Et il est
+arrivé que, même si le critère n’a pas été retenu, le médecin se note de penser à contrôler la
+kaliémie du patient. Dans ces conditions le critère B11 garde néanmoins un intérêt.
+C2 De l’aspirine en présence d’un antécédent d’ulcère gastroduodénal sans prescription
+d’un IPP – (risque de récidive d’ulcère)
+
+
+Résultats 48
+Le critère C2 n’a jamais été retenu ; en effet la prescription d’IPP a plutôt tendance à être
+trop large qu’oubliée. Le critère C2 permet néanmoins de rappeler qu’en l’absence
+d’antécédent d’ulcère la prescription d’IPP n’est pas obligatoire chez un patient prenant de
+l’aspirine.
+B4 Un bêtabloquant en présence d’une bradycardie (< 50 bpm), d’un bloc atrioventriculaire
+du second degré ou troisième degré – (risque de bloc complet ou d’asystolie)
+Le critère B4 n’a jamais été retenu et il n’est peut-être pas indispensable de rappeler au
+médecin d’arrêter un bêtabloquant en cas de bradycardie ou de BAV de haut degré.
+B9 Un diurétique de l’anse pour hypertension artérielle en présence d’une incontinence
+urinaire – (exacerbation probable de l’incontinence)
+Le critère B9 n’a jamais été retenu ; il est rare que le diurétique de l’anse soit présent
+uniquement pour l’hypertension artérielle ; il y a presque toujours une part d’insuffisance
+cardiaque, réelle ou supposée. Par ailleurs il est un peu redondant avec le critère B6 (un
+diurétique de l’anse en première intention pour une hypertension artérielle – (des alternatives
+plus sûres et plus efficaces sont disponibles)). Il permet néanmoins de rappeler que le
+diurétique de l’anse peut être responsable de l’exacerbation d’une incontinence urinaire.
+E6 La metformine lorsque le DFG est < 30 ml/min – (risque d’acidose lactique)
+Le critère E3 n’a jamais été retenu, les médecins sont naturellement vigilant à ce problème
+et arrêtent la metformine quand la clairance devient trop basse. Le seul problème est que les
+médecins en ville n’utilisent pas la formule de Cockcroft pour le calcul de la clairance mais
+plutôt MDRD ou CKD-EPI qui sont fournis par les laboratoires ; hors la formule de Cockcroft
+est le plus souvent inférieure aux 2 autres formules et parfois de manière importante. Mais
+de toute façon, il est peu probable qu’en voyant le critère E6 apparaître, ils aillent recalculer
+la clairance en Cockcroft ; donc ça ne changera rien à leur pratique.
+En regardant la liste des critères sortis par l’outil et jamais retenus, fournie en annexe 8, 9
+critères me paraissent peu utiles en pratique : les critères B4, B9, E6, G5, B2, L1, L2, L3, B1.
+Leur suppression aurait permis d’éviter la sortie de 82 critères STOPP sur les 505 sortis par
+l’outil sur les 50 ordonnances, ce qui fait un peu plus de 15%. Au final, cela aurait
+
+
+Résultats 49
+l’inconvénient de modifier la liste des critères STOPP par rapport à l’étude originale publiée
+sans apporter un gain majeur en termes d’utilisation.
+Il y a au total 12 critères START sur 34, soit 35%, qui sont sortis au moins une fois avec
+l’outil mais qui n’ont jamais été retenus par les utilisateurs. Dans la majorité des cas, cela
+vient du fait que le médicament recommandé était déjà présent sur l’ordonnance. Dans l’état
+actuel de l’outil, il n’est pas capable de vérifier si le médicament recommandé par le critère
+START est déjà présent sur l’ordonnance ; il se contente de sortir les critères START
+concernés par les pathologies qui ont été cochées. Cela alourdit l’utilisation de la partie
+START mais permet de mettre en évidence les prescriptions essentielles présentes sur
+l’ordonnance. On pourrait envisager une modification informatique permettant de ne pas
+afficher le critère START si le médicament préconisé est déjà présent sur l’ordonnance. On
+pourrait de même pour un nombre limité de critères STOPP faire en sorte qu’ils ne
+s’affichent que si la pathologie concernée est cochée. Cela permettrait de diminuer un peu le
+nombre de critères sortis par l’outil et d’éliminer un certain nombre de critères non
+pertinents ; il ne faut cependant pas s’imaginer que cela permettrait de ne sortir que les
+critères retenus après analyse par les médecins.
+
+
+Résultats 50
+4.3 ANALYSE QUALITATIVE DE L’UTILISATION DE STOPP/START
+Figure 17 : Nœuds comparés par nombre de références d’encodage
+
+
+Résultats 51
+4.3.1 Connaissance des outils d’optimisation d’ordonnance
+4.3.1.1 Connaissance de STOPP/START
+Sur les 39 médecins interrogés, 32 n’avait jamais entendu parler de STOPP/START soit plus
+de 80%. Sur les 7 qui en avait déjà entendu parler, c’était via différents canaux : bureau de la
+SFMG, recherche personnelle, groupes de pairs, université, direction de thèse et rédaction
+de thèse. Parmi ces 7 personnes, 4 l’avait déjà utilisé, 2 dans le cadre de la Consultation
+approfondie annuelle pour les patients en Affection de Longue Durée (CALD), 1 en
+consultation et 1 pour les ordonnances complexes.
+4.3.1.2 Connaissance d’autres outils d’optimisation d’ordonnance
+A propos de la connaissance d’autres outils d’optimisation d’ordonnance, la réponse
+revenant le plus souvent était les outils intégrés au logiciel de prescription type Vidal expert
+ou banque Claude Bernard. Mais il était souvent fait remarquer que ces outils n’étaient pas
+très utilisables car ils donnaient trop d’informations :
+« moi j'ai Claude Bernard on l'utilise rarement parce que c'est inutilisable, j'ai des pages et des
+pages d'interaction, de contre-indication et tout c'est du délire » (GP3)
+« on a un petit peu le système sur nos logiciels, tu as bien tout ce qui sort mais je ne sais pas tu mets
+du smecta tout sort en rouge; c'est difficile après de voir dans l'optimisation » (GP2)
+« [>H3]: mais c'est vrai que sur Vidal expert par exemple le nombre d'interaction c'est hallucinant,
+le nombre d'alarmes c'est, enfin tu te prends ping c’est un truc de fou
+[>H1]: dès que tu mets du doliprane
+[>H3]: tu les regardes jamais, parce que tu te dis ce n’est pas possible
+[>H1]: oui mais ça va à l'inverse de ce que ça veut
+[>H2]: oui c'est contre-productif » (GP3)
+Quelques personnes ont parlés de la grille MAI (« Medication Appropriateness Index »),
+notamment vu en Développement Professionnel Continu (DPC).
+
+
+Résultats 52
+Une personne a cité le guide PAPA (Prescriptions Adaptées pour les Personnes Âgées) de
+la Société Française de Gériatrie et Gérontologie (SFGG), qu’elle avait commandé, mais pas
+vraiment utilisé :
+« alors moi j'ai un petit bouquin que j'ai commandé et que je n’ai pas encore bien regardé » (GP2)
+Une personne, qui avait fait des recherches personnelles sur les outils d’optimisation
+d’ordonnance, a cité les outils Nord-Américains, ainsi qu’un outil personnel élaboré par la
+personne qui correspondait grosso-modo à une grille MAI.
+Une personne a fait remarquer qu’il était abonné à la revue Prescrire et qu’il pouvait
+télécharger le guide des interactions, mais qu’il ne l’avait pas fait jusqu’à présent.
+Pour conclure, on constate que peu de médecins avaient connaissance d’outils d’aide à
+l’optimisation de l’ordonnance, en dehors de celui qui est inclus dans leur logiciel de
+prescription. Les quelques personnes qui connaissaient d’autres outils, ne les utilisaient pas
+de manière régulière. Dans la majorité des cas, les médecins n’étaient pas vraiment
+satisfaits de l’outil inclus dans leur logiciel de prescription.
+
+
+Résultats 53
+4.3.2 Evaluation de STOPP/START
+Figure 18 : Carte conceptuelle de l’évaluation de STOPP/START
+
+
+Résultats 54
+4.3.2.1 Conception/organisation de STOPP/START
+Une des remarques fréquentes sur l’outil était que toutes les pathologies n’étaient pas
+présentes :
+« [>H3]: elle a des antécédents de thrombophlébite, antécédents d'hypothyroïdie, je ne sais pas où?
+[>Doctorant]: oh ce n’est pas dedans
+[>H3]: Ah ce n’est pas dedans?
+[>Doctorant]: Il n'il n’y a pas tout en fait, en fait il y a les maladies qui donnent lieu à un critère
+START » (GP1)
+Les médecins avaient du mal à comprendre pourquoi certaines pathologies étaient
+sélectionnées plutôt que d’autres :
+« [>D3]: non elle a eu un cancer, elle a du RGO; mais diverticulose est plus importante qu'un
+cancer?
+[>D2]: non mais tu ‘START’ rien avec un cancer
+[>Doctorant]: oui on suppose que c'est fait par ailleurs, on n'a pas besoin de vous le
+rappeler. » (GP5)
+Les médecins s’attendaient aussi visiblement à quelque chose de plus directif :
+« [>H1]: il y a beaucoup de STOPP quand même
+[>H2]: enfin ce n’est pas des contre-indications absolues non plus
+[>Doctorant]: non ça rappelle
+[>H2]: j'imagine que dans les choses qu'on va faire des fois c'est plus, non
+[>D2]: il y a des fois où il dit contre-indication absolue arrêter le médicament
+[>Doctorant]: il ne le dit jamais comme ça » (GP4)
+4.3.2.1.1 Ni système expert ni IA
+Quelque chose que les médecins avaient du mal à percevoir, c’était que l’outil informatique
+n’était qu’une version informatisée du STOPP/START papier pour en faciliter l’utilisation ;
+c'est-à-dire qu’il citait les critères STOPP correspondant aux médicaments figurant sur
+l’ordonnance et les critères START correspondant aux pathologies cochées. Il restait ensuite
+un travail d’analyse à faire par le médecin pour savoir si le critère STOPP ou START était
+
+
+Résultats 55
+effectivement applicable dans la situation présente ; c’est la différence entre les critères
+sortis par l’outil et les critères retenus par l’utilisateur comme expliqué au §4.1.2. Les
+médecins auraient voulu quelque chose de beaucoup plus intelligent, s’apparentant à un
+système expert :
+« [>H4]: il ne dit pas par exemple ce médicament dans ce que vous m'avez dit je ne sais pas ce qu'il
+fait là, ça aurait été le cas là
+[>Doctorant]: non, ça ne le dit pas, parce qu'en fait il analyse la liste des médicaments et enfin il dit
+effectivement que l'omeprazole il ne faut pas le garder à dose max mais là si il n’y a pas d'indication
+clinique, c'est ce qu'on est en train de dire
+[>H4]: il ne le dit pas
+[>Doctorant]: il n’y a pas d'indication donc on est dans le critère A1 : on a un médicament et il n’y
+a pas d'indication clinique; donc quelque part il est à arrêter » (GP4)
+L’outil n’est pas capable de faire le lien entre un médicament et la pathologie pour laquelle il
+aurait été prescrit. Il n’y a donc aucune chance qu’il puisse détecter l’absence d’indication
+pour un médicament.
+« [>Doctorant]: après les médecins il faut qu'ils réfléchissent; START rappelle un certain nombre
+de choses
+[>H2]: il est mono problème
+[>Doctorant]: il ne fait pas tout le travail du médecin, sinon il suffirait de rentrer les trucs
+[>H1]: ben y sert pas à grand-chose alors
+[>H2]: oui mais c'est ça c'est qu'il est mono-problème, en fait, il prend les choses les unes après les
+autres
+[>Doctorant]: un peu oui
+[>H3]: c'est embêtant » (GP3)
+Certains venaient avec une question bien précise à propos de leur ordonnance et avaient
+l’air de regretter que l’outil n’ait pas répondu à leur question :
+« ça ne répond pas à la question que je me posais sur le pentasa mais il n’y a pas de référentiel sur
+ça » (GP5)
+
+
+Résultats 56
+D’autres auraient voulu un outil qui prenne en compte tous les facteurs intervenant dans
+l’optimisation d’ordonnance :
+« il y a tellement de facteurs qui vont rentrer dans la déprescription que c'est un peu compliqué de
+trouver un outil complet ; en fait, c'est un outil qui prend pas la globalité des facteurs qui vont
+intervenir dans la déprescription, c'est ça qui est pas évident, arriver à faire un outil qui prend en
+charge tous les éléments, parce qu’il y a l'observance, il y a l'âge, il y a la polymédication, on n'a
+pas dit aussi on trouve de plus en plus avec les patients âgés des formes galéniques, les gens à qui
+on doit écraser, ouvrir les gélules des gens avec des troubles de la déglutition et ainsi de suite et
+c'est là que ça devient très compliqué » (GP4)
+Certains médecins étaient néanmoins rassurés que l’outil ne soit qu’une aide et qu’il ne
+puisse pas remplacer le médecin :
+« [>D1]: ben AINS il ne devrait pas te le mettre comme il te propose les anticoagulants
+[>Doctorant]: oui mais ça ne se recoupe pas, il faut réfléchir en fait; ça vous rappelle des choses
+mais ça veut pas dire que vous devez arrêter de réfléchir, ça vous fait pas l'ordonnance automatique
+du patient. Il ne suffit pas de mettre un ordinateur, de mettre la liste des pathologies et puis voilà »
+(GP2)
+« si on a un outil trop performant on sert plus à rien » (GP5)
+« [>Doctorant]: après il faut vérifier qu'il y ait pas de contre-indication et que ça se tient avec le
+reste
+[>H2]: comme quoi on n'est pas prêt d'être remplacé par un ordinateur » (GP5)
+Il fallait un certain temps d’utilisation pour que les médecins comprennent bien le
+fonctionnement de l’outil et ses limites ; cela se faisait progressivement au cours des
+séances. Dans l’ensemble, ils s’attendaient tous à un outil plus intelligent, même si certains
+étaient rassurés de ne pas pouvoir être remplacé par un ordinateur.
+Il existe un projet européen (SENATOR) (78) en cours, pour le développement et la
+validation d’un logiciel d’optimisation des traitements médicamenteux des patients âgés. Ce
+logiciel appliquera STOPP/START.
+
+
+Résultats 57
+4.3.2.1.2 Mise à jour de l’outil
+L’outil a été fait à partir de la version 2 des critères STOPP/START. Si de nouveaux critères
+étaient publiés, il faudrait bien évidemment remettre à jour la table de correspondance des
+critères avec les classes ATC et les pathologies, ainsi que la table des références. De
+même, la table de médicaments issue de la base de données des médicaments de la
+CNAMTS a été créée courant 2015. Cette base de données évolue régulièrement et il
+faudrait prévoir une mise à jour régulière (annuelle par exemple) de la table de
+médicaments.
+« [>H1]: mais ça veut dire que si ton outil, tu voulais continuer à t'en servir dans le temps, il faut
+que tu continues à développer ta base de données médicamenteuses, parce que ça, ça continue à
+évoluer et puis développer de l'autre côté les recommandations, la mise à jour des recommandations
+[>Doctorant]: ben les recommandations, si jamais ils faisaient une v3, oui il faudrait que je le
+refasse quoi, parce qu'il y a eu pas mal d’écart entre la v1 et la v2, je n'ai pas fait d'outil sur la v1,
+j'ai fait d'emblée la v2 puisqu'elle venait de sortir, mais si un jour dans quelques années ils disaient
+qu'il faut faire une v3 ben oui il faudrait faire évoluer l'outil, il va pas évoluer tout seul, quoi »
+(GP2)
+4.3.2.2 Points faibles de STOPP/START
+4.3.2.2.1 Chronophage
+Le point faible le plus souvent cité était le caractère chronophage de l’outil et sa lourdeur
+d’utilisation.
+« oui, mais moi ce que je crains c'est la lourdeur dans l'utilisation. Tu sais l'obsession en
+consultation c'est quand même le temps. » (GP1)
+« les points faibles c'est qu'il faut du temps, faut pas se mentir le point faible il est là, enfin il faut du
+temps pour revoir le dossier aussi bien que pour faire la grille en même temps si on veut que la
+grille elle soit complète il faut qu'elle soit longue et donc de toute façon c'est les points faibles de
+tous ces systèmes là c'est qu'on a besoin de temps » (MI2)
+
+
+Résultats 58
+« les points faibles, je ne sais pas, c'est comme tout outil comme ça c'est qu'après effectivement il
+est, bon, moins que Vidal expert mais il est quand même trop prolixe, il met trop d'alertes qui sont
+pas pertinentes, donc euh bon allez lourdeur d'utilisation, temps » (MI4)
+Le problème du temps d’utilisation de STOPP/START avait déjà été mise en évidence par
+l’étude de Dalleur (68) et même si la version informatisée simplifie les choses cela reste un
+problème.
+4.3.2.2.2 Absence de croisement médicaments et START et pathologies et STOPP
+Le deuxième défaut souvent cité était le fait que l’outil ne croisait pas. Effectivement, si la
+pathologie concernée est cochée le critère START sort que le médicament recommandé soit
+présent ou pas. Ceci alourdit effectivement l’utilisation de l’outil.
+« non mais il ne sait pas là ce n’est pas croisé, c'est ça que je suis en train de mettre c'est
+l'inconvénient majeur c'est que les 2 tableaux sont pas croisés » (GP5)
+Dans certains groupes ça leur paraissait être un défaut majeur, pour d’autres médecins cela
+n’était pas si gênant :
+« [>Médecin]: ...au début je trouvais que c'était un peu redondant de se dire tiens il me dit qu'il faut
+mettre du Kardégic parce qu'il y a un risque cardiovasculaire mais au final ça reprend aussi
+l'indication, on valide, ça valide la prescription ça fait pas que l'interdire ce n’est pas que un
+STOPP
+[>Doctorant]: oui dans START on se dit j'ai bien raison ça me conforte dans ma prescription
+[>Médecin]: oui c'est ça, ça conforte la prescription, c'est pour ça que je le mets
+[>Doctorant]: parce qu'on m'a dit ça pourrait croiser avec les médicaments et pas l'afficher si le
+médicament y est déjà mais je trouve que finalement
+[>Médecin]: oui mais non ça valide; au début ça déroute sur la 1ere fiche ça déroute; ben oui c'est
+bon je le fais quoi et en fait il dit ce que je fais donc c'est bien; mais en fait ça valide donc moi je ne
+trouve pas ça un problème » (MI2)
+On voit bien que le fait que l’outil était relativement basique et n’avait rien d’un système
+expert était considéré comme un point faible par une partie des médecins. Cela vient aussi
+
+
+Résultats 59
+du fait que le temps est quelque chose de primordial pour les médecins et si l’outil faisait lui
+même du tri dans les critères, son utilisation prendrait moins de temps.
+4.3.2.2.3 Discussion des critères retenus
+Tous les médecins étaient en désaccord ou sceptiques sur au moins un des critères. Les
+critères qui posaient problèmes étaient variables d’un groupe à l’autre, et d’un médecin à
+l’autre. En général les avis étaient relativement homogènes à l’intérieur d’un même groupe
+de pairs. Les critères qui étaient le plus souvent remis en question étaient les critères
+START. Par exemple : plusieurs n’étaient pas convaincus de l’intérêt de la supplémentation
+en vitamine D chez les patients chuteurs ou confinés au domicile (START E5) ou de
+l’efficacité de la vaccination anti-pneumococcique (START I2). Mais ils trouvaient normal que
+l’outil cite la recommandation et après, libre à eux, de ne pas vacciner :
+« [>H6]: après c'est la reco mais on n'est pas obligé de l'appliquer
+[>H4]: oui c'est ça voilà
+[>H6]: on te met juste la reco » (GP5)
+Plusieurs n’étaient pas non plus en accord avec l’indication d’un traitement
+anticholinestérasique dans le cas d’une démence d’Alzheimer (START C3), avec l’indication
+d’un antiagrégant plaquettaire pour une ACFA avec contre-indication aux anticoagulants
+(START A2), avec l’indication d’un corticoïde inhalé pour la BPCO (START B2) et avec
+l’indication d’un inhibiteur de la 5 alpha-réductase en cas de prostatisme (START G2). Ils
+étaient également étonnés de voir proposer de mettre des AINS pour traiter les douleurs
+chez les personnes âgées (START H1), et de voir le ralénate de strontium dans les
+traitements proposés pour l’ostéoporose (START E4).
+Certains médecins n’étaient pas non plus en accord avec les seuils tensionnels figurant dans
+le critère START A4 (16/10 au lieu de 15/10).
+Un médecin trouvait le critère sur l’indication aux IEC ou SARTANS dans le cas d’une
+néphropathie diabétique (START F1) trop réducteur ; pour lui ils étaient indiqués même en
+l’absence de néphropathie.
+
+
+Résultats 60
+En ce qui concerne les critères STOPP, les avis étaient assez divergents concernant les
+IPP, certains médecins ne voyant pas le problème à la prescription d’IPP même sans
+indication bien établie :
+« [>H1]: oui mais quels sont les inconvénients d'avoir l'oméprazole?
+[>H2]: non t'as que des avantages à le mettre » (GP3)
+« alors avec l'IPP qu'elle est le problème en dehors du coût économique de l'IPP qu'elle est le
+problème ?» (MI3)
+Et d’autres groupes au contraire trouvaient qu’on banalisait trop les IPP :
+« [>H5]: les IPP on les banalise trop
+[>Doctorant]: moi j'étais dans plein de groupes où ils me disaient je ne vois pas le problème, l’IPP
+c'est bien toléré je ne vois pas pourquoi je l'arrêterai
+[>H1]: ils ne lisent pas
+[>H6]: c'est banalisé
+[>Doctorant]: j'avais pleins de médecins, et dans la plupart des groupes ils étaient là ah oui bof, les
+IPP, ça pose pas de problèmes
+[>H5]: les IPP à la pelle et
+[>H2]: ça c'est le labo qui passe dans le couloir
+[>Doctorant]: oui et il vaut mieux au cas où; moi j'ai eu vachement ce retour là
+[>H2]: oui mais ce n’est pas vrai, comme quoi les gens sont formatés par les labos » (GP5)
+On m’a également fait remarquer qu’il y avait une erreur dans le critère STOPP J1 car le
+glibenclamide figure dans les sulfamides à longue durée d’action alors qu’il a une demi-vie
+courte :
+« [>H2]: non mais tu vois là glibenclamide, chlorpropamide, glimépiride, gliclazide à libération
+prolongée; le glibenclamide est un courte durée d'action
+[>H5]: c'est le daonil le glibenclamide
+[>H2]: mais là je vérifiais du coup c'est demi-vie courte
+[>H1]: ah oui ben là
+[>H2]: et il le met directement depuis tout à l'heure dans les longues durée d'action
+[>Doctorant]: ben ça c'est eux qu'ils l'ont écrit
+
+
+Résultats 61
+[>H1]: c'est un bug oui faut virer le glibenclamide » (GP5)
+Un médecin trouvait qu’il manquait un critère pour alerter en cas d’utilisation d’un thiazidique
+avec une insuffisance rénale. Et un médecin n’était pas d’accord avec l’utilisation de la
+formule de Cockroft pour le calcul de la clairance.
+Il y a donc eu beaucoup de discussions sur les critères retenus. Un médecin trouvait qu’ils
+faisaient anglo-saxons, orientés anti-aspirine et alpha-bloquant. Mais même si l’étude a été
+conduite par une équipe irlandaise, parmi les 19 experts européens il n’y avait que 2 anglais.
+Comme j’avais beaucoup de remarques sur les critères et que je n’étais pas en mesure de
+justifier pourquoi les auteurs de STOPP/START avaient choisis tels critères je les renvoyais
+sur la publication originale, avec notamment la liste des références citées pour chacun des
+critères. Mais je sentais bien que cela n’était pas satisfaisant. Du coup, j’ai modifié l’outil au
+cours de l’étude pour permettre d’afficher les références pour les critères sortis. Cette
+modification a eu lieu après le 3e groupe de pairs et avant la présentation aux médecins
+individuels.
+4.3.2.2.4 Incomplet
+Certains médecins ont fait ressortir dans les points faibles le caractère incomplet de
+STOPP/START : absence de signalement de certaines contre-indications, peu de prise en
+compte des interactions médicamenteuses, section fonction rénale et prescription
+incomplète, pas de prise en compte des posologies.
+4.3.2.3 Points forts de l’outil
+Globalement les médecins qui ont testé l’outil STOPP/START ont trouvé cela intéressant :
+« [>D2]: si c'est intéressant, ça permet de se remettre en cause
+[>H3]: si ce n’est pas mal
+[>H1]: c'est mieux que ce qu'on a dans la base Claude Bernard
+[>H5]: c'est différent, ce n’est pas que les interactions et
+[>H1]: il pose la question de l'indication de base » (GP4)
+« Quels sont les points forts? C’est efficace pour faire réfléchir » (MI3)
+
+
+Résultats 62
+« et puis c'est assez synthétique ça reprend item par item donc ça permet quand même de faire un tri
+de ce que tu veux et de ce que tu veux pas, c'est assez didactique, synthétique, je ne sais pas
+comment te dire ça » (GP2)
+Un seul médecin a trouvé l’outil long et peu performant et ne voyait aucun avantage à son
+utilisation.
+4.3.2.3.1 Optimisation des ordonnances
+Pour une majorité de médecins, l’utilisation de STOPP/START permettait d’aider à la
+réévaluation et l’optimisation des ordonnances :
+« mais peut-être de temps en temps pour optimiser l'ordonnance ça peut être intéressant » (GP2)
+L’outil permet de guider dans les questions à se poser à propos de l’ordonnance :
+« pour moi l'intérêt c'est ça revoir le dossier et du coup reprendre les médicaments et se reposer la
+question pourquoi on a mis ça et à quel moment et quand est-ce qu'on va l'arrêter. Si il y a un outil
+bien tiens j'utilise l'outil et lui il va me guider dans [..] les questions que je me pose » (MI2)
+Les médecins étaient bien conscients de la nécessité de réévaluer les ordonnances
+régulièrement :
+« donc oui je pense que pour un type comme moi ça peut être un outil intéressant le soir quand tu te
+dis mon dieu qu'ai-je fais; voilà mais bon ça m'empêchera pas de dormir mais c'est intéressant
+parce que bon, évidemment y a des grands interdits qu'on ne transgresse pas mais le diable est dans
+les détails pour nos prescriptions, la plus part du temps on est tous, moi le premier, victime du
+syndrome, du symptôme à l'ordonnance, tac tac tu empiles, tu empiles. » (MI3)
+4.3.2.3.2 Validation de l’ordonnance
+L’application de STOPP/START permet aussi de valider son ordonnance ; dans notre
+échantillon de médecin il n’y avait le plus souvent pas tant de modifications que cela :
+« [>H5]: ça a pas tant bippé que ça, finalement
+[>H6]: finalement il va garder toute sa liste de médoc le mec, ben pff » (GP5)
+« [>D1]: ben finalement on s'en sort pas mal » (GP5)
+« [>D1]: sur tout le monde-là, personne n'a grugé personne n'a vérifié son ordonnance, je trouve
+que personne n'a fait d'erreur monstrueuse quoi » (GP5)
+
+
+Résultats 63
+« au début je trouvais que c'était un peu redondant de se dire tiens il me dit qu'il faut mettre du
+Kardégic parce qu'il y a un risque cardiovasculaire mais au final ça reprend aussi l'indication, on
+valide, ça valide la prescription ça fait pas que l'interdire ce n’est pas que un STOPP » (MI2)
+Il faut quand même remarquer que notre échantillon de médecin était particulier ; il s’agissait
+pour la plupart de médecins participant à des groupes de pairs, dont 3 étaient adhérents à la
+SFMG ; plusieurs médecins étaient des médecins de la faculté (notamment 3 sur les 5
+interrogés individuellement). Sur un échantillon de médecins plus important et non
+sélectionnés, les résultats auraient probablement été différents. Mais l’objectif principal de
+notre étude était d’évaluer la faisabilité de l’utilisation de l’outil.
+4.3.2.3.3 Importance de la partie START
+Beaucoup de médecins ont été intéressés par la partie START ; le fait que l’outil ne soit pas
+là uniquement pour supprimer des médicaments mais pour rappeler également que certains
+médicaments sont utiles dans certaines indications.
+« [>H1]: et l'intérêt c'est que ça fonctionne quand même dans les 2 sens, c'est-à-dire que
+[>D1]: en STOPP et en START
+[>H1]: oui exactement, et tout ce qu'on a dans les aides à la prescription on nous dit attention là
+vous avez des effets secondaires ou attention compte-tenu de l'âge de votre patient ce n’est pas bon
+ou l'association de ces 2 produits là ça va pas bien ensemble, tandis que là t'as quand même le
+START en disant vérifiez si vous avez pas oublié un truc, c'est l'intérêt moi c'est le principal intérêt
+que je vois presque » (GP2)
+Il y en a même qui vont jusqu’à dire que pour optimiser l’ordonnance il faudrait se concentrer
+uniquement sur les START :
+« [>H4]: choisir les traitements prioritaires et mettre un critère d'observance et à ce moment-là
+développer une stratégie pour améliorer l'observance
+[>H3]: c'est une bonne idée ça, c'est une façon d'optimiser
+[>H5]: tu te concentres sur les START » (GP4)
+C’est effectivement une des originalités de STOPP/START par rapport à d’autres outils tel
+que la liste de Laroche par exemple, d’avoir une partie START.
+
+
+Résultats 64
+4.3.2.3.4 Discussion de propriétés pharmacologiques
+L’utilisation de STOPP/START a souvent permis de se remémorer à quelle classe le
+médicament appartient :
+« [>Doctorant]: ensuite, il a un alpha1 bloquant
+[>Médecin]: non
+[>Doctorant]: prasozine, je me suis trompé en le mettant ?
+[>Médecin]: non non il n’a pas d'alpha-bloquant ça c'est sûr...
+[>Doctorant]: alors qu'est-ce que j'ai mis qui m'a mis prasozine, c'est quoi prasozine?
+[>Médecin]: connais pas...
+[>Doctorant]: juste voir ce que c'est prazosine c'est l'Alpress, ben si je l'ai rentré
+[>Médecin]: ah ben si c'est un alpha-bloquant, t'as raison je suis bête
+[>Doctorant]: le prasozine c'est l'Alpress donc il a un alpha-bloquant » (MI3)
+Ou quelles sont ses propriétés pharmacologiques (le plus souvent cela concerne les
+médicaments avec un effet anticholinergique ou un effet vasodilatateur) :
+« [>Doctorant]: ensuite médicaments à risque de chute : elle a 2 médicaments qui sont
+vasodilatateurs
+[>D2]: attends c'est quoi les 2
+[>Doctorant]: le loxen
+[>D2]: et puis l'autre c'est quoi
+[>D1]: le verapamil
+[>D2]: l'isoptine c'est vasodilatateur? » (GP2)
+« [>Doctorant]: ça c'est le spiriva c'est anticholinergique
+[>D1]: je n’aurais pas pensé » (GP5)
+« [>Doctorant]: ensuite un médicament à effet anticholinergique en présence d'une démence ou
+d'un syndrome confusionnel
+[>Médecin]: c'est lequel ?[...]
+[>Doctorant]: le spiriva, ipratropium c'est celui-là; » (MI1)
+Le fait de discuter de l’ordonnance en groupe de pairs a permis de découvrir certains
+médicaments et leurs propriétés :
+
+
+Résultats 65
+« [>D1]: et le casodex c'est quoi?
+[>H1]: c'est un castrateur, c'est un anti-androgène » (GP2)
+Conclusion : Le fait que STOPP/START ne fonctionne qu’en DCI (même si l’on peut rentrer
+le médicament par son nom commercial), oblige à faire le lien entre le nom commercial et sa
+DCI. Cela induit des discussions pharmacologiques et permet de se remémorer quelle
+classe pharmacologique est prescrite. Beaucoup de médecins ignorent l’effet vasodilatateur
+ou anticholinergique de médicaments qu’ils prescrivent fréquemment. Il y a un renforcement
+de ces discussions pharmacologiques par le groupe de pairs et certaines discussions
+viennent uniquement du fait de discuter d’une ordonnance en groupe de pairs et pas de
+l’utilisation de STOPP/START.
+4.3.2.3.5 Formation du médecin
+L’utilisation de STOPP/START permet la découverte ou le rappel de certaines
+recommandations :
+« [>Doctorant]: et ensuite elle devrait être vaccinée par la vaccination anti-pneumococcique, parce
+que c'est indiqué chez elle compte-tenu du diabète et de l'insuffisance rénale[...]
+[>Doctorant]: dans les reco ça y est diabète et insuffisance rénale, je les ai ressorties
+[>D1]: diabète? Si tous les diabétiques doivent être traités » (GP1)
+« [>H2]: voilà les recommandations ce n’est pas obligatoire de les appliquer mais tu dois les
+connaître après toi tu dis si ça va pas mais c'est pour éviter de dire "ah merde j'avais oublié" »
+(GP5)
+Ou de contre-indications :
+« c'est parce que c'est sorti pour mes patients là, par exemple le glaucome tu vois, je n’avais pas en
+tête ça, je ne pensais pas qu’un médicament, après je n’ai pas lu ce qu'ils écrivent, un médicament
+pris de cette façon pouvait avoir un retentissement » (MI1)
+D’autre part, la possibilité d’afficher les références pour les critères sortis, qui a été rajoutée
+au cours de l’étude, est un plus : cela permet facilement au médecin d’approfondir un sujet
+donné et éventuellement de modifier ou non son opinion après lecture des références.
+
+
+Résultats 66
+« [>Médecin]: ensuite antécédents d'ulcère donc non; alors ça me choque sans prescription d'un
+IPP parce qu'à ma connaissance l'IPP ne minore pas le risque d'ulcère
+[>Doctorant]: ben alors après quand vous n’êtes pas d'accord avec ce qu'ils disent
+[>Médecin]: oui, qu'est-ce qu'on fait quand on n’est pas d'accord
+[>Doctorant]: on fait ça et il affiche les références qu'ils ont données dans leur publication, parce
+que eux sur chacun des critères ils disent on a mis ce critère en s'appuyant sur telle référence et
+après voilà vous avez le lien
+[>Médecin]: omeprazole dose fixe, d'accord il y avait moins d'ulcère en fait c'est les complications
+je crois qui sont moins fréquentes, donc ça protège des ulcères et des plaintes mais je crois que ça
+ne protège pas des hémorragies digestives; ok mais en tout cas c'est bien foutu. » (MI4)
+Par ailleurs, il est apparu au cours des séances, qu’on retrouvait toujours un peu les mêmes
+choses et donc à force d’utiliser l’outil, on finit par connaître les critères :
+« [>H6]: là tu retombes sur les 2 trucs
+[>Doctorant]: ben oui c'est toujours un peu la même chose
+[>H4]: les vieux ils ont tous un peu la même chose » (GP5)
+« et à force de faire et de le refaire je pense que si on le faisait plus souvent ça deviendrait comme
+un automatisme » (GP2)
+Au total, l’utilisation de STOPP/START permet de rappeler certaines recommandations ou
+contre-indications. Il y a aussi la possibilité d’approfondir ses connaissances, en allant lire les
+articles en référence. Ceci est d’autant plus intéressant que l’outil vient d’être mis à jour et
+que les références sont donc relativement récentes. Avec le temps, il y aura une perte de
+pertinence des références et de certains critères puisque ça ne tiendra pas compte des
+nouvelles études sorties. Par ailleurs, il y a un côté didactique, à force d’utiliser l’outil on a les
+critères les plus fréquents en tête.
+4.3.2.3.6 Références
+Quelques médecins ont signalés comme points forts, la bibliographie accessible pour chacun
+des critères. Ce point n’est sorti que dans les derniers groupes où les références étaient
+affichables directement dans la page des résultats.
+
+
+Résultats 67
+Un médecin a noté comme point fort le fait que ce soit un outil validé.
+4.3.2.3.7 Systématique
+Il est également ressorti à plusieurs reprises comme point fort, le caractère exhaustif de
+l’outil ; ce qui est en opposition avec le sentiment d’autres médecins qu’il était incomplet.
+Peut-être que les médecins voulaient plutôt parler de son côté systématique :
+« reprendre le traitement médicament par médicament »(GP3)
+« côté systématique de la détection, on est supposé tout détecter »(GP5)
+4.3.3 Intérêt d’un outil informatique
+4.3.3.1 Difficultés d’utilisation d’une version papier
+Il est apparu assez clairement en interrogeant les médecins qu’ils ne se voyaient pas utiliser
+une version papier :
+« [>Doctorant]: après le belge il l'a un peu simplifié en le présentant par médicament, c'est un peu
+simplifié, ça prend un peu moins de page, le belge a fait une version raccourcie comme ça, en fait ça
+reste quand même un peu
+[>H1]: inutilisable en pratique » (GP3)
+« moi je range ça tout de suite; déjà les consultations des personnes âgées c'est long et compliqué »
+(MI2)
+« ben il n’y a pas photo c'est plus simple en informatique que sur le papier, sur le papier tu dois
+dérouler toi-même faire tes axes de décision donc c'est compliqué; enfin c'est ingérable sur le papier
+à mon avis » (GP2)
+« ben sur le papier c'est illisible, de toute façon si y a 5 pages à lire tu ne vas pas les lire » (MI5)
+4.3.3.2 Ergonomie informatique
+4.3.3.2.1 Simplicité d’utilisation
+L’utilisation de la version informatisée a paru simple et facile à la plupart des médecins :
+
+
+Résultats 68
+« [>D5]: ben tu rentres les médicaments tu rentres les antécédents les différentes choses je ne vois
+pas ce qu'on peut faire de plus
+[>D3]: oui ce n’est pas très compliqué » (GP2)
+« intuitif voilà je dirais ça » (MI1)
+Lorsque j’ai fait la présentation en individuel, un des médecins s’était d’emblée approprié
+l’outil et l’utilisait lui-même, et ça ne lui a posé aucun problème :
+« est-ce qu'il est simple et facile à utiliser? oui clairement c'est bien, très bon outil » (MI4)
+La plupart des médecins trouvait que la version informatisée aidait à l’utilisation de
+STOPP/START :
+« est-ce qu'il aide à l'utilisation, oui par rapport au papier oui là je n’ai pas trop de doutes » (MI2)
+« ben là les points forts je dirais pour moi c'est la version informatique que t'as faite » (MI4)
+Sur l’ensemble des médecins interrogés, seulement deux n’étaient pas convaincus que la
+version informatisée actuelle apportait quelque chose :
+« Je ne suis pas sûr que la version informatique en l'état actuel, soit très utile en pratique » (GP5)
+4.3.3.2.2 Disponibilité de l’outil
+L’outil est hébergé sur un serveur web gratuit ; il n’y a pas de garantie de disponibilité.
+L’accès est libre et accessible à toutes personnes connaissant l’adresse ; il n’y a pas de mot
+de passe ni d’inscription.
+« [>H3]: Donc ça on peut y avoir accès en permanence ce logiciel?
+[>Doctorant]: oui, vous faites http://stoppstart.free.fr et il est dessus, il est disponible en accès libre,
+je n’ai pas mis de mots de passe, je n’ai rien mis
+[>H3]: très bien
+[>H3]: moi je vais le mettre en accueil » (GP1)
+« [>H2]: je pense que je vais le mettre dans mes favoris » (GP2)
+Le site web a été conçu en « responsive web design » c'est-à-dire que son affichage
+s’adapte aux différentes tailles d’écran (PC, tablette, smartphone).
+« [>Doctorant]: alors si t'as un portable, c'est pour ça que j'ai fait un format allongé si tu as envie
+de te poser des questions sur place chez lui et bien tu peux le faire sur ton téléphone si t'as la 3G
+
+
+Résultats 69
+[>Médecin]: effectivement
+[>Doctorant]: parce qu'il faut avoir juste la 3G et le format allongé du coup
+[>Médecin]: ça peut se faire sur un smartphone ça c'est vrai c'est intéressant » (MI1)
+« [>H5]: ça marche sur les smartphones ton truc?
+[>Doctorant]: ah bien oui; mais on ne peut pas discuter de 3 ordo en même temps mais vous pouvez
+faire la vôtre sur votre smartphone » (GP5)
+On m’a néanmoins demandé une version mobile iPhone et Android, qui actuellement
+n’existe pas.
+4.3.3.2.3 Sauvegarde
+La sauvegarde informatique fait partie des demandes d’améliorations faites par les premiers
+groupes que j’ai rencontrés :
+« [>H1]: au moins créer un document PDF parce ce que ce qui peut être intéressant, tu peux pas
+l'utiliser en pleine consultation ce truc là mais t'as vu ton patient ou tu vas le voir tu dis bon ben j'ai
+peut-être des choses à optimiser donc si c'est par exemple juste après la consultation tu prends ça
+tranquillement le soir tu dis bon ben mon ordonnance elle est pas parfaite, je me le fais et comme ça
+je pourrai réutiliser l'outil la prochaine fois parce que je l'aurais mis dans son dossier les
+conclusions; tu vois ce que je veux dire? » (GP2)
+C’est donc une modification qui a été intégrée au cours de l’étude et appréciée par les
+médecins suivants :
+« [>Doctorant]: voilà ça c'était un truc que je n’avais pas montré et ensuite quand on clique là ça
+permet d'avoir une sauvegarde PDF
+[>Médecin]: ah ça ce n’est pas mal » (MI3)
+4.3.3.3 Améliorations
+4.3.3.3.1 Croisement pathologies et STOPP et médicaments et START
+Comme expliqué au 4.3.2.2.2 l’un des principaux points faibles mentionnés était l’absence
+de croisement entre les médicaments et la partie START, et les pathologies et la partie
+STOPP ; c’est donc naturellement une amélioration qui a été souvent demandée :
+
+
+Résultats 70
+« mais moi je trouve quand même que tous ces outils, faut quand même qu'on améliore l'ergonomie,
+bon là par exemple le lien patho-médicaments, bon c'est un peu plus compliqué mais ça peut être
+fait pour éviter que si on a mis et qu'il y a une patho ben qu'il le sache dans la partie médicament,
+bon ça ce n’est pas vraiment compliqué mais la vrai fonctionnalité c'est que ça soit en lien à la fois
+avec les médicaments et le dossier pour les pathos et que l'alerte soit et du coup on aura plus que 2
+ou 3 alertes à lire, mais si ce n’est pas comme ça on sait bien qu'on l'utilise pas » (GP3)
+« [>H1]: c'est dommage que ça croise pas
+[>Doctorant]: ce n’est pas la 1ere fois qu'on me le dit, le fait de pas croiser ça permet de rappeler
+qu'il y a des médicaments, on a bien fait de les mettre
+[>H1]: ...si ça croise on voit qu'il y a déjà le médicament et ça permet d'alléger, parce que ça
+alourdit le système t'as vu c'est long quand même ; si ça croise il va sortir 3 trucs, ça nous dit il faut
+mettre le bêtabloquant machin mais il est déjà mis
+[>Doctorant]: oui d'accord, ça va réduire beaucoup les START mais pas sur les STOPP, sur les
+STOPP ça changera rien
+[>H1]: non sur les STOPP ça changera rien, mais sur les START surtout
+[>Doctorant]: ben sur les START ça conforte dans l'idée que ces médicaments on a bien fait de les
+mettre
+[>H1]: oui enfin ça serait bien quand même » (GP5)
+Au total, c’est une demande qui était présente dans près de la moitié des groupes. Par
+ailleurs, c’est une modification qui ferait gagner du temps et le temps est un aspect majeur.
+Néanmoins, je ne sais pas si le plus long dans l’utilisation de STOPP/START c’est de lire un
+critère START et de voir que le médicament recommandé est déjà présent ou de retrouver
+dans le dossier médical pourquoi on a mis ou arrêté tel médicament. Ceci étant, je pense
+que ça pourrait être une modification à faire mais qui demanderait de modifier complètement
+la partie informatique de l’outil ; une adaptation de la base de donnée ne serait pas
+suffisante.
+
+
+Résultats 71
+4.3.3.3.2 Intégration aux logiciels de prescriptions
+L’autre amélioration fréquemment demandée était que STOPP/START soit intégré au logiciel
+de prescription :
+« ce qui serait moi je pense intéressant sur votre programme c'est qu'il puisse s'intégrer sur la
+prescription directe, parce que si vous voulez on a pas le temps, ou rarement le temps de voir un
+patient parce que tac tac tac on enchaîne toute la journée, le soir il est 9h30, ah le patient je vais
+voir machin, sincèrement on a qu'une seule envie c'est de partir donc; par contre c'est vrai s'il était
+intégré par exemple au Vidal expert directement, ce serait intéressant d'avoir une critique du
+traitement qu'on intègre enfin voilà des éléments de critique ou d'alerte assez précise en même
+temps que la prescription qu'on fait » (GP3)
+« oui c'est un autre ciblage mais le problème c'est qu'on ne peut pas avoir 3 logiciels » (GP4)
+« [>Médecin]: et donc je mets dans la pratique quotidienne moi je mettrais intégré à mon logiciel,
+actuellement Vidal expert pas pratique
+[>Doctorant]: et éventuellement le mettre à la place quoi ou
+[>Médecin]: oui à la place » (MI4)
+
+
+Résultats 72
+4.3.4 Place dans la pratique
+Figure 19 : Carte conceptuelle de l’utilisation de STOPP/START en pratique
+
+
+Résultats 73
+4.3.4.1 Applicabilité de STOPP/START
+4.3.4.1.1 Vis-à-vis du médecin
+Il faut déjà que le médecin prenne un temps pour la réévaluation de l’ordonnance ce qui
+compte-tenu des contraintes du fonctionnement en libéral ne paraissait pas évident.
+« oui quand on peut et quand on y pense » (GP1)
+« ce n’est pas toujours évident de prendre le temps de se poser sur une ordonnance » (MI2)
+Dans certains cas, le médecin relativisait la maladie ou les symptômes parce qu’il n’avait pas
+envie d’introduire le médicament proposé ; il n’était pas convaincu de la balance bénéfice
+risque :
+« [>Doctorant]: ensuite un IRS pour anxiété sévère persistante
+[>H3]: ben moi je n’ai pas voulu le faire comme on sait qu'il y a toujours des risques
+d'hyponatrémie, qu'elle prend des diurétiques, je n’ai pas pris le risque
+[>Doctorant]: là ils disent interférant avec l'autonomie
+[>H3]: et puis elle le gère comme ça, bon ben je suis veuve, elle a toujours été angoissée
+[>D2]: il n’y a pas forcément d'indication
+[>H3]: ça m'est pas venu à l’idée [...]
+[>H3]: mais moi je n’ai pas voulu
+[>Doctorant]: enfin après ça dépend si ça interfère avec l'autonomie ou pas
+[>H3]: ben ça va interférer » (GP1)
+Ou il relativisait le bénéfice compte tenu de l’âge du patient :
+« Maintenant qu'est-ce que tu veux l'enquiquiner à 85 ans » (GP1)
+« [>Doctorant]: et ensuite, je vais quand même noter E3 parce que du coup il ressort; si y a une
+ostéoporose confirmée et bien ils disent qu'il faudrait mettre un traitement inhibiteur de la
+résorption osseuse, genre biphosphonate ou
+[>Médecin]: oui mais à son âge, je ne sais pas si c'est pertinent » (MI1)
+De même, vis-à-vis d’un critère STOPP, il n’était pas toujours convaincu du bénéfice de
+l’arrêt :
+[>H3]: non elle est à 20 d'omeprazole
+
+
+Résultats 74
+[>Doctorant]: on pourrait diminuer à 10
+[>H3t]: non le problème, c'est quelque chose je me suis pas posé la question de l'arrêter et puis on
+peut voir ce qui se passe
+[>H1]: quel intérêt?
+[>H2]: et elle prend de l'aspirine
+[>H3]: c'est vrai qu'elle est sous aspirine (GP3)
+On sentait aussi une certaine résistance à modifier un traitement qui jusque-là n’a jamais
+posé de problèmes :
+[>H3]: tu as dit que c'était plus facile à l'hôpital moi je pense que ce n’est pas une question
+d'hôpital ou ville parce que moi ça me pose aucun problème de passer d'un sulfamide à la
+metformine en ville; le problème c'est de se dire j'ai un truc, un traitement qui fonctionne qui
+correspond au patient qui n'entraine pas de troubles et qui est efficace et je n’ai pas envie de le
+changer et parce que ... et des fois quand on le fait le patient est hyper résistant
+[>H2]: à quel âge?
+[>Doctorant]: oui parce que on peut aussi se dire on change rien parce qu’il est bien jusqu'au jour
+où il va faire l'hypo, il va chuter il va être hospitalisé alors soit on se dit avant (GP3)
+Conclusion : outre les résistances vis-à-vis des recommandations et le manque de temps, on
+retrouve quelques éléments supplémentaires dont certains semblent justifiés.
+4.3.4.1.2 Vis-à-vis du patient
+Dans certains cas le patient est réticent à la modification de son traitement. Il y a, d’une part,
+la problématique des traitements par benzodiazépines où le sevrage est compliqué, avec
+parfois une résistance importante de la part du patient :
+« oui j'ai essayé de passer à du seresta pour avoir une 1/2 vie plus courte et diminuer l'effet
+cumulatif et ça a pas marché elle est revenu à.., mais elle était avant avec autre chose. Au début elle
+avait lexomil ou lysanxia ce qui a une 1/2 vie encore plus longue. Le pire c'est lysanxia » (GP1)
+Il y a également la résistance du patient vis-à-vis de la vaccination :
+« c'est marqué sur le dossier, elle a refusé les vaccinations; » (GP1)
+
+
+Résultats 75
+Le patient refuse aussi parfois que le médecin généraliste modifie des prescriptions d’un
+spécialiste ou mises en route à l’hôpital :
+« mais ça, ça vous concerne pas docteur » (GP4)
+« [>H2]: elle est dépressive et anxieuse, y a un moment donné
+[>H4]: et il lui a dit madame il faudra jamais l'arrêter
+[>D2]: même quand votre généraliste vous le dira
+[>H3]: dites bien à votre médecin généraliste qu'il ne faut pas l'arrêter
+[>D2]: que c'est moi qui l'ai dit
+[>H5]: le psychiatre a dit on n'arrête pas
+[>H4]: absolument » (GP4)
+« c'est très difficile d'arrêter le Plavix parce que les gens on leur a dit à la sortie de l'hôpital faut le
+garder » (GP4)
+Conclusion : pour les médecins, il existerait des résistances à différents niveaux de la part du
+patient.
+4.3.4.1.3 Vis-à-vis des paramédicaux
+Parfois ce sont les paramédicaux qui s’occupent du patient, qui pourraient freiner par rapport
+à l’arrêt de certains médicaments
+« [>Doctorant]: donc le neuroleptique augmente le risque d'AVC et de décès
+[>Médecin]: je l'ai diminué, je l'avais diminué mais je n’ose pas l'arrêter car même les infirmières
+libérales elles ne sont pas chaudes » (MI1)
+Néanmoins, c’est un sujet qui n’a été cité qu’une seule fois.
+4.3.4.1.4 Vis-à-vis de la sécurité sociale
+Les médecins ne seraient pas d’accord pour qu’un outil du type STOPP/START devienne
+contraignant ou leur soit opposable :
+« [>H4]: je ne veux pas être pessimiste mais je ne veux pas non plus que ça nous retombe sur la
+gueule en disant attendez, vous avez un outil attendez, vous avez 5 START, pourquoi vous n’avez pas
+arrêté alors que vous avez des STOPP
+
+
+Résultats 76
+[>H5]: mais je sais, et quand tu les entends discuter en négociation conventionnelle et tout ça,
+t'entends "docteur vous pouvez bien faire ça et ça, ça ne vous prend pas beaucoup de temps et ça
+vous pouvez bien le faire aussi" et puis quand tu commences à discuter un peu plus "mais vous avez
+le ROSP", ça coupe tout » (GP4)
+Ce sujet n’a également été abordé qu’une seule fois, mais il a déjà été mis en évidence dans
+l’étude de Dalleur (68).
+4.3.4.2 Contexte d’utilisation
+Lorsqu’on demandait aux médecins quelle pourrait être la place de STOPP/START dans leur
+pratique, la réponse la plus fréquente était en groupe de pairs, puis venait la notion de bilan
+annuel, d’utilisation en EHPAD, avec l’interne, lors d’un bilan quotidien, lors d’un
+changement de situation. Certains précisaient que ça ne pouvait pas avoir lieu pendant la
+consultation ; d’autres précisaient que ça ne pouvait être utilisé que s’il était couplé au
+logiciel de prescription, ou à Vidal expert, ou s’il y avait une rémunération spécifique.
+4.3.4.2.1 En groupe de pairs
+En groupe de pairs était la réponse qui est revenue le plus souvent concernant l’utilisation de
+STOPP/START.
+« en groupe de pairs ça peut être intéressant de faire ce qu'on a fait ce soir » (GP2)
+« en groupe de pairs oui quand on discute une ordonnance ça peut être utilisé car ça nous permet de
+retrouver des études, c'est intéressant » (MI1)
+Pourtant, certains médecins n’étaient pas convaincus que ce soit le bon endroit pour utiliser
+STOPP/START :
+« Voilà; en groupe de pairs moi j'estime que le groupe de pairs dans ma vision à moi le groupe de
+pairs est en aval de ça, c’est-à-dire que j’estime que quand tu viens en groupe de pairs t'as déjà
+normalement fait ce travail » (MI4)
+« parce que je dirais que la place pour moi de STOPP/START c'est avant l'expertise médicale, tu
+vois; c'est un outil d'alerte et d'information qu'on va utiliser en première intention au moment de la
+prescription et ensuite il peut y avoir la discussion en groupe de pairs quand on se demande si tel
+médicament est adapté ou pas quand je tombe sur le monsieur par exemple où l'urologue il dit tiens
+
+
+Résultats 77
+il faut lui rajouter l'Avodart, ben à ce moment-là ça va être la place au groupe de pairs de discuter
+des avantages et des inconvénients tu vois en fonction du contexte du patient, parce que forcément
+un outil comme ça ne tient pas compte de la globalité du patient, ça nous dit ce qu'il faut faire »
+(MI4)
+« En groupe de pairs, peu d'intérêt : critique des confrères bien suffisante pour créer le débat »
+(GP5)
+Conclusion : même si certains médecins n’étaient pas convaincus, l’utilisation en groupe de
+pairs paraissait intéressante. En effet, le regard extérieur des confrères pouvait faire ressortir
+des questions sur le dossier du patient qu’on ne se serait peut-être pas posées en utilisant
+l’outil seul. Cela n’a pas été très visible lors de l’étude, car, même les médecins vus
+individuellement, n’utilisaient pas l’outil seul, puisque le doctorant était présent et posait des
+questions. Les discussions étaient quand même plus riches en groupe de pairs. L’autre
+intérêt était qu’il est toujours un peu difficile de réévaluer une ordonnance et de juger du
+bénéfice/risque des modifications. Avoir l’avis de ses confrères était peut-être une aide pour
+décider de modifier ou non l’ordonnance. L’inconvénient était que l’on n’avait pas accès au
+dossier médical avec l’ensemble des informations.
+4.3.4.2.2 Bilan annuel
+Une autre réponse fréquente sur l’utilisation de STOPP/START était lors d’un bilan
+périodique le plus souvent annuel.
+« [>D1]: et des personnes polymédicamentées t'en as pas 10000 tu leur fait une fois par an ça va
+[>H1]: une fois par an moi je pense
+[>H3]: ça peut être une fois par an » (GP3)
+Certains voyaient ce bilan en dehors d’une consultation, lors d’une revue de dossier :
+« [>Médecin]: dans la pratique quotidienne, ce n'est surement pas dans la pratique quotidienne
+c'est plus dans ce que je disais bilan; moi je verrais ça genre sur bilan annuel
+[>Doctorant]: oui c'est en général ce qu'on me dit
+[>Médecin]: bilan annuel de dossier, c'est un peu moi je sais que dans ma pratique c'est un peu ce
+qui se passe, peut-être pas tous les ans mais tous les 2 ans je les reprends surtout les personnes
+
+
+Résultats 78
+âgées là où ça devient vraiment complexe enfin voilà la place ça pourrait être sur un bilan annuel
+de dossier pour voir pourquoi j'en suis là aujourd'hui, annuel ou tous les 2 ans au pire mais pas
+dans la pratique quotidienne, je le vois pas sur une consultation » (MI2)
+D’autres voyaient son utilisation lors d’une consultation spécifique type CALD ou consultation
+annuelle de synthèse :
+« [>H4]: moi je fais une consultation où je ne fais que de la thérapeutique et je considère que c'est
+une vraie consultation, il n’y a pas forcément d'examen clinique derrière, je prends le temps de
+réfléchir avec le patient, ça prend un maximum de temps » (GP4)
+« [>H1]: qu'elle pourrait être l'utilisation de cet outil dans la pratique, ben c'est CALD
+[>H7]: CALD on pourrait faire mais c'est compliqué » (GP5)
+4.3.4.2.3 Bilan quotidien
+Trois médecins ont parlé de l’utiliser en bilan quotidien à la fin de la journée de consultation
+pour les dossiers complexes :
+« [>Médecin]: A quel moment je pourrais l'utiliser ? bof, dans ma prescription quotidienne
+[>Doctorant]: est-ce que ça vous paraît utilisable en consult?
+[>Médecin]: ben il faut un peu de temps quand même
+[>Doctorant]: oui c'est en général ce qu'on me dit
+[>Médecin]: donc moi je serais plutôt pour, je suis un type relativement anxieux pour les
+prescriptions donc je serais assez pour le soir, mais ça fait un peu de boulot en plus, pour appliquer
+sur les malades polymédicamentés oui surement » (MI3)
+4.3.4.2.4 En EHPAD
+L’idée de l’utiliser en EHPAD a plusieurs fois été évoquée :
+« en EHPAD oui ça, ça m'irait beaucoup, je crois que je le ferai en plus » (MI3)
+« ça pour intervenir en maison de retraite ce n’est pas mal. Et puis ce n’est pas des gens malades
+entre guillemet c'est souvent des chroniques. Paradoxalement parfois j'ai plus de temps en maison
+de retraite » (GP1)
+
+
+Résultats 79
+4.3.4.2.5 Avec l’interne
+Certains médecins qui sont Maîtres de Stage Universitaire, se voyaient bien l’utiliser lors de
+l’étude d’un dossier avec leur interne.
+« les internes c'est.. , de temps en temps tu relis les dossiers avec eux, que eux ils ont géré, tu vois un
+truc que tu n’aurais pas fait ou que t'aimes pas » (GP1)
+« éducation des externes/internes (pour les MSU) »(GP5)
+« Etude du dossier avec interne »(GP4)
+4.3.4.2.6 Changement de situation
+Un médecin a parlé de l’utiliser lors de la prise en charge d’un patient de façon récente,
+notamment lorsqu’on récupère le dossier d’un médecin parti à la retraite ; cela permettait de
+refaire le point sur le dossier.
+« [>Doctorant]: donc on ajoute éventuellement la statine et vous vouliez enlever la flécaine c'est
+ça? mais elle l'a pourquoi la flécaine ?
+[>D1]: ben justement je n’ai pas noté et en relisant j'ai peut-être; j'ai repris un vieux dossier d'un
+médecin qui est parti à la retraite et peut-être que; faudrait que je la réinterroge quoi » (GP4)
+« réévaluer les ordonnances des patients qu'on prend en charge de façon récente » (GP4)
+Ou lorsqu’on était face à des troubles inexpliqués, notamment face à des hypotensions
+orthostatiques, à des effets anticholinergiques ou les médicaments favorisant les chutes.
+« [>Médecin]: quand y a des troubles inexpliqués chez un patient et que tu te poses la question d'un
+problème d'un effet secondaire d'association de médicament, là je le vois bien dans ce sens-là,
+quand y a des troubles inexpliqués et quand on se pose la question de l'origine médicamenteuse
+[>Doctorant]: après je ne sais pas s'il en sortirait tant que ça parce que
+[>Médecin]: là par exemple si j'en ai un qui fait de l'hypotension
+[>Doctorant]: oui sur l'hypotension ça peut bien aider oui sur certains troubles médicamenteux
+mais pas sur tous, sur l’hypotension oui parce qu’ils sont assez axés là-dessus donc là ça peut valoir
+le coup de les mettre et de vérifier
+[>Médecin]: oui je pensais à ça là
+[...]
+
+
+Résultats 80
+[>Doctorant]: ça dépend un peu du trouble mais effectivement hypotension comme c'est un sujet qui
+intéresse bien les gériatres ils l'ont bien cité et puis tout ce qui est un peu anticholinergique
+[>Doctorant]: ben oui ça aussi » (MI1)
+4.3.4.3 Discussion du dossier
+4.3.4.3.1 Réappropriation des éléments du dossier
+L’utilisation de STOPP/START amenait à se reposer des questions sur le dossier du patient
+et il manquait parfois des informations.
+« [>H3]: oui mais moi je suis sûr qu'elle a déjà eu du bisoprolol mais je me rappelle pas pourquoi
+elle ne l'a plus
+[>H5]: c'est ça le truc » (GP4)
+Bien évidemment, les médecins ne pouvaient pas connaître par cœur tous les éléments du
+dossier de leurs patients.
+« [>D1]: moi je veux bien commencer. J'espère que tu ne vas pas me poser des questions trop
+précises sur le patient, parce que là
+[>D2]: quoi tu ne connais pas tes patients !
+[>H1]: tu ne connais pas tes patients par cœur ?
+[>D1]: ben tu peux le dire oui
+[>H1]: tu n'as que 2500 patients et tu les connais pas tous par cœur ! » (GP2)
+En groupe de pairs, ils n’avaient pas accès à l’intégralité du dossier du patient ; donc en
+général, ils concluaient qu’ils allaient rechercher l’information manquante et qu’ils verraient
+ensuite en fonction du résultat pour l’optimisation de l’ordonnance. Dans les entretiens
+individuels, les médecins étaient à leur cabinet et avaient donc la possibilité de chercher
+l’information manquante dans le dossier du patient :
+« je n’ai rien noté dans l'entretien sur le Zolpidem je vais regarder à quelle fréquence je lui prescris
+ça, oh apparemment elle me demande une boîte quand même tous les 3 mois donc c'est quelque
+chose qu'elle ne prend pas de façon quotidienne mais de façon régulière quand même donc dans ces
+cas-là on le met quand même je suppose » (MI4)
+Parfois, ils en profitaient pour mettre à jour le dossier médical :
+
+
+Résultats 81
+« alors dépression et sevrage en mars 2013 et moral stable depuis donc non, c'est un antécédent
+donc elle l'a plus ça; tiens ben je vais le modifier pour le passer en antécédent, voilà; » (MI4)
+Donc l’utilisation de STOPP/START permettait de se réapproprier les éléments du dossier du
+patient et éventuellement de le mettre à jour par rapport aux pathologies chroniques, aux
+antécédents.
+4.3.4.3.2 Manque des informations
+Il est apparu qu’il manquait parfois des informations par exemple sur des prescriptions de
+spécialistes :
+« [>Médecin]: des infiltrations et je crois qu'il doit avoir des AINS de temps en temps mais je n’ai
+pas la main dessus, il va chez le rhumato quand ça va pas; quelque patient comme ça on n'a pas
+toujours la main sur les prescriptions parallèles, et on n’a pas la main
+[>Doctorant]: et vous n’avez pas les infos même
+[>Médecin]: et des fois on n’a pas les infos, oui, ça c'est, les gens oublient de te le dire quoi » (MI2)
+4.3.4.3.3 Ergonomie du dossier médical
+Lors de la discussion, il est aussi ressorti que ce n’était pas toujours facile de retrouver dans
+le dossier les médicaments qui avaient été essayés et la raison de leur arrêt ; que c’était une
+information difficile à tracer ; l’ergonomie du dossier médical n’était pas toujours optimale.
+« [>H4]: ce qu'il manque dans les dossiers médicaux c'est de tracer l'arrêt et la raison de l'arrêt, je
+pense que ça aussi il faut trouver un outil simple » (GP4)
+« [>H5]: le plus difficile c'est de retrouver est-ce qu'on a déjà essayé, des fois on dit à ça j'ai dû
+l'essayer c'est sûr et pourquoi je l'ai plus ?
+[>Doctorant]: c'est pour ça qu'avec la fiche on peut tracer mieux toutes les modifs qu'on fait
+[>H4]: indiquer pourquoi on l'a mis et pourquoi on l'arrête et alors quand on voit un cardiologue
+qui remet un machin
+[>H5]: même des fois toi avec l'interne des fois tu dis attend il devrait être sous, y a une raison,
+cherche pas y a une raison, après on peut s'être planté pas avoir raison mais globalement y a une
+raison mais on la retrouve pas, enfin si on le retrouve mais
+[>Doctorant]: il faut chercher
+
+
+Résultats 82
+[>H5]: c'est du boulot
+[>H4]: ça manque dans tous nos dossiers médicaux, faut mettre une page de pharmaco où je mets
+[>D1]: essaie ça
+[>H4]: pourquoi on introduit, pour quelle raison je mets tel ou tel médicament et pourquoi on
+l'arrête
+[>H2]: parce qu’on note les allergies
+[>H5]: oui les allergies, mais il n’y a pas de date
+[>H2]: mais on ne note pas les intolérances, les effets indésirables
+[>H3]: ou même tout simplement le rapport bénéfice, t'as plein de raison pour arrêter le
+traitement » (GP4)
+4.3.4.3.4 Discussion des diagnostics
+Le fait de rediscuter d’un dossier permettait aussi parfois de rediscuter ou repréciser certains
+diagnostics :
+« [>D2]: alors les pathologies, elle a une ACFA un trouble ventilatoire obstructif chronique; je ne
+sais pas si on peut dire asthme chronique, moi j'ai du mal à dire asthme
+[>Doctorant]: BPCO, ben je ne sais pas
+[>D2]: c'est des séquelles de tuberculose » (GP2)
+4.3.4.3.5 Compléments de bilan
+L’utilisation de STOPP/START n’entrainait pas toujours de modification de l’ordonnance,
+mais amenait parfois à un complément de bilan. Soit la situation n’était pas si claire et des
+examens complémentaires permettraient de clarifier les choses pour ensuite optimiser
+l’ordonnance :
+« [>H1]: résultats des courses il faut que tu fasses un holter et une écho » (GP3)
+Soit cela rappelait la surveillance biologique nécessaire pour certains traitements :
+« IRS en présence d'une hyponatrémie alors j'ai dû surveiller le potassium mais je ne sais plus à
+quand ça remonte, le sodium je veux dire; oui ça doit remonter pareil à 2013, il était à 130 donc il
+était normal mais c'est vrai que je pourrais lui
+[>Doctorant]: le contrôler de temps en temps
+
+
+Résultats 83
+[>Médecin]: je vais lui mettre un rappel : contrôler natrémie, c'est marqué; je vais le laisser ouvert
+parce que je m'attends à ce qu'il y en ait d'autres » (MI4)
+4.3.4.4 Discussion des prescriptions externes
+4.3.4.4.1 Discussion des prescriptions des autres médecins
+En voulant optimiser l’ordonnance, on se retrouvait parfois à discuter de prescriptions faites
+par d’autres médecins. Notamment les prescriptions hospitalières dont les indications
+n’étaient pas toujours explicitées ou avec lesquelles les médecins généralistes n’étaient pas
+toujours d’accord.
+« [>Doctorant]: ben c'est pareil il a une pathologie ulcéreuse?
+[>D2]: non, mais c'est bon parce que ils ont tous des IPP
+[>H1]: quand ils sortent de l'hôpital ils en ont tout le temps » (GP1)
+« [>H3]: ben en cardio ils sortent tous avec Crestor 70, si ça existait ils sortiraient avec Crestor 70
+et Omeprazole 200 » (GP1)
+Parfois, le médecin généraliste n’osait pas intervenir dans les prescriptions du spécialiste :
+« ceci étant ce n'était pas une critique je me disais oui c'est intéressant mais en fait des fois, en fait
+des fois on est aussi en butte avec le la prescription qui est cardio sur laquelle on n'a pas toujours la
+main en fait » (MI2)
+« [>H2]: le seul problème c'est que ce n’est pas nous en général qui décidons de mettre de
+l'amiodarone, ça c'est fait à l'hôpital ou en cardio » (GP5)
+Eventuellement, ils proposaient d’en discuter avec le médecin spécialiste :
+« ce que je peux faire c'est alerter le cardiologue qui la suit, alors c'est le thiazidique favorise les
+crises de goutte » (MI4)
+« [>Doctorant]: dans la partie START, il devrait avoir un IEC parce qu'il a une cardiopathie
+[>H1]: j'en parlerai au cardio » (GP3)
+4.3.4.4.2 Traitements spécialisés non connus
+Dans certains cas, les traitements des spécialistes n’étaient pas connus, c’était
+particulièrement fréquent en ophtalmologie :
+
+
+Résultats 84
+« [>Doctorant]: pour le glaucome on n'a pas son traitement en fait
+[>H4]: non mais c'est le problème des interférences avec les médicaments généraux sur le
+glaucome » (GP5)
+« [>Doctorant]: ensuite elle a quoi pour son glaucome ?
+[>Médecin]: je ne sais pas, c'est l'ophtalmo qui lui prescrit et je ne sais pas ce qu'elle a » (MI1)
+Parfois le diagnostic précis n’est pas connu :
+« [>H6]: le problème c'est que tu ne sais pas toujours, ils ne savent pas te le dire
+[>H1]: ils disent « j'ai un glaucome »
+[>H6]: ils ne savent jamais te dire s'ils ont un glaucome à angle ouvert ou pas
+[>H2]: non mais tu peux appeler l'ophtalmo
+[>H6]: t'arrives à avoir les ophtalmos toi ?
+[>H5]: non moi je demande au patient d'appeler l'ophtalmo pour savoir » (GP5)
+Conclusion : Une meilleure collaboration avec les autres prescripteurs (médecins hospitaliers
+et médecins spécialistes) serait nécessaire.
+4.3.4.4.3 Attitude du pharmacien
+Un seul médecin a évoqué la discussion des prescriptions avec le pharmacien :
+« nos amis pharmaciens avaient à un moment donné expérimenté un outil, dont ils rêvaient la
+généralisation, ils n’arrêtaient pas de nous téléphoner et finalement on finissait par se mordre le nez
+parce que eux disaient "non mais j'exécute pas une ordonnance qui met les gens en danger" ça se
+comprend et nous on disait "non mais attendez si on commence à siffler toutes les fautes on va plus
+pouvoir travailler, parce qu'il y a un moment donné, un bénéfice-risque que nous n'avons pas le
+droit de prendre par-dessus la jambe en disant "c'est moi qui prescrit je fais ce que je veux" c'est
+pas ça que je veux dire, mais à un moment donné on est obligé de trancher »(MI3)
+
+
+Conclusion 85
+5 CONCLUSION
+Cette étude a permis d’appliquer une version informatisée de STOPP/START version 2 sur
+50 ordonnances de médecine de ville, chez des patients âgés et polypathologiques en
+France. On obtient 80% de Prescription Médicamenteuse Potentiellement Inappropriée (PIM)
+et 82% de Prescription Potentielle Omise (PPO). On obtient des chiffres plus importants que
+dans la littérature, mais, d’une part, la population sélectionnée était âgée (>75ans) et
+polymédicamentée (>5 médicaments par ordonnance) et, d’autre part, il s’agissait de la
+version 2 pour laquelle il n’y a pas encore de données dans la littérature. Beaucoup
+d’ordonnances ont été modifiées, mais il n’y a eu, au final, que peu de modifications par
+ordonnance avec un nombre médian de médicaments par ordonnance passant de 9 à 8,5. Il
+faut néanmoins rappeler que les médecins n’ont pas été choisis au hasard et qu’il s’agissait
+pour la majorité de médecins investis dans des groupes de pairs et/ou proche de la faculté ;
+on aurait peut-être eu des résultats un peu différents avec des médecins sélectionnés au
+hasard.
+L’étude qualitative a permis de montrer que l’utilisation d’une version informatisée de
+STOPP/START v2 pour la réévaluation des ordonnances était réalisable, soit en groupe de
+pairs, soit au cabinet individuellement. Dans ce dernier cas, plutôt en bilan annuel ou lors de
+circonstances particulières. La version informatisée a paru utile et simple d’utilisation ; les
+médecins dans leur ensemble ne se voyaient pas utiliser la version papier. Il n’était
+cependant pas sûr que la majorité des médecins soit prête à utiliser la version informatisée
+dans sa version actuelle. Ils souhaiteraient d’une part un outil plus sophistiqué et d’autre part
+une intégration à leur logiciel de prescription pour éviter d’avoir plusieurs outils. On note une
+certaine ambivalence chez les médecins qui voudraient, à la limite, un outil « plus
+intelligent » couplé à leur dossier médical, qui fasse lui-même le tri dans les critères à retenir
+et qui mette en évidence les modifications à faire sur l’ordonnance ; mais d’un autre côté, ils
+ne souhaitent pas qu’on prenne de décision à leur place, et sont très critiques vis-à-vis des
+critères retenus, même lorsqu’il y a des recommandations bien établies. Ils veulent
+
+
+Conclusion 86
+conserver la liberté de les appliquer ou non. Je pense que l’outil pourrait être amélioré de
+manière à sortir moins de critères non pertinents, néanmoins le travail d’analyse et de
+réflexion de la part du médecin demeurera, et il est souhaitable que ce soit ainsi.
+Les différents contextes d’utilisation qui ont pu être mis en évidence varient d’un médecin à
+l’autre ; on retrouve les propositions suivantes : en groupes de pairs, en bilan annuel ou
+quotidien, pendant ou hors de la consultation, en EHPAD, en éducation des
+internes/externes, lors de changement de situation. Les deux premières propositions étant
+les plus fréquemment citées.
+L’étude a permis de retrouver un certain nombre de freins ou de facilitateurs à l’optimisation
+des ordonnances déjà mis en évidence dans d’autres études, tel que l’étude polychrome (79)
+ou la revue de la littérature d’Anderson (80) : l’inertie liée au manque de conviction que la
+modification sera bénéfique, la perception de sa capacité à optimiser la prescription et la
+faisabilité dans un environnement contraint (ressources notamment en terme de temps,
+méthode de travail, patient et son environnement).
+L’intérêt de l’application de STOPP/START dépasse largement les quelques modifications
+qui sont effectuées sur l’ordonnance. On a vu que son utilisation entraînait une revue du
+dossier du patient, avec notamment une réappropriation des éléments du dossier, voire une
+mise à jour, la mise en évidence d’informations manquantes à rechercher, une rediscussion
+éventuelle de certains diagnostics, avec éventuellement la réalisation d’examens
+complémentaires pour clarifier la situation, une discussion éventuelle avec les prescripteurs
+externes.
+L’autre intérêt de STOPP/START est son aspect « formateur » avec le rappel d’un certains
+nombres de recommandations, de précautions à prendre ou de propriétés
+pharmacologiques. Il est certain que, si l’on applique régulièrement STOPP/START, on finit
+par connaître les différents critères par cœur, ou au moins les plus fréquents. La version
+informatisée offre de plus la possibilité d’accéder facilement et rapidement aux références
+citées par les auteurs lorsque l’on souhaite approfondir la question.
+Au final, il me paraît essentiel que les médecins généralistes se prennent un temps
+annuellement pour la réévaluation des ordonnances et la revue du dossier de leurs patients
+
+
+Conclusion 87
+polymédicamentés âgés. Un outil tel que STOPP/START peut être une aide, mais quelques
+adaptations sont nécessaires pour qu’il soit réellement adopté par les médecins
+généralistes : une diminution des critères sortis non pertinents et une intégration au logiciel
+de prescription. Une étude de plus grande ampleur dont l’objectif est d’évaluer l’efficacité sur
+la morbi-mortalité à 1 an d’une intervention consistant à réviser systématiquement les
+ordonnances de patients polymédicamentés, âgés de 75 ans et plus, est en cours
+d’élaboration. La version informatisée de STOPP/START réalisée dans le cadre de cette
+thèse servira de base à cette étude.
+
+
+Annexes 88
+6 ANNEXES
+6.1 ANNEXE 1 : STOPP/START.V2 ADAPTATION EN LANGUE FRANÇAISE
+Source : [Lang P-O, Boland B, Dalleur O. Prescription médicamenteuses inappropriée : les nouveaux critères STOPP/START. Rev Médicale Suisse. 11 nov 2015].
+
+
+Annexes 89
+
+
+Annexes 90
+
+
+Annexes 91
+
+
+Annexes 92
+
+
+Annexes 93
+6.2 ANNEXE 2 : LISTE COMPLETE DES CRITERES STOPP V2 REGROUPES
+PAR MEDICAMENTS
+Source : [Dalleur O, Mouton A, Marien S, Boland B. STOPP/START, VERSION.2 Un outil à jour pour la qualité de la prescription médicamenteuse chez les patients âgés de 65 ans et plus. Louvain Méd. 2015].
+
+
+Annexes 94
+
+
+Annexes 95
+6.3 ANNEXE 3 : LISTE COMPLETE DES CRITERES START V2 REGROUPEES
+PAR SITUATION MEDICALE
+Source : [Dalleur O, Mouton A, Marien S, Boland B. STOPP/START, VERSION.2 Un outil à jour pour la qualité de la prescription médicamenteuse chez les patients âgés de 65 ans et plus. Louvain Méd. 2015].
+
+
+Annexes 96
+6.4 ANNEXE 4 : FICHIER DE CORRESPONDANCE ENTRE CRITERE
+STOPP/START ET MOLECULE OU PATHOLOGIE
+6.4.1 STOPP
+STOPP A Indication du traitement
+STOPP A1 Tous médicaments prescrits sans indication clinique
+ <Jamais>
+STOPP A2 Tout médicament prescrit au-delà de la durée recommandée, si elle est définie
+ <Jamais>
+STOPP A3 Toute duplication de prescription d’une classe médicamenteuse (deux benzodiazépines, anti-inflammatoires non stéroïdiens (AINS), inhibiteurs sélectifs de la recapture de la sérotonine (ISRS), diurétiques de l’anse, inhibiteurs de l’enzyme de conversion, bêtabloquants, anticoagulants...) – (monothérapie à optimaliser avant de considérer la duplication)
+ <Règle spéciale>
+STOPP B Système cardiovasculaire
+STOPP B1 La digoxine pour une décompensation d’insuffisance cardiaque avec fraction d’éjection ventriculaire gauche (FEVG) conservée – (pas de preuve de bénéfice)
+ C01AA05 : digoxine
+STOPP B2 Le vérapamil ou le diltiazem en présence d’une décompensation cardiaque de classe III ou IV – (risque d’aggravation de l’insuffisance cardiaque)
+ C08DB01 : diltiazem  C08DA01 : vérapamil
+STOPP B3 Un bêtabloquant en combinaison avec le vérapamil ou le diltiazem – (risque de bloc de conduction cardiaque)
+ C07A : Bêtabloquants (alprénolol, oxprénolol, pindolol, propranolol, timolol, sotalol, nadolol, mépindolol, cartéolol, tertatolol, bopindolol, bupranolol, penbutolol, cloranolol, sotalol en association, practolol, métoprolol, aténolol, acébutolol, bétaxolol, bévantolol, bisoprolol, céliprolol, esmolol, épanolol, s-aténolol, nébivolol, talinolol, métoprolol en association, bisoprolol en association, labétalol, carvédilol, )  S01ED : Bêtabloquants (timolol, bétaxolol, lévobunolol, métipranolol, cartéolol, béfunolol, timolol en association, bétaxolol en association, métipranolol en association, cartéolol en association, )  C08DA01 : vérapamil
+STOPP B4 Un bêtabloquant en présence d’une bradycardie (< 50 bpm), d’un bloc atrioventriculaire du second degré ou troisième degré – (risque de bloc complet ou d’asystolie)
+ C07A : Bêtabloquants (alprénolol, oxprénolol, pindolol, propranolol, timolol, sotalol, nadolol, mépindolol, cartéolol, tertatolol, bopindolol, bupranolol, penbutolol, cloranolol, sotalol en association, practolol, métoprolol, aténolol, acébutolol, bétaxolol, bévantolol, bisoprolol, céliprolol, esmolol, épanolol, s-aténolol, nébivolol, talinolol, métoprolol en association, bisoprolol en association, labétalol, carvédilol, )  S01ED : Bêtabloquants (timolol, bétaxolol, lévobunolol, métipranolol, cartéolol, béfunolol, timolol en association, bétaxolol en association, métipranolol en association, cartéolol en association, )
+STOPP B5 L’amiodarone en première intention pour une tachycardie supraventriculaire – (risque d’effets secondaires plus important que celui par bêtabloquant, digoxine, vérapamil ou diltiazem)
+ C01BD01 : amiodarone
+STOPP B6 Un diurétique de l’anse en première intention pour une hypertension artérielle – (des alternatives plus sûres et plus efficaces sont disponibles)
+
+
+Annexes 97
+ C03C : Diurétiques de l'anse (furosémide, bumétanide, pirétanide, torasémide, furosémide et potassium, bumétanide et potassium, acide étacrynique, acide tiénilique, muzolimine, étozoline, )
+STOPP B7 Un diurétique de l’anse pour oedèmes des membres inférieurs d’origine périphérique (c’est-à dire en l’absence d’argument pour une insuffisance cardiaque, insuffisance hépatique, insuffisance rénale ou syndrome néphrotique) – (la surélévation des jambes et le port de bas de contention sont plus appropriés)
+ C03C : Diurétiques de l'anse (furosémide, bumétanide, pirétanide, torasémide, furosémide et potassium, bumétanide et potassium, acide étacrynique, acide tiénilique, muzolimine, étozoline, )
+STOPP B8 Un diurétique thiazidique ou apparenté (indapamide) en présence d’une hypokaliémie (K<3,5 mmol/l), hyponatrémie (Na< 130 mmol/l), hypercalcémie (calcémie corrigée > 2,65 mmol/l ou > 10,6 mg/dl), ou d’une histoire d’arthrite microcristalline (goutte ou chondrocalcinose) – (risque accru de précipiter ces troubles métaboliques)
+ C03A : Diurétiques low-ceiling, thiazidiques (bendrofluméthiazide, hydrofluméthiazide, hydrochlorothiazide, chlorothiazide, polythiazide, trichlorméthiazide, cyclopenthiazide, méthyclothiazide, cyclothiazide, mébutizide, bendrofluméthiazide et potassium, hydrofluméthiazide et potassium, hydrochlorothiazide et potassium, chlorothiazide et potassium, polythiazide et potassium, trichlorméthiazide et potassium, cyclopenthiazide et potassium, méthyclothiazide et potassium, cyclothiazide et potassium, chlorothiazide en association, hydrofluméthiazide en association, hydrochlorothiazide en association, )
+STOPP B9 Un diurétique de l’anse pour hypertension artérielle en présence d’une incontinence urinaire – (exacerbation probable de l’incontinence)
+ C03C : Diurétiques de l'anse (furosémide, bumétanide, pirétanide, torasémide, furosémide et potassium, bumétanide et potassium, acide étacrynique, acide tiénilique, muzolimine, étozoline, )
+STOPP B10 Un antihypertenseur à action centrale (méthyldopa, clonidine, moxonidine, rilménidine, guanfacine) en l’absence d’une intolérance ou d’une inefficacité des autres classes d’antihypertenseurs – (les antihypertenseurs à action centrale sont moins bien tolérés)chez les patients âgés que chez les plus jeunes)
+ C02A : Adrénolytiques à action centrale (rescinnamine, réserpine, associations d'alcaloïdes du rauwolfia, alcaloïdes du rauwolfia, racine entière, déserpidine, méthoserpidine, biétaserpine, réserpine en association, associations d'alcaloïdes du rauwolfia, biétaserpine en association, méthyldopa, méthyldopa, clonidine, guanfacine, tolonidine, moxonidine, rilménidine, )
+STOPP B11 Un inhibiteur de l’enzyme de conversion (IEC) ou un antagoniste des récepteurs de l’angiotensine II (ARA II) en présence d’un antécédent d’hyperkaliémie – (risque de récidive)
+ C09A : Inhibiteurs de l'enzyme de conversion (IEC) non associes (captopril, énalapril, lisinopril, périndopril, ramipril, quinapril, bénazépril, cilazapril, fosinopril, trandolapril, spirapril, délapril, moexipril, témocapril, zofénopril, imidapril, )  C09B : Inhibiteurs de l'enzyme de conversion (IEC) en association (captopril et diurétiques, énalapril et diurétiques, lisinopril et diurétiques, périndopril et diurétiques, ramipril et diurétiques, quinapril et diurétiques, bénazépril et diurétiques, cilazapril et diurétiques, fosinopril et diurétiques, délapril et diurétiques, moexipril et diurétiques, zofénopril et diurétiques, énalapril et lercanidipine, lisinopril et amlodipine, périndopril et amlodipine, ramipril et félodipine, énalapril et nitrendipine, ramipril et amlodipine, trandolapril et vérapamil, délapril et manidipine, périndopril, amlodipine et indapamide, )  C09C : Antagonistes de l'angiotensine II (losartan, éprosartan, valsartan, irbésartan, tasosartan, candésartan, telmisartan, olmésartan médoxomil, azilsartan médoxomil, fimasartan, )  C09D : Antagonistes de l'angiotensine II en association (losartan et diurétiques, éprosartan et diurétiques, valsartan et diurétiques, irbésartan et diurétiques, candésartan et diurétiques, telmisartan et diurétiques, olmésartan médoxomil et diurétiques, azilsartan médoxomil et diurétiques, valsartan et amlodipine, olmésartan médoxomil et amlodipine, telmisartan et amlodipine, irbésartan et amlodipine, losartan et amlodipine, candésartan et amlodipine, valsartan, amlodipine et hydrochlorothiazide, valsartan et aliskiren, olmésartan médoxomil, amlodipine et hydrochlorothiazide, )
+
+
+Annexes 98
+STOPP B12 Un antagoniste de l’aldostérone (spironolactone, éplérénone) en l’absence d’une surveillance de la kaliémie (au moins semestrielle), lorsque cet antagoniste est associé à un médicament d’épargne potassique (IEC, ARA II, amiloride, triamtérène) – (risque d’hyperkaliémie sévère (> 6 mmol/l))
+ C03DA : Antagonistes de l'aldostérone (spironolactone, canrénoate de potassium, canrénone, éplérénone, )  C09 : Agents agissant sur le système rénine-angiotensine (captopril, énalapril, lisinopril, périndopril, ramipril, quinapril, bénazépril, cilazapril, fosinopril, trandolapril, spirapril, délapril, moexipril, témocapril, zofénopril, imidapril, captopril et diurétiques, énalapril et diurétiques, lisinopril et diurétiques, périndopril et diurétiques, ramipril et diurétiques, quinapril et diurétiques, bénazépril et diurétiques, cilazapril et diurétiques, fosinopril et diurétiques, délapril et diurétiques, moexipril et diurétiques, zofénopril et diurétiques, énalapril et lercanidipine, lisinopril et amlodipine, périndopril et amlodipine, ramipril et félodipine, énalapril et nitrendipine, ramipril et amlodipine, trandolapril et vérapamil, délapril et manidipine, périndopril, amlodipine et indapamide, losartan, éprosartan, valsartan, irbésartan, tasosartan, candésartan, telmisartan, olmésartan médoxomil, azilsartan médoxomil, fimasartan, losartan et diurétiques, éprosartan et diurétiques, valsartan et diurétiques, irbésartan et diurétiques, candésartan et diurétiques, telmisartan et diurétiques, olmésartan médoxomil et diurétiques, azilsartan médoxomil et diurétiques, valsartan et amlodipine, olmésartan médoxomil et amlodipine, telmisartan et amlodipine, irbésartan et amlodipine, losartan et amlodipine, candésartan et amlodipine, valsartan, amlodipine et hydrochlorothiazide, valsartan et aliskiren, olmésartan médoxomil, amlodipine et hydrochlorothiazide, rémikiren, aliskiren, aliskiren et hydrochlorothiazide, aliskiren et amlodipine, aliskiren, amlodipine et hydrochlorothiazide, )  C03DB : Autres diurétiques épargneurs potassiques (amiloride, triamtérène, )
+STOPP B13 Un inhibiteur de la 5-phosphodiestérase (sildénafil, tadalafil, vardénafil) en présence d’une décompensation cardiaque sévère avec hypotension (pression systolique < 90 mmHg) ou d’un angor traité par nitrés – (risque de choc cardiovasculaire)
+ G04BE03 : sildénafil  G04BE08 : tadalafil  G04BE09 : vardénafil  G04BE11 : udénafil  G04BE10 : avanafil
+STOPP C Antiplaquettaires et anticoagulants
+STOPP C1 De l’aspirine au long cours à dose > 160 mg/jour – (risque accru de saignement, sans preuve d’efficacité majorée)
+ A01AD05 : acide acétylsalicylique  B01AC06 : acide acétylsalicylique  B01AC56 : acide acétylsalicylique et inhibiteurs de pompe à protons  N02BA01 : acide acétylsalicylique  N02BA51 : acide acétylsalicylique en association sauf aux psycholeptiques  N02BA71 : acide acétylsalicylique en association avec des psycholeptiques  C10BX01 : simvastatine et acide acétylsalicylique  C10BX02 : pravastatine et acide acétylsalicylique  C10BX04 : simvastatine, acide acétylsalicylique et ramipril  M01BA03 : acide acétylsalicylique et corticoïdes
+STOPP C2 De l’aspirine en présence d’un antécédent d’ulcère gastroduodénal sans prescription d’un IPP – (risque de récidive d’ulcère)
+ A01AD05 : acide acétylsalicylique  B01AC06 : acide acétylsalicylique  B01AC56 : acide acétylsalicylique et inhibiteurs de pompe à protons  N02BA01 : acide acétylsalicylique  N02BA51 : acide acétylsalicylique en association sauf aux psycholeptiques  N02BA71 : acide acétylsalicylique en association avec des psycholeptiques  C10BX01 : simvastatine et acide acétylsalicylique  C10BX02 : pravastatine et acide acétylsalicylique  C10BX04 : simvastatine, acide acétylsalicylique et ramipril  M01BA03 : acide acétylsalicylique et corticoïdes
+
+
+Annexes 99
+STOPP C3 Un antiagrégant plaquettaire (aspirine, clopidogrel, dipyridamole) ou un anticoagulant oral (antivitamine K, inhibiteur direct de la thrombine ou du facteur Xa) en présence d’un risque hémorragique significatif (hypertension artérielle sévère non contrôlée, diathèse hémorragique, ou récent épisode de saignement spontané important) – (risque élevé d’hémorragie)
+ A01AD05 : acide acétylsalicylique  B01AC06 : acide acétylsalicylique  B01AC56 : acide acétylsalicylique et inhibiteurs de pompe à protons  N02BA01 : acide acétylsalicylique  N02BA51 : acide acétylsalicylique en association sauf aux psycholeptiques  N02BA71 : acide acétylsalicylique en association avec des psycholeptiques  C10BX01 : simvastatine et acide acétylsalicylique  C10BX02 : pravastatine et acide acétylsalicylique  C10BX04 : simvastatine, acide acétylsalicylique et ramipril  M01BA03 : acide acétylsalicylique et corticoïdes  B01A : Antithrombotiques (dicoumarol, phénindione, warfarine, phenprocoumone, acénocoumarol, biscoumacétate d'éthyl, clorindione, diphénadione, tioclomarol, fluindione, héparine, antithrombine III, daltéparine, énoxaparine, nadroparine, parnaparine, réviparine, danaparoïde, tinzaparine, sulodexide, bémiparine, héparine en association, ditazole, cloricromène, picotamide, clopidogrel, ticlopidine, acide acétylsalicylique, dipyridamole, carbasalate calcique, époprosténol, indobufen, iloprost, abciximab, aloxiprine, eptifibatide, tirofiban, triflusal, béraprost, treprostinil, prasugrel, cilostazol, ticagrélor, cangrélor, vorapaxar, associations d'inhibiteurs de l'agrégation plaquettaire, acide acétylsalicylique et inhibiteurs de pompe à protons, streptokinase, altéplase, anistreplase, urokinase, fibrinolysine, brinase, retéplase, saruplase, ancrod, drotrécogine alfa activée, ténectéplase, protéine C, désirudine, lépirudine, argatroban, melagatran, ximelagatran, bivalirudine, dabigatran étexilate, rivaroxaban, apixaban, défibrotide, sulfate de dermatane, fondaparinux, )
+STOPP C4 De l’aspirine associée au clopidogrel en prévention secondaire des accidents vasculaires cérébraux (sauf si syndrome coronarien aigu concomitant, stent coronarien depuis moins de douze mois, ou sténose carotidienne serrée symptomatique) – (pas de preuve de bénéfice, hors de ces trois exceptions, par rapport à une monothérapie par clopidogrel)
+ A01AD05 : acide acétylsalicylique  B01AC06 : acide acétylsalicylique  B01AC56 : acide acétylsalicylique et inhibiteurs de pompe à protons  N02BA01 : acide acétylsalicylique  N02BA51 : acide acétylsalicylique en association sauf aux psycholeptiques  N02BA71 : acide acétylsalicylique en association avec des psycholeptiques  C10BX01 : simvastatine et acide acétylsalicylique  C10BX02 : pravastatine et acide acétylsalicylique  C10BX04 : simvastatine, acide acétylsalicylique et ramipril  M01BA03 : acide acétylsalicylique et corticoïdes  B01AC04 : clopidogrel
+STOPP C5 De l’aspirine associée à un anticoagulant oral (antivitamine K, inhibiteur direct de la thrombine ou du facteur Xa) pour une fibrillation atriale – (pas de bénéfice additionnel de l’aspirine, qui majore le risque de saignement)
+ A01AD05 : acide acétylsalicylique  B01AC06 : acide acétylsalicylique  B01AC56 : acide acétylsalicylique et inhibiteurs de pompe à protons  N02BA01 : acide acétylsalicylique  N02BA51 : acide acétylsalicylique en association sauf aux psycholeptiques  N02BA71 : acide acétylsalicylique en association avec des psycholeptiques  C10BX01 : simvastatine et acide acétylsalicylique  C10BX02 : pravastatine et acide acétylsalicylique  C10BX04 : simvastatine, acide acétylsalicylique et ramipril  M01BA03 : acide acétylsalicylique et corticoïdes  B01AA : Antivitamines K (dicoumarol, phénindione, warfarine, phenprocoumone, acénocoumarol, biscoumacétate d'éthyl, clorindione, diphénadione, tioclomarol, fluindione, )  B01AE : Inhibiteurs directs de la thrombine (désirudine, lépirudine, argatroban, melagatran, ximelagatran, bivalirudine, dabigatran étexilate, )  B01AF : Inhibiteurs directs du facteur Xa (rivaroxaban, apixaban, )
+
+
+Annexes 100
+STOPP C6 Un antiagrégant plaquettaire (aspirine, clopidogrel, dipyridamole) en association à un anticoagulant oral (antivitamine K, inhibiteur direct de la thrombine ou du facteur Xa) pour une artériopathie stable (coronarienne, cérébrovasculaire ou périphérique) – (pas de bénéfice additionnel de l’ajout de l’antiagrégant, qui majore le risque de saignement)
+ B01AA : Antivitamines K (dicoumarol, phénindione, warfarine, phenprocoumone, acénocoumarol, biscoumacétate d'éthyl, clorindione, diphénadione, tioclomarol, fluindione, )  B01AE : Inhibiteurs directs de la thrombine (désirudine, lépirudine, argatroban, melagatran, ximelagatran, bivalirudine, dabigatran étexilate, )  B01AF : Inhibiteurs directs du facteur Xa (rivaroxaban, apixaban, )  A01AD05 : acide acétylsalicylique  B01AC06 : acide acétylsalicylique  B01AC56 : acide acétylsalicylique et inhibiteurs de pompe à protons  N02BA01 : acide acétylsalicylique  N02BA51 : acide acétylsalicylique en association sauf aux psycholeptiques  N02BA71 : acide acétylsalicylique en association avec des psycholeptiques  C10BX01 : simvastatine et acide acétylsalicylique  C10BX02 : pravastatine et acide acétylsalicylique  C10BX04 : simvastatine, acide acétylsalicylique et ramipril  M01BA03 : acide acétylsalicylique et corticoïdes  B01AC : Inhibiteurs de l'agrégation plaquettaire, héparine exclue (ditazole, cloricromène, picotamide, clopidogrel, ticlopidine, acide acétylsalicylique, dipyridamole, carbasalate calcique, époprosténol, indobufen, iloprost, abciximab, aloxiprine, eptifibatide, tirofiban, triflusal, béraprost, treprostinil, prasugrel, cilostazol, ticagrélor, cangrélor, vorapaxar, associations d'inhibiteurs de l'agrégation plaquettaire, acide acétylsalicylique et inhibiteurs de pompe à protons, )
+STOPP C7 La ticlopidine dans tous les cas – (le clopidogrel et le prasugrel ont des effets secondaires moindres et une efficacité similaire)
+ B01AC05 : ticlopidine
+STOPP C8 Un anticoagulant oral (antivitamine K, inhibiteur direct de la thrombine ou du facteur Xa) durant plus de six mois pour un premier épisode de thrombose veineuse profonde (TVP) sans facteur de risque de thrombophilie identifié – (pas de bénéfice additionnel après six mois)
+ B01AA : Antivitamines K (dicoumarol, phénindione, warfarine, phenprocoumone, acénocoumarol, biscoumacétate d'éthyl, clorindione, diphénadione, tioclomarol, fluindione, )  B01AE : Inhibiteurs directs de la thrombine (désirudine, lépirudine, argatroban, melagatran, ximelagatran, bivalirudine, dabigatran étexilate, )  B01AF : Inhibiteurs directs du facteur Xa (rivaroxaban, apixaban, )
+STOPP C9 Un anticoagulant oral (antivitamine K, inhibiteur direct de la thrombine ou du facteur Xa) durant plus de douze mois pour un premier épisode d’embolie pulmonaire (EP) sans facteur de risque de thrombophilie identifié – (pas de bénéfice additionnel après douze mois)
+ B01AA : Antivitamines K (dicoumarol, phénindione, warfarine, phenprocoumone, acénocoumarol, biscoumacétate d'éthyl, clorindione, diphénadione, tioclomarol, fluindione, )  B01AE : Inhibiteurs directs de la thrombine (désirudine, lépirudine, argatroban, melagatran, ximelagatran, bivalirudine, dabigatran étexilate, )  B01AF : Inhibiteurs directs du facteur Xa (rivaroxaban, apixaban, )
+STOPP C10 Un AINS associé à un anticoagulant oral (antivitamine K, inhibiteur direct de la thrombine ou du facteur Xa) – (risque accru d’hémorragie gastro-intestinale)
+ B01AA : Antivitamines K (dicoumarol, phénindione, warfarine, phenprocoumone, acénocoumarol, biscoumacétate d'éthyl, clorindione, diphénadione, tioclomarol, fluindione, )  B01AE : Inhibiteurs directs de la thrombine (désirudine, lépirudine, argatroban, melagatran, ximelagatran, bivalirudine, dabigatran étexilate, )  B01AF : Inhibiteurs directs du facteur Xa (rivaroxaban, apixaban, )  M01A : Anti-inflammatoires, antirhumatismaux, non stéroïdiens (phénylbutazone, mofébutazone, oxyphenbutazone, clofézone, kébuzone, indométacine, sulindac, tolmétine, zomépirac, diclofénac, alclofénac, bumadizone, étodolac, lonazolac, fentiazac, acémétacine, difenpiramide, oxamétacine, proglumétacine, kétorolac, acéclofénac, bufexamac, indométacine en association, diclofénac en association, piroxicam, ténoxicam, droxicam, lornoxicam, méloxicam, méloxicam en association, ibuprofène, naproxène, kétoprofène,

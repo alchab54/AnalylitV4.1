@@ -1,0 +1,322 @@
+Skip to Main Content
+Skip to Footer
+Select options
+Global search
+
+Published on 04.01.2024 in Vol 10 (2024)
+
+Preprints (earlier versions) of this paper are available at https://preprints.jmir.org/preprint/51183, first published July 31, 2023.
+Generative Language Models and Open Notes: Exploring the Promise and Limitations
+Generative Language Models and Open Notes: Exploring the Promise and Limitations
+
+Authors of this article:
+
+Charlotte Blease1, 2  ;  John Torous2  ;  Brian McMillan3  ;  Maria Hägglund1, 4  ;  Kenneth D Mandl5 
+Article
+Authors
+Cited by (19)
+Tweetations (14)
+Metrics
+Abstract
+
+Patients’ online record access (ORA) is growing worldwide. In some countries, including the United States and Sweden, access is advanced with patients obtaining rapid access to their full records on the web including laboratory and test results, lists of prescribed medications, vaccinations, and even the very narrative reports written by clinicians (the latter, commonly referred to as “open notes”). In the United States, patient’s ORA is also available in a downloadable form for use with other apps. While survey studies have shown that some patients report many benefits from ORA, there remain challenges with implementation around writing clinical documentation that patients may now read. With ORA, the functionality of the record is evolving; it is no longer only an aide memoire for doctors but also a communication tool for patients. Studies suggest that clinicians are changing how they write documentation, inviting worries about accuracy and completeness. Other concerns include work burdens; while few objective studies have examined the impact of ORA on workload, some research suggests that clinicians are spending more time writing notes and answering queries related to patients’ records. Aimed at addressing some of these concerns, clinician and patient education strategies have been proposed. In this viewpoint paper, we explore these approaches and suggest another longer-term strategy: the use of generative artificial intelligence (AI) to support clinicians in documenting narrative summaries that patients will find easier to understand. Applied to narrative clinical documentation, we suggest that such approaches may significantly help preserve the accuracy of notes, strengthen writing clarity and signals of empathy and patient-centered care, and serve as a buffer against documentation work burdens. However, we also consider the current risks associated with existing generative AI. We emphasize that for this innovation to play a key role in ORA, the cocreation of clinical notes will be imperative. We also caution that clinicians will need to be supported in how to work alongside generative AI to optimize its considerable potential.
+
+JMIR Med Educ 2024;10:e51183
+
+doi:10.2196/51183
+
+
+Keywords
+ChatGPT (305); generative language models (2); large language models (167); medical education (524); Open Notes (28); online record access (6); patient-centered care (173); empathy (40); language model (79); online record access (6); documentation (36); communication tool (6); clinical documentation (7) 
+We also recommend
+Changes in Documentation Due to Patient Access to Electronic Health Records: Protocol for a Scoping Review
+Eva Meier-Diedrich, JMIR Res Protoc, 2023
+Documenting the Influence of Scribes on Patient-Physician Communication Within Primary Care Encounters: A Pilot Study (Preprint)
+Shivang U Danak, JMIR Med Inform, 2019
+Patients' Experiences of Web-Based Access to Electronic Health Records in Finland: Cross-sectional Survey
+Sari Kujala, J Med Internet Res, 2022
+Impact of an Electronic Medical Record–Connected Questionnaire on Efficient Nursing Documentation: Usability and Efficacy Study
+Kana Kodama, JMIR Nursing, 2023
+Beyond Notes: Why It Is Time to Abandon an Outdated Documentation Paradigm
+Jackson Steinkamp, J Med Internet Res, 2021
+How to reduce liability risks when using electronic health records
+Robin L. Altman, AAP News, 2014
+OpenNotes: Toward a Participatory Pediatric Health System
+Chethan Sarabu, Pediatrics, 2018
+Evidence-based MedicineSearching Literature and Databases for Clinical Evidence (Search Tools)
+Gary M. Onady, Pediatr Rev, 2004
+Electronic Documentation in Pediatrics: The Rationale and Functionality Requirements
+Heather C. O’Donnell, Pediatrics, 2020
+Paper Versus Computer: Feasibility of an Electronic Medical Record in General Pediatrics
+Jolt Roukema, Pediatrics, 2006
+Powered by
+
+
+
+
+Introduction
+
+Patient online record access (ORA) is growing globally [1]. Access includes test and laboratory results, secondary or hospital care letters, lists of prescribed medications, and the narrative reports written by clinicians after visits (the latter referred to as “open notes”). Already, patients across an estimated 30 countries can access some of their records via secure web portals including health apps. In some countries, this innovation is advanced [1]. Since 2021, the federally enacted 21st Century Cures Act in the United States mandated that providers offer all patients access to download their electronic health records without charge [2]. In the Nordic countries, ORA has been implemented incrementally, starting around 2010 [3]. The Finnish patient portal OmaKanta was rolled out with stepwise implementation of functionality between 2010 and 2015 [4]. Patients in Sweden first obtained ORA in one of 21 regions in 2012 [5] with nationwide implementation achieved by 2018. Implementation in Norway began in 2015, reaching patients in 3 out of 4 regions by 2019 [6]. In England, from October 31, 2023, it is mandatory for general practitioners to offer ORA to their adult patients, albeit on a prospective basis [7].
+
+Patients with access to their records report using them to become more involved in their care, to follow up on doctors’ visits, and to obtain an overview of their test results and treatment history [3,8,9]. Multiple surveys show that patients using ORA are positive about the experience after reading their notes. They report many benefits including understanding their care plans better [9], improved communication with and greater trust in their provider [10], and feeling more in control of their health and care [6,8], including doing a better job taking their medications [11,12].
+
+Despite the patient benefits with ORA, challenges with their implementation in clinical practice remain. In this viewpoint paper, we identify outstanding concerns with ORA, which encompass a range of unintended consequences for clinician work burdens, and for the substantial task of conveying bespoke, compassionate, and understandable information to each unique patient who accesses their records. Currently, it has been proposed that a range of targeted patient training and medical education strategies may be sufficient to resolve at least some of these challenges [13-17]. We believe that such interventions are valuable; however, in this viewpoint paper, we explain why the ambitions of such training interventions may be limited.
+
+As a solution, we explain why the use of generative artificial intelligence (AI) may offer more tangible long-term promise than clinician training alone in helping to resolve problems with ORA implementation. While generative AI itself is not new, recent technical advances and the increased accessibility of large language models (LLMs; GPT-4 by OpenAI, LLaMA by Meta, and PaLM2 by Google) have made clinical use increasingly feasible. LLMs are an application of generative AI technology, often defined as machine learning algorithms that can recognize, summarize, and generate content based on training on large data sets. Unlike search engines, which offer pages of internet links in response to typed queries, generative LLMs such as GPT-4 simulate well-reasoned answers couched as conversations. In addition, these models can “remember” previous prompts, helping to build up the perception of dialogic exchange. We review the strengths and limitations of generative AI and emphasize that for this innovation to play a key role in ORA, it will be imperative for humans to be involved as overseers of computer input.
+
+
+
+Current Challenges With Open Notes
+Evolving Functionality of Records
+
+Guidelines, such as those issued by the British General Medical Council, state that clinicians should keep clear, accurate, contemporaneous records that include “...any minor concerns, and the details of any action you have taken, information you have shared and decisions you have made relating to those concerns” [18]. In the era of ORA, clinicians will also need to consider if what they write will be understandable, accessible, and supportive for patients [19]. With the knowledge that patients will read what they write, the functionality of the record is evolving, and this incurs changes with respect to how clinical information is documented [20,21]. Clinicians must uphold the original functionality of the record—documenting the patient’s medical information in clinical detail, but also communicating this information to the patient. With respect to the latter function, it is argued that for records to be understandable and acceptable to a lay audience, clinicians should ideally remove or explain medical acronyms, omit medical vernacular that may be perceived as offensive (such as “patient denies” or “patient complains of”), and strive to convey information in a manner that it is straightforward, comprehensive, and empathic in tone [14]. This is not an easy undertaking for clinicians tasked with pitching information at a literacy level that accommodates diverse patient populations while maintaining the clinical utility of records and adequately serving their medicolegal functions. Indeed, whether such dual functionality is even possible has been questioned [22].
+
+Documentation Changes
+
+To date, it is unclear whether ORA diminishes the clinical value of documentation [19,23]. However, there is evidence that clinicians may be undermining the accuracy or completeness (or both) of their records, perhaps in attempts to reduce patient anxieties, minimize follow-up contact, or reduce the likelihood of potential complaints [24,25]. For example, in the largest study conducted on clinicians’ experiences of open notes, a 3-center study at 3 diverse health systems in the United States (1628 of 6054, 27% clinicians responded), DesRoches et al [26] found that around 1 in 4 physicians admitted that they changed how they wrote differential diagnoses (23%, n=176), though the nature of these changes is not understood. More worryingly, more than 1 in 5 physicians (22%, n=168) believed that their notes were now less valuable for other clinicians [26].
+
+Conceivably, other changes following implementation of ORA might be more positive. In the study by DesRoches et al [26], 22% (n=166) of physicians reported changes to the use of a partnering language, and 18% (n=139) of them reported changes to how they used medical jargon or acronyms. However, it remains unknown whether such changes improve the comprehensibility of clinical records among patients or whether amendments come with a trade-off in terms of documentation quality.
+
+With ORA, there is also the potential for notes to convey bias of stigmatizing language. For example, in the United States, recent linguistic analysis studies have shown that negative patient descriptors in notes are considerably more common for non-Hispanic black patients and for patients with diabetes, those with substance use disorders, and those with chronic pain [27,28]. It is unclear whether with the knowledge patients may now read what they write, the use of stigmatizing language among these patient populations is being effectively omitted and “cleaned up” by clinicians.
+
+Work Burdens
+
+Time spent on documentation and patient portal messages remains a growing cause of clinician dissatisfaction and burnout [29]. The impact is exacerbated for clinicians with lower levels of digital competencies, and this “technostress” has been found to directly correlate with burnout [30]. Even tech-savvy young resident physicians have reported the use of the electronic health record as a leading cause of burnout [31]. In the United States, the study by DesRoches et al [26] on clinicians’ experiences, 37% (n=292) of physicians reported spending more time writing notes after patient access was enabled.
+
+Few studies have explored objective measures of the impact of ORA, however, where these measures have been implemented, some of them signal potential for increased patient contact. For example, Mold et al [32] found that the provision of ORA in primary care settings resulted in a moderate increase in email traffic from patients, with no change in telephone contact and variable changes to face-to-face contact. A recent Canadian study found that registration with a primary care web-based portal was associated with an increase in the number of visits to physicians, calls to practice triage nurses, and an increase in clerical workload [33]. Another recent study at an academic medical center in the United States reported a doubling in the number of messages sent by patients within 6 hours after ORA was implemented [34]. It seems reasonable to postulate that at least some of this increased contact may be driven by patients who desire clarifications about diagnoses, results, or other information that is documented in their records.
+
+
+
+Currently Proposed Solutions
+
+To encourage confidence with ORA and to overcome some of these challenges, targeted educational programs have been proposed. Among them are short lists of tips and advice to clinicians, and brief web-based training interventions [13,14,24]. More recently, some medical schools have taken this further. For example, Harvard Medical School has embedded within its curriculum practical training in how to write notes that patients will read [16], and similar work is underway in England [35]. The expressed aim of such training programs is to support physicians in writing notes efficiently and clearly, preserving the necessary clinical details. These programs also encourage students and clinicians to write sensitively and empathically, removing loaded jargon or acronyms that may be perceived as offensive (eg, “follow-up” instead of “F/U,” or “shortness of breath” instead of “SOB”) [14,16]. Notably, however, calls for curricular adaptations are isolated, perhaps reflecting wider uncertainty about ORA among the medical community and the perception that the innovation has been foisted on them.
+
+Similarly, interventions to advise patients about how to engage with ORA appear limited [14,36]. This may be owed to a fear among clinicians that encouraging access to web-based records may exacerbate patient anxiety, lead to increased contact time, or risk disagreements and requests to change documentation. We observe that current recommendations in the published and gray literature offer advice on the benefits and risks of accessing ORA, how to maintain password or portal security, and how to discuss errors or disagreements in their notes with clinicians [14,36].
+
+Combined, these clinician and patient support strategies are valuable but have inherent limitations. Training interventions may be variously implemented and take time to become established in mainstream medical education. Even beyond mainstream inclusion of training in medical curricula, it will also be necessary to target the so-called “hidden curriculum”—the set of unspoken and implicit rules and values that trainees may pick up from their mentors and colleagues within clinical practice [37]. It is unclear whether even those strategies that attempt to convert senior or experienced doctors to the cause are sufficient to counter the hidden curriculum or to neutralize the formation of documentation habits that may not be in keeping with the ORA mandate whereupon clinical notes may now be read by patients and caregivers.
+
+Other recommendations that clinicians should remove all acronyms and medical jargon may present practical dilemmas for upholding the quality of documentation. Aside from extra time spent typing documentation, the capacity to shift from expert to patient perspectives poses unappreciated difficulties. Undoubtedly, many clinicians, as domain experts, might not always fully appreciate when they are using specialist or technical language, nor do they have the attendant skills to convey what they know to patients in an understandable way—a cluster of problems collectively referred to as “the curse of expertise” [38]. Using imprecise language may also have future medical consequences and might result in harm if later clinicians misinterpret what was written [39].
+
+Relatedly, it seems a significant request that clinicians write notes that are bespoke for every patient’s level of health literacy. Yet, each person who attends a clinical visit will have specific health literacy needs. We suspect that the trade-off may lead to clinicians writing notes that are more suited to a readership like them—individuals with higher health literacy and more years of formal education.
+
+Similarly, while often considered a “soft skill,” the adoption of empathetic, encouraging, and supportive language might be a taller order than is frequently assumed. For example, psychologists report that negative biases can curb expressions of empathy [40-44]. Studies show that empathy can be influenced by patients’ race or ethnicity and may be diminished among people presenting with disabilities or already stigmatized conditions [40-44]. Making matters worse, self-inspection may be a particularly weak tool for clinicians to excavate and monitor their own prejudices [45]. Furthermore, the demand that clinicians tailor their notes in ways that are optimized to every patient’s understanding and their emotional needs may lead to not only increased workload but also higher risk of burnout [46].
+
+So far, no objective measures have assessed whether targeted training strategies are effective at improving clinical documentation in terms of preserving medical detail and utility, strengthening patient understanding and patients’ perceptions of clinician support and empathy. We emphasize that while commonly used in training evaluation, self-report surveys will not be sufficient to establish whether educational interventions work in terms of both preserving the detail in clinical notes and supporting patient understanding.
+
+Finally, perhaps most crucial of all, and as already noted, it is unclear whether narrative notes can ever uphold a genuine dual functionality targeting the needs of both clinician and patient readerships [22]. Conceivably, both needs are incommensurable and there will always be a trade-off in detail and understanding should the patient, or the clinician, be given primacy as target reader.
+
+
+
+Generative Language Models Writing Clinical Notes
+Strengths of Generative AI
+
+Doctors strongly desire support with documentation including note writing with surveys showing that they forecast a role for AI in assisting in these tasks [47,48]. Because of their promise with respect to administrative and documentation tasks in health care contexts, LLMs have been described as “the ultimate paperwork shredder” [49]. Owing to the sheer speed and scope of information upon which they draw, LLMs hold considerable potential in generating up-to-date, comprehensive clinical information for patients [50]. This makes the approach particularly promising in generating detailed narrative explanations and summaries of visit encounters. This may help to reduce work burdens on physicians tasked with writing clinical notes.
+
+Another striking strength of LLMs is their capacity to write responses in a requested style or by adopting a specific tone or conversational emphasis. This makes LLMs particularly promising in assisting with writing notes that omit the use of medical jargon or acronyms that are suitable for patients with different levels of health literacy, or among speakers of languages that differ from their provider’s language. This capacity may also help avoid the extra burdens on clinicians attempting to document notes that are tailored to the highly diverse range of unique patient readers.
+
+Preliminary research also suggests that LLMs may help with writing consistently sensitive or empathic notes. In 2023, a highly publicized study suggested that ChatGPT may have better bedside manners than actual human doctors [51]. A team compared written responses of doctors and ChatGPT offered to patients’ real-world health queries using Reddit’s AskDocs forum, where nearly half a million people post their medical problems and verified and credentialed clinicians offer suggestions. On average, ChatGPT responses were 4 times longer than doctors’ replies. A panel of health care professionals—blinded to who or what did the writing—preferred ChatGPT’s responses nearly 80% of the time. The panel ranked chatbot answers as being of significantly higher quality than web-based posts reportedly from doctors; they also judged these reported web-based doctors’ answers as more unacceptable responses to patients. ChatGPT’s responses were rated as “good” or “very good” nearly 4 times more often than those written by the reported web-based doctors, and ChatGPT’s responses were rated as almost 10 times more empathic than those by the reported web-based doctors. At the other end of the scale, these web-based physicians’ replies were perceived to lack empathy approximately 5 times more often than responses produced by ChatGPT.
+
+Limitations of Generative AI
+
+Despite their potential, LLMs have multiple limitations. The nature of the data sets the models are trained on is critical, as it will determine the scope and nature of responses possible. Of special relevance here, none of the easily accessible LLMs have yet been trained on medical texts and thus lack the core substrate to generate the most appropriate responses. Any bias in the source the models are trained on will also be reflected in answers or text provided. Thus, while a study in March 2023 showed that ChatGPT (version 3) Could pass the United States Medical Licensing Examination [52], the authors of the study noted that to truly assess the potential of such LLMs, there is a need for “controlled and real-world learning scenarios with students across the engagement and knowledge spectrum.” Still, the results of that study were acknowledged by the American Medical Association, which noted that it intends to begin considering how tools such as ChatGPT need to be incorporated into the education process [53].
+
+Indeed, the full extent to which LLMs embed discriminatory biases has not been fully explored. However, it would be surprising if these models did not replicate many of the same biases that already exist in clinical research, and consequently medical education, in part because of the underrecruitment of women, racial and ethnic minorities, and older people. Such skewing is already recognized as a source of disparity with the potential to perpetuate errors or misjudgments in clinical decisions [54-58]. Studies suggest that gender and racial biases are indeed coded into LLMs [59]. It remains unknown whether the potential for such discriminatory errors might prove worse than today with standard human-mediated care; however, some preliminary research suggests that negative stereotyping may be compounded by LLMs [60].
+
+Another concern is the lack of consistency in responses proffered by LLMs. Inputting the same question to GPT-4, for example, rarely elicits the same response. Of course, human responses are rarely consistent as well; however, the extent to which generative AI, relying on LLMs, offers the same level of reliable outputs is uncertain. This is a particular concern given that LLMs are prone to yield falsehoods—a phenomenon referred to as “hallucination.” Moreover, the persuasive conversational tone of LLMs such as GPT-4 means that narrative responses may appear compelling but factually incorrect.
+
+The extent to which doctors may already be adopting generative AI tools, such as OpenAI’s ChatGPT, is not yet known. In the United States, under the 1996 Health Insurance Portability and Accountability Act (HIPAA), which established national standards in the United States to protect patients’ health information from being shared by “covered entities”—that is, providers—to other third parties. Therefore, the use of OpenAI, for example, is precluded under the HIPAA. At the time of writing, in the most common use cases, uploading patient details to versions of generative AI would breach patient trust and medical confidentiality due to privacy concerns.
+
+However, the scope for this is quickly changing. Epic—the US software giant which has an estimated 78% of the share of hospital medical record use in the United States [61]—is currently piloting the integration of HIPAA-compliant GPT services [62]. In addition, an Azure HIPAA–compliant GPT-4 service already exists [63]. Voice-to-text clinical note generation products now represent a growing space in health care. For example, a new app called Ambient Experience from Nuance can listen to the physician’s conversation and, using ChatGPT (version 4), help create the clinical note that is ready for physicians to review [64]. In the United States, such capacities are set to become embedded into electronic health systems, signaling revolutionary changes in medical documentation practices.
+
+Clinicians and Computers as Coauthors
+
+Combined, the aforementioned discourse suggests that LLMs are far from ready to disintermediate clinicians when it comes to writing clinical notes. We argue that the innovation will play a key role if humans are involved. Thus, this promise could be harnessed if clinicians oversee the cocreation of clinical documentation. In this scenario, LLMs might offer initial draft documentation, which, crucially, should be supervised, and edited by clinicians whose key role in documentation will be to keep a check and balance on the current limitations with these models.
+
+Considering the scope of generative AI, we therefore propose that current training interventions might be constructively adapted to better prepare clinicians to oversee the writing of patient-facing clinical documentation, for example, by editing and checking the quality of clinical information constructed by generative AI and reviewing the sensitivity of the language used. Preliminary studies already show that when humans collaborate with LLMs to coproduce replies to patients, this can enhance patients’ ratings of levels of empathy compared with human-only produced responses [65]. Such partnership could offer a more robust and safe form of documentation quality control—one that could potentially avoid the work burdens associated with documentation burdens and, therefore, the potential for burnout from ORA. We emphasize, however, that training should reinforce the importance of using generative AI as an assistant narrative scribe and not as a substitute for writing notes.
+
+Furthermore, if health systems adopt this approach, we suggest that 2 (or even multiple) versions of clinical documentation may be feasible. Using LLMs, there is scope to not only a complete medical narrative pitched at the level of the domain expert or specialist, but also to document notes couched at the level of health literacy, language, and empathy of the individual patient who might be reading them. This could help overcome the current dilemma of documenting information in a way that is accessible for patients, but which does not diminish the clinical detail for health professionals.
+
+Future Research Directions
+
+Many research questions could usefully explore generative AI in cowriting clinical notes, especially dual-purpose documentation for both patients and clinicians. We suggest a few novel directions. First, qualitative studies could usefully explore how successfully generative AI translates clinical documentation into patient-friendly language. For example, studies could examine the accuracy and fidelity of generative AI in translating acronyms or other medical jargon, as well as the understandability of the notes, and the level of empathy embedded in patient-facing documentation. Second, experimental studies could probe whether documentation embeds biases or a higher likelihood of containing stigmatizing language for different patient demographics or health conditions. Third, pilot studies could help determine the satisfaction and administrative work burden of dual documentation among clinicians.
+
+
+
+Conclusions
+
+Generative AI is ready for mass use when it comes to writing or cowriting clinical notes, and its potential is enormous. We emphasize, however, that there remain evidence-based risks associated with existing generative AI, which relate to inconsistencies, errors, and hallucinations and the real potential to embed harmful biases in documentation. If carefully implemented, in the long term, doctors who write documentation using generative AI may do a better job of adapting to the evolving functionality of the electronic records than doctors who do not. This adoption may address the potential risk of “dumbing down” clinical documentation while conveying understandable and empathetic information to patients using plain and sensitive language. We also forecast that doctors who cowrite their documentation with LLMs will experience fewer work burdens.
+
+Conflicts of Interest
+
+JT is the Editor-in-Chief of JMIR Mental Health. The other authors declare no conflicts of interest.
+
+References
+Hägglund M, McMillan B, Whittaker R, Blease C. Patient empowerment through online access to health records. BMJ. Sep 29, 2022;378:e071531. [FREE Full text] [CrossRef] [Medline]
+Salmi L, Blease C, Hägglund M, Walker J, DesRoches CM. US policy requires immediate release of records to patients. BMJ. Feb 18, 2021;372:n426. [CrossRef] [Medline]
+Blease C, Salmi L, Rexhepi H, Hägglund M, DesRoches C. Patients, clinicians and open notes: information blocking as a case of epistemic injustice. J Med Ethics. May 14, 2021;48(10):785-793. [FREE Full text] [CrossRef] [Medline]
+Kujala S, Hörhammer I, Väyrynen A, Holmroos M, Nättiaho-Rönnholm M, Hägglund M, et al. Patients' experiences of web-based access to electronic health records in Finland: cross-sectional survey. J Med Internet Res. Jun 06, 2022;24(6):e37438. [FREE Full text] [CrossRef] [Medline]
+Hägglund M, Scandurra I. Patients' online access to electronic health records: current status and experiences from the implementation in Sweden. Stud Health Technol Inform. 2017;245:723-727. [Medline]
+Zanaboni P, Kummervold P, Sørensen T, Johansen M. Patient use and experience with online access to electronic health records in Norway: results from an online survey. J Med Internet Res. Feb 07, 2020;22(2):e16144. [FREE Full text] [CrossRef] [Medline]
+Colivicchi Q. GPs abandon legal challenge over patient records access. Pulse. 2023. URL: https:/​/www.​pulsetoday.co.uk/​news/​breaking-news/​gps-abandon-legal-challenge-over-patient-records-access/​ [accessed 2023-07-29]
+Moll J, Rexhepi H, Cajander Å, Grünloh C, Huvila I, Hägglund M, et al. Patients' experiences of accessing their electronic health records: national patient survey in Sweden. J Med Internet Res. Nov 01, 2018;20(11):e278. [FREE Full text] [CrossRef] [Medline]
+Walker J, Leveille S, Bell S, Chimowitz H, Dong Z, Elmore JG, et al. OpenNotes after 7 years: patient experiences with ongoing access to their clinicians' outpatient visit notes. J Med Internet Res. May 06, 2019;21(5):e13876. [FREE Full text] [CrossRef] [Medline]
+Bell S, Folcarelli P, Fossa A, Gerard M, Harper M, Leveille S, et al. Tackling ambulatory safety risks through patient engagement: what 10,000 patients and families say about safety-related knowledge, behaviors, and attitudes after reading visit notes. J Patient Saf. May 18, 2018;17(8):e791-e799. [CrossRef]
+Blease C, Dong Z, Torous J, Walker J, Hägglund M, DesRoches CM. Association of patients reading clinical notes with perception of medication adherence among persons with serious mental illness. JAMA Netw Open. Mar 01, 2021;4(3):e212823. [FREE Full text] [CrossRef] [Medline]
+DesRoches C, Bell S, Dong Z, Elmore J, Fernandez L, Fitzgerald P, et al. Patients managing medications and reading their visit notes: a survey of OpenNotes participants. Ann Intern Med. May 28, 2019;171(1):69. [CrossRef]
+Torous J. Opening Mental Health Notes: 7 Tips to Prepare Clinicians. Psychology Today. 2020. URL: https:/​/www.​psychologytoday.com/​us/​blog/​digital-mental-health/​202010/​opening-mental-health-notes-7-tips-prepare-clinicians [accessed 2020-12-11]
+Blease C, McMillan B, Salmi L, Davidge G, Delbanco T. Adapting to transparent medical records: international experience with "open notes". BMJ. Nov 21, 2022;379:e069861. [CrossRef] [Medline]
+Dobscha SK, Kenyon EA, Pisciotta MK, Niederhausen M, Woods S, Denneson LM. Impacts of a web-based course on mental health clinicians' attitudes and communication behaviors related to use of OpenNotes. Psychiatr Serv. Jun 01, 2019;70(6):474-479. [CrossRef] [Medline]
+Preparing medical students and their teachers for shared medical records. OpenNotes. URL: https://www.opennotes.org/preparing-medical-students/ [accessed 2022-07-05]
+Denneson L, Pisciotta M, Hooker E, Trevino A, Dobscha S. Impacts of a web-based educational program for veterans who read their mental health notes online. J Am Med Inform Assoc. Jan 01, 2019;26(1):3-8. [FREE Full text] [CrossRef] [Medline]
+Keeping records. General Medical Council. URL: http://tinyurl.com/mrybhdu8 [accessed 2023-07-29]
+Blease C, Torous J, Hägglund M. Does patient access to clinical notes change documentation? Front Public Health. 2020;8:577896. [FREE Full text] [CrossRef] [Medline]
+McMillan B, Eastham R, Brown B, Fitton R, Dickinson D. Primary care patient records in the United Kingdom: past, present, and future research priorities. J Med Internet Res. Dec 19, 2018;20(12):e11293. [FREE Full text] [CrossRef] [Medline]
+Blease CR, O'Neill S, Walker J, Hägglund M, Torous J. Sharing notes with mental health patients: balancing risks with respect. Lancet Psychiatry. Nov 2020;7(11):924-925. [CrossRef]
+Bernstein J. Not the last word: seeing ourselves as doctors see us. Clin Orthop Relat Res. Aug 2, 2022;480(9):1653-1656. [CrossRef]
+Meier-Diedrich E, Davidge G, Hägglund M, Kharko A, Lyckblad C, McMillan B, et al. Changes in documentation due to patient access to electronic health records: protocol for a scoping review. JMIR Res Protoc. Aug 28, 2023;12:e46722. [FREE Full text] [CrossRef] [Medline]
+Dobscha SK, Denneson LM, Jacobson LE, Williams HB, Cromer R, Woods S. VA mental health clinician experiences and attitudes toward OpenNotes. Gen Hosp Psychiatry. Jan 2016;38:89-93. [CrossRef] [Medline]
+Petersson L, Erlingsdóttir G. Open Notes in Swedish Psychiatric Care (Part 2): survey among psychiatric care professionals. JMIR Ment Health. Jun 21, 2018;5(2):e10521. [FREE Full text] [CrossRef] [Medline]
+DesRoches CM, Leveille S, Bell SK, Dong ZJ, Elmore JG, Fernandez L, et al. The views and experiences of clinicians sharing medical record notes with patients. JAMA Netw Open. Mar 02, 2020;3(3):e201753. [FREE Full text] [CrossRef] [Medline]
+Sun M, Oliwa T, Peek ME, Tung EL. Negative patient descriptors: documenting racial bias in the electronic health record. Health Aff (Millwood). Feb 01, 2022;41(2):203-211. [FREE Full text] [CrossRef] [Medline]
+Himmelstein G, Bates D, Zhou L. Examination of stigmatizing language in the electronic health record. JAMA Netw Open. Jan 04, 2022;5(1):e2144967. [FREE Full text] [CrossRef] [Medline]
+Stillman M. Death by patient portal. JAMA. Jul 18, 2023;330(3):223-224. [CrossRef] [Medline]
+Golz C, Peter K, Müller TJ, Mutschler J, Zwakhalen S, Hahn S. Technostress and digital competence among health professionals in Swiss psychiatric hospitals: cross-sectional study. JMIR Ment Health. Nov 04, 2021;8(11):e31408. [FREE Full text] [CrossRef] [Medline]
+Domaney N, Torous J, Greenberg W. Exploring the association between electronic health record use and burnout among psychiatry residents and faculty: a pilot survey study. Acad Psychiatry. Oct 2018;42(5):648-652. [CrossRef] [Medline]
+Mold F, de Lusignan S, Sheikh A, Majeed A, Wyatt JC, Quinn T, et al. Patients’ online access to their electronic health records and linked online services: a systematic review in primary care. Br J Gen Pract. Mar 02, 2015;65(632):e141-e151. [CrossRef]
+Ferguson K, Fraser M, Tuna M, Bruntz C, Dahrouge S. The impact of an electronic portal on patient encounters in primary care: interrupted time-series analysis. JMIR Med Inform. Feb 06, 2023;11:e43567. [FREE Full text] [CrossRef] [Medline]
+Steitz BD, Sulieman L, Wright A, Rosenbloom ST. Association of immediate release of test results to patients with implications for clinical workflow. JAMA Netw Open. Oct 01, 2021;4(10):e2129553. [FREE Full text] [CrossRef] [Medline]
+McMillan B, Davidge G, Nadeem F, Dowding D, Wilson K, Davies A. Navigating the electronic health record in university education: helping health care professionals of the future prepare for 21st century practice. BMJ Health Care Inform. Mar 2023;30(1) [FREE Full text] [CrossRef] [Medline]
+Hannan A. Do you want to see what your doctor or nurse has written about you or check your GP Electronic Health Record? Haughton Thornley Medical Centres. URL: http://tinyurl.com/2yr8rvkh [accessed 2023-12-19]
+Mahood S. Medical education: Beware the hidden curriculum. Can Fam Physician. Sep 2011;57(9):983-985. [FREE Full text] [Medline]
+Fisher M, Keil F. The curse of expertise: when more knowledge leads to miscalibrated explanatory insight. Cogn Sci. Jul 2016;40(5):1251-1269. [FREE Full text] [CrossRef] [Medline]
+Blease C, Cohen I, Hoffman S. Sharing clinical notes: potential medical-legal benefits and risks. JAMA. Feb 22, 2022;327(8):717-718. [CrossRef] [Medline]
+Batson C, Polycarpou M, Harmon-Jones E, Imhoff H, Mitchener E, Bednar L, et al. Empathy and attitudes: Can feeling for a member of a stigmatized group improve feelings toward the group? J Pers Soc Psychol. Jan 1997;72(1):105-118. [CrossRef]
+Hein IM, De Vries MC, Troost PW, Meynen G, Van Goudoever JB, Lindauer RJL. Informed consent instead of assent is appropriate in children from the age of twelve: policy implications of new findings on children's competence to consent to clinical research. BMC Med Ethics. Nov 09, 2015;16(1):76. [FREE Full text] [CrossRef] [Medline]
+Heins A, Homel P, Safdar B, Todd K. Physician race/ethnicity predicts successful emergency department analgesia. J Pain. Jul 2010;11(7):692-697. [CrossRef]
+Xu X, Zuo X, Wang X, Han S. Do you feel my pain? Racial group membership modulates empathic neural responses. J Neurosci. Jul 01, 2009;29(26):8525-8529. [CrossRef]
+Avenanti A, Sirigu A, Aglioti SM. Racial bias reduces empathic sensorimotor resonance with other-race pain. Curr Biol. Jun 08, 2010;20(11):1018-1022. [FREE Full text] [CrossRef] [Medline]
+Trivers R. The elements of a scientific theory of self-deception. Ann N Y Acad Sci. Apr 25, 2000;907(1):114-131. [CrossRef] [Medline]
+Nielsen H, Tulinius C. Preventing burnout among general practitioners: is there a possible route? Educ Prim Care. Sep 2009;20(5):353-359. [CrossRef] [Medline]
+Blease C, Kaptchuk TJ, Bernstein MH, Mandl KD, Halamka JD, DesRoches CM. Artificial intelligence and the future of primary care: exploratory qualitative study of UK general practitioners' views. J Med Internet Res. Mar 20, 2019;21(3):e12802. [FREE Full text] [CrossRef] [Medline]
+Kocaballi A, Ijaz K, Laranjo L, Quiroz J, Rezazadegan D, Tong H, et al. Envisioning an artificial intelligence documentation assistant for future primary care consultations: a co-design study with general practitioners. J Am Med Inform Assoc. Nov 01, 2020;27(11):1695-1704. [FREE Full text] [CrossRef] [Medline]
+Goldberg C, Kohane I, Lee P. The AI Revolution in Medicine: GPT-4 and Beyond. London. Pearson Education Limited; 2023.
+Blease C, Torous J. ChatGPT and mental healthcare: balancing benefits with risks of harms. BMJ Ment Health. Nov 10, 2023;26(1):e300884. [FREE Full text] [CrossRef] [Medline]
+Ayers JW, Poliak A, Dredze M, Leas EC, Zhu Z, Kelley JB, et al. Comparing physician and artificial intelligence chatbot responses to patient questions posted to a public social media forum. JAMA Intern Med. Jun 01, 2023;183(6):589-596. [CrossRef] [Medline]
+Kung T, Cheatham M, Medenilla A, Sillos C, De Leon L, Elepaño C, et al. Performance of ChatGPT on USMLE: Potential for AI-assisted medical education using large language models. PLOS Digit Health. Feb 2023;2(2):e0000198. [FREE Full text] [CrossRef] [Medline]
+Lubell J. ChatGPT passed the USMLE. What does it mean for med ed? American Medical Association. 2023. URL: https://www.ama-assn.org/practice-management/digital/chatgpt-passed-usmle-what-does-it-mean-med-ed [accessed 2023-07-29]
+Dijkstra A, Verdonk P, Lagro-Janssen A. Gender bias in medical textbooks: examples from coronary heart disease, depression, alcohol abuse and pharmacology. Med Educ. Oct 2008;42(10):1021-1028. [CrossRef] [Medline]
+Duma N, Vera Aguilera J, Paludo J, Haddox C, Gonzalez Velez M, Wang Y, et al. Representation of minorities and women in oncology clinical trials: review of the past 14 years. JOP. Jan 2018;14(1):e1-e10. [CrossRef]
+Geller S, Koch A, Pellettieri B, Carnes M. Inclusion, analysis, and reporting of sex and race/ethnicity in clinical trials: have we made progress? J Womens Health (Larchmt). Mar 2011;20(3):315-320. [FREE Full text] [CrossRef] [Medline]
+Watts G. Why the exclusion of older people from clinical research must stop. BMJ. May 21, 2012;344(may21 1):e3445-e3445. [CrossRef] [Medline]
+Bourgeois F, Olson K, Tse T, Ioannidis J, Mandl K. Prevalence and characteristics of interventional trials conducted exclusively in elderly persons: a cross-sectional analysis of registered clinical trials. PLoS One. 2016;11(5):e0155948. [FREE Full text] [CrossRef] [Medline]
+Zack T, Lehman E, Suzgun M, Rodriguez J, Celi L, Gichoya J, et al. Coding Inequity: Assessing GPT-4’s Potential for Perpetuating Racial and Gender Biases in Healthcare. medRxiv. Preprint posted online July 17, 2023. [CrossRef]
+Birhane A, Prabhu V, Han S, Boddeti V. On Hate Scaling Laws For Data-Swamps. arXiv. Preprint posted online June 22, 2023. [FREE Full text]
+Adams K. Becker's Health IT. URL: https:/​/www.​beckershospitalreview.com/​healthcare-information-technology/​31-numbers-that-show-how-big-epic-cerner-allscripts-meditech-are-in-healthcare.​html [accessed 2023-07-31]
+Adams K. Epic to Integrate GPT-4 into Its EHR Through Expanded Microsoft Partnership. MedCity News. 2023. URL: https:/​/medcitynews.​com/​2023/​04/​epic-to-integrate-gpt-4-into-its-ehr-through-expanded-microsoft-partnership/​ [accessed 2023-07-31]
+Boyd E. Introducing GPT-4 in Azure OpenAI Service. Azure Microsoft. 2023. URL: https://azure.microsoft.com/en-us/blog/introducing-gpt4-in-azure-openai-service/ [accessed 2023-07-31]
+DePeau-Wilson M. Clinical Note Writing App Powered by GPT-4 Set to Debut This Year. MedPage Today. 2023. URL: http://tinyurl.com/2nv8dfj4 [accessed 2023-12-15]
+Sharma A, Lin IW, Miner AS, Atkins DC, Althoff T. Human–AI collaboration enables more empathic conversations in text-based peer-to-peer mental health support. Nat Mach Intell. Jan 23, 2023;5(1):46-57. [CrossRef]
+
+
+Abbreviations
+AI: artificial intelligence
+HIPAA: Health Insurance Portability and Accountability Act
+LLM: large language model
+ORA: online record access
+
+
+
+Edited by K Venkatesh; submitted 31.07.23; peer-reviewed by B Senst, J Schwarz, R Marshall; comments to author 28.09.23; revised version received 30.09.23; accepted 10.11.23; published 04.01.24.
+
+Copyright
+
+©Charlotte Blease, John Torous, Brian McMillan, Maria Hägglund, Kenneth D Mandl. Originally published in JMIR Medical Education (https://mededu.jmir.org), 04.01.2024.
+
+This is an open-access article distributed under the terms of the Creative Commons Attribution License (https://creativecommons.org/licenses/by/4.0/), which permits unrestricted use, distribution, and reproduction in any medium, provided the original work, first published in JMIR Medical Education, is properly cited. The complete bibliographic information, a link to the original publication on https://mededu.jmir.org/, as well as this copyright and license information must be included.
+
+
+
+Citation
+
+Please cite as:
+
+Blease C, Torous J, McMillan B, Hägglund M, Mandl KD
+Generative Language Models and Open Notes: Exploring the Promise and Limitations
+JMIR Med Educ 2024;10:e51183
+doi: 10.2196/51183
+PMID: 38175688
+PMCID: 10797501
+
+ Copy Citation to Clipboard
+Export Metadata
+END for: Endnote
+BibTeX for: BibDesk, LaTeX
+RIS for: RefMan, Procite, Endnote, RefWorks
+Add this article to your Mendeley library
+Download
+ Download PDF
+ Download XML
+Share Article
+   
+Career Opportunities
+
+REHABILITATION THERAPIST, STATE FACILITIES (M-SAF)
+
+California Correctional Health Care Services
+
+, Nationwide
+
+SENIOR PSYCHIATRIST (SUP), C&RS (SAF)
+
+California Correctional Health Care Services
+
+, Nationwide
+
+SENIOR PSYCHIATRIST (SUP), C&RS (SAF)
+
+California Correctional Health Care Services
+
+, Nationwide
+
+RECREATION THERAPIST, CF
+
+California Correctional Health Care Services
+
+, Nationwide
+
+SENIOR PSYCHOLOGIST, CF (SUP)
+
+California Correctional Health Care Services
+
+, Nationwide
+
+JMIR Medical Education ISSN 2369-3762
+Resource Centre
+Author Hub
+Editor Hub
+Reviewer Hub
+Librarian Hub
+Browse Journal
+Latest Announcements
+Authors
+Themes
+Issues
+Blog
+About
+Privacy Statement
+Contact Us
+Sitemap
+Connect With Us
+ 
+Get Table of Contents Alerts
+Get Alerts
+
+Copyright © 2025 JMIR Publications
+
+We use cookies to enhance and personalize your browsing experience, monitor performance, and gain insights to improve our services. By clicking "Allow All", you consent to our use of cookies.
+
+Privacy Policy ↗
+Manage Cookies
+Decline
+Allow All
+Dismiss Banner

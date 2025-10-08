@@ -1,0 +1,1101 @@
+DOI: 10.1111/nyas.15296
+ORIGINAL ARTICLE
+The trabecular and compact myocardium of adult vertebrate
+ventricles are transcriptionally similar despite morphological
+differences
+Otto J. Mulleners Lieve E. van der Maarel Vincent M. Christoffels Bjarke Jensen
+Department of Medical Biology, Amsterdam Cardiovascular Sciences, Amsterdam UMC, Amsterdam, The Netherlands
+Correspondence
+Bjarke Jensen, Department of Medical Biology, Amsterdam Cardiovascular Sciences, University of Amsterdam, Amsterdam UMC, Room L2-106, Meibergdreef 15, 1105AZ Amsterdam, The Netherlands. Email: b.jensen@amsterdamumc.nl
+Funding information
+Prof. dr. A.F.M. Moorman Fund; Amsterdam University Fund; Dutch Research Council, Grant/Award Number: OCENW.GROOT.2019.029
+Abstract
+A poorly understood, major event in heart evolution is the convergent prioritization
+in mammals and birds of compact myocardium over trabecular myocardium. Com
+pact myocardium is thought to facilitate the greater cardiac outputs that distinguish
+endothermic mammals and birds from ectotherms, but the underlying mechanism
+remains unclear. We used transcriptomics to investigate whether the compact layer
+myocardium is intrinsically different from that of the trabecular layer. In the embry
+onic mouse heart, spatial transcriptomics revealed that 3% of detected genes were
+differentially expressed between trabecular and compact myocardium. In the adult,
+this analysis yielded only 0.2% differentially expressed genes. Additionally, the tran
+scriptomes of both embryonic trabecular and compact myocardium greatly differed
+from those of the adult myocardium. Reanalysis of available single-cell transcrip
+tomes showed relationships between human embryonic and adult trabecular and
+compact myocardium similar to those in mice. Analysis of new and published tran
+scriptomes from adult zebra finch, zebrafish, and tuna revealed few differentially
+expressed genes (<0.6%) and no conservation between species. We conclude that
+the transcriptional states of developing trabecular and compact myocardium do not
+persist into adulthood. In adult hearts, the compact layer myocardium is not intrin
+sically different from that of the trabecular layer despite the overt morphological
+differences.
+KEYWORDS
+cardiomyocyte, embryo, evolution, heart, RNA-sequencing, transcriptome
+INTRODUCTION
+The structure of the vertebrate ventricular wall exhibits two distinct
+architectures. In most species, the ventricle is predominantly filled
+with a sponge-like trabecular myocardium, covered by a thin outer
+This is an open access article under the terms of the Creative Commons Attribution-NonCommercial License, which permits use, distribution and reproduction in any medium, provided the original work is properly cited and is not used for commercial purposes. © 2025 The Author(s). Annals of the New York Academy of Sciences published by Wiley Periodicals LLC on behalf of The New York Academy of Sciences.
+layer of compact muscle. In contrast, mammalian and bird species pos
+sess a large open ventricular cavity, characterized by a thick compact
+myocardium and fewer, more defined trabeculations.1
+The metabolism of endotherms, represented here by mammals and
+birds, is significantly higher than that of ectotherms. It is associated
+76 wileyonlinelibrary.com/journal/nyas Ann NY Acad Sci. 2025;1545:76–90.
+
+
+ANNALS OF THE NEW YORK ACADEMY OF SCIENCES 77
+with greater systemic blood pressure that requires a greater cardiac
+output and increased tissue perfusion of blood. To raise cardiac output,
+either stroke volume, or heart rate or both must be elevated. Increas
+ing the stroke volume requires increasing the size of the heart, which
+can only be done to a limited extent. Heart rate, on the other hand,
+is markedly elevated in mammals and birds relative to ectotherms
+that are matched for body size and temperature.2 Therefore, elevated
+blood pressure, heart rate, and cardiac output are correlated with
+ventricles with a high ratio of compact-to-trabecular wall thickness
+and a large cavity. The causal relationship, if it exists, has not been
+established.3,4
+Theoretical arguments have been made that the highly trabeculated
+ventricles of ectotherms would offer higher resistance to blood flow,
+and would, therefore, be unable to fill and eject blood at the high fre
+quencies seen in endotherms.1 Also, the trabecular tissue organization
+may limit the speed of electrical activation.5 In humans, it was recently
+assessed that the myocardium of the trabecular and compact layers is
+similar when multiple lines of evidence were reviewed.6 One largely
+unexplored possibility is that the cellular phenotype of the cardiomy
+ocytes of the trabecular and compact myocardium is substantially
+different from each other. Among fish, the proportion of myocardium
+that is organized in a compact fashion can vary from close to 0%, up
+to 70% in the ventricles of some tuna species (e.g., the bigeye tuna7),
+although these high values have also been questioned.8,9 The presump
+tion is that this variation relates to functional differences, although
+it is unclear what that relation could be.10,11 If the myocardium of
+the trabecular and compact layers is substantially different from each
+other, the compact-to-trabecular ratios could be a basis that evolu
+tionary pressures may select on. Certain phenotypic differences can
+be found in the embryonic mammalian and avian hearts, where several
+genes are differentially expressed between the trabecular and compact
+layer.12 For some of the most well-known genes, such as Gja5, Nppa,
+Tbx5(a), and Hey2, we know there is also a differential expression in
+the ventricular wall of reptiles, amphibians, and fish.13–16 Conversely,
+across vertebrates and thus various ventricular morphologies, myocar
+dial mass is a strong predictor of the product of cardiac output and
+systolic blood pressure. This suggests that the myocardium of the tra
+becular and compact layers has similar properties.3,17 Thus, there are
+some indications that the myocardium of the trabecular and compact
+layer are different, and other indications that the myocardium is largely
+similar.
+While the high degree of variation in cardiac chamber morphol
+ogy between chambers of any heart as well as between species is
+clear, the significance of this variation is not. In this study, we inves
+tigated the hypothesis that trabecular and compact myocardium are
+phenotypically different by comparing the transcriptomes of trabecu
+lar and compact myocardium of adult hearts of different endothermic
+and ectothermic vertebrate species. As a point of reference, we com
+pared the transcriptomes of mouse and human embryonic trabecular
+and compact myocardium, of which pronounced differences are known
+from the literature. We found that despite the significant phenotypic
+differences seen in the embryonic heart, these do not persist in the
+adult heart.
+MATERIALS AND METHODS
+Ethics statement
+Animal care, housing, husbandry, and protocols were performed in
+accordance with guidelines from the Directive 2010/63/EU of the
+European Parliament and the Dutch government. Protocols were
+approved by the Animal Experimental Committee of the Amsterdam
+University Medical Centers.
+Animals
+Mice
+Animals were housed in Innovive IVC disposable cages (522.6 cm2,
+12.7 cm headroom), with corncob bedding and a cardboard house and
+tissues for enrichment. The cages contained a maximum of seven mice
+when their individual weights were 20–25 g, six mice between 26 and
+30 g, and five mice over 30 g. The mice received acidified sterile drink
+ing water (Innovive M-WB-300A, 2.5-3.0 pH) in the cage lid provided
+ad libitum. The mice were provided Teklad 2916 kibble ad libitum. The
+temperature in the facility was kept between 20◦C and 24◦C, with a
+relative humidity of between 45% and 65%. Lights were on between
+07:00 and 19:00 at 60 lux.
+FVB/NJ wild-type mouse embryos (Mus musculus, Janvier labs, www.
+janvier-labs.com) of 14.5 gestational days were obtained from in-house
+bred litters. Pregnant mice were anesthetized using 4% isoflurane
+1 L/min for 5 min, followed by cervical dislocation. Eight-week-old
+adult mice were asphyxiated in CO2 followed by cervical dislocation.
+Embryos and hearts were harvested in 1X phosphate-buffered saline
+(PBS) at 4◦C and fixed in 10% formaldehyde in PBS for 24 h. The sex of
+the individuals was unknown.
+Zebra finch
+We sampled five zebra finches that were raised in a breeding colony
+at Leiden University, The Netherlands. After catching, the birds were
+immediately killed by cervical dislocation, and the chest was opened.
+The use of postmortem material of animals culled as breeding sur
+plus is not considered a procedure in itself in accordance with the
+Experiments on Animals Act (Wet op dierproeven, 2014).18 This is
+the applicable legislation in The Netherlands in accordance with the
+European guidelines (EU directive no. 2010/63/EU) regarding the pro
+tection of animals used for scientific purposes. Therefore, a license was
+not obtained for the procedure. All zebra finches were housed and
+cared for in accordance with these regulations and internal guidelines
+concerning the care of the animals and licensing and skill of person
+nel. This also includes advice that was taken from the animal welfare
+body Leiden to minimize suffering for all animals at the facility (with
+or without a license). From four of these finches, we sampled trabecu
+lar left ventricular tissue, compact left ventricular tissue, and the right
+17496632, 2025, 1, Downloaded from https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15296 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+78 ANNALS OF THE NEW YORK ACADEMY OF SCIENCES
+ventricular free wall. As an outgroup to the ventricular samples, we also
+sequenced parts of the right atrioventricular junction, which included
+the muscular valve that is characteristic of the avian heart.19 These
+samples were expected to contain tissue from both the right atrium,
+right ventricle, and the atrioventricular sulcus. The fifth finch heart
+was fixed in 10% formaldehyde in PBS for 24 h, before being embed
+ded for histological purposes. Picrosirius red staining was performed
+as previously described.13
+RNA sequencing of zebra finch tissue
+RNA was isolated using the ReliaPrep RNA Tissue Miniprep System
+(Promega Benelux). The protocol for Isolation of RNA from fibrous tis
+sue was used. Four birds were sacrificed and used for dissecting tissue.
+Tapestation 4200 (Agilent) was used to confirm RNA integrity. Library
+preparation and RNA sequencing were performed at the Core Facility
+Genomics at the Amsterdam UMC. For library preparation, KAPA RNA
+HyperPrep with RiboErase (Roche) was used. The sequencing platform
+used was Illumina NovaSeq 6000 (Illumina) and the sequencing method
+used was S4.300 (PE150).
+Paired-end reads were mapped to the zebra finch transcriptome
+(bTaeGut1_v1) using STAR.20 All samples had >50% uniquely mapped
+reads. The ensemble genome annotation bTaeGut1_v1 contains 22,150
+genes and after filtering for genes with at least 10 counts we retained
+15,351 genes.
+Nanostring GeoMx Digital Spatial Profiler analysis
+Nanostring GeoMx Digital Spatial profiler (Nanostring) was used in
+combination with the GeoMx Whole Transcriptome Atlas Mouse RNA
+probe mix (v1) for NGS on paraplast-embedded fixed embryos and
+adult mouse hearts according to the manufacturer’s instructions. Anti
+cTnI (Hytest 4T21/2, 1:150) together with anti-Goat AlexaFluor 555
+(Thermofisher Scientific A-21432, 1:250) and SytoxGreen nuclear
+stain (Invitrogen S7020) were used to manually segment regions of
+interest. cTnI signal-based masking was used to further specify areas
+of interest (AOIs), enriching for cardiomyocytes.
+After selecting the AOIs, oligos were collected into a 96-well plate
+for library preparation and subsequent sequencing. Sequencing depth
+was determined by calculating the total area of all AOIs (μm2), and
+multiplying this by the Nanostring recommended Sequencing Depth
+Factor (100 for the Whole Transcriptome Atlas). Sequencing was
+performed on the NextSeq 1000 (Illumina).
+FASTQ files were trimmed, stitched, aligned, and deduplicated
+using the Nanostring GeoMx NGS pipeline (version 2.3.3.10). The
+generated DCC files were processed with the R GeoMxTools pack
+age (version 3.8.0) using the configuration file, the sample sheet, and
+the probe metadata file (v1). Normalization was performed using
+quantile-normalization. For hypothesis testing, a Wald test was per
+formed and the multiple testing correction was performed using the
+Benjamini−Hochberg method. Differentially expressed genes were
+defined as an adjusted p-value <0.05 and a log2 fold-change >0.25. All
+graphs were made in R (v4.3.1), using the package ggplot2 (v3.4.2) and
+ggrepel (v0.9.3).
+RNA sequencing analysis
+Bulk RNA sequencing analysis was performed using DESeq2.21
+Genes with fewer than 10 counts were removed. Normalization
+was performed using the DEseq2 (v3.17) variance-stabilizing trans
+formation method. For hypothesis testing, a Wald test was per
+formed and the multiple testing correction was performed using the
+Benjamini−Hochberg method. Differentially expressed genes were
+defined as an adjusted p-value <0.05 and a log2 fold-change >0.25. All
+graphs were made in R (v4.3.1), using the package ggplot2 (v3.4.2) and
+ggrepel (v0.9.3).
+Single-cell RNA sequencing analysis
+Seurat v422 was used for the analysis of all single-cell RNA sequencing
+data. Data were filtered using the following criteria:
+∙ Hill et al.23
+• Percent mitochondrial genes: <25%
+• nFeature: >1000, <30,000
+• nCount: >500, <6000
+∙ Asp et al.24
+• Percent mitochondrial genes: <25%
+• nFeature: >200, <6000
+• nCount: >500, <50,000
+∙ Kanemaru et al.25
+• Percent mitochondrial genes: <5% (Single nucleus RNA seq)
+• nFeature: >200, <6000
+• nCount: >500, <60,000
+∙ Galow et al.26
+• Percent mitochondrial genes: <5% (Single nucleus RNA seq)
+• nFeature: >200, <5000
+• nCount: >500, <6000
+Normalization and scaling were performed using SCTransform, v2,
+regressing out the percentage of mitochondrial genes. Furthermore,
+the Harmony package (v1.2.0) was used to integrate biological repli
+cates. After performing this, DimPlot using group_by was used to
+identify bias in clustering based on a number of variables if provided:
+sex, age, heart region, individual, cell cycle phase, and sequencing assay.
+Furthermore, the percentage of mitochondrial and ribosomal genes
+was assessed to see if clusters emerged based on these features. For
+the adult human data, we performed integration using the Harmony
+package (v1.2.0), based on the individuals.27
+Embryonic marker genes that were used to identify cardiomyocytes
+of the trabecular layer were Nppa, Nppb, Gja5, Gja1, Bmp10, Scn5a,
+Tbx5, Sema3a, Irx3, and Irx5. For the cardiomyocytes of the compact
+17496632, 2025, 1, Downloaded from https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15296 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+ANNALS OF THE NEW YORK ACADEMY OF SCIENCES 79
+F I G U R E 1 (A) Phylogenetic tree including histological samples of ventricular structure and zoomed-in sections of ventricular wall. The dashed line indicates the transition from myocardium with a trabecular or compact organization. Scale bar: zebrafish 100 μm, tuna 10 mm, other animals 1 mm. Pictograms obtained from PhyloPic.org. Danio rerio (zebrafish) by Mathew Wedel, CC0 1.0; Thunnus albacares (yellowfin tuna) by T. Michael Keesey, Public Domain Mark 1.0; Xenopus laevis (clawed frog) by Ian Quigley, CC BY 3.0; Taeniopygia guttata (zebra finch) by Andy Wilson, CC0 1.0; Plestiodon fasciatus (skink) by David Orr, CC0 1.0; Mus musculus (mouse) by Jiro Wada, CC0 1.0. Danio rerio histology section adapted from Tessadori et al.75; Thunnus albacares picture kindly provided to us by José M. Icardo; Xenopus laevis section from Jensen et al.13; Taeniopygia guttata picrosirius red staining.
+layer, we used Hey2, Tbx20, Mycn, Tnnt1, Prdm16, Glut1, Pdk1, and Ldha.12,28–34
+Pseudo-bulk analysis was used for differential gene expression anal
+ysis, using AggregateExpression to combine cells from clusters while
+keeping the biological individual separated. The Z-score was calculated
+to allow comparison between separate datasets, performed on log sta
+bilized values, and produced by the rlog function from the DESeq2
+package (v3.17). Differentially expressed genes were defined as an
+adjusted p-value <0.05 and a log2 fold-change >0.25. Correlation anal
+ysis between cell clusters from different datasets was performed using
+a Pearson correlation.
+For the human embryonic data, the differential gene expression
+analysis was performed using Seurat’s function FindMarkers, because
+DESeq2 is unable to work with n = 1 biological replicates.
+RESULTS
+Figure 1 shows the ventricles of species of several major vertebrate
+lineages. The morphological structures of these ventricles show a
+clear dichotomy between the endothermic species (represented by the
+mouse and the zebra finch) and the ectothermic species (zebrafish,
+tuna, clawed frog, and skink). The ventricular lumen of ectothermic
+species is traversed by a high number of very fine trabeculations.35
+Furthermore, generally, the compact wall is quite thin, although excep
+tions, such as in the tuna, are observed. As a significant fraction of the
+ventricle is made up by the trabecular layer, the ratio of compact to tra
+becular remains relatively low in all cases. In endothermic hearts, on
+the other hand, most of the lumen is open cavity. The trabeculations are
+fewer and thicker than those found in ectotherms and the compact wall
+is relatively thick, leading to a higher ratio of compact-to-trabecular
+myocardium.
+We assessed the extent of the trabecular layer by identifying the
+deepest point of the intertrabecular recesses, which are part of the
+ventricular cavity. In the ventricle of the clawed frog (Figure 1), we find
+essentially no myocardium that is not directly in contact with the ven
+tricular cavity (meaning that the compact myocardium makes up a very
+low percentage of the ventricle mass).
+Spatial transcriptome analysis of murine hearts reveals loss of embryonic transmural differences in the adult ventricular myocardium
+In this paper, we assess the transcriptomes of the myocardium or car
+diomyocytes from the trabeculated and compact myocardium from
+several different species, aiming to determine whether the cardiomy
+ocytes in these layers show a different phenotype.
+As the primary line of evidence, we employed spatial transcrip
+tomics using the GeoMX DSP platform because this combines high
+resolution spatial information to distinguish the trabecular and com
+pact layer with transcriptional profiles. Figure 2A,B shows representa
+tive histological slides of the embryonic and the adult ventricles used.
+Morphological regions that clearly identified trabecular and compact
+layers containing about 250–350 nuclei each were selected for suf
+ficient signal strength, while the zone in between the trabecular and
+compact layers was not included in the selections to ensure signal
+specificity. The Mouse Whole Transcriptome Atlas probe set contains
+19,963 genes and expression above the limit-of-quantification was
+detected for at least half of these genes. Cardiomyocyte-specific genes,
+17496632, 2025, 1, Downloaded from https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15296 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+80 ANNALS OF THE NEW YORK ACADEMY OF SCIENCES
+(B)
+(A)
+Bmp10
+Cited1
+Clu
+Cntn2
+Fabp4
+Gja5
+Hey2
+Irx3
+Irx5
+Kcnd2
+Mb
+Mif
+Myl1
+Myl4
+Nppa
+Nppb
+Scn5a
+Slit2 Thbs4
+Tnnt1
+Gpx3
+0
+25
+50
+75
+100
+-6 -3 0 3 6 log2 FC
+-log10 P-adj
+Cntn2
+Cytl1
+Hba-a1
+Hbb-b1
+Hbb-b2
+Igf2
+Irx5
+Kcnd2
+Lrtm1
+Ptgds Scn5a
+0
+25
+50
+75
+100
+-6 -3 0 3 6 log2 FC
+-log10 P-adj
+Hey2
+Irx3
+Irx5
+Mycn
+Nppa
+Scn5a
+-6
+-3
+0
+3
+6
+-6 -3 0 3 6 log2 FC - Hill scRNAseq
+log2 FC - GeoMx
+both Compact
+both Trabecular
+GeoMx Compact, scRNAseq Trabecular
+GeoMx Trabecular, scRNAseq Compact
+(C)
+F I G U R E 2 (A) Bottom: Volcano plot of the differential gene expression analysis between the trabecular (yellow) and compact (red) myocardium of E14.5 embryonic mice (detected genes that were not differentially expressed are shown with gray dots). Top: Representative image of the coronal section of E14.5 heart on the GeoMX slide (extra-ventricular tissue and space is obscured with white color). Green color indicates cardiac troponin-T signal and boxed regions indicate the specific regions that were sampled. (B) Bottom: Volcano plot of the differential gene expression analysis between the subendocardial myocardium (yellow) and the subepicardial myocardium (red) of adult mice. Top: Representative image of the transverse section of an adult mouse heart on the GeoMX slide. Green color indicates cardiac troponin-T signal and boxed regions indicate the specific regions that were sampled. (C) Scatter plot of the log2 fold change of the differential gene expression analysis of the embryonic mouse trabecular versus compact data from the GeoMx platform compared to the embryonic mouse data from the Hill et al.23 scRNAseq dataset. Positive values on the x- or y-axis correspond to higher expression in the GeoMx or scRNAseq trabecular myocardium, respectively. Negative values indicate lower expression.
+such as Ttn, Tnnt2, Tnni3, Mybpc3, and Actn2, were among the most
+frequently detected and highest expressed genes, indicating that the
+regions are strongly enriched for cardiomyocytes.
+The embryonic ventricle revealed 606 differentially expressed
+genes between the trabecular and compact myocardium, which repre
+sents about 3% of all detected genes. Several genes have been found
+to exhibit transmural (i.e., from endocardium to epicardium) expres
+sion patterns in the embryonic hearts of mice and humans. Some
+genes exhibit shallow gradients such as Tbx20, Mycn, Tbx5, and Gja1,
+whereas other genes exhibit steeper gradients, being nearly exclu
+sively expressed in their respective layers, such as Hey2, Nppa, and
+Gja5.12,29,33,36 Additionally, studies have found the cells in the compact
+layer to be more proliferative, and differences in metabolism between
+the two layers have been observed.31,37 Our spatial transcriptomic
+17496632, 2025, 1, Downloaded from https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15296 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+ANNALS OF THE NEW YORK ACADEMY OF SCIENCES 81
+analysis of the embryonic mouse left ventricle validates genes with a
+previously established transmural expression gradient and additionally
+provides a transcriptome-wide profile of genes differentially expressed
+between the trabecular and compact myocardium (Figure 2A).
+We also analyzed a second and independent line of evidence,
+namely, single-cell RNA sequencing data of more than 25,000 cells
+from E13.5 mouse hearts generated by Hill et al.23 While this approach
+does not contain spatial information, it can be used for a more nuanced
+analysis of cell states. As the data contained all cell types, we first
+identified the general cell types, such as fibroblasts (Vim+, Pdgfrb+),
+endothelium (Cdh5+, Npr3−), endocardium (Cdh5+, Npr3+), epicardium
+(Upk3b+), and cardiomyocytes (Tnnt2+). Within the cardiomyocytes, we
+were able to identify the ventricular (Myh7+) and atrial (Nppa+/Myh6+/
+Myl7+) cardiomyocytes.38,39
+Next, we tested whether the ventricular cardiomyocytes only could
+be clustered further. Two clusters were found that were distinct by
+1306 differentially expressed genes (8.1% of all detected genes, log2
+fold change >0.25, p-adjusted <0.05). Cells of one cluster had greater
+Nppa expression levels, while cells of the other cluster had a much
+greater Hey2 expression level. Moreover, 524 of the differentially
+expressed genes found in our spatial transcriptomics analysis were also
+found in the single cell-based dataset (Figure 2C). This amounts to a
+high degree of overlap in differentially expressed genes despite the use
+of slightly different ages (E13.5 and E14.5) and different technologies
+(spatial transcriptomics and single-cell RNAseq). We also considered
+no fold change threshold, or a threshold of 1, yielding 1066 and 94
+genes, respectively. As a final validation, we took the top 50 genes
+based on fold-change and p-value for both categories (from both the
+spatial transcriptomics and scRNAseq datasets) and compared these
+to the GENEPAINT40 database, an in situ hybridization (ISH) high
+throughput atlas of ∼15,000 genes (for E14.5 embryos). Out of 100
+genes analyzed, 83 exhibited a transmural gradient in the expression
+pattern, five did not show a differential pattern, and for 12, the ISH
+signal was inconclusive.
+To test whether similar transmural gradients exist in the adult heart,
+we sampled the left ventricle at three positions, subepicardially (com
+pact), mid-ventricle, and subendocardially (trabecular) (even in the
+adult heart, the left ventricular free wall has a substantial trabecular
+layer41). The latter also contained some ventricular conduction system
+cells. When performing differential gene expression analysis on the tra
+becular and compact regions of the adult hearts, we found an order of
+magnitude fewer differentially expressed genes, 36 genes comprising
+only 0.2% of all detected genes (Figure 2B) (no fold change threshold,
+36 genes; fold change threshold = 1, 7 genes). The corresponding num
+ber of genes for the embryonic hearts were 524, 1066, and 94. This
+shows the myocardium of the trabecular and compact layers is much
+more different in the embryonic heart compared to the mature heart,
+irrespective of the threshold used. Of these genes, at least several
+may be attributed to differential tissue composition or inaccuracies
+in the segmentation. For example, Hba-a1 and Hbb-b1/2, exclusively
+expressed in red blood cells, were enriched in the trabecular samples,
+likely due to picking up signal from the blood-filled lumen in between
+the trabeculations.
+It has been shown that Scn5a, Irx5, and Kcnd2 exhibit transmural
+expression gradients in adult mice and rabbit.42,43 Of these, only Scn5a
+was found to be significantly differentially expressed, although both
+Kcnd2 (unadjusted p-value 0.005) and Irx5 (unadjusted p-value 2.6E-6)
+exhibit a trend in the expected direction of enrichment.
+When comparing the results of the embryonic and the adult spatial
+transcriptomes (Figure 3A), we found very little correlation between
+genes differentially expressed in either region between the adult and
+the embryonic heart. There are nine genes that are significantly differ
+entially expressed in both the adult and embryonic ventricle in either
+region, three of these are also significantly expressed in Purkinje cells,
+which are derived from a subset of the embryonic trabeculae.44
+We also merged the embryonic and adult heart samples and ana
+lyzed both together (Figure 3B,C). In the principal component analysis,
+the variation between the adult and embryonic samples is mostly rep
+resented in principal component 1, which accounts for 86% of the
+variance, whereas the second principal component, which accounts for
+only 5% of the variance, reflects the separation between the embry
+onic compact and trabecular samples. When performing differential
+gene expression analysis on the pooled left ventricular samples, we find
+that 44.7% of all detected genes are differentially expressed between
+the embryo and the adult. Taken together, our spatial analysis indicates
+that the transcriptomes of both the embryonic trabecular and compact
+myocardium differ substantially from that of the adult ventricular wall,
+this difference being much larger than that between the embryonic
+trabecular and compact myocardium. Furthermore, the transcriptional
+differences between embryonic trabecular and compact myocardium
+are not maintained in the adult ventricular wall.
+Single-cell transcriptome analysis of human hearts reveals loss of embryonic transmural differences in the adult ventricular myocardium
+To assess whether transcriptional differences between the regions and
+stages (embryonic versus adult) are conserved in mammals, we rean
+alyzed available human single-cell RNA-sequencing datasets.24,25 We
+used a dataset generated by Asp et al.,24 where the authors performed
+single-cell RNA sequencing on a 6.5-week-old embryo (∼3400 cells,
+∼470 vCM cells). We could reproduce the results obtained by the
+authors, as well as those obtained by Sylvén et al.,45 who also reana
+lyzed these same data. We identified clusters belonging to major cell
+types, namely, endothelium (CDH5+, NPR3−), endocardium (CDH5+,
+NPR3+), epicardium (UPK3B+), as well as ventricular (MYH7) and atrial
+(MYH6) cardiomyocytes. Ventricular cardiomyocytes could be clus
+tered into the myocardium of the trabecular and compact layer based
+on the expression of NPPA and HEY2 (Figure 4A). When performing
+differential gene expression analysis, we identified 193 differentially
+expressed genes between trabecular and compact (out of 15,323, or
+1.3%). By comparing these genes with those we found in the mouse
+embryo, we found 76 genes that are differentially expressed (in the
+same layer, p-adjusted <0.05) in both human and mouse, includ
+ing established marker genes HEY2, SEMA3A, IRX3, IRX5, and NPPA.
+17496632, 2025, 1, Downloaded from https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15296 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+82 ANNALS OF THE NEW YORK ACADEMY OF SCIENCES
+NS Embryonic
+Adult Trabecular of
+adult & embryonic
+Compact of adult & embryonic
+Trabecular of adult & embryonic in the VCS
+-10
+-5
+0
+5
+10
+-20 0 20 PC1 (86 % of variance)
+PC2 (5 % of variance)
+Adult E14.5
+Compact Mid Trabecular
+(A) (B)
+(C)
+Irx3 Irx5
+Gsta4
+Mylk3
+Ntn1
+Slc8a1
+Atpif1
+Mb
+Scn5a
+Cfh
+-2
+0
+2
+-2 0 2 log2 FC - Embryonic
+log2 FC - Adult
+Ccnb1
+Cdk1
+Hk1 Ldha
+Lrrc10
+Myh7
+Mylk3
+Pkm
+Ryr2
+Tnni3
+0
+25
+50
+75
+100
+-6 -3 0 3 6 log2 FC
+-log10 P-adj
+F I G U R E 3 (A) Scatter plot of the log2 fold change of the differential gene expression analysis of the embryonic trabecular versus compact and the adult trabecular versus compact of the mouse heart. Positive values on the x- or y-axis correspond to higher expression in the embryonic or adult trabecular myocardium, respectively. Negative values indicate lower expression. NS—Non significant in either region at either age. Adult—Only significant in either region in adult hearts. Embryonic—Only significant in either region in embryonic hearts. Light blue marks differentially expressed genes that are associated with the ventricular conduction system (VCS). (B) Principle component analysis plot resulting from merging the embryonic and adult GeoMX experiments. (C) Volcano plot of the differential gene expression analysis of all the left ventricle samples from the adult compared to all left ventricle samples from the embryo.
+Furthermore, we see the expected trend for 231 genes (Figure 4B,
+unadjusted p-value <0.05).
+For the adult human heart, there are many datasets
+available.25,46–50 We opted to use the HeartCellAtlas v2, which
+was published by Kanemaru et al.,25 because this dataset has a very
+clear annotation of many possible confounding factors, and contains
+epicardium and endocardium, which implies that fully transmural
+samples were used, and thus contains subepicardial compact and
+subendocardial trabecular myocardium. During the initial clustering,
+performed as described in the previous section, we identified clusters
+belonging to endothelium (CDH5+, NPR3−), endocardium (CDH5+,
+NPR3+), and epicardium (UPK3B+), and we could also distinguish ven
+tricular (MYH7) and atrial (MYL7, MYH6) cardiomyocytes. Within the
+ventricular cardiomyocyte cluster, we found four distinct subclusters
+(as also found in the original study) indicative of four distinguishable
+ventricular cardiomyocyte (vCM) subtypes (Figure 4C, labels vCM1–4).
+To investigate whether any of these subtypes more closely resembles
+the embryonic compact or trabecular cardiomyocytes, we performed a
+cluster analysis on the Z-score of the embryonic and the adult clusters.
+We clustered based on the overlapping differentially expressed genes
+from the embryonic human and mouse in the trabecular and compact
+myocardium, as well as a selection of 300 cardiomyocyte-specific
+genes (compiled by using the Seurat function FindMarkers to identify
+the differentially expressed genes in cardiomyocytes compared to all
+other cell types). None of the four adult vCM subclusters more closely
+resemble either the embryonic trabecular or compact cardiomyocyte
+cluster. Moreover, the four adult clusters resembled adult atrial
+cardiomyocytes (aCMs) more than they resembled embryonic car
+diomyocytes (in Figure 4C, compare labels vCM1–4 to adult aCM). This
+observation indicates a substantial transformation from embryonic to
+adult cardiomyocyte states, suggesting that many maturation-related
+changes are shared across cardiomyocyte subtypes. Additionally, the
+embryonic trabecular and compact clusters were much more similar to
+each other than to any adult cardiomyocyte subcluster. In aggregate,
+the substantial differences in transcriptomes of embryonic trabecular
+and compact layers have disappeared in the adult ventricle.
+Adult zebra finch ventricles show little transcriptional distinction between trabecular and compact myocardium
+To evaluate whether differences between the trabecular and com
+pact myocardium could be present in birds, we conducted bulk RNA
+sequencing on various regions of the adult zebra finch heart. We
+detected 15,351 genes with at least 10 counts (out of 22,150 anno
+tated genes in the zebra finch reference genome, bTaeGut1_v1). The
+genes with the highest gene expression detected were sarcomere and
+sarcoplasmic reticulum components, for example, MYH15 (ventricular
+myosin heavy chain, MYH7 ortholog),51 RYR2 (ryanodine receptor 2),
+17496632, 2025, 1, Downloaded from https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15296 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+ANNALS OF THE NEW YORK ACADEMY OF SCIENCES 83
+(A)
+-2
+0
+2
+4
+-6 -3 0 3 6 log2 FC - Human
+only human
+both trend trabecular
+both compact
+Human compact, Mouse Trabecular
+both trend compact
+both trabecular
+Human trabecular, Mouse compact
+CM genes
+Trabecular genes
+Compact genes
+−2
+−1
+0
+1
+2
+aCM vCM2 vCM3 vCM1 vCM4 Comp Trab aCM
+Embryo
+Adult
+GO terms
+Sarcomere organization Muscle contraction Cardiac action potential
+TCA cycle Muscle cell development
+Muscle contraction Calcium transport Proliferation Cellular communication
+Cell cycle DNA replication
+Cell division
+(B)
+(C)
+log2 FC - Mouse
+-4
+-2
+0
+2
+4
+-10 -5 0 5 UMAP-1
+UMAP-2
+Compact Trabecular aCM
+Compact
+Trabecular
+Atria
+F I G U R E 4 (A) UMAP of the cardiomyocyte clusters of the embryonic cardiomyocyte clusters identified in the human single-cell RNA-sequencing dataset.24 (B) Scatter plot of the log2 fold change of the differential gene expression analysis of the embryonic human trabecular versus compact data from the Asp et al.24 scRNAseq dataset and the GeoMx embryonic mouse data. Positive values on the x- or y-axis correspond to higher expression in the scRNAseq or GeoMx trabecular myocardium, respectively. Negative values correspond to lower expression. Trend—p-value <0.05, rather than p-adjusted <0.05. (C) Heatmap showing Z-score of gene expression of the HeartCellAtlas adult ventricular cardiomyocyte clusters (vCM1–4), and atrial cardiomyocytes (aCM) and the Asp et al.24 embryonic cell types.
+ATP2A2 (ATPase sarcoplasmic/endoplasmic reticulum Ca2+ transport
+ing 2), and TTN (titin). These genes are components of sarcomeres and
+the sarcoplasmic reticulum, implying that a significant fraction of the
+tissue was composed of cardiomyocytes.
+Comparing the right atrioventricular valve (RAV) samples to the
+pooled ventricular samples, we find that roughly 7% of all detected
+genes were differentially expressed (Figure 5A; Wald test statis
+tic, Benjamini−Hochberg correction, p-adjusted <0.05). Furthermore,
+MYH7, which is known to be specific to the atria in chickens,52 was
+found in the RAV sample, as expected. When we compared the samples
+from the left ventricular trabecular and compact layer, we find 0.3% of
+all detected genes to be differentially expressed (Figure 5B). Among
+the 0.3% were NPPB in the trabecular tissue (NPPA is not present in
+birds53) and HEY2 in the compact layer.54
+We additionally sampled the right ventricular free wall, which con
+sists nearly entirely of compact myocardium.55 When comparing the
+right ventricular samples to the left ventricular samples, we find only
+0.8% and 0.7% differentially expressed genes when compared to the
+left ventricle compact myocardium, and the left ventricle trabecular
+myocardium, respectively (Figure 6).
+17496632, 2025, 1, Downloaded from https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15296 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+84 ANNALS OF THE NEW YORK ACADEMY OF SCIENCES
+COL14A1
+GAD2
+HEY2
+MMRN1 ALX4 ERBB4
+NEB
+RNaseP_nuc
+NTN1
+NPPB
+0
+5
+10
+15
+20
+25
+-5 0 5 log2 FC
+-log10 P-adj
+DECR1
+GOLGA4
+FHL2
+MTRES1
+SLC27A6
+EDIL3
+PAPLN
+SSB
+ABCB11
+EXOC6 NEXN
+CRIP1 SERPINE2
+ADAMTS2
+C8G
+NPPB
+SERPINF1
+CDON
+CADM1
+0
+5
+10
+15
+20
+25
+-5 0 5 log2 FC
+-log10 P-adj
+(A) (B)
+F I G U R E 5 Volcano plots of the differential gene expression analysis between (A) the right atrioventricular valve (green) and the ventricular samples (violet) of the zebra finch, and (B) the trabecular (yellow) and compact (red) left ventricular myocardium of the zebra finch.
+SEMA5A
+FAM221A
+HEY2
+FAM184B
+MMRN1
+ERBB4
+SETD3
+IRX3
+CELA2A
+GKN2.1
+0
+5
+10
+15
+20
+25
+-5 0 5 log2 FC
+-log10 P-adj
+(A)
+F13A1
+FAM221A
+MXRA5
+FAM184B
+LTBP2
+SETD3
+RHPN2
+IRX3
+HID1
+ATP1A2
+0
+5
+10
+15
+20
+25
+-5 0 5 log2 FC
+-log10 P-adj
+(B)
+F I G U R E 6 Volcano plots of the differential gene expression analysis between the left and right ventricle of the zebra finch. (A) Few differentially expressed genes were found in the comparison of the left ventricular compact layer (red) to the right ventricular free wall (blue). (B) Few differentially expressed genes were found in the comparison of the left ventricular trabecular layer (yellow) to the right ventricular free wall (blue).
+Fish myocardium exhibits limited differential expression between the trabecular and compact layers of the ventricle
+To compare the adult fish ventricle trabecular and compact layers, we
+reanalyzed published bulk RNA-sequencing data of the Pacific bluefin
+tuna and zebrafish. The zebrafish ventricle consists of mostly trabec
+ular myocardium, surrounded by a thin layer of compact muscle. This
+ventricular wall design represents the most common type found in
+fish. Tuna hearts, on the other hand, have some of the thickest and
+proportionally greatest compact layers found in fish.9
+Sánchez-Iranzo et al.15 showed in zebrafish that the expression
+of tbx5a in the ventricle is restricted to the majority of the trabec
+ular layer. Using a reporter line, the authors FACS-purified tbx5a
+positive and tbx5a-negative cardiomyocytes, the latter being enriched
+in cardiomyocytes from the compact layer, and performed bulk RNA
+sequencing. Using the data provided on GEO, we reperformed dif
+ferential expression analysis and our results corresponded to those
+of the authors.15 We found 84 genes to be differentially expressed
+(Figure 7A, p-adjusted <0.05), or 0.6% out of all genes detected. tbx5a,
+as expected, was significantly enriched in the trabecular layer. Further
+more, we compared the genes found to be differentially expressed in
+the zebrafish layers with those found to be differentially expressed in
+the embryonic mouse heart layers. This analysis was motivated by the
+notion that the embryonic heart of endotherms resembles the heart
+of ectotherms.35,56 We found that the genes that were differentially
+expressed in the trabecular layer in the mouse corresponded to those
+in the trabecular layer of the zebrafish roughly as often as those in
+the compact layer of the zebrafish. The same lack of correlation was
+observed for the compact layer as well (Figure 7B).
+Tunas may have the highest degree of compact myocardium among
+fish; perhaps more than half of the total ventricular mass is compact
+tissue.9,57 Ciezarek et al.58 performed RNA sequencing on several
+different cardiac components of Pacific Bluefin tuna. Their results
+showed roughly 2000 genes were differentially expressed between the
+atrial and ventricular samples, and our reanalysis revealed 10.1% of
+the total number of genes to be differentially expressed between the
+atrial and ventricular samples (Figure 8A; 2913 of 28,886 detected
+genes, p-adjusted <0.05). These included myh6 in the atrium and myh7
+in the ventricle, which in the zebrafish are known markers of those
+17496632, 2025, 1, Downloaded from https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15296 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+ANNALS OF THE NEW YORK ACADEMY OF SCIENCES 85
+-8 -4 0 4 8 log2 FC - Zebrafish
+both trend trabecular
+both trend compact
+Trabecular mouse, Compact ZF
+Compact mouse, Trabecular ZF
+anxa2a
+hey2
+slc27a4
+ing5a
+tbx5a
+emilin1b smtnl1
+acta2
+cavin1b phtf1
+crb2a
+Xirp2
+cxcl18b
+rpz5 prune
+tmsb4x
+myh7
+0
+10
+20
+30
+40
+-10 -5 0 5 10 log2 FC
+-log10 P-adj
+-2
+0
+2
+log2 FC - Mouse
+(B)
+(A)
+F I G U R E 7 (A) Volcano plot of the differential gene expression analysis between the tbx5a-positive trabecular cardiomyocytes (yellow) and the tbx5a-negative cardiomyocytes (red) of the zebrafish.15 (B) Scatter plot of the log2 fold change of the differential gene expression analysis of the adult zebrafish trabecular versus compact data, and the GeoMx embryonic mouse data. Positive values on the x- or y-axis correspond to higher expression in the scRNAseq or GeoMx trabecular myocardium, respectively. Negative values correspond to lower expression. Trend—p-value <0.05, rather than p-adjusted <0.05. Abbreviation: ZF, zebrafish.
+atp1b3a
+bmpr1ba
+coro1cb
+scn1a
+myh7
+tgm2a.5
+Insc
+kcnj5
+gnb5b
+myh6
+ankrd1a
+ttn.1
+tnni1a
+cpne5b
+pgm5
+0
+20
+40
+60
+80
+-10 0 10 log2 FC
+-log10 P-adj
+thbs4b
+dgat2
+0
+20
+40
+60
+80
+-10 0 10 log2 FC
+-log10 P-adj
+(A) (B)
+F I G U R E 8 Volcano plots of the differential gene expression analysis of the tuna58 between (A) the ventricle (violet) and the atrium (magenta), and (B) compact (red) and the trabecular (yellow) ventricular myocardium.
+respective chambers.59 Ciezarek et al.58 found no differentially
+expressed genes between the trabecular and compact layers, and
+our reanalysis revealed only two genes to be differentially expressed
+between the trabecular and the compact layers (Figure 8B). In sum
+mary, the myocardium of the ventricular trabecular and compact
+layer are almost the same transcriptionally, whereas the atrial and
+ventricular myocardium are markedly different.
+DISCUSSION
+In this study, we compared transcriptomes of embryonic and adult
+trabecular and compact myocardium from five different vertebrate
+species. The key finding is that the morphologically distinct ventric
+ular trabecular and compact myocardium of adult vertebrates are
+transcriptionally similar.
+If we assume that transcriptional similarity between the
+myocardium of the trabecular and compact layers translates to
+comparable functional capacities of the cardiomyocytes of the two
+layers, then the relative proportion of trabecular to compact car
+diomyocytes in the myocardium may not have much of an impact on
+overall ventricular tissue function. This does not rule out the biological
+relevance of the compact-to-trabecular myocardium ratio; however,
+given the small and inconsistent gene expression differences between
+trabecular and compact myocardium across species, we propose that
+cardiomyocytes in these layers are unlikely to drive any potential per
+formance differences. Should variation in the compact-to-trabecular
+ratio substantially impact function, it is not likely to be due to differ
+ences in the myocardium per se, but perhaps an emergent feature of
+tissue architecture, composition, or environment. However, it is also
+possible that adaptations occurring at the organismal level, rather than
+those directly pertaining to cardiac function, might drive variations in
+17496632, 2025, 1, Downloaded from https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15296 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+86 ANNALS OF THE NEW YORK ACADEMY OF SCIENCES
+the proportion of trabecular to compact myocardium. In this scenario,
+the ratio of compact to trabecular could potentially vary more freely
+based on adaptations not directly related to cardiac function. Further
+more, we need to consider the likely contribution of differences in
+cardiomyocyte phenotype between species to differences in cardiac
+performance.
+With ischemic heart disease being the leading cause of death
+worldwide, there is much interest in understanding how the heart
+of many ectothermic vertebrates is protected against myocardial
+infarction.60,61 This protection indicates that the hearts have a high
+proportion of trabecular myocardium where the individual trabecula
+tions are so thin that they are homeostatic by exchange by diffusion
+with the blood of the chamber cavity. In the mammalian lineage, there
+was an evolution away from this infarct-protected setting as most
+myocardium became organized in such big aggregates that coronary
+perfusion was required for homeostasis. We have proposed previously
+that this acquired disadvantage relates to the evolution of large cav
+ities which allow for fast filling and ejection from the cavities.5 That
+is, mammals evolved a strong predisposition for infarcts via coronary
+arterial disease, while gaining a capacity to generate greater cardiac
+outputs. In addition, myocardium in large aggregates may accelerate
+electrical conduction.5 These two gains are somewhat emergent and
+distinct features relative to the identity of the myocardium of the tra
+becular and compact layer that we report on here. There are then mul
+tiple ways to assess the importance of the extent of trabeculation.62 In
+the clinical literature, unfortunately, the myocardium of the trabecular
+layer is often considered inferior, somehow, to the myocardium of the
+compact layer.63 This could create conundrums where none exist, for
+example, when there is an unexpected association between a greater
+extent of trabeculation and higher physical activity.64
+Previously, Faber et al. reported equivalent force generation poten
+tial in cardiomyocytes isolated from the adult mouse trabecular and
+compact layers.65 Adult cardiomyocytes of both layers were also able
+to generate significantly more force than embryonic cardiomyocytes.
+These observations are in line with our current results, together sug
+gesting an association between the transcriptomes and functionality
+of ventricular cardiomyocytes. That the morphologically distinct tra
+becular and compact layers are comprised of phenotypically similar
+cardiomyocytes provides an explanation for the observation that the
+degree of left ventricular trabeculation does not predict pump function
+in humans.6 Myocardial architecture is thought to be functionally rele
+vant in fish due to a broad range in the proportion of compact muscle.10
+Roberts et al. found that the isometric twitch force of the trabecular
+myocardium in steelhead trout was significantly higher than that of the
+compact myocardium.66 Although hypoxic acclimation improved the
+contractile force of the compact myocardium, it remained lower than
+that of the trabecular myocardium.
+At least in some fish, then, experimental observations do support
+a functional difference between trabecular and compact-organized
+myocardium. Hillman and Hedrick,3 however, collated functional data
+from a range of vertebrates and demonstrated that total myocardial
+mass, irrespective of the underlying ventricular wall morphology, is
+strongly correlated to cardiac work. In our assessment, it is likely a gen
+eral rule that the myocardium of the trabecular and compact layers is
+highly similar in adult animals.
+In the embryonic mouse and human hearts, we found a substan
+tial number of transcriptional differences between the compact and
+trabecular myocardium. Very few genes overlap when comparing the
+differentially expressed genes found in embryonic and adult mouse
+hearts, and most of the genes that were enriched were in Purkinje
+fibers, which are derived from part of the embryonic trabeculations.44
+The transcriptional differences between mouse adult and embryonic
+left ventricles are nearly an order of magnitude larger than those found
+between embryonic compact and embryonic trabecular myocardium.
+Similar differences were found when reanalyzing human single-cell
+RNA-sequencing data. We can find several adult ventricular cardiomy
+ocyte clusters, and in the embryo, we can find distinct trabecular and
+compact cardiomyocytes. However, despite their clearly distinct phe
+notypes, the embryonic cardiomyocytes resemble each other more
+than they resemble any of the adult clusters.
+We hypothesize that the phenotypes of cardiomyocytes of the two
+layers follow a divergent trajectory during their development, but upon
+maturation, both phenotypes converge to acquire molecularly very
+similar states while being located in morphologically different struc
+tures. It has been suggested that heart cells return to their embryonic
+state in high-stress scenarios.67 These findings offer a perspective
+on the very substantial scale of changes in gene expression of these
+cardiomyocytes that would be required to return heart cells to their
+embryonic state. Furthermore, it is conceivable that the gene pro
+grams associated with the morphogenetic processes that give rise to
+both layers are no longer needed when the structures are formed and
+have matured. On the other hand, the expression of most cardiomy
+ocyte lineage-enriched genes is initiated during development and
+maintained into adulthood. This includes genes differentially expressed
+between the embryonic trabecular and compact layers. For example,
+Tbx5 and Tbx20, two essential developmental transcription factors dif
+ferentially expressed in the embryonic trabecular and compact layer,
+respectively,68,69 are required to maintain cardiomyocyte states in the
+adult.70,71
+In addition to mammals, birds are also endothermic animals. Birds
+have a shared ancestry with reptiles, ectothermic animals with a
+highly trabeculated heart design, which suggests that birds developed
+a compact-dominated heart structure separately after diverging from
+reptiles.72 As far as we could assess, the highly trabeculated embryonic
+ventricular wall of birds (e.g., chickens) shares gene expression with the
+trabeculated embryonic ventricular wall of mammals.73,74 When we
+compare the trabecular and compact left ventricle samples from adult
+zebra finch hearts, we observe very few differences. Furthermore,
+when we examine the right ventricle, which is almost devoid of trabec
+ulations, we find a similar number of differences compared to either
+left ventricle sample. Had there been differences between trabecular
+and compact cardiomyocytes, the compact out-group (right ventricle)
+should be more similar to the compact left ventricle samples if signifi
+cant differences existed between these regions. The adult zebra finch
+heart transcriptomes suggest that, like in mammals, embryonic differ
+ences diminish in adulthood, indicating a maturation trajectory and
+17496632, 2025, 1, Downloaded from https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15296 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+ANNALS OF THE NEW YORK ACADEMY OF SCIENCES 87
+potential convergent evolution, yet the few observed adult differences
+between zebra finches and mice are not similar, indicating a lack of
+evolutionary conservation.
+In both endothermic groups—mammals and birds—we find minimal
+differences between cardiomyocytes in the compact and trabecular
+layers of adult hearts. It then seems unlikely that the convergent evo
+lution of compact-dominated chamber walls in mammals and birds
+reflects a pronounced functional difference of the myocardium of the
+compact layer relative to the myocardium of the trabecular layer.
+We propose that, if there is a performance difference associated
+with the ventricular architecture, the cellular phenotype of the car
+diomyocytes of the compact and trabecular myocardium is unlikely to
+contribute to this. However, this scenario does not eliminate the pos
+sibility that there is relevance to the compact-to-trabecular ratio for
+cardiac performance.
+Teleost fish belong to the vertebrate clade that exhibits the most
+variation in ventricular wall architectures.9,10 The nearly compact-free
+heart of the zebrafish and the compact-rich tuna represent extremes of
+this variation. Yet, we find there are no differences between the com
+pact and trabecular layers of either species. Therefore, the increased
+performance of the tuna ventricle may not have much to do with the
+relatively high proportion of the compact layer. In contrast, the almost
+mammal-like cardiac mass remains an obvious explanation for the
+capacity to deliver substantial stroke volumes at mammal-like blood
+pressures. The minimal differences observed between trabecular and
+compact myocardium, together with no consistent transcriptional dif
+ferences across species, suggest that the relationship between the
+properties of these two tissue types may be specific to the species
+or clade. This perspective has the implications that, first, compar
+ing the proportions of trabecular and compact myocardium across
+distantly related species may not yield meaningful insight, as these dif
+ferences are not conserved. Second, the proportion of trabecular and
+compact layers among distant species may reflect the outcomes of dif
+ferent selection pressures. Thus, understanding the interplay between
+trabecular and compact structures may require a context-specific
+approach.
+CONCLUSION
+The hearts of endothermic and ectothermic vertebrates possess signif
+icant physiological differences. Aspects of these differences between
+hearts have been attributed to the different chamber wall designs;
+however, how these differences in morphology might lead to a differ
+ence in performance (i.e., heart rate and blood pressure) has remained
+unclear. One way might be that the individual cardiomyocytes found in
+the trabecular and compact layers of the hearts are different, in which
+case the ratio of trabecular versus compact myocardium of the ven
+tricle impacts heart function. We observed that differences between
+transcriptomes of trabecular and compact myocardium of adult hearts
+of endo- and ectotherms were minimal, suggesting the differences in
+phenotype are also small, and are unlikely to contribute to trabecular
+compact ratio-dependent differences in heart performance. Other
+properties of trabecular or compact myocardium could play a role in
+possible performance differences, perhaps differences in mechanical
+properties emerge from the difference in tissue organization.
+AUTHOR CONTRIBUTIONS
+Conceptualization of the study was by O.J.M., V.M.C., and B.J.; acqui
+sition of data was by O.J.M., L.E.vdM., and B.J.; data analysis and
+interpretation were done by O.J.M., V.M.C., and B.J.; writing of the
+manuscript was done by O.J.M., L.E.vdM., V.M.C., and B.J.
+ACKNOWLEDGMENTS
+The zebra finch heart tissues were kindly provided to us by Katha
+rina Riebel and Peter Snelderwaard of the Institute of Biology Leiden,
+Leiden University, The Netherlands. Corrie Gier de Vries provided
+invaluable assistance in optimizing the GeoMx platform for our embry
+onic and adult heart tissue. Alexandra Giovou provided the sectioned
+adult mouse tissue and provided assistance in segmenting the heart on
+the GeoMX Digital Spatial Profiler. A. Ciezarek (Earlham Institute, Nor
+wich) kindly provided the raw counts for their tuna RNA-seq data. José
+M. Icardo kindly provided the image of the tuna heart.
+COMPETING INTERESTS
+The authors declare no competing interests.
+DATA AVAILABILITY STATEMENT
+The data for the mouse and zebra finch will be provided upon reason
+able request. The human embryo single-cell RNA-sequencing dataset24
+is available from https://www.spatialresearch.org. The adult human
+dataset25 is available on https://www.heartcellatlas.org. The zebrafish
+data15 is available from the GEO database, accession GSE87596. The
+raw reads for the tuna data58 are available under BioProject num
+ber PRJNA495053, at NCBI. The mapped count matrices were kindly
+provided to us by the author.
+ETHICAL APPROVAL
+This study complied with the guidelines of the Institutional Review
+Board of Amsterdam UMC.
+ORCID
+Bjarke Jensen https://orcid.org/0000-0002-7750-8035
+PEER REVIEW
+The peer review history for this article is available at: https://publons.
+com/publon/10.1111/nyas.15296
+REFERENCES
+1. Burggren, W. W., Christoffels, V. M., Crossley, D. A., Enok, S., Farrell, A. P., Hedrick, M. S., Hicks, J. W., Jensen, B., Moorman, A. F. M., Mueller, C. A., Skovgaard, N., Taylor, E. W., & Wang, T. (2014). Comparative cardiovascular physiology: Future trends, opportunities and challenges. Acta Physiologica, 210, 257–276. https://doi.org/10.1111/apha.12170 2. Lillywhite, H. B., Zippel, K. C., & Farrell, A. P. (1999). Resting and maximal heart rates in ectothermic vertebrates. Comparative Biochemistry and Physiology Part A: Molecular & Integrative
+17496632, 2025, 1, Downloaded from https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15296 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+88 ANNALS OF THE NEW YORK ACADEMY OF SCIENCES
+Physiology, 124, 369–382. https://doi.org/10.1016/s1095-643 3(99)00129-4 3. Hillman, S. S., & Hedrick, M. S. (2015). A meta-analysis of in vivo vertebrate cardiac performance: Implications for cardiovascular support in the evolution of endothermy. Journal of Experimental Biology, 218, 1143–1150. https://doi.org/10.1242/jeb.1183 72 4. Hillman, S. S., Hancock, T. V., & Hedrick, M. S. (2013). A comparative meta-analysis of maximal aerobic metabolism of vertebrates: Implications for respiratory and cardiovascular limits to gas exchange. Journal of Comparative Physiology B, 183, 167–179. https://doi.org/10. 1007/s00360-012-0688-1 5. Boukens, B. J. D., Kristensen, D. L., Filogonio, R., Carreira, L. B. T., Sartori, M. R., Abe, A. S., Currie, S., Joyce, W., Conner, J., Opthof, T., Crossley, D. A., Wang, T., & Jensen, B. (2019). The electrocardiogram of vertebrates: Evolutionary changes from ectothermy to endothermy. Progress in Biophysics &Molecular Biology, 144, 16–29. https://doi.org/ 10.1016/j.pbiomolbio.2018.08.005 6. Visoiu, I., Jensen, B., Rimbas, R., Mihaila-Baldea, S., Nicula, A. I., & Vinereanu, D. (2024). How the trabecular layer impacts on left ventricular function. Journal of Cardiology, 85, 17–27. https://doi.org/10. 1016/j.jjcc.2024.08.008 7. Brill, R. W., & Bushnell, P. G. (1991). Metabolic and cardiac scope of high energy demand teleosts, the tunas. Canadian Journal of Zoology, 69, 2002–2009. https://doi.org/10.1139/z91-279 8. Clark, T. D., Seymour, R. S., Christian, K., Wells, R. M. G., Baldwin, J., & Farrell, A. P. (2007). Changes in cardiac output during swimming and aquatic hypoxia in the air-breathing Pacific tarpon. Comparative Biochemistry and Physiology Part A: Molecular & Integrative Physiology, 148, 562–571. https://doi.org/10.1016/j.cbpa.2007.07.007 9. Icardo, J. M. (2017). Heart morphology and anatomy. In A. K. Gamperl, T. E. Gillis, A. P. Farrell, & C. J. Brauner (Eds.), Fish physiology (Vol. 36, pp. 1–54). Elsevier. https://doi.org/10.1016/bs.fp.2017.05.002 10. Farrell, A. P. (2023). Getting to the heart of anatomical diversity and phenotypic plasticity: Fish hearts are an optimal organ model in need of greater mechanistic study. Journal of Experimental Biology, 226, jeb245582. https://doi.org/10.1242/jeb.245582 11. Keen, A. N., Klaiman, J. M., Shiels, H. A., & Gillis, T. E. (2017). Temperature-induced cardiac remodelling in fish. Journal of Experimental Biology, 220, 147–160. https://doi.org/10.1242/jeb.128496 12. Koibuchi, N., & Chin, M. T. (2007). CHF1/Hey2 plays a pivotal role in left ventricular maturation through suppression of ectopic atrial gene expression. Circulation Research, 100, 850–855. https://doi.org/ 10.1161/01.RES.0000261693.13269.bf 13. Jensen, B., Boukens, B. J. D., Postma, A. V., Gunst, Q. D., Van Den Hoff, M. J. B., Moorman, A. F. M., Wang, T., & Christoffels, V. M. (2012). Identifying the evolutionary building blocks of the cardiac conduction system. PLoS ONE, 7, e44231. https://doi.org/10.1371/journal.pone. 0044231 14. Jensen, B., Boukens, B. J., Crossley, D. A., Conner, J., Mohan, R. A., Van Duijvenboden, K., Postma, A. V., Gloschat, C. R., Elsey, R. M., Sedmera, D., Efimov, I. R., & Christoffels, V. M. (2018). Specialized impulse conduction pathway in the alligator heart. eLife, 7, e32120. https://doi.org/ 10.7554/eLife.32120 15. Sánchez-Iranzo, H., Galardi-Castilla, M., Minguillón, C., Sanz-Morejón, A., González-Rosa, J. M., Felker, A., Ernst, A., Guzmán-Martínez, G., Mosimann, C., & Mercader, N. (2018). Tbx5a lineage tracing shows cardiomyocyte plasticity during zebrafish heart regeneration. Nature Communications, 9, 428. https://doi.org/10.1038/s41467-017-026506
+16. She, P., Zhang, H., Peng, X., Sun, J., Gao, B., Zhou, Y., Zhu, X., Hu, X., Lai, K. S., Wong, J., Zhou, B., Wang, L., & Zhong, T P. (2020). The Gridlock transcriptional repressor impedes vertebrate heart regeneration by restricting expression of lysine methyltransferase. Development, 147, dev190678. https://doi.org/10.1242/dev.190678
+17. Jensen, B., Moorman, A. F. M., & Wang, T. (2014). Structure and function of the hearts of lizards and snakes: Squamate hearts. Biological Reviews, 89, 302–336. https://doi.org/10.1111/brv.12056 18. Offerhaus, J. A., Snelderwaard, P. C., Algül, S., Faber, J. W., Riebel, K., Jensen, B., & Boukens, B. J. (2021). High heart rate associated early repolarization causes J-waves in both zebra finch and mouse. Physiological Reports, 9, e14775. https://doi.org/10.14814/phy2.14775 19. Prosheva, V., Kaseva, N., & Dernovoj, B. (2019). Morpho-functional characterization of the heart of Gallus gallus domesticus with special reference to the right muscular atrioventricular valve. Journal of Anatomy, 235, 794–802. https://doi.org/10.1111/joa.13020 20. Dobin, A., Davis, C. A., Schlesinger, F., Drenkow, J., Zaleski, C., Jha, S., Batut, P., Chaisson, M., & Gingeras, T. R. (2013). STAR: Ultrafast universal RNA-seq aligner. Bioinformatics, 29, 15–21. https://doi.org/10. 1093/bioinformatics/bts635 21. Love, M. I., Huber, W., & Anders, S. (2014). Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biology, 15, 550. https://doi.org/10.1186/s13059-014-0550-8 22. Hao, Y., Hao, S., Andersen-Nissen, E., Mauck, W. M., Zheng, S., Butler, A., Lee, M. J., Wilk, A. J., Darby, C., Zager, M., Hoffman, P., Stoeckius, M., Papalexi, E., Mimitou, E. P., Jain, J., Srivastava, A., Stuart, T., Fleming, L M., Yeung, B., . . . Satija, R. (2021). Integrated analysis of multimodal single-cell data. Cell, 184, 3573–3587.e29. https://doi.org/10.1016/j. cell.2021.04.048 23. Hill, M. C., Kadow, Z. A., Li, L., Tran, T. T., Wythe, J. D., & Martin, J. F. (2019). A cellular atlas of Pitx2- dependent cardiac development. Development, 146, dev180398. https://doi.org/10.1242/dev.180398 24. Asp, M., Giacomello, S., Larsson, L., Wu, C., Fürth, D., Qian, X., Wärdell, E., Custodio, J., Reimegård, J., Salmén, F., Österholm, C., Ståhl, P L., Sundström, E., Åkesson, E., Bergmann, O., Bienko, M., Månsson-Broberg, A., Nilsson, M., Sylvén, C., & Lundeberg, J. (2019). A spatiotemporal organ-wide gene expression and cell atlas of the developing human heart. Cell, 179, 1647–1660.e19. https://doi.org/ 10.1016/j.cell.2019.11.025 25. Kanemaru, K., Cranley, J., Muraro, D., Miranda, A. M. A., Ho, S. Y., Wilbrey-Clark, A., Patrick Pett, J., Polanski, K., Richardson, L., Litvinukova, M., Kumasaka, N., Qin, Y., Jablonska, Z., Semprich, C. I., Mach, L., Dabrowska, M., Richoz, N., Bolt, L., Mamanova, L., . . . Teichmann, S. A. (2023). Spatially resolved multiomics of human cardiac niches. Nature, 619, 801–810. https://doi.org/10.1038/s41586023-06311-1 26. Galow, A. M., Wolfien, M., Müller, P., Bartsch, M., Brunner, R. M., Hoeflich, A., Wolkenhauer, O., David, R., & Goldammer, T. (2020). Integrative cluster analysis of whole hearts reveals proliferative cardiomyocytes in adult mice. Cells, 9, 1144. https://doi.org/10.3390/ cells9051144 27. Korsunsky, I., Millard, N., Fan, J., Slowikowski, K., Zhang, F., Wei, K., Baglaenko, Y., Brenner, M., Loh, P.-R., & Raychaudhuri, S. (2019). Fast, sensitive and accurate integration of single-cell data with Harmony. Nature Methods, 16, 1289–1296. https://doi.org/10.1038/s41592019-0619-0 28. Christoffels, V. M., Habets, P. E. M. H., Franco, D., Campione, M., De Jong, F., Lamers, W. H., Bao, Z. Z., Palmer, S., Biben, C., Harvey, R. P., & Moorman, A F. M. (2000). Chamber formation and morphogenesis in the developing mammalian heart. Developmental Biology, 223, 266–278. https://doi.org/10.1006/dbio.2000.9753 29. Hua, L. L., Vedantham, V., Barnes, R M., Hu, J., Robinson, A. S., Bressan, M., Srivastava, D., & Black, B L. (2014). Specification of the mouse cardiac conduction system in the absence of endothelin signaling. Developmental Biology, 393, 245–254. https://doi.org/10.1016/j.ydbio. 2014.07.008 30. Li, Y., Tian, X., Zhao, H., He, L., Zhang, S., Huang, X., Zhang, H., Miquerol, L., & Zhou, B. (2018). Genetic targeting of Purkinje fibres by Sema3aCreERT2. Science Reports, 8, 2382. https://doi.org/10.1038/s41598018-20829-9
+17496632, 2025, 1, Downloaded from https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15296 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+ANNALS OF THE NEW YORK ACADEMY OF SCIENCES 89
+31. Menendez-Montes, I., Escobar, B., Palacios, B., Gómez, M. J., IzquierdoGarcia, J. L., Flores, L., Jiménez-Borreguero, L. J., Aragones, J., RuizCabello, J., Torres, M., & Martin-Puig, S. (2016). Myocardial VHL-HIF signaling controls an embryonic metabolic switch essential for cardiac maturation. Developmental Cell, 39, 724–739. https://doi.org/10.1016/ j.devcel.2016.11.012 32. Remme, C. A., Verkerk, A. O., Hoogaars, W. M. H., Aanhaanen, W. T. J., Scicluna, B. P., Annink, C., Den Hoff, M. J. B., Wilde, A. A. M., Veen, T. A. B., Veldkamp, M. W., Bakker, J. M. T., Christoffels, V. M., & Bezzina, C. R. (2009). The cardiac sodium channel displays differential distribution in the conduction system and transmural heterogeneity in the murine ventricular myocardium. Basic Research in Cardiology, 104, 511–522. https://doi.org/10.1007/s00395-009-0012-8 33. Rhee, S., Chung, J. I., King, D. A., D’amato, G., Paik, D. T., Duan, A., Chang, A., Nagelberg, D., Sharma, B., Jeong, Y., Diehn, M., Wu, J. C., Morrison, A. J., & Red-Horse, K. (2018). Endothelial deletion of Ino80 disrupts coronary angiogenesis and causes congenital heart disease. Nature Communications, 9, 368. https://doi.org/10.1038/s41467-01702796-3 34. Sergeeva, I. A., Hooijkaas, I. B., Ruijter, J. M., Van Der Made, I., De Groot, N. E., Van De Werken, H. J. G., Creemers, E. E., & Christoffels, V. M. (2016). Identification of a regulatory domain controlling the NppaNppb gene cluster during heart development and stress. Development, 143(12), 132019. https://doi.org/10.1242/dev.132019 35. Jensen, B., Agger, P., De Boer, B. A., Oostra, R. J., Pedersen, M., Van Der Wal, A. C., Nils Planken, R., & Moorman, A. F. M. (2016). The hypertrabeculated (noncompacted) left ventricle is different from the ventricle of embryos and ectothermic vertebrates. Biochimica et Biophysica Acta (BBA) - Molecular Cell Research, 1863, 1696–1706. https:// doi.org/10.1016/j.bbamcr.2015.10.018 36. Wu, T., Liang, Z., Zhang, Z., Liu, C., Zhang, L., Gu, Y., Peterson, K. L., Evans, S. M., Fu, X. D., & Chen, J. (2022). PRDM16 is a compact myocardium-enriched transcription factor required to maintain compact myocardial cardiomyocyte identity in left ventricle. Circulation, 145, 586–602. https://doi.org/10.1161/CIRCULATIONAHA.121. 056666 37. Sedmera, D., Reckova, M., Dealmeida, A., Coppen, S. R., Kubalak, S. W., Gourdie, R. G., & Thompson, R. P. (2003). Spatiotemporal pattern of commitment to slowed proliferation in the embryonic mouse heart indicates progressive differentiation of the cardiac conduction system. Anatomical Record. Part A, Discoveries in Molecular, Cellular, and Evolutionary Biology, 274A, 773–777. https://doi.org/10.1002/ar.a. 10085 38. Zammit, P. S., Kelly, R. G., Franco, D., Brown, N., Moorman, A. F., & Buckingham, M. E. (2000). Suppression of atrial myosin gene expression occurs independently in the left and right ventricles of the developing mouse heart. Developmental Dynamics, 217, 75–85. https://doi.org/10.1002/(SICI)1097-0177(200001)217:1⟨75::AIDDVDY7⟩3.0.CO;2-L 39. Zeller, R., Bloch, K. D., Williams, B. S., Arceci, R. J., & Seidman, C. E. (1987). Localized expression of the atrial natriuretic factor gene during cardiac embryogenesis. Genes & Development, 1, 693–698. https:// doi.org/10.1101/gad.1.7.693 40. Visel, A. (2004). GenePaint.org: An atlas of gene expression patterns in the mouse embryo. Nucleic Acids Research, 32, 552D–556. https://doi. org/10.1093/nar/gkh029 41. Jensen, B., Chang, Y. H., Bamforth, S D., Mohun, T., Sedmera, D., Bartos, M., & Anderson, R. H. (2024). The changing morphology of the ventricular walls of mouse and human with increasing gestation. Journal of Anatomy, 244, 1040–1053. https://doi.org/10.1111/joa.14017 42. Costantini, D. L., Arruda, E. P., Agarwal, P., Kim, K. H., Zhu, Y., Zhu, W., Lebel, M., Cheng, C. W., Park, C. Y., Pierce, S. A., Guerchicoff, A., Pollevick, G. D., Chan, T. Y., Kabir, M. G, Cheng, S. H., Husain, M., Antzelevitch, C., Srivastava, D., Gross, G. J., . . . Bruneau, B. G. (2005). The homeodomain transcription factor Irx5 establishes the mouse car
+diac ventricular repolarization gradient. Cell, 123, 347–358. https:// doi.org/10.1016/j.cell.2005.08.004 43. Kim, K. H., Oh, Y., Liu, J., Dababneh, S., Xia, Y., Kim, R. Y., Kim, D. K., Ban, K., Husain, M., Hui, C. C., & Backx, P. H. (2022). Irx5 and transient outward K+ currents contribute to transmural contractile heterogeneities in the mouse ventricle. American Journal of Physiology-Heart and Circulatory Physiology, 322, H725–H741. https://doi.org/10.1152/ajpheart. 00572.2021 44. Miquerol, L., Moreno-Rascon, N., Beyer, S., Dupays, L., Meilhac, S. M., Buckingham, M. E., Franco, D., & Kelly, R. G. (2010). Biphasic development of the mammalian ventricular conduction system. Circulation Research, 107, 153–161. https://doi.org/10.1161/CIRCRESAHA.110. 218156 45. Sylvén, C., Wärdell, E., Månsson-Broberg, A., Cingolani, E., Ampatzis, K., Larsson, L., Björklund, Å., & Giacomello, S. (2023). High cardiomyocyte diversity in human early prenatal heart development. Iscience, 26, 105857. https://doi.org/10.1016/j.isci.2022.105857 46. Chaffin, M., Papangeli, I., Simonson, B., Akkad, A. D., Hill, M. C., Arduini, A., Fleming, S. J., Melanson, M., Hayat, S., Kost-Alimova, M., Atwa, O., Ye, J., Bedi, K. C., Nahrendorf, M., Kaushik, V. K., Stegmann, C. M., Margulies, K. B., Tucker, N. R., & Ellinor, P. T. (2022). Single-nucleus profiling of human dilated and hypertrophic cardiomyopathy. Nature, 608, 174–180. https://doi.org/10.1038/s41586-022-04817-8 47. Tucker, N. R., Chaffin, M., Fleming, S. J., Hall, A. W., Parsons, V. A., Bedi, K. C., Akkad, A. D., Herndon, C. N., Arduini, A., Papangeli, I., Roselli, C., Aguet, F., Choi, S. H., Ardlie, K. G., Babadi, M., Margulies, K. B., Stegmann, C. M., & Ellinor, P. T. (2020). Transcriptional and cellular diversity of the human heart. Circulation, 142, 466–482. https://doi. org/10.1161/CIRCULATIONAHA.119.045401 48. Hocker, J. D., Poirion, O. B., Zhu, F., Buchanan, J., Zhang, K., Chiou, J., Wang, T. M., Zhang, Q., Hou, X., Li, Y. E., Zhang, Y., Farah, E. N., Wang, A., Mcculloch, A. D., Gaulton, K. J., Ren, B., Chi, N. C., & Preissl, S. (2021). Cardiac cell type–specific gene regulatory programs and disease risk association. Science Advances, 7, eabf1444. https://doi.org/10. 1126/sciadv.abf1444 49. Koenig, A L., Shchukina, I., Amrute, J., Andhey, P. S., Zaitsev, K., Lai, L., Bajpai, G., Bredemeyer, A., Smith, G., Jones, C., Terrebonne, E., Rentschler, S. L., Artyomov, M. N., & Lavine, K. J. (2022). Singlecell transcriptomics reveals cell-type-specific diversification in human heart failure. Nature Cardiovascular Research, 1, 263–280. https://doi. org/10.1038/s44161-022-00028-6 50. Reichart, D., Lindberg, E. L., Maatz, H., Miranda, A. M. A., Viveiros, A., Shvetsov, N., Gärtner, A., Nadelmann, E. R., Lee, M., Kanemaru, K., RuizOrera, J., Strohmenger, V., Delaughter, D. M., Patone, G., Zhang, H., Woehler, A., Lippert, C., Kim, Y., Adami, E., . . . Seidman, C. E. (2022). Pathogenic variants damage cell composition and single cell transcription in cardiomyopathies. Science, 377, eabo1984. https://doi.org/10. 1126/science.abo1984 51. Rossi, A C., Mammucari, C., Argentini, C., Reggiani, C., & Schiaffino, S. (2010). Two novel/ancient myosins in mammalian skeletal muscles: MYH14/7b and MYH15 are expressed in extraocular muscles and muscle spindles: MYH14/7b and MYH15 expression in mammalian skeletal muscles. Journal of Physiology, 588, 353–364. https://doi.org/ 10.1113/jphysiol.2009.181008 52. Somi, S., Klein, A T. J., Houweling, A C., Ruijter, J. M., Buffing, A. A. M., Moorman, A. F. M., & Van Den Hoff, M. J. B. (2006). Atrial and ventricular myosin heavy-chain expression in the developing chicken heart: Strengths and limitations of non-radioactive in situ hybridization. Journal of Histochemistry and Cytochemistry, 54, 649–664. https://doi.org/ 10.1369/jhc.5A6846.2006 53. Houweling, A. C., Somi, S., Massink, M. P. G., Groenen, M. A., Moorman, A. F. M., & Christoffels, V. M. (2005). Comparative analysis of the natriuretic peptide precursor gene cluster in vertebrates reveals loss of ANF and retention of CNP-3 in chicken. Developmental Dynamics, 233, 1076–1082. https://doi.org/10.1002/dvdy.20423
+17496632, 2025, 1, Downloaded from https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15296 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+90 ANNALS OF THE NEW YORK ACADEMY OF SCIENCES
+54. Kokubo, H., Tomita-Miyagawa, S., Hamada, Y., & Saga, Y. (2007). Hesr1 and Hesr2 regulate atrioventricular boundary formation in the developing heart through the repression of Tbx2. Development, 134, 747–755. https://doi.org/10.1242/dev.02777 55. Sedmera, D., Pexieder, T., Rychterova, V., Hu, N., & Clark, E. B. (1999). Remodeling of chick embryonic ventricular myoarchitecture under experimentally changed loading conditions. Anatomical Record, 254, 238–252. https://doi.org/10.1002/(SICI)1097-0185(19990201) 254:2⟨238::AID-AR10⟩3.0.CO;2-V 56. Freedom, R. M., Yoo, S. J., Perrin, D., Taylor, G., Petersen, S., & Anderson, R. H. (2005). The morphological spectrum of ventricular noncompaction. Cardiology in the Young, 15, 345–364. https://doi.org/10.1017/ S1047951105000752 57. Santer, R. M., & Walker, M. G. (1980). Morphological studies on the ventricle of teleost and elasmobranch hearts. Journal of Zoology, 190, 259–272. https://doi.org/10.1111/j.1469-7998.1980.tb07771.x 58. Ciezarek, A., Gardner, L., Savolainen, V., & Block, B. (2020). Skeletal muscle and cardiac transcriptomics of a regionally endothermic fish, the Pacific bluefin tuna, Thunnus orientalis. BMC Genomics, 21, 642. https://doi.org/10.1186/s12864-020-07058-z 59. Gafranek, J. T., D’aniello, E., Ravisankar, P., Thakkar, K., Vagnozzi, R J., Lim, H. W., Salomonis, N., & Waxman, J. S. (2023). Sinus venosus adaptation models prolonged cardiovascular disease and reveals insights into evolutionary transitions of the vertebrate heart. Nature Communications, 14, 5509. https://doi.org/10.1038/s41467-023-41184y
+60. Kohmoto, T., Argenziano, M., Yamamoto, N., Vliet, K. A., Gu, A., Derosa, C. M., Fisher, P. E., Spotnitz, H. M., Burkhoff, D., & Smith, C. R. (1997). Assessment of transmyocardial perfusion in alligator hearts. Circulation, 95, 1585–1591. https://doi.org/10.1161/01.cir.95.6.1585 61. Hagensen, M. K., Abe, A. S., Falk, E., & Wang, T. (2008). Physiological importance of the coronary arterial blood supply to the rattlesnake heart. Journal of Experimental Biology, 211, 3588–3593. https://doi.org/ 10.1242/jeb.024489 62. Lochner, J. E., Badwey, J. A., Horn, W., & Karnovsky, M. L. (1986). all-trans-Retinal stimulates superoxide release and phospholipase C activity in neutrophils without significantly blocking protein kinase C. Proceedings of the National Academy of Sciences, 83, 7673–7677. https:// doi.org/10.1073/pnas.83.20.7673 63. Finsterer, J., Stöllberger, C., & Towbin, J. A. (2017). Left ventricular noncompaction cardiomyopathy: Cardiac, neuromuscular, and genetic factors. Nature Reviews Cardiology, 14, 224–237. https://doi.org/10. 1038/nrcardio.2016.207 64. Petersen, S. E., Jensen, B., Aung, N., Friedrich, M. G., Mcmahon, C. J., Mohiddin, S. A., Pignatelli, R. H., Ricci, F., Anderson, R. H., & Bluemke, D. A. (2023). Excessive trabeculation of the left ventricle. JACC: Cardiovascular Imaging, 16, 408–425. https://doi.org/10.1016/j.jcmg.2022.12. 026 65. Faber, J. W., Wüst, R. C. I., Dierx, I., Hummelink, J. A., Kuster, D. W. D., Nollet, E., Moorman, A. F. M., Sánchez-Quintana, D., Van Der Wal, A. C., Christoffels, V. M., & Jensen, B. (2022). Equal force generation potential of trabecular and compact wall ventricular cardiomyocytes. Iscience, 25, 105393. https://doi.org/10.1016/j.isci.2022.105393 66. Roberts, J. C., Carnevale, C., Gamperl, A. K., & Syme, D. A. (2021). Effects of hypoxic acclimation on contractile properties of the
+spongy and compact ventricular myocardium of steelhead trout (Oncorhynchus mykiss). Journal of Comparative Physiology B, 191, 99111. https://doi.org/10.1007/s00360-020-01318-w 67. Taegtmeyer, H., Sen, S., & Vela, D. (2010). Return to the fetal gene program: A suggested metabolic link to gene expression in the heart. Annals of the New York Academy of Sciences, 1188, 191–198. https://doi. org/10.1111/j.1749-6632.2009.05100.x 68. Bruneau, B. G., Nemer, G., Schmitt, J. P., Charron, F., Robitaille, L., Caron, S., Conner, D. A., Gessler, M., Nemer, M., Seidman, C. E., & Seidman, J. G. (2001). A murine model of Holt−Oram syndrome defines roles of the T-box transcription factor Tbx5 in cardiogenesis and disease. Cell, 106, 709–721. https://doi.org/10.1016/S0092-8674(01) 00493-7 69. Singh, M. K., Christoffels, V. M., Dias, J. M., Trowe, M. O., Petry, M., Schuster-Gossler, K., Bürger, A., Ericson, J., & Kispert, A. (2005). Tbx20 is essential for cardiac chamber differentiation and repression of Tbx2. Development, 132, 2697–2707. https://doi.org/10.1242/dev.01854 70. Shen, T., Aneas, I., Sakabe, N., Dirschinger, R. J., Wang, G., Smemo, S., Westlund, J. M., Cheng, H., Dalton, N., Gu, Y., Boogerd, C. J., Cai, C. L., Peterson, K., Chen, J., Nobrega, M. A., & Evans, S. M. (2011). Tbx20 regulates a genetic program essential to adult mouse cardiomyocyte function. Journal of Clinical Investigation, 121, 4640–4654. https://doi. org/10.1172/JCI59472 71. Nadadur, R. D., Broman, M. T., Boukens, B., Mazurek, S. R., Yang, X., Van Den Boogaard, M., Bekeny, J., Gadek, M., Ward, T., Zhang, M., Qiao, Y., Martin, J. F., Seidman, C. E., Seidman, J., Christoffels, V., Efimov, I R., Mcnally, E. M., Weber, C. R., & Moskowitz, I. P. (2016). Pitx2 modulates a Tbx5-dependent gene regulatory network to maintain atrial rhythm. Science Translational Medicine, 8, 354ra115. https://doi.org/10. 1126/scitranslmed.aaf4891 72. Ostrom, J. H. (1973). The ancestry of birds. Nature, 242, 136–136. https://doi.org/10.1038/242136a0 73. Houweling, A. C., Somi, S., Van Den Hoff, M. J. B., Moorman, A. F. M., & Christoffels, V. M. (2002). Developmental pattern of ANF gene expression reveals a strict localization of cardiac chamber formation in chicken. Anatomical Record, 266, 93–102. https://doi.org/10.1002/ ar.10042 74. Somi, S., Buffing, A. A. M., Moorman, A. F. M., & Van Den Hoff, M. J. B. (2004). Expression of bone morphogenetic protein-10 mRNA during chicken heart development. Anatomical Record, 279A, 579–582. https://doi.org/10.1002/ar.a.20052 75. Tessadori, F., Van Weerd, J. H., Burkhard, S. B., Verkerk, A. O., De Pater, E., Boukens, B. J., Vink, A., Christoffels, V. M., & Bakkers, J. (2012). Identification and functional characterization of cardiac pacemaker cells in zebrafish. PLoS One, 7, e47644. https://doi.org/10.1371/journal.pone. 0047644
+How to cite this article: Mulleners, O. J., van der Maarel, L. E.,
+Christoffels, V. M., & Jensen, B. (2025). The trabecular and
+compact myocardium of adult vertebrate ventricles are
+transcriptionally similar despite morphological differences.
+Ann NY Acad Sci., 1545, 76–90.
+https://doi.org/10.1111/nyas.15296
+17496632, 2025, 1, Downloaded from https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15296 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License

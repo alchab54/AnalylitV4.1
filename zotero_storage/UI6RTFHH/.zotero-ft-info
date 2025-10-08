@@ -1,0 +1,16 @@
+Title:          The Promise of Explainable AI in Digital Health for Precision Medicine: A Systematic Review
+Subject:        This review synthesizes the literature on explaining machine-learning models for digital health data in precision medicine. As healthcare increasingly tailors treatments to individual characteristics, the integration of artificial intelligence with digital health data becomes crucial. Leveraging a topic-modeling approach, this paper distills the key themes of 27 journal articles. We included peer-reviewed journal articles written in English, with no time constraints on the search. A Google Scholar search, conducted up to 19 September 2023, yielded 27 journal articles. Through a topic-modeling approach, the identified topics encompassed optimizing patient healthcare through data-driven medicine, predictive modeling with data and algorithms, predicting diseases with deep learning of biomedical data, and machine learning in medicine. This review delves into specific applications of explainable artificial intelligence, emphasizing its role in fostering transparency, accountability, and trust within the healthcare domain. Our review highlights the necessity for further development and validation of explanation methods to advance precision healthcare delivery.
+Keywords:       digital health; explainable artificial intelligence; precision medicine; machine learning
+Author:         Ben Allen
+Creator:        LaTeX with hyperref
+Producer:       pdfTeX-1.40.25
+CreationDate:   03/01/24 15:09:43
+ModDate:        03/01/24 08:12:30
+Tagged:         no
+Form:           none
+Pages:          13
+Encrypted:      no
+Page size:      595.276 x 841.89 pts (A4) (rotated 0 degrees)
+File size:      870127 bytes
+Optimized:      no
+PDF version:    1.7

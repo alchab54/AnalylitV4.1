@@ -1,0 +1,79 @@
+AbonnerArchive
+ende
+ 
+
+DOSSIER: LA RATIONALISATION DES ÉMOTIONS
+
+L’algorithme empathique
+
+L’intelligence artificielle doit intégrer l’affect, décoder nos sentiments et anticiper les réactions émotionnelles que les machines ne manquent pas de susciter en nous.
+
+Claudia Hoffmann, 7 mars 2019
+Bluesky
+LinkedIn
+Partager
+
+Pour beaucoup de gens, le robot Sophia crée un malaise. Et confirme la théorie de la «vallée de l'étrange» (uncanny valley): l'acceptation sociale de robots anthropomorphiques chute face à des machines qui nous ressemblent trop, ou pas assez. | Image: Keystone/AP Photo/Niranjan Shrestha
+
+Insultez-vous votre ordinateur lorsqu’il bloque? Vous surprenez-vous à sourire lorsque l’assistance vocale de votre portable vous donne des réponses absurdes? Souhaitez-vous «Bonne nuit!» à votre tondeuse à gazon automatique quand elle va se recharger? Vous n’êtes pas le seul dans ce cas. «Nous avons une tendance naturelle à considérer les machines comme des êtres humains», souligne Martina Mara, professeure de psychologie des robots à l’Université de Linz, en Autriche. Notre cerveau se concentre en effet sur les interactions sociales et réagit de manière involontaire aux stimuli qui leur sont associé. Par exemple le mouvement: une tondeuse robotisée s’approche et nous pensons déjà qu’elle veut entrer en contact avec nous. «Il faut très peu de choses pour que nous ayons l’impression que les machines possèdent des intentions et des sentiments», relève la chercheuse.
+
+Le psy virtuel
+
+Les machines suscitent aussi des émotions alors même qu’on sait pertinemment qu’elles ne sont pas vivantes, confirme la psychologue Elisa Mekler, directrice du pôle de recherche sur les interaction humains-machines à l’Université de Bâle. Elle étudie notamment les relations que des personnes nouent avec des personnages de jeux vidéo: «Les sentiments décrits sont parfois étonnamment intenses.» Ils sont comparables à ceux que l’on peut avoir à l’égard d’êtres humains: de la sympathie et la fierté à la peur et la culpabilité, lorsque quelque chose de grave leur arrive.
+
+Positives ou négatives, nos expériences émotionnelles restent très bien ancrées dans la mémoire. Un client sera fâché et frustré s’il ne comprend pas bien comment procéder pour acheter un objet en ligne ou qu’il peine à se faire comprendre par un robot assistant. «Les designers et les fabricants ont tout intérêt à créer des produits qui suscitent des sentiments positifs», résume Elisa Mekler.
+
+«Nous avons une tendance naturelle à considérer les machines comme des êtres humains.»
+Martina Mara
+
+C’est l’un des objectifs de l’informatique affective, qui doit permettre à l’intelligence artificielle d’apprendre à déchiffrer les émotions humaines et à réagir à cellesci de façon appropriée – et même à simuler des sentiments. Des algorithmes analysent l’expression du visage, la tonalité de la voix ou encore la température et la conductance de la peau. D’autres apprennent à reconnaître les émotions dans des textes (voir «Analyse de texte»).
+
+Les applications sont nombreuses. Le chatbot Karim de la firme X2AI veut offrir un soutien thérapeutique aux réfugiés syriens souffrant de stress post-traumatique. Des systèmes basés sur des caméras et des capteurs sont actuellement développés pour détecter la fatigue ou l’irritation d’un automobiliste et lui suggérer de faire une pause. Et des robots soignants sensibles aux émotions devront un jour pouvoir déceler si un patient est angoissé ou énervé et adapter leur comportement en conséquence.
+
+L’ordinateur se moque de nous
+
+Un problème pour la reconnaissance des émotions est l’importance jouée par le contexte: difficile de faire la différence entre un sourire de satisfaction ou d’embarras. «Des malentendus surviennent facilement entre l’homme et la machine, note Mireille Bétrancourt, professeure en technologies de l'information et processus d’apprentissage à l’Université de Genève. Et des réactions inadéquates conduisent à une perte de confiance.»
+
+Dans le cadre du projet Eatmint, la chercheuse étudie comment les émotions sont décodées lors d’un travail d’équipe basé sur des collaborations médiatisées par ordinateur et comment elles peuvent être transmises par les utilisateurs. L’ordinateur a adressé une réponse totalement inappropriée («Comme c’est amusant!») à un participant qui était frustré de ne pas parvenir à exécuter une tâche. Irrité, ce dernier a interrompu la communication. C’est pourquoi les systèmes sensibles aux émotions doivent tirer des conclusions parfaitement correctes. Pour la chercheuse, il vaut mieux interroger directement les utilisateurs sur leurs sentiments plutôt que de tenter de les déduire de façon indirecte à partir de données – et de risquer de se tromper.
+
+Analyse de texte
+Nos contributions sur Facebook et nos commentaires sur des sites de news communiquent très souvent nos points de vue et nos sentiments. Extraire ces informations de façon automatique peut s’avérer très utile. Il est possible d’établir des prévisions sur l’issue d’élections en se basant sur l’analyse de tweets, ou de déterminer si des clients ont une attitude positive ou négative à l’égard d’une marque. Certains algorithmes estiment les risques qu’une personne soit dépressive en se fondant sur le choix des mots qu’elle emploie sur Facebook.
+
+La plupart de ces outils d’analyse se basent soit sur des listes de mots établies manuellement signalant des émotions particulières, soit sur l’apprentissage automatique. Ils s’avèrent souvent assez précis lorsqu’il s’agit uniquement de faire la différence entre des sentiments positifs et négatifs. Le décodage plus raffiné d’émotions telles que la joie, la colère ou la tristesse est plus difficile, notamment si elles ne sont exprimées que de façon implicite. Il est très difficile de classer les mots ambigus, de reconnaître l’ironie ou de tenir compte du contexte. Pour tenter d’y arriver, certaines recherches misent sur la capacité d’apprentissage étendue des réseaux neuronaux profonds, une forme sophistiquée d’apprentissage automatique qui permet d’aborder des problèmes plus complexes.
+
+Interpréter des emoticons
+
+Par exemple, l’équipe de Pearl Pu à l’EPFL a interprété les sentiments exprimés dans plus de 50 000 Tweets postés lors des Jeux Olympiques de Londres en 2012. L’algorithme développé suit la méthode du «distant learning »: il analyse les indices présents dans les textes eux-mêmes, par exemple les emoticons, avant de généraliser et de pouvoir interpréter des Tweets ne comprenant que du texte (voir exemples ci-dessous). Parfois avec un certain succès.
+
+La confiance est cruciale pour que les gens fassent appel aux technologies intelligentes. Etonnamment, il arrive qu’une machine suscite davantage de confiance qu’un être humain. Cela peut être précieux dans un cadre thérapeutique, comme l’a montré une étude américaine sur d’anciens combattants. Lorsque les sujets ont appris qu’ils discutaient en fait avec une thérapeute virtuelle pilotée par un ordinateur, ils ont eu plus de facilité à évoquer leurs souvenirs honteux que lorsqu’ils imaginaient converser avec une vraie personne. La machine a réduit leur crainte de se voir jugés moralement.
+
+C’est là que se cache un nouveau risque, note Elisa Mekler: «Les systèmes qui interagissent de manière humaine peuvent facilement nous soutirer des informations très personnelles.» Cela soulève des questions de protection de la personnalité ainsi que des données. Il en va de même pour les technologies qui reconnaissent automatiquement les émotions. Jusqu’à quel point les données récoltées par des véhicules prenant en compte nos émotions ou des logiciels d’analyse vocale sont-elles sécurisées? Qui peut y accéder? Une étude de l’Université de Siegen, en Allemagne, révèle que les utilisateurs potentiels souhaitent que leurs données soient enregistrées de manière sûre et ne soient pas transmises à des tiers. Ils ne seraient prêts à utiliser des technologies sensibles aux émotions qu’à cette condition.
+
+CC BY-NC-ND
+Bluesky
+LinkedIn
+Partager
+DOSSIER: LA RATIONALISATION DES ÉMOTIONS
+Sur les traces des émotions
+Science: le coeur autant que la tête
+«Beaucoup d’affects sont déterminés par la morale et la socialisation»
+La science, une affaire d’émotions
+Portfolio: les émotions dans la ville
+S'abonner à Horizons
+ Abonner
+S’abonner à la newsletter
+Lire aussi
+
+Des algorithmes démasquent mieux le blanchiment d’argent 
+
+Une fois l’algorithme passé dessus, le tour est joué 
+
+Un algorithme prédit le succès des publications 
+
+Univers 3D instantanés grâce aux algorithmes malins 
+
+A propos de nous
+Rédaction
+Impressum
+Disclaimer
+Contact

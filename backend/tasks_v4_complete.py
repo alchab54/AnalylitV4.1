@@ -14,6 +14,7 @@ import re
 from functools import wraps
 from pathlib import Path
 from typing import Dict, List, Optional, Any
+from pypdf import PdfReader 
 
 # --- CORRECTIF DE COMPATIBILITÉ PYZOTERO / FEEDPARSER ---
 # pyzotero tente de patcher une méthode interne de feedparser qui n'existe plus.
@@ -28,7 +29,7 @@ from scipy import stats
 from sklearn.metrics import cohen_kappa_score
 
 import chromadb
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer, util
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -50,6 +51,7 @@ from sqlalchemy.orm import Session # Explicitly import Session for type hinting 
 from .atn_scoring_engine_v21 import ATNScoringEngineV22
 
 # --- Importer les helpers/utilitaires applicatifs ---
+
 from utils.fetchers import db_manager, fetch_unpaywall_pdf_url, fetch_article_details
 from utils.ai_processors import call_ollama_api
 from utils.file_handlers import sanitize_filename, extract_text_from_pdf
@@ -66,6 +68,7 @@ from utils.prompt_templates import (
     get_synthesis_prompt_template,
     get_rag_chat_prompt_template,
     get_effective_prompt_template,
+
 ) # Import de la fonction centralisée
 from utils.logging_config import setup_logging
 
@@ -98,6 +101,7 @@ engine = create_engine(
     pool_pre_ping=True,
     pool_recycle=1800,  # Recycle connections every 30 minutes
     connect_args={"options": f"-csearch_path={SCHEMA},public"} 
+
 )
 SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
@@ -105,6 +109,7 @@ config = get_config()
 redis_conn = Redis.from_url(config.REDIS_URL)
 analysis_queue = Queue('analysis_queue', connection=redis_conn, job_timeout=600)
 # --- Embeddings / Vector store (RAG) ---
+
 EMBEDDING_MODEL_NAME = getattr(config, "EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 EMBED_BATCH = getattr(config, "EMBED_BATCH", 32)
 MIN_CHUNK_LEN = getattr(config, "MIN_CHUNK_LEN", 250)
@@ -114,10 +119,12 @@ CHUNK_OVERLAP = getattr(config, "CHUNK_OVERLAP", 200)
 
 # Charge un modèle d'embedding localement
 try:
+
     embedding_model = SentenceTransformer(EMBEDDING_MODEL_NAME)
 except Exception as e:
     logger.error(f"Erreur chargement du modèle d'embedding '{EMBEDDING_MODEL_NAME}': {e}")
     embedding_model = None
+
 
 try:
     from backend.atn_scoring_engine_v21 import ATNScoringEngineV22
@@ -126,6 +133,7 @@ try:
 except ImportError as e:
     logger.warning(f"⚠️ Algorithme ATN non disponible: {e}")
     ATN_SCORING_AVAILABLE = False
+
 # ================================================================ 
 # === DÉCORATEUR DE GESTION DE SESSION DB
 # ================================================================ 
@@ -158,6 +166,7 @@ def with_db_session(func):
             session.close() # Toujours fermer la session pour libérer la connexion.
     return wrapper
 
+
 # ================================================================ 
 # === FONCTIONS UTILITAIRES DB-SAFE (SQLAlchemy)
 # ================================================================ 
@@ -165,6 +174,7 @@ def update_project_status(session, project_id: str, status: str, result: dict = 
                           graph: dict = None, prisma_path: str = None, analysis_result: dict = None,
                           analysis_plot_path: str = None):
     """Met à jour le statut et/ou champs résultat d'un projet."""
+
     now_iso = datetime.now().isoformat()
     
     set_clauses = ["status = :status", "updated_at = :ts"]
@@ -192,11 +202,13 @@ def update_project_status(session, project_id: str, status: str, result: dict = 
     stmt = f"UPDATE projects SET {', '.join(set_clauses)} WHERE id = :pid"
     session.execute(text(stmt), params)
 
+
 def log_processing_status(session, project_id: str, article_id: str, status: str, details: str):
     """Enregistre un événement de traitement dans processing_log."""
     
     # Nous devons générer manuellement l'UUID car nous utilisons du SQL brut.
     log_id = str(uuid.uuid4()) 
+
     
     session.execute(text("""
         INSERT INTO processing_log (id, project_id, pmid, task_name, status, details, \"timestamp\")
@@ -211,9 +223,11 @@ def log_processing_status(session, project_id: str, article_id: str, status: str
         "ts": datetime.now()
     })
     
+
 def increment_processed_count(session, project_id: str):
     """Incrémente processed_count du projet."""
     session.execute(text("UPDATE projects SET processed_count = processed_count + 1 WHERE id = :id"), {"id": project_id})
+
 
 def update_project_timing(session, project_id: str, duration: float):
     """Ajoute une durée au total_processing_time."""
@@ -516,6 +530,39 @@ def calculate_atn_score_for_article(article_data: dict) -> dict:
 # Plus de scores constants à 9.1 - calcul précis basé sur le contenu réel
 # ==============================================================================
 
+def get_pdf_text(article_data, project_id):
+    """
+    Tente de trouver et d'extraire le texte intégral d'un PDF associé à un article,
+    en utilisant le volume Docker partagé.
+    """
+    if 'attachments' not in article_data or not article_data['attachments']:
+        logger.info(f"[{article_data.get('article_id')}] Pas de section 'attachments' dans les données Zotero.")
+        return None
+
+    for attachment in article_data['attachments']:
+        if attachment.get('contentType') == 'application/pdf' and attachment.get('path', '').startswith('storage:'):
+            try:
+                # Extrait la clé du dossier (ex: YQDYXX2K/document.pdf)
+                relative_path = attachment['path'].split(':', 1)[1]
+                
+                # Construit le chemin à l'intérieur du conteneur Docker
+                pdf_path_in_container = os.path.join('/app/zotero_storage', relative_path)
+
+                if os.path.exists(pdf_path_in_container):
+                    logger.info(f"[{article_data.get('article_id')}] PDF trouvé : {pdf_path_in_container}")
+                    reader = PdfReader(pdf_path_in_container)
+                    full_text = " ".join([page.extract_text() for page in reader.pages if page.extract_text()])
+                    logger.info(f"[{article_data.get('article_id')}] {len(full_text)} caractères extraits du PDF.")
+                    return full_text
+                else:
+                    logger.warning(f"[{article_data.get('article_id')}] Chemin PDF {pdf_path_in_container} non trouvé dans le volume partagé.")
+            except Exception as e:
+                logger.error(f"[{article_data.get('article_id')}] Erreur lors de la lecture du PDF {attachment.get('path')}: {e}")
+                return None
+    
+    logger.info(f"[{article_data.get('article_id')}] Aucun PDF valide trouvé dans les pièces jointes.")
+    return None
+
 @with_db_session
 def process_single_article_task(session, project_id: str, article_data: dict, profile: dict, analysis_mode: str, custom_grid_id: str = None):
     """
@@ -558,6 +605,15 @@ def process_single_article_task(session, project_id: str, article_data: dict, pr
             text_for_analysis = f"{article.get('title', '')}\n\n{article.get('abstract', '')}"
             analysis_source = "abstract"
 
+
+        # Tenter d'obtenir le texte intégral du PDF
+        full_text = get_pdf_text(article, project_id)
+
+        if full_text:
+            logger.info("Utilisation du texte intégral du PDF pour le scoring.")
+            # Combinez tout pour une analyse maximale
+            combined_text = f"{article.get('title', '')}\n\n{article.get('abstract', '')}\n\n{full_text}"
+
         # Vérification contenu minimal
         if len(text_for_analysis.strip()) < 50:
             log_processing_status(session, project_id, article_id, "écarté", "Contenu textuel insuffisant.")
@@ -581,21 +637,29 @@ def process_single_article_task(session, project_id: str, article_data: dict, pr
         except (ValueError, TypeError):
             year = datetime.now().year
 
+        # ✅ Tenter d'obtenir le texte intégral du PDF
+        full_text_content = get_pdf_text(article, project_id)
+
         # Dictionnaire de données COMPLET pour le scoring ATN
         data_for_scoring = {
-            "title": article.get("title", ""),
-            "abstract": article.get("abstract", ""),  # ✅ GARANTI d'être passé
-            "journal": article.get("journal", ""),
-            "year": year,
-            "keywords": article.get("keywords", []),  # ✅ Liste vide si inexistant
-            "database_source": article.get("database_source", "")
+            'title': article.get('title', ''),
+            'abstract': article.get('abstract', ''), # GARANTI d'être passé
+            'journal': article.get('journal', ''),
+            'year': year,
+            'keywords': article.get('keywords', []), # Liste vide si inexistant
+            'database_source': article.get('database_source', ''),
+            'full_text': full_text_content if full_text_content else "" # ✅ AJOUT DE LA CLÉ full_text
         }
-        
-        logger.info(f"[DEBUG_SCORING] Données envoyées au moteur pour {article_id}: {data_for_scoring}")
+
+        if full_text_content:
+            logger.info(f"[{article_id}] Scoring avec texte intégral du PDF.")
+        else:
+            logger.info(f"[{article_id}] Scoring avec titre/abstract uniquement.")
+
+        logger.info(f"[DEBUG_SCORING] Données envoyées au moteur pour {article_id}: {{'title': ..., 'abstract': ..., 'full_text_length': len(data_for_scoring['full_text'])}}")
 
         # Appel du moteur de scoring ATN v2.2 avec données complètes
-        atn_results = calculate_atn_score_for_article(data_for_scoring)
-        
+        atn_results = calculate_atn_score_for_article(data_for_scoring) # MENGHINI
         logger.info(f"[ATN_SCORING] Article {article_id}: Score={atn_results.get('atn_score', 0)}, Catégorie={atn_results.get('atn_category', 'Non évalué')}")
 
         # ======================================================================
@@ -1711,6 +1775,7 @@ def run_extension_task(session, project_id: str, extension_name: str):
 # === REPORTING TASKS
 # ================================================================
 
+
 @with_db_session
 def generate_bibliography_task(session, project_id: str):
     """
@@ -1755,6 +1820,7 @@ def generate_bibliography_task(session, project_id: str):
     except Exception as e:
         logger.error(f"Erreur lors de la génération de la bibliographie pour le projet {project_id}: {e}", exc_info=True)
         send_project_notification(project_id, 'report_failed', f'Erreur lors de la génération de la bibliographie: {e}')
+
 
 @with_db_session
 def generate_summary_table_task(session, project_id: str):
@@ -1807,6 +1873,7 @@ def generate_summary_table_task(session, project_id: str):
     except Exception as e:
         logger.error(f"Erreur lors de la génération du tableau de synthèse pour le projet {project_id}: {e}", exc_info=True)
         send_project_notification(project_id, 'report_failed', f'Erreur lors de la génération du tableau de synthèse: {e}')
+
 
 @with_db_session
 def export_excel_report_task(session, project_id: str):
@@ -2114,6 +2181,7 @@ RÉPONSE ATTENDUE : Objet JSON avec les 30 champs ATN comme clés.
             'atn_fields_count': len(atn_fields),
             'grid_version': '1.0'
         }
+
     )
     
     logger.info(f"✅ Extraction ATN complète: {len(extraction_results)} articles")

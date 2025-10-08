@@ -1,0 +1,349 @@
+European Eating Disorders Review
+
+RESEARCH ARTICLE OPEN ACCESS
+User Experience and Therapeutic Alliance of Treatment Completers of Clinician‐Supported Versus Self‐Help Online Intervention for Eating Disorders: A Mixed Methods Approach
+Sarah Barakat1 | Sean Rom1 | Marcellinus Kim2 | Phillip Aouad1 | Sarah Maguire1
+1InsideOut Institute for Eating Disorders, University of Sydney and Sydney Local Health District, Sydney, Australia | 2Sydney Local Health District Mental Health Services, Royal Prince Alfred Hospital, Sydney, Australia
+Correspondence: Sarah Barakat (sarah.barakat@sydney.edu)
+Received: 9 June 2024 | Revised: 19 December 2024 | Accepted: 16 January 2025
+Handling Editor: Nadia Micali
+Funding: This work was supported by the NSW Health Translational Research Grants Scheme (Grant no. 61).
+Keywords: bulimia nervosa | cognitive behavioural therapy | digital health | feeding and eating disorders | internet‐based intervention
+ABSTRACT
+Background: Poor rates of retention associated with digital interventions necessitate understanding of factors influencing engagement. This study presents a secondary analysis of a three‐arm, randomised controlled trial of an online self‐help treatment for bulimia nervosa (clinician‐supported, self‐help and waitlist control). Aims: The study aimed to understand the effect of added clinician‐support, or lack of support, upon user experience and therapeutic alliance. Method: At post‐treatment, 61 participants completed a battery of self‐report questionnaires assessing user experience and therapeutic alliance. Data were analysed using mixed methods (regression and thematic analyses). Results: Quantitative analyses indicated clinician‐supported participants reported higher levels of treatment satisfaction and therapeutic alliance, however differences were not significant after controlling for covariates. Intervention effectiveness ratings were positively associated with post‐treatment reductions in binge episodes and eating disorder psychopathology. Qualitative data were organised into four themes: (1) human support, (2) content, structure and digital set up, (3) process of therapeutic change and (4) positive feedback. Conclusions: Overall, the intervention was found to have positive ratings of user experience and therapeutic alliance in both supported and unsupported versions. The qualitative analyses revealed a strong preference for human support. The findings shed light on the complex interactions between digital and human elements of blended treatment delivery. Trial Registration: The trial was pre‐registered with the Australia New Zealand Clinical Trials Registry (ACTRN 12619000123145p)
+This is an open access article under the terms of the Creative Commons Attribution‐NonCommercial‐NoDerivs License, which permits use and distribution in any medium, provided the original work is properly cited, the use is non‐commercial and no modifications or adaptations are made.
+© 2025 The Author(s). European Eating Disorders Review published by Eating Disorders Association and John Wiley & Sons Ltd.
+European Eating Disorders Review, 2025; 33:751–762 751 of 848 https://doi.org/10.1002/erv.3176
+
+
+1 | Introduction
+There is growing evidence to support the efficacy of digital selfhelp interventions in the treatment of eating disorders (EDs), yet despite these promising findings, concern has been raised about high dropout rates and poor adherence that can be associated with online interventions (Barakat et al. 2019; Linardon et al. 2020a). Central to addressing these issues is an understanding of how an individual's level of engagement is influenced by their perception of a digital intervention as useful, useable and satisfying (Graham et al. 2019). This information can be used to modify intervention content, digital design and delivery to better match user preferences and beliefs. This is a core principle of user‐centred design, which is increasingly being applied in academic research to strengthen the appeal and usage of digital interventions (Graham et al. 2021; Yardley et al. 2016).
+A recent systematic review of 10 studies examining user experience of self‐help treatments for EDs found several facilitators of engagement across studies, including anonymity, flexibility and self‐efficacy (Yim et al. 2019). However, the absence of human support was reliably identified as a barrier to uptake. These findings are consistent with those across other fields of mental health, which repeatedly report users' perception that a sense of reciprocity and emotional connection with another human is missing from their experience of treatment when using a digital intervention (McClay et al. 2016). User‐centred design principles emphasise that modification of a product should be driven by user feedback (Graham et al. 2019), however, unlike changes to the visual design or functionality of a digital platform, user preferences for human support have greater implications in terms of ongoing costs and clinical resources.
+It is also important to consider whether preferences for professional support are backed by evidence regarding the efficacy of clinician‐supported interventions. Several research studies have identified a preference for clinician‐support over selfguided digital interventions (McClay et al. 2016; Linardon et al. 2020b), however emerging evidence from RCTs involving direct comparison of supported and unsupported formats
+suggest very little to no added benefit of support in terms of adherence or treatment outcomes (Dear et al. 2015; Berger et al. 2011; Titov et al. 2016). While these trials are not always adequately powered to detect such group differences, the findings are consistent with the results from our RCT of a 10‐session online CBT programme for bulimia nervosa (BN), which found clinically and statistically significant outcomes were achieved across both independent and clinician‐supported use of the intervention (Barakat et al. 2023). Similarly, two other large RCTs comparing supported and unsupported delivery of an internet‐based ED intervention (Aardoom et al. 2016; Rohrbach et al. 2022) demonstrated no added benefit from human support in terms of symptom reduction. Interestingly, these studies did find greater treatment satisfaction reported by the supported versus unsupported arms. The authors suggest that the experience of empathy, warmth, and attention from another human is likely to be responsible for this difference, however the findings remain speculative due to the very brief length of the surveys used and the absence of a thorough qualitative methodology.
+Other studies have attempted to explore the role of cliniciansupport by measuring the degree of therapeutic alliance experienced in digital interventions (Henson, Peck, and Torous 2019; Lopez et al. 2019; Rotger et al. 2022). Existing studies have shown that high alliance ratings can be achieved with a support clinician and in some cases are similar in magnitude to face‐toface treatments (Berger 2017; Stoeten et al. 2022; Sucala et al. 2012). There is also emerging evidence that positive therapeutic alliance can be experienced in a completely unsupported digital environment (Clarke et al. 2016; Kiluk et al. 2014; Ormrod et al. 2010). However, what is less clear is the relative contribution of distinct aspects of the blended human‐digital therapeutic environment, including alliance with the support clinician versus alliance with the digital programme (Tremain et al. 2020). This is a particularly important consideration given the potential for sophisticated digital features to replicate fundamental aspects of bidirectional human connection (e.g., encouragement, empathy, timely corrective feedback), which may be able to increase therapeutic alliance in the absence of direct human contact. Given the cost‐ and timeintensive resources that are required for the provision of human support, it is important that further attempts are made to understand the benefits of clinician‐support in terms of one's subjective experience of using a digital intervention.
+1.1 | Aims
+Our study aimed to examine experiences of participants' who completed a newly‐developed digital intervention, Binge Eating eTherapy (BEeT), as part of a randomised controlled trial consisting of three arms –self‐help (with administrative researcher contact), clinician‐supported self‐help and a WLC condition. A user‐centred design framework was used to guide the design and development of BEeT, inclusive of the six key phases (Graham et al. 2019). In the years preceding clinical trial, extensive research was conducted regarding the needs of target users (Investigate), followed by a conceptual ideation process (Ideate), multiple within‐cycle iterative designs (Prototype) and testing (Evaluate), and integration of feedback to optimise design
+Summary
+� A strong preference for human support was identified across all arms in the qualitative analyses, such that selfhelp participants described feeling deprived of clinician contact and clinician‐supported participants reported clinician contact as a facilitator of adherence and motivation to engage with treatment.
+� Quantitative analyses revealed that whilst higher ratings of digital therapeutic alliance and treatment satisfaction were found for supported versus unsupported arms, these differences did not remain significant in the multivariate model.
+� Across all arms, participants who had greater baseline to post‐treatment decreases in objective binge episode frequency were more likely to view the intervention as effective.
+752 of 848 European Eating Disorders Review, 2025
+10990968, 2025, 4, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/erv.3176 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+(Refine & Develop). The outcomes of the final stage of this process (Validate) will be presented in the current paper, involving collation of feedback regarding the design and functionality of BEeT when tested in practice, with the aim of generating knowledge for future design iterations. We also sought to determine the ways in which added clinician‐support, or lack of support, influenced participants' experience, including the degree of therapeutic alliance experienced by users. Finally, we sought to examine whether participants' ratings of satisfaction, perceived intervention effectiveness and therapeutic alliance were associated with (1) symptom reduction following completion of the intervention and (2) intervention usage.
+2 | Methods
+2.1 | Participants and Procedure
+This study is an exploratory, secondary analysis of a RCT examining an online psychological intervention, BEeT, in a sample of participants with full or subthreshold BN. A full description of this study including information on recruitment, eligibility criteria, trial design and methodology is detailed elsewhere (Barakat et al. 2021). In brief, BEeT is an online cognitive behavioural therapy (CBT) self‐help programme consisting of 10 weekly, one‐hour multimedia sessions and accompanying digital self‐monitoring.
+Participants (N = 114) who met criteria for BN or sub‐clinical BN (other specified feeding or eating disorder (OSFED) with bulimic behaviours) were recruited into the RCT from May 2020 to October 2021 and randomised to one of three trial arms; BEeT as a self‐help programme (with administrative researcher contact), BEeT with structured clinician‐support (weekly 30‐min telemedicine sessions), or no‐treatment (waitlist control; WLC). Both intervention conditions were delivered across a 12week period. WLC were given access to self‐help BEeT after a 12‐week waitlist period (i.e., ‘delayed self‐help’). Participants were recruited from the general community in Australia via advertisements on health websites and social media or referrals from health professionals. All participants provided written informed consent. At post‐treatment, participants were asked to complete a battery of questionnaires listed below. Only those participants who completed the post‐treatment data collection were able to be analysed in this part of the study.
+2.2 | Measures
+All outcome measures were administered as online self‐report assessments.
+2.2.1 | Sociodemographic Characteristics
+Participants were asked to provide information regarding sociodemographic variables such as age, gender, and occupation.
+2.2.2 | Eating Disorder Examination‐Questionnaire (EDE‐Q)
+The Eating Disorder Examination‐Questionnaire (EDE‐Q) (Fairburn et al. 2008) is a highly validated 28‐item measure that assesses the frequencies of eating disorder behaviours over the past 28 days and cognitive symptoms assessed via subscales of weight concern, shape concern, and dietary restraint, as well as the global EDE‐Q score (range: 0–6; higher scores indicate more severe eating disorder symptoms; Cronbach's a = 0.82).
+2.2.3 | Kessler Psychological Distress Scale (K10)
+The Kessler Psychological Distress Scale (K10) is a 10‐item measure of psychological distress in the previous 30 days (Kessler et al. 2002) (range: 0–50, higher scores represent greater psychological distress; Cronbach's a = 0.92).
+The K10 and EDE‐Q were administered at baseline, posttreatment, and 3‐month follow up.
+2.2.4 | Intervention Usage
+The number of days active on the platform was monitored via the digital platform, where an active day was defined as any day on which the participant logged onto the platform. Several intervention usage metrics were collected in this study, however only one could be used in the analyses due to issues with multicollinearity. Active days was selected as a broad measure of engagement.
+2.2.5 | Therapeutic Alliance
+2.2.5.1 | Working Alliance Inventory for Online
+Interventions‐Short (WAI‐TECH‐SF)1. The Working Alliance Inventory for Online Interventions‐ Short Form (WAI‐TECH‐SF) was adapted from the Working Alliance Inventory‐Short Revised (WAI‐SR) (Hatcher et al. 2006). The WAI‐TECH‐SF assesses the therapeutic alliance experienced between the user and the online self‐help programme and consists of 12‐items rated on a 7‐point Likert scale, ranging from 1 = ‘never’ to 7 = ‘always’. The total score is a sum of responses to all items (range: 12–84; Cronbach's a = 0.94). Given the total score has stronger reliability than the subscales, only the total score was used in this study (Herrero et al. 2020).
+2.2.6 | User Experience Surveys
+User experience was measured using two researcher‐designed surveys, each tailored to assess intervention‐specific aspects of self‐help and clinician‐supported conditions. Purpose‐designed questionnaires were utilised as the existing literature did not indicate a standardised or validated measure that addressed the research questions. Both surveys consist of 14 questions which
+753 of 848
+10990968, 2025, 4, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/erv.3176 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+use a combination of closed‐ended responses (Likert scale; checkbox; ‘yes/no’) and open‐ended free‐text responses. The surveys yield an overall satisfaction score and perceived intervention effectiveness score, in addition to descriptive information regarding the helpfulness of intervention skills, perceived advantages of self‐help versus clinician‐supported, barriers and facilitators of adherence, and suggested improvements. Survey questions were written by author S.B. and reviewed by S.M. (Supporting Information S1).
+The WAI‐TECH‐SF and user experience surveys were administered post‐treatment for each condition, meaning the delayed self‐help arm received these after completing the self‐help intervention, which they were given access to after completing 12 weeks on the waitlist.
+2.3 | Analyses
+2.3.1 | Quantitative Analyses
+All analyses were conducted using STATA Version 15 (StataCorp 2017). Means and standard deviations were reported for continuous variables and frequencies with percentages for ordinal variables.
+Multivariate generalised linear models (GLM) were used to compare differences between trial arms on the WAI‐TECH total score, overall satisfaction score and perceived intervention effectiveness score. GLM analyses were also used to examine the association between these scores and (1) primary treatment outcomes (i.e., baseline to post‐treatment change in objective binge episode frequency and the EDE‐Q global score) and (2) intervention usage (i.e., total active days using the intervention). Participants' responses to the overall satisfaction and perceived intervention effectiveness items were highly skewed, with most participants scoring at the upper ends of these scales. Due to the relatively small number of responses in the lower categories, it was necessary to combine categories to create binary variables using ‘low’ and ‘high’ cut offs. Ratings of 1–3 were classified as ‘low’ and ratings of 4 and 5 were classified as ‘high’. A linear GLM was applied for the WAI‐TECH‐SF total score (continuous variable) and a logistic GLM for overall satisfaction and perceived intervention effectiveness scores (binary variables). Given that this is an exploratory analysis, significance level of 5% was considered to be statistically significant for all results.
+2.3.2 | Qualitative Analyses
+Thematic analyses were used to assess responses to the four open‐ended questions in the user experience surveys. Participant responses were grouped according to intervention arm and analysed separately within these groups. Thematic analyses were manually conducted according to the Braun and Clarke (2006) framework for qualitative data analysis, including initial coding of responses line‐by‐line according to common words and sentiments, followed by grouping according to theme (Braun and Clarke 2006). Individual responses were analysed
+and coded independently by S.B. and S.R. Then, P.A. reviewed the coding framework and confirmed which codes conceptually fit together within each theme. Discrepancies were addressed and resolved via consensus.
+The authors maintained reflexivity throughout this study through regular reflection upon the potential role of their personal characteristics upon the analysis, alongside discussion and challenging of potential biases and assumptions. S.B., S.R. and P.A. are mental health clinicians with extensive experience in the treatment of eating disorders, meaning that they are intimately aware of the challenges and therapeutic processes associated with the intervention examined in this study. Whilst this experience may have helped to enrich their understanding of the intervention's impact, it also posed the risk of limiting the analysis if pre‐existing perspectives were rigidly adhered to. All authors made an active effort to be conscious of this and tried their best to not allow their experience and training to greatly influence their interpretation. S.B. was the trial coordinator so was familiar with the study participants, however, the potential impact of this knowledge was largely mitigated by the use of de‐identified responses. S.B. also regularly reflected upon their experiences of managing the trial and how they may have shaped the analysis.
+3 | Results
+3.1 | Participants
+A total of 61 participants across three intervention arms completed the post‐treatment assessment: self‐help (n = 26 out of 38), clinician‐supported (n = 24 out of 37) and delayed selfhelp (n = 11 out of 39).2 The mean age of participants across conditions was 31.2 years (SD = 9.3, range 16–59). The majority were female (96.7%) and had a mean BMI of 26.2 (SD = 6.5, range 19.7–48.4). At baseline, 95.1% participants met diagnostic criteria for BN and a remaining 4.9% subthreshold BN. On average, at baseline the frequency of objective binge episodes in the past 28 days was 15.0 (SD = 9.8, range 0–45). Further details regarding sample demographics and clinical outcomes are available in the original report (Barakat et al., 2023).
+3.2 | Therapeutic Alliance
+The mean WAI‐TECH‐SF total score was highest for the clinician‐supported arm (M = 70.36, SD = 11.37), followed by self‐help (M = 58.33, SD = 12.45) then delayed self‐help (M = 58.27, SD = 16.95). In the multivariate regression analyses, no significant associations were apparent. Two associations were close to significance, including the difference in WAI‐TECH‐SF total score between the self‐help and cliniciansupported arms (b = 11.37, SE = 6.10, p = 0.071), with clinician‐supported arm scoring higher than self‐help, and the association between WAI‐TECH‐SF total score and EDE‐Q global difference score (b = 3.84, SE = 2.09, p = 0.076; Table 1), such that that participants who displayed greater reductions in EDE‐Q global score were more likely to have a higher WAI‐TECH‐SF total score.
+754 of 848 European Eating Disorders Review, 2025
+10990968, 2025, 4, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/erv.3176 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+3.3 | User Experience
+3.3.1 | Experience of Satisfaction
+The majority of clinician‐supported BEeT participants (95.8%) reported high satisfaction with the treatment programme, followed by self‐help (73.1%) and delayed self‐help (63.6%). No significant associations involving user satisfaction were apparent in the multivariate model. Although, differences in overall satisfaction between clinician‐supported and self‐help did approach significance (OR = 17.30, SE = 26.07, p = 0.059), with clinician‐supported arm scoring higher than self‐help.
+3.3.2 | Perceived Effectiveness of the Intervention in Creating Symptom Change
+Majority of clinician‐supported participants rated the intervention as highly effective in reducing their ED cognitions and behaviours (87.5% and 83.3%, respectively). Fewer self‐help participants reported high perceived intervention effectiveness (69.2% for both cognitions and behaviours), followed by an even
+smaller number of delayed self‐help participants (45.5% for cognitions and 63.6% for behaviours).
+In the multivariate model, objective binge episode reduction was associated with the users' perceived effectiveness of the programme (both cognitive and behavioural), meaning that participants who had greater baseline to post‐treatment decreases in objective binge episode frequency were more likely to have higher ratings of perceived intervention effectiveness (OR = 1.14, SE = 0.07, p = 0.036 and OR = 1.19, SE = 0.09, p = 0.025, respectively).
+3.3.3 | Utility of Specific Skills and Digital Features of the Intervention
+The skills rated as most helpful include regular eating (self‐help; 73.1%), thought challenging (clinician‐supported; 78.3%), and both self‐monitoring and distraction/urge surfing (delayed selfhelp; equal votes 63.6%). The skills rated as the least helpful were problem solving (self‐help; 19.2%) and meal planning (cliniciansupported; 17.4% and delayed self‐help 9.1%; Figure 1).
+TABLE 1 | Results of multivariate generalised linear model analyses.
+Variables
+WAI‐TECH‐SF Overall satisfaction
+Perceived intervention effectiveness (cognitive Symptoms)
+Perceived intervention effectiveness (behavioural symptoms)
+Coefficient (SE)
+p
+value 95% CI
+Odds ratio (SE)
+pvalue
+95% CI
+Odds ratio (SE)
+pvalue
+95% CI
+Odds ratio (SE)
+pvalue
+95% CI
+Objective binge episode frequency difference score (T0–T1)
+−0.03 (0.25) 0.904 −0.55, 0.48
+1.10 (0.07)
+0.172 0.96, 1.25
+1.19 (0.09)
+0.025 1.02, 1.38
+1.14 (0.07)
+0.036 1.01, 1.29
+EDE‐Q global difference score (T0–T1)
+3.84 (2.09) 0.076 −0.43, 8.10
+1.58 (0.64)
+0.259 0.71, 3.51
+1.14 (0.40)
+0.704 0.57, 2.28
+1.26 (0.41)
+0.482 0.67, 2.37
+Active days of intervention use
+0.07 (0.05) 0.200 −0.04, 0.17
+1.02 (0.01)
+0.175 0.99, 1.05
+1.00 (0.01)
+0.765 0.98, 1.01
+1.02 (0.01)
+0.136 0.99, 1.04
+Baseline age −0.02 (0.22) 0.915 −0.47, 0.43
+0.98 (0.05)
+0.592 0.89, 1.07
+0.98 (0.04)
+0.573 0.90, 1.06
+0.98 (0.04)
+0.565 0.89, 1.06
+Baseline K10 total score −0.59 (0.38) 0.129 −1.37, 0.18
+0.93 (0.06)
+0.254 0.82, 1.05
+0.95 (0.05)
+0.325 0.85. 1.06
+0.93 (0.05)
+0.192 0.84, 1.04
+Total frequency of researcher contact
+−0.15 (0.28) 0.593 −0.73, 0.42
+1.08 (0.06)
+0.214 0.96, 1.21
+0.95 (0.05)
+0.352 0.85, 1.06
+1.00 (0.05)
+0.991 0.90, 1.11
+Randomisation
+Clinician supported versus pure self‐help
+11.37 (6.10) 0.071 −1.04, 23.80
+17.30 (26.07)
+0.059 0.90, 331.88
+1.45 (1.81)
+0.764 0.13, 16.64
+1.49 (1.67)
+0.723 0.16, 13.44
+Waitlist control versus pure self‐help
+2.87 (5.74) 0.621 −8.82, 14.55
+1.67 (1.79)
+0.632 0.20, 13.66
+0.26 (0.27)
+0.194 0.04, 1.97
+1.17 (1.23)
+0.880 0.15, 9.16
+Clinician supported versus waitlist control
+−8.51 (5.78) 0.137 −19.87, 2.85
+0.10 (0.13)
+0.094 0.01, 1.49
+0.18 (0.20)
+0.114 0.02, 1.51
+0.79 (0.84)
+0.823 0.10, 6.40
+Note: Bold values are those that are significant findings i.e., p < 0.05.
+755 of 848
+10990968, 2025, 4, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/erv.3176 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+The digital features rated as most helpful include the selfmonitoring tools for both clinician‐supported (66.7%) and delayed self‐help (63.6%) and the video/audio tapes of the eTherapist for self‐help (53.8%). Between‐session tasks (i.e., homework) were rated as the least helpful digital feature across all three arms (Figure 1). Seven participants reported that lived experience videos were a helpful feature.
+3.3.4 | Perceived Advantages and Disadvantages of SelfHelp Versus Clinician‐Supported Delivery Format
+The flexibility of online delivery was the most commonly reported advantage of self‐help (Table 2). For the majority of selfhelp (73.1%) and delayed self‐help (54.5%), the absence of a health professional made it difficult for them to remain engaged
+FIGURE 1 | Participant ratings of helpfulness of skills and digital features in the binge eating eTherapy programme. (a) Most helpful skills. (b) Most helpful digital features. [Colour figure can be viewed at wileyonlinelibrary.com]
+756 of 848 European Eating Disorders Review, 2025
+10990968, 2025, 4, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/erv.3176 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+with the programme. Most self‐help participants (61.5%) felt satisfied without clinician‐support, however fewer delayed selfhelp participants (45.5%) agreed with this.
+The most reported advantage of clinician‐supported was the ability to clarify content and problem‐solve difficulties with their support clinician (Table 2). Clinician‐supported participants mostly endorsed that there were no unhelpful aspects of the programme, however 34.8% did report worry about the clinician evaluating their progress.
+3.3.5 | Barriers and Facilitators of Adherence and Suggestions for Improvements
+Thematic analysis of open‐ended survey responses resulted in four common first‐order themes (Table 3). Two themes that had to be revisited due to minor discrepancies between coders, resulting in a reliability rate of 80%. These discrepancies were addressed and resolved via consensus.
+3.3.5.1 | Theme 1: Human Support. For clinician‐supported participants, weekly support sessions were consistently identified as a facilitator of adherence (n = 21). Features of this support emerged as subthemes, including accountability and non‐judgemental stance of the clinician, an improved understanding of intervention content and building trust with the programme.
+Conversely, participants in self‐help (n = 8) and delayed selfhelp (n = 2) reported that the absence of clinician‐support
+negatively impacted their adherence. Related subthemes include lack of accountability, difficulties managing challenging emotions independently and the inability to clarify their understanding of the skills. Contact with research staff emerged as a facilitator of adherence for both self‐help arms (n = 12). Despite this contact often relating to administrative matters, it appears that their interaction/s were perceived as supportive and motivating. One delayed self‐help participant reported that researcher presence motivated adherence due to concerns about disappointing the researcher.
+Most participants in self‐help (n = 13) and delayed self‐help (n = 5) suggested that future iterations of the treatment include more clinician‐support, either online or in‐person. Even with regular access to a support clinician, three cliniciansupported participants recommended longer clinician‐support sessions (e.g., 45‐min as opposed to 30‐min).
+3.3.5.2 | Theme 2: Content, Structure and Digital Set up. Feedback regarding intervention content was largely nonspecific in nature (e.g., ‘good content’) making it difficult to determine exactly which skills or features were engaging or aversive. Self‐monitoring was the most frequently cited skill, described more positively by self‐help as compared to cliniciansupported participants. Participants across all three arms reflected positively upon the lived experience videos in creating ‘a sense of community’ and suggested that more be included (n = 4). The web interface design was described as appealing and intuitive, and visual features were helpful in monitoring progress, however, again mostly non‐specific in nature (e.g., ‘attractive, easy to use ). Participants across all arms (n = 14) described automated text or email reminders as facilitators of
+TABLE 2 | Participant ratings of most and least helpful aspects of binge eating eTherapy according to trial arm.
+Variable
+N (%) N (%) Self‐help (n = 26)
+Delayed selfhelp (n = 11)
+Clinician‐supported (n = 24)
+Most helpful aspects of self‐help programme Most helpful aspects of clinician‐supported programme
+Complete programme at my own pace & in own time
+21 (80.8) 9 (81.8) Kept me engaged in the programme 19 (79.2)
+Did not have to travel or take time out of schedule to attend appointments
+20 (76.9) 7 (63.6) Helped me to clarify or problem solve any difficulties
+20 (83.3)
+Anonymity of programme 7 (26.9) 4 (36.4) Helped me to better understand the information in the online programme
+13 (54.2)
+I could revisit sessions 13 (50) 5 (45.5) — 
+Least helpful aspects of the self‐help programme Least helpful aspects of the clinician‐supported programme
+Difficult to remain engaged without a health professional
+19 (73.1) 6 (54.5) Worried about not having completed programme correctly when reporting back to clinician
+8 (33.3)
+Difficult to set aside time to complete 12 (46.2) 8 (72.7) There were no unhelpful aspects 15 (62.5)
+Needing to access internet connection
+0 (0) 0 (0) — 
+No health professional to seek support from
+9 (34.6) 2 (18.2) — 
+757 of 848
+10990968, 2025, 4, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/erv.3176 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+adherence. Reminders embedded within the online session (e.g., ‘to–do’ lists at the end of a session) and other in‐built structural features (e.g., 7‐day deadlines, weekly reviews) were identified
+as helpful in enhancing accountability for self‐help (n = 3) and delayed self‐help participants (n = 1).
+Although the intervention is an abbreviated CBT programme, a commonly reported barrier was the time requirement needed to maintain adherence to the programme, as well as the pace of content delivery, which became increasingly difficult as more skills were added weekly. A closely related barrier was competing commitments and demands (e.g., everyday stressors, work demands) which imposed further time constraints. Several participants (n = 7) suggested extended time between sessions, delayed introduction of new skills and digital features to monitor progress and offset feelings of overwhelm (e.g., printable summary sheets, cumulative checklists, ‘I feel overwhelmed or stuck’ button). User interface glitches created a tedious and unpleasant experience when accessing the intervention via smartphone or tablet and hindered adherence (n = 5). For example, confusing web navigation made it difficult to intuitively find tools or features and resulted in non‐adherence to self‐monitoring which required frequent access to the platform.
+3.3.5.3 | Theme 3: Process of Therapeutic Change. The challenges and successes experienced as part of the process of changing participants' eating behaviours emerged as a theme across all three arms (n = 17). Participants described discomfort and difficult emotions that arose when implementing skills practice (e.g., ‘sense of failing’), which were further compounded by the core beliefs and fears which underlie and drive disordered eating behaviours (e.g., fear of weight gain, desire to be thin). Conversely, motivation and engagement increased for participants who were able to experience an improvements in their symptoms.
+Participants (n = 16) across all arms described motivation as a facilitator of adherence. Self‐help and delayed self‐help participants described their motivation as self‐derived (e.g., ‘Just knowing that I need to recover’) whereas clinician‐supported participants reported that their motivation was fostered by clinician‐support (e.g., ‘Motivation from <clinician> when I was feeling low’). Lack of motivation was described as a barrier to adherence by participants in both clinician‐supported and selfhelp conditions (n = 7). No participants delayed self‐help identified motivation as a barrier.
+3.3.5.4 | Theme 4: Positive Feedback. Several participants expressed gratitude regarding the profound positive impact that the intervention has had upon their self‐awareness and engrained disordered eating behaviours (n = 16). The sentiment of hope was also apparent for participants who acknowledged that despite needing further treatment, their experience in the trial had afforded them the confidence and self‐efficacy to continue treatment seeking. Additionally, several participants reported that BEeT has been the most rewarding and accessible programme that they have engaged with. Overall, a greater number of clinician‐supported participants provided positive feedback (n = 12) as compared to self‐help (n = 4). No participants in the delayed self‐help provided positive feedback.
+TABLE 3 | Participant quotes according to themes of qualitative analyses.
+Theme 1: Human support
+‘Having the weekly check‐ins, someone explaining the concepts so they are further synthesised’.SSH
+‘Encouragement from researcher to stick with it’.WLC
+‘Feeling like no‐one to talk to when challenging emotions came up’.WLC
+‘Exposure therapy is hard without support so my own fear took over...I didn't have someone to ask questions and bound my ideas off–I need someone to spot my unhelpful thinking so I can try to challenge it’.SH
+‘Sometimes it was hard to see if I was on the right track with activities within the session’.WLC
+Theme 2: Content, structure and digital set up
+‘I liked the videos featuring others who have experienced binge eating. Hearing their stories made me feel like I wasn't so alone and I became more confident that I would be able to overcome binge eating’.SSH
+‘I fell behind and kept learning new strategies but needed to implement previous ones. It was hard to keep track of what strategies to implement’.SH
+‘Entering information into the online planner was a bit tedious at times and could be time‐consuming and tricky to do when not in front of a computer’.SH
+‘It becomes very time consuming completing all the activities, felt a bit overwhelming trying to do them all correctly all the time when life gets in the way’.SSH
+Theme 3: Process of therapeutic change
+‘Although it was sometimes difficult to engage with the programme, I found the experience of putting the skills into practice had such a remarkable impact on the extent to which my eating behaviours were affecting my life that it made me persevere’.SH
+‘Jumping ahead and going backwards a bit, mentally taxing and draining dealing with emotions in the middle of the programme’.WLC
+Theme 4: Positive feedback
+‘Thank you! You've changed my life. I still have a long way to go but I feel as [though] I can do it now’.SH
+‘Some weeks were certainly easier than others but the full programme was so beneficial and, even though I know I will need to keep working on practicing the skills I have learnt, I think the programme has been life‐changing’.PSH
+‘This was the most rewarding programme I have ever done, I have learnt so much’.SSH
+‘Thank you so much. You have really helped me where no one else could and I can't explain my gratitude enough’.SSH
+Abbreviations: SH, self‐help; SSH, supported self‐help (i.e., clinician supported); WLC, waitlist control.
+758 of 848 European Eating Disorders Review, 2025
+10990968, 2025, 4, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/erv.3176 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+4 | Discussion
+This study offers an in‐depth exploration of participants' experiences using an online self‐help treatment for BN in three distinct formats: clinician‐supported, self‐help, and after a 12week waitlist period. The study has several key findings. Whilst the results of the qualitative analyses indicate that human guidance is perceived as a necessary adjunct to online selfhelp interventions, the quantitative analyses painted a different picture. Treatment satisfaction was greater in the cliniciansupported arm (95.7%) as compared to self‐help (73.1%) and delayed self‐help arms (63.6%), however these differences did not reach significance when adjusted for covariates. Only perceived intervention effectiveness was significantly associated with baseline to post‐treatment change in objective binge episode frequency. The thematic analyses revealed several facilitators of engagement including contact from research staff, accountability from support clinician, automated text or email reminders, self‐motivation, seeing improvement in symptoms and the convenience of online delivery. Barriers identified include absence of clinician‐support for the unsupported arms, digital glitches, poor usability of intervention on mobile, rapid pace of skills delivery, time constraints and managing difficult emotions associated with change.
+4.1 | Quantitative Findings
+Consistent with the existing research, this study demonstrates that positive therapeutic alliance can be fostered in digital treatment environments (Berger 2017; Stoeten et al. 2022; Sucala et al. 2012; Clarke et al. 2016; Kiluk et al. 2014; Ormrod et al. 2010). The degree of therapeutic alliance reported by clinician‐supported participants was high (> 80% of total possible WAI‐TECH‐SF score) and aligns with other supported online CBT interventions and some trials of face‐to‐face CBT for anxiety and depression (Hadjistavropoulos et al. 2017; Preschl, Maercker, and Wagner 2011). In contrast, alliance ratings for the self‐help and delayed self‐help arms were lower than these estimates (~65% of total possible WAI‐TECH‐SF score). Yet, higher ratings of therapeutic alliance and treatment satisfaction for supported versus unsupported participants did not reach statistical significance in the multivariate model. Whilst these results differ from similar studies which found higher satisfaction ratings with added clinician‐support (Aardoom et al. 2016; Rohrbach et al. 2022), overall we observed very high satisfaction levels with the BEeT programme, so it is possible that a ceiling effect may have played a role. Also, given the differences in satisfaction between self‐help and supported arms were close to statistical significance in the multivariate model, it is possible that future studies with a larger sample size or which use a different item response structure (e.g., continuous variable) may reach significance for this comparison.
+Perceived intervention effectiveness was as the only consistent variable associated with treatment outcome in this study. This finding is supported by similar studies which have identified poor treatment credibility and low expected efficacy of self‐help interventions as predictors of non‐starters, dropouts, and overall adherence (Alaoui et al. 2015; Boettcheret al. 2013; Nordgreen
+et al. 2012). Failure for either treatment satisfaction or therapeutic alliance to emerge as significantly associated with outcome or engagement is also consistent with other digital health research (Clarke et al. 2016; Hadjistavropoulos et al. 2017; Preschl, Maercker, and Wagner 2011), yet conflicts with the evidenced central role of therapeutic alliance in traditional therapist‐led treatments (Horvath et al. 2011). These findings suggest that therapeutic alliance may be less important to treatment outcome in digital contexts. However, Tremain et al. (2020) express caution in drawing such conclusions given that most findings regarding digital therapeutic alliance have originated from secondary analyses with small samples and no control conditions (Tremain et al. 2020). Similarly, our finding of no associations with adherence may be due to methodological issues related to the type of intervention usage metric chosen. Measures of intervention usage collected in this study were highly correlated, meaning only one metric could be used in the model. It is possible that our choice of active days failed to capture more detailed information about exposure to intervention content, which in turn, may have limited the scope of our findings. For example, if a participant logged into the programme for 5 minutes or 5 hours in one day, these both would be coded as one active day of use.
+4.2 | Qualitative Findings
+The critical role of human support in online self‐help treatments was clearly demonstrated in the qualitative analyses. Consistent with previous qualitative studies, clinician‐supported participants emphasised that human qualities were most instrumental in creating a positive experience (e.g., non‐judgemental stance, empathy, accountability, encouragement) ((Yim et al. 2019; McClay et al. 2013; Pretorius et al. 2009; Sánchez‐Ortiz et al. 2011)). The ability to share one's emotional experience and feel listened to may well explain the higher levels of satisfaction and therapeutic alliance experienced by supported participants. The value of feeling understood by another human was also reflected in the supportive role of other non‐clinician persons, such as the research staff, friends and family of the user, and the lived experienced characters in the programme.
+For the self‐help and delayed self‐help arms, lack of in‐person accountability left participants yearning for clinical contact and certainty that they were on the right track. Given the wellknown preference for clinician‐support by users of digital treatments (McClay et al. 2016; Linardon et al. 2020b), this raises the question of whether participants randomised to selfhelp felt short‐changed in comparison to those with support, which may have negatively coloured their experience. However, this perception of disadvantage may be misguided with emerging evidence from our research (Barakat et al. 2023) and others (Aardoom et al. 2016; Rohrbach et al. 2022) suggesting similar, or even improved, treatment outcomes in unsupported versus supported conditions. Findings from this study also shed light on possible reasons for continued improvement of self‐help participants once formal treatment has ended. Self‐help participants commonly described their motivation to engage with treatment as self‐derived, whereas clinician‐supported participants often attributed their motivation to their support clinician.
+759 of 848
+10990968, 2025, 4, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/erv.3176 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+These findings suggest that self‐directed engagement may foster greater self‐efficacy by encouraging the individual to take responsibility for not only their own efforts, but also their successes. Future research should use expectation management strategies to enhance in users' perceptions of self‐help treatments as a credible and effective intervention, as well as in‐built digital features aimed towards increasing self‐efficacy and positive views of autonomy (e.g., a personalised bar chart showing symptom change).
+Consistent with existing research, the flexibility, convenience, and anonymity afforded by digital treatments were identified as facilitators of engagement (Yim et al. 2019; Linardon et al. 2022). Other positive aspects of usability identified include reminders, weekly progress reviews and diverse content delivery (e.g., blended multimedia, interactive activities), which all closely align with digital design frameworks aimed towards personalisation and engagement, and which future researchers are encouraged to embed within the design of their own interventions (Proudfoot et al. 2011). Conversely, digital glitches were experienced as disruptive by all participants and are known to be associated with higher dropout rates (Gerhards et al. 2011). The pace of content delivery was also identified as barrier to engagement. While it might be expected that clinician‐support would facilitate understanding of skills and offset overwhelm, this finding was consistent across delivery formats highlighting the need for pace and programme load to be addressed in future research to ensure a therapeutic dose of content is delivered without overwhelming the individual. Finally, content tailoring did not emerge as a theme despite efforts to incorporate personalised feedback. While participants did rate general reminders as useful, it may have been that more sophisticated automated feedback software was needed to standout to users, such as artificial intelligence, which has been shown to replicate real‐life human support in the treatment of depression (Kelders et al. 2015).
+4.3 | Limitations & Strengths
+This study is a unique contribution to the field being the first to closely compare differences in therapeutic alliance and user experience between clinician‐supported and unsupported versions of an online self‐help ED intervention. The mixed methodology was a notable strength of the study, with qualitative and quantitative analyses providing insight into the mechanisms underlying objective, behaviourally focused indicators of outcome. The use of a standardised self‐report questionnaire allowed for a time‐efficient approach to collect user experience data from a larger, more representative sample than what could be achieved conducting individual interviews with 10–15 participants. However, a drawback was the broad nature of the feedback at times, especially about the intervention content and visual features (e.g., ‘attractive, easy to use’). Concern has also been raised about the psychometric properties of digital therapeutic alliance questionnaires (e.g., WAI‐TECH‐SF), with criticism centring around crude adaptions of these measures from therapist‐led setting (Tremain et al. 2020). An additional limitation is the small to moderate sample size, which is likely to have contributed to some of the null findings observed. The
+exploratory nature of the current study means that replication in an adequately sized sample is required to further validate our findings.
+Finally, a major limitation of the current study was that data was only collected for treatment completers, meaning that the experiences of people who dropped out were not captured. This may have led to a skewed dataset of participants with high motivation, failing to yield important information about the factors which drive disengagement. This is a particular concern for the WLC participants, who were likely to require an even greater degree of motivation to sustain both the waitlist period and self‐help intervention. The insights to be gained from speaking to participants who dropped out of the intervention are arguably central to understanding ways to adapt digital treatments to prevent disengagement.
+4.4 | Conclusions
+Overall, our study demonstrates that positive experiences of therapeutic alliance and treatment satisfaction can be fostered in supported and unsupported online self‐help treatment for BN. Incongruency between the effect and perception of clinician‐support in the qualitative and quantitative analyses speaks to the need for ongoing research to understand the unique relational features of digital therapeutic environments. The digital intervention examined in this study was viewed favourably by participants across several usability metrics, including interactivity, flexibility and ease of use. However, there were also barriers to engagement, such as digital glitches and rapid content delivery, which must be addressed in future iterations of this intervention, and provide insights regarding the design of future digital interventions across mental health conditions. The novel and rapidly evolving nature of technology‐based interventions necessitates ongoing research into the role of engagement‐facilitating features, in particular digital analogues of face‐to‐face relationships.
+Author Contributions
+S.M. obtained the funding for the trial and is the lead investigator. S.B. collected the data and had a lead role in analysing and interpreting the findings. S.R. and P.A. assisted with the thematic analyses. M.K. assisted with the statistical data analyses. S.B. wrote the manuscript. All authors reviewed and provided detailed feedback on the manuscript.
+Acknowledgements
+We would like to thank all participants for their willingness to be involved in the research and share their lived experience. Open access publishing facilitated by The University of Sydney, as part of the Wiley The University of Sydney agreement via the Council of Australian University Librarians.
+Ethics Statement
+All procedures involving human subjects/patients were approved by Sydney Local Health District (Royal Prince Alfred Hospital) Human Research Ethics Review Board (HREC #X18‐0486).
+760 of 848 European Eating Disorders Review, 2025
+10990968, 2025, 4, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/erv.3176 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+Conflicts of Interest
+The authors declare no conflicts of interest.
+Data Availability Statement
+Deidentified data that support the findings of this study may be made available after approval of a proposal and signed data access agreement (contact SB).
+Endnotes
+1 It was realised early in the delivery of the intervention that therapeutic alliance was likely playing a role in intervention adherence. Therefore, an ethics amendment was approved to add a measure of therapeutic alliance shortly after study commencement. Forty out of 60 participants completed the digital therapeutic alliance measure (Working Alliance Inventory for Online Interventions‐Short Form). In accordance with the recommendations of the CONSORT guidelines for intervention trials, this sample size was considered sufficient to conduct exploratory statistical analyses in the absence of a formal power analysis (Moher et al. 2012).
+2 Due to issues with dropout, the total sample included in the current study is much smaller than the number of participants enrolled in the RCT (n = 114). The number of delayed self‐help participants were far fewer than the other two trials arms as this group includes participants who persisted through both the waitlist period and intervention period.
+References
+Aardoom, J. J., A. E. Dingemans, P. Spinhoven, J. R. van Ginkel, M. de Rooij, and E. F. van Furth. 2016. “Web‐Based Fully Automated SelfHelp With Different Levels of Therapist Support for Individuals With Eating Disorder Symptoms: A Randomized Controlled Trial.” Journal of Medical Internet Research 18, no. 6: e5709. https://doi.org/10.2196/jmir. 5709.
+Alaoui, S. E., B. Ljótsson, E. Hedman, et al. 2015. “Predictors of Symptomatic Change and Adherence in Internet‐Based Cognitive Behaviour Therapy for Social Anxiety Disorder in Routine Psychiatric Care.” PLoS One 10, no. 4: e0124258. https://doi.org/10.1371/journal. pone.0124258.
+Barakat, S., A. L. Burton, M. Cunich, et al. 2023. “A Randomised Controlled Trial of Clinician Supported vs Self‐Help Delivery of Online Cognitive Behaviour Therapy for Bulimia Nervosa.” Psychiatry Research 329: 115534. https://doi.org/10.1016/j.psychres.2023.115534.
+Barakat, S., S. Maguire, K. E. Smith, T. B. Mason, R. D. Crosby, and S. Touyz. 2019. “Evaluating the Role of Digital Intervention Design in Treatment Outcomes and Adherence to eTherapy Programs for Eating Disorders: A Systematic Review and Meta‐Analysis.” International Journal of Eating Disorders 52, no. 10: 1077–1094. https://doi.org/10. 1002/eat.23131.
+Barakat, S., S. Touyz, D. Maloney, et al. 2021. “Supported Online Cognitive Behavioural Therapy for Bulimia Nervosa: A Study Protocol of a Randomised Controlled Trial.” Journal of Eating Disorders 9, no. 1: 126. https://doi.org/10.1186/s40337‐021‐00482‐w.
+Berger, T. 2017. “The Therapeutic Alliance in Internet Interventions: A Narrative Review and Suggestions for Future Research.” Psychotherapy Research 27, no. 5: 511–524. https://doi.org/10.1080/10503307.2015. 1119908.
+Berger, T., F. Caspar, R. Richardson, B. Kneubühler, D. Sutter, and G. Andersson. 2011. “Internet‐Based Treatment of Social Phobia: A Randomized Controlled Trial Comparing Unguided With Two Types of Guided Self‐Help.” Behaviour Research and Therapy 49, no. 3: 158–169. https://doi.org/10.1016/j.brat.2010.12.007.
+Boettcher, J., B. Renneberg, and T. Berger. 2013. “Patient Expectations in Internet‐Based Self‐Help for Social Anxiety.” Cognitive Behaviour
+Therapy 42, no. 3: 203–214. https://doi.org/10.1080/16506073.2012. 759615.
+Braun, V., and V. Clarke. 2006. “Using Thematic Analysis in Psychology.” Qualitative Research in Psychology 3, no. 2: 77–101. https://doi.org/ 10.1191/1478088706qp063oa.
+Clarke, J., J. Proudfoot, A. Whitton, et al. 2016. “Therapeutic Alliance With a Fully Automated Mobile Phone and Web‐Based Intervention: Secondary Analysis of a Randomized Controlled Trial.” JMIR Mental Health 3, no. 1: e4656. https://doi.org/10.2196/mental.4656.
+Dear, B. F., M. Gandy, E. Karin, et al. 2015. “The Pain Course: A Randomised Controlled Trial Examining an Internet‐Delivered Pain Management Program When Provided With Different Levels of Clinician Support.” Pain 156, no. 10: 1920–1935. https://doi.org/10.1097/j. pain.0000000000000251.
+Fairburn, C., and S. J. Beglin. 2008. “Eating Disorder Examination Questionnaire (6.0).” In Cognitive Behavior Therapy and Eating Disorders, 309–315. New York, NY, US: Guildford Press.
+Gerhards, S. a. H., T. A. Abma, A. Arntz, et al. 2011. “Improving Adherence and Effectiveness of Computerised Cognitive Behavioural Therapy Without Support for Depression: A Qualitative Study on Patient Experiences.” Journal of Affective Disorders 129, no. 1–3: 117–125. https://doi.org/10.1016/j.jad.2010.09.012.
+Graham, A. K., M. J. Kwasny, E. G. Lattie, et al. 2021. “Targeting Subjective Engagement in Experimental Therapeutics for Digital Mental Health Interventions.” Internet Interv 25: 100403. https://doi.org/10. 1016/j.invent.2021.100403.
+Graham, A. K., J. E. Wildes, M. Reddy, S. A. Munson, C. Barr Taylor, and D. C. Mohr. 2019. “User‐centered Design for Technology‐Enabled Services for Eating Disorders.” International Journal of Eating Disorders 52, no. 10: 1095–1107. https://doi.org/10.1002/eat.23130.
+Hadjistavropoulos, H. D., N. E. Pugh, H. Hesser, and G. Andersson. 2017. “Therapeutic Alliance in Internet‐Delivered Cognitive Behaviour Therapy for Depression or Generalized Anxiety.” Clinical Psychology & Psychotherapy 24, no. 2: 451–461. https://doi.org/10.1002/cpp.2014.
+Hatcher, R. L., and J. A. Gillaspy. 2006. “Development and Validation of a Revised Short Version of the Working Alliance Inventory.” Psychotherapy Research 16, no. 1: 12–25. https://doi.org/10.1080/10503300500352500.
+Henson, P., P. Peck, and J. Torous. 2019. “Considering the Therapeutic Alliance in Digital Mental Health Interventions.” Harvard Review of Psychiatry 27, no. 4: 268–273. https://doi.org/10.1097/hrp.0000000000 000224.
+Herrero, R., M. D. Vara, M. Miragall, et al. 2020. “Working Alliance Inventory for Online Interventions‐Short Form (WAI‐TECH‐SF): The Role of the Therapeutic Alliance Between Patient and Online Program in Therapeutic Outcomes.” International Journal of Environmental Research and Public Health 17, no. 17: 6169. https://doi.org/10.3390/ ijerph17176169.
+Horvath, A. O., A. C. D. Re, C. Flückiger, and D. Symonds. 2011. “Alliance in Individual Psychotherapy.” In Psychotherapy Relationships that Work: Evidence‐Based Responsiveness. 2nd ed., 25–69. New York, NY, US: Oxford University Press.
+Kelders, S. M., E. T. Bohlmeijer, W. T. M. Pots, and J. E. W. C. van Gemert‐Pijnen. 2015. “Comparing Human and Automated Support for Depression: Fractional Factorial Randomized Controlled Trial.” Behaviour Research and Therapy 72: 72–80. https://doi.org/10.1016/j.brat. 2015.06.014.
+Kessler, R. C., G. Andrews, L. J. Colpe, et al. 2002. “Short Screening Scales to Monitor Population Prevalences and Trends in Non‐Specific Psychological Distress.” Psychological Medicine 32, no. 6: 959–976. https://doi.org/10.1017/s0033291702006074.
+Kiluk, B. D., K. Serafini, T. Frankforter, C. Nich, and K. M. Carroll. 2014. “Only Connect: The Working Alliance in Computer‐Based Cognitive
+761 of 848
+10990968, 2025, 4, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/erv.3176 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+Behavioral Therapy.” Behaviour Research and Therapy 63: 139–146. https://doi.org/10.1016/j.brat.2014.10.003.
+Linardon, J., T. King, A. Shatte, and M. Fuller‐Tyszkiewicz. 2022. “Usability Evaluation of a Cognitive‐Behavioral App‐Based Intervention for Binge Eating and Related Psychopathology: A Qualitative Study.” Behavior Modification 46, no. 5: 1002–1020. https://doi.org/10.1177/ 01454455211021764.
+Linardon, J., A. Shatte, M. Messer, J. Firth, and M. Fuller‐Tyszkiewicz. 2020a. “E‐Mental Health Interventions for the Treatment and Prevention of Eating Disorders: An Updated Systematic Review and MetaAnalysis.” Journal of Consulting and Clinical Psychology 88, no. 11: 994–1007. https://doi.org/10.1037/ccp0000575.
+Linardon, J., A. Shatte, H. Tepper, and M. Fuller‐Tyszkiewicz. 2020b. “A Survey Study of Attitudes toward, and Preferences for, E‐Therapy Interventions for Eating Disorder Psychopathology.” International Journal of Eating Disorders 53, no. 6: 907–916. https://doi.org/10.1002/eat.23268.
+Lopez, A., S. Schwenk, C. D. Schneck, R. J. Griffin, and M. C. Mishkind. 2019. “Technology‐Based Mental Health Treatment and the Impact on the Therapeutic Alliance.” Current Psychiatry Reports 21, no. 8: 76. https://doi.org/10.1007/s11920‐019‐1055‐7.
+McClay, C. A., L. Waters, C. McHale, U. Schmidt, and C. Williams. 2013. “Online Cognitive Behavioral Therapy for Bulimic Type Disorders, Delivered in the Community by a Nonclinician: Qualitative Study.” Journal of Medical Internet Research 15, no. 3: e46. https://doi.org/10. 2196/jmir.2083.
+McClay, C. A., L. Waters, U. Schmidt, and C. Williams. 2016. “A Survey of Attitudes towards Computerized Self‐Help for Eating Disorders Within a Community‐Based Sample.” Behavioural and Cognitive Psychotherapy 44, no. 1: 65–78. https://doi.org/10.1017/s1352465814000484.
+Moher, D., S. Hopewell, K. F. Schulz, et al. 2012. “CONSORT 2010 Explanation and Elaboration: Updated Guidelines for Reporting Parallel Group Randomised Trials.” International Journal of Surgery 10, no. 1: 28–55. https://doi.org/10.1016/j.ijsu.2011.10.001.
+Nordgreen, T., O. E. Havik, L. G. Öst, T. Furmark, P. Carlbring, and G. Andersson. 2012. “Outcome Predictors in Guided and Unguided SelfHelp for Social Anxiety Disorder.” Behaviour Research and Therapy 50, no. 1: 13–21. https://doi.org/10.1016/j.brat.2011.10.009.
+Ormrod, J. A., L. Kennedy, J. Scott, and K. Cavanagh. 2010. “Computerised Cognitive Behavioural Therapy in an Adult Mental Health Service: A Pilot Study of Outcomes and Alliance.” Cognitive Behaviour Therapy 39, no. 3: 188–192. https://doi.org/10.1080/16506071003675614.
+Preschl, B., A. Maercker, and B. Wagner. 2011. “The Working Alliance in a Randomized Controlled Trial Comparing Online With Face‐ToFace Cognitive‐Behavioral Therapy for Depression.” BMC Psychiatry 11, no. 1: 189. https://doi.org/10.1186/1471‐244x‐11‐189.
+Pretorius, N., J. Arcelus, J. Beecham, et al. 2009. “Cognitive‐Behavioural Therapy for Adolescents With Bulimic Symptomatology: The Acceptability and Effectiveness of Internet‐Based Delivery.” Behaviour Research and Therapy 47, no. 9: 729–736. https://doi.org/10.1016/j.brat. 2009.05.006.
+Proudfoot, J., B. Klein, A. Barak, et al. 2011. “Establishing Guidelines for Executing and Reporting Internet Intervention Research.” Cognitive Behaviour Therapy 40, no. 2: 82–97. https://doi.org/10.1080/16506073. 2011.573807.
+Rohrbach, P. J., A. E. Dingemans, P. Spinhoven, et al. 2022. “Effectiveness of an Online Self‐Help Program, Expert‐Patient Support, and Their Combination for Eating Disorders: Results From a Randomized Controlled Trial.” International Journal of Eating Disorders 55, no. 10: 1361–1373. https://doi.org/10.1002/eat.23785.
+Rotger, J. M., and V. Cabré. 2022. “Therapeutic Alliance in Online and Face‐To‐Face Psychological Treatment: Comparative Study.” JMIR Mental Health 9, no. 5: e36775. https://doi.org/10.2196/36775.
+Sánchez‐Ortiz, V. C., J. House, C. Munro, et al. 2011. “‘A Computer Isn’t Gonna Judge You’: A Qualitative Study of Users’ Views of an InternetBased Cognitive Behavioural Guided Self‐Care Treatment Package for Bulimia Nervosa and Related Disorders.” Eating and Weight Disorders 16, no. 2: e93–e101. https://doi.org/10.1007/bf03325314.
+StataCorp. 2017. Stata Statistical Software: Release, Vol. 15. Texas, USA: StataCorp.
+Stoeten, C., H. A. de Haan, M. G. Postel, M. Brusse‐Keizer, and E. D. ter Huurne. 2022. “Therapeutic Alliance in Web‐Based Treatment for Eating Disorders: Secondary Analysis of a Randomized Controlled Trial.” JMIR Formative Research 6, no. 6: e33813. https://doi.org/10. 2196/33813.
+Sucala, M., J. B. Schnur, M. J. Constantino, S. J. Miller, E. H. Brackman, and G. H. Montgomery. 2012. “The Therapeutic Relationship in ETherapy for Mental Health: A Systematic Review.” Journal of Medical Internet Research 14, no. 4: e2084. https://doi.org/10.2196/jmir.2084.
+Titov, N., V. J. Fogliati, L. G. Staples, et al. 2016. “Treating Anxiety and Depression in Older Adults: Randomised Controlled Trial Comparing Guided V. Self‐Guided Internet‐Delivered Cognitive‐Behavioural Therapy.” BJPsych Open 2, no. 1: 50–58. https://doi.org/10.1192/bjpo.bp.115. 002139.
+Tremain, H., C. McEnery, K. Fletcher, and G. Murray. 2020. “The Therapeutic Alliance in Digital Mental Health Interventions for Serious Mental Illnesses: Narrative Review.” JMIR Ment Health 7, no. 8: e17204. https://doi.org/10.2196/17204.
+Yardley, L., B. J. Spring, H. Riper, et al. 2016. “Understanding and Promoting Effective Engagement With Digital Behavior Change Interventions.” American Journal of Preventive Medicine 51, no. 5: 833–842. https://doi.org/10.1016/j.amepre.2016.06.015.
+Yim, S. H., and U. Schmidt. 2019. “Experiences of Computer‐Based and Conventional Self‐Help Interventions for Eating Disorders: A Systematic Review and Meta‐Synthesis of Qualitative Research.” International Journal of Eating Disorders 52, no. 10: 1108–1124. https://doi.org/10. 1002/eat.23142.
+Supporting Information
+Additional supporting information can be found online in the Supporting Information section.
+762 of 848 European Eating Disorders Review, 2025
+10990968, 2025, 4, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/erv.3176 by Cochrane France, Wiley Online Library on [08/07/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License

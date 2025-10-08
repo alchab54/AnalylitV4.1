@@ -1,0 +1,536 @@
+Skip to main contentSkip to article
+Brought to you by:Universite de Lorraine
+Journals & Books
+Help
+Search
+Alice Chabaux
+University of Lorraine
+
+Access to subscribed content via University of Lorraine
+
+Change organization
+View PDF
+Download full issue
+Outline
+Highlights
+Abstract
+Keywords
+1. Introduction
+2. Methods
+3. Results
+4. Discussion
+5. Conclusion
+CRediT authorship contribution statement
+Consent for publication
+Ethics approval and consent to participate
+Funding
+Declaration of competing interest
+Acknowledgement
+Data availability
+References
+Show full outline
+Figures (4)
+Tables (3)
+Table 1
+Table 2
+Table 3
+Journal of Affective Disorders
+Volume 382, 1 August 2025, Pages 428-437
+Research paper
+Short sleep duration and daytime outdoor activities effects on adolescents mental health: A stress susceptibility-recovery model analysis
+Author links open overlay panelXiaoyun Yang a,Yunjuan Yang b c d e,Jie Yang a,Junyu Ni d,Huiyu Li d,Xiaodong Mu e,Chunlan Wang e
+Show more
+Add to Mendeley
+Share
+Cite
+https://doi.org/10.1016/j.jad.2025.04.085Get rights and content
+Under a Creative Commons license
+Open access
+Highlights
+•
+Older adolescents and females were at higher risk for depressive mood.
+•
+Short sleep duration mediated the association between reduced daytime outdoor activity and increased depressive mood or affective disorders risk.
+•
+The importance of sleep duration and daytime outdoor activity as key determinants of emotional well-being (depressive mood or affective disorders), particularly considering aging and gender disparities.
+•
+This study will help establish a more comprehensive pathological model and identify effective targets for future clinical treatments.
+Abstract
+Background
+Mental health disorders are a growing public health challenge globally. This study aimed to utilize the Stress Susceptibility-Recovery Model to identify the relationship between sleep duration, daytime outdoor activities, and major mental health outcomes among adolescents.
+Methods
+Data from the Yunnan Students' Common Disease Survey was analyzed. Multi-factorial logistic regression assessed the impact of each variable on mental health, while subgroup analyses and interaction tests examined the stability of the association between sleep duration, daytime outdoor activity, and mental health. Mendelian Randomization analysis assessed causal effects.
+Results
+The analysis included 204,158 participants aged 12–18 from 953 surveillance schools. After adjusting for covariates, the prevalence of depressive mood increased from 18.81 % (12–13 years) to 24.89 % (16–18 years); Females had a higher prevalence than males (1:1.36). Senior high school students (26.04 %) had a significantly higher rate than junior high school (21.41 %), and vocational high school students (18.42 %). Students with <2 h of daytime outdoor activity had a higher prevalence of depressive mood (24.40 %) compared to those with 2 or more hours of daytime outdoor activity (19.96 % for 2 h and 19.70 % for 3 or more hours). Short sleep duration mediated the association between reduced daytime outdoor activity and increased depressive mood or affective disorders risk, supporting the Stress Susceptibility-recovery Model.
+Conclusions
+Sleep duration and daytime outdoor activity were key determinants of emotional well-being, considering aging and gender disparities.
+Limitations
+Potential sampling bias due to differences in baseline characteristics between participants with and without missing data.
+Previous article in issue
+Next article in issue
+Keywords
+Sleep duration
+Outdoor activity
+Mental health
+A cross-sectional study
+Mendelian random analysis
+1. Introduction
+Mental health disorders are a growing public health challenge globally, with increasing prevalence across diverse population. According to the World Health Organization (WHO), an estimated one in seven children and adolescents aged 10 to 19 are affected by mental health conditions, most commonly anxiety, depression, and behavioral disorders. Since one-third of mental health conditions emerge before age 14 and half before age 18, early intervention is essential to help children and young people to thrive and realize their full potential (WHO, 2024).
+Traditional treatment options, primarily pharmacological therapies, are limited by side effects, high costs, and limited long-term effectiveness. Therefore, there is a growing interest in exploring complementary, non-pharmacological interventions, particularly lifestyle-related factors. Among these, sleep duration and daytime outdoor activities exposure have emerged as critical but understudied determinants of psychological well-being. These factors are gaining attention as potentially powerful tools for improving mental health.
+Sleep is crucial for long-term health and well-being (Ramar et al., 2021; Matricciani et al., 2019; Bruce et al., 2017) We spend about one-third of our life either sleeping or attempting to sleep (Aminoff et al., 2011). Adequate sleep can repair, relax, and rejuvenate our body and help reverse the effect of stress (WHO, 2023). insufficient sleep, typically defined as <7 h per night, affects about one-third of adults in developed countrie (Chaput et al., 2023; JP Chaput et al., 2017; Chan, 2021; J. Chaput et al., 2017). Nowadays, with the increase in academic pressure and lifestyle changes (artificial lighting, use of electronic devices, etc.), have made insufficient sleep (Owens, 2014), includes poor sleep quality and short sleep duration, which is more common among children and adolescents (Claussen et al., 2023). Chronic sleep deprivation extends beyond fatigue (Mukherjee et al., 2024; Ramos et al., 2023); it is associated with poor physical health (Garbarino et al., 2021), cognitive dysfunction (Csipo et al., 2021), brain function (Krause et al., 2017), emotional dysregulation (Tomaso et al., 2021), problems with attention, behavior, learning, memory (Kim et al., 2022), and increased susceptibility to mental health disorders like anxiety, and depression (Ramos et al., 2023; Blackwelder et al., 2021).
+Daytime outdoor activities can positively impact depression by promoting physical exercise, which boosted endorphin production and provided opportunities for social interaction in reducing symptoms of depression (Samsudin et al., 2024). Adolescents who spend more time outdoor during the day may benefit from these protective effects, leading to improvements in mental health (Bélanger et al., 2019). Meanwhile, with the change of environmental factors, such as limited access to outdoor spaces, modern sedentary lifestyles, and socioeconomic constraints, significantly contribute to reduced physical activity (Yang et al., 2023). The lack of outdoor activities and prolonged sedentary behavior among adolescents was associated with numerous health challenges. Low levels of physical activity and high sedentary time have been linked to an increased risk of metabolic syndrome, obesity, and cardiovascular issues in adolescents (Lavie et al., 2019; Silveira et al., 2022; Zhang and Liu, 2024; Su et al., 2017; Kerr and Booth, 2022). Previous study have confirmed excessive sedentary time (≧3 h/day) was associated with mental health issues line depression and lower quality of life (Huang et al., 2020).
+Previous studies have predominantly focused on single lifestyle factor, such as sleep or physical activity. Build on these findings, it is essential to consider how the interaction between sleep duration and daytime outdoor activity exposure can influence mental health. Although the effects of sleep and outdoor activities on mental health improvements have been recognized independently, the synergistic effects of these two factors remain relatively under-explored. This study aims to address this gap by examining how the combined influence of sleep duration and daytime outdoor activities can enhance mental health outcomes within the framework of the Stress Susceptibility-Recovery Model (Ebner and Singewald, 2017).
+The Stress Susceptibility-Recovery Model is a theoretical framework that integrates psychology and physiology perspectives to explain how individuals develop varying mental health outcomes in response to stressors and the subsequent recovery process. The model emphasizes that an individual's susceptibility to stress and their ability to recover from stressful events are the two core processes that determine mental health. According to the Stress Susceptibility-Recovery Model, differences between individuals in susceptibility to stressor exposure, and in recovery following exposure, are driven by a complex interaction of biological, psychological and environmental factors. This model combines the function of genetic risk factors, especially genetic polymorphisms of genes regulating the activity of stress hormones (for example, polymorphisms of serotonin transporter genes and genes of corticotropin-releasing hormone receptor) with the activity of the HPA axis and stress-related diseases. A major form of measurement of recovery is described in the model, related to what happens to patients when they are exposed to stressors, and the physiological responses (expressed mainly by sleep) and psychological responses (also quantified) they express when recovering from a stressor. By examining these response patterns, scientists have been able to discover more about why some people respond more positively than others to the same stressful events (that is to say some recover and others remain struggling for a long time). Furthermore, this model provides an important conceptual framework within which to explore whether differences between individuals in sensitivity to stressors as well as opportunity for recovery in the form of sleep are a trans-diagnostic mechanism for mental health in adolescence (Homberg et al., 2022; Palamarchuk Iryna and Tracy, 2021; Kalmbach David et al., 2018). The Stress Susceptibility-Recovery Model suggests that that homeostatic balance between stress reactivity and recovery capacity serves as an informatively core feature of psychological well-being.
+Particularly in adolescence, researchers have employed this model to investigate how altered sleep timing could increase sensitivity to stress, making one more susceptible to mental health issues (Homberg et al., 2022; Palamarchuk Iryna and Tracy, 2021; Kalmbach David et al., 2018). Therefore recovery mechanisms, especially restorative sleep, act as protective buffers in this scenario for minimizing the adverse effects of chronic exposure to stressors and stress vulnerability, emphasizing the possibility for sleep to play an important role in the establishment of mental resilience during adolescence.
+Mendelian randomization (MR): an econometrics-based approach that takes advantage of genetic variants to serve as instrumental variables (IVs) and construct causal relationships between risk factors and outcomes (Lawlor et al., 2008). Therefore, this study uses MR to examine the potential causal relationships between genetically predicted sleep duration, outdoor activity, and adolescent mental health. Genetic instruments were derived from well-powered GWAS meta-analyses that identified SNPs strongly associated with self-reported and accelerometer-based measures of single factor-sleep duration (Austin-Zimmerman et al., 2023) or outdoor activity (Coventry et al., 2021) with mental health.
+This study will utilize the Stress Susceptibility-Recovery Model to explore the relationship between sleep duration, daytime outdoor activities, and major mental health outcomes among adolescents. By addressing the gaps, the study aimed to inform more comprehensive strategies for mental health management and prevention, facilitate early intervention for mental health issues, particularly among high risk adolescents populations, reduce the risk of mental disorders, and lessen the burden on healthcare resources. This reducing stress susceptibility, along with enhancing recovery, may help to lower the risk of developing depression.
+2. Methods
+2.1. Data source
+Yunnan Students' Common Disease Survey was designed to assess the sleep duration, daytime outdoor activity, and mental health status among students in Yunnan, Southwest China. The data for this study were collected from 2019 to 2022. Genome-wide association study (GWAS) datasets from the MR-Base database were used for MR analysis. Details of the GWAS data set are given in Table 1.
+
+Table 1. Baseline characteristics based on students in Yunnan, Southwest China.
+
+18,904 (24.89)	Depressive mood	H	P
+Overall (N = 204,158)	Suspicious(N = 15,780)	Yes(N = 46,716)
+Age				1177.967	<0.001⁎⁎
+ 12–13	55,722	3524 (6.32)	10,481 (18.81)		
+ 14–15	72,488	5582 (7.70)	17,331 (23.91)		
+ 16–18	75,948	6674 (8.79)			
+Gender				1726.867	<0.001⁎⁎
+ Male	96,379	6741 (6.99)	18,500 (19.20)		
+Female	107,779	9039 (8.39)	28,216 (26.18)		
+Ethnicity				5.279	0.071⁎
+ Han	105,396	8009 (7.60)	24,179 (22.94)		
+ Ethnics	98,762	7771 (7.87)	22,537 (22.82)		
+Grade				1128.415	<0.001⁎⁎
+Junior High School	116,083	8015 (6.90)	24,858 (21.41)		
+ Senior High School	73,986	6625 (8.95)	19,263 (26.04)		
+ Vocational High School	14,089	1140 (8.09)	2595 (18.42)		
+Sleep duration				4982.084	<0.001⁎⁎
+ <7 h	62,636	5619 (8.97)	20,120 (32.12)		
+ ≧7 h	141,522	10,161 (7.18)	26,596 (18.79)		
+Daytime outdoor activity				737.057	<0.001⁎⁎
+ <2 h	136,471	11,128 (8.15)	33,297 (24.40)		
+ 2 h-	32,474	2289 (7.05)	6481 (19.96)		
+ ≧3 h	35,213	2363 (6.71)	6938 (19.70)		
+⁎
+P < 0.05.
+⁎⁎
+P < 0.01.
+2.2. Study design
+This study used a dual approach to investigate the relationship between sleep duration, daytime outdoors activity, and mental health. It combined an observational cross-sectional study from the Yunnan Students' Common Disease Survey with a two-sample Mendelian randomization (MR) study. The integration of these two methodologies enables a thorough assessment of both observational correlations and potential causal relationships. The overall study design is shown in Fig. 1.
+Download: Download high-res image (702KB)
+Download: Download full-size image
+
+Fig. 1. Schematic representation of this two-sample Mendelian randomization study principle and procedures.
+
+2.3. Sample population
+The study was a repeated cross-sectional study with data from 2019 to 2022. Basically, the study was conducted from September to November, maintaining an approximate one-year interval.
+In brief, the study participants were randomly sampled from 32 counties (24.80 % of counties in Yunnan) of 16 surveillance prefectures in Yunnan from 2019 to 2022. The surveillance counties covered 100 % in 2022. The study used multi-stage stratified sampling based on local economic level and educational development. At first, according to the local economic level, the sampling strategy involved in the study aimed to ensure representation by including both urban and rural areas in each prefecture. Specifically, one urban city and one rural county were randomly sampled from each prefecture. Then, according to the educational development and the proximity of schools to urban and rural, random sampling was used to sample schools for surveillance. In the urban city, the survey randomly selected five schools as surveillance schools, and in rural county, four schools were randomly selected as surveillance schools (including one junior boarding school and one senior boarding school). Surveillance schools remained consistent from 2019 to 2022. At last, all participants aged 12–18 were randomly selected from surveillance schools (as in Fig. 2). And all participants and/or their parents/guardians provided written informed consent.
+Download: Download high-res image (620KB)
+Download: Download full-size image
+
+Fig. 2. Flowchart of study participants selection.
+
+We maintained the situation of using face-to-face questionnaire collection to conduct the surveys to make the study comparable and to reduce the potential influence. From 2019 to 2022, the non-response rate was 4.49 %, 2.54 %, 3.35 %, and 5.04 %. We deleted the data that there was missing. There were 204,158 participants from 953 surveillance schools aged 12–18 included in this analysis. Account of it, in 2019(n = 32,362) 2020(n = 33,048), 2021(n = 32,822), and 2022(n = 105,926). And there were 96,379 boys and 107,779 girls included. There were 105,396 Han ethnics (51.62 %) and 98,762 Minority ethnics (48.38 %). The average age was 14.85 ± 1.78 years.
+2.4. Exposure ad outcome variables
+For MR analyses, sleep duration, time spent outdoors in Summer, and time spent outdoors in Winter were considered exposures respectively. While major mental health (including depression, affective disorders, anxious personality disorders, and persistent mood disorders) was considered outcomes. This study leveraged existing gene-typing datasets to conduct a two-sample Mendelian randomization analysis, using summary-level data to explore the potential causal link between sleep duration and the risk of major mental health (Eleanor et al., 2022; Ingrid et al., 2022). Genetic variation tools for sleep duration, daytime outdoor activity, and major mental health were obtained from GWAS database. Initially, single nucleotide polymorphisms (SNPs) linked to sleep duration and daytime outdoor activity with a p-value <5 × 10−8 and a minor allele frequency (MAF) ˃ 0.01 were initially selected as instrumental variables. Then, the F-statistic for each retained SNP was calculated to evaluate the strength of the association between the genetic variants and the exposures, reflecting the instrument power, while an F-statistic < 10 reflects a low instrument validity, leading to the removal of the corresponding SNPs. The F-statistic was calculated using the formula: Fstatistic = ((n−k−1)/k)((R2/(1-R2)). SNPs exhibiting chain imbalance were eliminated (R2 threshold<10,000 kb within a window of 0.001), leaving only the remaining SNPs extracted from the resultant data set.
+For the cross-sectional study, sleep duration and daytime spent outdoor activities were the exposure variables respectively. Depressive mood was considered the outcome variable.
+2.5. Measurement tool
+This study measured the depressive mood of adolescents using the Center for Epidemiological Studies Depression Scale (CESD), developed by Radloff L.S. from the National Institute of Mental Health (Radloff, 1977; Radloff, 1991). This scale comprises 20 items, with 16 items assessing negative affects and 4 items assessing positive affects of depressive mood. The CES-D has a good predictive accuracy when compared to the full 20-item version. In 2009, it has been verified CES-D was suitable for Chinese adolescents (Cronbach α of CES-D was 0.88) (Chen et al., 2009). And the CES-D focuses on evaluating the frequency of current depressive mood, which made it suitable for comparing survey results across different time points (Luo et al., 2023; Radloff, 1977).
+2.6. Depressive mood definitions
+The CES-D scale is scored on a 4-point scale with “1” indicating none, “2” indicating rarely (less than one day per week), “3” indicating sometimes (one to two days per week), and “4” indicating often (three to seven days per week). For the reverse questions (questions 2, 3, 5, 6, 7, and 8), the opposite scale was used, i.e., “1” means often, “2” means sometimes, “3” means rarely, and “4” means not at all. The range of scores for CES-D is from 0 to 60. The total score of CES-D is 60. The depressive mood was categorized three kinds of classification: 1. No depressive mood (NDM): the total scores of a participate was <16 score; 2. Suspected depressive mood (SDM): the total scores of a participate was between 17 and 19 score; 3. Having some degree of depressive mood (DM): the total scores of a participate was between 20 and 60.
+2.7. Covariates
+The cross-sectional analysis included multiple covariates: age, gender, ethnicity, grade, sleep duration, and daytime outdoor activity. Based on the China Sleep Research Report 2023, it showed that the average length of sleep per night for China's primary and secondary school student population was only 7.74 h (Junxiu et al., 2023.) So this study classified the sleep duration into binary classifications (<7 h and >7 h).
+2.8. Statistical analysis
+For the cross-sectional study, sleep duration and time spent on outdoor activities were considered exposure variables, respectively. Depressive mood was considered the outcome variable. Participants were categorized into three groups based on depressive mood, which was assessed using the CES-D scale. Group comparisons were conducted using non-parametric tests. In this study, another key variable was sleep duration, which was categorized into two groups: short sleep duration (insufficient sleep) group, defined as sleep time <7 h/day, and ordinary sleep group, defined as sleep time ≧7 h/day. Continuous variables were expressed as mean ± SD and categorical variables as percentages. Multivariate logistic regression models were assessed the association between sleep duration and depressive mood. Subgroup analyses and interaction tests were performed to examine the robustness of the associations.
+The Wald ration was used to estimate the effect of each set of exposure on the outcome for each IV, and the effect sizes of each IVs were combined using the inverse variance weighted (IVW) method to provide an overall estimation of the causal effect. In principle, the IVW method assumes that all SNPs involved in the causal estimate meet the assumptions of MR. However, since the robustness of causal associations can be compromised if any IVs influence multiple phenotypes. To address potential violations of MR assumptions, more robust alternative MR methods were applied. The weighted median (WM) method aggregates the effects of individual variants, assuming that over 50 % of the weight comes from valid IVs, while the MR-Egger method addressed directional pleiotropy, allowing all variants to have direct effects and adjusting the estimate accordingly.
+As an additional sensitivity analysis, a leave-one-out analysis was performed to identify the potential outliers and demonstrated the stability of the results, indicating the reliability of the MR estimates (Fig. 3). The Cochrane's Q test was used to assess the heterogeneity, and the MR Pleiotropy Residual Sum and Outlier (MR-PRESSO) test was applied to identify horizontal pleiotropy. Significant outliers, if detected, were removed. And the MR causal estimation was recalculated (using the MR_PRESSO outlier test).
+Download: Download high-res image (172KB)
+Download: Download full-size image
+
+Fig. 3. The mediation association of sleep duration, time of daytime outdoor activities, and Depressive mood.
+
+The two-sample MR analysis was performed using the “TwoSampleMR” package, and the MR-PRESSO was conducted with the “MRPRESSO” package. The forest plots were generated using “forestploter” package. While the scatter, funner, and leave-one-out plots were directly created using the “TwoSampleMR” package.
+According to the hypothesis of sleep duration and outdoor activity may influence mental health outcomes indirectly through intermediary variables such as stress or emotional regulation, mediation analysis was necessary to test these indirect pathways and provide deeper insight into the potential mechanisms underlying the observed associations. In this study to explore the potential underlying mechanisms, a mediation analysis was performed by the bootstrapped method with R mediation to assess whether the time of daytime outside activities mediated the association between sleep duration and depressive mood. Estimation of direct and indirect effects with the rapid course of these relationships is allowed by this approach.
+All the statistical analyses and visualization were conducted using R version 4.3.2 (The R Foundation, http://www.R-project.org). Statistical significance was defined as two-sided P < 0.05.
+3. Results
+3.1. Baseline characteristics from participants
+Significant associations were found for age, gender, grade, sleep duration and daytime outdoor activity with depressive mood (P < 0.001). However, no significant association was observed for ethnicity (P > 0.05).
+The study results showed the prevalence of depressive mood increased with age, with the highest prevalence observed in the 16–18 age group (24.89 %) compared to the 12–13 age group (18.81 %). Similarly, females reported a higher prevalence of depressive mood (26.18 % compared to males (19.20 %), and the gender ratio was 1:1.36.
+In terms of grade level, students in senior high school showed a significantly higher prevalence of depressive mood (26.04 %) compared to those in junior high school (21.41 %) and vocational high school (18.42 %). Sleep duration was also a significant factor, with students reporting <7 h of sleep showing a higher prevalence of depressive mood (32.12 %) compared to those with 7 or more hours of sleep (18.79 %).
+Students who engaged in fewer than 2 h of daytime outdoor activity had a higher prevalence of depressive mood (24.40 %) compared to those who participated in 2 or more hours of daytime outdoor activity (19.96 % for 2 h and 19.70 % for 3 or more hours).
+3.2. Association between sleep duration and major mental health
+The results of the multiple logistic regression model were shown in Table 2. The study findings showed a negative association between sleep duration and depressive mood before adjusting for all covariates. The risk of depressive mood in short sleep duration group was 2.148 (95%CI = 2.102–2.195, P < 0.001). And the risk of suspicious depressive mood in short sleep duration group was 1.368 (95%CI = 1.318–1.420, P < 0.001). After controlling the confounded variables, the odds of depressive mood in short sleep duration group was 2.035 (95%CI = 1.987–2.084, P < 0.001). And the odds of suspicious depressive mood in short sleep duration group was 1.409 (95%CI = 1.358–1.463, P < 0.001).
+
+Table 2. Multiple logistic regression analysis on the association between sleep duration and depressive mood.
+
+Empty Cell	Category groups
+Non-depressive mood	Suspicious	Depressive mood
+Model 1	Reference	1.368 (1.318–1.420) <0.001⁎⁎	2.148 (2.102–2.195) <0.001⁎⁎
+Model 2	Reference	1.423 (1.370–1.477) <0.001⁎⁎	2.055 (2.007–2.104) <0.001⁎⁎
+Model 3	Reference	1.409 (1.358–1.463) <0.001⁎⁎	2.035 (1.987–2.084) <0.001⁎⁎
+Model 1: Unadjusted model.
+Model 2: Adjusted age, gender, grade, and ethnicity.
+Model 3: Adjusted age, gender, grade, ethnicity, and daytime outdoor activity.
+⁎⁎
+P < 0.01.
+3.3. Relationship between sleep duration, daytime outdoor activity, and major mental health
+As Fig. 3 shown, the effect value of sleep duration and depressive mood was −3.78(95 % CI −3.87 ∼ −3.69); the effect value of sleep duration and daytime outdoor activities was 0.15(95 % CI 0.14–0.16); the effect value of daytime outdoor activities and depressive mood was −0.66(95 % CI -0.71 ∼ −0.60). And the intermediary effect of the time of daytime outdoor activities was −0.10(95 % CI -0.11 ∼ −0.09). The percentage of direct effect value was 97.36 %(P < 0.01).
+3.4. MR analysis between sleep duration and major mental health
+Based on the SNP inclusion criteria, eligible SNPs were selected as instrumental variables to assess the causal relationship between sleep duration, daytime outdoor activity, and major mental health. The results of IVW or MR-Egger are demonstrated in Table 3 and Fig. 3. There was a significant causal relationship between daytime outdoor activity in Summer and depression (P < 0.05). There was a related association between sleep duration with depression and affective disorders (0.05<P > 0.10).
+
+Table 3. Sensitivity MR analyses for significant associations between sleep duration and major mental health.
+
+Note: —— indicated that statistical analyses could not be complete. ⁎ P < 0.05; ⁎⁎ P < 0.01;
+0.05 < P < 0.10.
+3.5. Sensitivity analysis for MR results
+Cochran's Q and MR-Egger intercept tests confirmed the absence of heterogeneity and horizontal pleiotropy in the MR analysis, as shown in Table 3. Leave-one-out analysis demonstrated the stability of the results, indicating the reliability of the MR estimates (Fig. 4).
+Download: Download high-res image (1005KB)
+Download: Download full-size image
+
+Fig. 4. Causal effect of sleep duration, time spent outdoors on major mental health. Colored lines represent the results of MR analyses based on the five methods. The slope of the line represents the causal effect of exposure on the risk of mental health (Note:
+
+0.05 < P < 0.10; *P < 0.05).
+
+4. Discussion
+This study represented the first attempt to apply the Stress Susceptibility-Recovery Model to evaluate the relationship between sleep duration, daytime outdoor activities, and major mental health outcomes among adolescents.
+This study found that as age increased, the prevalence of depressive mood was increased from 18.81 % among those aged 12–13 to 24.89 % among those aged 16–18; the prevalence of depressive mood was higher in females compared to male, with a gender ratio of 1:1.36; the prevalence of depressive mood among adolescents with insufficient sleep was higher than that of adolescents with sleep duration of ≧7 h. Furthermore, as the time spent in daytime outdoor activities increased, the prevalence of depressive mood decreased from 24.40 % to 19.70 %. These findings implied older adolescents and females were at higher risk for depressive mood, providing robust evidence for the importance of adequate sleep and daytime outdoor activity in reducing depressive symptoms.
+By MR analysis, the results indicated a potential association between sleep duration and affective disorders (0.05 < P < 0.10). Additionally, time spent outdoors in Summer showed a significant association with depression (P < 0.05). The cross-sectional study showed that the effect value of sleep duration on depressive mood was −3.78(95 % CI: −3.87 ∼ −3.69) in short sleep duration group. The odds of depressive mood were increased 2.04 times higher in the insufficient sleep duration group compared to the sufficient sleep duration group. Additionally, the effect value of daytime outdoor activities on depressive mood was −0.66(95 % CI: −0.71 ∼ −0.60). And the direct effect of sleep duration was 97.36 % to depressive mood (P < 0.01). This study confirmed that daytime outdoor activities mediated the relationship between short sleep duration and depressive mood. In other words, reduced sleep duration mediated the effect of decreased outdoor activities, contributing to depression through a combined effect (Burns et al., 2021). Specifically, sleep duration was the main factor associated with depressive mood, account for 97.36 %. Therefore, daytime outdoor activities can positively affect depression by promoting physical activity, increasing endorphin production, and providing social interaction opportunities-all of which are well-known to reduce depressive symptoms. Adolescents who spend more time outdoors during the day may benefit from these protective effects, improving both sleep quality and overall mental health.
+Above all, the key finding of this study was that it supported the Stress Susceptibility-recovery Model. This model provided an insightful framework for understanding the role of sleep duration and daytime outdoor activities in maintaining emotional well-being. This study found in short sleep duration group, the odds of depressive mood were increased 2.04 times higher than sufficient sleep duration group. That is, a negative correlation was found between sleep duration and depressive mood, suggesting that adequate sleep duration was associated with lower depressive symptoms. Similarly, a negative correlation was observed between daytime outdoor activity and depressive mood, indicating that more daytime outdoor activity was associated with reduced depressive mood. In other words, this study confirmed that insufficient sleep can disrupt the body's stress regulation mechanisms (Meerlo et al., 2008), causing the individual's physiological stress system (such as the hypothalamic- pituitary-adrenal axis, or HPA axis) to remain high sensitivity (Chellappa and Aeschbach, 2022). This led to elevated stress hormone levels (e.g., cortisol) (Hirotsu et al., 2015), and increased negative emotional experiences in daily life, thereby increasing the risk of depression (Ormiston et al., 2022). The physiological basis of this phenomenon involved over-activation of the HPA axis, which elevated cortisol levels and impaired individual's ability to regulate emotions effectively (Russell and Lightman, 2019; Mbiydzenyuy and Qulu, 2024; Sheng et al., 2021).
+In addition, daytime outdoor activity played a mediating compensatory role between insufficient sleep and depressive mood. This study found that daytime outdoor activity can increase exposure to sunlight, which was often referred to as a “happiness factor” (Burns et al., 2021; Siraji et al., 2023). Under the combined influence of sunlight and physical activity, the HPA axis promoted endorphin secretion and reduced cortisol levels. Therefore, daytime outdoor activity can serve as a supplementary recovery mechanism. Particularly when sleep duration was insufficient, sunlight and outdoor activity can help individuals reduce stress responses, alleviate depressive mood, enhance recovery from daily challenges, and reduce the accumulation of depressive mood.
+This study results consisted with the results of Violeta Clement-Carbonell’ study. That is, the study showed that there is a stronger association between sleep quality and mental health than sleep quality and physical health in young adults (Clement-Carbonell et al., 2021).
+Consequently, this interplay between sleep, stress, and emotional regulation illustrated the complex relationship contributing to increased depression prevalence among those with chronic sleep disturbances. This finding not only provided scientific evidence for early intervention in clinical management of mental health, but also offered a new perspective for epidemiological research, particularly in understanding how sleep duration affected mental health progression. Overall, this study suggested that promoting adequate sleep and encouraging daytime outdoor activity were effective strategies for managing depressive symptoms in adolescents, especially in older female adolescents.
+4.1. Limitations
+While this study contributed some valuable insights into the relationship between sleep duration, daytime outdoor activity, and depressive mood. However, several limitations need to be acknowledged. First, differences in baseline characteristics between participants with and without missing data suggest a potential sampling bias in this cross-sectional study. Furthermore, this cross-sectional design limits the ability to infer causality between sleep duration, daytime outdoor activity, and depressive mood. Second, this study focused on a relatively homogeneous population, which limits the generalizability of the findings to more diverse populations with varying genetic backgrounds, comorbidities, conditions, and lifestyle factors. Third, the validity of these findings relied on specific assumptions inherent to the instrumental variable approach, including the absence of bias from horizontal pleiotropy. The MR study primarily included individuals of European ancestry, due to the limited availability of GWAS data for other racial and ethnic groups, which may restrict the generalizability of the findings to more diverse populations. Future longitudinal studies are needed to validate these findings and explore the biological mechanisms underlying the relationship between sleep duration, daytime outdoor activity, and depression progression, particularly how sleep duration influences depressive mood and inflammatory responses. This will help establish a more comprehensive pathological model and identify effective targets for future clinical treatments. At last, this study used binary classifications (<7 h and >7 h) to evaluate the sleep duration. This do not reflect the complexity of sleep patterns in adolescents. And this study did not account for important lifestyle confounders such as socioeconomic status, screen time, and diet, which are known to influence both sleep behaviors and mental health outcomes in adolescents. The omission of these factors may bias the observed associations and limit the causal interpretation of our results. Future research should prioritize the inclusion of these variables using more comprehensive data collection methods and robust analytical strategies to better capture the multifactorial nature of adolescent health and behavior.
+5. Conclusion
+In summary, this study combined data from a repeated cross-sectional survey of the Yunnan Students' Common Disease Survey with MR analysis, providing substantial evidence for the correlation between sleep duration, daytime outdoor activity, and major mental health. This study revealed that short sleep duration mediated the association between reduced daytime outdoor activity and increased depression susceptibility, based on the Stress Susceptibility-recovery Model. These findings highlighted the importance of sleep duration and daytime outdoor activity as key determinants of emotional well-being (depressive mood or affective disorders), particularly considering aging and gender disparities. By maintaining adequate sleep and engaging in regular daytime outdoor activity, especially in Summer, may help modulate physiological stress responses, reduce vulnerability to depression, and enhance their capacity to recover from daily challenges. These insights contributed to understanding the interactive roles of sleep, outdoor activity, and mental health, providing a foundation for developing targeted interventions to alleviate the mental health burden.
+CRediT authorship contribution statement
+Xiaoyun Yang: Project administration, Data curation. Yunjuan Yang: Writing – review & editing, Writing – original draft, Visualization, Project administration, Methodology, Investigation, Funding acquisition, Formal analysis, Data curation, Conceptualization. Jie Yang: Project administration, Methodology. Junyu Ni: Software. Huiyu Li: Software. Xiaodong Mu: Software. Chunlan Wang: Software.
+Consent for publication
+Not applicable.
+Ethics approval and consent to participate
+Ethnic approval was obtained from the Medical Research Ethics Committee of Yunnan Centers for Disease Control and Prevention (Ethical approval NO. 2023-31). All the students' parents have given written informed consent for their children's participation in this survey. They were all willing to participate in the survey to receive the CES-D examination. Students or parents could refuse to participate in this survey, and were informed that their information would be kept confidential. And our research analyzed data anonymously. The Ethics Committees approved this consent procedure. To ensure data validity of comparisons, the samples in each group were randomly selected in different survey years.
+Funding
+1.
+This research was supported by Yunnan Provincial Grant for the Academic Leadership (grant No.2024AC350014)
+2.
+the 16th Batch of Kunming Grant for the Young Academic and Technical Leadership (grant No. KMRCD-2018011)
+3.
+The grant by Xishan District Bureau of Science and Technology (grant NO. 34 Xikezi)
+4.
+2024 Yunnan Provincial Expert Basic Research Workstation (grant NO. 2024-164)
+5.
+Research on the Association between Chronic Diseases and Common Diseases in Children and Health Behavior Intervention Strategies (grant NO. YNAPM2025-006)
+Declaration of competing interest
+The authors declare that they have no competing interests.
+Acknowledgement
+The authors are grateful to the participants for their involvement in the survey. The authors also thank the team at Department of School Health, Yunnan Center for Disease Control and Prevention; and the technical support of all team members in the survey. And the assistance from the Centers for Disease Control and Prevention at 16 prefectures and 129 counties are highly appreciated. We thank the participants and staff of MR-Base database.
+Data availability
+The raw data sets of this study can be available by emailing the corresponding author on reasonable request.
+References
+Aminoff et al., 2011
+M.J. Aminoff, F. Boller, D.F. Swaab
+We spend about one-third of our life either sleeping or attempting to do so
+Handb. Clin. Neurol., 98 (2011), p. vii, 10.1016/B978-0-444-52006-7.00047-2
+View PDFView articleGoogle Scholar
+Austin-Zimmerman et al., 2023
+I. Austin-Zimmerman, D.F. Levey, O. Giannakopoulou, et al.
+Genome-wide association studies and cross-population meta-analyses investigating short and long sleep duration
+Nat. Commun., 14 (2023), p. 6059, 10.1038/s41467-023-41249-y
+View at publisher
+View in ScopusGoogle Scholar
+Bélanger et al., 2019
+Mathieu Bélanger, François Gallant, Isabelle Doré, et al.
+Physical activity mediates the relationship between outdoor time and mental health
+Prev. Med. Rep., 16 (2019), Article 101006, 10.1016/j.pmedr.2019.101006
+View PDFView articleView in ScopusGoogle Scholar
+Blackwelder et al., 2021
+A. Blackwelder, M. Hoskins, L. Huber
+Effect of inadequate sleep on frequent mental distress
+Prev. Chronic Dis., 18 (2021), Article 200573, 10.5888/pcd18.200573
+View at publisherGoogle Scholar
+Bruce et al., 2017
+E.S. Bruce, L. Lunt, J.E. McDonagh
+Sleep in adolescents and young adults
+Clin. Med. (Lond.), 17 (5) (2017), pp. 424-428, 10.7861/clinmedicine.17-5-424
+View PDFView articleGoogle Scholar
+Burns et al., 2021
+A.C. Burns, R. Saxena, C. Vetter, et al.
+Time spent in outdoor light is associated with mood, sleep, and circadian rhythm-related outcomes: a cross-sectional and longitudinal study in over 400,000 UK biobank participants
+J. Affect. Disord., 1 (295) (2021 Dec), pp. 347-352, 10.1016/j.jad.2021.08.056
+View PDFView articleView in ScopusGoogle Scholar
+Chan, 2021
+C.M.H. Chan
+Prevalence of insufficient sleep and its associated factors among working adults in Malaysia
+Nat. Sci. Sleep., 13 (2021), pp. 1109-1116, 10.2147/NSS.S295537
+View at publisher
+View in ScopusGoogle Scholar
+Chaput et al., 2017a
+J.P. Chaput, S.L. Wong, I. Michaud
+Duration and quality of sleep among Canadians aged 18 to 79
+Health Rep., 28 (2017), pp. 28-33
+View in ScopusGoogle Scholar
+Chaput et al., 2017b
+J. Chaput, T.J. Saunders, V. Carson
+Interactions between sleep, movement and other non-movement behaviors in the pathogenesis of childhood obesity
+18 (Suppl. 1) (2017 Feb.), pp. 7-14, 10.1111/obr.12508
+View at publisherView in ScopusGoogle Scholar
+Chaput et al., 2023
+J.P. Chaput, A.W. McHill, R.C. Cox, et al.
+The role of insufficient sleep and circadian misalignment in obesity
+Nat. Rev. Endocrinol., 19 (2023), pp. 82-97, 10.1038/s41574-022-00747-7
+View at publisherView in ScopusGoogle Scholar
+Chellappa and Aeschbach, 2022
+Sarah L. Chellappa, Daniel Aeschbach
+Sleep and anxiety: from mechanisms to interventions
+Sleep Med. Rev., 61 (2022), Article 101583, 10.1016/j.smrv.2021.101583
+View PDFView articleView in ScopusGoogle Scholar
+Chen et al., 2009
+Zhiyan Chen, Xiaodong Yang, Xinying Li
+Psychometric features of CES-D in Chinese adolescents
+Chin. J. Clin. Psych., 17 (4) (2009 Apr), pp. 443-445
+(in Chinese)
+View at publisherCrossrefView in ScopusGoogle Scholar
+Claussen et al., 2023
+A.H. Claussen, L.V. Dimitrov, S. Bhupalam, A.G. Wheaton, M.L. Danielson
+Short sleep duration: children’s mental, behavioral, and developmental disorders and demographic, neighborhood, and family context in a nationally representative sample, 2016–2019
+Prev. Chronic Dis., 20 (2023), Article 220408, 10.5888/pcd20.220408
+View at publisherGoogle Scholar
+Clement-Carbonell et al., 2021
+V. Clement-Carbonell, I. Portilla-Tamarit, M. Rubio-Aparicio, et al.
+Sleep quality, mental and physical health: a differential relationship
+Int. J. Environ. Res. Public Health, 18 (2) (2021), p. 460, 10.3390/ijerph18020460
+View at publisherGoogle Scholar
+Coventry et al., 2021
+P.A. Coventry, J.E. Brown, J. Pervin, et al.
+Nature-based outdoor activities for mental and physical health: systematic review and meta-analysis
+SSM Popul. Health., 16 (2021), Article 100934, 10.1016/j.ssmph.2021.100934
+View PDFView articleView in ScopusGoogle Scholar
+Csipo et al., 2021
+T. Csipo, A. Lipecz, C. Owens, et al.
+Sleep deprivation impairs cognitive performance, alters task-associated cerebral blood flow and decreases cortical neurovascular coupling-related hemodynamic responses
+Sci. Rep., 11 (2021), p. 20994, 10.1038/s41598-021-00188-8
+View at publisher
+View in ScopusGoogle Scholar
+Ebner and Singewald, 2017
+Karl Ebner, Nicolas Singewald
+Individual differences in stress susceptibility and stress inhibitory mechanisms
+Curr. Opin. Behav. Sci., 14 (2017), pp. 54-64, 10.1016/j.cobeha.2016.11.016
+View PDFView articleView in ScopusGoogle Scholar
+Eleanor et al., 2022
+Sanderson Eleanor, Glymour M. Maria, V. Holmes Michael, et al.
+Mendelian randomization
+Nat. Rev. Methods Primers., 2 (2022), p. 6, 10.1038/s43586-021-00092-5
+View at publisherGoogle Scholar
+Garbarino et al., 2021
+S. Garbarino, P. Lanteri, N.L. Bragazzi, et al.
+Role of sleep deprivation in immune-related disease risk and outcomes
+Commun. Biol., 4 (2021), p. 1304, 10.1038/s42003-021-02825-4
+View at publisher
+View in ScopusGoogle Scholar
+Hirotsu et al., 2015
+Camila Hirotsu, Sergio Tufik, Monica Levy Andersen
+Interactions between sleep, stress, and metabolism: from physiological to pathological conditions
+Sleep Sci., 8 (3) (2015), pp. 143-152, 10.1016/j.slsci.2015.09.002
+View PDFView articleView in ScopusGoogle Scholar
+Homberg et al., 2022
+Judith R. Homberg, Jagiellowicz, Jadzia
+A neural model of vulnerability and resilience to stress-related disorders linked to differential susceptibility
+Mol. Psychiatry, 27 (2022), pp. 514-524, 10.1038/s41380-021-01047-8
+View at publisherView in ScopusGoogle Scholar
+Huang et al., 2020
+Y. Huang, L. Li, Y. Gan, et al.
+Sedentary behaviors and risk of depression: a meta-analysis of prospective studies
+Transl. Psychiatry, 10 (2020), p. 26, 10.1038/s41398-020-0715-z
+View PDFView articleGoogle Scholar
+Ingrid et al., 2022
+Gergei Ingrid, Zheng Jie, F.M. Andlauer Till, et al.
+GWAS meta-analysis followed by Mendelian randomization revealed potential control mechanisms for circulating α-Klotho levels
+Hum. Mol. Genet., 31 (2022), pp. 792-802, 10.1093/hmg/ddab263
+View at publisher
+Google Scholar
+Junxiu et al., 2023
+Wang Junxiu, Zhang Yan, Zhang Yue, et al.
+China Sleep Research Report 2023
+Social Sciences Literature Publishing House, Peking (2023)
+Google Scholar
+Kalmbach David et al., 2018
+A. Kalmbach David, R. Anderson Jason, Christopher L. Drake
+The impact of stress on sleep: pathogenic sleep reactivity as a vulnerability to insomnia and circadian disorders
+J. Sleep Res., 27 (6) (2018), Article e12710, 10.1111/jsr.12710
+View at publisherGoogle Scholar
+Kerr and Booth, 2022
+Nathan R. Kerr, Frank W. Booth
+Contributions of physical inactivity and sedentary behavior to metabolic and endocrine diseases
+REVIEW, 33 (12) (2022 Dec), pp. 817-827, 10.1016/j.tem.2022.09.002
+View PDFView articleView in ScopusGoogle Scholar
+Kim et al., 2022
+T. Kim, S. Kim, J. Kang, M. Kwon, S.H. Lee
+The common effects of sleep deprivation on human long-term memory and cognitive control processes
+Front. Neurosci., 16 (2022 Jun), Article 883848, 10.3389/fnins.2022.883848
+View at publisherView in ScopusGoogle Scholar
+Krause et al., 2017
+A. Krause, E. Simon, B. Mander, et al.
+The sleep-deprived human brain
+Nat. Rev. Neurosci., 18 (2017), pp. 404-418, 10.1038/nrn.2017.55
+View at publisherView in ScopusGoogle Scholar
+Lavie et al., 2019
+C.J. Lavie, C. Ozemek, S. Carbone, et al.
+Sedentary behavior, exercise, and cardiovascular health
+Circ. Res., 124 (5) (2019 Mar), pp. 799-815, 10.1161/CIRCRESAHA.118.312669
+View at publisherView in ScopusGoogle Scholar
+Lawlor et al., 2008
+D.A. Lawlor, R.M. Harbord, J.A.C. Sterne, et al.
+Mendelian randomization: using genes as instruments for making causal inferences in epidemiology
+Stat. Med., 27 (2008), pp. 1133-1163, 10.1002/sim.3034
+View at publisherView in ScopusGoogle Scholar
+Luo et al., 2023
+Qiuxia Luo, Kai Bao, Wenlong Gao, Yuanyuan Xiang, Ming Li, Yuqi Zhang
+Joint effects of depressive status and body mass index on the risk of incident hypertension in aging population: evidence from a nationwide population-based cohort study
+BMC Psychiatry, 23 (2023 Aug), p. 608, 10.1186/s12888-023-05105-z
+View at publisher
+View in ScopusGoogle Scholar
+Matricciani et al., 2019
+L. Matricciani, C. Paquet, B. Galland, M. Short, T. Olds
+Children’s sleep and health: a meta-review
+Sleep Med. Rev., 46 (2019), pp. 136-150, 10.1016/j.smrv.2019.04.011
+View PDFView articleView in ScopusGoogle Scholar
+Mbiydzenyuy and Qulu, 2024
+N.E. Mbiydzenyuy, L.A. Qulu
+Stress, hypothalamic-pituitary-adrenal axis, hypothalamic-pituitary-gonadal axis, and aggression
+Metab. Brain Dis., 39 (2024), pp. 1613-1636, 10.1007/s11011-024-01393-w
+View at publisher
+View in ScopusGoogle Scholar
+Meerlo et al., 2008
+P. Meerlo, A. Sgoifo, D. Suchecki
+Restricted and disrupted sleep: effects on autonomic function, neuroendocrine stress systems and stress responsivity
+Sleep Med. Rev., 12 (3) (2008 Jun), pp. 197-210, 10.1016/j.smrv.2007.07.007
+View PDFView articleView in ScopusGoogle Scholar
+Mukherjee et al., 2024
+Upasana Mukherjee, Ujala Sehar, Malcolm Brownell, et al.
+Mechanisms, consequences and role of interventions for sleep deprivation: focus on mild cognitive impairment and Alzheimer’s disease in elderly
+Aging Res. Rev., 100 (2024 Sep), Article 102457, 10.1016/j.arr.2024.102457
+View PDFView articleView in ScopusGoogle Scholar
+Ormiston et al., 2022
+C.K. Ormiston, D. Lopez, F.A. Ishino, T.S. McNeel, et al.
+Acculturation and depression are associated with short and long sleep duration among Mexican Americans in NHANES 2005–2018
+Prev. Med. Rep. (2022), Article 101918, 10.1371/journal.pone.0311288
+View PDFView articleView in ScopusGoogle Scholar
+Owens, 2014
+J. Owens
+Insufficient sleep in adolescents and young adults: an update on causes and consequences
+Pediatrics, 134 (3) (2014 Sep), pp. e921-e932, 10.1542/peds.2014-1696
+View at publisherView in ScopusGoogle Scholar
+Palamarchuk Iryna and Tracy, 2021
+S. Palamarchuk Iryna, Vaillancourt Tracy
+Mental resilience and coping with stress: a comprehensive, multi-level model of cognitive processing, decision making, and behavior
+Front Behav Neurosci., 15 (2021), Article 719674, 10.3389/fnbeh.2021.719674
+View at publisherGoogle Scholar
+Radloff, 1977
+L.S. Radloff
+The CES-D scale: a self-report depression scale for research in the general population
+Appl. Psychol. Measur., 1 (1977), pp. 385-401, 10.1177/014662167700100306
+View at publisherView in ScopusGoogle Scholar
+Radloff, 1991
+L.S. Radloff
+The use of the center for epidemiologic studies depression scale in adolescents and young adults
+J. Youth Adolesc., 20 (2) (1991 Apr), pp. 149-166, 10.1007/BF01537606
+View at publisherView in ScopusGoogle Scholar
+Ramar et al., 2021
+K. Ramar, R.K. Malhotra, K.A. Carden, et al.
+Sleep is essential to health: an American Academy of sleep medicine position statement
+J. Clin. Sleep Med., 17 (10) (2021), pp. 2115-2119, 10.5664/jcsm.9476
+View at publisherView in ScopusGoogle Scholar
+Ramos et al., 2023
+A.R. Ramos, A.G. Wheaton, D.A. Johnson
+Sleep deprivation, sleep disorders, and chronic disease
+Prev. Chronic Dis., 20 (2023), Article 230197, 10.5888/pcd20.230197
+View at publisherGoogle Scholar
+Russell and Lightman, 2019
+G. Russell, S. Lightman
+The human stress response
+Nat. Rev. Endocrinol., 15 (2019), pp. 525-534, 10.1038/s41574-019-0228-0
+View at publisherView in ScopusGoogle Scholar
+Samsudin et al., 2024
+Nadia Samsudin, Richard Peter Bailey, Francis Ries, et al.
+Assessing the impact of physical activity on reducing depressive symptoms: a rapid review
+BMC Sports Sci. Med. Rehabil., 16 (2024 May), p. 107, 10.1186/s13102-024-00895-5
+View at publisher
+View in ScopusGoogle Scholar
+Sheng et al., 2021
+J.A. Sheng, N.J. Bales, S.A. Myers, et al.
+The hypothalamic-pituitary-adrenal axis: development, programming actions of hormones, and maternal-fetal interactions
+Front. Behav. Neurosci., 14 (2021 Jan), Article 601939, 10.3389/fnbeh.2020.601939
+View at publisherGoogle Scholar
+Silveira et al., 2022
+Erika Aparecida Silveira, Carolina Rodrigues Mendonça, Felipe Mendes Delpino, et al.
+Sedentary behavior, physical inactivity, abdominal obesity and obesity in adults and older adults: a systematic review and meta-analysis
+Clin. Nutr. ESPEN., 50 (2022), pp. 63-73, 10.1016/j.clnesp.2022.06.001
+View PDFView articleView in ScopusGoogle Scholar
+Siraji et al., 2023
+M.A. Siraji, M. Spitschan, V. Kalavally, et al.
+Light exposure behaviors predict mood, memory and sleep quality
+Sci. Rep., 13 (2023), Article 12425, 10.1038/s41598-023-39636-y
+View at publisher
+View in ScopusGoogle Scholar
+Su et al., 2017
+C. Su, X. Jia, Z. Wang, et al.
+Longitudinal association of leisure time physical activity and sedentary behaviors with body weight among Chinese adults from China health and nutrition survey 2004–2011
+Eur. J. Clin. Nutr., 71 (2017), pp. 383-388, 10.1038/ejcn.2016.262
+View in ScopusGoogle Scholar
+Tomaso et al., 2021
+C.C. Tomaso, A.B. Johnson, T.D. Nelson
+The effect of sleep deprivation and restriction on mood, emotion, and emotion regulation: three meta-analyses in one
+Sleep, 44 (6) (2021 Jun), Article zsaa289, 10.1093/sleep/zsaa289
+Google Scholar
+WHO, 2023
+WHO
+Stress
+https://www.who.int/news-room/questions-and-answers/item/stress (2023 Feb)
+Google Scholar
+WHO, 2024
+WHO
+WHO and UNICEF release guidance to improve access to mental health care for children and young people
+https://www.who.int/news/item/09-10-2024-who-and-unicef-launch-guidance-to-improve-access-to-mental-health-care-for-children-and-young-people (2024 Oct.)
+Google Scholar
+Yang et al., 2023
+H. Yang, R. An, C.V. Clarke, J. Shen
+Impact of economic growth on physical activity and sedentary behaviors: a systematic review
+Public Health, 215 (2023), pp. 17-26, 10.1016/j.puhe.2022.11.020
+View PDFView articleGoogle Scholar
+Zhang and Liu, 2024
+Y. Zhang, X. Liu
+Effects of physical activity and sedentary behaviors on cardiovascular disease and the risk of all-cause mortality in overweight or obese middle-aged and older adults
+Front. Public Health, 12 (2024 Feb), Article 1302783, 10.3389/fpubh.2024.1302783
+View in ScopusGoogle Scholar
+Cited by (0)
+© 2025 The Authors. Published by Elsevier B.V.
+Recommended articles
+Diet quality and depression risk: A systematic review and meta-analysis of prospective studies
+Journal of Affective Disorders, Volume 382, 2025, pp. 154-166
+Patricio Molero, …, Marc L. Molendijk
+View PDF
+Specific expression and common potential therapeutic drugs in different brain regions of major depressive disorder patients: bioinformatics analysis
+Journal of Affective Disorders, Volume 382, 2025, pp. 478-487
+Nan Chen, Yong Luan
+View PDF
+Multi-omics reveal the role of nociception-related genes TNXB, CTNND1 and CBL in depression
+Journal of Affective Disorders, Volume 382, 2025, pp. 346-354
+Qian Wu, …, Xiuyun Wen
+View PDF
+Show 3 more articles
+Article Metrics
+Captures
+Mendeley Readers10
+View details
+About ScienceDirect
+Remote access
+Advertise
+Contact and support
+Terms and conditions
+Privacy policy
+
+Cookies are used by this site.Cookie Settings
+
+All content on this site: Copyright © 2025 Elsevier B.V., its licensors, and contributors. All rights are reserved, including those for text and data mining, AI training, and similar technologies. For all open access content, the relevant licensing terms apply.

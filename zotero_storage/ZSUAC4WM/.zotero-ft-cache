@@ -1,0 +1,704 @@
+COMPREHENSIVE REVIEW
+The use of virtual reality in assessment and treatment of
+anxiety and related disorders
+Katharina Meyerbröker1,2 | Nexhmedin Morina3
+1Department of Clinical Psychology, Utrecht University, Utrecht, The Netherlands
+2Altrecht Academic Anxiety Centre, Utrecht, The Netherlands
+3Institute of Psychology, University of Münster, Münster, Germany
+Correspondence
+Katharina Meyerbröker, Utrecht University, Department of Clinical Psychology, Heidelberglaan 1, 3584 CS, Utrecht, The Netherlands. Email: k.meyerbroker@uu.nl
+Abstract
+In recent years the development of new virtual environments has been qualitatively
+high and fast at the same time, but the dissemination of virtual reality (VR) in clinical
+practice is still scarce. The aim of this review is to give an insight into the state of the
+art of the use of VR as an assessment tool and treatment intervention in anxiety and
+related disorders as posttraumatic stress disorder and obsessive–compulsive
+disorders.
+Besides an overview into the efficacy of VR, a summary will be given on assumed
+working mechanisms in virtual reality exposure therapy and how this aligns with
+current theoretical models. Further, it will be discussed how VR is accepted by
+patients and research into the reluctance of therapist to use this technology
+during treatment with focus on the therapeutic alliance and how it may be
+influenced by the use of VR. Finally, we discuss clinical and future issues as, for
+example, dissemination into clinical practice and what VR has to offer therapists
+in future. This not only in adult population but as well in younger patients, as
+young adolescents VR has a great potential as it connects easily with its playful
+elements to this population and might be a low threshold step to offer treatment
+or preventive interventions.
+KEYWORDS
+anxiety disorders, OCD, PTSD, virtual reality, virtual reality exposure
+1 | INTRODUCTION
+Exposure therapy involves exposing the patient to feared stimuli and
+is the treatment of choice in the majority of anxiety and related
+disorders (National Institute for Health and Clinical Excellence, 2011).
+Virtual reality exposure therapy (VRET) can be categorized as a
+modern variant of exposure therapy designed to simulate naturalistic
+environments wherein patients are exposed to their idiosyncratic fear.
+Given its unlimited technological possibilities, VRET offers the
+therapist a pallet of options to provide individual tailored exposure
+treatment. The use of VRET in anxiety and related disorders has been
+one of first technological agents introduced in the therapist's office.
+Its efficacy has been studied extensively (e.g., Carl et al., 2019;
+Wechsler et al., 2019), including its generalizability to the real world
+(Morina, Ijntema, et al., 2015).
+The dominant theory in explaining the effects of exposure ther
+apy has been the Emotional Processing Theory (Foa & Kozak, 1986).
+However, in recent years the effects of exposure therapy have been
+explained in terms of the inhibitory learning model (Craske
+et al., 2014). Although underlying mechanisms of VRET are still not
+Received: 23 March 2021 Revised: 28 May 2021 Accepted: 30 May 2021
+DOI: 10.1002/cpp.2623
+This is an open access article under the terms of the Creative Commons Attribution-NonCommercial-NoDerivs License, which permits use and distribution in any medium, provided the original work is properly cited, the use is non-commercial and no modifications or adaptations are made. © 2021 The Authors. Clinical Psychology & Psychotherapy published by John Wiley & Sons Ltd.
+466 wileyonlinelibrary.com/journal/cpp Clin Psychol Psychother. 2021;28:466–476.
+
+
+well understood (Scheveneels et al., 2019), parallels in temporal
+precedence between VRET and exposure in vivo have been found
+(Meyerbroeker et al., 2013).
+The aim of this literature overview is to provide the reader with
+the current evidence for VR as an assessment and treatment tool in
+anxiety and related disorders. We will further focus on implications
+for future research and clinical practice.
+2 | ASSESSMENT
+VR offers a high potential in ecological validity and controlled real life
+experiences (Bell et al., 2020). Furthermore, consumer and commercial
+VR has been available for a long time now (Riva & Serino, 2020).
+Nonetheless, empirical findings about VR as an assessment tool
+are still scarce. Most of the available research into the assessment of
+anxiety disorders with VR has been conducted with social
+anxiety disorder (SAD), posttraumatic stress disorder (PTSD) and
+obsessive–compulsive disorder (OCD). For a more extensive overview
+in other disorders see Emmelkamp and Meyerbröker (2021).
+2.1 | Social anxiety disorder
+Research investigating whether VR can be used as a reliable and valid
+assessment tool in SAD and fear of public speaking has produced
+rather inconclusive results. This might be due to the racing
+technological development in recent years. While in earlier years
+spontaneous interaction between the patient and an avatar (virtual
+person in VR) were not possible due to pre-programmed speech
+sequences of the avatars, more recently spontaneous interaction in
+VR were made possible by developing interactive avatars.
+Several studies have concluded that virtual social environments
+can be effectively modified for therapeutic purposes (Felnhofer
+et al., 2019; Hartanto et al., 2014; H. Kim et al., 2018; Kishimoto &
+Ding, 2019; Lange & Pauli, 2019). For example, Kim et al. (2018)
+instructed 79 individuals with SAD and 51 healthy control participant
+to give impromptu speeches on self-related topics to a virtual
+audience and reported that participants with SAD showed less eye
+gaze towards the audience than healthy controls. Lange and
+Pauli (2019) examined avoidance behaviour in 50 individuals with high
+versus low social anxiety and concluded that avoidance behaviour
+when bypassing virtual humans with neutral and angry facial
+expressions is modulated by the emotional facial expressions of virtual
+bystanders and that social anxiety generally amplifies avoidance.
+Research has also investigated the use of verbal interactions
+between individuals with high anxiety levels and virtual humans. In a
+pilot study with healthy participants, it was found that real time
+conversations operated by the therapist in VR can elicit fear
+(Powers et al., 2013). Our group has applied a virtual reality system
+specifically designed to expose clients with social anxiety to anxiety
+provoking verbal social situations. In a study, we found that two
+sessions of virtual exposure involving several free speech dialogues
+with avatars prearranged by the therapist could induce significant
+levels of social anxiety in university students with elevated social
+anxiety (Morina, Brinkman, et al., 2015). In a more recent study, we
+investigated whether a VR behavioural avoidance test (BAT) would
+predict social anxiety in daily life (Kampmann et al., 2018). In
+particular, we investigated the value of maximum anxiety levels during
+in vivo and virtual reality behavioural assessment tasks (BATs) in
+predicting daily social anxiety relative to self-report measures. It was
+found that neither in vivo nor VR BATs better predicted complaints of
+social anxiety than self-report questionnaires.
+Other studies have investigated potential physiological
+differences between virtual reality BAT and in vivo BAT (Dechant
+et al., 2017; Kothgassner et al., 2016; Owens & Beidel, 2015;
+Scheveneels et al., 2019). The findings indicate that asking individuals
+with and without SAD to give a presentation in front of a virtual
+audience versus a real audience leads to similar significant increases in
+physiological outcomes, such as salivary cortisol, cardiovascular
+or electrodermal activity (Kothgassner et al., 2016; Owens &
+Beidel, 2015). This applied both to normal participants and individuals
+with SAD. There is some preliminary evidence that assessing
+physiological outcomes while being confronted with feared virtual
+environments may have diagnostic validity (Scheveneels et al., 2019).
+In sum, VR has the potential to function as an ecological valid
+assessment instrument. However, future research needs to further
+examine its potential additional value above self-report questionnaires.
+2.2 | Posttraumatic stress disorder
+Even though patients with PTSD are known to be highly avoidant of
+trauma related stimuli, research into VR as an assessment tool is scarce.
+In one study conducted with veterans, it was investigated whether
+avoidant behaviour on an avatar task predicts PTSD severity (Myers
+et al., 2016). In this study, the patient directed an avatar confronted with
+elements potentially triggering his symptoms. A strong correlation
+between PTSD symptom burden and the ability to predict PTSD symp
+tom burden based on demographic variables (age, sex and combat expo
+sure) was significantly improved by adding the task score as a predictor.
+The authors concluded that virtual environments have the potential for
+more objective assessment of PTSD symptoms, compared with symptom
+self-report which have been associated with over- or underreport of
+Key Practitioner Message
+• Virtual reality exposure therapy is effective in most anxi
+ety disorders
+• Virtual reality as an assessment tool offers potential as a
+research paradigm
+• Virtual reality exposure working mechanisms are not yet
+investigated well
+• Cost-effectiveness of VR in clinical practice is not well
+established yet
+MEYERBRÖKER AND MORINA 467
+10990879, 2021, 3, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/cpp.2623 by Cochrane France, Wiley Online Library on [22/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+symptoms in veterans. In PTSD research, VR has been used as a predic
+tion tool for the development of PTSD symptoms in veterans as well, for
+an overview see Bourla et al. (2018). Furthermore, VR has also been
+applied as an experimental psychopathology model to study trauma
+related symptoms among healthy participants. Several studies provide
+evidence that VR can successfully elicit negative affect and
+induction-related symptoms (e.g., Cuperus et al., 2017; Dibbets, 2020;
+Dibbets & Schulte-Ostermann, 2015; Meyer et al., n.d.). The aim in these
+studies is to assess relevant cognitive, behavioural and physiological pro
+cesses involved in stress-related symptoms, aiming at increasing our
+knowledge about PTSD by modelling processes related to trauma
+exposure.
+2.3 | Obsessive–compulsive disorder
+In OCD, several studies have investigated the feasibility of VR as an
+assessment instrument, mainly focusing on evoking fear of
+contamination and control behaviours. Objective behavioural indices
+have been used to study OCD behaviour in a daily environment
+(e.g., house and office) to assess how individuals engage in OCD rele
+vant tasks (Kim et al., 2010). The VR task included measures of
+checking behaviour (i.e., frequency and gaze duration) and time spent
+gazing at relevant OCD stimuli. It was found that these measures
+differentiated well between healthy individuals and those with OCD. A
+study elaborating on these findings by the same group (Kim et al., 2012)
+investigated whether the VR environment could discriminate OCD
+patients with checking behaviours from those without checking behav
+iours. The authors concluded that patients with checking behaviour
+showed a higher checking frequency and spent more time on checking
+and more time on gazing in the VR environment. This is in line with a
+pilot study done by another group, wherein a virtual video game envi
+ronment (i.e., a house with different OCD provoking situations as, e.g., a
+burning gas stove) was used to provoke more OCD symptoms in OCD
+patients in comparison to healthy controls (van Bennekom et al., 2017).
+The study was replicated in another small sample by the same group
+(van Bennekom et al., 2021). No relation was found between arousal
+and emotions during the VR game and the severity measure of OCD.
+The authors concluded that their gaming environment has the potential
+to objectify and standardize OCD diagnosis. In a study focusing more
+on individuals with fear of contamination, a subtype of OCD, it was
+investigated whether the VR environment could evoke anxiety
+symptoms (Laforest, Bouchard, Crétu, et al., 2016). Participants had to
+go through the restroom with various degrees of cleanliness (e.g., the
+first stall was relatively clean, and the last presented filthy walls and an
+unflushed toilet). Participants were asked to virtually ‘touch’ walls and
+the toilet seat each time with their hands. It was found that exposure to
+a more contaminated virtual environment resulted in higher levels of
+anxiety on self-report and physiological measures in the OCD group rel
+ative to individuals without fear of contamination.
+In sum, it has been found that VR has potential in diagnostic valid
+ity, including discrimination between subtypes of OCD (e.g., fear of
+contamination). Yet, future research needs to further examine several
+basic assessment criteria: usability; utility (i.e., what us the additional
+value of a technological contribution), and satisfaction and reliability
+(including accuracy, effectiveness, and efficiency) (for an overview see
+Ferreri et al., 2019). Other relevant developmental possibilities con
+cern for example enhancing the sense of presence by using rubber
+hands in fear of contamination (Jalal et al., 2020).
+3 | TREATMENT
+Several clinical trials have assessed the efficacy of VRET for patients
+with specific phobias, SAD, agoraphobia and panic disorder,
+generalized anxiety disorder (GAD), and PTSD, and OCD.
+3.1 | Specific phobias
+Specific phobias can be subdivided into different categories such as sit
+uational phobias (e.g. fear of flying) or small animals (e.g., spider phobia)
+(American Psychiatric Association, (APA), 2013). We will limit this
+overview to the clinically most relevant phobias as acrophobia and fear
+of flying for which several RCT's have been conducted. In a first RCT,
+33 patients with acrophobia were randomized to either VRET or
+exposure in vivo to heights (Emmelkamp et al., 2002). The virtual
+environments were an exact copy of the surroundings for the exposure
+in vivo (i.e., fire escape stairs). VRET was found to be as effective as
+exposure in vivo on anxiety and avoidance self-report measures and a
+behavioural avoidance test. Results were maintained at 6-month
+follow-up. In another study, a randomized crossover design was used
+to investigate whether cognitive coping statements would enhance the
+effects of VRET (Krijn, Emmelkamp, Ólafsson, Schuemie, & Van Der
+Mast, 2007). Twenty-six patients with acrophobia were randomly
+assigned to either two sessions of VRET followed by two sessions of
+VRET + coping statements or two sessions of VRET + coping
+statements followed by two sessions of VRET. The authors concluded
+that coping statements had no additional value above VRET.
+In a more recent trial that combined VR with a smartphone
+application (Donker et al., 2019), participants with acrophobia were ran
+domly assigned to either a self-guided app-based VR intervention using
+cardboard VR goggles or a waiting list control condition. A total of six
+animated VR CBT modules and a gamified VR environment were made
+accessible during a 3-week period. A total of 193 participants were ran
+domly assigned to either the intervention group (n = 96) or a control
+group (n = 97). Intent-to-treat analyses showed a significant reduction
+of acrophobia symptoms after treatment and at 3-month follow-up.
+Another RCT was investigated whether effects of VRET in patients
+with acrophobia or fear of flying could be enhanced by pharmacological
+agents (Meyerbröker et al., 2018). Patients were randomly assigned to
+either VRET plus yohimbine hydrochloride, VRET plus propranolol, or
+VRET plus a placebo. It was found that while all three conditions
+improved on the anxiety symptoms, no differences were found
+between conditions, indicating that VRET with a nonactive placebo is a
+powerful intervention in the treatment of acrophobia.
+468 MEYERBRÖKER AND MORINA
+10990879, 2021, 3, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/cpp.2623 by Cochrane France, Wiley Online Library on [22/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+Research into the efficacy of VRET in fear of flying has been done in
+comparison with different control conditions. In the first trials, it was
+found that VRET for fear of flying was more effective than bibliotherapy,
+relaxation and exposure in vitro (Maltby et al., 2002; Mühlberger
+et al., 2001). The long-term effects were maintained up to 3 years after
+treatment (Mühlberger et al., 2006; Wiederhold & Wiederhold, 2003). In
+other trials, VRET was compared to cognitive therapy (Krijn, Emmelkamp,
+Ólafsson, Bouwman, et al., 2007) and exposure in vivo (Rothbaum
+et al., 2000; Rothbaum et al., 2006). It was found across studies that
+VRET was as effective as exposure in vivo and that its effects generalized
+to the real world (Morina, Ijntema, et al., 2015). VRET for fear of flying
+offers some advantages over exposure in vivo. Along treatment efficacy
+VRET for fear of flying represents a more sustainable therapy as it can be
+conducted without having to actually fly (Meyerbröker, 2014).
+3.2 | Social anxiety disorder
+Several controlled trials have examined treatment efficacy in SAD
+(see Emmelkamp et al., 2020 for an overview of research into differ
+ent aspects of SAD). The first trial was conducted by Klinger
+et al. (2005) who divided and matched 36 patients with SAD into two
+groups based on gender, age, duration, SAD severity and ability to use
+computers. The examination of a 12 sessions virtual exposure to
+diverse social situations relative to a 12 sessions group cognitive
+behaviour therapy revealed both treatments were similarly effective.
+More recently, four RCTS have investigated VRET in socially anxious
+patients, including speech anxiety. Bouchard et al. (2011) compared
+two variants of CBT plus exposure with waiting list control: (a) CBT
+plus exposure in vivo and (b) CBT plus exposure in virtuo. Both
+variants of CBT were clearly more effective than the control condition
+and no differences were found in effects of CBT plus exposure in vivo
+and CBT plus exposure in virtuo. However, results are difficult to
+interpret, given that the exposure variants were mixed with other
+CBT exercises. Since then, three RCTs applying VRET alone or in
+combination with cognitive components have been conducted
+(Anderson et al., 2013; Bouchard et al., 2011; Kampmann et al., 2016).
+Bouchard et al. (2011) compared CBT plus VRET (n = 17) and CBT
+plus in vivo exposure (n = 22) to a wait-list condition (n = 20). Both
+active treatments were more effective than wait-list and results indi
+cated that CBT plus VRET was more effective than CBT plus in vivo
+exposure. The results were similar at the 6-month follow-up. It must be
+noted, however, that in this trial the therapist discussed exposure exer
+cises with the patient while being in the same room, which may have
+confounded the results. Furthermore, given the combination of cogni
+tive restructuring and VRET, the effects of pure VRET cannot be iso
+lated. Anderson et al. (2013) randomly assigned patients with SAD to
+8 weeks of VRET (n = 30) or exposure group therapy (n = 39) or wait
+list control (n = 28). A substantial number of participants had fear of
+public speaking as their main complaint. Both treatments involved cogni
+tive components addressing self-focused attention, negative perception
+of self and others, rumination, perception of negative emotion regula
+tion and unrealistic goal settings in social situations. Treatment efficacy
+was re-assessed among 28 out of the original sample of 65 patients 4 to
+6 years after treatment and the majority of patients reported significant
+improvements (Anderson et al., 2017; Richards et al., 2016).
+Our group (Kampmann et al., 2016) conducted the first trial with
+patients with generalized SAD using pure VRET without any cognitive
+intervention (n = 20) and compared this to individual exposure in vivo
+without any cognitive intervention (n = 20) and a wait-list control group
+(n = 20). Furthermore, this was the first trial to apply a variety of com
+plex virtual social interactions (e.g., buying and returning clothes, talking
+to a stranger or attending a job interview), which were controlled by the
+therapist sitting in a separate room. Both active treatments were more
+effective than the wait-list control group on social anxiety symptoms,
+BAT, stress, and avoidant personality disorder related beliefs. However,
+in vivo exposure was more effective than VRET in reducing social anxi
+ety and avoidant personality disorder related beliefs at 3-month follow
+up. Thus, VRET as a standalone therapy consisting of extensive verbal
+interaction only was effective in reducing complaints of generalized
+SAD, yet it was less effective than exposure in vivo.
+Altogether, existing trials suggest that VRET for SAD is effective.
+However, more clinical trials on the efficacy of VRET for SAD are
+clearly needed.
+3.3 | Agoraphobia and panic disorder
+In the treatment of panic disorder and agoraphobia, VR provides an
+excellent opportunity to mimic different daily life situations. Although
+this prospect seems obvious, existing research into the efficacy of
+VRET in panic disorder and agoraphobia has been limited, and
+dissemination into clinical practice is not seen often.
+In a first study with patients with panic disorder VRET was
+compared to exposure in vivo in weekly treatment consisting of
+nine sessions (Botella et al., 2007). It was found that VRET was
+superior to the waiting list control group, but that effects for VRET
+were comparable to those in exposure in vivo and were maintained
+at 12-month follow up. In another study VRET was compared to
+CBT in an 11 session treatment (Penate et al., 2008). At post
+treatment participants were asked to do a behavioural avoidance
+test, wherein patients were asked to walk on a common street.
+Results showed that effects of CBT and VRET were comparable,
+showing a significant decrease on panic measures. In another RCT,
+92 patients with panic disorder and agoraphobia were randomized
+to receive either CBT or VRET (Pelissolo et al., 2012). Moderate
+response rates to treatment were found in both groups, without
+any significant difference between-groups. The results were stable
+at 9-month follow-up. In another RCT, our group combined VRET
+with cognitive interventions and compared to cognitive interven
+tions and exposure in vivo or a waiting list control condition
+(Meyerbroeker et al., 2013). It was found that cognitive interven
+tions plus VRET or exposure in vivo were superior to waiting list
+control condition, but on three of the four outcome measures
+effects found were equally effective between in vivo or VRET. In a
+small RCT, the additional effect of cognitive therapy added to VRET
+MEYERBRÖKER AND MORINA 469
+10990879, 2021, 3, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/cpp.2623 by Cochrane France, Wiley Online Library on [22/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+was investigated (Malbos et al., 2013) and no additional value of
+cognitive therapy was found.
+Taken together, VRET seems to be a suitable treatment for
+patients with panic disorder and agoraphobia (Wechsler et al., 2019),
+but dissemination is not easy in times that generalization and
+distribution of virtual environments remains a costly issue.
+3.4 | Generalized anxiety disorder
+Different strategies have been applied to use VR techniques in the
+treatment of GAD (see e.g., Wang et al., 2019). Not all of these
+treatment approaches are in line with international treatment
+guidelines (NICE, 2013), nor do they make use of standardized
+research procedures or relevant clinical measures.
+In a first study VRET was combined with a mobile device giving bio
+feedback in comparison with a waiting list control group (Gorini &
+Riva, 2008). In this small trial participants entered a relaxing and peace
+ful virtual environment (e.g., a beach or a park), where they could relax.
+After the relaxation phase participants were exposed to their idiosyn
+cratic stressor in words and had to rate their anxiety. It was found that
+both groups improved compared to baseline, but no differences
+between the groups were found. These results are in line with another
+study wherein VR was used as a relaxation method in combination with
+a mindfulness skills training (Navarro-Haro et al., 2019). In this study
+mindfulness group training was compared with mindfulness training
+plus VR training in mindfulness in reducing GAD symptoms. It was
+found that both groups improved significantly on GAD measures, but
+only the VR group showed a better treatment adherence.
+In a small pilot study, 24 patients with GAD were randomized to
+(a) the VR and mobile group, including a biofeedback-assisted
+relaxation programme; (b) the VR and mobile group without
+biofeedback; or (c) a waiting-list control group (Repetto et al., 2013).
+A clinical protocol for the treatment of GAD based on the use of a
+biofeedback-enhanced VR system was investigated. The VR consisted
+of an eight-session treatment wherein relaxation and exposure
+techniques were used. In the first six sessions, patients explored
+relaxing VR environments (e.g., a tropical island) that were
+accompanied by progressive muscle relaxation. In the last two
+sessions, the patients explored the island again but were exposed to
+preselected words or images related to their idiosyncratic stressful
+fears. Although both active treatment groups experienced a significant
+decrease on general anxiety symptoms, no difference was found
+between conditions.
+In a different approach to treat GAD, it was investigated whether
+the engagement in aerobic exercise would lead to stress reduction
+and therefore to the presence of less GAD symptoms (Wang
+et al., 2020). In this study 77 patients with GAD were randomly
+assigned to either to virtual nature group or a virtual abstract painting
+group. In the virtual nature a 20-min moderate to high intensity
+aerobic exercise was done. Results on psychophysiological and
+self-report measures showed that the virtual nature group compared
+to the virtual abstract painting group showed higher levels of stress
+reduction and personal satisfaction. The authors conclude that a
+virtual exercise is more effective in inducing relaxing effects in
+patients with GAD.
+In within-subjects design it was investigated whether patients
+with GAD, who were first exposed to a neutral non-catastrophic sce
+nario and then to a personalized scenario in imagination or a standard
+ized virtual scenario, all presented in a counter-balanced order
+(Guitard et al., 2019). It was found that the standardized virtual reality
+scenario evoked as much anxiety as the personalized scenario in imag
+ination. The authors conclude that the standardized VR scenario can
+be used in therapy and that the findings were not attributable to gen
+eral negative effect but GAD anxiety specific.
+In sum, there are interesting approaches into the treatment of
+GAD, but none of these studies has proven the additional value of
+VR in the treatment of GAD. The last study (Guitard et al., 2019)
+seems to be a promising approach, but further efficacy trials
+are needed.
+3.5 | Posttraumatic stress disorder
+Rothbaum et al. (2001) conducted the first examination of the efficacy
+of VRET for PTSD in an open clinical trial with 16 male Vietnam
+veterans in the US. VRET consisted of an average of 13 exposure
+therapy sessions, following which patients reported a significant
+reduction in PTSD. Since then, several RCTs have compared the
+efficacy of VRET for PTSD, with most of them using exposure therapy
+as an active control condition (McLay et al., 2011, McLay et al., 2017;
+Reger et al., 2016; Roy et al., 2014), whereas one RCT compared
+VRET to present-centred therapy. All of the trials comparing VRET to
+an active condition were conducted with military personnel. The
+findings do not suggest any significant differences between VRET
+and exposure therapy (McLay et al., 2011, McLay et al., 2017;
+Reger et al., 2016; Roy et al., 2014). The comparison of VRET to
+present-centred therapy also indicated that VRET is effective in
+treating PTSD, without any significant difference between the two
+active conditions (Ready et al., 2010).
+A number of RCTs compared the efficacy of VRET to wait-list
+among military personnel (Gamito et al., 2010; Miyahira et al., 2012;
+Reger et al., 2016) or civilians and disaster workers exposed to 9/11
+terrorist attacks (Difede et al., 2007). These trials revealed that VRET
+is significantly more effective in reducing PTSD symptoms than
+wait-list control conditions.
+Altogether, current research on VRET for PTSD suggests
+that VRET can successfully reduce PTSD symptoms. It must be
+noted, however, that the findings must be interpreted with
+great caution because only two of the trials included more than
+10 participants in the VRET condition (McLay et al., 2017; Reger
+et al., 2016, with 36 and 30 participants in the VRET condition at
+post-treatment, respectively). To that effect, more trials with larger
+samples are needed. Furthermore, future research needs to
+investigate potential benefits of VRET over other available
+efficacious treatments.
+470 MEYERBRÖKER AND MORINA
+10990879, 2021, 3, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/cpp.2623 by Cochrane France, Wiley Online Library on [22/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+3.6 | Obsessive–compulsive disorder
+In a pilot study with OCD patients with fear of contamination, a
+12 session VR exposure and response prevention (ERP) treatment
+was given (Laforest, Bouchard, Bossé, et al., 2016). A single-case
+design was used to analyse the data of three patients exposed to two
+different virtual environments (one neutral training environment and a
+contaminated OCD environment). Data of a time series analyses
+showed significant symptom reduction in all patients.
+After this first promising pilot study, only two other trials into the
+efficacy of VR ERP have been published. The first concerns a
+nonclinical trial with participants (n = 21) with high fear of contamina
+tion, who received three sessions of VR ERP (Inozu et al., 2020). It
+was shown that participants experienced less anxiety and disgust and
+a reduced urge to wash their hands in comparison with healthy
+controls. In another study with OCD patients, the use of rubber hands
+to simulate contamination with a patient's own hands were investi
+gated (Jalal et al., 2020). In this trial participants watched a visible fake
+hand that was mimicked with their invisible real hand, simulation
+exposure to that their hand was contaminated with fake faeces.
+Patients (n = 29) were randomly assigned to either synchronously
+manipulation or asynchronously. It was found that after 5 min of
+tactile stimulation of the hand no differences between groups were
+found, indicating an increased facial disgust, increased anxiety and
+handwashing urges.
+To sum up, it is surprising that despite a chronic course of the
+disorder, almost no studies into the efficacy of VR ERP can be found.
+Although, different OCD themes (e.g., control, contamination, etc.)
+make different environments necessary to apply broad ERP, these
+themes seem to be universal (Hunt, 2020). Whether virtual
+environments specifically need to incorporate all idiosyncratic fears of
+patients remains unclear (Meyerbröker, 2014), however, the efficacy
+of VR ERP still needs to be demonstrated.
+4 | WORKING MECHANISMS OF VIRTUAL REALITY EXPOSURE THERAPY
+In this section, the theoretical assumptions of exposure therapy and
+how they align with findings within VR research will be discussed. In
+general, research into the working mechanisms of change underlying
+VRET has been scarce.
+It has been assumed that the effects of VRET are driven by the
+same underlying cognitive and emotional mechanisms as exposure
+in vivo. Currently, the most influential theoretical model on explaining
+the effects of exposure therapy for anxiety disorders is the inhibitory
+learning model (Craske et al., 2014). However, according to the
+inhibitory learning model, patients learn in exposure therapy that their
+feared negative outcomes cannot occur or will not have the same
+consequences as in real life. For instance, a patient with OCD will
+know that touching a virtual contaminated toilet can lead to disgust,
+but not to actual contamination. In fact, a large number of feared
+negative outcomes often reported by patients with anxiety disorders
+cannot occur in VRET. Therefore, it can be questioned if the effects
+found in VRET can be fully explained by the inhibitory learning model.
+In a recent study into the working mechanisms of VRET, it was
+found that treatment effects were not predicted by the extent to
+which participants could test and evaluate their expectancies of an
+exposure task (Scheveneels et al., 2019). This remains the only study
+to date, which investigated the effects of VRET and how these align
+to the inhibitory learning model.
+In earlier studies, the effects of VRET were investigated in terms
+of the Emotional Processing Theory (EPT), which posits three basic
+assumptions (Foa & Kozak, 1986). According to the EPT, first
+activation of the anxiety network has to take place, before within
+and between session habituation can occur. In VRET results with
+patients with fear of heights (Emmelkamp et al., 2002), panic
+disorder and agoraphobia (Meyerbroeker et al., 2013), and PTSD
+(Reger et al., 2019) have been compared to exposure in vivo and
+prolonged exposure. In fear of heights, the authors found that
+subjective units of distress (SUDS) during VR exposure and exposure
+in vivo showed that patients were basically experiencing the same
+reactions: anxiety first increased during exposure and then steadily
+decreased across sessions. The authors concluded that generally the
+overall anxiety level experienced during VR exposure, was lower than
+the anxiety experienced during exposure in vivo, but this did not
+affect efficacy. This is comparable with the results found in panic
+disorder and agoraphobia and PTSD and prolonged exposure. No
+differences between the VRET and (prolonged) exposure (in vivo)
+group were found on average and peak SUDS and relevant outcome
+measures.
+Besides the EPT and the inhibitory learning model, other
+cognitive and emotional processes such as self-efficacy have been
+investigated. Self-efficacy refers to the concept of trust into
+one's own capacity to successful execute a relevant behaviour
+(Bandura, 1977). Several studies have investigated cognitive and
+emotional mechanisms involved in VRET. Both in SAD
+(Kampmann et al., 2019) and in specific phobias (Meyerbröker &
+Emmelkamp, 2008) it was found that self-efficacy increases during
+VRET. Self-efficacy was significantly associated with treatment
+outcome, but these changes did not significantly predict symptom
+improvement (Kampmann et al., 2019).
+In a study using VRET as exposure method in 28 patients with
+spider phobia, it was found that changes in perceived self-efficacy
+and dysfunctional beliefs were the best predictor of change in
+general outcome measures (Côté & Bouchard, 2009). Findings
+indicate that eventually a sense of mastery is an important element
+accounting for the effects of VRET. A study done by the same
+group (Tardif et al., 2019) revealed that among patients with spider
+phobia changes in their beliefs about spiders and in perceived
+self-efficacy significantly predicted the reduction in fear after VR
+treatment.
+In sum, it can be concluded that self-efficacy plays an important
+role in VRET, possibly by breaking an avoidance behaviour pattern
+and increasing the belief about one's own capacity and maybe thereby
+the motivation in patients to go further in the process of exposure.
+MEYERBRÖKER AND MORINA 471
+10990879, 2021, 3, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/cpp.2623 by Cochrane France, Wiley Online Library on [22/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+However, more research into the mechanisms of change in VRET is
+clearly warranted, given that the effects of VRET do not align with
+theoretical models.
+5 | CLINICAL PRACTICE
+With respect to clinical practice, there are some reoccurring issues
+concerning both the patients and the therapists. Difficulties on how
+to engage patients to use VR for therapeutic reasons relate to
+patients' distrust in technology or avoidance tendencies. On the other
+hand, some therapists are concerned that the use of VR might
+diminish the therapeutic relationship. In our experience, most patients
+are willing to at least give VRET a try. This helps them to get familiar
+with the advantages of VR therapy. In recent years, the equipment for
+VR treatment has become much lighter and easily applicable. In a first
+study done already in 2007 (Garcia-Palacios et al., 2007) patients
+willingness to undergo VRET or exposure in vivo was compared in
+patients with specific phobias. The authors conclude that the
+acceptability of VRET was comparable to exposure in vivo. In another
+study the acceptability of VR interoceptive exposure was compared
+to traditional interoceptive exposure in patients with panic disorder
+(Quero et al., 2014). Although the VR interoceptive exposure was
+evaluated as positively as traditional interoceptive exposure at
+post-treatment, at 3 month follow-up patients who had received VR
+interoceptive exposure were less satisfied than patients who had
+received traditional interoceptive exposure.
+While in the past decennia there have been enormous improve
+ments of virtual environments, it has not been observed that patients
+experienced significantly more emotional involvement by a higher
+sense of presence. As a consequence, it can be concluded that making
+virtual environments more realistic does not necessarily increase the
+sense of presence and emotional involvement. Altogether, it seems
+sufficient that a virtual environment generally contains the anxiety
+specific triggers for a disorder to enhance the sense of presence in
+patients. This is often enhanced when a certain level of interaction is
+possible in the virtual environment. Comparing attrition rates between
+VRET and exposure in vivo, it has been found in a meta-analysis
+(Benbow & Anderson, 2019) that in anxiety disorders these attrition
+rates are comparable.
+With respect to the concern raised by some therapists that VRET
+might interfere with the therapeutic alliance, we would like to point
+out that VR therapy can of course be only partially used. This enables
+the therapist to test the extent to which VR therapy interferes with
+the therapeutic alliance. More importantly, several studies have
+investigated the working alliance during VRET. In a study by Wrzesien
+and colleagues (Wrzesien et al., 2013) no negative influence of VR
+was found on the therapeutic alliance. In another study, a direct
+comparison between VRET and exposure in vivo was made and no
+differences in evaluation of the therapeutic alliance were found
+(Ngai et al., 2015).
+In conclusion, there is evidence that restraint in using VR in a
+therapeutic context, is not supported by empirical evidence. In fact,
+there is evidence that it produces comparable therapeutic effects
+when adequately personalized to a patient's anxiety.
+6 | FUTURE DIRECTIONS
+Virtual reality provides clinicians with an enormous potential of
+possibilities for therapeutic use and researchers with the option to
+make use of highly standardized exposure procedures. There are a
+few important aspects concerning the use of VR in the future. One
+aspect that has been barely investigated is the use of VR in children
+and adolescents within the therapeutic context. VRET is a potentially
+fruitful approach to exposure, and particularly in adolescents, given
+its low barriers and playful elements. Connecting with the
+technological driven environment of adolescents, VRET is assumed to
+have a high potential to improve treatment, early intervention and
+prevention in this population. However, despite its potential in
+adolescents, high-quality research on the effectiveness of VRET in
+this group is scarce (Kothgassner & Felnhofer, 2020). There is only
+one study in adolescents (13–16 years) with fear of public speaking
+(Kahlon et al., 2019), that found that symptoms decreased
+significantly and that treatment effects were maintained at 1 and
+3 month follow up. One of the limitations of the study is that it did
+not include an adequate control condition. In conclusion, whereas
+VRET seems a promising treatment for adolescents with SAD, there is
+a compelling need for high-quality research into its efficacy this
+younger population.
+One of the potentials but also pitfalls of VR is the proliferation
+of different health technology companies offering different
+functionalities within their commercial packages. Often these
+packages have been developed by technicians and they miss the
+important functionality as interaction or specific anxiety triggers.
+Large differences in quality of therapeutical use and functionality
+are all presented as virtual reality. Often it only concerns 360
+video's with no potential for the therapist to give direction to the
+intervention and no potential for the patient to interact. When
+applications are provided with functionalities like these, develop
+mental and economic costs increase enormously and this is not
+always evident for clinicians as is always indicated that the
+economic costs of VR hardware are being significantly reduced.
+This is one of the potential obstacles concerning the slow going
+dissemination of VR in clinical practice. Although the costs for the
+hardware have been significantly reduced in the past decennia and
+a VR computer set and VR goggles and one motion-sensing device
+are available for less than $1.500 (Vailati Riboni et al., 2020) the
+costs are mainly in developing and creating adequate VR
+environments and functionality. These costs may be one of reasons
+why dissemination of VR in clinical practice is still going slow
+(Segal et al., 2011).
+CONFLICT OF INTEREST
+Both authors declare to have no conflict of interest by the publication
+of this manuscript.
+472 MEYERBRÖKER AND MORINA
+10990879, 2021, 3, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/cpp.2623 by Cochrane France, Wiley Online Library on [22/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+ORCID
+Katharina Meyerbröker https://orcid.org/0000-0002-3122-6331
+Nexhmedin Morina https://orcid.org/0000-0002-2331-9140
+REFERENCES
+American Psychiatric Association, (APA), (2013). Diagnostic and statistical manual of mental disorders: DSM-5. Anderson, P. L., Edwards, S. M., & Goodnight, J. R. (2017). Virtual reality and exposure group therapy for social anxiety disorder: Results from a 4–6 year follow-up. Cognitive Therapy and Research, 41(2), 230–236. https://doi.org/10.1007/s10608-016-9820-y Anderson, P. L., Price, M., Edwards, S. M., Obasaju, M. A., Schmertz, S. K., Zimand, E., & Calamaras, M. R. (2013). Virtual reality exposure therapy for social anxiety disorder: A randomized controlled trial. Journal of Consulting and Clinical Psychology, 81(5), 751–760. https://doi.org/10. 1037/a0033559 Bandura, A. (1977). Self-efficacy: Toward a unifying theory of behavioral change. Psychological Review, 84, 191–215. https://doi.org/10.1037/ 0033-295X.84.2.191 Bell, I. H., Nicholas, J., Alvarez-Jimenez, M., Thompson, A., & Valmaggia, L. (2020). Virtual reality as a clinical tool in mental health research and practice. Dialogues in Clinical Neuroscience, 22(2), 169–177. https://doi.org/10.31887/DCNS.2020.22.2/lvalmaggia Benbow, A. A., & Anderson, P. L. (2019). A meta-analytic examination of attrition in virtual reality exposure therapy for anxiety disorders. Journal of Anxiety Disorders, 61, 18–26. https://doi.org/10.1016/j. janxdis.2018.06.006 Botella, C., Gracía-Palacios, A., Villa, H., Baños, R. M., Quero, S., Alcañiz, M., & Riva, G. (2007). Virtual reality exposure in the treatment of panic disorder and agoraphobia: A controlled study. Clinical Psychology and Psychotherapy, 14(3), 164–175. https://doi.org/ 10.1002/cpp.524 Bouchard, S., Dumoulin, S., Robillard, G., Guitard, T., Klinger, E., Forget, H., & Roucaut, F. X. (2011). A randomized control trial for the use of in virtuo exposure in the treatment of social phobia: Final results. Journal of Cyber Therapy and Rehabilitation, 4, 197–199.
+Bourla, A., Mouchabac, S., el Hage, W., & Ferreri, F. (2018). E-PTSD: An overview on how new technologies can improve prediction and assessment of posttraumatic stress disorder (PTSD). European Journal of Psychotraumatology, 9(sup1, 1424448. https://doi.org/10.1080/ 20008198.2018.1424448 Carl, E., Stein, A. T., Levihn-Coon, A., Pogue, J. R., Rothbaum, B., Emmelkamp, P., Asmundson, G. J. G., Carlbring, P., & Powers, M. B. (2019). Virtual reality exposure therapy for anxiety and related disorders: A meta-analysis of randomized controlled trials. Journal of Anxiety Disorders, 61, 27–36. https://doi.org/10.1016/j.janxdis.2018.08.003 Côté, S., & Bouchard, S. (2009). Cognitive mechanisms underlying virtual reality exposure. Cyberpsychology & Behavior, 12(2), 121–129. https:// doi.org/10.1089/cpb.2008.0008 Craske, M. G., Treanor, M., Conway, C. C., Zbozinek, T., & Vervliet, B. (2014). Maximizing exposure therapy: An inhibitory learning approach. Behaviour Research and Therapy, 58, 10–23. https://doi.org/10.1016/j. brat.2014.04.006 Cuperus, A. A., Klaassen, F., Hagenaars, M. A., & Engelhard, I. M. (2017). A virtual reality paradigm as an analogue to real-life trauma: Its effectiveness compared with the trauma film paradigm. European Journal of Psychotraumatology, 8(sup1, 1338106. https://doi.org/10. 1080/20008198.2017.1338106 Dechant, M., Trimpl, S., Wolff, C., Mühlberger, A., & Shiban, Y. (2017). Potential of virtual reality as a diagnostic tool for social anxiety: A pilot study. Computers in Human Behavior, 76, 128–134. https://doi.org/10.1016/j.chb.2017.07.005 Dibbets, P. (2020). A novel virtual reality paradigm: Predictors for stress-related intrusions and avoidance behavior. Journal of Behavior
+Therapy and Experimental Psychiatry, 67, 101449. https://doi.org/10. 1016/j.jbtep.2019.01.001 Dibbets, P., & Schulte-Ostermann, M. A. (2015). Virtual reality, real emotions: A novel analogue for the assessment of risk factors of post-traumatic stress disorder. Frontiers in Psychology, 6, 681. https://doi.org/10.3389/fpsyg.2015.00681 Difede, J., Cukor, J., Jayasinghe, N., Patt, I., Jedel, S., Spielman, L., ... Hoffman, H. G. (2007). Virtual reality exposure therapy for the treatment of posttraumatic stress disorder following. The Journal of Clinical Psychiatry, 68, 1682–1689. https://doi.org/10.4088/JCP. v68n1102 Donker, T., Cornelisz, I., van Klaveren, C., van Straten, A., Carlbring, P., Cuijpers, P., & van Gelder, J.-L. (2019). Effectiveness of self-guided app-based virtual reality cognitive behavior therapy for acrophobia: A randomized clinical trial. JAMA Psychiatry, 76(7), 682–690. https://doi. org/10.1001/jamapsychiatry.2019.0219 Emmelkamp, P. M. G., Krijn, M., Hulsbosch, A. M., De Vries, S., Schuemie, M. J., & Van der Mast, C. A. P. G. (2002). Virtual reality treatment versus exposure in vivo: A comparative evaluation in acrophobia. Behaviour Research and Therapy, 40(5), 509–516. https://doi.org/10.1016/S0005-7967(01)00023-7 Emmelkamp, P. M. G., & Meyerbröker, K. (2021). Virtual reality therapy in mental health. Annual Review of Clinical Psychology, 17, 495–519. https://doi.org/10.1146/annurev-clinpsy-081219-115923 Emmelkamp, P. M. G., Meyerbröker, K., & Morina, N. (2020). Virtual reality therapy in social anxiety disorder. Current Psychiatry Reports, 22(7), 32. https://doi.org/10.1007/s11920-020-01156-1 Felnhofer, A., Kryspin-Exner, I., Kothgassner, O., Hlavacs, H., & Beutl, L. (2019). Physical presence, social presence, and anxiety in participants with social anxiety disorder during virtual Cue exposure. J, 22(1), 46–50. https://doi.org/10.1089/cyber.2018.0221 Ferreri, F., Bourla, A., Peretti, C.-S., Segawa, T., Jaafari, N., & Mouchabac, S. (2019). How new technologies can improve prediction, assessment, and intervention in obsessive-compulsive disorder (e-OCD): Review. JMIR Mental Health, 6(12), e11643. https://doi.org/ 10.2196/11643 Foa, E. B., & Kozak, M. J. (1986, January). Emotional processing of fear. Exposure to corrective information. Psychological Bulletin, 99, 20–35. https://doi.org/10.1037/0033-2909.99.1.20 Gamito, P., Oliveira, J., Rosa, P., Morais, D., Duarte, N., Oliveira, S., & Saraiva, T. (2010). PTSD elderly war veterans: A clinical controlled pilot study. Cyberpsychology, Behavior and Social Networking, 13(1), 43–48. https://doi.org/10.1089/cyber.2009.0237 Garcia-Palacios, A., Botella, C., Hoffman, H., & Fabregat, S. (2007). Comparing acceptance and refusal rates of virtual reality exposure vs. in vivo exposure by patients with specific phobias. Cyberpsychology & Behavior, 10(5), 722–724. https://doi.org/10.1089/ cpb.2007.9962 Gorini, A., & Riva, G. (2008). The potential of virtual reality as anxiety management tool: A randomized controlled study in a sample of patients affected by generalized anxiety disorder. Trials, 9. https://doi.org/10.1186/1745-6215-9-25 Guitard, T., Bouchard, S., Belanger, C., & Berthiaume, M. (2019). Exposure to a standardized catastrophic scenario in virtual reality or a personalized scenario in imagination for generalized anxiety disorder. Journal of Clinical Medicine, 8(3). https://doi.org/10.3390/jcm8030309 Hartanto, D., Kampmann, I. L., Morina, N., Emmelkamp, P. G. M., Neerincx, M. A., & Brinkman, W.-P. (2014). Controlling social stress in virtual reality environments. PLoS ONE, 9(3), 1–17. https://doi.org/10. 1371/journal.pone.0092804 Hunt, C. (2020). Differences in OCD symptom presentations across age, culture, and gender: A quantitative review of studies using the Y-BOCS symptom checklist. Journal of Obsessive-Compulsive and Related Disorders, 26, 100533. https://doi.org/10.1016/j.jocrd.2020. 100533
+MEYERBRÖKER AND MORINA 473
+10990879, 2021, 3, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/cpp.2623 by Cochrane France, Wiley Online Library on [22/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+Inozu, M., Celikcan, U., Akin, B., & Mustafaoglu Cicek, N. (2020). The use of virtual reality (VR) exposure for reducing contamination fear and disgust: Can VR be an effective alternative exposure technique to in vivo? Journal of Obsessive-Compulsive and Related Disorders, 25, 100518. https://doi.org/10.1016/j.jocrd.2020.100518 Jalal, B., McNally, R. J., Elias, J. A., Potluri, S., & Ramachandran, V. S. (2020). “Fake it till you make it!” Contaminating rubber hands (“multisensory stimulation therapy”) to treat obsessive-compulsive disorder. Frontiers in Human Neuroscience 13. https://doi.org/10. 3389/fnhum.2019.00414 Kahlon, S., Lindner, P., & Nordgreen, T. (2019). Virtual reality exposure therapy for adolescents with fear of public speaking: A non-randomized feasibility and pilot study. Child and Adolescent Psychiatry and Mental Health, 13(1), 47. https://doi.org/10.1186/ s13034-019-0307-y Kampmann, I. L., Emmelkamp, P. M. G., Hartanto, D., Brinkman, W.-P., Zijlstra, B. J. H., & Morina, N. (2016). Exposure to virtual social interactions in the treatment of social anxiety disorder: A randomized controlled trial. Behaviour Research and Therapy, 77, 147–156. https:// doi.org/10.1016/j.brat.2015.12.016 Kampmann, I. L., Emmelkamp, P. M., & Morina, N. (2018). Self-report questionnaires, behavioral assessment tasks, and an implicit behavior measure: Do they predict social anxiety in everyday life? PeerJ, 2018 (8), e5441. https://doi.org/10.7717/peerj.5441 Kampmann, I. L., Emmelkamp, P. M. G., & Morina, N. (2019). Cognitive predictors of treatment outcome for exposure therapy: Do changes in self-efficacy, self-focused attention, and estimated social costs predict symptom improvement in social anxiety disorder? BMC Psychiatry, 19 (1), 80. https://doi.org/10.1186/s12888-019-2054-2 Kim, H., Shin, J. E., Hong, Y.-J., Shin, Y.-B., Shin, Y. S., Han, K., Kim, J. J., & Choi, S.-H. (2018). Aversive eye gaze during a speech in virtual environment in patients with social anxiety disorder. Australian & New Zealand Journal of Psychiatry, 52(3), 279–285. https://doi.org/10. 1177/0004867417714335 Kim, K., Roh, D., Kim, C.-H., Cha, K. R., Rosenthal, M. Z., & Kim, S. I. (2012). Comparison of checking behavior in adults with or without checking symptom of obsessive-compulsive disorder using a novel computer-based measure. Computer Methods and Programs in Biomedicine, 108(1), 434–441. https://doi.org/10.1016/j.cmpb.2012. 03.014 Kim, K., Kim, S. I., Cha, K. R., Park, J., Rosenthal, M. Z., Kim, J.-J., Han, K., Kim, I. Y., & Kim, C.-H. (2010). Development of a computer-based behavioral assessment of checking behavior in obsessive-compulsive disorder. Comprehensive Psychiatry, 51(1), 86–93. https://doi.org/10. 1016/j.comppsych.2008.12.001 Kishimoto, T., & Ding, X. (2019). The influences of virtual social feedback on social anxiety disorders. Behavioural and Cognitive Psychotherapy, 47(6), 726–735. https://doi.org/10.1017/S1352465819000377 Klinger, E., Bouchard, S., Légeron, P., Roy, S., Lauer, F., Chemin, I., & Nugues, P. (2005). Virtual reality therapy versus cognitive behavior therapy for social phobia: A preliminary controlled study. CyberPsychology and Behavior, 8(1), 76–88. https://doi.org/10.1089/ cpb.2005.8.76 Kothgassner, O. D., & Felnhofer, A. (2020). Lack of research on efficacy of virtual reality exposure therapy (VRET) for anxiety disorders in children and adolescents. Neuropsychiatrie. https://doi.org/10.1007/ s40211-020-00349-7 Kothgassner, O. D., Felnhofer, A., Hlavacs, H., Beutl, L., Palme, R., Kryspin-Exner, I., & Glenk, L. M. (2016). Salivary cortisol and cardiovascular reactivity to a public speaking task in a virtual and real-life environment. Computers in Human Behavior, 62(C), 124–135. https://doi.org/10.1016/j.chb.2016.03.081 Krijn, M., Emmelkamp, P. M. G., Ólafsson, R. P., Bouwman, M., Van Gerwen, L. J., Spinhoven, P., ... Van Der Mast, C. A. P. G. (2007). Fear of flying treatment methods: Virtual reality exposure vs. cognitive
+behavioral therapy. Aviation Space and Environmental Medicine, 78(2), 121–128. Krijn, M., Emmelkamp, P. M. G., Ólafsson, R. P., Schuemie, M. J., & Van Der Mast, C. A. P. G. (2007). Do self-statements enhance the effectiveness of virtual reality exposure therapy? A comparative evaluation in acrophobia. CyberPsychology and Behavior, 10(3), 362–370. https://doi.org/10.1089/cpb.2006.9943 Laforest, M., Bouchard, S., Crétu, A.-M., & Mesly, O. (2016). Inducing an anxiety response using a contaminated virtual environment: Validation of a therapeutic tool for obsessive-compulsive disorder. Frontiers in ICT, 3. https://doi.org/10.3389/fict.2016.00018 Laforest, M., Bouchard, S., Bossé, J., & Mesly, O. (2016). Effectiveness of in virtuo exposure and response prevention treatment using cognitive-behavioral therapy for obsessive-compulsive disorder: A study based on a single-case study protocol. Frontiers in Psychiatry, 7. https://doi.org/10.3389/fpsyt.2016.00099 Lange, B., & Pauli, P. (2019). Social anxiety changes the way we move—A social approach-avoidance task in a virtual reality CAVE system. PLoS ONE, 14(12), 1–19. https://doi.org/10.1371/journal.pone.0226805 Malbos, E., Rapee, R. M., & Kavakli, M. (2013). A controlled study of agoraphobia and the independent effect of virtual reality exposure therapy. Australian and New Zealand Journal of Psychiatry, 47(2), 160–168. https://doi.org/10.1177/0004867412453626 Maltby, N., Kirsch, I., Mayers, M., & Allen, G. J. (2002). Virtual reality exposure therapy for the treatment of fear of flying: A controlled investigation. Journal of Consulting and Clinical Psychology, 70(5), 1112–1118. https://doi.org/10.1037/0022-006X.70.5.1112 McLay, R. N., Wood, D. P., Webb-Murphy, J. A., Spira, J. L., Wiederhold, M. D., Pyne, J. M., & Wiederhold, B. K. (2011). A randomized, controlled trial of virtual reality-graded exposure therapy for post-traumatic stress disorder in active duty service members with combat-related post-traumatic stress disorder. Cyberpsychology, Behavior and Social Networking, 14(4), 223–229. https://doi.org/10. 1089/cyber.2011.0003 McLay, R. N., Baird, A., Webb-Murphy, J., Deal, W., Tran, L., Anson, H., Klam, W., & Johnston, S. (2017). A randomized, head-to-head study of virtual reality exposure therapy for posttraumatic stress disorder. Cyberpsychology, Behavior and Social Networking, 20(4), 218–224. https://doi.org/10.1089/cyber.2016.0554 Meyer, T., Nelson, J., & Morina, N. (n.d.). Time for a walk through time: Re-experiencing of aversive memories is inversely linked to spatio-temporal distance.
+Meyerbroeker, K., Morina, N., Kerkhof, G. A., & Emmelkamp, P. M. G. (2013). Virtual reality exposure therapy does not provide any additional value in agoraphobic patients: A randomized controlled trial. Psychotherapy and Psychosomatics, 82, 170–176. https://doi.org/10. 1159/000342715 Meyerbröker, K., & Emmelkamp, P. M. G. (2008). Therapeutic processes in virtual reality exposure therapy: The role of cognitions and the therapeutic alliance. Journal of Cyber Therapy and Rehabilitation, 1(3). Meyerbröker, K., Morina, N., & Emmelkamp, P. M. G. (2018). Enhancement of exposure therapy in participants with specific phobia: A randomized controlled trial comparing yohimbine, propranolol and placebo. Journal of Anxiety Disorders, 57, 48–56. https://doi.org/10.1016/j.janxdis. 2018.05.001 Meyerbröker, K. (2014). Virtual Reality Exposure Therapy. In P. M. G. Emmelkamp & T. Ehring (Eds.), The Wiley handbook of anxiety disorders (pp. 1310–1324). Wiley & Blackwell. https://doi.org/10.1002/ 9781118775349.ch63 Miyahira, S. D., Folen, R. A., Hoffman, H. G., Garcia-Palacios, A., Spira, J. L., & Kawasaki, M. (2012). The effectiveness of VR exposure therapy for PTSD in returning warfighters. Annual Review of Cybertherapy and Telemedicine, 10, 128–132.
+Morina, N., Ijntema, H., Meyerbröker, K., & Emmelkamp, P. M. G. (2015). Can virtual reality exposure therapy gains be generalized to real-life? A
+474 MEYERBRÖKER AND MORINA
+10990879, 2021, 3, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/cpp.2623 by Cochrane France, Wiley Online Library on [22/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+meta-analysis of studies applying behavioral assessments. Behaviour Research and Therapy, 74, 18–24. https://doi.org/10.1016/j.brat.2015. 08.010 Morina, N., Brinkman, W.-P., Hartanto, D., Kampmann, I. L., & Emmelkamp, P. M. G. (2015). Social interactions in virtual reality exposure therapy: A proof-of-concept pilot study. Technology and Health Care, 23(5), 581–589. https://doi.org/10.3233/THC-151014 Mühlberger, A., Herrmann, M. J., Wiedemann, G., Ellgring, H., & Pauli, P. (2001). Repeated exposure of flight phobics to flights in virtual reality. Behaviour Research and Therapy, 39(9), 1033–1050. https://doi.org/ 10.1016/S0005-7967(00)00076-0 Mühlberger, A., Weik, A., Pauli, P., & Wiedemann, G. (2006). One-session virtual reality exposure treatment for fear of flying: 1-year follow-up and graduation flight accompaniment effects. Psychotherapy Research, 16(1), 26–40. https://doi.org/10.1080/10503300500090944 Myers, C. E., Radell, M. L., Shind, C., Ebanks-Williams, Y., Beck, K. D., & Gilbertson, M. W. (2016). Beyond symptom self-report: Use of a computer “avatar” to assess post-traumatic stress disorder (PTSD) symptoms. Stress, 19(6), 593–598. https://doi.org/10.1080/ 10253890.2016.1232385 National Institute for Health and Clinical Excellence. (2011). Common mental health problems: Identification and pathways to care. National Institute for Health and Clinical Excellence. (2013). Common mental health problems: Identification and pathways to care. NICE Guideline (CG123). Navarro-Haro, M. V., Modrego-Alarcon, M., Hoffman, H. G., Lopez-Montoyo, A., Navarro-Gil, M., Montero-Marin, J., ... García-Campayo, J. (2019). Evaluation of a mindfulness-based intervention with and without virtual reality dialectical behavior therapy® mindfulness skills training for the treatment of generalized anxiety disorder in primary care: A pilot study. Frontiers in Psychology, 10, 55. https://doi.org/10.3389/fpsyg.2019.00055 Ngai, I., Tully, E. C., & Anderson, P. L. (2015). The course of the working alliance during virtual reality and exposure group therapy for social anxiety disorder. Behavioural and Cognitive Psychotherapy, 43(2), 167–181. https://doi.org/10.1017/S135246581300088X Owens, M. E., & Beidel, D. C. (2015). Can virtual reality effectively elicit distress associated with social anxiety disorder? Journal of Psychopathology and Behavioral Assessment, 37(2), 296–305. https://doi.org/10.1007/s10862-014-9454-x Pelissolo, A., Zaoui, M., Aguayo, G., Yao, S. N., Roche, S., & Ecochard, R. (2012). Virtual reality exposure therapy versus cognitive behavior therapy for panic disorder with agoraphobia: A randomized comparison study. Journal of CyberTherapy & Rehabilitation, 5(1), 34–43. Penate, W., Pitti, C. T., Manuel Bethencourt, J., de la Fuente, J., & Gracia, R. (2008). The effects of a treatment based on the use of virtual reality exposure and cognitive-behavioral therapy applied to patients with agoraphobia. International Journal of Clinical and Health Psychology, 8(1), 5–22.
+Powers, M. B., Briceno, N. F., Gresham, R., Jouriles, E. N., Emmelkamp, P. M. G., & Smits, J. A. J. (2013). Do conversations with virtual avatars increase feelings of social anxiety? Journal of Anxiety Disorders, 27(4), 398–403. https://doi.org/10.1016/j.janxdis.2013. 03.003 Quero, S., Angeles Perez-Ara, M., Breton-Lopez, J., Garcia-Palacios, A., Banos, R. M., & Botella, C. (2014). Acceptability of virtual reality interoceptive exposure for the treatment of panic disorder with agoraphobia. British Journal of Guidance & Counselling, 42(2), 123–137. https://doi.org/10.1080/03069885.2013.852159 Ready, D. J., Gerardi, R. J., Backscheider, A. G., Mascaro, N., & Rothbaum, B. O. (2010). Comparing virtual reality exposure therapy to present-centered therapy with 11 U.S. Vietnam veterans with PTSD. Cyberpsychology, Behavior and Social Networking, 13(1), 49–54. https://doi.org/10.1089/cyber.2009.0239
+Reger, G. M., Koenen-Woods, P., Zetocha, K., Smolenski, D. J., Holloway, K. M., Rothbaum, B. O., Difede, J. A., Rizzo, A. A., Edwards-Stewart, A., Skopp, N. A., Mishkind, M., Reger, M. A., & Gahm, G. A. (2016). Randomized controlled trial of prolonged exposure using imaginal exposure vs. virtual reality exposure in active duty soldiers with deployment-related posttraumatic stress disorder (PTSD). Journal of Consulting and Clinical Psychology, 84(11), 946–959. https://doi.org/10.1037/ccp0000134 Reger, G. M., Smolenski, D., Norr, A., Katz, A., Buck, B., & Rothbaum, B. O. (2019). Does virtual reality increase emotional engagement during exposure for PTSD? Subjective distress during prolonged and virtual reality exposure therapy. Journal of Anxiety Disorders, 61, 75–81. https://doi.org/10.1016/j.janxdis.2018.06.001 Repetto, C., Gaggioli, A., Pallavicini, F., Cipresso, P., Raspelli, S., & Riva, G. (2013). Virtual reality and mobile phones in the treatment of generalized anxiety disorders: A phase-2 clinical trial. Personal and Ubiquitous Computing, 17(2), 253–260. https://doi.org/10.1007/ s00779-011-0467-0 Richards, S. H., Dickens, C., Anderson, R., Richards, D. A., Taylor, R. S., Ukoumunne, O. C., Kessler, D., Turner, K., Kuyken, W., Gandhi, M., Knight, L., Gibson, A., Davey, A., Warren, F., Winder, R., Wright, C., & Campbell, J. (2016). Assessing the effectiveness of enhanced psychological care for patients with depressive symptoms attending cardiac rehabilitation compared with treatment as usual (CADENCE): Study protocol for a pilot cluster randomised controlled trial. Trials, 17, 17, 59. https://doi.org/10.1186/s13063-016-1184-9 Riva, G., & Serino, S. (2020). Virtual reality in the assessment, understanding and treatment of mental health disorders. Journal of Clinical Medicine, 9(11). https://doi.org/10.3390/jcm9113434 Rothbaum, B. O., Anderson, P., Zimand, E., Hodges, L., Lang, D., & Wilson, J. (2006). Virtual reality exposure therapy and standard (in vivo) exposure therapy in the treatment of fear of flying. Behavior Therapy, 37(1), 80–90. https://doi.org/10.1016/j.beth.2005. 04.004 Rothbaum, B. O., Hodges, L. F., Ready, D., Graap, K., & Alarcon, R. D. (2001). Virtual reality exposure therapy for Vietnam veterans with posttraumatic stress disorder. The Journal of Clinical Psychiatry, 62(8), 617–622. https://doi.org/10.4088/jcp.v62n0808 Rothbaum, B. O., Hodges, L., Smith, S., Lee, J. H., & Price, L. (2000). A controlled study of virtual reality exposure therapy for the fear of flying. Journal of Consulting and Clinical Psychology, 68(6), 1020–1026. https://doi.org/10.1037/0022-006X.68.6.1020 Roy, M. J., Constanzo, M. E., Blair, J. R., & Rizzo, A. A. (2014). Compelling evidence that exposure therapy for PTSD normalizes brain function. Studies in Health Technology and Informatics, 199, 61–65.
+Scheveneels, S., Boddez, Y., Van Daele, T., & Hermans, D. (2019). Virtually unexpected: No role for expectancy violation in virtual reality exposure for public speaking anxiety. Frontiers in Psychology, 10, 2849. https://doi.org/10.3389/fpsyg.2019.02849 Segal, R., Bhatia, M., & Drapeau, M. (2011). Therapists' perception of benefits and costs of using virtual reality treatments. Cyberpsychology, Behavior and Social Networking, 14(1–2), 29–34. https://doi.org/10. 1089/cyber.2009.0398 Tardif, N., Therrien, C.-E., & Bouchard, S. (2019). Re-examining psychological mechanisms underlying virtual reality-based exposure for spider phobia. Cyberpsychology, Behavior and Social Networking, 22(1), 39–45. https://doi.org/10.1089/cyber.2017.0711 Vailati Riboni, F., Comazzi, B., Bercovitz, K., Castelnuovo, G., Molinari, E., & Pagnini, F. (2020). Technologically-enhanced psychological interventions for older adults: A scoping review. BMC Geriatrics, 20 (1), 191. https://doi.org/10.1186/s12877-020-01594-9 van Bennekom, M. J., de Koning, P. P., Gevonden, M. J., Kasanmoentalib, M. S., & Denys, D. (2021). A virtual reality game to assess OCD symptoms. Frontiers in Psychiatry, 11, 1640. https://doi. org/10.3389/fpsyt.2020.550165
+MEYERBRÖKER AND MORINA 475
+10990879, 2021, 3, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/cpp.2623 by Cochrane France, Wiley Online Library on [22/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+van Bennekom, M. J., Kasanmoentalib, M. S., de Koning, P. P., & Denys, D. (2017). A virtual reality game to assess obsessive-compulsive disorder. Cyberpsychology, Behavior and Social Networking, 20(11), 718–722. https://doi.org/10.1089/cyber.2017.0107 Wang, T.-C., Sit, C. H.-P., Tang, T.-W., & Tsai, C.-L. (2020). Psychological and physiological responses in patients with generalized anxiety disorder: The use of acute exercise and virtual reality environment. International Journal of Environmental Research and Public Health, 17 (13), 1–15. https://doi.org/10.3390/ijerph17134855 Wang, T.-C., Tsai, C.-L., Tang, T.-W., Wang, W.-L., & Lee, K.-T. (2019). The effect of cycling through a projection-based virtual environment system on generalized anxiety disorder. Journal of Clinical Medicine, 8 (7), 973. https://doi.org/10.3390/jcm8070973 Wechsler, T. F., Kuempers, F., & Muehlberger, A. (2019). Inferiority or even superiority of virtual reality exposure therapy in phobias?—A systematic review and quantitative meta-analysis on randomized controlled trials specifically comparing the efficacy of virtual reality exposure to gold standard in vivo Exp. Frontiers in Psychology, 10, 10. https://doi.org/10.3389/fpsyg.2019.01758
+Wiederhold, B. K., & Wiederhold, M. D. (2003). Three-year follow-up for virtual reality exposure for fear of flying. Cyberpsychology & Behavior, 6 (4), 441–445. https://doi.org/10.1089/109493103322278844 Wrzesien, M., Breton-Lopez, J., Botella, C., Burkhardt, J.-M., Alcañiz, M., Pérez-Ara, M. A., & del Amo, A. R. (2013). How technology influences the therapeutic process: Evaluation of the patient-therapist relationship in augmented reality exposure therapy and in vivo exposure therapy. Behavioural and Cognitive Psychotherapy, 41(4), 505–509. https://doi.org/10.1017/S1352465813000088
+How to cite this article: Meyerbröker K, Morina N. The use of
+virtual reality in assessment and treatment of anxiety and
+related disorders. Clin Psychol Psychother. 2021;28:466–476.
+https://doi.org/10.1002/cpp.2623
+476 MEYERBRÖKER AND MORINA
+10990879, 2021, 3, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/cpp.2623 by Cochrane France, Wiley Online Library on [22/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License

@@ -1,0 +1,419 @@
+Original Paper
+Examining the Impact of Digital Components Across Different Phases of Treatment in a Blended Care Cognitive Behavioral Therapy Intervention for Depression and Anxiety: Pragmatic Retrospective Study
+Monica S Wu1*, PhD; Robert E Wickham2,3*, PhD; Shih-Yin Chen1, MS; Connie Chen1, MD; Anita Lungu1, PhD
+1Lyra Health, Burlingame, CA, United States
+2Department of Psychological Sciences, Northern Arizona University, Flagstaff, AZ, United States
+3Department of Psychology, Palo Alto University, Palo Alto, CA, United States
+*these authors contributed equally
+Corresponding Author: Monica S Wu, PhD Lyra Health 287 Lorton Ave Burlingame, CA, 94010 United States Phone: 1 877 505 7147 Email: mwu@lyrahealth.com
+Abstract
+Background: Depression and anxiety incur significant personal and societal costs. Effective psychotherapies exist, such as cognitive behavioral therapy (CBT); however, timely access to quality care is limited by myriad barriers. Blended care therapy models incorporate traditional face-to-face therapy with scalable, digital components of care, expanding the reach of evidence-based care.
+Objective: The aim of this study is to determine the effectiveness of a blended care CBT program (BC-CBT) in real-world settings and examine the unique impacts of the (1) digital components of care (video lessons and digital exercises) and (2) phase of treatment (early versus late) in decreasing symptoms of anxiety and depression.
+Methods: This retrospective cohort analysis included 3401 US-based individuals enrolled in a BC-CBT program, who presented with clinical levels of depression and/or anxiety. The treatment program consisted of regular therapy sessions augmented by clinician-assigned digital video lessons and exercises. A growth curve model incorporating time-varying covariates examined the relationship between engagement with BCT components (ie, therapy sessions, digital video lessons, and digital exercises) during the early (weeks 0-7) and late (weeks 8-15) phases of treatment, and weekly symptom reports on depression and anxiety measures.
+Results: On average, a significant decline in depression and anxiety symptoms was observed during the initial weeks of treatment (P<.001), with a continued, though slower, decline over subsequent weeks (P<.001). Each session completed was associated with significant decreases in anxiety (b=–0.72) and depression (b=–0.83) in the early phase, as well as in the late phase (anxiety, b=–0.47; depression, b=–0.27). Significant decreases in anxiety (b=–0.15) and depression (b=–0.12) were observed for time spent on video lessons (measured in 10-minute intervals) in the early phase of treatment. Engaging with exercises was associated with statistically significant increases in anxiety symptoms (b=0.03) during the early phase of treatment. However, sensitivity analyses examining the effects of exercises in isolation revealed significant decreases in anxiety (b=–0.05) in the early phase, suggesting a potential suppression effect in the larger model.
+Conclusions: Using a retrospective cohort design, therapy sessions and digital video lessons were uniquely predictive of improvements in depression and anxiety symptoms, and their effects were modulated based on the phase of treatment (early vs late). Future research should investigate whether other treatment variables, such as therapeutic alliance or familiarity with technology, are related to differential effects on various components of care.
+(JMIR Form Res 2021;5(12):e33452) doi: 10.2196/33452
+https://formative.jmir.org/2021/12/e33452 JMIR Form Res 2021 | vol. 5 | iss. 12 | e33452 | p. 1 (page number not for citation purposes)
+JMIR FORMATIVE RESEARCH Wu et al
+XSL•FO
+RenderX
+
+
+KEYWORDS
+blended care; cognitive-behavioral therapy; depression; anxiety; digital; phase; mental health; digital health; digital therapy
+Introduction
+Anxiety and depression are leading causes of disability worldwide, costing the global economy US $1 trillion each year due to lost productivity [1]. Given these significant societal and personal burdens [2,3], access to timely, quality care is imperative. Cognitive behavioral therapy (CBT) is considered the gold-standard psychotherapy for anxiety and depression and has robust empirical support [4]. However, obtaining access to CBT is hindered by various barriers, including the costs of therapy, long waiting lists, paucity of qualified mental health professionals, and lack of mental health resources (especially in rural areas) [5].
+To overcome these barriers, teletherapy and internet-based CBT (iCBT) are promising ways to bridge the gap in accessing quality mental health care through technology. Video-based teletherapy allows treatment sessions to occur over a videoconferencing platform in real time, and it has shown similarly robust treatment outcomes when compared to in-person CBT for depression and anxiety [6]. Teletherapy facilitates access to therapy regardless of travel limitations or lack of resources in certain geographic locations, expanding the reach of evidence-based care [7].
+Similarly, the use of iCBT permits remote access to evidence-based therapy materials, delivered through various digital media (text, audio, video, interactive, and gamified formats) [8]. Treatment materials are deliverable in a scalable and asynchronous manner, allowing for broader dissemination and convenient access to evidence-based therapy content. Targeting anxiety and depression through iCBT has shown significant decreases in symptom severity [9,10], although greater treatment effects are observed when iCBT is performed with therapist support versus without [11]. Indeed, difficulties with retention and smaller treatment effects arise without therapist guidance [12], especially when implemented in real word conditions [13], highlighting the potency of therapist involvement. Combining teletherapy and iCBT harnesses the advantages of both modalities of treatment, lending support for a blended care model of therapy.
+Blended care therapy combines traditional face-to-face therapy with digital components of care that cover key therapeutic concepts and skills. Through therapist involvement in regular therapy sessions, clients are able to receive personalized care, discuss therapy content in depth, and be held accountable for homework completion. The digital materials help maintain fidelity to evidence-based practices, reinforce key concepts and skills outside of session, and facilitate rapid dissemination of therapeutic content in a scalable manner [14]. Blended care CBT (BC-CBT) integrates the benefits of both modalities and is a potentially cost-effective manner of delivering treatment [15]. Additionally, CBT delivered in a blended care format has preliminarily demonstrated significant decreases in depression and anxiety symptoms, highlighting its effectiveness in real-world settings [16].
+Despite these benefits, there is limited research on the effectiveness of BC-CBT at scale, and whether the different digital components of care (eg, video lessons, digital exercises) have varied impacts on treatment outcome. Teasing apart the unique contributions of the digital components will help better inform which components are most potent in decreasing symptom severity. Additionally, the timing of when various care components are assigned could be an influential factor. Given that symptom changes in psychotherapy often do not follow a linear path [17], it is prudent to consider how different treatment components may contribute to symptom reduction in the early versus late phases of therapy. As various treatment components and process variables may be more or less potent at different times [18], examining these variables in a time-sensitive manner will allow for increased precision and personalization of care to optimize treatment outcomes. Early response and treatment gains at the beginning of therapy have received particular attention [19], as clients who experience early response to treatment tend to achieve better posttreatment outcomes for anxiety and depression [20]. The later phase of therapy is critically important as well, as it typically focuses on translating the therapeutic concepts and skills (learned in the earlier phase of therapy) into day-to-day practice, which is crucial for generalizing these skills [21]. Indeed, facing challenging situations and implementing regular out-of-session skills practices lead to long-term decreases in symptom severity and strengthen the durability of treatment gains [22,23]. Taken together, these findings highlight the importance of examining symptom changes in the early versus late phases of therapy, given the unique impact of each phase of therapy.
+Ultimately, a gap remains in our understanding of the unique impact of the digital components of care in BC-CBT, as well as how the phase of treatment may impact treatment outcomes. Consequently, this study aims to evaluate the unique impact of treatment sessions, digital video lessons, and digital exercises in a blended care CBT intervention for depression and anxiety in real-world settings, examined across early versus late phases of treatment. These data are intended to better inform how to optimize care by customizing the different treatment components within a BC-CBT program and the timing of their assignment.
+Methods
+Study Design and Procedures
+This study employed a retrospective cohort design, analyzing data collected as part of routine quality control for the BC-CBT program at Lyra Health. Lyra Health is partnered with Lyra Clinical Associates to provide therapeutic services to clients through the BC-CBT program. Clients are employees (or their dependents) of companies that offer mental health benefits through Lyra. Individuals were informed of their behavioral health benefits through their employers, and they could receive care with no cost to them using a set number of Employee Assistance Program sessions or, for certain employers, could receive care through their employer-sponsored health plan.
+https://formative.jmir.org/2021/12/e33452 JMIR Form Res 2021 | vol. 5 | iss. 12 | e33452 | p. 2 (page number not for citation purposes)
+JMIR FORMATIVE RESEARCH Wu et al
+XSL•FO
+RenderX
+
+
+Individuals who accessed the services through their employer-sponsored health plan may have been required to pay a copay, coinsurance, or applicable deductible for sessions through the health plan. Interested clients registered on the web and completed a triage flow to indicate their presenting issues, preference for modality of care, and brief treatment history. If they were appropriate for the BC-CBT program, they were eligible to select the program on the web and book care with a provider. All clinical activities (therapy sessions, questionnaires, digital activities) were conducted over a secure, Health Insurance Portability and Accountability Act (HIPAA)–compliant online platform developed by Lyra Health. Clients were prompted to complete standardized measures of anxiety and depression weekly for the duration of care. Clients were assigned digital activities by their providers, and engagement with and completion of these activities were tracked through the online platform. This retrospective analysis of deidentified data collected during therapy was determined to not be human subjects research by the Palo Alto University institutional review board.
+Participants and Data Inclusion
+Participants included in the study were individuals who started BC-CBT treatment between August 1, 2019, and May 3, 2021.
+Participants were required to have scored above the clinical cutoff for either the Generalized Anxiety Disorder-7 (GAD-7; score ≥8) or the Patient Health Questionnaire-9 (PHQ-9; score ≥10) on a valid baseline assessment (N=3674). To meet inclusion criteria for the BC-CBT program, clients were required to be 18 years of age or older and to be willing to see a provider via video. Clients were excluded from the BC-CBT program if they reported active suicidality, self-harm, or homicidality, or if they had a current diagnosis of severe alcohol/substance use disorder(s), psychiatric disorder with psychotic features that are not stabilized by medications, or unstable bipolar disorder.
+Baseline assessments were considered invalid if they were collected more than 2 weeks prior to the first therapy session or after the second therapy session with the provider. Additionally, participants were considered to be missing a valid second assessment if no additional assessment beyond the baseline was completed within 5 weeks after the last therapy session. Assessments were also excluded if they were collected more than 16 weeks after the first therapy session, which represents the mean plus 1 standard deviation of the treatment duration for the sample. Please see Figure 1 for a comprehensive diagram of the participant flow.
+Figure 1. Participant flow. GAD-7: Generalized Anxiety Disorder-7; PHQ-9: Patient Health Questionnaire-9.
+Blended Care Therapy Program
+The BC-CBT program included both regular face-to-face therapy sessions with the providers and digital components of care. Providers conducted therapy sessions via video-based teletherapy, generally starting with weekly sessions and gradually titrating to biweekly sessions. Providers assigned digital activities through the platform, and these activities were personalized based on the client’s presenting issues. Completion of assigned digital activities could be monitored in real time via
+the platform by providers, who were encouraged to send secure messages to their client to remind and/or reinforce completion of assignments. More details regarding the BC-CBT online platform can be accessed via Lungu et al (2020) [16].
+Therapy Sessions
+A short-term, goal-based model was employed, and providers used evidence-based care based on principles from CBT, dialectical behavior therapy (DBT), and acceptance and commitment therapy (ACT). Providers were extensively vetted
+https://formative.jmir.org/2021/12/e33452 JMIR Form Res 2021 | vol. 5 | iss. 12 | e33452 | p. 3 (page number not for citation purposes)
+JMIR FORMATIVE RESEARCH Wu et al
+XSL•FO
+RenderX
+
+
+through a rigorous multistep interview process, and received intensive training in CBT and the proprietary online platform. Ongoing quality assurance was conducted via random session video reviews, regular consultation meetings, and continuing education presentations.
+Digital Activities
+The digital components of the BCT program included digital video lessons and digital exercises. Digital video lessons employ a storytelling approach, which has been shown to be helpful for enhancing relatability and normalization of the presenting issues [24]. These videos follow a character going through therapy, presenting key CBT-based concepts and skills. Example topics include managing emotions, addressing thinking traps, challenging avoidance, and mindful awareness. The video lessons are ~8 minutes in length on average, and a brief quiz is administered at the end of each video lesson to check for understanding.
+Digital exercises are analogous to paper logs or handouts that facilitate practice of therapy skills. They include awareness-building exercises (eg, thought record) or practice-oriented exercises (eg, exposure practice, behavioral activation, distress tolerance). Providers assign digital exercises to the clients based on their presenting needs, and clients are able to complete them asynchronously at their convenience. Exercise responses can be viewed in real time through the platform by both the provider and the client, and the provider is able to comment on the exercise to reinforce completion and troubleshoot any issues that arise.
+Measures
+Demographics
+Information regarding client demographics (eg, the client’s sex, ethnicity, and birthdate) was collected through the initial intake form completed on the online platform. Minority status was defined by the selection of a non-White group, including American Indian or Alaska Native, Asian or Pacific Islander, Black or African American, Hispanic or Latino, Native Hawaiian or Other Pacific Islander, “multiple,” or “other.”
+PHQ-9 Score
+The Patient Health Questionnaire 9 (PHQ-9) is a 9-item self-report questionnaire that assesses the presence and severity of depressive symptoms in the past week. A cutoff score of ≥10 on the PHQ-9 has been utilized to indicate a likely diagnosis of major depression [25].
+GAD-7 Score
+The GAD-7 is a 7-item self-report questionnaire that assesses the presence and severity of anxiety symptoms in the past week [26]. A cutoff score on the GAD-7 of ≥8 has been used to indicate a likely diagnosis of generalized anxiety disorder [27].
+Both symptom severity measures have undergone extensive validation in numerous clinical trials, demonstrating strong psychometric properties as supported by high validity, reliability, and treatment sensitivity [28].
+Digital Activity Engagement
+The online platform records whether or not the client has engaged with the digital video lesson or the digital exercise. The time spent watching digital video lessons is recorded in the system and was coded in 10-minute intervals for the purposes of this study. The completion of digital exercises is logged in the system each time it is submitted by the client.
+Data Analyses
+A mixed effects modeling approach to growth curve analysis was employed, which accommodates individually varying time intervals for outcome responses while accounting for missing data under the conditional missing at random (MAR) assumption. This approach also allows for the incorporation of time-invariant covariates (TICs) to model the impact of stable client-level attributes on individual trajectories, as well as time-varying covariates (TVCs) to model the predictive utility of attributes that vary across clients during the course of treatment. Analyses were conducted with SAS PROC MIXED, version 9.4, using restricted maximum likelihood estimation [29]. Because the focus of therapy is tailored and different outcomes may be observed based on the primary presenting issue [30], analyses were conducted separately for clients meeting the threshold for elevated anxiety (GAD-7 ≥8) or depression (PHQ-9 ≥10). If a client exceeded the thresholds for both anxiety and depression, they were included in both analyses.
+Following cleaning and validation, a series of hierarchically structured individual growth curve models were examined. The initial analysis (Model 1) for each outcome (PHQ-9, GAD-7) featured a conditional model characterized by fixed effects corresponding to a second-order (quadratic) trajectory, along with client-level random effects for the intercept and linear trajectory components and a provider-level random effect for the intercept. The initial model also included the number of therapy sessions and digital exercises completed during the past 7 days, as well as the amount of time spent engaged with digital lessons (in 10-minute intervals) as TVCs.
+Next, in Model 2, we incorporated a dummy-coded variable indicating the phase of treatment (late phase: Weeks 0-7=0; Weeks 8-15=1) along with the interaction terms between the phase indicator and the engagement TVCs. This allowed the magnitude of TVC effects to differ across the early and late phases of treatment; i.e., the inclusion of the late phase*TVC interaction terms means that the first-order coefficients for therapy sessions, digital lessons, and exercises represent the simple effects of these predictors during the early phase of the study period [31]. In addition, the interaction terms describe the change in the magnitude of each TVC when considered during the late phase relative to the early phase.
+In Model 3, several demographic variables were added as TICs to examine the impact of age, gender, and race on individual trajectories. Finally, several sensitivity analyses were conducted to evaluate the impact of receiving a therapy session and engaging with digital lessons during the same week, along with the isolated association between digital exercise engagement and weekly symptoms.
+https://formative.jmir.org/2021/12/e33452 JMIR Form Res 2021 | vol. 5 | iss. 12 | e33452 | p. 4 (page number not for citation purposes)
+JMIR FORMATIVE RESEARCH Wu et al
+XSL•FO
+RenderX
+
+
+Results
+Participant Characteristics
+Table 1 includes the participants’ demographic and baseline characteristics for the entire sample and each of the analysis samples (GAD-7 and PHQ-9), as well as the engagement in
+therapy sessions, digital lessons, and exercises during the first 16 weeks.
+Figures 2 and 3 are bar charts that respectively illustrate the GAD-7 and PHQ-9 mean scores over the study period. The length of the error bars represents the standard error of the mean. To interpret the “Week” values, Week=–1 is the week before the first session, and Week=1 is the first week after the first session.
+Table 1. Demographic information and engagement in treatment components.
+GAD-7a sample (n=3031) PHQ-9b sample (n=1999)
+Entire sample (N=3401)
+Age, mean (SD) 33.15 (8.68) 33.22 (8.66) 33.16 (8.82)
+Female sex, n (%) 2218 (65.22) 1987 (65.56) 1304 (65.23)
+Race/ethnicity, n (%)
+Minority 1731 (50.90) 1547 (51.04) 1043 (52.18)
+Unknown 136 (4.00) 121 (3.99) 95 (4.75)
+Baseline GAD-7 score, mean (SD) 11.83 (4.08) 12.64 (3.52) 12.14 (4.68)
+Baseline PHQ-9 score, mean (SD) 10.72 (4.92) 10.49 (5.08) 13.99 (3.43)
+Number of sessions completed, mean (SD) 5.82 (3.05) 5.84 (3.09) 5.97 (3.14)
+Total number of out-of-session engagements, mean (SD) 43.36 (28.34) 43.39 (28.45) 44.80 (29.49)
+Number of lessons completed, mean (SD) 5.56 (3.54) 5.53 (3.52) 5.67 (3.65)
+Number of exercises completed, mean (SD) 10.56 (12.16) 10.49 (12.10) 10.96 (12.57)
+Duration of care (weeks), mean (SD) 6.97 (4.71) 6.98 (4.72) 7.13 (4.79)
+aGAD-7: Generalized Anxiety Disorder-7.
+bPHQ-9: Patient Health Questionnaire-9.
+Figure 2. Mean Generalized Anxiety Disorder-7 (GAD-7) scores by week.
+https://formative.jmir.org/2021/12/e33452 JMIR Form Res 2021 | vol. 5 | iss. 12 | e33452 | p. 5 (page number not for citation purposes)
+JMIR FORMATIVE RESEARCH Wu et al
+XSL•FO
+RenderX
+
+
+Figure 3. Mean Patient Health Questionnaire-9 (PHQ-9) scores by week.
+GAD-7 Score
+Model 1 featured a linear and a quadratic trajectory and time-varying indicators of engagement (therapy sessions, digital lessons, and digital exercises). The fixed coefficient for the first-order effect of the treatment week revealed that on average, GAD-7 symptom scores decreased considerably during the first week of treatment (b=–1.09, 95% CI –1.12 to –1.06; P<.001). However, a significant quadratic coefficient (b=0.05, 95% CI 0.05-0.05; P<.001) suggests that the rate of decline diminishes over time. Fixed effect coefficients for the TVCs revealed that clients who attended a therapy session during the last 7 days reported significantly lower GAD-7 scores (b=–0.68, 95% CI –0.77 to –0.59; P<.001), and that every 10 minutes of digital lessons completed was associated with significantly lower GAD-7 scores (b=–0.14, 95% CI –0.19 to –0.08; P<.001). Contrary to our expectations, engagement with digital exercises was associated with a slight increase in GAD-7 scores (b=0.03, 95% CI 0.00-0.06; P=.045).
+In Model 2, the TVC coefficients were allowed to differ across the phases of treatment. The first-order effect of the phase indicator variable (late phase) suggests that the average anxiety trajectory shifts upwards slightly during the later phase of treatment (b=0.44, 95% CI 0.20-0.68; P<.001), relative to the
+early phase. A significant late phase*therapy sessions interaction emerged (b=0.25, 95% CI 0.03-0.47; P=.03), suggesting that the beneficial effect of a session became weaker during the late phase of treatment. A similar pattern emerged for digital lessons, such that the beneficial effect of completing 10 minutes of lessons was significantly weaker (b=0.22, 95% CI 0.07-0.36; P=.004) during the late phase of treatment. In contrast, the phase interaction involving digital exercises failed to reach significance.
+Model 3 contained the same configuration of TVCs and phase interactions as Model 2, but incorporated several client-level TICs examining the impact of demographic variables. Although no differences in initial GAD-7 scores emerged as a function of age or race, females reported slightly higher baseline anxiety scores (b=0.37, 95% CI 0.15-0.60; P=.001) relative to male clients. The coefficients describing TVC effects across early and late phases were identical to Model 2. In sum, anxiety symptoms declined significantly over the course of treatment overall. Additionally, engagement with weekly therapy sessions and digital lessons was associated with lower anxiety symptoms, particularly during the early phase of treatment. Table 2 includes all point estimates and 95% confidence intervals for fixed effects for the GAD-7 analyses, and Table 3 shows the deviance and selection criteria.
+https://formative.jmir.org/2021/12/e33452 JMIR Form Res 2021 | vol. 5 | iss. 12 | e33452 | p. 6 (page number not for citation purposes)
+JMIR FORMATIVE RESEARCH Wu et al
+XSL•FO
+RenderX
+
+
+Table 2. Generalized Anxiety Disorder-7 analysis results (n=3031).
+Model 1 Model 2 Model 3
+Estimate (95% tobs (df) P value CI)
+Estimate (95% tobs (df) P value CI)
+P value
+tobsa (df)
+Estimate (95% CI)
+91.87 <.001 (1485)
+11.16 (10.93 to 11.40)
+153.62 <.001 (307)
+11.36 (11.22 to 11.51)
+11.31 (11.17 153.80 (297) <.001 to 11.46)
+Intercept
+65.91 <.001 (15,000)
+–1.09
+(–1.13 to
+–1.06)
+65.89 <.001 (15,000)
+–1.09
+(–1.13 to
+–1.06)
+–1.09 65.75 (15,000) <.001
+(–1.12 to
+–1.06)
+Week
+29.82 <.001 (17,000)
+0.04 (0.04 to 0.05)
+29.81 <.001 (17,000)
+0.04 (0.04 to 0.05)
+0.05 (0.05 to 36.12 (16,000) <.001 0.05)
+Week2
+13.59 <.001 (18,000)
+–0.72
+(–0.82 to
+–0.61)
+13.58 <.001 (18,000)
+–0.72
+(–0.82 to
+–0.61)
+–0.68 14.36 (18,000) <.001
+(–0.77 to
+–0.59)
+Therapy sessions in the last 7 days
+2.10 .04 (19,000)
+0.03 (0.00 to 0.06)
+2.12 .03 (19,000)
+0.03 (0.00 to 0.06)
+0.03 (0.00 to 2.01 (19,000) .04 0.06)
+Digital exercises in the last 7 days
+4.86 <.001 (18,000)
+–0.15
+(–0.21 to
+–0.09)
+4.91 <.001 (18,000)
+–0.15
+(–0.21 to
+–0.09)
+–0.14 4.74 (18,000) <.001
+(–0.19 to
+–0.08)
+Digital lessons in the last 7 days
+3.61 <.001 (18,000)
+0.44 (0.20 to 0.68)
+3.60 <.001 (18,000)
+0.44 (0.20 to 0.68)
+—
+—b
+Late phase
+2.20 .03 (18,000)
+0.25 (0.03 to 0.47)
+2.19 .03 (18,000)
+0.25 (0.03 to 0.47)
+Late phase*therapy ses- — — sions in the last 7 days
+1.07 .29 (18,000)
+0.04
+(–0.03 to 0.11)
+1.06 .29 (18,000)
+0.04
+(–0.03, to 0.11)
+Late phase*digital exer- — — cises in the last 7 days
+2.85 .004 (18,000)
+0.21 (0.07 to 0.36)
+2.88 .004 (18,000)
+0.22 (0.07 to 0.36)
+Late phase*digital — — lessons in the last 7 days
+0.00 0.27 (2941) .79
+(–0.01 to 0.01)
+Age — — — — — 
+0.37 (0.15 to 3.24 (2986) .001 0.60)
+Gender — — — — — 
+–0.13 1.15 (2984) .25
+(–0.35 to 0.09)
+Minority ethnicity — — — — — 
+0.47 1.64 (3016) .10
+(–0.09 to 1.02)
+No ethnicity reported — — — — — 
+atobs: observed t test result.
+b—: not applicable (variables not entered into model).
+Table 3. Deviance and selection criteria for the 3 models in the Generalized Anxiety Disorder-7 analysis.
+Model 1 Model 2 Model 3
+111676.4 111622.0 111620.8
+Deviance (–2LLa)
+Akaike information criterion 111686.4 111632.0 111630.8
+Bayesian information criterion 111704.2 111649.9 111648.7
+a—2LL: log-likelihood ratio.
+PHQ-9 Score
+As before, the fixed coefficient for the first-order effect of treatment week for Model 1 revealed that on average, PHQ-9 scores decreased significantly during the first week of treatment
+(b=–1.24, 95% CI –1.28 to –1.20; P<.001). A significant quadratic coefficient (b=0.05, 95% CI 0.05-0.06, P<.001) indicates that the rate of decline diminishes over the course of treatment. Fixed effect coefficients for the TVCs revealed that
+https://formative.jmir.org/2021/12/e33452 JMIR Form Res 2021 | vol. 5 | iss. 12 | e33452 | p. 7 (page number not for citation purposes)
+JMIR FORMATIVE RESEARCH Wu et al
+XSL•FO
+RenderX
+
+
+clients who attended a therapy session during the last 7 days reported significantly lower PHQ-9 scores (b=–0.73, 95% CI –0.85 to –0.61; P<.001). In addition, completion of digital exercises (b=–0.04, 95% CI –0.08 to 0.00; P=.03) and digital lessons (b=–0.01, 95% CI –0.17 to –0.03; P=.008) over the prior week was associated with significantly lower PHQ-9 scores.
+In Model 2, the first-order effect of late phase suggests that the average depression trajectory shifts upwards slightly during Weeks 8 to 15 of treatment (b=0.38, 95% CI 0.08-0.69; P=.01). A significant late phase*therapy sessions interaction emerged (b=0.56, 95% CI 0.27-0.84; P<.001), suggesting that the beneficial effect of a session became weaker during the late phase of treatment. A similar pattern emerged for digital lessons, such that the beneficial effect of completing 10 minutes of
+lessons was significantly weaker (b=0.28, 95% CI 0.09-0.46; P=.003) during the late phase of treatment. In contrast, the phase interaction involving digital exercises failed to reach significance.
+For Model 3, no differences in initial PHQ-9 scores emerged as a function of age, race, or gender. Overall, depression symptoms declined significantly over the course of treatment. Additionally, engagement with all program elements was associated with lower depression symptoms, with therapy sessions and digital lessons exhibiting a stronger effect during the early phase of treatment. Table 4 includes all point estimates and 95% confidence intervals for fixed effects for the PHQ-9 analyses, and Table 5 shows the deviance and selection criteria.
+https://formative.jmir.org/2021/12/e33452 JMIR Form Res 2021 | vol. 5 | iss. 12 | e33452 | p. 8 (page number not for citation purposes)
+JMIR FORMATIVE RESEARCH Wu et al
+XSL•FO
+RenderX
+
+
+Table 4. Patient Health Questionnaire-9 analysis results (n=1999).
+Model 1 Model 2 Model 3
+Estimate (95% tobs (df) P value CI)
+Estimate (95% tobs (df) P value CI)
+P value
+tobsa (df)
+Estimate (95% CI)
+74.43 <.001 (1247)
+12.38 (12.06 to 12.71)
+130.54 <.001 (284)
+12.51 (12.32 to 12.70)
+12.43 (12.24 130.55 (276) <.001 to 12.62)
+Intercept
+56.88 <.001 (9717)
+–1.24
+(–1.28 to
+–1.20)
+56.89 <.001 (9714)
+–1.24
+(–1.28 to
+–1.20)
+–1.24 56.79 (9682) <.001
+(–1.28 to
+–1.20)
+Week
+25.51 <.001 (12,000)
+0.05 (0.04 to 0.05)
+25.51 <.001 (12,000)
+0.05 (0.04 to 0.05)
+0.05 (0.05 to 30.74 (11,000) <.001 0.06)
+Week2
+12.08 <.001 (12,000)
+–0.83
+(–0.96 to
+–0.69)
+12.07 <.001 (12,000)
+–0.82
+(–0.96 to
+–0.69)
+–0.73 11.87 (12,000) <.001
+(–0.85 to
+–0.61)
+Therapy sessions in the last 7 days
+1.59 .11 (13,000)
+–0.03
+(–0.07 to 0.01)
+1.60 .11 (13,000)
+–0.03
+(–0.07 to 0.01)
+–0.04 2.18 (13,000) .03
+(–0.08 to 0.00)
+Digital exercises in the last 7 days
+2.94 .003 (12,000)
+–0.12
+(–0.19 to
+–0.04)
+2.95 .003 (12,000)
+–0.12
+(–0.19 to
+–0.04)
+–0.10 2.67 (12,000) .01
+(–0.17 to
+–0.03)
+Digital lessons in the last 7 days
+2.45 .01 (12,000)
+0.38 (0.08 to 0.69)
+2.45 .01 (12,000)
+0.38 (0.08 to 0.69)
+—
+—b
+Late phase
+3.83 <.001 (12,000)
+0.56 (0.27 to 0.84)
+3.82 <.001 (12,000)
+0.56 (0.27 to 0.84)
+Late phase*therapy ses- — — sions in the last 7 days
+0.43 .67 (12,000)
+0.02
+(–0.07 to 0.11)
+0.43 .67 (12,000)
+0.02
+(–0.07 to 0.11)
+Late phase*digital exer- — — cises in the last 7 days
+2.96 .003 (12,000)
+0.28 (0.09 to 0.46)
+2.96 .003 (12,000)
+0.28 (0.09 to 0.46)
+Late phase*digital — — lessons in the last 7 days
+0.01 0.61 (1986) .54
+(–0.01 to 0.02)
+Age — — — — — 
+0.23 1.41 (1991) .16
+(–0.09 to 0.54)
+Gender — — — — — 
+–0.07 0.43 (1998) .67
+(–0.38 to 0.24)
+Minority ethnicity — — — — — 
+0.28 0.75 (2058) .45
+(–0.45 to 1.00)
+No ethnicity reported — — — — — 
+atobs: observed t test result.
+b—: not applicable (variables not entered into model).
+Table 5. Deviance and selection criteria for the 3 models in the Patient Health Questionnaire-9 analysis.
+Model 1 Model 2 Model 3
+76960.5 76905.2 76913.4
+Deviance (–2LLa)
+Akaike information criterion 76970.5 76915.2 76923.4
+Bayesian information criterion 76988.2 76932.8 76941.1
+a—2LL: log-likelihood ratio.
+Sensitivity Analysis
+To investigate the extent to which the unexpected findings for the digital exercises in Model 1 of the GAD-7 analysis can be
+explained by multicollinearity or suppression effects, we specified a series of follow-up models examining digital exercises in isolation. A significant effect emerged, such that completing a digital exercise was associated with an expected
+https://formative.jmir.org/2021/12/e33452 JMIR Form Res 2021 | vol. 5 | iss. 12 | e33452 | p. 9 (page number not for citation purposes)
+JMIR FORMATIVE RESEARCH Wu et al
+XSL•FO
+RenderX
+
+
+b=–0.05 unit decrease in GAD-7 scores (95% CI –0.08 to –0.02; P<.001).
+Discussion
+Findings from this study revealed significant declines in anxiety and depression symptoms, with a steep initial decline that became less pronounced over time. The initial model showed that engagement with therapy sessions and digital lessons during the prior 7 days was uniquely associated with lower anxiety and depression symptoms. Although engagement with digital exercises over the past week was associated with lower depression symptoms, a positive coefficient emerged in the analysis on anxiety symptoms. Sensitivity analyses revealed that the unexpected positive relationship between use of digital exercises and anxiety symptoms may be attributable to collinearity with therapy sessions and digital lessons. Analyses examining differences across the early (Weeks 0-7) and late (Weeks 8-15) phases of therapy found that for both anxiety and depression, therapy sessions and digital lessons (but not digital exercises) were significantly stronger (more negative) during the early phase of treatment. These effects remained after incorporating age, gender, and ethnicity.
+Overall, significant declines in both anxiety and depression were observed throughout treatment, demonstrating the efficacy of BC-CBT in decreasing these symptomatologies. These robust effects lend support to a blended care model in addressing anxiety and depressive symptoms [16], and such a model can be a potentially more scalable and cost-effective method of providing evidence-based care compared to traditional methods of delivering psychotherapy [15]. Additionally, steeper declines in symptom severity were observed during the early stages of therapy, and therapy sessions and video lessons were significantly more potent in decreasing symptomatology during the early phase of treatment. Given that the initial stages of therapy are largely dedicated to providing pertinent psychoeducation and establishing key therapeutic concepts and skills, therapy sessions and digital video lessons appear to be effective ways to reinforce the uptake of this crucial information. Specifically, a key component of early psychoeducation is to establish the rationale for treatment and clarify how current cognitive and behavioral patterns contribute to the maintenance of symptomology. This crucial information has been shown to facilitate client reappraisals and contributes to lower avoidance of challenging situations early on in treatment [32], which is key for decreasing symptom severity and functional impairment. Consequently, providers should capitalize on the robust effects of these treatment components earlier on in therapy, ensuring that sessions are occurring consistently and that video lessons are being routinely assigned to clients in order to reinforce key therapeutic concepts. These findings also highlight the importance of setting positive expectations and obtaining client buy-in early on in therapy [33], given that the early phase of treatment often incites hope and a sense of agency [34]. This will optimally position clients to be their own enactors of change, motivating them to learn and practice coping skills later on in therapy.
+Indeed, the later phase of therapy is primarily dedicated to the actual practice of skills in day-to-day life, which is challenging for clients as they start to practice these coping skills in more difficult, real-world situations. As such, it is not surprising to see a slower decline in symptoms in the latter stage of therapy, which is expected due to the increased difficulty of therapeutic tasks [17,35]. The later stages of therapy are critical to achieving reliable clinical improvement and durability of treatment gains, given the opportunities for real-world generalization of therapy skills. To facilitate these crucial steps, future studies would benefit from investigating how to increase the potency of digital tools and engagement in the later phase and further develop digital content that is better suited for later stages in treatment (eg, more in-depth skills review and practices). Ultimately, although the early and late phases of therapy have unique focuses, they both play crucial roles in achieving positive treatment outcomes.
+Having a therapy session and watching digital video lessons were uniquely associated with decreases in anxiety and depression, highlighting the potency of both traditional face-to-face therapy and the digital components within a blended care model. Meeting with a therapist for regular sessions allows the client to receive individualized care, in-depth exploration of key concepts and skills, and increased accountability. Indeed, therapy sessions were relatively more impactful in decreasing symptomology, underscoring the importance of therapist-led treatment [36,37]. It is notable that completing digital video lessons also uniquely contributed to decreases in anxiety and depression, supporting its potential standalone utility. The digital video lessons help teach and reinforce key therapy concepts in an engaging manner, allow for asynchronous review of the materials at the client’s convenience, and facilitate dissemination of therapeutic content at scale. These benefits are particularly important to consider when resources are limited and therapy sessions cannot be conducted with regularity, which can be affected by financial barriers, difficulties obtaining reliable transportation to/from sessions, or lack of access to trained professionals [38,39]. In these cases, digital video lessons can be pivotal in expanding access to evidence-based treatment, given the support that digital interventions have received for effectively reducing access barriers [40].
+There was an unexpected finding of digital exercises being associated with increased anxiety symptoms, but the effect size was relatively weak. Based on the sensitivity analyses, the follow-up models indicated a potential suppression effect for digital exercises; digital exercises in isolation contributed to decreases in anxiety and depressive symptoms. These findings are more consistent with extant literature, which reports a strong association between greater homework compliance and better treatment outcomes [41,42]. The relatively small effect sizes observed can be attributed to the measurement method of exercise completion. In fact, previous research has reported smaller effect sizes when homework completion is measured objectively and contemporaneously [41], both of which are typical with digital platforms. Additionally, clients may have generalized the skills to day-to-day life as therapy progressed and gradually decreased reliance on the digital exercise [21], causing them to practice the skills taught in the exercises but
+https://formative.jmir.org/2021/12/e33452 JMIR Form Res 2021 | vol. 5 | iss. 12 | e33452 | p. 10 (page number not for citation purposes)
+JMIR FORMATIVE RESEARCH Wu et al
+XSL•FO
+RenderX
+
+
+not actually log them in the platform, thereby diluting the strength of the association. Future studies should seek to further disentangle the overlap between various digital components of care and better establish the unique contributions through randomly assigned conditions and/or sequencing studies.
+These findings should be considered within the context of several limitations and suggested future directions for research. First, this study employs a pragmatic retrospective design, limiting the ability to rule out regression to the mean effects. Future studies should seek to examine the efficacy of BC-CBT and its care components in a randomized controlled trial to instill further confidence in this model beyond a control condition. Within these limitations, it is important to note that the naturalistic design in real-world settings strengthens the ecological validity, and the growth curve model allows us to glean nuanced information about the temporality of changes and account for stable and varying client-level differences. Second, self-report measures were used to determine clinical outcomes. Although the measures used are extensively validated and possess strong psychometric properties, future studies should use a multimethod, multi-informant approach to measuring symptomatology to establish a more comprehensive evaluation [43]. Third, more general therapy process variables were not incorporated into the analyses. As such, future studies should seek to better understand the impact of these factors (eg, therapeutic alliance, treatment expectations, familiarity with technology, therapist reinforcement of skills practice) on engagement with digital activities and treatment outcome [44]. Fourth, the measurement of digital exercise completion could be improved in future studies. Although real-time data were gathered whenever clients completed exercises in the platform, data collection is incumbent upon the client electronically logging it, so it is possible that clients were practicing the coping skills noted in the digital exercise but not actually logging it in the system. Additionally, more nuanced data regarding the actual time clients spent on digital exercises may be helpful to examine in relation to outcomes. Fifth, given that the number of exercises assigned decreases significantly in the later phase of therapy, it is possible that there was less power to detect the impact of
+exercises on decreasing symptomology. Sixth, given that other types of digital engagement occurred in between sessions (eg, completion of assessments, messages between provider and client), it would also be helpful to examine their impact on treatment outcomes. Although they are inherently different from digital therapy content (ie, digital content directly teaching therapeutic concepts and skills), these other types of engagement may uniquely impact engagement in therapy overall. Seventh, this study focused on treatment outcomes during the acute phase of therapy. Future studies should seek to conduct long-term follow-ups to determine how robust BC-CBT is in maintaining treatment gains for anxiety and depression. Eighth, although anxiety and depression were the primary focuses of the study, clients may have had other presenting problems as well. Future studies should seek to examine the impact of comorbidities on treatment outcome. Ninth, this study focused on distinct outcomes (ie, anxiety and depression symptoms), and many clients met inclusion criteria for both conditions, resulting in their inclusion in both sets of analyses. Although this does not pose a meaningful threat to the validity of the analyses presented here, future studies drawing on larger samples should explore whether clients with comorbid presentations respond differently to the BC-CBT intervention than clients who only meet criteria for one condition. Tenth, providers anchored their interventions in CBT-based approaches and were able to implement a variety of interventions (eg, DBT, ACT). It would be of interest in future studies to investigate the potential impact of different approaches on outcomes.
+Collectively, these findings highlight the robust effectiveness of a BC-CBT program in decreasing anxiety and depression in real-world settings. Given the myriad barriers to accessing evidence-based care, blended care programs combine the advantages of technology with traditional face-to-face therapy to facilitate greater dissemination of CBT. Timing of treatment components and the potency of certain digital activities (ie, video lessons) should be considered when implementing a blended care model. Ultimately, the unique contributions of various treatment components underscore the utility of a blended care model in effectively treating depression and anxiety.
+Acknowledgments
+The authors would like to extend their gratitude for the Lyra Health blended care therapists, who are dedicated to helping their clients live more productive and fulfilling lives.
+Authors' Contributions
+All authors were responsible for study conceptualization and for writing components of the original manuscript draft, as well as for reviewing and editing. SC was responsible for data curation and formal analysis. SC and REW were responsible for the formulation of the data analytic plan and data validation.
+Conflicts of Interest
+MSW, SC, and AL, are employed by Lyra Health, receive income from Lyra Health, and have been granted equity in Lyra Health. CC is employed by Lyra Health and Lyra Clinical Associates, receives income from Lyra Health and Lyra Clinical Associates, and has been granted equity in Lyra Health. REW is a paid consultant for Lyra Health.
+References
+1. The Lancet Global Health. Mental health matters. Lancet Glob Health 2020 Nov;8(11):e1352 [FREE Full text] [doi: 10.1016/S2214-109X(20)30432-0] [Medline: 33069297]
+https://formative.jmir.org/2021/12/e33452 JMIR Form Res 2021 | vol. 5 | iss. 12 | e33452 | p. 11 (page number not for citation purposes)
+JMIR FORMATIVE RESEARCH Wu et al
+XSL•FO
+RenderX
+
+
+2. Wittchen HU. Generalized anxiety disorder: prevalence, burden, and cost to society. Depress Anxiety 2002;16(4):162-171 [FREE Full text] [doi: 10.1002/da.10065] [Medline: 12497648] 3. Kessler RC. The costs of depression. Psychiatr Clin North Am 2012 Mar;35(1):1-14 [FREE Full text] [doi: 10.1016/j.psc.2011.11.005] [Medline: 22370487] 4. Butler AC, Chapman JE, Forman EM, Beck AT. The empirical status of cognitive-behavioral therapy: a review of meta-analyses. Clin Psychol Rev 2006 Jan;26(1):17-31. [doi: 10.1016/j.cpr.2005.07.003] [Medline: 16199119] 5. Payne KA, Myhr G. Increasing access to cognitive-behavioural therapy (CBT) for the treatment of mental illness in Canada: a research framework and call for action. Healthc Policy 2010 Feb;5(3):e173-e185 [FREE Full text] [Medline: 21286263] 6. Fernandez E, Woldgabreal Y, Day A, Pham T, Gleich B, Aboujaoude E. Live psychotherapy by video versus in-person: a meta-analysis of efficacy and its relationship to types and targets of treatment. Clin Psychol Psychother 2021 Apr 07. [doi: 10.1002/cpp.2594] [Medline: 33826190] 7. Weightman M. Digital psychotherapy as an effective and timely treatment option for depression and anxiety disorders: implications for rural and remote practice. J Int Med Res 2020 Jun 12;48(6) [FREE Full text] [doi: 10.1177/0300060520928686] [Medline: 32527170] 8. Andersson G, Carlbring P, Ljótsson B, Hedman E. Guided internet-based CBT for common mental disorders. J Contemp Psychother 2013 May 21;43(4):223-233. [doi: 10.1007/s10879-013-9237-9] 9. Păsărelu CR, Andersson G, Nordgren LB, Dobrean A. Internet-delivered transdiagnostic and tailored cognitive behavioral therapy for anxiety and depression: a systematic review and meta-analysis of randomized controlled trials. Cogn Behav Ther 2017;46(1):1-28. [doi: 10.1080/16506073.2016.1231219] [Medline: 27712544] 10. Andrews G, Basu A, Cuijpers P, Craske MG, McEvoy P, English CL, et al. Computer therapy for the anxiety and depression disorders is effective, acceptable and practical health care: An updated meta-analysis. J Anxiety Disord 2018;55:70-78 [FREE Full text] [doi: 10.1016/j.janxdis.2018.01.001] [Medline: 29422409] 11. Spek V, Cuijpers P, Nyklícek I, Riper H, Keyzer J, Pop V. Internet-based cognitive behaviour therapy for symptoms of depression and anxiety: a meta-analysis. Psychol Med 2007;37(3):319-328. [doi: 10.1017/S0033291706008944] [Medline: 17112400] 12. Baumeister H, Reichler L, Munzinger M, Lin J. The impact of guidance on Internet-based mental health interventions a systematic review. Internet Interv 2014 Oct;1(4):205-215. [doi: 10.1016/j.invent.2014.08.003] 13. Baumel A, Edan S, Kane JM. Is there a trial bias impacting user engagement with unguided e-mental health interventions? A systematic comparison of published reports and real-world usage of the same programs. Transl Behav Med 2019 Nov 25;9(6):1020-1033. [doi: 10.1093/tbm/ibz147] [Medline: 31689344] 14. Valerio Netto A. Application of blended care as a mechanism of action in the construction of digital therapeutics. Einstein (Sao Paulo) 2020;18:eMD5640 [FREE Full text] [doi: 10.31744/einstein_journal/2020MD5640] [Medline: 33237249] 15. Kooistra LC, Wiersma JE, Ruwaard J, Neijenhuijs K, Lokkerbol J, van Oppen P, et al. Cost and effectiveness of blended versus standard cognitive behavioral therapy for outpatients with depression in routine specialized mental health care: pilot randomized controlled trial. J Med Internet Res 2019 Oct 29;21(10):e14261 [FREE Full text] [doi: 10.2196/14261] [Medline: 31663855] 16. Lungu A, Jun JJ, Azarmanesh O, Leykin Y, Chen CE. Blended care-cognitive behavioral therapy for depression and anxiety in real-world settings: pragmatic retrospective study. J Med Internet Res 2020 Jul 06;22(7):e18723 [FREE Full text] [doi: 10.2196/18723] [Medline: 32628120] 17. Hayes AM, Laurenceau JP, Feldman G, Strauss JL, Cardaciotto L. Change is not always linear: the study of nonlinear and discontinuous patterns of change in psychotherapy. Clin Psychol Rev 2007;27(6):715-723 [FREE Full text] [doi: 10.1016/j.cpr.2007.01.008] [Medline: 17316941] 18. Gloster AT, Klotsche J, Gerlach AL, Hamm A, Ströhle A, Gauggel S, et al. Timing matters: change depends on the stage of treatment in cognitive behavioral therapy for panic disorder with agoraphobia. J Consult Clin Psychol 2014;82(1):141-153. [doi: 10.1037/a0034555] [Medline: 24188509] 19. Shalom JG, Aderka IM. A meta-analysis of sudden gains in psychotherapy: outcome and moderators. Clin Psychol Rev 2020;76:101827. [doi: 10.1016/j.cpr.2020.101827] [Medline: 32036232] 20. Beard JIL, Delgadillo J. Early response to psychological therapy as a predictor of depression and anxiety treatment outcomes: a systematic review and meta-analysis. Depress Anxiety 2019 Sep 24;36(9):866-878. [doi: 10.1002/da.22931] [Medline: 31233263] 21. Cummings C, Kazantzis N, Kendall PC. Facilitating homework and generalization of skills to the real world. In: Evidence-Based CBT for Anxiety and Depression in Children and Adolescents: A Competencies Based Approach. West Sussex, UK: John Wiley & Sons, Ltd; 2014:141-155. 22. Huppert JD, Roth Ledley D, Foa EB. The use of homework in behavior therapy for anxiety disorders. J Psychother Integr 2006;16(2):128-139. [doi: 10.1037/1053-0479.16.2.128] 23. Glenn D, Golinelli D, Rose RD, Roy-Byrne P, Stein MB, Sullivan G, et al. Who gets the most out of cognitive behavioral therapy for anxiety disorders? The role of treatment dose and patient engagement. J Consult Clin Psychol 2013 Aug;81(4):639-649 [FREE Full text] [doi: 10.1037/a0033403] [Medline: 23750465]
+https://formative.jmir.org/2021/12/e33452 JMIR Form Res 2021 | vol. 5 | iss. 12 | e33452 | p. 12 (page number not for citation purposes)
+JMIR FORMATIVE RESEARCH Wu et al
+XSL•FO
+RenderX
+
+
+24. Williams AD, O'Moore K, Mason E, Andrews G. The effectiveness of internet cognitive behaviour therapy (iCBT) for social anxiety disorder across two routine practice pathways. Internet Interv 2014 Oct;1(4):225-229. [doi: 10.1016/j.invent.2014.11.001] 25. Kroenke K, Spitzer RL, Williams JB. The PHQ-9: validity of a brief depression severity measure. J Gen Intern Med 2001 Sep;16(9):606-613 [FREE Full text] [doi: 10.1046/j.1525-1497.2001.016009606.x] [Medline: 11556941] 26. Spitzer RL, Kroenke K, Williams JBW, Löwe B. A brief measure for assessing generalized anxiety disorder: the GAD-7. Arch Intern Med 2006 May 22;166(10):1092-1097. [doi: 10.1001/archinte.166.10.1092] [Medline: 16717171] 27. Plummer F, Manea L, Trepel D, McMillan D. Screening for anxiety disorders with the GAD-7 and GAD-2: a systematic review and diagnostic metaanalysis. Gen Hosp Psychiatry 2016;39:24-31. [doi: 10.1016/j.genhosppsych.2015.11.005] [Medline: 26719105] 28. Kroenke K, Spitzer RL, Williams JBW, Löwe B. The Patient Health Questionnaire Somatic, Anxiety, and Depressive Symptom Scales: a systematic review. Gen Hosp Psychiatry 2010;32(4):345-359. [doi: 10.1016/j.genhosppsych.2010.03.006] [Medline: 20633738] 29. SAS Institute. SAS/STAT Documentation (Version 9.4). Cary, NC: SAS; 2014. 30. Flynn HA, Warren R. Using CBT effectively for treating depression and anxiety. Curr Psychiatry 2014;13(6):45-53 [FREE Full text] 31. Aiken LS, West SG. Multiple Regression: Testing and Interpreting Interactions. Newbury Park, CA: Sage; 1991. 32. Holtforth M, Grawe K, Castonguay LG. Predicting a reduction of avoidance motivation in psychotherapy: Toward the delineation of differential processes of change operating at different phases of treatment. Psychother Res 2006 Oct;16(5):639-644. [doi: 10.1080/10503300600608215] 33. DeFife JA, Hilsenroth MJ. Starting off on the right foot: common factor elements in early psychotherapy process. J Psychother Integr 2011;21(2):172-191 [FREE Full text] [doi: 10.1037/a0023889] 34. Howard KI, Lueger RJ, Maling MS, Martinovich Z. A phase model of psychotherapy outcome: causal mediation of change. J Consult Clin Psychol 1993 Aug;61(4):678-685. [doi: 10.1037//0022-006x.61.4.678] [Medline: 8370864] 35. Chu BC, Skriner LC, Zandberg LJ. Shape of change in cognitive behavioral therapy for youth anxiety: symptom trajectory and predictors of change. J Consult Clin Psychol 2013;81(4):573-587. [doi: 10.1037/a0033390] [Medline: 23796317] 36. Reardon ML, Cukrowicz KC, Reeves MD, Joiner TE. Duration and Regularity of Therapy Attendance as Predictors of Treatment Outcome in an Adult Outpatient Population. Psychother Res 2010;12(3):273-285. [doi: 10.1080/713664390] 37. Xiao H, Hayes JA, Castonguay LG, McAleavey AA, Locke BD. Therapist effects and the impacts of therapy nonattendance. Psychotherapy (Chic) 2017;54(1):58-65. [doi: 10.1037/pst0000103] [Medline: 28263652] 38. Patel V, Chowdhary N, Rahman A, Verdeli H. Improving access to psychological treatments: lessons from developing countries. Behav Res Ther 2011 Sep;49(9):523-528 [FREE Full text] [doi: 10.1016/j.brat.2011.06.012] [Medline: 21788012] 39. Santiago CD, Kaltman S, Miranda J. Poverty and mental health: how do low-income adults and children fare in psychotherapy? J Clin Psychol 2013 Feb;69(2):115-126. [doi: 10.1002/jclp.21951] [Medline: 23280880] 40. Bennett CB, Ruggero CJ, Sever AC, Yanouri L. eHealth to redress psychotherapy access barriers both new and old: a review of reviews and meta-analyses. J Psychother Integr 2020 Jun;30(2):188-207. [doi: 10.1037/int0000217] 41. Mausbach BT, Moore R, Roesch S, Cardenas V, Patterson TL. The relationship between homework compliance and therapy outcomes: an updated meta-analysis. Cognit Ther Res 2010;34(5):429-438 [FREE Full text] [doi: 10.1007/s10608-010-9297-z] [Medline: 20930925] 42. Rees CS, McEvoy P, Nathan PR. Relationship between homework completion and outcome in cognitive behaviour therapy. Cogn Behav Ther 2005;34(4):242-247. [doi: 10.1080/16506070510011548] [Medline: 16319035] 43. Eid M, Diener E. Handbook of Multimethod Measurement in Psychology. Washington, DC: American Psychological Association; 2006. 44. Baumeister H, Bauereiss N, Zarski AC, Braun L, Buntrock C, Hoherz C, et al. Clinical and cost-effectiveness of PSYCHOnlineTHERAPY: study protocol of a multicenter blended outpatient psychotherapy cluster randomized controlled trial for patients with depressive and anxiety disorders. Front Psychiatry 2021;12:660534 [FREE Full text] [doi: 10.3389/fpsyt.2021.660534] [Medline: 34054617]
+Abbreviations
+ACT: acceptance and commitment therapy BC-CBT: blended care cognitive behavioral therapy CBT: cognitive behavioral therapy DBT: dialectical behavior therapy GAD-7: Generalized Anxiety Disorder-7 HIPAA: Health Insurance Portability and Accountability Act iCBT: internet-based cognitive behavioral therapy MAR: missing at random PHQ-9: Patient Health Questionnaire-9
+https://formative.jmir.org/2021/12/e33452 JMIR Form Res 2021 | vol. 5 | iss. 12 | e33452 | p. 13 (page number not for citation purposes)
+JMIR FORMATIVE RESEARCH Wu et al
+XSL•FO
+RenderX
+
+
+TIC: time-invariant covariate TVC: time-varying covariate
+Edited by G Eysenbach; submitted 07.10.21; peer-reviewed by A Daros; comments to author 29.10.21; accepted 21.11.21; published 17.12.21
+Please cite as: Wu MS, Wickham RE, Chen SY, Chen C, Lungu A Examining the Impact of Digital Components Across Different Phases of Treatment in a Blended Care Cognitive Behavioral Therapy Intervention for Depression and Anxiety: Pragmatic Retrospective Study JMIR Form Res 2021;5(12):e33452 URL: https://formative.jmir.org/2021/12/e33452 doi: 10.2196/33452 PMID:
+©Monica S Wu, Robert E Wickham, Shih-Yin Chen, Connie Chen, Anita Lungu. Originally published in JMIR Formative Research (https://formative.jmir.org), 17.12.2021. This is an open-access article distributed under the terms of the Creative Commons Attribution License (https://creativecommons.org/licenses/by/4.0/), which permits unrestricted use, distribution, and reproduction in any medium, provided the original work, first published in JMIR Formative Research, is properly cited. The complete bibliographic information, a link to the original publication on https://formative.jmir.org, as well as this copyright and license information must be included.
+https://formative.jmir.org/2021/12/e33452 JMIR Form Res 2021 | vol. 5 | iss. 12 | e33452 | p. 14 (page number not for citation purposes)
+JMIR FORMATIVE RESEARCH Wu et al
+XSL•FO
+RenderX

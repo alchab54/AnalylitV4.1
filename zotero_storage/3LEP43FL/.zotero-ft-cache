@@ -1,0 +1,508 @@
+MILITARY MEDICINE, 187, 5/6:e577, 2022
+Rapid Review on the Effectiveness of Telehealth Interventions for the Treatment of Behavioral Health Disorders
+Dawn M. Bellanti, DNP, MSN*; Marija S. Kelber, PhD*; Don E. Workman, PhD†; Erin H. Beech, MA*; Brad E. Belsher, PhD‡
+ABSTRACT Introduction:
+The Psychological Health Center of Excellence conducted a rapid review of the literature to investigate the effectiveness of behavioral health treatments (i.e., evidence-based psychotherapy and psychiatry) delivered in person compared to telehealth (TH; i.e., video teleconference and telephone).
+Materials and Methods:
+The rapid review methods included a systematic search of a single database (PubMed), hand-searching of relevant systematic reviews, dual screening, single-person data abstraction verified by a second person, and dual risk of bias assessment. Due to heterogeneity across studies, no quantitative analyses were conducted.
+Results:
+Twenty-two randomized controlled trials (RCTs), eight of which were non-inferiority trials, evaluated the effectiveness of TH via telephone or video teleconferencing compared to in-person (IP) delivery for patient populations with posttraumatic stress disorder, depression, and mixed diagnoses. The majority of RCTs and all but one of the eight noninferiority trials found that clinical outcomes did not differ between TH and IP treatment delivery. Two studies found that subgroups with higher symptom severity (hopelessness and anxiety disorders, respectively) in the TH group had worse treatment-related outcomes than IP participants with similar symptom profiles. The majority of studies found no significant differences in satisfaction with care, quality of the therapeutic alliance, or study discontinuation between TH and IP groups.
+Conclusion:
+Based on evidence from 22 RCTs, the use of TH platforms, including video conference and telephone modalities, generally produces similar outcomes as face-to-face provision of psychotherapy and psychiatry services.
+INTRODUCTION
+The use of telehealth (TH) for the delivery of synchronous (real-time) behavioral health (BH) services has become increasingly popular. Both telepsychology (technological delivery of psychological treatment) and telepsychiatry (technological delivery of psychiatric services) delivered synchronously show promise for improving access to care and overcoming barriers to treatment.1 Stigma and practical matters, such as lack of transportation or difficulty getting time off from work, present barriers for accessing treatment.2 Furthermore, frequent military relocations and
+*Psychological Health Center of Excellence (PHCoE), Research Branch, Research & Development Division (J-9), Defense Health Agency, Silver Spring, MD 20910, USA †Veterans Health Administration, Office of Research Development, Washington, DC 20402, USA ‡Phoenix VA Health Care System, Carl T Hayden Veterans Medical Center, Phoenix, AZ 85012, USA Work for this article was completed by federal government employees and contractors supporting the Defense Health Agency. The opinions and assertions contained herein are the private views of the authors and are not to be construed as official or reflecting the views of the U.S. Government, the Department of Defense, or the Defense Health Agency. doi:https://doi.org/10.1093/milmed/usab318
+Published by Oxford University Press on behalf of the Association of Military Surgeons of the United States 2021. This work is written by (a) US Government employee(s) and is in the public domain in the US.
+overseas deployments may result in delays in seeking treatment or disruptions in treatment. Telehealth can improve access to care for service members deploying to areas distal from large or traditional healthcare facilities, provide greater flexibility in scheduling treatment, and reduce the stigma associated with being physically present in mental health clinics.3,4 Importantly, technological advances make this possible without compromising Department of Defense (DoD) security requirements.5 In the past, the use of TH has been limited in part because of privacy and security concerns.6 However, the onset of the coronavirus disease 2019 pandemic has restricted access to inperson (IP) care and has increased the impetus for offering TH services via telephone and video teleconference (VTC).7 Consistent with ongoing efforts by Medicare and private insurers to implement and reimburse for TH options for health visits, lawmakers have urged the availability of the full scope of TH services for mental health care in particular.8 This has prompted DoD BH leaders to consider policy changes and best practices for TH delivery of behavioral healthcare and medication management. With the goal of improving and standardizing TH practices in the military health system, DoD stakeholders requested a short-suspense review of the literature on the effectiveness of TH interventions for the treatment of BH disorders. This article summarizes a rapid review of the evidence conducted in response to this request.
+MILITARY MEDICINE, Vol. 187, May/June 2022 e577
+Downloaded from https://academic.oup.com/milmed/article/187/5-6/e577/6345927 by guest on 15 July 2025
+
+
+Rapid Review on Effectiveness of Telehealth Interventions
+Many research studies and systematic reviews have evaluated the effectiveness of TH delivery of BH services9–11; however, most have focused on the use of self-guided computer-based or internet-delivered treatments where providers may have a limited role. Apaydin and colleagues12,13 created an evidence map which characterized the voluminous research literature on the use of TH for augmenting clinical care of depression and anxiety. This map showed that the majority of 280 reviewed randomized controlled trials (RCTs) of TH interventions utilized computers. Studies on therapist-administered synchronous interventions (i.e., those occurring in real time) via telephone or VTC were less common; only 8% of TH RCTs evaluated telephone
+delivery, while 2% focused on VTC.13 Of greater interest for this review is synchronous TH via telephone or VTC. Synchronous TH allows real-time interaction between patient and provider and, compared to other types of TH, is more similar to IP treatment.14 Several systematic reviews that evaluated the effectiveness of synchronous telepsychology services yielded encouraging findings (Table I). Four systematic reviews assessed the effectiveness of interventions delivered over the telephone.14–17 However, those reviews included studies that compared telepsychology interventions to waiting list or treatment as usual, and did not exclusively compare telephone to IP delivery of the same treatment. Seven systematic reviews evaluated
+TABLE I. Selected Systematic Reviews Evaluating Synchronous Telehealth Interventions
+Author
+Included study types Population Intervention Technology Comparator Findings
+Coughtrey and Pistrang, 201815
+RCTs and quasiexperimental
+Anxiety and depression
+Evidence-based interventions
+Telephone Waiting list Telephone-based interventions showed promise in reducing depression and anxiety symptoms compared to non-TH interventions Varker et al., 201817
+RCTs, systematic reviews, and meta-analyses
+Anxiety, PTSD, and adjustment disorder
+Any synchronous treatment
+Telephone, VTC, Internetdelivered, and text-based
+Treatment as usual, IP treatment, and alternative telepsychology
+Evidence supported the use of VTC and telephone-based interventions compared to non-TH interventions Berryhill et al., 201818
+RCTs, uncontrolled, and quasiexperimental
+Depression Evidence-based interventions
+VTC Face-to-face There was no difference between VTC and face-to-face
+Osenbach et al., 201314
+RCTs Depression Any synchronous treatment
+Telephone and VTC
+Face-to-face and treatment as usual
+TH interventions were equally effective as non-TH interventions in reducing depression symptoms Mohr et al., 200816
+RCTs Depression Evidence-based interventions
+Telephone Any Telephone-based treatments were associated with reductions in depressive symptoms Bolton and Dorstyn, 201519
+RCTs and quasiexperimental
+PTSD Evidence-based interventions
+VTC and Internet Any Video-based interventions produced reductions in symptoms, but faceto-face interventions demonstrated larger treatment gains Gentry et al., 201920
+RCTs and openlabel studies
+Any psychiatric disorder
+Group therapy VTC Face-to-face, waiting list, and no treatment control
+VTC resulted in similar treatment outcomes as face-to-face groups
+Drago et al., 201621
+RCTs Any psychiatric disorder
+Pharmaco-therapy VTC Face-to-face VTC was non-inferior to face-to-face Garcia-Lizana and MunozMayorga, 201022
+RCTs Any psychiatric disorder
+Pharmaco-therapy VTC Face-to-face There was insufficient evidence on the effectiveness of telepsychiatry
+Abbreviations: PTSD, Posttraumatic stress disorder; RCT, randomized controlled trial; VTC, video teleconferencing.
+e578 MILITARY MEDICINE, Vol. 187, May/June 2022
+Downloaded from https://academic.oup.com/milmed/article/187/5-6/e577/6345927 by guest on 15 July 2025
+
+
+Rapid Review on Effectiveness of Telehealth Interventions
+the effectiveness of VTC delivery, with most reviews examining telepsychology interventions for depression or anxiety.14–22 Gentry et al.20 evaluated RCTs and open-label studies of TH group therapy and concluded that therapy delivered via VTC resulted in similar treatment outcomes as face-toface group therapy. Berryhill et al.18 also found that VTC did not differ from face-to-face delivery in the effectiveness of treatment for depression.19 One review of 11 studies found that face-to-face treatment for posttraumatic stress disorder (PTSD) had larger treatment gains than VTC-delivered therapy.19 Telehealth treatments are comparable to IP therapy on ratings of treatment satisfaction and therapeutic alliance.23 However, therapy format (individual vs. group) affects perceptions of treatment experience for TH and IP patients.23 Thus, to optimize implementation of TH, it seems important to identify other factors that moderate the effects of TH on perception of and response to treatment. Systematic reviews of the effectiveness of telepsychiatry have yielded inconsistent findings from a limited number of reviews directly comparing TH to IP treatments.21,22 The current rapid review was designed to (1) evaluate the effectiveness of synchronous BH treatment delivered via TH compared to IP care and (2) determine whether certain patients benefit more from a specific modality. We addressed the following questions: (1) Are evidence-based behavioral healthcare interventions delivered via TH platforms (i.e., VTC and telephonic modalities) as effective as IP delivery of these treatments for a range of BH disorders? and (2) Is there any evidence to indicate whether TH treatment modalities are more appropriate for some patients and IP care for others?
+METHODS
+This rapid review comprised a systematic search of a single database, hand-searching of relevant systematic reviews, dual screening, single-person data abstraction verified by a second person, and dual risk of bias assessment. A search of PubMed was conducted on May 14, 2020, with no restriction on date. The search employed a combination of keywords and Medical Subject Heading terms for the concepts of: (1) mental health disorder; (2) psychotherapy or psychiatric intervention; and (3) TH. A fourth set of search terms was included to limit the results to RCTs. Search terms within a concept were combined with the Boolean Operator “OR” and concepts were linked with the Boolean Operator “AND.” The PubMed “19+” filter was applied to limit the search results to adult populations. Full search syntax is provided in Table S1. The reference sections of published systematic reviews on telepsychology and telepsychiatry were hand-searched to identify additional studies. Studies were included if they met the following criteria: peer-reviewed RCTs published in English, including adults with symptoms or diagnosis of any mental health disorder, comparing the same intervention (evidence-based psychotherapy or psychiatry) using different delivery modalities (face-toface, telephone, and VTC). We included both “office-based
+VTC” (i.e., synchronous TH delivered by a provider in one clinical setting to patients located in a different satellite clinic) and “home-based VTC” (i.e., TH delivered by providers in a clinical setting to patients in their home environment). Table S2 describes the full inclusion and exclusion criteria. Titles and abstracts were dually screened by two subject matter experts, with disagreements resolved through discussion or consultation with a third person if required. Full-text articles were obtained for records included at the title/abstract stage and were screened dually using the same criteria. Following screening, articles were linked by study, and a single reviewer extracted study characteristics and results for each study using a previously piloted data extraction form. Extracted data were verified by a second reviewer. For each of the included studies, two reviewers independently completed the Cochrane Risk of Bias Assessment (considered the gold standard for assessing the risk of bias for RCTs)24 and resolved disagreements through discussion.
+RESULTS
+A total of 997 records were screened, yielding 22 primary RCTs reported in 42 publications that met inclusion criteria (see PRISMA flow diagram, Fig. 1). A description of study characteristics and main conclusions from both primary studies and secondary analyses is in Table II. Citations of included studies and risk of bias assessments are presented in Table S3 and Figures S1 and S2, respectively. Studies focused on populations with the following diagnoses: depression (41%), PTSD (41%), and mixed samples with various BH diagnoses (18%). More than half of the studies (55%) were conducted on veteran populations. Although one study included both veterans and active duty service members (AD SMs), no studies were conducted with an exclusively AD SM population. The majority of BH interventions (86%) were evidence-based psychotherapies, including cognitive behavioral therapy (CBT), cognitive processing therapy (CPT), and behavioral activation (BA), while the remaining 14% were psychiatry treatments, encompassing medication management, psychoeducation, and/or supportive counseling. Most studies compared IP treatment delivery to officebased VTC (48%); the remainder comprised telephone (29%) and home-based VTC (24%) TH modalities. A single study compared home-based IP treatment with both office-based and home-based VTC. The types of TH modalities used in those studies included telephone (both on landlines and smartphones) and VTC via various technologies (e.g., analog videophone, PolyCom, and Personal Computer-based), either coordinated from a centralized to a distal satellite site or to the participant’s home.
+Telehealth Psychotherapies for Depression
+Eight RCTs reported on various evidence-based psychotherapies for depression, delivered either by telephone or home-based VTC (Table II). Four studies concluded that
+MILITARY MEDICINE, Vol. 187, May/June 2022 e579
+Downloaded from https://academic.oup.com/milmed/article/187/5-6/e577/6345927 by guest on 15 July 2025
+
+
+Rapid Review on Effectiveness of Telehealth Interventions
+FIGURE 1. PRISMA flow diagram.
+telephone-administered CBT was both feasible and acceptable to patients with depression and resulted in similar or more favorable post-treatment effects on depressive symptoms when compared to IP delivery.25–28 Telehealth-delivered treatment resulted in greater improvement in self-reported depressive symptoms and global functioning,26 greater reductions in worry,29 and was more cost-effective than IP delivery in patients with depression.30 One study compared IP with home-based VTC treatment in depressed patients and generally found similar decreases in depression severity and other outcomes, regardless of method of delivery.31 Three studies were non-inferiority trials. A large noninferiority trial in patients with major depressive disorder found that telephone-delivered CBT was not worse than IP care at post-treatment, but that those who received IP treatment had comparatively lower depression scores at 6-month follow-up.32 In one study of older veterans,
+behavioral activation treatment for depression (BATD) via VTC was not worse than IP treatment delivery for depressive symptoms, quality of life (QoL), satisfaction with care, and costs.33 The results from the other study, with a predominantly AD SM sample, found that although depression and hopelessness decreased in both groups (VTC and IP BATD), the magnitude of decrease was less pronounced in the TH group and, therefore, the results did not support non-inferiority of TH compared to IP treatment.34
+Telehealth Psychotherapies for PTSD
+Nine RCTs evaluated evidence-based psychotherapies for the treatment of PTSD and related symptoms. Two RCTs showed that VTC-delivered therapy was as good as IP therapy at decreasing PTSD symptoms.35,36 However, in one of these studies with prolonged exposure therapy in
+e580 MILITARY MEDICINE, Vol. 187, May/June 2022
+Downloaded from https://academic.oup.com/milmed/article/187/5-6/e577/6345927 by guest on 15 July 2025
+
+
+Rapid Review on Effectiveness of Telehealth Interventions
+TABLE II. Study Characteristics and Main Conclusions
+Citation Sample description TH modalitya Treatment Main conclusions Study type
+Depression
+Mohr et al., 201232 325 primary care patients
+with MDD and HAMD > 16;
+78% female, and mean age
+47.7 years
+Telephone CBT CBT delivered by TH was not inferior to IP on depression
+measures at post-treatment. At 6-month follow-up, the IP
+group was significantly less depressed than TH group. Sig
+nificantly fewer TH participants discontinued treatment
+compared to IP group32. There were equivalent outcomes
+on total alliance scores at post-treatment37. In a subgroup
+with comorbid anxiety, TH participants had significantly
+poorer depression and anxiety outcomes at post-treatment
+and follow-up compared to the IP group38.
+Non
+inferiority
+trial
+Fann et al., 201526 100 adults with TBI and
+MDD, PHQ-9 score ≥10,
+63% male, and mean age
+45.8 years
+Telephone CBT There was a greater effect of CBT-T on self-reported mea
+sures of depression symptoms (SCL-20) and global
+improvement (PGI). There were similar improvements in
+depressive symptoms between TH and IP groups at week
+16. There were no significant differences between groups in
+health-related QoL, functional impairment, post-concussive
+symptoms, or quality of the therapeutic relationship.
+RCT
+Himelhoch et al.,
+201328
+34 HIV-infected individuals
+with severe depressive symp
+toms, 74% female, and mean
+age 45.1 years
+Telephone CBT Depressive symptoms were significantly reduced in both TH
+and IP groups with large effect sizes. Satisfaction and ther
+apeutic alliance were not significantly different between
+groups. TH-delivered therapy is feasible, acceptable, and
+efficacious for major depression among economically
+disadvantaged individuals.
+Pilot RCT
+Glueckauf et al.,
+201227
+14 dementia caregivers with
+depression and PHQ-9 score
+≥10, 91% female, and mean
+age 57.9 years
+Telephone CBT There were no statistically significant differences between
+TH and IP CBT on any outcomes (depression symptoms,
+physical symptoms, caregiver support, and subjective
+burden). This pilot study showed preliminary evidence of
+clinical utility and improvement in clinical outcomes across
+both modalities.
+Pilot RCT
+Alegria et al., 201425 257 Latino primary care
+patients with moderate-to
+severe depression at two
+sites: Boston, MA (n = 127)
+and San Juan, PR (n = 130);
+82% female
+Telephone CBT (ECLA,
+a culturally
+adapted
+version of
+CBT)
+ECLA had similar effects on depressive symptoms and func
+tional impairment when delivered via TH or IP to Latino
+primary care patients with moderate-to-severe depression25.
+There were greater reductions in worry in the TH compared
+to the IP group at 4-month follow-up29. TH delivery was
+less costly and more cost-effective than IP delivery30.
+RCT
+Egede et al., 201533 241 veterans with MDD;
+98% male and mean age
+63.9 years
+VTC (in home) BATD EB psychotherapy for depression in older veterans via TH is
+feasible and produces outcomes that are no worse than IP
+delivery 12 months after treatment33. QoL and satisfaction
+with care were similar in both groups39. Healthcare costs
+did not differ between TH and IP delivery40. TH group had
+lower health utilization costs 1 year post-intervention with
+similar QALYs compared to those receiving IP care41.
+Non
+inferiority
+trial
+(continued)
+MILITARY MEDICINE, Vol. 187, May/June 2022 e581
+Downloaded from https://academic.oup.com/milmed/article/187/5-6/e577/6345927 by guest on 15 July 2025
+
+
+Rapid Review on Effectiveness of Telehealth Interventions
+TABLE II. (Continued)
+Citation Sample description TH modalitya Treatment Main conclusions Study type
+Luxton et al., 201634 121 SM and veterans with
+major and minor depressive
+disorder; 82% male
+VTC (in home) BATD This study did not demonstrate non-inferiority of home-based
+TH compared to IP treatment based on depression and hope
+lessness outcomes. There were no significant differences
+between groups on any of the secondary outcomes (reduc
+tion in anxiety, PTSD symptoms, MH treatment stigma,
+and satisfaction with services)34. Higher satisfaction with
+IP treatment was associated with younger age, junior mil
+itary status; higher satisfaction with in-home TH delivery
+was associated with older, more senior, more symptomatic
+participants42. In the subgroup with higher hopelessness
+severity at baseline, those who received treatment via TH
+had less symptom improvement compared to IP delivery.
+Older participants with higher loneliness and anxiety scores
+at baseline were more likely to be in this subgroup43.
+Non
+inferiority
+trial
+Choi et al., 2014a31 121 depressed homebound
+individuals; 78% female and
+mean age 64.8 years
+VTC (in home)
+vs. IP (in home)
+PST There were no significant differences in treatment effects on
+depression severity between in-home TH and IP delivery
+of PST among depressed homebound older adults. Despite
+lack of experience with technology, TH participants had
+very positive attitudes toward TH-delivered therapy at post
+treatment31. The effects on both depression and disability
+outcomes were sustained significantly longer at 36-week
+follow-up for TH relative to IP delivery (Choi, 2014b)44.
+RCT
+PTSD
+Morland et al.,
+201445
+125 veterans with PTSD;
+100% male and mean age
+55 years
+VTC (office
+based) (group
+therapy)
+CPT-C CPT-C provided to veterans with PTSD via TH produced
+outcomes that were non-inferior to IP treatment. Both
+groups had significant reductions in PTSD symptoms at
+post-treatment and follow-up45. There were no major dif
+ferences in treatment outcomes across multiple domains,
+including QoL, between TH and IP delivery46.
+Non
+inferiority
+trial
+Morland et al.,
+201547
+126 females with PTSD (21
+veterans and 105 civilians)
+and mean age 46 years
+VTC (office
+based)
+CPT-C The non-inferiority hypothesis was supported. CPT-C pro
+vided to female trauma survivors with PTSD via TH is
+feasible and produces clinical and process outcomes that are
+comparable to IP delivery.
+Non
+inferiority
+trial
+Liu et al., 202048 207 veterans with PTSD, 74%
+male, and mean age 48 years
+VTC (office
+based)
+CPT-C CPT delivered via TH was non-inferior to IP psychotherapy
+in improving self-reported PTSD and depression symptoms
+at both post-treatment and 6-month follow-up. For clinician
+administered PTSD outcomes, there was significantly less
+reduction in CAPS scores at post-treatment in TH compared
+to the IP group, but by 6-month follow-up, non-inferiority
+between modalities was observed.
+Non
+inferiority
+trial
+(continued)
+e582 MILITARY MEDICINE, Vol. 187, May/June 2022
+Downloaded from https://academic.oup.com/milmed/article/187/5-6/e577/6345927 by guest on 15 July 2025
+
+
+Rapid Review on Effectiveness of Telehealth Interventions
+TABLE II. (Continued)
+Maieritsch et al.,
+201635
+90 OEF/OIF veterans with
+PTSD, 93% male, and mean
+age of 30.9 years
+VTC (office
+based)
+CPT CPT for PTSD delivered by TH may be as good as IP CPT,
+as demonstrated by the trend level in CAPS scores. A higher
+than expected overall dropout rate precluded an adequate
+sample size to determine equivalence. There were no differ
+ences between groups on secondary outcome of therapeutic
+alliance.
+Equivalence
+trial
+Morland et al.,
+202036
+175 veterans with PTSD; 75%
+male and mean age 47 years
+VTC (in home)
+vs. VTC (office
+based) vs. IP (in
+home)
+PE Participants in the three groups experienced improvements
+across all primary (PCL and CAPS) and secondary clinical
+outcomes that were maintained over time, irrespective of
+treatment modality. In-home IP group had a higher treat
+ment completion rate and attended more PE sessions.
+Office-based TH group had significantly worse depres
+sion at posttreatment and 6-month follow-up compared to
+in-home IP. Over half of participants in the office-based TH
+group dropped out, possibly due to barriers associated with
+coming into the clinic and technological issues.
+RCT
+Acierno et al.,
+201749
+132 veterans with combat
+related PTSD; 96% male and
+mean age 42 years
+VTC (in home) PE PE delivered by TH was “as good as” the same treatment
+delivered by IP for PTSD symptom response at all time
+points. However, non-inferiority hypotheses for depression
+were only supported at 6-month follow-up, with IP outper
+forming TH delivery on depression scores at post-treatment
+and 3-month follow-up49. Discontinuation rates were higher
+in the TH group50. There were no significant between-group
+differences on perception of quality of service delivery or
+satisfaction with services51.
+Non
+inferiority
+trial
+Acierno et al.,
+201652
+265 veterans with combat
+related PTSD (77% full and
+24% subthreshold); 94%
+male and mean age 46 years
+VTC (in home) BA-TE Comparative effectiveness of BA-TE via TH relative to IP
+treatment was within the minimally clinically meaningful
+range for both PTSD and major depression symptoms at
+posttreatment and follow-up. Discontinuation rates from
+both groups were similar.
+Non
+inferiority
+trial
+Ziemba et al., 201453 18 OEF/OIF veterans with
+PTSD; 90% male
+VTC (office
+based)
+CBT CBT delivered by TH or IP resulted in similar improvements
+in PTSD, anxiety, and depressive symptoms at posttreat
+ment. TH group had a greater change in mental health
+scores relative to IP. There was greater satisfaction with
+services in TH compared to IP group.
+Pilot RCT
+(continued)
+MILITARY MEDICINE, Vol. 187, May/June 2022 e583
+Downloaded from https://academic.oup.com/milmed/article/187/5-6/e577/6345927 by guest on 15 July 2025
+
+
+Rapid Review on Effectiveness of Telehealth Interventions
+TABLE II. (Continued)
+Citation Sample description TH modalitya Treatment Main conclusions Study type
+Franklin et al.,
+201854
+18 male veterans with full
+or subthreshold PTSD and
+trauma-related insomnia, and
+mean age 53.8 years
+Telephone CBT-I Preliminary data suggest that rural veterans experienced
+improved sleep quality after receiving CBT-I by TH or
+IP. While the IP group had a greater reduction in insom
+nia at posttreatment and at 1-month follow-up, there were
+no between-group differences at 3-month follow-up.
+Satisfaction with services was equivalent in both groups.
+Pilot RCT
+Mixed MH diagnoses
+Mitchell et al.,
+200855
+128 adults with bulimia ner
+vosa (BN) or eating disorder
+not otherwise specified (ED
+NOS); 63% female, and
+mean age 29 years
+VTC (office
+based)
+CBT CBT delivered to adults with eating disorders resulted in
+equivalent clinical outcomes at posttreatment whether deliv
+ered via TH or IP55. Based on therapeutic alliance variables,
+participants did not have a modality preference, yet thera
+pists preferred IP to TH60. TH delivery was associated with
+lower costs per abstinent subject61.
+RCT
+Stubbings et al.,
+201356
+26 individuals with DSM-IV
+Axis-I mood or anxi
+ety disorders; mean age
+30.8 years
+VTC (office
+based)
+CBT CBT was effective in significantly reducing symptoms of
+depression, anxiety, and stress and improving QoL in indi
+viduals with mood and anxiety disorders. There were no
+significant differences in any outcomes, including ratings on
+the therapeutic alliance, between the TH and IP groups.
+Pilot RCT
+De Las Cuevas et al.,
+200657
+140 outpatients with psychi
+atric diagnoses (ICD-10 F1,
+F2, F3, F4, and F6); 66%
+female
+VTC (office
+based)
+Telepsychiatry There were no statistically significant differences in global
+index scores between the two delivery modalities. Psychi
+atric treatment, whether by TH or IP, resulted in comparable
+outcomes in patients with various MH diagnoses.
+RCT
+O’Reilly et al.,
+200758
+495 patients with any MH
+diagnosis and elevated Brief
+Symptom Inventory (BSI)
+scores referred to psychiatry;
+63% female
+VTC (office
+based)
+Telepsychiatry Psychiatric consultation and follow-up produced equivalent
+clinical outcomes whether delivered by TH or IP. Psychiatry
+via TH was less expensive to deliver than IP services. These
+findings suggest that telepsychiatry can be cost-effective
+option for providing psychiatric services.
+Equivalence
+trial
+Ruskin et al., 200459 119 veterans with depression
+diagnoses; 88% male and
+mean age 49.7 years
+VTC (office
+based)
+Telepsychiatry There were no significant differences between TH and IP
+psychiatric treatments on symptom improvement, remis
+sion, treatment adherence, or patient satisfaction. Rates of
+improvement in both clinician-administered and self-report
+measures of depression were not significantly different
+between the two groups over the 6-month treatment period.
+These results suggest that telepsychiatry results in symptom
+improvement that is comparable to IP treatment.
+RCT
+aAll are compared to IP group unless otherwise specified.
+Abbreviations: BATD, Behavioral Activation Treatment for Depression; BA-TE, Behavioral Activation and Therapeutic Exposure; CAPS, Clinician-Administered PTSD Scale; CBT, Cognitive Behavioral
+Therapy; CBT-C, CBT, cognitive only version; CBT-I, CBT for insomnia; CBT-T, CBT via telephone; DSM-IV, Diagnostic and Statistical Manual of Mental Disorders, fourth edition; EB, evidence-based;
+ECLA, Engagement and Counseling for Latinos intervention; HAMD, Hamilton Depression Rating Scale; HIV, human immunodeficiency virus; IP, in-person; MDD, major depressive disorder; MH, mental
+health; OEF/OIF, Operation Enduring Freedom/Operation Iraqi Freedom; PCL, PTSD checklist; PE, prolonged exposure therapy; PGI, Patient Global Impression Scale of Improvement; PHQ-9, Patient
+Health Questionnaire, 9-item depression module; PST, Problem-Solving Therapy; PTSD, posttraumatic stress disorder; QoL, quality of life; RCT, randomized controlled trial; SCL-20, Symptom Checklist
+(20 items); TBI, traumatic brain injury; TH, telehealth; VTC, video teleconferencing; BN, bulimia nervosa; ED-NOS, eating disorder not otherwise specified; BSI, Brief Symptom Inventory.
+e584 MILITARY MEDICINE, Vol. 187, May/June 2022
+Downloaded from https://academic.oup.com/milmed/article/187/5-6/e577/6345927 by guest on 15 July 2025
+
+
+Rapid Review on Effectiveness of Telehealth Interventions
+veterans with PTSD, TH participants had substantially higher discontinuation rates and comparatively worse depression than the IP group at post-treatment and follow-up.36 Five non-inferiority trials (three evaluating CPT, two BA, and one prolonged exposure) concluded that office-based VTC45,47,48 or home-based VTC49,52 were non-inferior to IP treatment in improving PTSD symptoms at post-treatment. Several studies concluded that there were no significant differences between modalities in improving secondary depressive symptoms48,52 or QoL45 in cohorts of participants with PTSD.
+Telehealth Psychotherapies for Various Behavioral Health Diagnoses
+Two studies found that psychotherapy delivered via officebased VTC produced similar outcomes as IP therapy in patient populations with various BH diagnoses.55,56 For individuals with various mood and anxiety disorders, both treatment modalities reduced anxiety, depression, and stress symptoms and improved QoL.56 Therapy delivered via office-based VTC to patients with eating disorders improved binge eating episodes and purging frequency similar to improvements among those receiving IP therapy55; however, participants who received IP treatment had greater decreases in depression and purging frequency at 12-month follow-up than those receiving VTC.61
+Psychiatric Treatment via Telehealth
+Several RCTs57–59 provided evidence that telepsychiatry delivered by office-based VTC to individuals with various BH diagnoses produced similar outcomes as OP treatment (Table II). Ruskin and colleagues reported that there were no differences in symptom improvement, remission, treatment adherence, or satisfaction among veterans with various depressive diagnoses who received telepsychiatry or IP psychiatric services.59 One study found that psychiatric treatment delivered by VTC was less costly and more costeffective than IP treatment,58 while another study found that office-based VTC expenses were higher than IP treatment costs.59
+Variables Associated with Differences between Groups
+The second key question in this rapid review was to identify any variables associated with differential effects between IP and TH delivery. To answer this question, we examined studies that compared TH to IP delivery on predictors of treatment response, satisfaction with care, quality of the therapeutic alliance, and study discontinuation rates.
+Predictors of Treatment Response
+Two studies evaluated symptom severity and mental health comorbidities as predictors of treatment response in TH compared to IP modality.32,43 In a study of veterans with
+depressive disorders, participants with higher hopelessness symptoms at baseline who received therapy via VTC improved less than those receiving IP treatment,34 whereas in the subgroup with lower baseline hopelessness scores, there were no significant differences in change over time between the two modalities.43 The authors noted that these findings also might have been attributable to age differences between the groups, as participants with higher loneliness and anxiety scores at baseline tended to be older.43 In another study analyzing the effects of comorbidities on treatment response, there were no significant differences between telephone and IP therapy delivered to depressed patients without concurrent anxiety disorders.32 However, participants with comorbid depression and anxiety disorders who received telephone-delivered therapy had significantly poorer outcomes on depression and anxiety symptoms at treatment end and follow-up relative to the IP group.38 Two studies that evaluated the effects of moderator variables such as sex, race, income, and age found no significant moderator-by-modality interaction on clinical outcomes.32,33
+Satisfaction with Services and Therapeutic Alliance
+Nine of 11 studies that measured satisfaction with care found no differences between participants in TH and IP groups, suggesting that the mode of delivering services did not adversely affect participants’ overall satisfaction. In the two studies that found between-group differences, satisfaction was higher in the IP group in one47 and higher in the TH group in the other.53 One study evaluated associations between satisfaction ratings and demographic variables in a mixed AD SM and veteran population. Higher satisfaction with IP treatment was associated with younger age and more junior military status, whereas greater satisfaction with in-home TH delivery was associated with older, more symptomatic participants.42 Eight studies examined differences in participants’ perceptions of the quality of the therapeutic alliance. In all eight studies, across varied diagnoses (PTSD, major depressive disorder, and mood, anxiety, and eating disorders), there were no differences in participants’ perceptions of the quality of the client–therapist relationship between modali
+ties.26,28,32,35,45,47,56,60
+Discontinuation Rates
+Fifteen of 17 studies that examined differences in rates of study discontinuation (i.e., participant withdrawal from the study for any reason or failure to complete treatment per protocol) found no significant differences between the TH and IP groups. Two studies found significant between-group differences with mixed results. One study showed higher TH discontinuation rates among veterans with PTSD (officebased VTC, 54%; home-based VTC, 38%; IP in home, 21%). The authors attributed the higher dropout rate in the office-based group to barriers associated with traveling to the clinic and to technological problems that required information
+MILITARY MEDICINE, Vol. 187, May/June 2022 e585
+Downloaded from https://academic.oup.com/milmed/article/187/5-6/e577/6345927 by guest on 15 July 2025
+
+
+Rapid Review on Effectiveness of Telehealth Interventions
+technology support.36 Conversely, among patients receiving CBT for major depression, Mohr and colleagues found higher discontinuation rates in the IP than in the telephone group (32.7% vs. 20.9%) and conjectured that higher adherence in the telephone group was related to overcoming access barriers.32
+DISCUSSION
+Twenty-two RCTs evaluated TH delivery compared to IP delivery of BH treatment for patients with PTSD, depression, and mixed BH conditions. It was notable that more than half of the included trials were conducted in veterans, with a substantial proportion of studies evaluating TH treatments for PTSD. The results from the majority of studies found that the clinical outcomes of TH delivered via telephone or VTC were similar to IP service delivery. In addition, we identified eight non-inferiority trials. Because we focused on evidence-based psychotherapies with strong recommendations supporting their use for the management of PTSD and major depressive disorder,62,63 the evidence from non-inferiority trials was considered acceptable.64 Seven of the eight non-inferiority trials included in this review, across varied diagnoses and evidence-based psychotherapies, concluded that TH delivery was “as good as” IP delivery. Interestingly, several studies found that TH treatment for depression resulted in more favorable outcomes compared to IP delivery on several measures. Satisfaction with services, therapeutic alliance, and discontinuation rates were similar in both TH and IP modalities. Although the post-treatment effects of TH were favorable, there were variations in whether these outcomes were sustained over time. Furthermore, TH treatment may not be suitable for all patients. For instance, two studies showed that patients with higher symptom severity and mental health comorbidities had worse treatment outcomes in the TH compared to the IP modality. Future TH protocols may need to consider symptom severity, comorbidity, and other relevant variables when determining the appropriateness of TH for particular patients. The reviewed RCTs included subjects from many demographic groups, including combat veterans, Latino primary care patients, active duty service members, and human immunodeficiency virus (HIV)-infected urban patients with depression, increasing the generalizability of the findings. The results of this rapid review are consistent with prior systematic reviews evaluating synchronous treatments via TH.14–18,22,23 Telehealth has been shown to have a number of advantages over IP treatment, including cost savings and costeffectiveness.30,58,61 For active duty military personnel who frequently relocate and/or are deployed, TH has the potential to provide continuity of care with a consistent provider. However, TH may not be optimal for all patients, as lack of privacy, technical difficulties,34 and other factors may affect willingness to engage in and continue therapy. Adequate equipment
+testing should precede the delivery of TH services so that they can be implemented as seamlessly as possible.
+Limitations
+Several limitations are worth noting. Due to wide heterogeneity across studies (i.e., different evidence-based therapies, TH conditions, outcome measures, and populations), we opted against meta-analytic synthesis of results and grading of the evidence. Instead, we relied on a narrative synthesis and we interpreted results based on the reported statistical significance testing. In addition, since rapid reviews focus on a targeted research question and curtailed pool of research literature, the process may omit relevant research studies. We attempted to minimize this risk of omission by hand-searching systematic reviews on the topic.
+Future Directions
+We identified a number of research gaps that should be addressed in future research. Although VTC has gained increasing popularity, about one-third of trials evaluated telephone-delivered care. Although both TH modalities appeared to be equally effective as IP care, it is worth evaluating whether either TH modality results in better patient engagement and treatment outcomes. In the current climate where coronavirus disease 2019 restricts access to IP care, a choice between telephone and VTC for treatment delivery is potentially important. We did not identify any studies that directly compared these different TH modalities. Given that most studies found no differences between either TH modality compared to IP treatment, one may speculate that these different TH modalities are comparable. However, research is needed to substantiate this observation. Most studies evaluated outcomes at post-treatment. When available, we reported the results of longer-term follow-ups. However, because most studies did not evaluate long-term effects, it was unclear whether the effects of TH treatment persisted over time. Future studies should evaluate long-term effects of TH treatment. None of the studies addressed legal or ethical concerns associated with telepsychiatry, such as the requirement for one IP visit before prescribing, prescribing controlled substances remotely, and prescribing across state lines. These concerns will have to be addressed before implementation of telepsychiatry. Only two studies evaluated the effects of participants’ clinical characteristics on treatment response, finding that patients with higher symptom severity and those with mental health comorbidities may be better suited to IP treatment. More research is needed to examine the moderating effects of clinical characteristics and other individual variables. In circumstances where TH is the only available option, it may be necessary to determine ways to optimize treatment for clients with higher symptom severity and mental health comorbidities. Furthermore, future research should examine how patients’ preferences and ease of use with a particular TH modality may influence treatment outcomes.
+e586 MILITARY MEDICINE, Vol. 187, May/June 2022
+Downloaded from https://academic.oup.com/milmed/article/187/5-6/e577/6345927 by guest on 15 July 2025
+
+
+Rapid Review on Effectiveness of Telehealth Interventions
+CONCLUSIONS
+Empirical evidence supports the use and implementation of TH in the military health system as a modality for providing BH interventions, including evidence-based psychotherapies and psychiatric treatments. The equivalence of TH to IP care has been established in multiple settings, with a number of psychological conditions, and across broad demographic categories, including military and veteran populations. More research is needed to evaluate the long-term effects of TH and determine types of clients best suited for that treatment modality.
+ACKNOWLEDGMENTS None declared.
+SUPPLEMENTARY MATERIAL
+Supplementary material is available at Military Medicine online.
+FUNDING
+None declared.
+CONFLICT OF INTEREST STATEMENT
+None declared.
+REFERENCES
+1. Jacobs JC, Blonigen DM, Kimerling R, et al: Increasing mental health care access, continuity, and efficiency for veterans through telehealth with video tablets. Psych Serv 2019; 70(11): 976–82. 2. Hoge CW, Castro CA, Messer SC, McGurk D, Cotting DI, Koffman RL: Combat duty in Iraq and Afghanistan, mental health problems, and barriers to care. N Engl J Med 2004; 351(1): 13–22. 3. Mohammadi R, Tabanejad Z, Abhari S, et al: A systematic review of the use of telemedicine in the military forces worldwide. Shiraz E-Med J 2020; 21(11): e99343. 4. Zinzow HM, Britt TW, McFadden AC, Burnette CM, Gillispie S: Connecting active duty and returning veterans to mental health treatment: interventions and treatment adaptations that may reduce barriers to care. Clin Psychol Rev 2012; 32(8): 741–53. 5. Little J, Schmeltz A, Cooper M, et al: Preserving continuity of behavioral health clinical care to patients using mobile devices. Mil Med 2021; 186(1): 137–41. 6. Betancourt JA, Rosenberg MA, Zevallos A, Brown JR, Mileski M: The impact of COVID-19 on telemedicine utilization across multiple service lines in the United States. Healthcare 2020; 8(4): 380–401. 7. Centers for Disease Control and Prevention: Using telehealth to expand access to essential health services during the COVID-19 pandemic. Available at https://www.cdc.gov/coronavirus/2019-ncov/hcp/ telehealth.html; accessed November 21, 2020. 8. Jowers K: Military families need more telehealth options during coronavirus pandemic, Senators say. Available at https://www.mili tarytimes.com/pay-benefits/2020/05/05/military-families-need-moretelehealth-options-during-coronavirus-pandemic-senators-say/; accessed November 21, 2020. 9. Arnberg FK, Linton SJ, Hultcrantz M, Heintz E, Jonsson U: Internetdelivered psychological treatments for mood and anxiety disorders: a systematic review of their efficacy, safety, and cost-effectiveness. PLoS One 2014; 9(5): e98118. 10. Richards D, Richardson T, Timulak L, McElvaney J: The efficacy of internet-delivered treatment for generalized anxiety disorder: a systematic review and meta-analysis. Intern Interven 2015; 2(3): 272–82.
+11. Spek V, Cuijpers P, Nyklícek I, Riper H, Keyzer J, Pop V: Internetbased cognitive behaviour therapy for symptoms of depression and anxiety: a meta-analysis. Psychol Med 2007; 37(3): 319–28. 12. Apaydin EA, Maher AR, Raaen L, et al: The use of technology in the clinical care of depression: an evidence map. J Clin Psychiatry 2018; 79(5). 13. Ruelaz Maher AR, Apaydin E, Raaen L, Motala A, Shanman RM, Hempel S: The Use of Technology to Augment Clinical Care in Depression and Anxiety Disorders: An Evidence Map. RAND National Defense Research Institute; 2019. 14. Osenbach JE, O’Brien KM, Mishkind M, Smolenski DJ: Synchronous telehealth technologies in psychotherapy for depression: a metaanalysis. Depress Anxiety 2013; 30(11): 1058–67. 15. Coughtrey AE, Pistrang N: The effectiveness of telephone-delivered psychological therapies for depression and anxiety: a systematic review. J Telemed Telecare 2018; 24(2): 65–74. 16. Mohr DC, Vella L, Hart S, Heckman T, Simon G: The effect of telephone-administered psychotherapy on symptoms of depression and attrition: a meta-analysis. Clin Psychol 2008; 15(3): 243–53. 17. Varker T, Brand RM, Ward J, Terhaag S, Phelps A: Efficacy of synchronous telepsychology interventions for people with anxiety, depression, posttraumatic stress disorder, and adjustment disorder: a rapid evidence assessment. Psychol Serv 2019; 16(4): 621–35. 18. Berryhill MB, Culmer N, Williams N, et al: Videoconferencing psychotherapy and depression: a systematic review. Telemed J E Health 2019; 25(6): 435–46. 19. Bolton AJ, Dorstyn DS: Telepsychology for posttraumatic stress disorder: a systematic review. J Telemed Telecare 2015; 21(5): 254–67. 20. Gentry MT, Lapid MI, Clark MM, Rummans TA: Evidence for telehealth group-based treatment: a systematic review. J Telemed Telecare 2019; 25(6): 327–42. 21. Drago A, Winding TN, Antypa N: Videoconferencing in psychiatry, a meta-analysis of assessment and treatment. Eur Psychiatry 2016; 36: 29–37. 22. García-Lizana F, Muñoz-Mayorga I: What about telepsychiatry? A systematic review. Prim Care Companion J Clin Psychiatry 2010; 12(2): PCC.09m00831. 23. Jenkins-Guarnieri M, Pruitt LD, Luxton DD, Johnson K: Patient perceptions of telemental health: systematic review of direct comparisons to in-person psychotherapeutic treatments. Telemed J eHealth 2015; 21(8): 652–60. 24. Higgins JP, Thomas J, Chandler J, et al, eds.: Cochrane Handbook for Systematic Reviews of Interventions. John Wiley & Sons; 2019.
+25. Alegria M, Ludman E, Kafali EN, et al: Effectiveness of the Engagement and Counseling for Latinos (ECLA) intervention in low-income Latinos. Med Care 2014; 52(11): 989–97. 26. Fann JR, Bombardier CH, Vannoy S, et al: Telephone and in-person cognitive behavioral therapy for major depression after traumatic brain injury: a randomized controlled trial. J Neurotrauma 2015; 32(1): 45–57. 27. Glueckauf RL, Davis WS, Willis F, et al: Telephone-based, cognitive-behavioral therapy for African American dementia caregivers with depression: initial findings. Rehabil Psychol 2012; 57(2): 124–39. 28. Himelhoch S, Medoff D, Maxfield J, et al: Telephone based cognitive behavioral therapy targeting major depression among urban dwelling, low income people living with HIV/AIDS: results of a randomized controlled trial. AIDS Behav 2013; 17(8): 2756–64. 29. Alcantara C, Li X, Wang Y, Canino G, Alegria M: Treatment moderators and effectiveness of Engagement and Counseling for Latinos intervention on worry reduction in a low-income primary care sample. J Consult Clin Psychol 2016; 84(11): 1016–22. 30. Kafali N, Cook B, Canino G, Alegria M: Cost-effectiveness of a randomized trial to treat depression among Latinos. J Ment Health Policy Econ 2014; 17(2): 41–50.
+MILITARY MEDICINE, Vol. 187, May/June 2022 e587
+Downloaded from https://academic.oup.com/milmed/article/187/5-6/e577/6345927 by guest on 15 July 2025
+
+
+Rapid Review on Effectiveness of Telehealth Interventions
+31. Choi NG, Hegel MT, Marti N, Marinucci ML, Sirrianni L, Bruce ML: Telehealth problem-solving therapy for depressed low-income homebound older adults. Am J Geriatr Psychiatry 2014a; 22(3): 263–71. 32. Mohr DC, Ho J, Duffecy J, et al: Effect of telephone-administered vs face-to-face cognitive behavioral therapy on adherence to therapy and depression outcomes among primary care patients: a randomized trial. JAMA 2012; 307(21): 2278–85. 33. Egede LE, Acierno R, Knapp RG, et al: Psychotherapy for depression in older veterans via telemedicine: a randomised, open-label, non-inferiority trial. Lancet Psychiatry 2015; 2(8): 693–701. 34. Luxton DD, Pruitt LD, Wagner A, Smolenski DJ, Jenkins-Guarnieri MA, Gahm G: Home-based telebehavioral health for U.S. military personnel and veterans with depression: a randomized controlled trial. J Consult Clin Psychol 2016; 84(11): 923–34. 35. Maieritsch KP, Smith TL, Hessinger JD, Ahearn EP, Eickhoff JC, Zhao Q: Randomized controlled equivalence trial comparing videoconference and in-person delivery of cognitive processing therapy for PTSD. J Telemed Telecare 2016; 22(4): 238–43. 36. Morland LA, Mackintosh MA, Glassman LH, et al: Home-based delivery of variable length prolonged exposure therapy: a comparison of clinical efficacy between service modalities. Depress Anxiety 2020; 37(4): 346–55. 37. Stiles-Shields C, Corden ME, Kwasny MJ, Schueller SM, Mohr DC: Predictors of outcome for telephone and face-to-face administered cognitive behavioral therapy for depression. Psychol Med 2015b; 45(15): 3205–15. 38. Stiles-Shields C, Kwasny MJ, Cai X, Mohr DC: Comorbid anxiety as a differential treatment predictor for telephone versus face-to-face administered cognitive behavioral therapy for depression. Depress Anxiety 2014a; 31(11): 934–40. 39. Egede LE, Acierno R, Knapp RG, Walker RJ, Payne EH, Frueh BC: Psychotherapy for depression in older veterans via telemedicine: effect on quality of life, satisfaction, treatment credibility, and service delivery perception. J Clin Psychiatry 2016; 77(12): 1704–11. 40. Egede LE, Gebregziabher M, Walker RJ, Payne EH, Acierno R, Frueh BC: Trajectory of cost overtime after psychotherapy for depression in older Veterans via telemedicine. J Affect Disord 2017; 207: 157–62. 41. Egede LE, Dismuke CE, Walker RJ, Acierno R, Frueh BC: Costeffectiveness of behavioral activation for depression in older adult veterans: in-person care versus telehealth. J Clin Psychiatry 2018; 79(5): 17m11888. 42. Pruitt LD, Vuletic S, Smolenski DJ, Wagner A, Luxton DD, Gahm GA: Predicting post treatment client satisfaction between behavioural activation for depression delivered either in-person or via home-based telehealth. J Telemed Telecare 2019; 25(8): 460–7. 43. Smolenski DJ, Pruitt LD, Vuletic S, Luxton DD, Gahm G: Unobserved heterogeneity in response to treatment for depression through videoconference. Psychiatr Rehabil J 2017; 40(3): 303–8. 44. Choi NG, Marti CN, Bruce ML, Hegel MT, Wilson NL, Kunik ME: Six-month postintervention depression and disability outcomes of inhome telehealth problem-solving therapy for depressed, low-income homebound older adults. Depress Anxiety 2014b; 31(8): 653–61. 45. Morland LA, Mackintosh MA, Greene CJ, et al: Cognitive processing therapy for posttraumatic stress disorder delivered to rural veterans via telemental health: a randomized noninferiority clinical trial. J Clin Psychiatry 2014; 75(5): 470–6. 46. Glassman LH, Mackintosh MA, Talkovsky A, et al: Quality of life following treatment for PTSD: comparison of videoconferencing and in-person modalities. J Telemed Telecare 2019; 25(2): 123–7. 47. Morland LA, Mackintosh MA, Rosen CS, et al: Telemedicine versus in-person delivery of cognitive processing therapy for women with posttraumatic stress disorder: a randomized noninferiority trial. Depress Anxiety 2015; 32(11): 811–20.
+48. Liu L, Thorp SR, Moreno L, et al: Videoconferencing psychotherapy for veterans with PTSD: results from a randomized controlled noninferiority trial. J Telemed Telecare 2020; 26(9): 507–19. 49. Acierno R, Knapp R, Tuerk P, et al: A non-inferiority trial of prolonged exposure for posttraumatic stress disorder: in-person versus home-based telehealth. Behav Res Ther 2017; 89: 57–65. 50. Gros DF, Allan NP, Lancaster CL, Szafranski DD, Acierno R: Predictors of treatment discontinuation during prolonged exposure for PTSD. Behav Cogn Psychother 2018a; 46(1): 35–49. 51. Gros DF, Lancaster CL, Lo ́pez CM, Acierno R: Treatment satisfaction of home-based telehealth versus in-person delivery of prolonged exposure for combat-related PTSD in veterans. J Telemed Telecare 2018b; 24(1): 51–5. 52. Acierno R, Gros DF, Ruggiero KJ, et al: Behavioral activation and therapeutic exposure for posttraumatic stress disorder: a noninferiority trial of treatment delivered in-person versus home-based telehealth. Depress Anxiety 2016; 33(5): 415–23. 53. Ziemba SJ, Bradley NS, Landry LA, Roth CH, Porter LS, Cuyler RN: Posttraumatic stress disorder treatment for Operation Enduring Freedom/Operation Iraqi Freedom combat veterans through a civilian community-based telemedicine network. Telemed J E Health 2014; 20(5): 446–50. 54. Franklin LC, Walton JL, Raines AM, et al: Pilot study comparing telephone to in-person delivery of cognitive-behavioural therapy for trauma-related insomnia for rural veterans. J Telemed Telecare 2018; 24(9): 629–35. 55. Mitchell JE, Crosby RD, Wonderlich SA, et al: A randomized trial comparing the efficacy of cognitive-behavioral therapy for bulimia nervosa delivered via telemedicine versus face-to-face. Behav Res Ther 2008; 46(5): 581–92. 56. Stubbings DR, Rees CS, Roberts LD, Kane RT: Comparing in-person to videoconference-based cognitive behavioral therapy for mood and anxiety disorders: randomized controlled trial. J Med Internet Res 2013; 15(11): e258. 57. De Las Cuevas C, Arredondo MT, Cabrera MF, Sulzenbacher H, Meise U: Randomized clinical trial of telepsychiatry through videoconference versus face-to-face conventional psychiatric treatment. Telemed J E Health 2006; 12(3): 341–50. 58. O’Reilly R, Bishop J, Maddox K, Hutchinson L, Fisman M, Takhar J: Is telepsychiatry equivalent to face-to-face psychiatry? Results from a randomized controlled equivalence trial. Psychiatr Serv 2007; 58(6): 836–43. 59. Ruskin PE, Silver-Aylaian M, Kling MA, et al: Treatment outcomes in depression: comparison of remote treatment through telepsychiatry to in-person treatment. Am J Psychiatry 2004; 161(8): 1471–6. 60. Ertelt TW, Crosby RD, Marino JM, Mitchell JE, Lancaster K, Crow SJ: Therapeutic factors affecting the cognitive behavioral treatment of bulimia nervosa via telemedicine versus face-to-face delivery. Int J Eat Disord 2011; 44(8): 687–91. 61. Crow SJ, Mitchell JE, Crosby RD, Swanson SA, Wonderlich S, Lancanster K: The cost effectiveness of cognitive behavioral therapy for bulimia nervosa delivered via telemedicine versus face-to-face. Behav Res Ther 2009; 47(6): 451–3. 62. Management of Major Depressive Disorder Working Group: VA/DoD Clinical Practice Guideline for the Management of Major Depressive Disorder. Department of Veterans Affairs, Department of Defense; 2016. 63. Management of Post-Traumatic Stress Working Group: VA/DOD Clinical Practice Guideline for the Management of Post-Traumatic Stress Disorder and Acute Stress Disorder. Department of Veterans Affairs, Department of Defense; 2017. 64. Angeli F, Verdecchia P, Vaudo G, Masnaghetti S, Reboldi G: Optimal use of the non-inferiority trial design. Pharmaceut Med 2020; 34(3): 159–65.
+e588 MILITARY MEDICINE, Vol. 187, May/June 2022
+Downloaded from https://academic.oup.com/milmed/article/187/5-6/e577/6345927 by guest on 15 July 2025

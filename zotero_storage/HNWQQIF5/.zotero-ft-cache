@@ -1,0 +1,496 @@
+Vol.:(0123456789)
+13
+https://doi.org/10.1007/s41347-021-00216-4
+Therapeutic Factors and Member Satisfaction in an Online Group Intervention During the COVID‐19 Pandemic
+Andreas Brouzos1 · Stephanos P. Vassilopoulos2 · Vaia Stavrou1 · Vasiliki C. Baourda 1 · Christina Tassi1 · Katia Ourania Brouzou3
+Received: 14 January 2021 / Revised: 18 May 2021 / Accepted: 28 May 2021 © The Author(s), under exclusive licence to Springer Nature Switzerland AG 2021
+Abstract
+The purpose of the present study was to evaluate members’ perceptions of the therapeutic factors during a group intervention that was designed to mitigate the adverse psychological effects of the coronavirus pandemic and the imposition of restrictive measures, their satisfaction with the online format of the intervention, and how these are associated with the intervention’s outcomes. The participants (N = 44, Mage = 31.93, SD = 8.09) were Greek adults who attended a 2-week, voluntary, online group intervention. To assess the effectiveness of the intervention, 1 week before and 1 week after implementation, participants completed several questionnaires measuring their demographic characteristics, empathy, resilience, affectivity, feelings of loneliness, depression and anxiety levels, and feelings of fear regarding the outbreak. One week after the intervention, they also completed two questionnaires evaluating the therapeutic factors and their satisfaction and impressions regarding telemental health counseling. Analyses showed that the most frequently cited therapeutic factor was guidance, followed by acceptance, self-disclosure, universality, and instillation of hope. Therapeutic factors of catharsis, self-disclosure, guidance, self-understanding, vicarious learning, and therapeutic alliance correlated with elements of empathy, resilience, loneliness, positive emotions, symptoms of anxiety and depression, and fear of the coronavirus. Satisfaction with the online format of the intervention was associated to universality, elements of empathy, and symptoms of depression. More specifically, member satisfaction was negatively correlated with improvement in personal distress and depression, an unexpected finding that may be attributed to the brief duration of the present intervention. The practical value of the results for the development and implementation of online psychological interventions during a crisis is discussed.
+Keywords Telemental health · COVID-19 · Therapeutic factors · Member satisfaction
+Introduction
+The rapid spread of the new coronavirus has led to the outbreak of a pandemic, infecting more than 160 million people worldwide and causing more than 3 million deaths (World Health Organization [WHO], 2021a). Efforts to reduce the pandemic through quarantine and social distancing have led
+to a wide range of psychological consequences (Zhou et al., 2020). Telemental health services may be an effective way to provide relief to those affected and to combat the psychological impact of the restrictive measures (Holmes et al., 2020; Roncero et al., 2020; Zhou et al., 2020). Specifically, people seem to be vulnerable to a host of negative emotions such as fear, panic, anger, anxiety, stress, depression, shame, loneliness, guilt, helplessness, and concerns about work, income, and security (Holmes et al., 2020; Kokou-Kpolou et al., 2020; Li et al., 2020). In fact, the intensity of these emotions along with the long-term isolation may have more serious effects than the coronavirus itself (Zhou et al., 2020). Attempts to prevent and cure COVID-19 have led to global initiatives to develop and dispense vaccines or find an alternative drug treatment (WHO, 2021b). The efforts so far are encouraging, and several vaccines are already being administered to people worldwide (WHO, 2021b). However,
+* Vaia Stavrou v.stavrou@uoi.gr
+1 Laboratory of Educational Psychology, Counseling and Research, Department of Primary Education, University of Ioannina, Ioannina, Greece
+2 Department of Educational Sciences and Social Work, University of Patras, Patras, Greece
+3 Department of Psychiatry and Psychotherapy, Medical Faculty, Heinrich Heine University, Düsseldorf, Germany
+/ Published online: 26 September 2021
+Journal of Technology in Behavioral Science (2021) 6:609–619
+
+
+13
+social distancing and good hygiene remain two widely implemented measures to protect the community against the virus that cannot yet be abandoned (WHO, 2021b; Zhou et al., 2020). Although effective in fighting the virus, the strategy of social distancing leads to alienation from family and friends, depriving the individual of the support they may need during a pandemic (Park et al., 2020). Lack of social support leaves one alone to deal with the psychological effects of the pandemic, which they often feel unable to manage (Park et al., 2020). Absence of proper treatment may lead to long-term effects on a person’s health, causing more serious illnesses in need of extensive monitoring and treatment (Holmes et al., 2020; Horesh & Brown, 2020; Park et al., 2020). Caring for psychological needs can reduce the risk of mental health problems and ensure the well-being of those affected by the pandemic (Holmes et al., 2020; Horesh & Brown, 2020; Zhou et al., 2020). Providing psychological help in the midst of a pandemic and subsequent isolation conditions is possible through the use of telemental health services (Holmes et al., 2020; Roncero et al., 2020; Zhou et al., 2020). Telemental health refers to the provision of mental health services through remote telecommunication channels such as mobile device applications, video or telephone conferencing, and online self-help content (Gentry et al., 2019; Whaibeh et al., 2020). In general, the provision of telemental health has proven its usefulness for delivering mental health services (Schuster et al., 2019; Wilson et al., 2020) and has also shown its effectiveness in treating depression, anxiety, and post-traumatic stress (García-Lizana & Muñoz-Mayorga, 2010; Rees & Maclaine, 2015; Turgoose et al., 2018). However, the use and effectiveness of telemental health services in combating the psychological effects of the outbreak of the COVID-19 pandemic has not been evaluated so far. The evaluation of an intervention is twofold and focuses on both the result and the process. Although outcome research is common in the literature, the opposite is true for process research (Shechtman, 2007). Process research refers to the identification and evaluation of the variables that emerge during the therapeutic process and affect its effectiveness (Brouzos et al., 2015, 2020; Shechtman, 2007). Therapeutic factors are one of the most frequently investigated process variables (Brouzos et al., 2015, 2020; Shechtman, 2007). Research shows that therapeutic factors are an important element of the process that facilitates group members’ personal growth (Kivlighan & Arseneau, 2009). Yalom was one of the first to develop a classification of 11 therapeutic factors that emerge during group psychotherapy and lead to therapeutic change (Shechtman, 2003; Yalom & Leszcz, 2005). Bloch et al. (1979) proposed a new taxonomy of therapeutic factors, using the critical incidents methodology. According to this method, members describe the events they consider most important in each session, thus showing the importance they attribute to each factor
+throughout the intervention’s duration (Kivlighan & Goldfine, 1991; MacKenzie, 1987). The assessment of critical incidents is based on ten therapeutic factors that emerged after a modification of Yalom’s categorization and a review of the relevant literature, namely, catharsis, self-disclosure, learning from interpersonal actions, universality, acceptance, altruism, guidance, self-understanding, vicarious learning, and instillation of hope (Bloch et al., 1979). Specific to telemental health services, another key variable to evaluate process is usability, which describes the extent to which users are able to use a product to achieve the expected goals of effectiveness, efficiency, and satisfaction in a certain context (Parmanto et al., 2016). The assessment of telehealth technology is considered essential to maximize the effectiveness of both technological media and provided mental health services (Parmanto et al., 2016). Given all of the above, the present study aimed at evaluating the therapeutic factors and the participants’ satisfaction with the online format of a group intervention that was designed to alleviate the adverse psychological effects caused by the COVID-19 pandemic and the subsequent social distancing in adults of the general population in Greece. In general, the intervention was effective in promoting the participants’ strengths and ameliorating their psychological distress (Brouzos et al., 2021a, 2021b). Members of the intervention group experienced an increase in empathy, resilience, and positive feelings, while reporting a decrease in fear about the pandemic outbreak, negative feelings, loneliness, anxiety, and depression (Brouzos et al., 2021a, 2021b). The current study aimed to investigate whether the effectiveness of the intervention would be associated with specific therapeutic factors that would emerge during the sessions and with participants’ satisfaction with the online format of the intervention. More specifically, we expected participants to highlight the importance of therapeutic factors such as guidance, acceptance, self-disclosure, and universality primarily and learning from interpersonal actions, self-understanding, acceptance, and instillation of hope secondarily based on previous research findings (Brouzos et al., 2015, 2020; DeLuciaWaack, 2006; Kivlighan & Holmes, 2004). Moreover, another research question that we sought to answer was whether the therapeutic factors that would emerge and the participants’ satisfaction with the online format of the intervention would be associated with each other as well as with the outcomes of the present intervention.
+Methods
+Participants
+The present study followed all the principles of the Helsinki Declaration and the ethical guidelines of the American Psychological Association (2017). Participants were approached
+610 Journal of Technology in Behavioral Science (2021) 6:609–619
+
+
+13
+through advertisements in social media platforms, such as Facebook. All interested parties could inquire about the intervention through email or message and the researchers promptly replied, providing them with all relevant information. The participation in the intervention was voluntary and required their electronic consent, after they were fully informed about its purpose and content. Withdrawal from the survey was allowed at any time. The final sample included 44 Greek adults (6 men, 38 women) from various parts of Greece aged 20–54 years (Mage = 31.93, SD = 8.09). There were no dropouts or missing data during the study and no participant missed any of his group’s sessions.
+Measures
+All study participants completed an online questionnaire before the intervention’s implementation (pre-measurement) and after its conclusion (post-measurement). The pre-measurement questionnaire included nine quantitative self-report scales that are described below. The post-measurement questionnaire included the same scales, as well as two additional questionnaires, one quantitative and one qualitative.
+Descriptive Measures. Data on demographic variables (i.e., sex, age, city of residence) were collected through a selfreport questionnaire.
+Empathy. Participants’ empathy levels were assessed with the Interpersonal Reactivity Index (IRI; Davis, 1980). The questionnaire includes four seven-item subscales answered on a 5-point Likert scale and has demonstrated good psychometric properties in Greek (e.g., Tsitsas, 2009). The perspectivetaking scale measures one’s efforts to understand others’ point of view. The fantasy scale assesses one’s ability to picture themselves in imaginary situations. The empathic concern scale measures one’s positive emotional reactions towards others. Finally, the personal distress scale assesses one’s feelings of discomfort towards others’ hardship. Internal reliability in this study was good for all scales (α = 0.79, α = 0.69, α = 0.72, and α = 0.77 respectively).
+Resilience. Resilience was assessed with using the 10-item version of the Connor-Davidson Resilience Scale (CDRISK-10; Campbell-Sills & Stein, 2007), which measures one’s coping skills. Items are measured on a 5-point Likert scale, and the scale has shown good psychometric properties when used in Greek samples (e.g., Parthimos et al., 2019) and had good internal reliability (α = 0.88).
+Mood. The Positive and Negative Affect Schedule (PANAS; Watson et al., 1988) was used to measure the participants’
+mood. Participants were asked to rate on a 5-point Likert scale the extent to which they have felt ten positive and ten negative affective states in the past 2 weeks. The scale has previously been translated and used in Greek showing good psychometric properties (Stalikas et al., 2012), and good internal validity was found in the current study (α = 0.84 for the positive and α = 0.84 for the negative affectivity scale).
+Loneliness. The De Jong Gierveld Loneliness Scale (De Jong Gierveld & Van Tilburg, 1999), which has 11 items on a 5-point Likert scale, was used to measure feelings of loneliness. The scale has previously shown good psychometric properties in Greek samples (e.g., Zervou, 2018). In the current study, the scale showed good internal validity and it was used as a uni-dimensional tool measuring overall loneliness (α = 0.83), and as two separate subscales that assess social (5 items; α = 0.75) and emotional (6 items; α = 0.82) loneliness (De Jong Gierveld & Van Tilburg, 1999).
+Anxiety and Depression. Symptoms of anxiety were assessed using the Generalized Anxiety Disorder 7-item Scale (GAD-7; Spitzer et al., 2006), consisting of seven items measured on a 4-point Likert scale. Also, symptoms of depression were assessed with the Patient Health Questionnaire-9 (PHQ-9; Kroenke et al., 2001) which includes nine items measured on a 4-point Likert scale. Internal validity in the current study was good for both scales (α = 0.89 and α = 0.88, respectively). Both scales have previously been used with the Greek population showing good psychometric properties (e.g., Parlapani et al., 2020).
+Fear. Participants’ fear due to the COVID-19 pandemic was measured with the Fear of the Coronavirus Questionnaire (FCQ; Mertens et al., 2020), an eight-item custom-built measure answered on a 5-point Likert scale. The scale was translated in Greek for the purposes of this study by a fluent English speaker and it showed good internal validity in the current study (α = 0.75).
+Satisfaction with the Intervention. Participants’ satisfaction
+with the online format of the intervention and their perceptions regarding interaction quality were evaluated through the Telehealth Usability Questionnaire (Parmanto et al., 2016) at post-measurement. The questionnaire consists of eight items measured on a 7-point Likert scale. The scale was translated in Greek by a fluent English speaker for the purposes of this study and it demonstrated good internal validity (α = 0.80).
+Critical Incidents. The Critical Incident Questionnaire (CIQ; Bloch et al., 1979) includes an open-ended question that taps directly into each member’s perspective regarding what makes the group effective by assessing the therapeutic
+Journal of Technology in Behavioral Science (2021) 6:609–619 611
+
+
+13
+factors that emerge during the sessions (Lese & MacNairSemands, 2000; MacKenzie, 1987). The CIQ has previously been translated and used in the Greek population (e.g., Brouzos et al., 2015). The questionnaire was administered to all members of the intervention group at post-measurement. Group members’ answers were classified into the ten therapeutic factors proposed by Bloch et al. (1979). Specifically, the two independent raters first classified ten arbitrary participants’ answers together until they had reached 100% agreement. Then, they independently rated the remaining answers, reaching an initial 91% agreement in their ratings. Disagreements were discussed until full consensus was reached. One answer did not match the existing therapeutic factors and it was included in a new category, “therapeutic alliance,” to describe the emotional closeness that members feel towards the group facilitator.
+Procedure
+The “Staying Home—Feeling Positive” intervention includes six 50-min group sessions, and its implementation spans 2 weeks. We opted for this intensive timeframe responding to the special circumstances when the intervention was employed (i.e., the lift of the restrictive measure of quarantine in 2 weeks following the first session of the intervention). The intervention’s design is based on a multidisciplinary approach and includes elements of cognitivebehavioral and positive psychology psychotherapeutic models (Brouzos et al., 2021a, 2021b). Its purpose is to alleviate the psychological effects caused by the rapid spread
+of the coronavirus and the consequent social distancing by strengthening participants’ coping strategies, enhancing their resilience, and facilitating the experience of positive emotions. The intervention was implemented online from April 22 to May 8, 2020, in 8 groups of 5–7 people using free video conferencing software. The topic of each session is described in Table 1. A written protocol with clear descriptions of each session’s content and detailed instructions for the facilitators was prepared to ensure fidelity in implementing the intervention. Three experienced female facilitators (SV, BVC, TC) implemented the intervention after appropriate training and received regular supervision by the first author throughout the program.
+Results
+Therapeutic Factors
+Therapeutic factors’ endorsement during the intervention is presented in Table 2. The association of the therapeutic factors with the intervention’s outcomes and participants’ satisfaction with the online format of the intervention was investigated using the Pearson correlation. For this purpose, the mean difference between participants’ scores after and before the intervention was calculated for each of the outcome measures, and these scores were correlated with therapeutic factors’ endorsement (Table 3). The results of the correlation analysis revealed that catharsis was significantly and negatively associated with the
+Table 1 Overview of the sessions
+Session Goals
+1. Self-protection and team building 1. To provide psychoeducation regarding physical self-protection during the COVID-19 pandemic 2. To provide psychoeducation regarding mental self-protection in managing the media information during the COVID-19 pandemic 3. To build rapport between the group members and the group facilitator while also enhancing a sense of belongingness in the group
+2. Learning to relax 1. To understand how cognitions can impact our emotions and behaviors 2. To learn how to reduce the intensity of negative thoughts through mindfulness cognitive therapy 3. To learn relaxation techniques
+3. Developing mindful conflict resolution 1. To assist group members in developing effective mechanisms of conflict resolution based on mindfulness
+4. Creating a pleasant day 1. To recognize goals and desires for the day through a mindfulness technique 2. Mindful execution of daily activities and recognition of the most pleasant through CBT 3. To guide group members in realizing their character strengths and managing them in everyday life
+5. Enhancing empathy, altruism, and gratitude
+1. To guide group members in realizing their family’s character strengths and managing them for family development and strengthening relations 2. To guide members in creating pleasant interaction with other family members 3. To develop group members’ empathy, altruism, and gratitude towards family members and other people
+6. Recognizing positive aspects, summing up and saying goodbye
+1. To find benefits in the adversity of quarantine and the COVID-19 pandemic 2. To remind group members the lessons learned from participating in the intervention 3. To facilitate the termination of the intervention
+612 Journal of Technology in Behavioral Science (2021) 6:609–619
+
+
+13
+increase in members’ ability to use their imagination. Selfdisclosure was significantly and positively correlated with the decreases in emotional loneliness, symptoms of anxiety, and depression. Guidance was significantly and positively correlated with the increase in understanding of the perspectives of others, and negatively with the increase in positive emotions. Self-understanding was significantly and negatively associated with the increases in the expression of empathic interest in others, resilience, and the decrease in social loneliness. Vicarious learning was significantly and negatively associated with the decrease in emotional loneliness. Finally, therapeutic alliance was significantly and positively associated with the decrease of fear about the spread and effects of the coronavirus. Moreover, satisfaction with the online format of the intervention was significantly and positively correlated with universality (Table 3).
+Satisfaction with the Intervention
+The association between participants’ satisfaction with the online format of the intervention and the intervention’s effectiveness was assessed using the Pearson correlation. Results showed that participants’ satisfaction was significantly and positively correlated with the increases in perspective-taking and fantasy, while it was negatively associated with the decreases in personal distress, and symptoms of depression (Table 4).
+Discussion
+The outbreak of the new coronavirus pandemic and the imposition of restrictive measures to control it seem to be the cause of serious mental health problems, necessitating the provision of telemental health services (Zhou et al., 2020).
+The present study sought to identify the therapeutic factors during an online group intervention targeting the psychological impact of COVID-19 and to examine the association of therapeutic factors and participants’ satisfaction of the online format of the intervention with its outcomes. The emergence of therapeutic factors depends on the group type (DeLucia-Waack, 2006; Kivlighan & Holmes, 2004). Guidance, self-disclosure, learning from interpersonal actions, universality, acceptance, self-understanding, and instillation of hope are common therapeutic factors in groups aiming at educating members regarding a psychological construct and assisting them in developing specific skills (Brouzos et al., 2015, 2020; DeLucia-Waack, 2006). The results of the present study confirm the previous literature and show that the therapeutic factors emerging in telemental health groups appear to be the same as those that operate in face-to-face groups (Heckman et al., 2017). The most common therapeutic factors in the present online intervention were guidance, acceptance, self-disclosure, universality, instillation of hope, self-understanding, and learning through interpersonal actions. Therefore, the effect of therapeutic factors does not appear to be affected by the remote application of the intervention (e.g., Heckman et al., 2017). However, the classification of therapeutic factors as proposed by Bloch et al. (1979) may not represent all of the critical incidents that occur in therapeutic reality (Brouzos et al., 2015, 2020; Kivlighan & Goldfine, 1991; Mackenzie, 1987). In fact, researchers have suggested additional categories of therapeutic factors (Brouzos et al., 2015, 2020; Dierick & Lietaer, 2008; Kivlighan & Goldfine, 1991). The weakness of Bloch et al.’s (1979) taxonomy was also highlighted in the context of telemental health services. In the present study, the description of a critical incident did not reflect any of the ten therapeutic factors classified by Bloch et al. (1979). Thus, an additional category, “therapeutic alliance,” was created in order to reflect the incident in the member’s response. The therapeutic alliance is an important element of the group process and refers to the therapeutic relationship developed between the facilitator and the group members (Gillaspy et al., 2002). It is usually addressed as a separate variable of the group process not as a therapeutic factor (e.g., Abouguendia et al., 2004; Shechtman & Katz, 2007). However, Dierick and Lietaer (2008) have included feeling confidence in the group therapist, an important aspect of therapeutic alliance, as one of their therapeutic factors. Based on the results of this study, this particular factor plays an important role even in the context of an online intervention. Therapeutic factors are considered to affect the therapeutic outcome (Amram & Benbenishty, 2014; Kivlighan & Arseneau, 2009). In particular, interpersonal learning, guidance, and universality might be helpful in treating social phobia (Choi & Park, 2006). Self-disclosure and
+Table 2 Percentages of therapeutic factors endorsed by intervention participants
+Therapeutic factor Percentage
+Catharsis 6.8% (3 out of 44 members) Self-disclosure 15.9% (7 out of 44 members)
+Learning through interpersonal actions
+11.4% (5 out of 44 members)
+Universality 13.6% (6 out of 44 members) Acceptance 25% (11 out of 44 members) Altruism 2.3% (1 out of 44 members) Guidance 47.7% (21 out of 44 members) Self-understanding 11.4% (5 out of 44 members) Vicarious learning 6.8% (3 out of 44 members) Instillation of hope 13.6% (6 out of 44 members) Therapeutic alliance 2.3% (1 out of 44 members)
+Journal of Technology in Behavioral Science (2021) 6:609–619 613
+
+
+13
+Table 3 Correlations among therapeutic factors and changes in outcome variables
+Catharsis Self-disclo
+sure
+Learning
+through
+interpersonal
+actions
+Universality Acceptance Altruism Guidance Self-under
+standing
+Vicarious
+learning
+Instillation of
+hope
+Therapeutic
+alliance
+Increase in
+perspective
+taking
+r = − .291,
+p = .077
+r = .130,
+p = .438
+r = .068,
+p = .686
+r = .112,
+p = .505
+r = .177,
+p = .289
+r = − .043,
+p = .796
+r = .402,
+p = .012*
+r = − .297,
+p = .070
+r = − .169,
+p = .312
+r = − .137,
+p = .414
+r = .162,
+p = .330
+Increase in
+fantasy
+r = − .321,
+p = .050*
+r = − .097,
+p = .561
+r = .052,
+p = .757
+r = .121,
+p = .469
+r = .008,
+p = .960
+r = − .060,
+p = .723
+r = .136,
+p = .414
+r = − .055,
+p = .742
+r = − .079,
+p = .637
+r = .062,
+p = .713
+r = − .060,
+p = .723
+Increase in
+empathic
+concern
+r = − .013,
+p = .938
+r = − .075,
+p = .653
+r = .068,
+p = .685
+r = .175,
+p = .294
+r = − .069,
+p = .681
+r = − .187,
+p = .260
+r = − .002,
+p = .990
+r = − .327,
+p = .045*
+r = − .246,
+p = .136
+r = − .019,
+p = 908
+r = − .089,
+p = .594
+Decrease in
+personal
+Distress
+r = − .157,
+p = .346
+r = .019,
+p = .911
+r = − .233,
+p = .159
+r = − .182,
+p = .274
+r = .031,
+p = .854
+r = − .114,
+p = .497
+r = .007,
+p = .968
+r = .039,
+p = .818
+r = .070,
+p = .677
+r = − .014,
+p = .933
+r = .192,
+p = .248
+Increase in
+resilience
+r = − .109,
+p = .513
+r = − .086,
+p = .608
+r = .249,
+p = .131
+r = − .089,
+p = .597
+r = .066,
+p = .696
+r = .022,
+p = .896
+r = .005,
+p = .975
+r = − .396,
+p = .014*
+r = .006,
+p = .971
+r = − .089,
+p = .597
+r = .050,
+p = .767
+Increase in
+positive
+affect
+r = .014,
+p = .935
+r = − .048,
+p = .775
+r = − .005,
+p = .977
+r = − .108,
+p = .520
+r = − .107,
+p = .521
+r = .008,
+p = .964
+r = − .339,
+p = .037*
+r = − .246,
+p = .136
+r = .187,
+p = .262
+r = .063,
+p = .708
+r = − .041,
+p = .808
+Decrease in
+negative
+affect
+r = .130,
+p = .436
+r = .277,
+p = .092
+r = − .158,
+p = .342
+r = − .207,
+p = .213
+r = .152,
+p = .364
+r = − .115,
+p = .493
+r = .181,
+p = .277
+r = .098,
+p = .558
+r = − .204,
+p = .219
+r = .031,
+p = .853
+r = .080,
+p = .631
+Decrease
+in overall
+loneliness
+r = .138,
+p = .410
+r = .299,
+p = .068
+r = .022,
+p = .898
+r = − .061,
+p = .715
+r = .041,
+p = .807
+r = − .080,
+p = .633
+r = − .043,
+p = .797
+r = .233,
+p = .160
+r = − .236,
+p = .154
+r = .065,
+p = .696
+r = .156,
+p = .350
+Decrease in
+emotional
+loneliness
+r = .319,
+p = .051
+r = .373,
+p = .021*
+r = .150,
+p = .369
+r = − .150,
+p = .370
+r = .048,
+p = .772
+r = − .212,
+p = .201
+r = .079,
+p = .639
+r = .035,
+p = .836
+r = − .329,
+p = .043*
+r = .064,
+p = .704
+r = .193,
+p = .246
+Decrease in
+social lone
+liness
+r = − .108,
+p = .518
+r = .089,
+p = .593
+r = − .118,
+p = .481
+r = .056,
+p = .739
+r = .015,
+p = .930
+r = .089,
+p = .593
+r = − .147,
+p = .379
+r = .328,
+p = .044*
+r = − .035,
+p = .834
+r = .038,
+p = .821
+r = .049,
+p = .772
+Decrease in
+anxiety
+r = .161,
+p = .335
+r = .384,
+p = .017*
+r = − .157,
+p = .347
+r = − .073,
+p = .662
+r = .206,
+p = .215
+r = − .096,
+p = .566
+r = .010,
+p = .952
+r = .037,
+p = .825
+r = − .171,
+p = .304
+r = .009,
+p = .959
+r = .053,
+p = .752
+Decrease in
+depression
+r = .082,
+p = .623
+r = .334,
+p = .040*
+r = .069,
+p = .679
+r = − .278,
+p = .092
+r = .175,
+p = .292
+r = − .051,
+p = .762
+r = − .179,
+p = .282
+r = .087,
+p = .605
+r = − .047,
+p = .778
+r = − .022,
+p = .896
+r = .168,
+p = .314
+Decrease
+in fear of
+COVID-19
+r = .157,
+p = .345
+r = .251,
+p = .128
+r = − .057,
+p = .736
+r = − .071,
+p = .672
+r = .198,
+p = .233
+r = − .012,
+p = .944
+r = .075,
+p = .656
+r = .114,
+p = .494
+r = .015,
+p = .931
+r = .022,
+p = .898
+r = .349,
+p = .032*
+Satisfaction
+with the
+intervention
+r = − .289,
+p = .079
+r = − .247,
+p = .135
+r = .004,
+p = .980
+r = .355,
+p = .029*
+r = − .086,
+p = .608
+r = .078,
+p = .641
+r = − .018,
+p = .915
+r = − .096,
+p = .566
+r = − .012,
+p = .943
+r = .131,
+p = .432
+r = − .007,
+p = .968
+614 Journal of Technology in Behavioral Science (2021) 6:609–619
+
+
+13
+interpersonal learning are linked to better outcomes in treating neurotic and personality disorders (Tschuschke & Dies, 1994). Altruism, interpersonal learning, guidance, and self-understanding seem to play an important role in patients with panic disorder (Behenck et al., 2017). Also, higher endorsement of therapeutic factors from the initial stage of therapy leads to improved therapeutic results for patients with substance abuse problems (Amram & Benbenishty, 2014). In the present study, therapeutic factors appeared to be associated with the outcomes of the intervention. Catharsis was negatively associated with increases in the participants’ ability to picture themselves in imaginary situations. Creating imaginary scenarios is likely a way to escape negative emotions, such as anxiety, depression, and/or anger (Sánchez-Bernardos & Avia, 2004). During the intervention, these feelings were released within the safe environment of the group, resulting to catharsis. Once the emotions that cause discomfort were released, members probably no longer had to engage in imaginary situations. Self-disclosure was positively correlated with decreases in emotional loneliness and symptoms of anxiety and depression. In line with previous findings (Leung, 2002), group members seem to feel less emotionally lonely as they share with others personal experiences that they may be ashamed of or reluctant to reveal. Revealing troubling intimate experiences and stories within the group’s familiar, confidential, and supportive context may reduce members’ symptoms of anxiety and depression (Kahn & Garrison, 2009). Guidance was positively related to the increase in understanding others’ perspectives and negatively related to the increase in positive emotions. Providing information within the group may have helped members to form a new
+strategy to approach and communicate with others, shifting their focus from their own perspective to that of another person (Mufiqoh et al., 2018; Nesdale et al., 2005). Thus, they were able to abandon a more indifferent attitude towards people and show greater sensitivity and openness to what others think or feel. However, learning new techniques and realizing their usefulness in everyday life may have reduced the level of positive emotions of the members, as until then they did not know or did not use them adequately or consciously (Levin et al., 2010). Self-understanding was negatively associated with increases in the expression of empathic concern towards others and resilience, and with decrease in social loneliness. The members’ attempt to understand themselves seems to focus on personal thoughts or feelings, absorbing them from the expression of empathy towards others (Damon & Hart, 1982). This process may lead to changes in their existing cognitive structures, causing discomfort and temporarily reducing their resilience (Beardslee, 1989). Members are likely to distance themselves from other people in their effort to understand themselves and regain their balance, experiencing feelings of loneliness (Newman & Newman, 2001; Rocach & Heather, 1997). Vicarious learning showed a negative relationship with the decrease in emotional loneliness. Loneliness does not seem to hinder vicarious learning. In fact, previous findings show that the attention and perception of social information and cues remain unaffected or enhanced in lonely individuals (Gardner et al., 2005). Therapeutic alliance was negatively associated with the decrease in fear of the coronavirus, as it is possible that the development of emotional closeness between the group facilitator and the members’ is likely to cause members’ concern about the facilitator’s health and well-being (Grynberg & Konrath, 2020). Members’ satisfaction with the online format of the intervention was positively associated with the therapeutic factor of universality and the increases in perspective-taking and fantasy, whereas it was negatively related to decreases in personal distress and depression. Satisfaction from the process is likely to reinforce the members’ effort to relate and find common ground with others in the group (Keyton, 1991; Shaw et al., 2000), creating a sense of universality. Satisfaction has also been linked to increased empathy (Greenberg et al., 2001). Empathy nurtures positive relationships, and perspective-taking and fantasy are core elements of understanding others (Davis, 1980; Greenberg et al., 2001). Feeling understood enhances feelings of safety, self-disclosure, compliance, and adherence to the sessions (Greenberg et al., 2001), which altogether may have led to higher satisfaction in the context of the current intervention. At the same time, participants’ satisfaction seemed to be associated with personal distress and symptoms of depression. In particular,
+Table 4 Correlations between participants’ satisfaction with the online format of the intervention and changes in outcome variables
+Satisfaction with the intervention
+Increase in perspective-taking r = .407, p = .011* Increase in fantasy r = .331, p = .043* Increase in empathic concern r = .296, p = .071 Decrease in personal distress r = − .396, p = .014* Increase in resilience r = .263, p = .111 Increase in positive affect r = .272, p = .098 Decrease in negative affect r = − .261, p = .113 Decrease in overall loneliness r = − .308, p = .060 Decrease in emotional loneliness r = − .255, p = .123 Decrease in social loneliness r = − .223, p = .178 Decrease in anxiety r = − .225, p = .174 Decrease in depression r = − .390, p = .016* Decrease in fear of COVID-19 r = − .087, p = .602
+Journal of Technology in Behavioral Science (2021) 6:609–619 615
+
+
+13
+the members who were most satisfied with the distance counseling seemed to show little or no improvement in the symptoms of distress and depression. The intervention implemented in the context of the present study was shortterm. Despite its short duration, it became a routine and the online meetings served as a kind of company with other people during the difficult period of quarantine and social distancing, giving a sense of normality in the members’ daily life. Therefore, the intervention’s termination may have caused discomfort to the members, as they considered it abrupt and earlier than they would have liked or expected, without allowing them appropriate time to prepare for the separation from the other members and the group facilitator (Knox et al., 2010; Roe et al., 2006). Based on this finding, an important implication for practitioners and researchers would be to take measures in order to prevent the negative emotions that might accompany the abrupt ending of shortterm interventions and allow a smoother transition to group members’ daily lives. More specifically, additional booster sessions could be integrated in the intervention’s plan (e.g., Brouzos et al., 2021a, 2021b) or relevant audiovisual material and web or smartphone applications could be suggested to participants as means to continue working on the skills that the intervention imparted them, thus maintaining the intervention’s positive outcomes (e.g., Howells et al., 2016; van Emmerik et al., 2020).
+Limitations and Directions for Future Research
+The two main limitations of the present study include the evaluation of therapeutic factors at a single point in time at the end of the intervention and the evaluation of only one group process variable. Future research should assess therapeutic factors at multiple time points, ideally at the end of each session, as well as examine multiple group process variables, such as therapeutic alliance and group climate. Another limitation is the small sample, which reduces the generalization of results. It would be useful to repeat the research on a larger sample. The results of the current study also highlighted the limitations of Bloch et al.’s (1979) taxonomy. More specifically, it appears that the ten therapeutic factors that Bloch et al. (1979) suggested do not respond to all the therapeutic factors that emerge during an online group intervention. Future research is therefore encouraged to focus on investigating a new classification of therapeutic factors specific to online interventions. The brief time span of the intervention was an inevitable limitation of the current study. The intervention aimed at ameliorating the negative psychological effects of the quarantine during the COVID-19 pandemic. By the time of its implementation, the Greek government had announced the gradual lift of the restrictive measures, a decision that
+would alter the research conditions and possibly affect the intervention’s outcomes. An intense short-term intervention was considered as the only option to avoid this. Future studies should examine the effect of a lengthier intervention. A final limitation refers to participants’ data management. As reported earlier, the intervention was administered online through widely used video conferencing software, after ensuring the participants’ informed consent. Unfortunately, there is currently no specialized telemental health software or other relative software that could ensure the confidentiality of personal data available in Greece. Actions should be taken in this direction.
+Conclusions
+The group processes taking place during a telemental health group intervention and the study of its process follow the same principles as those that emerge during the implementation of traditional, face-to-face, group interventions. The online format of the intervention did not prevent the emergence of therapeutic factors that usually appear in face-toface groups, showing that the processes of online groups evolve in the same way and are associated with the intervention’s outcomes. Ensuring that the process runs smoothly in general and towards the end of the program and the transition to self-help is essential, as members’ satisfaction with the online delivery of the intervention seems to affect its outcomes and the nature of the ongoing Covid-19 pandemic indicates long-term use of technology capabilities to support individuals.
+Declarations
+Ethical Approval All procedures performed within this research which involved human participants were in accordance with the ethical standards of the Helsinki Declaration and the guidelines of the American Psychological Association.
+Informed Consent Informed consent was obtained from all individual participants included in the study.
+Conflict of Interest The authors declare no competing interests.
+References
+Abouguendia, M., Joyce, A. S., Piper, W. E., & Ogrodniczuk, J. S. (2004). Alliance as a mediator of expectancy effects in shortterm group psychotherapy. Group Dynamics: Theory, Research, and Practice, 8(1), 3–12. https://doi.org/10.1037/1089-2699.8.1.3 American Psychological Association. (2017). Ethical principles of psychologists and code of conduct (2002, amended effective June 1, 2010, and January 1, 2017). https://www.apa.org/ethics/code/
+616 Journal of Technology in Behavioral Science (2021) 6:609–619
+
+
+13
+Amram, Y., & Benbenishty, R. (2014). The impact of therapeutic factors on locus of control of addicts in therapeutic communities. Journal of Groups in Addiction & Recovery, 9(4), 313–325. https://doi.org/10.1080/1556035X.2014.967576 Beardslee, W. R. (1989). The role of self-understanding in resilient individuals. American Journal of Orthopsychiatry, 59(2), 266278. https://doi.org/10.1111/j.1939-0025.1989.tb01659.x Behenck, A., Wesner, A. C., Finkler, D., & Heldt, E. (2017). Contribution of group therapeutic factors to the outcome of cognitivebehavioral therapy for patients with panic disorder. Archives of Psychiatric Nursing, 31(2), 142–146. https://doi.org/10.1016/j. apnu.2016.09.001 Bloch, S., Reibstein, J., Crouch, E., Holroyd, P., & Themen, J. (1979). A method for the study of therapeutic factors in group psychotherapy. British Journal of Psychiatry, 134(3), 257–263. https:// doi.org/10.1192/bjp.134.3.257 Brouzos, A., Vassilopoulos, S. P., Baourda, V. C., Tassi, C., Stavrou, V., Moschou, K., & Brouzou, K. O. (2021a). “Staying Home Feeling Positive”: Effectiveness of an on-line positive psychology group intervention during the COVID-19 pandemic. Current Psychology. https://doi.org/10.1007/s12144-021-01613-x Brouzos, A., Vassilopoulos, S. P., Romosiou, V., Stavrou, V., Tassi, C., Baourda, V. C., & Brouzou, K. O. (2021b). ‘Stay Safe-Feel Positive’ on the frontline: An online positive psychology intervention for police officers during the COVID-19 pandemic. The Journal of Positive Psychology, 1-11. https://doi.org/10.1080/17439760.2021.1975161 Brouzos, A., Vassilopoulos, S. P., & Baourda, V. C. (2015). Therapeutic factors and members’ perception of co-leaders’ attitudes in a psychoeducational group for Greek children with social anxiety. The Journal for Specialists in Group Work, 40(2), 204–224. https://doi.org/10.1080/01933922.2015.1017065 Brouzos, A., Vassilopoulos, S. P., Stavrou, V., Baourda, & V. C. (2020). Therapeutic factors during a psychoeducational group intervention aiming to promote school adjustment in first grade students. The European Journal of Counselling Psychology, 8(1), 177–195. https://doi.org/10.5964/ejcop.v8i1.143 Campbell-Sills, L., & Stein, M. B. (2007). Psychometric analysis and refinement of the Connor-Davidson resilience scale (CD-RISC): Validation of a 10-item measure of resilience. Journal of Traumatic Stress, 20(6), 1019–1028. https://doi.org/10.1002/jts.20271 Choi, Y.-H., & Park, K.-H. (2006). Therapeutic factors of cognitive behavioral group treatment for social phobia. Journal of Korean Medical Science, 21(2), 333–336. https://doi.org/10.3346/jkms. 2006.21.2.333 Damon, W., & Hart, D. (1982). The development of self-understanding from infancy through adolescence. Child Development, 53(4), 841–864. https://doi.org/10.2307/1129122 Davis, M. H. (1980). A multidimensional approach to individual differences in empathy. Journal of Personality and Social Psychology, 10, 85.
+De Jong Gierveld, J., & Van Tilburg, T. (1999). Manual of the loneliness scale 1999. Vrije Universiteit Amsterdam, Amsterdam.
+DeLucia-Waack, J. L. (2006). Leading psychoeducational groups for children and adolescents. Sage Publications.
+Dierick, P., & Lietaer, G. (2008). Client perception of therapeutic factors in group psychotherapy and growth groups: An empiricallybased hierarchical model. International Journal of Group Psychotherapy, 58(2), 203–230. https://doi.org/10.1521/ijgp.2008. 58.2.203 García-Lizana, F., & Muñoz-Mayorga, I. (2010). Telemedicine for depression: A systematic review. Perspectives in Psychiatric Care, 46(2), 119–126. https://doi.org/10.1111/j.1744-6163.2010. 00247.x Gentry, M. T., Lapid, M. I., Clark, M. M., & Rummans, T. A. (2019). Evidence for telehealth group-based treatment: A systematic
+review. Journal of Telemedicine and Telecare, 25(6), 327–342. https://doi.org/10.1177/1357633X18775855 Gillaspy, J. A., Wright, A. R., Campbell, C., Stokes, S., & Adinoff, B. (2002). Group alliance and cohesion as predictors of drug and alcohol abuse treatment outcomes. Psychotherapy Research, 12(2), 213–229. https://doi.org/10.1093/ptr/12.2.213 Gardner, W. L., Pickett, C. L., Jefferis, V., & Knowles, M. (2005). On the outside looking in: Loneliness and social monitoring. Personality and Social Psychology Bulletin, 31(11), 1549–1560. https:// doi.org/10.1177/0146167205277208 Greenberg, L. S., Elliott, R., Watson, J. C., & Bohart, A. C. (2001). Empathy. Psychotherapy: Theory, Research, Practice, Training, 38(4), 380–384. https://doi.org/10.1037/0033-3204.38.4.380 Grynberg, D., & Konrath, S. (2020). The closer you feel, the more you care: Positive associations between closeness, pain intensity rating, empathic concern and personal distress to someone in pain. Acta Psychologica, 210, 103175. https://doi.org/10.1016/j.actpsy. 2020.103175 Heckman, T. G., Heckman, B. D., Anderson, T., Bianco, J. A., Sutton, M., & Lovejoy, T. I. (2017). Common factors and depressive symptom relief trajectories in group teletherapy for persons ageing with HIV. Clinical Psychology & Psychotherapy, 24(1), 139–148. https://doi. org/10.1002/cpp.1989 Holmes, E. A., O’Connor, R. C., Perry, V. H., Tracey, I., Wessely, S., Arseneault, L., & Bullmore, E. (2020). Multidisciplinary research priorities for the COVID-19 pandemic: A call for action for mental health science. The Lancet Psychiatry, 7(6), 547–560. https:// doi.org/10.1016/S2215-0366(20)30168-1 Horesh, D., & Brown, A. D. (2020). Traumatic stress in the age of COVID-19: A call to close critical gaps and adapt to new realities. Psychological Trauma: Theory, Research, Practice, and Policy, 12(4), 331–335. https://doi.org/10.1037/tra0000592 Howells, A., Ivtzan, I., & Eiroa-Orosa, F. J. (2016). Putting the ‘app’ in happiness: A randomised controlled trial of a smartphonebased mindfulness intervention to enhance wellbeing. Journal of Happiness Studies, 17(1), 163–185. https://doi.org/10.1007/ s10902-014-9589-1 Kahn, J. H., & Garrison, A. M. (2009). Emotional self-disclosure and emotional avoidance: Relations with symptoms of depression and anxiety. Journal of Counseling Psychology, 56(4), 573–584. https://doi.org/10.1037/a0016574 Keyton, J. (1991). Evaluating individual group member satisfaction as a situational variable. Small Group Research, 22(2), 200–219. https://doi.org/10.1177/1046496491222004 Kivlighan, D. M., Jr., & Holmes, S. E. (2004). The importance of therapeutic factors: A typology of therapeutic factors studies. In J. L. DeLucia-Waack, D. A. Gerrity, C. R. Kalodner, & M. T. Riva (Eds.), Handbook of group counseling and psychotherapy (p. 23–36). Sage Publications Ltd. https://doi.org/10.4135/ 9781452229683.n2 Kivlighan, D. M., Jr., & Arseneau, J. R. (2009). A typology of critical incidents in intergroup dialogue groups. Group Dynamics: Theory, Research, and Practice, 13(2), 89–102. https://doi.org/ 10.1037/gdn0000088 Kivlighan, D. M., Jr., & Goldfine, D. C. (1991). Endorsement of therapeutic factors as a function of stage of group development and participant interpersonal attitudes. Journal of Counseling Psychology, 38(2), 150–158. https://doi.org/10.1037/0022-0167.38.2.150 Kokou-Kpolou, C. K., Megalakaki, O., Laimou, D., & Kousouri, M. (2020). Insomnia during COVID-19 pandemic and lockdown: Prevalence, severity, and associated risk factors in french population. Psychiatry Research, 290, 113128. https://doi.org/10.1016/j. psychres.2020.113128 Knox, S., Adrians, N., Everson, E., Hess, S., Hill, C., & CrookLyon, R. (2011). Clients’ perspectives on therapy termination.
+Journal of Technology in Behavioral Science (2021) 6:609–619 617
+
+
+13
+Psychotherapy Research, 21(2), 154–167. https://doi.org/10. 1080/10503307.2010.534509 Kroenke, K., Spitzer, R. L., & Williams, J. B. W. (2001). The PHQ-9. Journal of General Internal Medicine, 16(9), 606–613. https:// doi.org/10.1046/j.1525-1497.2001.016009606.x Lese, K. P., & MacNair-Semands, R. R. (2000). The therapeutic factors inventory: Development of a scale. Group, 24(4), 303–317. https://doi.org/10.1023/A:1026616626780 Leung, L. (2002). Loneliness, self-disclosure, and ICQ (“I Seek You”) use. CyberPsychology & Behavior, 5(3), 241–251. https://doi.org/ 10.1089/109493102760147240 Levin, D. Z., Kurtzberg, T. R., Phillips, K. W., & Lount, R. B., Jr. (2010). The role of affect in knowledge transfer. Group Dynamics: Theory, Research, and Practice, 14(2), 123–142. https://doi. org/10.1037/a0017317 Li, S., Wang, Y., Xue, J., Zhao, N., & Zhu, T. (2020). The impact of COVID-19 epidemic declaration on psychological consequences: A study on active weibo users. International Journal of Environmental Research and Public Health, 17(6), 2032. https://doi.org/ 10.3390/ijerph17062032 MacKenzie, K. R. (1987). Therapeutic factors in group psychotherapy: A contemporary view. Group, 11(1), 26–34. https://doi.org/10. 1007/BF01456798 Mertens, G., Gerritsen, L., Duijndam, S., Salemink, E., & Engelhard, I. M. (2020). Fear of the coronavirus (COVID-19): Predictors in an online study conducted in March 2020. Journal of Anxiety Disorders, 74, 102258. https://doi.org/10.1016/j.janxdis.2020.102258 Mufiqoh, A., Sugiharto, D. Y. P., & Anni, C. T. (2018). The effectiveness of group guidance with film media to improve students’ empathy and social interaction. Jurnal Bimbingan Konseling, 7(2), 96–100. https://doi.org/10.15294/jubk.v7i2.24390 Nesdale, D., Griffith, J., Durkin, K., & Maass, A. (2005). Empathy, group norms and children’s ethnic attitudes. Journal of Applied Developmental Psychology, 26(6), 623–637. https://doi.org/10. 1016/j.appdev.2005.08.003 Newman, B. M., & Newman, P. R. (2001). Group identity and alienation: Giving the we its due. Journal of Youth and Adolescence, 30(5), 515–538. https://doi.org/10.1023/A:1010480003929 Park, C. L., Russell, B. S., Fendrich, M., Finkelstein-Fox, L., Hutchison, M., & Becker, J. (2020). Americans’ COVID-19 stress, coping, and adherence to CDC guidelines. Journal of General Internal Medicine, 35(8), 2296–2303. https://doi.org/10.1007/s11606-020-05898-9 Parlapani, E., Holeva, V., Voitsidis, P., Blekas, A., Gliatas, I., Porfyri, G. N., Golemis, A., Papadopouloy, K., Dimitriadou, A., Chatzigeorgiou, A. F., Bairachtari, V., Patsiala, S., Skorpa, M., Papigkioti, K., Kafetzopoulou, C., & Diakogiannis, I. (2020). Psychological and behavioral responses to the COVID-19 pandemic in Greece. Frontiers in Psychiatry, 11, 821. https://doi. org/10.3389/fpsyt.2020.00821 Parmanto, B., Lewis, A. N., Graham, K. M., & Bertolet, M. H. (2016). Development of the Telehealth Usability Questionnaire (TUQ). International Journal of Telerehabilitation, 8(1), 3–10. https://doi. org/10.5195/ijt.2016.6196 Parthimos, T. P., Rankin, K. P., Lykou, E., Kamtsadeli, V., Tsinia, N., Hatzopoulou, M., Chatziantoniou, E., Papatriantafyllou, O., Miller, B., Papanikolaou, A., Papageorgiou, S. G., & Papatriantafyllou, J. D. (2019). The Interpersonal Reactivity Index (IRI) scale in Greek patients with dementia. Dialogues in Clinical Neuroscience & Mental Health, 2(1), 12–19. https://doi.org/10.26386/obrela.v2i1.105 Rees, C. S., & Maclaine, E. (2015). A systematic review of videoconference-delivered psychological treatment for anxiety disorders. Australian Psychologist, 50(4), 259–264. https://doi.org/10.1111/ ap.12122 Roe, D., Dekel, R., Harel, G., Fennig, S., & Fennig, S. (2006). Clients’ feelings during termination of psychodynamically oriented
+psychotherapy. Bulletin of the Menninger Clinic, 70(1), 68–81. https://doi.org/10.1521/bumc.2006.70.1.68 Rokach, A., & Heather, B. (1997). Loneliness: A multidimensional experience. Psychology: A Journal of Human Behavior, 34(1), 1–9. Roncero, C., García-Ullán, L., de la Iglesia-Larrad, J. I., Martín, C., Andrés, P., Ojeda, A., González-Parra, D., Pérez, J., Fombellida, C., Álvarez-Navares, A., Benito Sanchez, J. A., Dutil, V., Lorenzo, C., & Montejo, Á. L. (2020). The response of the mental health network of the Salamanca area to the COVID-19 pandemic: The role of the telemedicine. Psychiatry Research, 291, 113252. https://doi.org/10.1016/j.psychres.2020.113252 Sánchez-Bernardos, M. L., & Avia, M. D. (2004). Personality correlates of fantasy proneness among adolescents. Personality and Individual Differences, 37(5), 1069–1079. https://doi.org/10. 1016/j.paid.2003.11.015 Schuster, R., Kalthoff, I., Walther, A., Köhldorfer, L., Partinger, E., Berger, T., & Laireiter, A.-R. (2019). Effects, adherence, and therapists’ perceptions of web- and mobile-supported group therapy for depression: Mixed-methods study. Journal of Medical Internet Research, 21(5), e11860–e11860. https://doi.org/10.2196/11860 Shaw, J. D., Duffy, M. K., & Stark, E. M. (2000). Interdependence and preference for group work: Main and congruence effects on the satisfaction and performance of group members. Journal of Management, 26(2), 259–279. https://doi.org/10.1016/S01492063(99)00045-8 Shechtman, Z. (2003). Therapeutic factors and outcomes in group and individual therapy of aggressive boys. Group Dynamics: Theory, Research, and Practice, 7(3), 225–237. https://doi.org/10.1037/ 1089-2699.7.3.225 Shechtman, Z. (2007). How does group process research inform leaders of counseling and psychotherapy groups? Group Dynamics: Theory, Research, and Practice, 11(4), 293. https://doi.org/10. 1037/1089-2699.11.4.293 Shechtman, Z., & Katz, E. (2007). Therapeutic bonding in group as an explanatory variable of progress in the social competence of students with learning disabilities. Group Dynamics: Theory, Research, and Practice, 11(2), 117–128. https://doi.org/10.1037/ 1089-2699.11.2.117 Spitzer, R. L., Kroenke, K., Williams, J. B. W., & Löwe, B. (2006). A brief measure for assessing generalized anxiety disorder: The GAD-7. Archives of Internal Medicine, 166(10), 1092–1097. https://doi.org/10.1001/archinte.166.10.1092 Stalikas, A., Triliva, S., & Roussi, P. (2012). Psychometric instruments in Greece. Pedio.
+Tschuschke, V., & Dies, R. R. (1994). Intensive analysis of therapeutic factors and outcome in long-term inpatient groups. International Journal of Group Psychotherapy, 44(2), 185–208. https://doi.org/ 10.1080/00207284.1994.11490742
+Tsitsas, G. (2009). The effect of an assertiveness training program on the assertiveness, the locus of control, the empathy and the selfesteem of Greek college students [Doctoral dissertation, National and Kapodistrian University of Athens]. https://doi.org/10.12681/ eadd/24242 Turgoose, D., Ashwick, R., & Murphy, D. (2018). Systematic review of lessons learned from delivering tele-therapy to veterans with posttraumatic stress disorder. Journal of Telemedicine and Telecare, 24(9), 575–585. https://doi.org/10.1177/1357633X17730443 van Emmerik A. A. P., Keijzer R., & Schoenmakers T. M. (2020) Integrating mindfulness into a routine schedule: The role of mobilehealth mindfulness applications. In J. Uribarri & J. Vassalotti (Eds.), Nutrition, fitness, and mindfulness 217 -222. Nutrition and Health. Humana, Cham. https://doi.org/10.1007/978-3-03030892-6_15 Watson, D., Clark, L. A., & Tellegen, A. (1988). Development and validation of brief measures of positive and negative affect: The
+618 Journal of Technology in Behavioral Science (2021) 6:609–619
+
+
+13
+PANAS scales. Journal of Personality and Social Psychology, 54(6), 1063–1070. https://doi.org/10.1037/0022-3514.54.6.1063 Whaibeh, E., Mahmoud, H., & Naal, H. (2020). Telemental health in the context of a pandemic: the covid-19 experience. Current Treatment Options in Psychiatry, 1-5 https://doi.org/10.1007/ s40501-020-00210-2 Wilson, A., Moretto, N., Langbecker, D., & Snoswell, C. L. (2020). Use of reimbursed psychology videoconference services in Australia: An investigation using administrative data. Value in Health Regional Issues, 21, 69–73. https://doi.org/10.1016/j.vhri.2019. 07.007 World Health Organization. (2021a). WHO Coronavirus (COVID-19) dashboard. https://covid19.who.int/ World Health Organization. (2021b). Coronavirus disease (COVID19) pandemic. https://www.who.int/emergencies/diseases/novelcoronavirus-2019
+Yalom, I. D., & Leszcz, M. (2005). The theory and practice of group psychotherapy (5th ed.). Basic Books/Hachette Book Group. Zervou, S. (2018). Investigation of the correlation between feelings of loneliness with resilience and forgiveness in inpatients with psychiatric symptoms [Master’s thesis, Hellenic Open University]. https://apothesis.eap.gr/handle/repo/37941 Zhou, X., Snoswell, C. L., Harding, L. E., Bambling, M., Edirippulige, S., Bai, X., & Smith, A. C. (2020). The role of telehealth in reducing the mental health burden from COVID-19. Telemedicine and e-Health, 26(4), 377–379. https://doi.org/10.1089/tmj.2020.0068
+Publisher's Note Springer Nature remains neutral with regard to jurisdictional claims in published maps and institutional affiliations.
+Journal of Technology in Behavioral Science (2021) 6:609–619 619

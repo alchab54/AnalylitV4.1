@@ -1,0 +1,680 @@
+1
+SORBONNE UNIVERSITÉ
+FACULTE DE MEDECINE SORBONNE UNIVERSITÉ
+ANNÉE 2021 THÈSE N°21SORUM23
+PRESENTEE POUR LE DIPLOME
+DE DOCTEUR EN MEDECINE
+Diplôme d’État
+PAR
+Chloé LANGER
+NÉ(E) LE 25/01/1991 à Neuilly Sur Seine
+______________
+PRÉSENTÉE ET SOUTENUE PUBLIQUEMENT LE 27/05/2021
+LIEN ENTRE L’EMPATHIE DU MÉDECIN GÉNÉRALISTE
+ET SA PRATIQUE CLINIQUE
+DIRECTEURS DE THÈSE : Lindemann Wolfgang / Cadwallader Jean-Sébastien
+PRÉSIDENT DE THÈSE : IBANEZ Gladys
+
+
+2
+REMERCIEMENTS
+Merci à Wolfgang Lindemann de m’avoir proposé ce beau sujet.
+Merci à Jean-Sébastien Cadwallader d’avoir accepté d’en reprendre les rênes.
+Merci à Eric Gallam et Magali Ferry d’avoir accepté de faire partie de mon jury et à Gladys Ibanez d’avoir accepté de le présider.
+Merci à Johan de nous avoir sauvées des méandres des statistiques.
+Merci à Véziane, pour avoir pu nous serrer les coudes durant cette aventure.
+À Romain, pour avoir toujours été là.
+À mes parents pour m’avoir toujours soutenue et parfois relevée.
+À Laura et Manon, sans qui je n’aurais pas dépassé le stade de la P1.
+Au Greco du love ; Agathe et Arié, mes paires dans ce début de vie de médecin.
+
+
+3
+SOMMAIRE
+ABBRÉVIATIONS.................................................................................................................................... 5
+INTRODUCTION..................................................................................................................................... 6
+1. L’empathie................................................................................................................................ 8 1.1 Définition............................................................................................................... 8 1.2 Neurophysiologie de l’empathie........................................................................ 9 1.3 Mesurer l’empathie............................................................................................. 9 1.4 Les soft skills....................................................................................................... 10
+2. Données de littérature......................................................................................................... 11 2.1 Lien entre empathie et résultats thérapeutiques......................................... 11 2.2 Les déterminants de l’empathie...................................................................... 11 2.3 Lien entre empathie et burn out..................................................................... 13
+3. La rémunération sur objectifs de santé publique (ROSP)............................................... 15
+4. Matériels et méthode........................................................................................................... 17
+5. Résultats................................................................................................................................. 19 5.1 Données générales............................................................................................ 19 5.2 Lien entre empathie et ROSP........................................................................... 19 5.3 Déterminants de l’empathie............................................................................ 27 5.4 Lien entre empathie et burn out..................................................................... 30 5.5 Corrélation de la pratique estimée aux items de la ROSP............................ 30 5.6 Synthèse
+6. Discussion.............................................................................................................................. 34 6.1 Reprise des résultats principaux...................................................................... 34 6.2 Forces et faiblesses de l’étude......................................................................... 34 6.2.1 Forces de l’étude...................................................................... 34 6.2.2 Population de l’étude............................................................... 35 6.2.3 Biais............................................................................................ 35 6.2.4 La ROSP...................................................................................... 35 6.2.5 COVID 19................................................................................... 36 6.3 Perspectives........................................................................................................ 37
+7. Conclusion.............................................................................................................................. 38
+8. Annexes.................................................................................................................................. 39
+
+
+4
+8.1 Echelle JSPE......................................................................................................... 39 8.2 Questionnaire..................................................................................................... 40 8.3 Echelle MBI......................................................................................................... 43 8.4 Tableau des statistiques descriptives de l’échantillon.................................. 44 8.5 Tableau des résultats au test de Mann Whitney........................................... 46
+9. Bibliographie.......................................................................................................................... 48
+
+
+5
+ABBRÉVIATIONS
+AAP : antiagrégant plaquettaire
+ALD : affection longue durée
+AOMI : artériopathie oblitérante des membres inférieurs
+AP : accomplissement personnel
+ARA2 : antagoniste des récepteurs de l’angiotensine 2
+C3G : céphalosporines de 3e génération
+CE : compréhension émotionnelle
+CNGE : Collège des Généralistes Enseignants
+Dep : dépersonnalisation
+DES : Diplôme d’Etudes Spécialisées
+EE : épuisement émotionnel
+HbA1C : hémoglobine glyquée
+HTA : hypertension artérielle
+IEC : inhibiteur de l’enzyme de conversion
+JSPE : Jefferson Scale of Physician Empathy
+MBI : Maslach Burn out Inventory
+MeSH : Medical Subject Headings
+MRC : maladie rénale chronique
+NURSE : Name, Understand, Respect, Support, Explore
+OH : alcool
+PP : prise de perspective
+ROSP : Rémunération sur Objectifs de Santé Publique
+SipS : se mettre à la place du patient
+
+
+6
+INTRODUCTION
+La médecine et plus spécifiquement la médecine générale n’est pas seulement une "technique » mais comprend une grande part de relations humaines, on parle en effet de « relation médecin-malade ». Une meilleure relation permettrait d’améliorer l’alliance thérapeutique et l’observance de la part du patient.
+Les anglo-saxons parlent de « soft skills » (« compétences douces » ou « compétences comportementales » en français), indispensables aux compétences techniques, dont l’une des facettes est le concept d’empathie.
+L’empathie est un terme apparu au XIXe siècle d’une rétrotraduction en grec ancien de l’expression allemande « Einfühlung(svermögen) ». Empathie veut dire littéralement « (capacité de) ressentir l’intérieur d’autrui » et a évolué jusqu’à ce jour pour signifier la capacité à percevoir ce que ressent l’autre, de communiquer cette compréhension à autrui et, dans le contexte des soins, d’agir en fonction dans une intention soignante (1).
+On s’accorde à dire aujourd’hui qu’un médecin se doit de se montrer le plus empathique possible. Une relation « empathique » entre médecin et patient favoriserait une communication honnête, sans dissimulations, entrainant de meilleurs diagnostiques de la part du praticien et une meilleure adhésion de la part du patient (2). De nombreuses études ainsi réalisées ont montré le lien entre l’empathie du praticien et l’amélioration subjective ou perçue de la satisfaction du patient (2). Plusieurs études ont également démontré une corrélation positive entre l’empathie du praticien et des résultats thérapeutiques concrets, que nous décrirons par la suite.
+L’apparition de la ROSP (Rémunération sur Objectifs de Santé Publique) en 2011, a permis de mettre en exergue certains indicateurs du suivi des patients, qui semblent essentiels dans sa prise en charge (comme par exemple le dosage de l’hémoglobine glyquée -HbA1- régulier chez le patient diabétique). Ils sont donc censés être le reflet de la pratique clinique des médecins généralistes et permettent de récupérer une multitude de critères cliniques en une seule fois.
+Le but de notre étude était d’évaluer si les médecins plus empathiques ont une meilleure pratique clinique dont les indicateurs de la ROSP sont censés être le reflet.
+Cette thèse s’est faite en collaboration avec un deuxième projet de thèse, pour mettre en rapport la pratique clinique avec le burn out des médecins, évalué par un questionnaire de burn out standard (le Maslach Burn out-Inventory MBI (3)). Cela nous a permis de mettre en
+
+
+7
+commun les questionnaires et les listes de diffusion mais également d’évaluer l’empathie selon l’épuisement des médecins.
+Il existait deux objectifs secondaires. Le premier était de chercher ou confirmer les déterminants de l’empathie, le second, dans le cadre de la collaboration, était de chercher un lien entre l’empathie et le burn out.
+Dans la première partie, nous expliquerons plus en détails les différents points de notre étude (l’empathie, sa mesure et la ROSP), nous ferons un point sur les études réalisées jusqu’ici sur le sujet, puis nous expliquerons la réalisation de l’étude et les résultats. Enfin, nous ouvrirons la discussion à l’interprétation des résultats.
+
+
+8
+1- L’EMPATHIE
+1.1 Définition
+Le terme « Einfühlung » a été créé au XIXe siècle par Robert Vischer, philosophe allemand et concernait initialement les sentiments « accompagnant la perception visuelle de la forme de tout objet possible » dans le domaine de l’art, progressivement étendu au domaine des relations interpersonnelles en psychologie par le philosophe Théodore Lipps (4). Le psychologue et philosophe Edward Titchener fut le premier à traduire le terme « Einfühlung » par « Empathy » (en anglais, équivalant à empathie en français) apparenté au grec avec le préfixe « en » = dedans et « pathos » = souffrance / affection. Freud placera ce mot dans le monde de la psychanalyse pour comparer notre état d’esprit par rapport à l’autre puis en décrivant l’attitude que doit avoir un thérapeute (5).
+Aujourd’hui, l’empathie est définie dans le Larousse comme : « Faculté intuitive de se mettre à la place d'autrui, de percevoir ce qu'il ressent ». On distingue classiquement l’empathie cognitive de l’empathie émotionnelle. Pour Carl Rogers, psychologue américain, l’empathie est séparée entre affect et cognition. L’empathie émotionnelle ou affective, intuitive et inconsciente, est la réponse émotionnelle d’un sujet en réponse à l’observation des émotions d’un autre. L’empathie cognitive est le fait de comprendre les émotions d’autrui grâce à des processus cognitifs. Il existe encore des débats sur ces deux composantes, mais pour beaucoup, elles sont toutes deux nécessaires à l’empathie clinique (5,6).
+Mohammadreza Hojat, professeur à la Jefferson University à Philadelphie, a énormément travaillé sur l’empathie dans le milieu médical. Il a défini l’empathie médicale comme le fait de comprendre les sentiments de ses patients et d’arriver à partager cette compréhension contrairement à la sympathie où les émotions sont partagées (7).
+La « sympathie » vient étymologiquement du grec « syn » = avec et « pathos » = souffrance / affection et a comme définition : « Participation à la joie, à la peine d'autrui ». Elle correspond donc au fait de partager ses sentiments avec autrui et par conséquence d’être affecté par ces derniers. L’empathie ne doit pas être confondue avec la sympathie. En effet, la sympathie, en excès, pourrait interférer avec l’objectivité dont un praticien doit faire preuve lors d’une consultation (8), alors que l’empathie, en théorie, ne devrait pas être néfaste, peu importe son niveau. Il s’agit de comprendre le ressenti du patient et d’être capable de lui montrer cette compréhension.
+L’empathie est un point important recherché par les patients chez leur médecin. Ils se sentent alors plus en confiance alors qu’il résultera de l’absence d’empathie un sentiment de déception et de frustration, poussant le patient à éviter les visites chez le médecin (9). De
+
+
+9
+plus, un patient en confiance aura plus de facilité à s’exprimer permettant au médecin de récolter plus d’informations (10) et potentiellement de faire un meilleur diagnostic et des propositions thérapeutiques mieux acceptées (11).
+1.2 Neurophysiologie de l’empathie
+Les neurones miroirs ont été découverts en 1992, initialement chez le singe et avec des méthodes invasives, en prouvant que l’activation des neurones dans le cortex prémoteur se faisait pendant une action mais également en regardant un autre individu faire cette même action (12). L’avènement de l’IRM fonctionnelle a permis la réalisation d’études chez les humains, en identifiant plusieurs régions du cortex s’activant dans les deux situations : lors de la réalisation d’une action ainsi que dans l’observation de celle-ci (13). Cela est valable également pour des actions plus minimes comme la contraction des muscles du visage, responsable des expressions faciales permettant d’exprimer les émotions.
+Nos neurones s’activent donc dans les mêmes régions cérébrales que celles d’une personne faisant une action, quand nous la regardons. Cela permet de provoquer une reconnaissance émotionnelle, précurseur de l’empathie (14). Avenanti et al (15), ont visualisé l’activation de ces neurones miroirs quand des observateurs regardaient des scènes douloureuses (aiguille dans une main) et ont retrouvé un lien entre l’intensité d’activation neuronale et le score de l’empathie cognitive. De plus, Schulte-Rüther et al (16) ont prouvé que l’activité des neurones miroirs était corrélée positivement avec des scores d’empathie hauts.
+Nous possédons aujourd’hui de plus en plus de preuves que les neurones miroirs sont à la base de nos capacités d’empathie.
+1.3 Mesurer l’empathie
+Il existe plusieurs questionnaires d’auto-évaluation ayant pour but de donner une valeur numérique à l’empathie, de la mesurer. Ces échelles sont valables dans la population générale et ne sont pas spécifiques aux soignants.
+La Jefferson Scale of Physician Empathy (JSPE), un auto-questionnaire, a été créée initialement pour mesurer l’empathie des étudiant en médecine (« Student » : JSPE-S). En 2002, elle a été modifiée et validée pour mesurer l’empathie d’un praticien. Elle a ensuite été traduite et validée en français en 2012 seulement (17) (Annexe 1). C’est aujourd’hui la seule échelle d’empathie dont nous disposons qui s’adresse uniquement aux médecins.
+
+
+10
+Elle se présente sous la forme d’une échelle en 20 questions avec mesure par échelle de Likert comprenant 7 choix de réponse allant de « pas du tout » à « tout à fait » et permettant de mesurer l’empathie sur 3 composantes indépendantes (18): prise de perspective (« Perspective taking », « PP »), compréhension émotionnelle (« Compassionate Care », « CE ») et se mettre à la place du patient (« Walking in patient’s shoes », « SipS »).
+Chaque composante est mesurée à l’aide de plusieurs items qui ne se suivent pas. La « compréhension émotionnelle » utilise les items 1, 7, 8, 11, 12, 14, 18 et 19 ; « Se mettre à la place du patient » les items 3 et 6 ; et pour la prise de perspective, les items 2, 4, 5, 9, 10, 13, 15, 16, 17 et 20 (18). Les items 1, 3, 6, 7, 8, 11, 12, 14, 18 et 19 sont cotés négativement. Le score total est compris entre 20 et 140, plus le score est élevé, plus le praticien est considéré comme empathique. Pour certains, il n’est pas sûr que l’échelle française, contrairement à sa version originale, permette de mesurer l’empathie globale avec certitude (17) et seule l’analyse de ses trois composantes séparées serait garantie.
+1.4 Les soft skills
+Les « soft skills » traduit en français par compétences douces, en opposition aux « hard skills » qui représentent le savoir-faire brut, se sont fait connaitre via le milieu de l’entreprise. Devant leur évolution et l’avancée des intelligences artificielles, les entreprises recherchent d’autres profils que des personnes seulement douées de capacités techniques (19). Elles sont décrites différemment mais l’on retrouve toujours : créativité, esprit critique, capacité de communication, curiosité et... l’empathie.
+L’empathie ferait donc partie de ces compétences douces, utiles dans le monde de l’entreprise. Mais ces compétences sont-elles également utiles aux médecins ? Inversement, est-ce qu’une personne ayant des « soft skills » plus développées sera également plus empathique ? Dans la littérature, on retrouve que les capacités de communication font parties des exigences qu’attend un patient de la part de son médecin généraliste (20).
+Nous nous sommes demandé si la créativité et les capacités d’expression étaient corrélées à l’empathie d’un médecin. Pour cela, nous avons ajouté dans notre questionnaire trois questions concernant la capacité d’adapter sa communication à son interlocuteur, l’envie de participer à une activité d’expression et le fait d’être timide ou non ; en partant de l’hypothèse qu’un médecin moins timide et plus enclin à s’exprimer possèdera une meilleure capacité de communication avec un effet bénéfique sur la relation médecin-patient et une meilleure compréhension émotionnelle de ses patients.
+
+
+11
+2- DONNEES DE LITTÉRATURE
+2.1 Lien entre l’empathie et résultats thérapeutiques
+Nous avons effectué une recherche via PubMed afin de vérifier les travaux ayant déjà été faits sur le sujet.
+Les mots-clefs et mots « MeSH » utilisés était : « Empathy », « General practitioner », « traitment outcome » ou « therapeutic results » ou « clinical outcome ». Nous nous sommes également servi des études citées dans certains articles et des fonctions « cited by » et « similar articles » de PubMed.
+Kaplowitz et al (21), en 2004, montraient que les patients ressentant de l’empathie de la part de leur médecin étaient plus satisfait de la consultation et avaient une meilleure compliance au traitement. De même, une revue de la littérature menée par Pinto et al en 2012 (22) a montré que la communication centrée sur le patient (c’est-à-dire avec une écoute active, un intérêt montré, une attention à l’état émotionnel du patient et faisant preuve d’empathie) était associée à une meilleure alliance thérapeutique. Neumann et al (23), dans leur article, ont étudié l’influence d’une relation empathique avec leur médecin chez des patients atteints d’une pathologie tumorale. Ils ont trouvé comme résultats une diminution de la dépression au long cours chez les patients percevant leur médecin comme empathique, via l’envie d’avoir plus d’informations sur leur maladie et les possibilités thérapeutiques.
+L’équipe de Del Canale en 2012 (24) a trouvé qu’il y a avait significativement moins de complications aigües dues au diabète chez les patients de médecins ayant des score d’empathie élevés. Dans le même registre, Hojat en 2011 a trouvé une corrélation positive entre l’empathie des médecins et le contrôle de l’hémoglobine glyquée ainsi que du LDL cholestérol (1). Également en 2011, Rakel et al démontrent que les taux d’Interleukine 8 et de neutrophiles ont significativement diminué chez les patients ayant jugé leur médecin empathique, 48h après la consultation (25). Puis en 2017, Yuguero et al ont décelé un meilleur contrôle tensionnel des patients de médecins plus empathiques (26).
+L’étude de O. Yuguero et al, en 2019 (27), a montré que les médecins généralistes plus empathiques avaient de meilleurs résultats concernant l’efficience de leurs prescriptions, suivant les recommandations actuelles en Espagne.
+2.2 Les déterminants de l’empathie
+Les déterminants de l’empathie sont retrouvés différents selon les études :
+
+
+12
+Dans une étude (7), Hojat a cherché à voir si l’empathie était différente selon le sexe, l’âge et la spécialité des médecins. Il n’a pas trouvé de différence significative en fonction du sexe ni de l’âge. Par contre, des différences ont été retrouvées selon les spécialités, les médecins généralistes arrivant en 5e position derrière les psychiatres, les internistes, pédiatres et urgentistes, mais cela importe peu pour cette thèse puisque nous ne parlerons que des médecins généralistes.
+Dans sa thèse (6) Aude Woerner a cherché les déterminants de l’empathie. Elle a trouvé des scores d’empathie significativement plus élevés chez les femmes, chez les médecins en couples ou divorcés par rapport aux célibataires, chez ceux ayant suivi une psychothérapie, chez ceux issus de famille avec un haut niveau socioprofessionnel. Également, l’empathie était corrélée positivement aux consultations longues et négativement au fait de faire plus de 120 consultations par semaine. Elle n’a pas trouvé de lien chez les médecins ayant de problèmes de santé familiaux. Contre toute attente, il est retrouvé un score plus faible chez les médecins réalisant une formation Balint. L’étude de Cataldo et al ne retrouve pas de lien entre l’empathie et la participation à un groupe Balint (28).
+Les groupes Balint sont des groupes de réunion de 8 à 12 personnes, ayant pour but de réfléchir à des situations cliniques vécues où la relation médecin-malade a posé des questions ou problème (29). Le déroulement se fait dans le respect des membres du groupe, la bienveillance et l’absence de jugement. Les groupes sont dirigés par des animateurs formés, il peut s’agir de médecins ou de professions paramédicales, psychologues ou psychanalystes. Le nom vient de Michael Balint, médecin, qui découvre grâce à sa 3e femme les groupes de travail composés de médecin et psychanalystes. Pensant que la relation soignant-soigné ne peut être enseigné dans des cours magistraux, il développe cette formation de groupe (29). Certaines études montrent une augmentation de l’empathie chez les étudiants participant aux groupes Balint par rapport à ceux n’y participant pas (30,31). De par le but de ces groupes, nous nous attendions à trouver une corrélation positive entre la participation à un groupe Balint et l’empathie.
+Cécile Buffel du Vaure a dédié sa thèse aux déterminants de l’empathie (32). Elle y retrouve une corrélation positive, entre autres, avec le fait d’avoir suivi une psychothérapie et le fait d’être en couple. Elle n’a pas retrouvé non plus de corrélation avec l’âge ou le sexe.
+Dans leur article, Charles et al (33) ont trouvé que l’empathie était corrélée négativement à la tranche d’âge 45-54 ans et la pratique libérale pure. Ils n’ont pas trouvé de lien avec le genre.
+William et al, affirment que les animaux sont bénéfiques pour le développement des enfants et ont une influence sur l’empathie. Ils ont trouvé dans leur étude (34) une corrélation positive entre l’attachement aux animaux de compagnie et les scores d’empathie.
+
+
+13
+L’équipe de Perenc et al, partant de l’hypothèse qu’une personne ayant été élevée dans une fratrie avec un enfant en situation de handicap aurait une meilleure capacité pour comprendre les émotions et pensées des autres, a en effet trouvé une corrélation positive entre les scores d’empathie élevés et cette situation familiale (35). De même, Jambon et al ont analysé le lien entre empathie et fratrie, et ont déduit de leur recherche que les cadets avaient des scores d’empathie plus élevés, quelle que soit la qualité de la relation avec leurs frères et sœurs (36).
+Ces études ne retrouvent pas les mêmes déterminants de l’empathie. En plus de vouloir confirmer certains de ces déterminants comme la fratrie, les animaux de compagnie ou la participation à un groupe Balint, nous voulions ajouter également la recherche de « soft skills », la capacité d’expression, en la traduisant par une moindre timidité et une capacité d’expression en public, pour rechercher une relation avec l’empathie.
+2.3 Lien entre empathie et burn out
+Le burn out ou syndrome d’épuisement professionnel, est décrit par Christina Maslach, psychologue sociale, comme un « état d’épuisement professionnel (à la fois émotionnel, physique et psychique) ressenti face à des situations de travail « émotionnellement » exigeantes » (37). Il existe trois composantes distinctes au burn out : l’épuisement émotionnel (avoir l’impression d’être vidé de ses ressources, « EE »), la dépersonnalisation (détachement vis-à-vis du travail et des personnes, distanciation, cynisme, « Dep ») et la perte d’accomplissement personnel (dévalorisation de soi et de son travail, « AP »).
+Le burn out peut se déclencher quand une personne se sent dépassée émotionnellement. Or les médecins peuvent facilement se sentir dépassés par les demandes de leurs patients avec une contrainte de temps et de moyens. Lors d’une étude réalisée en France en 2018, 50% des médecins interrogés (toutes spécialités confondues) déclaraient éprouver des symptômes de burn out et/ou de dépression (38).
+Concernant le lien avec l’empathie, trois hypothèses sont décrites (39) :
+- le burn out diminue l’empathie, via la déshumanisation qu’il entraine, avec une diminution des interactions sociales, résultats retrouvés dans la thèse d’Aude Woerner (6). De plus, le stress et l’anxiété seraient responsables d’une diminution de l’activité des neurones miroirs (40).
+- L’empathie crée le burn out, de par l’épuisement émotionnel et la plus grande fatigue provoquée par l’écoute active et empathique. Nous ne sommes pas en accord avec cette hypothèse car l’empathie clinique, plus cognitive qu’émotionnelle, devrait au contraire
+
+
+14
+permettre de se protéger de l’affect engendré par les émotions des patients, ce qui nous emmène à la dernière hypothèse.
+- L’empathie protège du burn out. Une personne empathique nécessite de présenter des capacités de conscience et de recul face aux émotions, qui seraient des outils utiles contre le stress et le burn out. Un praticien empathique n’est pas détaché face au patient mais s’il a conscience des émotions de son patient, il a également conscience de l’affect que cela pourrait provoquer chez lui et ne se laissera pas affecter par celui-ci. Cela permettrait de trouver la juste distance entre le patient et le médecin. Cette théorie est affirmée par Thirioux et al (41).
+Dans notre étude, nous chercherons à confirmer une corrélation négative entre l’empathie et le burn out, résultat retrouvé majoritairement dans la littérature (26,27,42,43).
+
+
+15
+3- LA RÉMUNÉRATION SUR OBJECTIFS DE SANTÉ PUBLIQUE (ROSP)
+Pour inciter les praticiens à une meilleure pratique en accord avec les recommandations, la ROSP a été mise en place en 2011 et modifiée en 2018(44) pour permettre de valoriser les praticiens ayant de bonnes pratiques cliniques selon des critères concrets. Elle comprend pour l’adulte 29 indicateurs répartis en trois thèmes :
+- Suivi des maladies chroniques : concernant le diabète (ex : fréquence du dosage de l’HbA1c) ou le risque cardiovasculaire (ex : fréquence de l’utilisation de la grille SCORE avant l’introduction de statine).
+- Prévention : couverture vaccinale (ex : part des patients de plus de 65ans vaccinés contre la grippe saisonnière), dépistage des cancers (part des patients ayant bénéficiés du dépistage du cancer du sein, col de l’utérus et colorectal), prévention de la iatrogénie (ex : part des patients sous benzodiazépine > 4 ou 12 semaines), prise en charge des addictions (ex : part des patients ayant bénéficié d’une intervention brève contre le tabac), antibiothérapie (ex : part des patients traités par antibiotiques particulièrement générateurs d’antibiorésistances).
+- Optimisation et efficience des prescriptions (ex : part des médicaments prescrits dans le répertoire des génériques).
+Pour les enfants, il existe 10 indicateurs répartis en deux thèmes :
+- Suivi des pathologies chroniques, concernant l’asthme (ex : part des patients présentant un asthme persistant traité par corticoïdes inhalés et/ou anti-leucotriènes).
+- Prévention : risque d’obésité (part des patients dont l’IMC est renseigné dans le dossier au moins une fois par an), vaccination (ex : part des patients ayant reçu deux doses de vaccin ROR), dépistage des troubles sensoriels (ex : part des patients de 4 à 12 mois ayant eu un dépistage clinique des troubles visuels et auditifs), antibiorésistance (ex : part des patients de moins de 4 ans traités par C3G parmi ceux traités par antibiotiques), santé dentaire (part des patients de moins de 16 ans ayant bénéficié d’au moins un examen bucco-dentaire)
+Les indicateurs sont transmis automatiquement à la sécurité sociale via le logiciel médecin ou alors auto-déclarés pour 4 d’entre eux pour l’adulte et 3 pour l’enfant : examen des pieds du patient diabétique, utilisation d’une grille de scorage avant la prescription de statines, part des patients tabagiques ou ayant une consommation excessive d’alcool ayant fait l’objet d’une intervention brève enregistrée dans le dossier, mesure de l’IMC des enfants, dépistage des troubles sensoriels des enfants. Ils ne concernent que les patients ayant déclaré le médecin en tant que médecin traitant.
+
+
+16
+Chaque indicateur a un objectif cible et intermédiaire en pourcentage, un minimum de patients nécessaires pour valider le résultat sans erreur statistique et un nombre de points obtenus grâce à cet indicateur.
+Exemple pour la prévention de la grippe avec la figure 1 :
+Figure 1. Exemple de d’objectif pour la prévention de la grippe chez les patients de plus de 65ans (45)
+La rémunération du médecin se fait en fonction des points obtenus, pondérés par la progression réalisée (« taux de réalisation ») et par le volume de la patientèle déclarante du médecin traitant, le tout multiplié par 7, donnant le montant en euro (46). Cette méthode est adaptée pour les médecins nouvellement installés, avec une majoration de la valeur du point, dégressive sur 3 ans.
+Tout médecin peut décider de ne pas percevoir la ROSP en envoyant un courrier à sa caisse de rattachement.
+Chaque année, les médecins peuvent récupérer leurs résultats sur leur espace AmeliPro (site de la sécurité sociale). Ainsi cela permet d’avoir une idée sur la pratique d’un médecin : actions de prévention, efficience des prescriptions et suivi des maladies chroniques, récupérable en quelques clics.
+
+
+17
+4- MATÉRIELS ET MÉTHODE
+Il s’agit d’une étude transversale et descriptive.
+La population étudiée est constituée de médecins généralistes de France. Le recrutement des médecins s’est fait par réseau personnel, par listing des praticiens rattachés aux facultés de Paris VI et Paris VII, par mailing du directeur de thèse et par les réseaux sociaux.
+Les médecins ont répondu à un questionnaire contenant :
+- le questionnaire JSPE (Annexe 1)
+- des questions de données sociodémographiques : âge et sexe (Annexe 2)
+- des questions personnelles : fratrie et écart d’âge, relation dans la fratrie, existence d’une maladie chronique dans la fratrie, animal de compagnie, composition du foyer, timidité, pratique d’une activité d’expression, problème de santé ou relationnel (Annexe 2)
+- des questions sur la pratique professionnelle : nombre d’actes par jour, impression sur le temps de travail, participation à un groupe Balint, relations et communication avec les patients (Annexe 2)
+- des questions relatives à la ROSP : intérêt du bon suivi de la ROSP, intérêt à faire réaliser le fond d’œil et l’examen des pieds chez le patient diabétique, la protéinurie chez le patient diabétique ou hypertendu, l’intérêt du dépistage des troubles sensoriels chez les enfants et l’intérêt à la limitation de la prescription des antibiotiques. Ces questions ont été posées afin de voir si on retrouve une relation entre l’intérêt porté aux items de la ROSP et les résultats effectifs (Annexe 2)
+- dans le cadre de la collaboration : le questionnaire MBI pour l’auto-évaluation du burn out, composé de 22 questions avec réponses sous forme d’échelle de Likert. Chaque item est côté de 0 à 6 correspondants à différents degrés, de « jamais » à « quotidien ». Elle permet d’explorer les différentes dimensions du burn out, sachant qu’un niveau élevé de burn out dans une dimension suffit à affirmer son existence. Le MBI est l’échelle la plus utilisée pour l’évaluation du burn out, et est validée dans sa version française (47) (Annexe 3).
+Les questionnaires ont dans un premier temps été testés par nos collègues internes pour vérifier la faisabilité, la compréhension, le temps de réponse et prendre des remarques éventuelles. Ils ont ensuite été distribués entre mars et septembre 2020. Ils ont été remplis via internet pour la plupart ou en version papier. Les praticiens pouvaient accepter ou refuser de transmettre leurs données ROSP. Ceux ayant accepté nous donnaient un moyen de communication (e-mail ou téléphone), puis les résultats étaient récupérés en mains
+
+
+18
+propres au cabinet, envoyés par mail, transmis par téléphone ou, rarement, envoyés par courrier postal.
+Le critère de jugement principal est composite, il s’agit des critères de la ROSP.
+Les analyses de données ont été faites avec les logiciels R et Gretl.
+
+
+19
+5- RÉSULTATS
+Nous avons récolté 375 réponses au questionnaire. Parmi les 375, environ 156 praticiens ont accepté de transmettre leurs données ROSP.
+Au total, nous avons récupéré 75 résultats de ROSP de praticiens différents. Les données 2020 étant incomplètes lors des envois des questionnaires, nous avons demandé également la ROSP 2019. Celle de 2018 est décrite dans les résultats de 2019 (colonne « résultats antérieurs »), nous avons donc décidé de faire une moyenne de chaque indicateur sur ces 3 années.
+Les analyses multivariées ont été réalisées grâce au test de Mann Withney. Seuls les résultats statistiquement significatifs sont détaillés avec leurs intervalles de confiance, les autres sont mis en annexe (Tableau 2 de l’annexe 5). Pour chaque item ayant une différence statistiquement significative, un graphique a été réalisé pour connaitre le sens de la corrélation.
+5-1 Données générales
+Notre échantillon est constitué majoritairement de femmes (74%) avec une moyenne d’âge de 41,6 ans. Les médecins de notre panel ont une moyenne de 25 actes par jour et sont la moitié à estimer ne pas trop travailler. Leur résultat moyen à la JSPE est de 111/140, ce qui est semblable aux autres études françaises. Selon le questionnaire MBI, ils sont 64% à répondre au diagnostic de burn out.
+Le tableau des statistiques descriptives de la population est à retrouver en annexe 4 (tableau 1).
+5-2 Lien entre empathie et ROSP
+Suivi des pathologies chroniques
+Variable Composante Intervalle de confiance à 95%
+P-Value
+Fond d’œil Globale [3.50 ; 12.05] 0,00230 SipS [1.38 ; 10.50] 0,0116 CE [2.89 ; 10.80] 0,00335 MRC CE [−19.22 ; −5.02 × 10−3] 0,0488
+Prévention Secondaire
+PP [−15.00 ; −0.71] 0,03310
+Tableau 3 : tableau des intervalles de confiance des variables concernant le suivi des pathologies chroniques pour lesquelles p < 0,05
+
+
+20
+- Fond d’œil (patients traités par antidiabétiques ayant bénéficié d’un examen du fond d’œil ou d’une rétinographie dans les 2ans) : corrélation significative et positive avec empathie globale et plus particulièrement avec la composante « se mettre à la place du patient » et la compréhension émotionnelle.
+Graphique 1 : graphique de répartition entre le fond d’œil est les résultats à la JSPE, il existe une tendance à l’augmentation de la réalisation du fond d’œil proportionnel au score de la JSPE
+- Maladie rénale chronique (MRC) chez le diabétique (patients traités par antidiabétiques ayant bénéficié d’une recherche annuelle de microalbuminurie et d’une estimation du débit de filtration glomérulaire) : corrélation négative avec la compréhension émotionnelle.
+Graphique 2 : graphique de répartition de la fréquence de détection de la MRC en fonction de l’empathie, la répartition de la fréquence de dépistage de la MRC se fait vers des valeurs plus basses chez les patients ayant une CE plus élevée.
+
+
+21
+- Prévention secondaire (patients présentant un antécédent de maladie coronaire ou d’AOMI traités par statines et AAP et IEC ou ARA2) : corrélation négative avec la prise de perspective.
+Graphique 3 : graphique de répartition de la fréquence de réalisation de prévention secondaire en fonction de la prise de perspective
+Prévention
+Variable Composante Intervalle de confiance à 95%
+P-Value
+Frottis Globale [−8.24 ; −0.20] 0,04315 Cancer colorectal Globale [−10.71 ; −5.00 × 10−3] 0,04916 PP [−10.40 ; −8.15 × 10−1] 0,02322 Addiction OH Globale [−8.44 × 10−6 ; 27.08] 0,04556
+Vaccination antigrippale ALD
+PP [−14.58 ; −0.14] 0,03982
+Tableau 4 : tableau des intervalles de confiance des variables concernant les déterminants de l’empathie pour lesquelles p < 0,05
+- Frottis (part des patients de 25 à 65 ans ayant bénéficié d’un frottis au cours des 3 dernières années) : corrélation négative avec l’empathie globale, sans corrélation retrouvée avec les composantes prises séparément.
+
+
+22
+Graphique 4 : graphique de répartition de la fréquence de détection de la MRC en fonction de l’empathie
+- Cancer colorectal (part des patients de 50 à 74 ans pour lesquels un dépistage du cancer colorectal a été réalisé au cours des 2 dernières années) : corrélation négative avec l’empathie globale et plus particulièrement la prise de perspective.
+Graphique 5 : graphique de répartition de la fréquence de dépistage du cancer colorectal en fonction de l’empathie
+- Addiction à l’alcool (OH) (part des patients consommateurs excessifs d’alcool ayant fait l’objet d’une intervention brève et enregistrée dans le dossier) : corrélation positive avec l’empathie globale
+
+
+23
+Graphique 6 : graphique de répartition de la fréquence d’intervention auprès des patients consommateurs excessifs d’alcool en fonction de l’empathie
+- Vaccination antigrippale des patients en affection longue durée (ALD) (part des patients âgés de 16 à 64 ans en ALD ou présentant une maladie respiratoire chronique vaccinés pour la grippe) : corrélation négative avec la prise de perspective.
+Graphique 7 : graphique de répartition de la fréquence de réalisation du vaccin antigrippal chez les personnes en ALD en fonction de la prise de perspective
+
+
+24
+Efficience des prescriptions
+Variable Composante Intervalle de confiance à 95%
+P-Value
+Génériques Globale [1.62 ; 6.71] 0,00373 CE [6.92 × 10−1 ; 5.07] 0,01404 Insuline biosimilaire SipS [−18.84 ; −1.54 × 10−7] 0,02727 Metformine CE [3.22 × 10−5 ; 9.37] 0,04940
+Tableau 5 : tableau des intervalles de confiance des variables concernant les efficiences des prescriptions pour lesquelles p < 0,05
+- Génériques globaux (indice global de prescription dans le répertoire des génériques) : corrélation positive avec empathie globale et plus particulièrement avec la compréhension émotionnelle.
+Graphique 8 : graphique de répartition de la fréquence de prescription de générique en fonction de la compréhension émotionnelle
+- Insuline biosimilaire (prescription de biosimilaires parmi les prescriptions d’insuline glargine) : corrélation positive avec la composante « se mettre à la place du patient ».
+
+
+25
+Graphique 9 : graphique de répartition de la fréquence de prescription de biosimilaire de l’insuline en fonction de la composante « se mettre à la place du patient »
+- Metformine (part des patients diabétiques traités par metformine) : corrélation positive avec la compréhension émotionnelle.
+Graphique 10 : graphique de répartition de la fréquence de prescription de Metformine en fonction de la compréhension émotionnelle
+ROSP de l’enfant
+Variable Composante Intervalle de confiance à 95%
+P-Value
+C3G > 4ans Globale [−14.55 ; −2.94 × 10−6 ] 0,02730 Troubles sensoriels PP [0.00 ; 534 × 10−5] 0,03471 IMC PP [−2.41 × 10−5 ; 7.61] 0,04936
+Tableau 6 : tableau des intervalles de confiance des variables concernant les items de la ROSP de l’enfant pour lesquelles p < 0,05
+- C3G chez les plus de 4 ans (part des patients de plus de 4 ans traités par C3G parmi les patients traités par antibiotiques) : corrélation négative avec l’empathie globale, sans qu’une composante ne ressorte en particulier.
+
+
+26
+Graphique 11 : graphique de répartition de la fréquence de prescription de C3G chez les plus de 4ans en fonction de l’empathie
+- Dépistage troubles sensoriels (part des patients de 4 à 12 mois ayant eu un dépistage des troubles visuels et auditifs) : corrélation positive avec la prise de perspective.
+Graphique 12 : graphique de répartition de la fréquence de dépistage des troubles sensoriels en fonction de la prise de perspective
+- Obésité (part des patients MT de moins de 16 ans dont la courbe de corpulence est renseignée dans le dossier médical au moins une fois par an) : corrélation positive avec la prise de perspective.
+
+
+27
+Graphique 13 : graphique de répartition de la fréquence de dépistage de l’obésité en fonction de la prise de perspective
+5-3 Déterminants de l’empathie
+Variable Composante Intervalle de confiance à 95%
+P-Value
+Age PP [1.78 × 10−5 ; 3.00] 0,03733 Sips [9.83 × 10−6 ; 4] 0,03144 CE [−5.00 ; −1.00] 0,00368 Problème de santé SipS [−5.47 ×10−5 ; 1.83 ×10−5] 0,03568
+Activité de relaxation
+Globale [−1.19 × 10−5 ; 5.73 × 10−5] 0,04434 CE [−7.00 × 10−5 ; −6.64 × 10−5] 0,00919
+Adapter sa communication
+PP [6.78 × 10−5 ; 1.00] 2.98 × 10−7 SipS [1.35 × 10−5 ; 1.00] 2.44 × 10−5 CE [−5.09 × 10−5 ; 4.31 × 10−5] 0,04186 Actes par jour CE [−3.00 ; −5.58 × 10−5] 0,01789
+Durée de consultation
+Globale [2.93 × 10−5 ; 5.01 × 10−5] 0,03963 PP [−4.70 × 10−6 ; 5.33 × 10−5] 0,04143
+Tableau 7 : tableau des intervalles de confiance des variables concernant les déterminants de l’empathie pour lesquelles p < 0,05
+- Age : corrélation inversement proportionnelle entre les trois composantes de l’empathie et l’âge.
+
+
+28
+Graphique 14 : graphique de répartition de l’empathie en fonction de l’âge
+- Problème de santé : nous retrouvons une corrélation positive entre le fait d’avoir eu un problème de santé dans les deux dernières années et le fait de se mettre à la place du patient.
+Graphique 15 : graphique de répartition de l’empathie en fonction du fait d’avoir eu un problème de santé (1 : pas de problème, 2 : problème peu grave, 3 : problème grave)
+- Relaxation (« participez-vous à une activité de relaxation type yoga, méditation... ») : corrélation positive avec empathie globale, plus particulièrement la compréhension émotionnelle.
+
+
+29
+Graphique 16 : graphique de répartition de la compréhension émotionnelle en fonction du fait de faire une activité de relaxation ou non
+- Adapter la communication (facilité à adapter sa communication au niveau de compréhension du patient) : corrélation positive avec l’empathie globale ainsi que ses trois composantes.
+Graphique 17 : graphique représentant le fait d’adapter sa communication en fonction de l’empathie
+- Nombres d’actes par jour : corrélation inverse avec la compréhension émotionnelle.
+
+
+30
+Graphique 18 : graphique de répartition entre le nombre d’acte par jour et la compréhension émotionnelle
+- Durée de consultation : différence significative, les praticiens les plus empathiques ont eu plus tendance à augmenter leur durée de consultation sur les 3 dernières années, visible en particulier sur la composante prise de perspective.
+Graphique 19 : graphique de répartition entre le fait d’adapter sa communication en fonction de l’empathie
+5-4 Lien entre empathie et burn out
+Variable Composante Intervalle de confiance à 95%
+P-Value
+Accomplissement personnel
+Globale [2.00 ; 4.00] 8, 21 × 10−8 PP [2.00 ; 4.00] 5.53 × 10−7 SipS [1.00 ; 4.00] 3.60 × 10−5 Dépersonnalisation SipS [−3.00; −6.91 × 10−6] 0,01560
+
+
+31
+Tableau 8 : tableau des intervalles de confiance des variables concernant le burn out pour lesquelles p < 0,05
+- Accomplissement personnel : corrélation positive avec empathie globale et plus particulièrement la prise de perspective et le fait de se mettre à la place du patient.
+Graphique 20 : graphique de répartition entre l’accomplissement personnel et le score d’empathie globale
+- Dépersonnalisation : corrélation négative avec « se mettre à la place du patient »
+Graphique 21 : graphique de répartition entre la dépersonnalisation et la composante « se mettre à la place du patient » de la JSPE
+5-5 Corrélation de la pratique estimée aux items de la ROSP
+Pour rappel, nous avions demandé l’importance accordée par certains aspects du suivi du patient, par rapport à tous les éléments de son suivi, sous forme d’échelle de Likert allant de « très peu d’importance » à « un de mes objectifs principaux » (Cf. 4 ou Annexe 2), pour pouvoir les comparer avec les résultats effectifs pour ces mêmes items de la ROSP.
+Nous l’avons fait arbitrairement pour l’examen de la rétine et des pieds d’un diabétique, l’évaluation de la protéinurie chez un patient diabétique ou hypertendu, le dépistage des troubles sensoriels des enfants et la limitation de la prescription d’antibiotiques.
+
+
+32
+Nous n’avons pas trouvé de corrélation, pour aucun de ces items.
+Fond d’œil Examen des pieds
+Protéinurie Examen visuel et auditif
+Prescription antibiotique
+Rétinopathie 0,1335 Pied diabétique 0,2916
+MRC 0,0800
+Troubles sensoriels 0,2890
+Limitation des antibiotiques
+-0,1757
+Tableau 9 : corrélation entre l’importance accordée aux items et leurs résultats effectifs à la ROSP (une corrélation est forte si elle tend vers 1 ou -1)
+5-6 Synthèse
+- Vis-à-vis des résultats à la ROSP et du burn out :
+Les médecins ayant une empathie cognitive plus développée (correspondant à la prise de perspective) auraient de meilleurs résultats vis-à-vis des dépistages des troubles sensoriels et de la prévention de l’obésité chez l’enfant. Par contre, ils auraient de moins bons résultats pour la prévention du cancer colorectal, de la prévention secondaire cardiovasculaire et de la vaccination antigrippale chez les patients en ALD. Ils auraient également un meilleur accomplissement professionnel et donc seraient moins en burn out.
+Les médecins ayant une empathie émotionnelle plus développée (correspondant à la compréhension émotionnelle) auraient de meilleurs résultats vis-à-vis de la prévention de la rétinopathie chez le patient diabétique, de la prescription de génériques, de la prescription en priorité de Metformine chez le patient diabétique. Mais ils auraient de moins bons résultats vis-à-vis de la détection de la maladie rénale chronique chez le patient diabétique.
+Les médecins étant plus à même de se mettre à la place du patient auraient une meilleure prévention de la rétinopathie diabétique et une prescription préférentielle de biosimilaire de l’insuline glargine. Ils seraient moins sujets à la dépersonnalisation du burn out et également présenteraient un meilleur accomplissement personnel dans leur travail.
+Les médecins ayant un score d’empathie global plus élevé seraient plus enclins à faire une intervention chez les patients consommateurs excessifs d’alcool, prescriraient moins de C3G chez les enfants et auraient une meilleure prévention de la rétinopathie diabétique. Mais ils auraient de moins bons résultats concernant le dépistage du cancer du col de l’utérus et du cancer colorectal. Pour rappel, les résultats donnés par les scores de l’empathie globale de l’échelle française de la JSPE ne sont pas garantis et donc à analyser avec précaution.
+Résultats effectifs (ROSP)
+Intérêt affirmé au dépistage
+
+
+33
+- Vis-à-vis des déterminants de l’empathie :
+Nous avons retrouvé comme déterminants de l’empathie le fait d’être plus jeune. Des durées de consultation plus longues sont associées à une meilleure prise de perspective et une absence de diminution du temps de consultation sur les deux dernières années à une meilleure compréhension émotionnelle. De même, les médecins s’adonnant à une activité de relaxation ont une plus grande compréhension émotionnelle. Les médecins ayant eu des problèmes de santé dans les deux dernières années arrivent mieux à se mettre à la place du patient.
+Également, les médecins arrivant mieux à adapter leur communication au degré de compréhension de leur interlocuteur seraient plus empathiques, dans les trois composantes de l’empathie (prise de perspective, compréhension émotionnelle, se mettre à la place du patient).
+Nous n’avons pas retrouvé de différence selon le genre et le mode de vie. Nous n’avons pas non plus trouvé de corrélation entre l’empathie, le nombre de frères et sœurs ainsi que les relations dans la fratrie et l’éventuelle présence d’une personne en situation de handicap. Le fait d’avoir eu un animal de compagnie ne semble pas influencer l’empathie non plus selon nos résultats, de même que la participation à un groupe Balint.
+En dehors du fait d’adapter la communication à son interlocuteur, les deux autres soft skills recherchées (participer à une activité d’expression et la timidité) n’ont pas montré d’influence sur l’empathie.
+
+
+34
+6- DISCUSSION
+6-1 Reprise des résultats principaux
+Nous avons trouvé de bons résultats chez les médecins empathiques vis-à-vis du diabète, de la détection de la consommation excessive d’alcool et de de la prévention des troubles sensoriels et de l’obésité chez l’enfant. Ces maladies (diabète, obésité, troubles du développement, alcoolisme) sont encore des maladies à caractère excluant et stigmatisant. On peut se poser la question de savoir si les médecins les plus empathiques ont plus tendance à lutter contre la stigmatisation.
+Nous avons également trouvé que les médecins plus empathiques étaient moins en burn out. Cela est en accord avec la majorité de la littérature traitant du sujet (cf 2.3).
+Les médecins qui avaient des durées de consultations plus longues seraient également plus empathiques, ce qui semble logique, des consultations plus longues laissant plus la place à une écoute active et à la possibilité du patient de s’exprimer. Ce résultat est similaire à celui de plusieurs études (6,32).
+La capacité à adapter sa communication est retrouvée corrélée à tous les niveaux d’empathie. C’est compréhensible car pour adapter sa communication, il faut arriver à se mettre à la place du patient pour estimer son degré de compréhension et cela est une des compétences qui semble être exigée par les patients de la part de leur médecin (20).
+Les médecins jeunes de notre échantillon avaient de meilleurs scores d’empathie, ce qui n’a pas été retrouvé dans la littérature.
+6-2 Forces et faiblesses de l’étude
+6-2-1 Forces de l’étude
+Une des forces de notre étude est son originalité, nous n’avons pas retrouvé d’étude similaire dans la littérature. Le nombre de critères analysés a permis une étude large de la pratique des médecins.
+Le questionnaire utilisé pour l’analyse de l’empathie, la JSPE, est un questionnaire validé et spécialisé pour les médecins, dont les résultats sont fiables.
+Les médecins ayant répondu à notre questionnaire viennent de la France entière. Même si la question n’était pas posée directement dans les questionnaires et que nous n’avons par
+
+
+35
+conséquent pas fait de statistique sur les données géographiques, les codes postaux indiqués sur les données de la ROSP étaient très variés.
+6-2-2 Population de l’étude
+74% des répondeurs étaient des femmes. Pourtant au 1er janvier 2020, il était recensé 48% de femmes parmi les médecins généralistes et 43% chez les libéraux exclusifs (48). Des études ont déjà montré que le taux de réponses aux études était plus élevé chez les femmes (49), cela s’est particulièrement retrouvé dans notre étude.
+La moyenne d’âge était de 41,6 ans en moyenne dans notre étude, comparée à 51,6 ans chez les médecins généralistes français. Cette différence peut s’expliquer par le fait que la majorité des réponses ont été obtenues via des réseaux sociaux de médecins, plutôt utilisés par des médecins jeunes.
+De même, 64% de notre population d’étude répond à un critère du burn out, alors qu’il serait plutôt estimé à 50% chez les médecins généralistes français (38). La seconde étude sur le burn out retrouve une corrélation entre l’âge jeune et le burn out, ce qui peut expliquer pourquoi notre échantillon présente un taux de burn out plus élevé que dans la population générale, étant donné que la moyenne d’âge y est plus faible.
+Notre population d’étude semble somme toute assez différente de la population cible et est donc peu représentative de tous les médecins généralistes en France.
+6-2-3 Biais
+Taille de l’échantillon : notre étude a eu un faible taux de réponses vis-à-vis de la ROSP, seulement 20% des répondants nous ont transmis leurs données. Il est donc possible qu’il existe d’autres corrélations entre la ROSP et le niveau d’empathie mais que les résultats retrouvés n’aient pas été significatifs du fait d’un échantillon trop petit.
+Biais de désirabilité sociale : il est possible que les répondants soient inconsciemment tentés de donner des réponses plus « socialement désirables » aux questions posées, en l’occurrence d’influencer les réponses pour paraitre plus empathique. Ce biais est présent avec un auto-questionnaire mais limité par le fait que les réponses soient anonymisées et qu’il s’agisse d’un questionnaire validé d’auto-mesure de l’empathie.
+6-2-4 La ROSP
+Est-ce que la ROSP représente vraiment la pratique clinique ? Nous aurions pensé que quand un médecin affirme, par exemple, que limiter la prescription d’antibiotiques est l’un de ses
+
+
+36
+objectifs principaux, cela se serait vu dans les résultats de sa ROSP pour les items de la souscatégorie « Antibiothérapie ». Pourtant, nous ne retrouvons aucune corrélation et cela pour 5 items différents.
+Les indicateurs de la ROSP sont-ils vraiment pertinents et représentatifs de la qualité de la pratique clinique ? Les nouveaux indicateurs de 2018 reprennent les recommandations de la HAS, mais certains ne font pas l’unanimité, notamment pour le dépistage du cancer du sein pour lequel est reproché un sur-diagnostic de cancer et une augmentation du risque lié à l’irradiation pour un bénéfice en termes de mortalité limité (50,51). Il s’agit également souvent d’un recueil de réalisation d’un examen sans indice sur la suite de la prise en charge (par exemple, les points seront accordés pour un dosage de l’HbA1C régulier, même si celleci est toujours haute et qu’aucune action n’a été entreprise pour la faire diminuer).
+La ROSP étant une base de rémunération, on peut également se poser la question de savoir si certains médecins cherchent à améliorer leurs indicateurs dans le but de percevoir une rémunération, plus que dans une intention de soin vis-à-vis du patient. Carine CHHO a dédié sa thèse à rechercher une modification des pratiques de médecins généralistes depuis l’introduction de la ROSP en 2013 (52). D’après les réponses obtenues, les médecins faisaient plus attention à être systématiques lors de leur entretien avec leurs patients en abordant plus les sujets comme la vaccination et le dépistage organisé des cancers. La question se pose alors de savoir si ce changement de pratique est dû à l’évolution naturelle des pratiques, au fait que la ROSP agisse comme un rappel des pratiques, ou seulement à l’attrait de la rémunération. En Martinique, Olivier SOUSSAIN a voulu répondre à cette question dans sa thèse sur le bilan de la ROSP de 2012 à 2016 (53) et il a observé que les médecins déclarant la ROSP avaient de meilleurs résultats pour les critères auto-déclarés que ceux ne la déclarant pas, prouvant qu’il ne s’agissait pas uniquement d’une évolution naturelle mais que la ROSP induit une modification des pratiques. Dans la thèse d’Olivier Saint-Lary sur l’éthique posée par le paiement à la performance, il ressort que les médecins généralistes interrogés privilégient leur pratique clinique et la singularité de chaque patient avant de penser aux items de la ROSP (54) et donc à une éventuelle rémunération.
+6-2-5 COVID 19
+Les questionnaires de thèse ont été distribués à partir de mars 2020, soit au début du retentissement de l’épidémie de COVID 19 en France. Nous avons ajouté l’item « Hors COVID » pour les questions relatives à la pratique médicale mais il est possible que cette période particulière ait eu une répercussion psychologique, influençant l’estimation de l’empathie ou du burn out.
+
+
+37
+6-3 Perspectives
+L’empathie peut être travaillée et améliorée, notamment chez les étudiants en médecine, surtout qu’il a été montré qu’elle a tendance à baisser durant les études médicales (55,56). L’empathie est d’ailleurs une des compétences exigées par le Collège des Généralistes Enseignants (CNGE) pour le DES (Diplôme d’Étude Spécialisées) de médecine générale : « Soins centrés sur la personne : manifester une écoute active et empathique, adapter la communication aux possibilités de compréhension du sujet, prendre en compte ses émotions et celles du patient sujet [..] ». Hojat a montré que l’empathie des étudiants augmentait significativement des semaines après avoir travaillé à l’étude de vidéos d’extraits de consultations (57), et il a été prouvé l’effet bénéfique de l’écriture, du théâtre, de l’entrainement aux outils de communication et des mises en situations expérimentales (58). Cela serait également utile pour diminuer le burn out chez les internes en médecine générale (59). A la faculté de Paris 6, il est proposé des ateliers sur la communication, des jeux de rôles, des ateliers de théâtre pour apprendre à adapter sa communication et pour travailler l’empathie. D’autres hôpitaux ou universités proposent à des patients de partager leurs expériences avec les étudiants et internes pour pouvoir analyser et améliorer la relation de soin (60). Les groupes Balint pourraient également servir à augmenter l’empathie chez les étudiants (61,62). Certaines études montrent l’apport de la réalité virtuelle dans l’amélioration de l’empathie (63), dont une étude retrouvant des résultats meilleurs à la JSPE chez les étudiants après avoir joué à un jeu vidéo appelé « That Dragon, Cancer » où ils incarnaient les parents d’un enfant atteint d’un cancer (64).
+Parmi les « soft skills », les capacités de communication semblent être importantes par leur intrication avec l’empathie et pour le développement de la relation médecin-patient. Pour aider et améliorer sa communication avec le patient, des outils peuvent également être utiles, comme la grille de Calgary-Cambridge (65,66) permettant de structurer l’entretien médical, aider à la construction de la relation médecin-patient et planifier avec le patient les suites de la consultation. Claude Richard, Marie-Thérèse Lussier et al ont également proposé un modèle pour développer ses capacités en communication, pouvant servir également de base pédagogique pour l’enseignement (67). Un autre outil, le NURSE (Name, Understand, Respect, Support, Explore) permet d’aider à construire une communication empathique avec le patient, en partant du fait de nommer ses émotions jusqu’à l’inviter à parler de ces préoccupations pour mieux le soutenir (68).
+
+
+38
+7- CONCLUSION
+L’empathie a prouvé à maintes reprises être bénéfique pour la relation médecin-patient, pour le vécu d’une consultation par le patient mais également pour certains résultats thérapeutiques et les médecins plus empathiques seraient moins en burn out.
+Malgré ses défauts, la ROSP reste un indicateur de la pratique clinique. Notre étude a retrouvé des résultats discordants, pouvant être expliqués par son manque de puissance statistique, mais retrouve le fait que des médecins plus empathiques seraient plus actifs pour lutter ou prévenir contre les maladies à tendance stigmatisantes et seraient moins enclins au burn out.
+Il existe des moyens pour travailler l’empathie, surtout chez les étudiants en médecine, que ce soit en travaillant eux-mêmes lors de mises en scène ou jeux de rôle ou alors en participant à des groupes de travail de retour d’expérience de patients. Il peut également être utile de s’aider d’outils pour parfaire ses capacités de communication avec les patients. Dans un futur proche, le développement de la réalité virtuelle pourrait être un vrai plus dans le développement de l’empathie.
+
+
+39
+8- ANNEXES
+8.1 Annexe 1 : Échelle JSPE
+Lisez attentivement chaque affirmation proposée dans ce questionnaire et évaluez à quel point vous êtes en accord ou en désaccord avec ces affirmations. Pour chacune d’entre elles, cochez la case qui décrit le mieux votre façon d’être selon l’échelle allant de « Pas du tout d’accord » à « tout à fait d’accord ».
+(1) Pas du
+tout
+(2)
+(3)
+(4)
+(5)
+(6)
+(7) Tout à
+fait
+Ma compréhension des sentiments de mes patients et de leur famille n’influence pas mon traitement médical ou chirurgical Mes patients se sentent mieux quand je comprends leurs sentiments Il m’est difficile de voir les choses selon le point de vue de mes patients Dans les relations soignants-soignés, je considère le fait de comprendre le langage corporel de mes patients comme aussi important que de comprendre la communication verbale J’ai un bon sens de l’humour qui, je pense, contribue à obtenir de meilleurs résultats cliniques Il m’est difficile de voir les choses selon le point de vue de mes patents parce que chaque personne est différente Quand j’interroge mes patients sur leurs antécédents ou leur santé physique, j’essaie de ne pas prêter attention à leurs émotions Être attentif au vécu de mes patients n’influence pas les résultats de leurs traitements Quand je soigne mes patients, j’essaie de me mettre à leur place
+Mes patients accordent de l’importance au fait que je comprenne leurs sentiments, ce qui est thérapeutique en soi Les maladies des patients ne peuvent être guéries que par le traitement médical ou chirurgical, ainsi les liens émotionnels avec mes patients n’ont pas d’influence significative sur les résultats médicaux ou chirurgicaux Interroger les patients sur ce qu’il se passe dans leur(s) vie(s) personnelle n’est pas utile pour comprendre leurs plaintes liées à leur état physique J’essaie de comprendre ce qui se passe dans l’esprit de mes patients en prêtant de l’attention aux signes non verbaux et au langage corporel Je pense que l’émotion n’a pas sa place dans le traitement de la maladie physique L’empathie est une compétence thérapeutique sans laquelle le succès du traitement est limité Ma compréhension de l’état émotionnel de mes patients tout comme celui de leurs familles est une composante importante de la relation J’essaie de penser comme mes patients pour leur offrir de meilleurs soins Je ne me laisse pas influencer lorsqu’il y a des fortes relations personnelles entre mes patients et les membres de leur famille Je n’ai pas de plaisir à lire de la littérature non médicale ou à
+
+
+40
+m’intéresser aux arts
+Je crois que l’empathie est un facteur thérapeutique important dans le traitement médical ou chirurgical
+8.2 Annexe 2 : Questionnaire
+Questionnaire de Thèse: Burn out et empathie des médecins généralistes,
+influence sur la prise en charge des patients
+Age : ________ ans Sexe : H  F 
+Vie personnelle
+- Quel est votre nombre de frère et sœur et leur écart d’âge avec vous ? (entourez + ou – selon que votre frère ou sœur est plus âgé ou plus jeune)
+1. Frère  / Sœur  Ecart d’âge : + / - ___ ans
+2. Frère  / Sœur  Ecart d’âge : + / - ___ ans
+3. Frère  / Sœur  Ecart d’âge : + / - ___ ans
+4. Plus de 3 frères et/ou sœurs 
+- Comment décrivez-vous votre relation avec vos frères et sœurs ? (cochez sur l’échelle)
+Distante | | | | | | | | | | | Chaleureuse
+Solidaire | | | | | | | | | | | Compétitive
+- Un de vos frère/sœur avait-il une maladie sévère, chronique handicapante ou un handicap significatif ?
+Oui  Non 
+- Avez-vous été le responsable principal d’un animal domestique (mammifère) dans votre enfance ? Si oui,
+pendant combien d’année ? Non  Oui  Pendant ___ année(s)
+Neutre
+
+
+41
+-Vivez-vous : Seul  En couple  Autre (colocation) 
+- Avez-vous envie de pratiquer une activité où il faut monter sur scène (théâtre, musique, chant...) :
+Aucune envie  Peu envie  Forte envie  Je l’ai déjà fait  Je le fais 
+-Je suis timide : Tout à fait  Un peu  Pas tellement  Pas du tout 
+-Avez-vous eu un problème de santé majeur lors de ces deux dernières années ?
+Aucun problème  Problème peu grave  Problème grave 
+-Avez-vous eu un problème « relationnel » majeur lors de ces deux dernières années ? (séparation privée ou professionnelle, litige...)
+Aucun problème  Problème peu grave  Problème grave 
+Vie professionnelle
+- Combien d’actes par jour effectuez-vous ? ____ actes
+-Trouvez- vous que vous travaillez trop ?
+Je garde exprès du temps non-médical  Non  Un peu trop  Beaucoup trop 
+-Participez-vous ou avez-vous participé à un groupe Balint lors de ces deux dernières années ?
+Oui  Non 
+- Participez-vous ou avez-vous participé à une activité de relaxation lors de ces deux dernières années ?
+(yoga, méditation...) oui  non
+-Si je suis affectueux et chaleureux avec mes patients je reçois toujours autant ou même plus que ce que je
+donne en retour : Pas toujours  Oui mais ce n’est pas mon approche 
+Oui dans la mesure du possible  Oui et je fais ainsi  Oui et je le suis au maximum 
+
+
+42
+-Adapter ma communication au niveau de compréhension de mon patient (enfant, personne âgé) est pour
+moi : Assez difficile  Pas trop difficile  Assez facile  Facile  Naturel 
+-Par rapport à il y a 2 ans :
+-nombre d’acte par jour en plus ou en moins : + ____ ou - _____
+-durée de consultation par patient augmentée ou diminuée ? +_____ ou -_____(min)
+- êtes-vous plus ou moins satisfait de votre travail ?
+Nettement moins  Un peu moins  Pareil  Un peu plus  Nettement plus 
+-Quelle importance accordez-vous, par rapport à tous les éléments du suivi du patient ? :
+- au bon suivi des indicateurs du ROSP dans leur totalité ? Aucune importance 
+Peu d’importance  Relativement important  Un de mes objectifs principaux 
+- à motiver un patient diabétique à faire régulièrement un examen de la rétine ?
+Très peu d’importance  Moins d’importance  Relativement important 
+Très important  Un de mes objectifs principaux 
+- à examiner les pieds d’un diabétique annuellement ?
+Très peu d’importance  Moins d’importance  Relativement important 
+Très important  Un de mes objectifs principaux 
+- à évaluer annuellement la protéinurie chez un patient diabétique ou hypertendu ?
+Très peu d’importance  Moins d’importance  Relativement important 
+Très important  Un de mes objectifs principaux 
+- au dépistage des troubles visuels, auditifs et du langage des enfants :
+Très peu d’importance  Moins d’importance  Relativement important 
+
+
+43
+Très important  Un de mes objectifs principaux 
+- à la limitation de prescription d’antibiotiques chez les patients sans ALD
+Très peu d’importance  Moins d’importance  Relativement important 
+Très important  Un de mes objectifs principaux 
+8.3 Annexe 3 : Echelle MBI
+Lisez attentivement chaque affirmation proposée dans ce questionnaire. Indiquez la fréquence à laquelle vous ressentez ce qui est décrit à chaque item selon l’échelle allant de « jamais » à « chaque jour ».
+Jamais
+Qqs fois
+par année
+1 fois par
+mois
+Qqs fois
+par mois
+1 fois par
+semaine
+Qqs fois par
+semaine
+Chaque
+jour
+Je me sens émotionnellement vidé(e) par mon travail Je me sens à bout à la fin de ma journée de travail
+Je me sens fatigué(e) lorsque je me lève le matin et que j’ai à affronter une autre journée de travail Je peux comprendre facilement ce que mes malades ressentent
+Je sens que je m’occupe de certains malades de façon impersonnelle comme s’ils étaient des objets Travailler avec des gens tout au long de la journée me demande beaucoup d’effort Je m’occupe très efficacement des problèmes de mes malades Je sens que je craque à cause de mon travail
+J’ai l’impression, à travers mon travail, d’avoir une influence positive sur les personnes Je suis devenu(e) plus insensible aux gens depuis que j’ai ce travail Je crains que ce travail ne m’endurcisse émotionnellement Je me sens plein(e) d’énergie Je me sens frustré(é) Je sens que je travaille « trop dur »
+Je ne me soucie pas vraiment de ce qui arrive à certains de mes malades Travailler en contact direct avec les gens me stresse trop
+J’arrive facilement à créer une atmosphère détendue avec mes malades Je me sens ragaillardi(e) lorsque dans mon travail j’ai été proche de mes malades J’ai accompli beaucoup de choses qui en valent la peine dans ce travail Je me sens au bout du rouleau Dans mon travail, je traite les problèmes émotionnels très
+
+
+44
+calmement
+J’ai l’impression que mes malades me rendent responsable de certains de leurs problèmes
+8.4 Annexe 4 : Tableau des statistiques descriptives de l’échantillon
+Population : N = 375 Effectifs ou
+[moyenne]
+Pourcentage (%)
+Min-max Ecart-type
+Sociodémographique Sexe Homme 97 25,87 Femme 278 74,13 Âge (années) [41,6] 26-74 11,45 Personnel
+- Nombre de frère ou sœur [1,8] 0-7 1,08 - Relation dans la fratrie Distante(0) -> Chaleureuse (10) [7,3] 0-10 2,59 Solidaire(0) -> Compétitive (10) [3,5] 0-10 3,15 - Pas de condition de handicap dans la fratrie
+331 88,5 0,32
+- Animal de compagnie Non 213 56,80 Moyenne de possession en année 4,2 0-62 6,90 - Vie En couple 305 82,2 Célibataire 65 17,5 Autre (colocation...) 1 0,27 - Envie d’activité d’expression Aucune envie 175 47,1 Peu envie 69 18,6 Forte envie 27 7,3 Je l’ai déjà fait 79 21,3 Je le fait 21 5,7 - Timidité Oui 67 18,1 Un peu 150 40,4 Pas tellement 104 28 Non 50 13,5 - Problème de santé dans les 2 dernières années Aucun 227 61,2 Problème peu grave 121 32,6
+
+
+45
+Problème grave 23 6,2 - Problème relationnel dans ces 2 dernières années Aucun 213 57,4 Problème peu grave 116 31,3 Problème grave 42 11,3 Vie professionnelle - Nombre d’actes par jour [25,3] 2-55 7,60 - Trop de charge de travail ? Temps non médical réservé 97 25,9 Non 95 25,3 Un peu trop 146 38,9 Beaucoup trop 37 9,9 - Participation à un groupe Balint 18 4,8 - Participation à une activité de relaxation
+136 36,3
+- Capacité à adapter sa communication Assez difficile 4 1 Pas trop difficile 27 7,2 Assez facile 90 24 Facile 68 18,1 Naturel 186 49,6 - Par rapport à il y a 2 ans : Modification du nombre d’acte [+ 0,9] -20 - + 20 4,74 Modification de la durée de consultation (min)
+[+1,2] -10 - + 20 4,59
+Modification de la satisfaction : Nettement moins 31 8,3 Un peu moins 70 18,7 Pareil 163 43,5 Un peu plus 77 20,5 Nettement plus 34 9 Relation à la ROSP
+1 : aucune importance -> 5 : un des objectifs principaux - Suivi des indicateurs ROSP dans leur ensemble
+[2] 1-5 0,75
+- Examen de la rétine du patient diabétique
+[3,7] 1-5 0,67
+- Examen des pieds du patient diabétique
+[3,5] 1-5 0,85
+- Evaluation de la protéinurie (HTA ou diabète)
+[3,8] 1-5 0,75
+- Dépistable troubles sensoriels de l’enfant
+[3,5] 1-5 0,87
+
+
+46
+- Limitation de la prescription d’antibiotique
+[3,5] 1-5 1,05
+Empathie :
+Global : PP : CE : SipS :
+[111] [55,6] [45] [10,7]
+38-140 16-70 14-56 2-14
+11,83 7,60 5,58 2,35 Burn out :
+EE Dep AP
+[30,5] [12,9] [48,4]
+9-63 5-34 27-56
+12,59 6,46 5,89
+Tableau 1 : statistiques descriptives de l’échantillon
+8.5 Annexe 5 : Tableau des résultats au test de Mann Whitney
+Empathie Globale
+CE PP SipS
+Sexe 0,393014919 0,96561187 0,98927095 0,2824551 âge 0,446545662 0,00368117 0,03732883 0,03144095 Fratrie 0,914911205 0,90225046 0,82174965 0,60515845 Relation fratrie 1 0,468902043 0,07851537 0,41868728 0,78174327 Relation fratrie 2 0,407204136 0,39771675 0,24737182 0,3395313 Handicap 0,142217012 0,58246982 0,06293222 0,31373413 Animal de compagnie 0,956630746 0,48776862 0,73804128 0,42729341 Vie sociale 0,894124717 0,99939217 0,62546536 0,12425924 Activité d'expression 0,76236517 0,05994908 0,96176256 0,67941478 Timidité 0,607651741 0,25848459 0,0644228 0,18051644 Problème de santé 0,653230938 0,63661157 0,32701272 0,03568096 Problème relationnel 0,970923188 0,33286789 0,2657511 0,34296644 Actes par jour 0,406593399 0,01789345 0,34021714 0,51875079 Quantité de travail 0,781867867 0,12009316 0,33523114 0,44513228 Groupe Balint 0,82959659 0,08170075 0,26937704 0,169133 Relaxation 0,044338682 0,00919273 0,07169079 0,11941484 Communication 0,000109416 0,04186218 2,98E-07 2,44E-05 Changement nbr actes /j 0,378719436 0,94086128 0,375162 0,29761401 Durée consultation 0,039625322 0,12738424 0,0414279 0,14555638 Satisfaction 0,463234837 0,17785483 0,2514198 0,36540118 EE 0,640614882 0,15924028 0,66684129 0,75396456 DEP 0,062339361 0,4433563 0,08239494 0,01560357
+
+
+47
+Tableau 2 : résultats du test de Mann Whitney entre les différentes composantes de l’empathie et les déterminants de l’empathie et les items de la ROSP. Un résultat < 0,05 correspond à une différence significative
+AP 8,21E-08 0,06803242 5,53E-07 3,60E-05 HBA1C 0,762851406 0,60722906 0,11955954 0,81850285 Fond d'œil 0,002296887 0,00334516 0,43970516 0,01159481 MRC chez diabétique 0,923622049 0,0487516 0,50003613 0,86342299 MRC chez HTA 0,40030297 0,54388682 0,90755914 0,29328849 Prévention secondaire 0,265047723 0,5661068 0,03309918 0,97998938 INR 0,459558543 0,06369182 0,36507229 0,41578179 Examen pied diabétique 0,12006073 0,98334364 0,13032561 0,82683202 Evaluation cardiovasculaire
+0,638338798 0,38951998 0,3223312 0,54359269
+Vaccin grippe > 65ans 0,140936906 0,47222901 0,69475436 0,84165543 Vaccin grippe ALD 0,276614922 0,82478358 0,03981951 0,87420192 Cancer du sein 0,678615954 0,9006885 0,62263824 0,14741154 Frottis 0,04314503 0,87380521 0,41000558 0,65609473 Colorectal 0,049158115 1 0,02322296 0,09514882 Psychotrope > 75ans 0,979553353 0,75277301 0,55557637 0,31763778 BZD hypnotique > 4S 0,847945488 0,59384627 0,60318221 0,51745994 BZD anxiolytiques > 12S 0,612063783 0,40756748 0,18085058 0,65608977 Antibiothérapie 16-65ans 0,599116739 0,24032455 0,63047672 0,73503612 Antibiorésistances 0,74775993 0,83818999 0,09384782 0,89137522 Statines génériques 0,509887048 0,9409062 0,37081737 0,15543531 HTA génériques 0,09610112 0,38223578 0,7906367 0,60536508 Génériques globaux 0,003725265 0,01404215 0,50345061 0,0631035 Insuline biosimilaire 0,389657007 0,09256112 0,63984433 0,02727448 Ezetimibe 0,136420817 0,89702046 0,83136736 0,06442239 IPP avec AINS 0,354052647 0,21019173 0,7424829 0,4798781 Aspirine comme AAP 0,07484823 0,34288476 0,15305429 0,46807167 Metformine 0,389386949 0,04939687 0,80753692 0,52469753 Dosage TSH 0,403083104 0,96314404 0,65589491 0,96146665 Addiction OH 0,045556424 0,55768029 0,13170454 0,3090505 Addiction tabac 0,209854731 0,95527152 0,21715063 0,20286795 Asthme ttt 1 0,34274738 0,49832825 0,40479001 Asthme EFR 0,402709951 0,85779958 0,74766882 0,47431478 C3G > 4ans 0,027297153 0,30971817 0,07444516 0,58137389 C3G < 4ans 0,167992258 0,20148717 0,53173643 0,76996705 Dents 0,339771889 0,66854111 0,35800664 0,70788258 Neisvac 0,393013887 0,20747155 0,38716274 0,3863869 ROR 0,815630698 0,27379175 0,77189338 0,99035743 Troubles langage 0,080957451 0,80626432 0,20129464 0,57811189 Troubles sensoriels 0,073415686 0,14597906 0,03471247 0,90911535 IMC 0,177957995 0,1817117 0,04936339 0,89245542
+
+
+48
+9- BIBLIOGRAPHIE
+1. Hojat M, Louis DZ, Markham FW, Wender R, Rabinowitz C, Gonnella JS. Physicians’ empathy and clinical outcomes for diabetic patients. Acad Med J Assoc Am Med Coll. mars 2011;86(3):359‐64.
+2. Empathy in health professions, education and patient care - Mohammadreza Hojat [Internet]. [cité 5 avr 2018]. Disponible sur: https://livre.fnac.com/a9229376/Mohammadreza-Hojat-Empathy-inhealth-professions-education-and-patient-care
+3. The measurement of experienced burnout - Maslach - 1981 - Journal of Organizational Behavior Wiley Online Library [Internet]. [cité 5 avr 2018]. Disponible sur: https://onlinelibrary.wiley.com/doi/abs/10.1002/job.4030020205
+4. Maurice Elie. De l’Einfühlung à l’empathie [Internet]. 2012 [cité 26 nov 2020]. Disponible sur: http://temporel.fr/De-l-Einfuhlung-a-l-empathie-par
+5. HOCHMANN J. Une histoire de l’empathie. Odile Jacob. 2012. 386 p.
+6. Woerner A. Empathie, burn out et caractéristiques sociodémographiques des médecins généralistes. :220.
+7. Hojat M, Gonnella JS, Nasca TJ, Mangione S, Vergare M, Magee M. Physician empathy: definition, components, measurement, and relationship to gender and specialty. Am J Psychiatry. sept 2002;159(9):1563‐9.
+8. Aring CD. SYMPATHY AND EMPATHY. J Am Med Assoc. 24 mai 1958;167(4):448‐52.
+9. Derksen F, Olde Hartman TC, van Dijk A, Plouvier A, Bensing J, Lagro-Janssen A. Consequences of the presence and absence of empathy during consultations in primary care: A focus group study with patients. Patient Educ Couns. 2017;100(5):987‐93.
+10. Coulehan J, Platt F, Egener B, Frankel R, Lin C, Lown B, et al. “Let Me See If I Have This Right ...”: Words That Help Build Empathy. Ann Intern Med. 1 sept 2001;135:221‐7.
+11. Mercer SW, Reynolds WJ. Empathy and quality of care. Br J Gen Pract. oct 2002;52(Suppl):S9-12.
+12. di Pellegrino G, Fadiga L, Fogassi L, Gallese V, Rizzolatti G. Understanding motor events: a neurophysiological study. Exp Brain Res. 1 oct 1992;91(1):176‐80.
+13. Cook R, Bird G, Catmur C, Press C, Heyes C. Mirror neurons: From origin to function. Behav Brain Sci. avr 2014;37(2):177‐92.
+14. Corradini A, Antonietti A. Mirror neurons and their function in cognitively understood empathy. Conscious Cogn. sept 2013;22(3):1152‐61.
+15. Avenanti A, Bueti D, Galati G, Aglioti S. Transcranial magnetic stimulation highlights the sensorimotor side of empathy for pain. Nat Neurosci. 1 août 2005;8:955‐60.
+
+
+49
+16. Schulte-Rüther M, Markowitsch HJ, Fink GR, Piefke M. Mirror neuron and theory of mind mechanisms involved in face-to-face interactions: a functional magnetic resonance imaging approach to empathy. J Cogn Neurosci. août 2007;19(8):1354‐72.
+17. F. Zenasni PhD. Development of a French-language version of the Jefferson Scale of Physician Empathy and association with practice characteristics and burnout in a sample of General Practitioners. 2012.
+18. Hojat M, LaNoue M. Exploration and confirmation of the latent variable structure of the Jefferson scale of empathy. Int J Med Educ. 20 avr 2014;5:73‐81.
+19. Pourquoi les soft skills deviennent incontournables | Sciences Po Executive Education [Internet]. [cité 1 déc 2020]. Disponible sur: https://www.sciencespo.fr/executive-education/pourquoi-les-soft-skillsdeviennent-incontournables
+20. Wensing M, Jung HP, Mainz J, Olesen F, Grol R. A systematic review of the literature on patient priorities for general practice care. Part 1: Description of the research domain. Soc Sci Med 1982. nov 1998;47(10):1573‐88.
+21. Kim SS, Kaplowitz S, Johnston MV. The effects of physician empathy on patient satisfaction and compliance. Eval Health Prof. sept 2004;27(3):237‐51.
+22. Pinto RZ, Ferreira ML, Oliveira VC, Franco MR, Adams R, Maher CG, et al. Patient-centred communication is associated with positive therapeutic alliance: a systematic review. J Physiother. 2012;58(2):77‐87.
+23. Neumann M, Wirtz M, Bollschweiler E, Mercer SW, Warm M, Wolf J, et al. Determinants and patientreported long-term outcomes of physician empathy in oncology: A structural equation modelling approach. Patient Educ Couns. 1 déc 2007;69(1):63‐75.
+24. Del Canale S, Louis DZ, Maio V, Wang X, Rossi G, Hojat M, et al. The relationship between physician empathy and disease complications: an empirical study of primary care physicians and their diabetic patients in Parma, Italy. Acad Med J Assoc Am Med Coll. sept 2012;87(9):1243‐9.
+25. Rakel D, Barrett B, Zhang Z, Hoeft T, Chewning B, Marchand L, et al. Perception of empathy in the therapeutic encounter: effects on the common cold. Patient Educ Couns. déc 2011;85(3):390‐7.
+26. Yuguero O, Marsal JR, Esquerda M, Soler-González J. Occupational burnout and empathy influence blood pressure control in primary care physicians. BMC Fam Pract. 12 mai 2017;18(1):63.
+27. Yuguero O, Marsal J, Esquerda M, Galvan L, Soler-González J. Cross-sectional study of the association between empathy and burnout and drug prescribing quality in primary care. Prim Health Care Res Dev. 2019;20:e145.
+28. Cataldo KP, Peeden K, Geesey ME, Dickerson L. Association between Balint training and physician empathy and work satisfaction. Fam Med. mai 2005;37(5):328‐31.
+29. Les groupes Balint | Société Médicale Balint [Internet]. [cité 1 déc 2020]. Disponible sur: https://www.balint-smb-france.org/groupe-balint.php
+
+
+50
+30. Airagnes G, Consoli SM, De Morlhon O, Galliot A-M, Lemogne C, Jaury P. Appropriate training based on Balint groups can improve the empathic abilities of medical students: a preliminary study. J Psychosom Res. mai 2014;76(5):426‐9.
+31. Lemogne C, Buffel du Vaure C, Hoertel N, Catu-Pinault A, Limosin F, Ghasarossian C, et al. Balint groups and narrative medicine compared to a control condition in promoting students’ empathy. BMC Med Educ. 9 nov 2020;20(1):412.
+32. Buffel du Vaure C. Déterminants de l’empathie clinique des médecins généralistes et de leur pratique. Paris Descartes; 2012.
+33. Charles JA, Ahnfeldt-Mollerup P, Søndergaard J, Kristensen T. Empathy Variation in General Practice: A Survey among General Practitioners in Denmark. Int J Environ Res Public Health. 02 2018;15(3).
+34. Williams J, Muldoon J, Lawrence A. Children and their pets: Exploring the relationships between pet ownership, pet attitudes, attachment to pets and empathy. Educ Health. 1 janv 2010;28.
+35. Perenc L, Pęczkowski R. Cognitive and affective empathy among adolescent siblings of children with a physical disability. Disabil Health J. janv 2018;11(1):43‐8.
+36. Jambon M, Madigan S, Plamondon A, Daniel E, Jenkins JM. The Development of Empathic Concern in Siblings: A Reciprocal Influence Model. Child Dev [Internet]. 20 févr 2018 [cité 21 déc 2018]; Disponible sur: http://doi.wiley.com/10.1111/cdev.13015
+37. DGT, Anact, INRS. Guide d’aide à la prévention : Le syndrome d’épuisement professionnel ou burnout [Internet]. 2015 [cité 1 déc 2020]. Disponible sur: https://travailemploi.gouv.fr/IMG/pdf/Exe_Burnout_21-05-2015_version_internet.pdf
+38. Sondage : le burnout des médecins français [Internet]. Medscape. [cité 12 nov 2020]. Disponible sur: //francais.medscape.com/diaporama/33000161
+39. Zenasni F, Boujut E, Woerner A, Sultan S. Burnout and empathy in primary care: three hypotheses. Br J Gen Pract. juill 2012;62(600):346‐7.
+40. Gallese V. The roots of empathy: the shared manifold hypothesis and the neural basis of intersubjectivity. Psychopathology. août 2003;36(4):171‐80.
+41. Thirioux B, Birault F, Jaafari N. Empathy Is a Protective Factor of Burnout in Physicians: New NeuroPhenomenological Hypotheses Regarding Empathy and Sympathy in Care Relationship. Front Psychol. 2016;7:763.
+42. Yuguero O, Forné C, Esquerda M, Pifarré J, Abadías MJ, Viñas J. Empathy and burnout of emergency professionals of a health region: A cross-sectional study. Medicine (Baltimore). sept 2017;96(37):e8030.
+43. Sturzu L, Lala A, Bisch M, Guitter M, Dobre D, Schwan R. Empathy and Burnout - A Cross-Sectional Study Among Mental Healthcare Providers in France. J Med Life. mars 2019;12(1):21‐9.
+44. La Rosp [Internet]. [cité 13 oct 2020]. Disponible sur: https://www.ameli.fr/medecin/exerciceliberal/remuneration/remuneration-objectifs/nouvelle-rosp
+
+
+51
+45. Rosp médecin traitant de l’adulte [Internet]. [cité 13 oct 2020]. Disponible sur: https://www.ameli.fr/medecin/exercice-liberal/remuneration/remuneration-objectifs/medecintraitant-adulte
+46. GUIDE METHODOLOGIQUE : Rémunération sur Objectifs de Santé Publique. 2019;28.
+47. Dion G, Tessier R. Validation de la traduction de l’Inventaire d’épuisement professionnel de Maslach et Jackson. / Validation of a French translation of the Maslach Burnout Inventory (MBI). Can J Behav Sci Can Sci Comport. 1 avr 1994;26:210‐27.
+48. Démographie des professionnels de santé - DREES [Internet]. [cité 1 déc 2020]. Disponible sur: https://drees.shinyapps.io/demographie-ps/
+49. Smith G. Does gender influence online survey participation?: A record-linkage analysis of university faculty online survey response behavior. :22.
+50. Gøtzsche P. Dépistage du cancer du sein par mammographie [Internet]. Minerva Website. [cité 15 avr 2021]. Disponible sur: http://www.minerva-ebm.be/FR/Analysis/294
+51. FERRY M. Pertinence médicale (qualité des soins) et pertinence pratique (faisabilité) de 18 des 29 indicateurs de la rémunération à la performance. :151.
+52. CHHO C. Les changements comportementaux induits par la Rémunération sur Objectifs de Santé Publique (ROSP) gé. :62.
+53. Soussain O. La Rémunération sur Objectifs de Santé Publique : ça marche ? Bilan de la ROSP de 2012 à 2016 à partir des données de la Sécurité Sociale concernant les médecins généralistes de Martinique. 5 févr 2018;96.
+54. Saint-Lary O. Paiement à la performance et soins primaires: étude des tensions éthiques liées à son introduction. :211.
+55. Hojat M, Vergare MJ, Maxwell K, Brainard G, Herrine SK, Isenberg GA, et al. The devil is in the third year: a longitudinal study of erosion of empathy in medical school. Acad Med J Assoc Am Med Coll. sept 2009;84(9):1182‐91.
+56. Neumann M, Edelhäuser F, Tauschel D, Fischer MR, Wirtz M, Woopen C, et al. Empathy decline and its reasons: a systematic review of studies with medical students and residents. Acad Med J Assoc Am Med Coll. août 2011;86(8):996‐1009.
+57. Hojat M, Axelrod D, Spandorfer J, Mangione S. Enhancing and sustaining empathy in medical students. Med Teach. déc 2013;35(12):996‐1001.
+58. Batt-Rawden SA, Chisolm MS, Anton B, Flickinger TE. Teaching Empathy to Medical Students: An Updated, Systematic Review. Acad Med. août 2013;88(8):1171‐7.
+59. Galam E, Vauloup Soupault C, Bunge L, Buffel du Vaure C, Boujut E, Jaury P. « Intern life »: a longitudinal study of burnout, empathy, and coping strategies used by French GPs in training. BJGP Open. 14 juin 2017;1(2):bjgpopen17X100773.
+
+
+52
+60. Webzine Santé Ordre des médecins #12; L’empathie au service de la relation médecin-patient [Internet]. [cité 15 avr 2021]. Disponible sur: https://www.conseil-national.medecin.fr
+61. Buffel du Vaure C, Lemogne C, Bunge L, Catu-Pinault A, Hoertel N, Ghasarossian C, et al. Promoting empathy among medical students: A two-site randomized controlled study. J Psychosom Res. déc 2017;103:102‐7.
+62. Airagnes G, du Vaure CB, Galam E, Bunge L, Hoertel N, Limosin F, et al. Personality traits are associated with cognitive empathy in medical students but not with its evolution and interventions to improve it. J Psychosom Res. 1 mai 2021;144:110410.
+63. Louie AK, Coverdale JH, Balon R, Beresin EV, Brenner AM, Guerrero APS, et al. Enhancing Empathy: a Role for Virtual Reality? Acad Psychiatry. 1 déc 2018;42(6):747‐52.
+64. Chen A, Hanna JJ, Manohar A, Tobia A. Teaching Empathy: the Implementation of a Video Game into a Psychiatry Clerkship Curriculum. Acad Psychiatry J Am Assoc Dir Psychiatr Resid Train Assoc Acad Psychiatry. juin 2018;42(3):362‐5.
+65. Sm K, Jd S. Rendre explicite l’organisation de l’entrevue. :7.
+66. Kurtz S, Silverman J, Benson J, Draper J. Marrying content and process in clinical method teaching: enhancing the Calgary-Cambridge guides. Acad Med J Assoc Am Med Coll. août 2003;78(8):802‐9.
+67. Richard C, Lussier M-T, Galarneau S, Jamoulle O. Compétence en communication professionnelle en santé. Pédagogie Médicale. nov 2010;11(4):255‐72.
+68. Samuelson J. It’s not just what you say and do, it’s how you say and do it that patients remember. :3.
+
+
+53
+RÉSUMÉ :
+L’empathie a prouvé être utile en médecine générale, de par l’amélioration du vécu de la consultation par le patient mais également par l’amélioration de certains résultats thérapeutiques.
+La ROSP (Rémunération sur Objectifs de Santé Publique), a été mise en place en 2011 pour valoriser les médecins ayant une bonne pratique clinique. Elle présente 29 indicateurs répartis en trois thèmes (suivi des maladies chroniques, prévention, optimisation et efficience des prescriptions). Les résultats à ces indicateurs sont censés être le reflet de la pratique clinique d’un médecin.
+Le but de cette étude était d’évaluer si les médecins plus empathiques ont une meilleure pratique clinique. L’empathie a été mesurée avec l’échelle JSPE et le critère de jugement principal était composite, formé par les différents items de la ROSP. Les objectifs secondaires étaient de chercher les déterminants de l’empathie et de chercher un lien entre l’empathie et le burn out (dans le cadre d’une collaboration avec un second projet de thèse sur le burn out et la pratique clinique).
+Les résultats de l’étude sont discordants mais retrouvent le fait que les médecins plus empathiques seraient plus actifs pour lutter ou prévenir contre les maladies à tendance stigmatisantes et seraient moins enclins au burn out. Les médecins plus jeunes, ayant des durées de consultation plus longues en moyenne et arrivant mieux à adapter leur communication avaient de meilleurs scores d’empathie.
+Ces résultats ainsi que ceux de la littérature existant sur le sujet incitent à travailler l’empathie par différentes méthodes (mise en situation, groupe Balint, atelier de communication...), en particulier chez les étudiants en médecine chez qui l’empathie a tendance à baisser durant les études.
+MOTS CLEFS :
+Empathie, pratique clinique, burn out, médecine générale

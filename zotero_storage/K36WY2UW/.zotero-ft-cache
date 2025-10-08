@@ -1,0 +1,125 @@
+Pour améliorer votre expérience, nous (et nos partenaires) stockons et/ou accédons à des informations sur votre terminal (cookie ou équivalent) avec votre accord pour tous nos sites et applications, sur vos terminaux connectés.
+
+Notre site Web peut utiliser ces cookies pour :
+
+ Mesurer l'audience de la publicité sur notre site, sans profilage
+ Afficher des publicités personnalisées basées sur votre navigation et votre profil
+ Personnaliser notre contenu éditorial en fonction de votre navigation
+ Vous permettre de partager du contenu sur les réseaux sociaux ou les plateformes présents sur notre site Internet
+
+Politique de confidentialité
+Gérer les préférences
+Accepter tout
+Skip to Article Content
+Skip to Article Information
+British Journal of HaematologyVolume 198, Issue 5 p. 807-811
+WIDER PERSPECTIVES
+Open Access
+Integrating artificial intelligence into haematology training and practice: Opportunities, threats and proposed solutions
+First published: 04 July 2022
+https://doi.org/10.1111/bjh.18343
+Citations: 2
+About
+Sections
+ 
+Summary
+
+There remains a limited emphasis on the use beyond the research domain of artificial intelligence (AI) in haematology and it does not feature significantly in postgraduate medical education and training. This perspective article considers recent developments in the field of AI research in haematology and anticipates the potential benefits and risks associated with its deeper integration into the specialty. Anxiety towards the greater use of AI in healthcare stems from legitimate concerns surrounding data protection, lack of transparency in clinical decision-making, and erosion of the doctor–patient relationship. The specialty of haematology has successfully embraced multiple disruptive innovations. We are at the cusp of a new era of closer integration of AI into routine haematology practice that will ultimately benefit patient care but to harness its benefits the next generation of haematologists will need access to bespoke learning opportunities with input from data scientists.
+
+Abbreviations
+AI
+artificial intelligence
+ALL
+acute lymphoblastic leukaemia
+EBM
+evidence-based medicine
+HbH
+haemoglobin H
+HSCT
+haematopoietic stem cell transplantation
+MM
+multiple myeloma
+
+Although artificial intelligence (AI) has found useful applications in our daily professional lives, such as in the predictive text used in e-mails and e-mail address prompts, it is still in its infancy in routine clinical practice and is almost completely absent from undergraduate medical curricula. A recent review on AI in undergraduate medical education highlights the limited adoption of AI in undergraduate medical education and calls for the design of a standardised competency framework.1 The authors acknowledge that their scoping review did not extend to postgraduate training or continuing medical education settings, both of which have potential as valuable learning environments for AI learning. Haematology as a specialty is ideally poised to benefit from AI applications given its reliance on data and image-driven diagnosis and the complexities of its treatment regimens. An excellent review article in this journal by Shouval et al.2 describes in detail the spectrum of AI and its potential deployment in haematology practice. In this perspective, we consider recent developments in AI research in haematology, we address concerns surrounding the wider adoption of AI in the clinical arena, and we propose solutions to the educational barriers that currently hinder its clinical application.
+
+The volume of publications in medical AI research has expanded greatly in recent years,3 particularly in specialties where image interpretation and pattern recognition by highly trained clinicians form the cornerstone of diagnosis. AI has the capacity to enhance the clinician's ability to make accurate and rapid diagnoses quickly based on a vast array of data, as well as to use data to make prognoses on patient outcomes. Haematological diagnosis combines the visual interpretation skills of the haematologist with a multitude of sophisticated immunological and genomic data acquisition tools. However, there remains a limited emphasis on the use of AI in haematology beyond the research environment. The most recent versions of the Royal Colleges curricula in haematology in the UK or Ireland, for example, do not mention AI in otherwise very comprehensive documents.4 Although examples of the successful implementation of novel AI-related modules in undergraduate curricula in North America have been described,5, 6 we are not aware of any longitudinal courses in medical AI that span the undergraduate–postgraduate interface in medical specialties, including haematology. We believe that trainees in haematology should have a working knowledge of AI in order to embrace it as a tool for optimising clinical care.
+
+The manual microscopic review of peripheral blood films remains the ‘gold standard’ for the diagnosis of several haematological conditions. It has been estimated that some 15% of blood samples require manual review.7 A recent study reported on the use of a novel AI-based decision support system that utilised a full-field approach for blood cell recognition and classification in both normal and abnormal peripheral blood films.8 Impressive degrees of correlation with conventional manual microscopy were achieved. Such systems will not replace morphologists but act as a labour-assistance device to alleviate busy workloads. The reduction in slide review time afforded by such AI machine-learning tools would allow haematologists to devote more time to abnormal slide examination. A deep-learning AI method was used to automatically count white blood cells in colour bone marrow microscopic images.9 The highest correct recognition rate that was achieved approached 98.8%. The authors reflected on the decreased inspection time needed with instant production of images, as well as the elimination of human factors such as fatigue that can lead to miscounting of cells. Promising convolutional neural network-based automated image analysis methods for the microscopic diagnosis of malaria from blood films have also been recently reported in the literature and this application could have significant advantages in resource poor malaria endemic regions of the world, where limited laboratory workforce capacity exists.10
+
+The application of AI-aided image analysis to the morphological detection of rare cells has obvious advantages in terms of reducing operator-dependent error and saving time on what is considered a laborious process. Researchers in Singapore developed a convolutional neural network-based algorithm for the detection of haemoglobin H (HbH) inclusions in the red blood cells of patients with suspected alpha-thalassaemia.11 The software was trained using digital images of HbH-positive and -negative blood films. A sensitivity of 91% and specificity of 99% to detect HbH-positive cells at various magnifications were achieved. Analysis of single-cell rheoscopy data using machine learning was used to diagnose efficiently and rapidly various hereditary haemolytic anaemias, including hereditary spherocytosis, using low whole blood sample volumes.12 An accuracy of 92% in identifying sample datasets was achieved by the best performing algorithms. Data from new samples can be continuously incorporated in the future in order to extend the efficacy of this AI method.
+
+Machine-learning algorithms have been applied with considerable success in predicting hospital re-admission, e.g., in high-risk patients with sickle cell disease.13 This has obvious benefits for the targeting of healthcare resources at individual discharged patients in an effort to prevent their re-admission. Machine learning has also been used for the automated phenotyping of megakaryocytes using non-neoplastic samples and those from patients with myeloproliferative neoplasms including essential thrombocythaemia, polycythaemia rubra vera, and myelofibrosis.14 The authors point to the potential for machine learning as a new tool for assessing patient samples and monitoring disease progression.
+
+There has been increasing attention in recent years given to the application of AI in the diagnosis of multiple myeloma (MM). Despite being one of the most common haematological malignancies worldwide, MM remains difficult to cure owing to high levels of relapse and chemoresistance. AI-based studies provide hope for the discovery of novel markers for the earlier diagnosis and improved selection of therapies in patients with MM. Researchers from China used various machine-learning algorithms to develop a diagnostic model of MM based on training and test datasets of routine laboratory data (haemoglobin, serum creatinine, serum calcium, immunoglobulin, albumin, total protein).15 The Gradient Boosting Decision Tree algorithm performed the best, with a precision of 92.9% and an impressive area under the receiver operating characteristic curve of 0.975 (95% confidence interval 0.963–0.986).
+
+Artificial intelligence also has the capacity to reveal information that is concealed in high-dimensional haematological data. The prognostic potential of immunophenotypical marker expression intensity using flow cytometry data to predict relapse of childhood acute lymphoblastic leukaemia (ALL) was assessed in one study.16 Researchers found a consistent association between a lower expression of the CD38 marker and ALL relapse. Carreras et al.17 also reported a high degree of accuracy in predicting the survival of patients with diffuse large B-cell lymphoma using artificial neural networks to analyse a pancancer immune profiling panel.
+
+Haematopoietic stem cell transplantation (HSCT) is widely used in the treatment of various haematological malignancies. Machine learning may be used to automate various HSCT steps, such as donor selection, identification of biomarkers for early diagnosis of complications, and modelling of graft-versus-host disease risk stratification. A novel disease-risk stratification tool incorporating disease features related to histology, genetics and treatment response was validated in a retrospective study of >47 000 adult patients who underwent allogeneic HSCT for various haematological malignancies.18 The potential benefits of this model in facilitating the analysis and interpretation of clinical trial results from heterogeneous cohorts are discussed.
+
+Anxiety towards the greater use of AI in healthcare is understandable and stems from legitimate concerns surrounding data protection, lack of transparency in clinical decision-making, and erosion of the time-honoured doctor–patient relationship. Fears may be expressed that embracing AI will lead to the replacement of physicians by machines which, no matter how technologically advanced, can never simulate the empathy conveyed by doctors in a longitudinal therapeutic relationship.19 Haematologists should be reassured that, far from being substituted by AI, they can benefit from having their diagnostic and prognostic skills augmented by this exciting technology, which will enable them to assign more mundane tasks to machines while focusing on more complex clinical problems and maximising their time with patients and trainees. The exponential volume of data arising from the use of high-throughput next-generation molecular genetic sequencing positions haematology well for the application of AI in diagnosis and personalised management, with the ultimate goal of improving treatment outcomes, diagnostic accuracy and speed, and reduction in technical errors.20 AI also has the potential to reduce the isolation of clinicians working in remote or poorly resourced settings, thus improving access to and global equity of healthcare. The challenge will be to harness this technology while preserving the primacy of the physician's role in decision-making and provision of clinical oversight.
+
+With the exponential expansion of medical knowledge, there is an increasing acceptance that medical education, rather than attempting to exhaustively convey information, should equip learners with the research and critical enquiry skills required to navigate complex medical data. Despite this, information and data science, big data analytics, and AI remain largely absent from most medical curricula.21 This domain of learning tends to reside in schools of engineering or computer science and opportunities for cross-pollination even within universities remain limited. A recent survey of 210 postgraduate trainee doctors in NHS hospitals in London found that, despite reservations about how AI might affect their clinical judgement or practical skills, the majority of doctors believed that AI would reduce their workload and improve their research and audit skills.22 Most (92%) of the trainees reported that AI training was insufficient in their current curricula and 81% were supportive of more AI-training opportunities. The need for formal AI training has been prioritised in government health policy and there is a recognition that future doctors should be proficient in data input, interpretation of algorithmic output, and communication of AI-based management plans to patients.23
+
+Grunhut et al.6 in their recent thoughtful review on the education of future physicians in AI reiterate the importance of exposing learners to the limitations and inherent biases of AI, as well as the ethical aspects of implementing AI for shared clinical decision-making. They challenge us to imagine how a clinician untrained in AI can navigate the ethical dilemmas surrounding the application of AI in clinical practice, such as when an AI algorithm predicts a high probability of mortality in an individual patient. Paranjape et al.5 stress the importance of interdisciplinary involvement in AI curricular design, with experts in data and implementation science working alongside medical educators and clinicians.
+
+We believe that national specialty directors in haematology and other medical subspecialties should work jointly with Royal Colleges and other national training boards in convening suitably qualified experts in AI and data science, as well as medical education experts, in an effort to co-design core modules in applied medical AI to bridge this educational gap. Table 1 outlines the broad elements of such an approach, which should be responsive to ongoing developments in AI technology and clinical application. Furthermore, we propose the creation of a British Society of Haematology special interest group and/or working group, which would be tasked with promoting research and educational innovation in the emerging domain of AI in haematology.
+
+TABLE 1. Core components of a spiral curriculum in medical artificial intelligence for haematology trainees
+Educational content	Learning and assessment	Comments
+Undergraduate phase
+Data entrya	Computer-based practical instruction	Interdisciplinary experiential learning of the fundamentals of AI and machine learning should be integrated, where possible, into existing undergraduate modules in medical informatics and EBM
+Data curationb	Computer-based practical instruction
+AI and machine-learning theory	Online video-based lectures
+Basic specialist training
+AI algorithms	Data scientist-led tutorials	The early postgraduate phase of medical training should provide a grounding in applied AI and an introduction to the use of AI algorithms as a core activity across medical specialties
+Clinical AI applications	Literature review
+Higher specialist training
+Communicating AI to patients	Simulation-based learning	The higher specialist training phase should focus on how to integrate AI into clinical decision-making and doctor–patient communication, as well as a consideration of its limitations
+Ethics of AI in clinical practice	Reflective assignments
+Limitations and potential harm	Peer-assisted reflective seminars
+Continuing medical education
+Research updates	Conference workshops	There should be sessions on applied AI-related research in haematology conferences and opportunities to engage in clinical audit of AI in specialists' practice
+Evaluation of clinical practice	Clinical audit activities
+Abbreviations: AI, artificial intelligence; EBM, evidence-based medicine.
+a Data entry is the process of accurately transcribing information into an electronic device such as a computer.
+b Data curation is the process of creating, organising and maintaining datasets to enable them to be accessed and used by others.
+
+From the early days of pioneers like William Hewson (1739–1774), the specialty of haematology has demonstrated flexibility in adapting to multiple advances in knowledge and technology. We are on the verge of a new era of closer integration of AI into routine clinical practice that will ultimately benefit our patients and development of the specialty. To facilitate this transition, AI and machine-learning theory should become core elements of undergraduate and postgraduate medical curricula and should involve close co-operation between clinicians and data scientists. Future research should survey the expectations and attitudes of haematologists towards AI and evaluate the educational benefits of pilot curricula.
+
+AUTHOR CONTRIBUTIONS
+
+Gerard Thomas Flaherty and Shang Yuin Chai were responsible for study conception, design, literature search and preparation of the first draft of the manuscript. Amjad Hayat was responsible for data interpretation and editing the draft for significant intellectual content. All authors read and approved the final version of the manuscript.
+
+ACKNOWLEDGEMENT
+
+Open access funding provided by IReL.
+
+CONFLICTS OF INTEREST
+
+The authors declare no conflicts of interest.
+
+Open Research
+REFERENCES
+Citing Literature
+Download PDF
+ Back
+Additional links
+ABOUT WILEY ONLINE LIBRARY
+Privacy Policy
+Terms of Use
+About Cookies
+Manage Cookies
+Accessibility
+Wiley Research DE&I Statement and Publishing Policies
+Developing World Access
+HELP & SUPPORT
+Contact Us
+Training and Support
+DMCA & Reporting Piracy
+OPPORTUNITIES
+Subscription Agents
+Advertisers & Corporate Partners
+CONNECT WITH WILEY
+The Wiley Network
+Wiley Press Room
+Copyright © 1999-2023 John Wiley & Sons, Inc. All rights reserved

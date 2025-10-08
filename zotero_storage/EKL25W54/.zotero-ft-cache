@@ -1,0 +1,508 @@
+Review Article
+1Dept. of Psychology, Lovely Professional University, Phagwara, Punjab, India.
+Exploring the Potential and Challenges of Digital and AI-Driven Psychotherapy for ADHD,OCD,Schizophrenia,and Substance Use Disorders: A Comprehensive Narrative Review
+HOW TO CITE THIS ARTICLE: Beg MJ and Verma MK. Exploring the Potential and Challenges of Digital and AI-Driven Psychotherapy for ADHD, OCD, Schizophrenia, and Substance Use Disorders: A Comprehensive Narrative Review. Indian J Psychol Med. 2024;XX:1–13.
+ACCESS THIS ARTICLE ONLINE Website: journals.sagepub.com/home/szj DOI: 10.1177/02537176241300569
+Submitted: 17 Jul. 2024 Accepted: 02 Nov. 2024 Published Online: xxxx
+Address for correspondence: Mirza Jahanzeb Beg, Dept. of Psychology, Lovely Professional University, Phagwara, Punjab 144411, India. E-mail: mirzajahanzebbeg@gmail.com
+Creative Commons Non Commercial CC BY-NC: This article is distributed under the terms of the Creative Commons Attribution- NonCommercial 4.0 License (http://www.creativecommons.org/licenses/by-nc/4.0/) which permits non-Commercial use, reproduction and distribution of the work without further permission provided the original work is attributed as specified on the Sage and Open Access pages (https://us.sagepub. com/en-us/nam/open-access-at-sage).
+Copyright © The Author(s) 2024
+Mirza Jahanzeb Beg 1 and Manish Kumar Verma1
+patient well-being and addressing ethical complexities, is essential for optimizing treatment outcomes.
+Keywords: Artificial intelligence, e-Health, m-Health, psychotherapy, ADHD, OCD, schizophrenia, substance abuse
+D
+igital health integrates emerging technologies to transform mental healthcare through e-Mental health platforms, m-Health applications, and artificial intelligence (AI)-based tools, improving self-management, patient care, and treatment. e-Health leverages digital technologies like online health information, telemedicine, and electronic health records to enhance healthcare delivery. m-Health, a subset of e-Health, focuses on mobile interventions via smartphones and wearable devices for health services and self-management.1,2 In contrast, AI-based interventions employ machine learning and natural language processing for
+ABSTRACT
+Purpose of the Review: Psychotherapy remains a fundamental component of mental health treatment, yet it encounters significant barriers to accessibility and efficacy. The integration of digital therapies, encompassing e-Health, m-Health, and artificial intelligence (AI) offers the transformative potential to enhance therapeutic processes through automated systems that improve access and personalize treatment. This integration, however, involves complex considerations, including health-related quality of life (HRQoL) and the dynamics of the therapeutic alliance. This narrative review synthesizes current literature on the application of digital therapies in psychotherapy, with a focus on attention-deficit/hyperactivity disorder (ADHD), obsessive-compulsive disorder (OCD), schizophrenia, and substance use disorders (SUDs). The review evaluates the effectiveness of these interventions, their impact on HRQoL, therapeutic
+relationships, and the associated ethical considerations.
+Collection and Analysis of Data: Following Green’s checklist for narrative reviews, a systematic literature review was conducted on studies published from January 2009 to May 2024. Inclusion criteria centered on digital therapies, including AI-based, Internet-based, and mobile-based interventions in psychotherapy. A total of 23 studies were analyzed.
+Conclusions: The findings indicate that digital therapies hold substantial promise for enhancing therapeutic interventions across various mental health disorders, particularly through chatbots and Internet-based psychotherapy. However, successful integration requires careful attention to the therapeutic alliance, HRQoL, and ethical implications. This review highlights the significant potential of digital therapies, including AI-driven psychotherapy, in managing diverse mental health disorders. A balanced approach to integration, prioritizing
+Indian Journal of Psychological Medicine | Volume XX | Issue X | XXXX-XXXX 2024 1
+
+
+Indian Journal of Psychological Medicine | Volume XX | Issue X | XXXX-XXXX 2024
+Indian Journal of Psychological Medicine | Volume XX | Issue X | XXXX-XXXX 2024
+2
+Beg and Verma
+personalized therapy, automated assessments, and improved decision-making through chatbots and virtual therapists. AI also offers innovative diagnostic tools and enhances psychotherapy for disorders like anxiety and depression, akin to e-Health and m-Health interventions, by providing personalized support. Despite their potential, these technologies face challenges in effectiveness, clinical relevance, accessibility, privacy, security, personalized care, and integration with traditional healthcare, necessitating robust, large-scale studies.3,4,5 Outcome measures for digital interventions are crucial in evaluating their impact on mental health. These include user engagement, which indicates satisfaction and adherence; symptom reduction, which captures the alleviation of psychological symptoms; and effectiveness, which evaluates the overall therapeutic success, enhancement of quality of life, and sustained benefits.6,7 The current review extends our previous study on AI in psychotherapy for anxiety and depressive disorders. Despite promising developments, there remains a significant knowledge gap in understanding the effectiveness of digital interventions within the context of attention deficit/hyperactivity disorder (ADHD), obsessive compulsive disorder (OCD), schizophrenia, and substance use disorders (SUDs). Building on these insights, this article aims to fill the identified gap by examining digital interventions for ADHD, OCD, schizophrenia, and SUDs, with a particular focus on their impact on health-related quality of life (HRQoL) and the strength of the therapeutic alliance (TA) (Table 1).
+Methodology
+We conducted an extensive literature review between December 2023 and May 2024, covering different forms of digital therapies (including AI-based,
+Internet-based, and mobile-based interventions) for treating mental health disorders. The search was performed across several online databases, including Scopus, PsycINFO, PubMed, and Google Scholar. The search strategy included terms such as “artificial intelligence,” “machine learning,” “deep learning,” “mental health,” “psychotherapy,” “digital health interventions,” and “Internet-based cognitive behavioral therapy (CBT),” combined with specific disorders like “ADHD,” “OCD,” “schizophrenia,” and “Substance Use Disorders.” Additional search terms like “chatbot,” “conversational agent,” “m-Health,” “mobile health,” “online therapy,” and “digital therapeutics” were incorporated to capture various forms of digital interventions. Boolean operators (AND, OR, NOT) were used to refine the search and link relevant concepts, ensuring comprehensive coverage of AI-based, m-Health, Internet-based cognitive behavioral therapy (iCBT), and digital therapeutic interventions in mental health. We restricted our search to English papers published between January 2009 and May 2024. The search entailed employing diverse terms in numerous permutations and combinations, with the aim of capturing studies relevant to both AI-based interventions and other forms of digital psychotherapy. In order to assist the selection of relevant papers for our thorough review study, we have defined the following inclusion and exclusion criteria: Inclusion: (a) Articles discussing AI-based, Internet-based, or mobile-based interventions in psychotherapy; (b) studies examining the efficacy, acceptance, or application of these digital interventions in treating mental health disorders; (c) focus on ADHD/OCD/Schizophrenia/ SUDs; (d) use of randomized trials or observational studies or review studies. Exclusion: (a) Articles discussing digital interventions outside psychotherapy;
+(b) nonempirical discussions on digital interventions in psychotherapy; (c) general mental health topics; (d) nonempirical designs like opinions or editorials; and (e) focus on depressive/anxiety disorders. The study adhered to Green’s checklist for narrative reviews.8 The first author independently searched the literature using set terms and criteria, consulting a second author for discrepancies. Publications were selected based on titles and abstracts, and full texts were further assessed. Additional articles were found through references. Data extraction focused on capturing key outcome measures–user engagement, symptom reduction, and overall effectiveness. The study synthesized themes, patterns, trends, gaps, and issues regarding digital therapies, with particular attention to the evolving role of AI in psychotherapy, providing a foundation for future research (Multimedia Appendix).
+AI Applications for Enhancing Health Outcomes and Quality of Life
+HRQoL reflects an individual’s physical and mental well-being in the context of their health conditions. It captures the impact of illness on daily life and serves as a valuable tool for understanding how a disease affects a person’s life.9,10 Chronic illnesses significantly reduce HRQoL, highlighting the need for effective management strategies. Digital technologies offer promising interventions to address this challenge. Mobile health tools like chatbots (e.g., Wysa) can help individuals manage mild mental health concerns and enhance their HRQoL.11 This link between mental health and HRQoL is well-established across both adult and pediatric populations.12 Mental health disorders significantly impact HRQoL by disrupting daily functioning, social interactions, and goal achievement. They can also exacerbate physical health problems, creating a downward spiral. For example, ADHD, OCD, SUD, and schizophrenia all contribute to diminished HRQoL across various domains.13,14,15,16 Artificial intelligence (AI) has the potential to improve HRQoL further. AI advancements are revolutionizing mental healthcare through enhanced diagnosis, treatment selection, and patient monitoring. Machine
+TABLE 1.
+AI-Driven Psychotherapy: Key Research Questions.
+What are the specific AI, digital, e-Health, and m-Health interventions used in psychotherapy for ADHD, OCD, Schizophrenia, and Substance Use Disorders?
+How effective are AI, digital, e-Health, and m-Health interventions in improving health-related quality of life (HRQoL) and therapeutic relationships in the context of these disorders?
+What are the primary challenges and ethical considerations in utilizing AI, digital, e-Health, and m-Health interventions for psychotherapy in these specific mental health disorders?
+
+
+Indian Journal of Psychological Medicine | Volume XX | Issue X | XXXX-XXXX 2024 3
+Review Article
+learning offers valuable insights into human behavior patterns and disease progression. However, quantifying the impact of these technologies on HRQoL remains challenging. This necessitates integrating human-centric outcomes in studies evaluating digital interventions.17
+Digital Therapeutic Alliance in AI-Based Psychotherapy
+The TA, the bond between a mental health professional and a patient, is integral to the success of psychological treatments.18 It enhances the engagement and effectiveness of therapy. Research indicates a consistent, moderate correlation between TA and treatment outcomes across various mental health issues and therapeutic approaches for all age groups.19 Digital therapeutic alliance (DTA) refers to a broad range of digital mental health treatments and interventions, including computer-facilitated teletherapy, web and mobile applications, and AI-powered therapeutic methods.20 Human-computer interaction (HCI) theories suggest the potential for DTA, highlighting how applications can promote empathy,21 task completion and goal achievement,22 therapy accessibility,23 user-app attachment,24 and self-determination.25 However, some digital interventions may yield benefits without a DTA, potentially through promoting self-management and help-seeking behaviors.13 Review by Henson et al.26 Highlights the understudied role of DTA in evaluating mobile mental health tools. App design and functionality are crucial for building DTA, suggesting the need to consider user goals when designing interventions.While smartphones can improve engagement, the impact of clinician interaction on DTA remains unclear. Notably, limited research exists on DTA for solely smartphone-delivered interventions, and simply translating therapy manuals to mobile formats has not yielded optimal results. Investigating DTA could be key to enhancing the effectiveness of digital mental health interventions.
+AI and Digital Interventions for Enhancing ADHD Outcomes
+Jang et al.27 A pilot study was conducted on 46 adults with attention deficit
+symptoms to test the efficacy of Todaki, a chatbot for CBT and psychoeducation. The chatbot group showed significant symptom reduction, correlating with the frequency of psychoeducation program use. Detailed results and statistical tests, including p values, were reported but lacked power calculation and confidence intervals. Participants valued the chatbot’s empathy but found its conversation flow unnatural. The study concluded the chatbot’s potential for symptom improvement and recommended largescale trials for further verification. A comprehensive analysis by Shou et al.28 Six randomized controlled trials involving 261 ADHD patients, including both children and adults, utilized data from PubMed, EMBASE, and Cochrane libraries. The study employed the Cochrane bias risk tool and standardized mean difference (SMD) as effect indicators. Results indicated that online interventions significantly improved attention deficit and social function compared to a waiting list control group, with combined SMDs of −0.73 and −0.59, respectively. Despite the small sample size and potential heterogeneity, the study highlighted the need for further research to assess the efficacy and costeffectiveness of online ADHD treatments. In another study, Selaskowski et al.29 Compared chatbot-based psychoeducation (CBP) and app-based psychoeducation (ABP)with 34 adults with ADHD.Both CBP and ABP were found to be equally effective in reducing symptoms. The study faced limitations such as short duration, technical issues, and lack of control groups. However, randomization was applied, equal care was provided, and no significant dropout or harms were reported. Detailed reporting of intervention effects, power calculations, and outcomes was provided. Terabot, an interface designed to facilitate online discussions among adults with ADHD, was introduced through a study utilizing Wizard of Oz trials, design workshops, prototyping, and iterative testing. Nordberg indicated Terabot’s potential to guide group discussions and aid mental health interventions.30 The study called for further development and high-fidelity testing for validation, acknowledging prototype limitations such as low fidelity and potential real-world errors. It advocated more research on chatbot design, particularly in prototyping scripts and mental health support experiences.
+An AI system designed to help students with ADHD identify behavioral patterns was developed at Malmö University. Utilizing a Double Diamond design framework and co-design methods, Ravishankar aimed to foster understanding and personal reflection about the disorder.31 The prototype showed promise, but the study’s scope was limited. Due to time constraints, the “Design after Design” phase was not fully explored, indicating potential for future work.
+Effectiveness of Internetbased CBT for OCD
+A 12-week single-blind randomized controlled trial by Lenhard assessed the feasibility and efficacy of iCBT for adolescents with OCD, involving 67 participants aged 12–17.32 The study found that iCBT significantly reduced OCD symptoms and demonstrated cost savings of–$144.98 per patient. Despite potential sample bias, possible recall bias, measurement error in cost data, and short duration, the study concluded that iCBT is a viable treatment for adolescent OCD and advocated for further research to assess long-term cost-effectiveness. In a comparison of iCBT and Internet-based progressive relaxation training (iPRT) for OCD, Kyrios et al.33 Conducted a randomized controlled trial with 179 Australian residents aged 18 or older. The study found no significant differences in demographic or mental health between the two groups. Despite 54% of treatment completers no longer meeting OCD diagnostic criteria, the iCBT group showed significant improvement in OCD severity. However, limitations included challenges in engaging participants for post-treatment assessments and deviations from the original protocol. Andersson et al.34 Studied the effectiveness of iCBT for obsessive-compulsive disorder (OCD) in a 15-week program involving 23 participants. The program included psychoeducation, cognitive restructuring, and exposure to response prevention. Results showed significant improvement in primary and secondary outcomes, including OCD symptoms, depression, general functioning, anxiety, and quality of life. However, the study’s limitations, including a small sample size and self-reported measures, warrant cautious interpretation.
+
+
+Indian Journal of Psychological Medicine | Volume XX | Issue X | XXXX-XXXX 2024
+4
+Beg and Verma
+A randomized controlled trial by Andersson et al.35 In 2012, a 10-week iCBT program with online supportive therapy for OCD in a Swedish adult population. Both groups showed significant improvements on the Yale-Brown Obsessive-Compulsive Scale (Y-BOCS), with larger improvements in the iCBT group (Cohen’s d of 1.12 at post-treatment). Despite lacking a placebo control group and potential generalizability issues due to its Swedish context, the study suggests iCBT’s effectiveness for OCD. In a 2014 study by Andersson et al.36 Examined the long-term efficacy of iCBT for OCD, involving 101 participants, with 93 randomized to receive either a booster program or not. The study showed sustained long-term effects from pre-treatment to all follow-up assessments and significant symptom reduction in the booster group at seven months. Despite limitations such as a lack of simultaneous procedures and potential biases due to participant withdrawals, the study concluded that iCBT and an Internet-based booster program can enhance outcomes and prevent relapse in some OCD patients.
+m-Health and AI Interventions for Schizophrenia
+Gire et al. (2017) reviewed m-Health interventions for psychosis, focusing on their feasibility and effectiveness. The study included seven randomized controlled trials with 1,105 participants in Europe, the USA, and China. The interventions used mobile devices for medication adherence, cognitive training, and symptom monitoring. Results showed significant improvements in medication adherence and cognitive functioning. However, the study was limited by the small number of included studies and relatively small sample sizes, highlighting the need for larger, well-designed trials to evaluate further the potential benefits of m-Health technologies for psychosis treatment.2 Over a 12-week randomized controlled trial, Schlosser et al.37 Evaluated the efficacy of the PRIME mobile app in enhancing motivation among young individuals with recent-onset schizophrenia spectrum disorders (SSDs). With
+43 participants aged 16–36, divided into PRIME and treatment-as-usual/waitlist (TAU/WL) control groups, the study revealed significant improvements in depression, defeatist beliefs, self-efficacy, and social motivation within the PRIME group, which persisted posttrial. However, limitations included a small sample size, a short follow-up period, and the lack of comparisons with other interventions due to the TAU/WL control condition. Evaluating the TechCare App for individuals with psychosis in the North West of England, Gire et al.38 Found it to be both acceptable and feasible. This study involved 16 participants aged 18–65 from early intervention services (EIS) who utilized the app for real-time, personalized, guided self-help interventions based on CBT. Results indicated that 83.33% completed the six-week study, with 70% achieving compliance thresholds. Although participants found the app acceptable and feasible, the small sample size and location in one EIS may limit the generalizability of the results. A systematic review by Yang et al.39 The review covered 70 studies on AI in schizophrenia rehabilitation, revealing that AI enhances rehabilitation through real-time data analysis despite challenges like algorithmic transparency and data security. It highlighted the need for high-quality data, user-centered design, and more qualitative studies for a comprehensive evaluation of AI’s impact. The authors adhered to PRISMA guidelines for study quality assessment, focusing on AI applications, technologies, and data types in rehabilitation management. However, they did not provide numerical results or confidence intervals. Nwoye et al.40 Developed an AI-based chatbot, SchizoBot, to provide CBT to schizophrenia patients. By training an artificial neural network (ANN) on a dataset that includes CBT details and frequently asked questions (FAQs) of schizophrenia patients, the model achieved a 93.97% accuracy score. SchizoBot is envisioned as a cost-effective and accessible tool to improve patient health and assist clinicians. However, the study’s limitations include the need for real-time validation and user satisfaction assessment, suggesting further research with larger datasets and clinical consultations.
+Digital and ChatbotAssisted Interventions for Substance Use Disorders
+In 2021, Prochaska et al.41 assessed the effectiveness of Woebot-substance use disorders (W-SUDs) in reducing substance misuse during the coronavirus disease 2019 (COVID-19) pandemic. The study involved 180 US adults screened for substance misuse, and results indicated significant reductions in substance use occasions and improved mental health outcomes. Despite a small sample size, self-reported data, and high attrition, the study suggests that W-SUDs can help alleviate the population-level burden of SUDs Elmasri and Maeder investigated chatbots for assessing alcohol habits in mental health interventions for young adults aged 18–25 in Australia.42 A chatbot was developed to assess drinking habits and health risk levels and was positively received in a cohort study of 17 participants. The study suggested enhanced user satisfaction with chatbots of varying behavior and sophistication. Limitations included a small sample size and the absence of a control group. In 2021, Prochaska et al.43 Evaluated the efficacy of W-SUD in treating probable SUDs in a predominantly non-Hispanic white female cohort aged 18–65.The eightweek intervention used the W-SUDs app to deliver CBT. Post-intervention, 76% of participants positively rated W-SUDs, with 43% feeling their needs were met. The single-arm design and short duration limit causal inference and long-term effects, suggesting a need for further randomized controlled trials to confirm W-SUDs’ clinical utility and effectiveness. Robo, a chatbot designed to provide instant answers to opioid-addicted patients on social media, was introduced by Moghadasi et al.44 That utilized deep learning techniques to retrieve answers from a Reddit-sourced dataset of questions and answers, employing single-turn response matching and query semantic understanding (QSU) components. The study featured three real use cases where Robo effectively responded to patient inquiries. However, limitations included reliance on a single data source and the chatbot’s inability to provide medical advice.
+
+
+Indian Journal of Psychological Medicine | Volume XX | Issue X | XXXX-XXXX 2024 5
+Review Article
+The effectiveness and usability of connected health interventions for SUD in adults were evaluated in a systematic review by Carreiro et al.45 In 2020, 32 studies were analyzed, with a focus on interventions using mobile phones or wearable devices to collect data and trigger real-time responses. The most common SUD studied was alcohol use disorder, with interventions often involving craving management and tailored feedback. Results showed positive effects on SUD outcomes and high acceptability, but limitations included small sample sizes, potential publication bias, and a focus on younger populations. In a 2023 randomized controlled trial, Chun-Hung et al.46 Investigated chatbot-assisted therapy (CAT) for methamphetamine use disorder. The study reported minor improvements in treatment retention and fewer MA-positive urine samples in the experimental group but no significant clinical difference. Despite CAT’s potential benefits, the study emphasized the need for more research. Limitations included masked therapeutic effects, a predominantly male and employed sample, selection bias, exclusion of individuals with acute mental illness, and resource-constrained assessment. The study concluded that CAT’s benefits outweighed its harms but lacked a cost-effectiveness analysis. Echo-APP, a virtual digital psychotherapist app for patients with methamphetamine use disorder, was developed and evaluated by Chen et al.47 In a 2023 study. The app aimed to improve treatment motivation and reduce psychological cravings through a tablet-based interface. The study involved 47 patients from the Shanghai Drug Rehabilitation Center. Results showed significant improvements in treatment motivation and reduced cravings. However, limitations include reliance on scale-based assessments, lack of a control group, and the focus on a specific substance use disorder. A systematic review by Ogilvie et al.48 examined six studies on chatbots as supportive agents for SUD patients, indicating potential for substance use reduction. Despite promising results, the need for more research was highlighted due to limitations like small sample sizes, reliance on user scenarios, a lack of longitudinal
+studies, and the necessity for expert input for ethical data use. The review’s generalizability is limited, and the balance of benefits against harms and costs was not addressed.
+Discussion
+This narrative review underscores the promising role of AI and digital therapies in reducing symptoms and improving patient outcomes, introducing innovative strategies for psychological disorder management. Through a comprehensive review of 23 studies, the impact of digital interventions on psychotherapy for ADHD, OCD, schizophrenia, and SUDs is examined, focusing on outcomes, such as user engagement, symptom reduction, and overall effectiveness. Digital and AI-based interventions for ADHD, explored across five studies, demonstrate significant potential for symptom reduction. In one study, Jang et al. found that the AI chatbot Todaki reduced attention deficit symptoms, though issues with conversation flow affected user engagement. Another study by Shou et al. noted that online interventions improved both attention deficit and social functioning. Selaskowski et al. compared app-based psychoeducation with AI chatbots, suggesting limited added benefits of AI. Additional systems like Terabot and Malmö University’s prototype have shown promise for group discussions and promoting understanding but face early-stage limitations. AI therapies offer personalized interaction and facilitate deeper self-reflection, although natural conversation flow and user engagement remain areas for improvement. While symptom reduction has been observed, enhancing user engagement with AI systems warrants further research. In studies on OCD, the effectiveness of digital interventions emerges prominently. Lenharde and Kyrios et al. demonstrated significant symptom reduction with iCBT despite challenges related to biases and short study durations. A series of studies by Andersson et al. reported consistent improvements with iCBT, though they emphasized the need for randomized trials and long-term studies. Although iCBT’s efficacy for OCD is well-documented, research on AI-based treatments remains limited. This gap
+calls for future studies on AI-driven interventions, which could provide adaptive, personalized treatments and real-time engagement monitoring. Without empirical AI-based studies, direct comparisons are lacking, leaving questions about the efficacy and scalability of AI technologies for OCD treatment unresolved. A review of digital interventions for schizophrenia across five studies reveals advancements in feasibility and patient outcomes, though focused research on AI-specific interventions remains limited. For instance, Gire et al. reported improvements in medication adherence and cognitive functioning with m-Health interventions, albeit with small sample limitations. Another study by Schlosser et al. highlighted the PRIME app’s potential for enhancing motivation and mental health, though short follow-ups and small samples constrained broader applicability. The TechCare App demonstrated high user engagement in a study by Gire et al., though a localized sample limited results. Some AI-based interventions, such as SchizoBot and those reviewed by Yang et al., have shown promise for symptom reduction and scalability but face challenges in algorithmic transparency and validation. While AI enhances personalization and real-time feedback, m-Health apps continue to play a crucial role in medication management and cognitive support. Digital and AI-based interventions for SUDs present the potential to support treatment and recovery across eight studies. Prochaska et al. observed that W-SUDs reduced substance use and improved mental health, though small samples and single-arm designs constrained results. Moghadasi et al. reported effectiveness with Robo, a chatbot for opioid inquiries, though clinical validation and dataset scope were limited. Studies by Elmasri & Maeder and ChunHung et al. found chatbots beneficial for alcohol and methamphetamine use but noted biases and small sample sizes. Carreiro et al. reviewed mobile and wearable interventions, which yielded positive outcomes. Chen et al. introduced Echo-APP, a virtual psychotherapist that reduced methamphetamine cravings, although without a control group. AI-based therapies enhance user engagement with real-time responses and
+
+
+Indian Journal of Psychological Medicine | Volume XX | Issue X | XXXX-XXXX 2024
+6
+Beg and Verma
+personalized feedback, though they still face validation and ethical challenges. Both AI and digital interventions prove effective for substance use reduction, though further studies are needed to evaluate long-term treatment outcomes. The challenge of measuring AI’s impact on intangible outcomes like HRQoL and DTA necessitates more nuanced and extensive research. Future studies should prioritize human-centric outcomes and focus on application design to enhance therapeutic relationships and user engagement. Understanding clinician interaction and the potential for improved outcomes through DTA is crucial. The effectiveness of digital tools depends on their design and functionality. The limited literature on DTA, especially for smartphone-based selfguided treatments, highlights the need for comprehensive research to maximize AI’s potential in mental health interventions. Our review offers valuable insight into the effectiveness of digital and AI-based interventions in reducing symptoms in psychotherapy. However, it is crucial to acknowledge its limitations. Our search parameters, restricted to English-language publications and specific databases, may have excluded relevant studies in other languages or time periods. Additionally, while we focused on digital interventions, including AI-based, e-Health, and m-Health therapies, diverse research methodologies prevented us from comprehensively assessing the overall quality of the studies.
+Several avenues for future research warrant exploration. Despite progress in digital health, the absence of AI interventions in long-term addiction recovery and severe mental health disorders (such as OCD) highlights a significant research gap. Understanding transference and countertransference dynamics in AI-based psychotherapy is crucial. Studies point to users forming relationships with AI bots mimicking human interactions.49 Investigating the impact of anthropomorphism, consistent responses, personalization, long-term interactions, emotional needs projection, and attachment dynamics on therapeutic outcomes can provide valuable insights. For instance, how do users anthropomorphize AI, and what emotional patterns emerge during therapy? Additionally, studying how AI’s consistent responses affect transference patterns can reveal user expectations and their impact on therapy. Long-term studies are essential to evaluate how continuous interactions and AI memory build rapport and trust, understand user emotional projections, and guide the development of effective, ethical AI mental health systems.
+Conclusion
+The review of 23 research studies, including ADHD, OCD, schizophrenia, and SUDs, highlights the promising role of AI and digital therapies for symptom reduction and improved patient outcomes. Nevertheless, it also emphasizes the need for extensive and varied studies, ongoing verification and improvement of technologies, and tackling obstacles such as data
+accuracy, algorithm clarity, and user-focused design. The review also emphasizes the need for more sophisticated and comprehensive research to assess the influence of AI on intangible outcomes such as HRQoL and the digital therapeutic relationship. In addition, studying how users interact with AI programs, including the dynamics of transference and countertransference, will enhance future research. The study emphasizes the need for ongoing research to address methodological limitations, ensure efficacy, enhance feasibility, and fully exploit the potential of AI in mental health treatment.
+Declaration of Conflicting Interests
+The authors declared no conflicts of interest regarding the research, authorship and/or publication of this article.
+Declaration Regarding the Use of Generative AI None Used.
+Ethical Approval
+Ethical permission was not applicable for this article, as this is a review article drafted from various research articles and not from patients directly.
+Funding
+The authors received no financial support for the research, authorship and/or publication of this article.
+ORCID iDs
+Mirza Jahanzeb Beg https://orcid.org/00000002-6308-2678 Manish Kumar Verma https://orcid.org/00000002-4814-6987
+
+
+MULTIMEDIA APPENDIX.
+Selected characteristics of the included studies examining the effects of cCBT for ADHD, OCD, Schizophrenia and substance use disorders in
+adolescents and young adults.
+Study Focus
+Recruit/
+Primary
+Outcome
+M age
+(SD)
+Age
+range % Fem.
+Diag./
+elev. Intervention Control
+Ni rand.
+(analyzed)
+Nc rand.
+(analyzed) Guided Country Findings and Limitations
+Andersson
+2011
+OCD Clin. + Comm./
+Y-BOCS
+39 21–67 65 Diag. iCBT N.a. 24 (23) N.a. Yes Sweden Found significant reductions in OCD symptoms,
+depressive symptoms, and improvements in general
+functioning, with 61% of participants showing clinically
+significant improvement. However, limitations include
+the small sample size, lack of a control group, exclusion
+of patients with extreme OCD, and the potential bias
+due to the single therapist involved.
+Andersson
+2012
+OCD Clin. + Comm./
+Y-BOCS
+34 (13) 18–67 66 Diag. iCBT Attention
+control
+50 (48) 51 (51) Yes Sweden Found iCBT to be an effective treatment for OCD,
+showing significant improvements in OCD symptoms
+compared to the control group. Limitations included
+the self-selected nature of participants, the exclusion
+of severe OCD cases, and the difference in therapist
+contact time between the ICBT and control groups.
+Andersson
+2014
+OCD Clin. + Comm./
+Y-BOCS
+36.39
+(11.18)
+18–67 67 Diag. iCBT Supportive
+therapy
+47 (43) 46 (44) Yes Sweden Found iCBT for OCD, with or without a booster
+program, led to sustained long-term effects and
+reduced symptoms, particularly in the booster group.
+However, limitations include lack of simultaneous
+procedures for the two cohorts and potential biases
+due to participant withdrawals.
+Carreiro
+2020a
+SUD N.a. N.a. N.a. N.a. N.a. m-Health
+interventions
+N.a. N.a. N.a. N.a. USA Found that most interventions, especially for
+alcohol use disorder, effectively reduced cravings
+and substance use, with high user acceptability.
+Common methods included craving management,
+coping assistance, and tailored feedback, often
+via smartphones using ecological momentary
+assessment. Limitations included small sample sizes,
+potential positive publication bias, and exclusion of
+non-English articles, possibly overlooking cultural
+differences. The study also highlighted the reliance on
+self-reported data and the need for more research on
+wearable sensors and predictive analytics.
+Chen 2023 SUD Clin./
+SOCRATES
+38.85
+(8.08)
+N.a. N.a. Diag. Chatbot
+Echo-APP
+N.a. 47 (47) N.a. Yes China Found that a single session significantly enhanced
+patients’ treatment motivation and reduced
+psychological cravings. Limitations included
+reliance on self-reported scales, a single-arm
+design without a control group, and a focus solely
+on methamphetamine users, which limits the
+generalizability of the results.
+(Appendix continued)
+
+
+Study Focus
+Recruit/
+Primary
+Outcome
+M age
+(SD)
+Age
+range % Fem.
+Diag./
+elev. Intervention Control
+Ni rand.
+(analyzed)
+Nc rand.
+(analyzed) Guided Country Findings and Limitations
+Chun-Hung
+2023
+SUD Clin./Urine
+drug tests
+37.00
+(10.40)
+20–69 18.2 Diag. MBRP (CAT) TAU 50 (50) 49 (49) Yes Taiwan Found that participants receiving the treatment
+exhibited greater adherence, experienced
+favorable treatment outcomes, and reported high
+satisfaction. The chatbot provided accessible,
+personalized, and stigma-free support, leading to
+fewer methamphetamine-positive urine samples
+compared to the control group. Limitations included a
+predominantly male sample, potential selection bias,
+and a short follow-up period of 6 months.
+Elmasri &
+Maeder
+2016
+SUD Comm./
+AUDIT-C
+N.a. 18–25 41.17 N.a. Chatbot N.a. 17 N.a. N.a. Australia Found that a simple chatbot for assessing alcohol
+drinking habits and providing education was well
+received by young adults aged 18-25, showing high
+user satisfaction and usability. However, limitations
+included a small sample size of 17 participants, lack of
+a control group, and the need for more sophisticated
+AI to handle diverse user inputs and improve the
+chatbot’s conversational abilities.
+Gire 2017a SCZ N.a. N.a. N.a. N.a. N.a. m-Health N.a. N.a. N.a. N.a. N.a. Found that mobile technologies can improve
+medication adherence, cognitive functioning, and
+social support. However, the limited number of
+studies (7) and small sample sizes restrict definitive
+conclusions. The interventions were generally
+feasible and acceptable, but more extensive
+research is needed to confirm their effectiveness and
+applicability, especially in low-resource settings.
+Gire 2021 SCZ Clin./
+Engagement
+with 33% of
+the available
+notifications
+24.83 18–65 33 Diag. m-Health
+TechCare
+N.a. 16 (14) N.a. Yes UK Found that the TechCare App was feasible and
+acceptable for delivering real-time psychological
+interventions for psychosis, with 83% of participants
+completing the study and 70% achieving compliance.
+Limitations included a small sample size, potential
+selection bias, and the study being conducted in only
+one early intervention service, limiting generalizability.
+Jang 2021 ADHD Clin./CAARS 26.7
+(8.97)
+19–60 57 Elev. Chatbot
+Todaki
+Information
+control
+23 (19) 23 (18) No Korea Explored a mobile app-based chatbot, Todaki, for
+alleviating attention deficit symptoms. In a pilot study
+with 46 participants, Todaki significantly reduced
+symptoms compared to controls. Users’ engagement
+with the psychoeducation program correlated with
+symptom improvement. Participants appreciated the
+chatbot’s empathic character but found conversation
+flow unnatural. Larger randomized controlled trials are
+warranted to confirm efficacy.
+Kyrios 2018 OCD Clin. + Comm./
+Y-BOCS
+33.4 (9.9) 18–59 65.7 Diag./
+Elev.
+iCBT iPRT 89 (52) 90 (63) Yes Australia Compared iCBT to Internet-based progressive
+relaxation training (iPRT) for OCD. While both
+interventions showed promise, iCBT led to significant
+improvement in OCD severity. Challenges included
+participant engagement for post-treatment
+assessments and deviations from the protocol.
+(Appendix continued)
+
+
+Study Focus
+Recruit/
+Primary
+Outcome
+M age
+(SD)
+Age
+range % Fem.
+Diag./
+elev. Intervention Control
+Ni rand.
+(analyzed)
+Nc rand.
+(analyzed) Guided Country Findings and Limitations
+Lenhard
+2017
+OCD Comm./ CY
+BOCS
+14.60
+(1.71)
+12–17 46 Diag. iCBT BiP OCD Waiting list 33 (33) 34 (28) Yes Sweden Evaluated iCBT for adolescent OCD in a single-blind
+randomized controlled trial over 12 weeks. iCBT
+significantly reduced symptoms compared to the
+waitlist group (27% treatment responders versus 0%)
+and demonstrated cost savings averaging −$144.98
+per patient. Limitations include a possibly biased
+sample and short duration, warranting further research
+for long-term efficacy and cost-effectiveness.
+Moghadasi
+2020b
+SUD N.a. N.a N.a N.a N.a Chatbot
+based
+Psychoedu.
+Robo
+N.a. N.a. N.a. N.a. USA Utilizing deep learning, Robo retrieves answers from
+a dataset sourced from Reddit forums, focusing on
+single-turn response matching and query semantic
+understanding. The dataset comprises 20,494 Q&A
+pairs, with limitations including single-source data
+and the inability to offer medical advice.
+Nordberg
+2019b
+ADHD – – – – – Chatbot
+Terabot
+– – – – Norway The findings indicated that guided group chats based
+on predefined scripts were perceived positively by
+both domain experts and participants, suggesting the
+feasibility of such a concept. However, the study’s
+limitations include the low-fidelity nature of the
+chatbot prototype and the small sample size, which
+may not fully represent the broader population.
+Nwoye
+2024b
+SCZ N.a. N.a. N.a. N.a. N.a. Chatbot
+SchizoBot
+N.a. N.a. N.a. N.a. Nigeria Demonstrated promising results with a high accuracy
+rate of 93.97% using a 60:40 train-test data split. The
+chatbot effectively provided CBT responses, showing
+potential as a low-cost, accessible tool to augment
+traditional therapy. However, limitations include
+the need for further validation with larger datasets
+and real-time user feedback to ensure the model’s
+robustness and generalizability.
+Ogilvie
+2022a
+SUD N.a. N.a. N.a. N.a. N.a. N.a. N.a. N.a. N.a. N.a. UK Found that while chatbots show promise in reducing
+substance use and providing accessible support, the
+current body of research is limited and of varying
+quality. Only six papers met the inclusion criteria,
+with mixed results on the efficacy and safety of
+chatbots. The study highlighted the need for more
+robust, expert-informed research to ensure chatbots
+can safely and effectively support individuals
+with SUD, emphasizing the importance of ethical
+considerations and the potential risks of using big
+data without proper oversight.
+Prochaska
+2021 (a)
+SUD Comm./ CAGE
+AID(SR)
+40.8
+(12.1)
+18–65 65.9 Diag. CAT Woebot Waiting list 88 (71) 92 (81) No USA Evaluated Woebot-SUDs (W-SUDs), a digital health
+solution, in reducing substance misuse during COVID-19.
+In an 8-week RCT, W-SUDs users showed significant
+reductions in substance use and improved mental health
+outcomes. Limitations included a small sample size and
+self-reported data, but findings suggest W-SUDs may
+mitigate barriers to traditional treatment.
+(Appendix continued)
+
+
+Study Focus
+Recruit/
+Primary
+Outcome
+M age
+(SD)
+Age
+range % Fem.
+Diag./
+elev. Intervention Control
+Ni rand.
+(analyzed)
+Nc rand.
+(analyzed) Guided Country Findings and Limitations
+Prochaska
+2021 (b)
+SUD Comm./ CAGE
+AID
+36.8
+(10.0)
+18–65 75.2 Diag. CAT Woebot N.a. 128 (101) N.a. No USA Assessed Woebot for substance use disorders’
+feasibility and acceptability in US adults with
+probable substance use disorder. Despite 76%
+positive ratings, only 43% felt their needs were
+entirely met. Significant variations in acceptance
+ratings and demographic differences were noted.
+Further randomized controlled trials are needed to
+establish its clinical utility.
+Ravishankar
+2019b
+ADHD – – – – – – – – – – Sweden Key findings include the identification of ADHD
+related challenges such as inattention, hyperactivity,
+and poor organizational skills, and the potential of
+interactive AI and personal informatics to provide
+valuable insights. However, limitations include
+the small sample size, the need for more extensive
+testing, and the challenge of maintaining user
+engagement over time.
+Schlosser
+2018
+SCZ Clin./ Trust
+Task
+24.32
+(2.6)
+16–36 65 Diag. m-Health
+PRIME
+TAU/
+waitlist
+22 (17) 21 (15) Yes USA Found that the PRIME mobile app significantly
+improved motivation, depression, and self-efficacy
+in young people with schizophrenia. Participants
+showed greater reward learning, anticipated pleasure,
+and effort expenditure. However, the study’s small
+sample size, short follow-up period, and use of a
+waitlist control limit the generalizability and long
+term impact of the findings. Further research is
+needed to confirm these results.
+Selaskowski
+2023
+ADHD Clin./IDA-R 29.6 (8.4) 19–65 52.9 Diag. Chatbot
+based
+Psychoedu.
+App-based
+Psychoedu.
+17 (17) 17 (17) – UK Found that both chatbot-based and conventional app
+based psychoeducation significantly reduced ADHD
+symptoms in adults, with no significant difference
+between the two methods. Both interventions were
+safe and feasible, but the chatbot faced technical
+issues. Limitations included a short intervention
+duration, minor differences in app usage time, technical
+errors in the chatbot, and a moderate sample size.
+Shou 2022a ADHD Clin. N.a. N.a. N.a. N.a. Online
+Interventions
+Waiting list N.a. N.a. N.a. China Found that online interventions for ADHD are
+effective in improving attention deficit and social
+function in both adults and children. Six randomized
+controlled trials with 261 participants showed
+significant improvements compared to a waiting
+list control group. The combined standardized
+mean difference (SMD) for attention deficit was
+−0.73 and for social function was -0.59, indicating
+moderate effectiveness. The study suggests online
+interventions as a viable treatment option for ADHD.
+(Appendix continued)
+
+
+Study Focus
+Recruit/
+Primary
+Outcome
+M age
+(SD)
+Age
+range % Fem.
+Diag./
+elev. Intervention Control
+Ni rand.
+(analyzed)
+Nc rand.
+(analyzed) Guided Country Findings and Limitations
+Yang 2024a SCZ N.a. N.a. N.a. N.a. N.a. N.a. N.a N.a. N.a. N.a. China The study systematically reviews the application
+of AI in schizophrenia rehabilitation, highlighting
+its potential in symptom monitoring, relapse risk
+prediction, and personalized interventions. AI
+technologies like machine learning, deep learning,
+and natural language processing are used to analyze
+behavioral, speech, and ecological momentary
+assessment data. However, the study identifies
+limitations such as insufficient data quality and
+quantity, challenges in optimizing user experience,
+and integration issues between AI and traditional
+rehabilitation methods.
+aSystematic review/Systematic review and meta-analysis.
+bStudies focusing on developing a chatbot.
+ADHD = Attention deficit hyperactivity disorder; AUDIT-C = alcohol use disorders identification test; CAGE-AID = cut down, annoyed, guilty, eye opener-adapted to include drugs; CAARS = Conner’s Adult ADHD Rating Scale; CAT = Chatbot-assisted
+therapy; cCBT = computer-based cognitive behavioral therapy; Clin. = clinical; Comm. = community; CY-BOCS = Children’sYale-Brown Obsessive-Compulsive Scale; Diag./Elev. = diagnosis or elevated symptoms required; Educ. progr. = educational
+program; Fem. = female; FTF = face-to-face; iCBT = Internet-based Cognitive Behavioral Therapy; IDA-R = integrated diagnosis of ADHD in adulthood – revised version; iPRT = Internet-based progressive relaxation therapy; MBRP = mindfulness-based
+relapse prevention; m-Health = mobile health; N.a. = not applicable; Nc rand. = randomized N of control group; Ni rand. = randomized N of intervention group; Nmod = number of cCBT modules; N.R. = not reported; OCD = obsessive compulsive disorder; OR
+= observer-rated; Psychoedu = psychoeducation; Recruit. = recruitment; SCZ = schizophrenia; Sec. schools = secondary schools; SOCRATES = Stages of Change Readiness and Treatment Eagerness Scale; SR = self-report; SUD = substance use disorder;
+TAU = treatment-as-usual; UK = United Kingdom; Univ. = university; USA = United States of America;Y-BOCS:Yale-Brown Obsessive-Compulsive Scale.
+
+
+Indian Journal of Psychological Medicine | Volume XX | Issue X | XXXX-XXXX 2024
+12
+Beg and Verma
+References
+1. Timakum T, Xie Q and Song M. Analysis of e-mental health research: Mapping the relationship between information technology and mental healthcare. BMC Psychiatry 2022; 22: 57.
+2. Gire N, Farooq S, Naeem F, et al. m-Health based interventions for the assessment and treatment of psychotic disorders: A systematic review. Mhealth 2017; 3: 33–33. 3. Khosravi M and Azar G. A systematic review of reviews on the advantages of m-Health utilization in mental health services: A viable option for large populations in low-resource settings.
+Camb Prisms Glob Ment Health 2024; 11: e43. 4. Mudiyanselage KWW, De Santis KK, Jörg F, et al. The effectiveness of mental health interventions involving non-specialists and digital technology in low- and middle-income countries: A systematic review. BMC Public Health 2024; 24: 77. 5. Beg MJ, Verma M, Chanthar KMMV, et al. Artificial intelligence for psychotherapy: A review of the current state and future directions. Indian J Psychol Med Epub ahead of print July 28, 2024. DOI: 10.1177/02537176241260819. 6. Opie JE, Vuong A, Welsh ET, et al. Outcomes of best-practice guided digital mental health interventions for youth and young adults with emerging symptoms: Part I. A systematic review of socioemotional outcomes and
+recommendations. Clin Child Fam Psychol Rev 2024; 27: 424–475. 7. Gan DZQ, McGillivray L, Han J, et al. Effect of engagement with digital interventions on mental health outcomes: A systematic review and meta-analysis. Front Digit Health; 3. Epub ahead of
+print November 4, 2021. DOI: 10.3389/ fdgth.2021.764079. 8. Green BN, Johnson CD and Adams A. Writing narrative literature reviews for peer-reviewed journals: Secrets of the trade. J Chiropr Med 2006; 5(3):101–117. 9. Yin S, Njai R, Barker L, et al. Summarizing health-related quality of life (HRQOL): Development and testing of a one-factor model. Popul Health Metr 2016; 14: 1–9. 10. Cook EL and Harman JS. A comparison of health-related quality of life for individuals with mental health disorders and common chronic medical conditions. Public Health Rep 2008; 123(1): 45–51. 11. Lockl J, Schick D, Stoetzer J-C, et al. A model to assess the impact of digital technologies on the health-related quality of life. Int J Technol Assess Health Care 2022; 38(1): e81. 12. Rajmil L, Palacio-Vieira JA, Herdman M, et al. Effect on health-related quality of life of changes in mental health in
+children and adolescents. Health Qual Life Outcomes. 2009; 7: 1–7. 13. Lamsal R, Finlay B, Whitehurst DGT, et al. Generic preference-based healthrelated quality of life in children with neurodevelopmental disorders: A scoping review. Dev Med Child Neurol 2020; 62(2): 169–177. 14. Subramaniam M, Soh P, Vaingankar JA, et al. quality of life in obsessivecompulsive disorder: Impact of the disorder and of treatment. CNS Drugs 2013; 27: 367–383. 15. Müller O, Baumann C, Di Patrizio P, et al. Patient’s early satisfaction with care: A predictor of health-related quality of life change among outpatients with substance dependence. Health Qual Life Outcome 2020; 18: 1-–11. 16. Hoseinipalangi Z, Golmohammadi Z, Rafiei S, et al. Global health-related quality of life in schizophrenia: Systematic review and meta-analysis. BMJ Support Palliat Care 2022; 12: 123–131.
+17. Sarker S, Chatterjee S, Xiao X, et al. The sociotechnical axis of cohesion for the IS discipline: Its historical legacy and its continued relevance. MIS Quarterly 2019; 43: 695–720. 18. Horvath AO and Luborsky L. The role of the therapeutic alliance in psychotherapy. J Consult Clin Psychol 1993; 61: 561–573. 19. Tong F, Lederman R, D’Alfonso S, et al. Digital therapeutic alliance with fully automated mental health smartphone apps: A narrative review. Front Psychiatry Epub ahead of print June 22, 2022. DOI: 10.3389/fpsyt.2022.819623. 20. D’Alfonso S, Lederman R, Bucci S, et al. The digital therapeutic alliance and human-computer interaction. JMIR Ment Health 2020; 7(12): e21895. 21. Keen S. Narrative empathy. In: Peter Hühn, Jan Christoph Meister, John Pier and Wolf Schmid (eds) Handbook of Narratology. 2nd ed. Berlin, München, Boston: DE GRUYTER, 2014, pp. 521–530. 22. Oinas-Kukkonen H and Harjumaa M. Persuasive systems design: Key issues, process model, and system features. Commun Assoc Inf Syst Epub ahead of print January 1, 2009. DOI: 10.17705/1cais.02428. 23. Clarke J, Proudfoot J, Whitton A, et al. Therapeutic alliance with a fully automated mobile phone and web-based intervention: Secondary analysis of a randomized controlled trial. JMIR Ment Health 2016; 3(1): e4656. 24. Bickmore TW, Caruso L, Clough-Gorr K, et al. ‘It’s just like you talk to a friend’ relational agents for older adults. Interact Comput 2005; 17(6): 711–735. 25. Ryan RM and Deci EL. Overview of selfdetermination theory: An organismic
+dialectical perspective. In: Deci EL, Ryan RM (Eds) Handbook of self-determination research. The University of Rochester Press, 2002; 2(3–33): 36. 26. Henson P, Wisniewski H, Hollis C, et al. Digital mental health apps and the therapeutic alliance: Initial review. BJPsych Open 2019; 5(1): e15. 27. Jang S, Kim J-J, Kim S-J, et al. Mobile app-based chatbot to deliver cognitive behavioral therapy and psychoeducation for adults with attention deficit: A development and feasibility/usability study. Int J Med Inform 2021; 150: 104440. 28. Shou S, Xiu S, Li Y, et al. Efficacy of online intervention for ADHD: A meta-analysis and systematic review. Front Psychol; 13. Epub ahead of print June 28, 2022. DOI: 10.3389/fpsyg.2022.854810. 29. Selaskowski B, Reiland M, Schulze M, et al. Chatbot-supported psychoeducation in adult attention-deficit hyperactivity disorder: Randomised controlled trial. BJPsych Open 2023; 9(6): e192.
+30. Nordberg OE. Designing a conversational interface for guiding online peer support conversations between adults with ADHD.
+Master’s Thesis, The University of Bergen, Norway, 2019.
+31. Ravishankar V. Designing an assistive technology for self-reflection for students suffering from ADHD at Malmö University. Master’s Thesis, Malmö University, Sweden, 2022.
+32. Lenhard F. Internet-delivered cognitive behavior therapy for adolescents with obsessivecompulsive disorder. Doctoral Thesis, Karolinska Institutet, Sweden, 2017. 33. Kyrios M, Ahern C, Fassnacht DB, et al. Therapist-assisted internet-based cognitive behavioral therapy versus progressive relaxation in obsessivecompulsive disorder: Randomized controlled trial. J Med Internet Res 2018; 20(8): e242. 34. Andersson E, Ljótsson B, Hedman E, et al. Internet-based cognitive behavior therapy for obsessive-compulsive disorder: A pilot study. BMC Psychiatry. 2011; 11: 1–10. 35. Andersson E, Enander J, Andrén P, et al. Internet-based cognitive behavior therapy for obsessive-compulsive disorder: A randomized controlled trial. Psychol Med 2012; 42(10): 2193–2203. 36. Andersson E, Steneby S, Karlsson K, et al. Long-term efficacy of internetbased cognitive behavior therapy for obsessive-compulsive disorder with or without booster: A randomized controlled trial. Psychol Med 2014; 44(13): 2877–2887. 37. Schlosser DA, Campellone TR, Truong B, et al. Efficacy of PRIME, a mobile
+
+
+Indian Journal of Psychological Medicine | Volume XX | Issue X | XXXX-XXXX 2024 13
+Review Article
+app intervention designed to improve motivation in young people with schizophrenia. Schizophr Bull 2018; 44: 1010–1020. 38. Gire N, Caton N, McKeown M, et al. ‘Care co-ordinator in my pocket’: A feasibility study of mobile assessment and therapy for psychosis (TechCare). BMJ Open 2021; 11: e046755. 39. Yang H, Chang F, Zhu D, et al. Application of artificial intelligence in schizophrenia rehabilitation management: Systematic literature review. arXiv preprint. arXiv:2405.10883, 2024. 40. Nwoye EO, Muslehat AA, Umeh C, et al. SchizoBot: Delivering cognitive behavioural therapy for augmented management of schizophrenia. Digit Technol Res Appl 2024; 3(2): 24–40. 41. Prochaska JJ, Vogel EA, Chieng A, et al. A randomized controlled trial of a therapeutic relational agent for reducing substance misuse during the COVID-19 pandemic. Drug Alcohol Depend. 2021; 227: 108986.
+42. Elmasri D and Maeder A. A conversational agent for an online mental health intervention. In: Ascoli G, Hawrylycz M, Ali H, et al. (eds) Brain Informatics and Health: International Conference. BIH 2016, Omaha, NE, USA, 13–16 October 2016, Proceedings 2016, pp. 243–251. Springer International Publishing. 43. Prochaska JJ, Vogel EA, Chieng A, et al. A Therapeutic relational agent for reducing problematic substance use (Woebot): Development and usability study. J Med Internet Res 2021; 23(3): e24850. 44. Moghadasi MN, Zhuang Y and Gellban H. Robo: A counselor chatbot for opioid addicted patients. In: Proceedings of the 2020 2nd Symposium on Signal Processing Systems. New York, NY, USA: ACM, 2020, pp. 91–95. 45. Carreiro S, Newcomb M, Leach R, et al. Current reporting of usability and impact of mHealth interventions for substance use disorder: A systematic review. Drug Alcohol Depend 2020; 215: 108201.
+46. Chun-Hung L, Guan-Hsiung L, Wu-Chuan Y, et al. Chatbotassisted therapy for patients with methamphetamine use disorder: A preliminary randomized controlled trial. Front Psychiatry Epub ahead of print July 7, 2023. DOI: 10.3389/fpsyt.2023.1159399. 47. Chen T, Chen L, Li S, et al. Virtual digital psychotherapist app–based treatment in patients with methamphetamine use disorder (Echo-APP): Single-arm pilot feasibility and efficacy study. JMIR Mhealth Uhealth 2023; 11: e40373. 48. Ogilvie L, Prescott J and Carson J. The use of chatbots as supportive agents for people seeking help with substance use disorder: A systematic review. Eur Addict Res 2022; 28(6): 405–418. 49. Holohan M and Fiske A. “Like I’m talking to a real person”: Exploring the meaning of transference for the use and design of AI-based applications in psychotherapy. Front Psychol Epub ahead of print September 27, 2021. DOI: 10.3389/ fpsyg.2021.720476.

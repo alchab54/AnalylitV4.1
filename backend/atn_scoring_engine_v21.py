@@ -52,11 +52,20 @@ class ATNScoringEngineV22:
     def calculate_atn_score_v22(self, article: Dict) -> Dict[str, Any]:
         """Calcule score ATN v2.2 avec nouveaux critères 2024 et justification corrigée."""
         
-        title = str(article.get("title", "")).lower()
-        abstract = str(article.get("abstract", "")).lower()
-        journal = str(article.get("journal", "")).lower()
-        keywords = " ".join(str(k) for k in article.get("keywords", [])).lower()
-        full_text = f"{title} {abstract} {journal} {keywords}"
+        title = str(article.get('title', '')).lower()
+        abstract = str(article.get('abstract', '')).lower()
+        journal = str(article.get('journal', '')).lower()
+        keywords = ' '.join(str(k) for k in article.get('keywords', [])).lower()
+        
+        # ✅ PRIORITÉ AU TEXTE INTÉGRAL S'IL EST DISPONIBLE
+        full_text_from_pdf = str(article.get('full_text', '')).lower()
+
+        if full_text_from_pdf:
+            # Si le PDF est fourni, on utilise tout pour une analyse maximale
+            full_text = f"{title} {abstract} {journal} {keywords} {full_text_from_pdf}"
+        else:
+            # Sinon, on garde le comportement original
+            full_text = f"{title} {abstract} {journal} {keywords}"
 
         total_score = 0
         detailed_justifications = []

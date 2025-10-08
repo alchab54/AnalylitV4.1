@@ -1,0 +1,16 @@
+Title:          Explainable Artificial Intelligence (XAI) in Biomedicine: Making AI Decisions Trustworthy for Physicians and Patients
+Subject:        The use of artificial intelligence (AI) systems in biomedical and clinical settings can disrupt the traditional doctor­patient relationship, which is based on trust and transparency in medical advice and therapeutic decisions. When the diagnosis or selection of a therapy is no longer made solely by the physician, but to a significant extent by a machine using algorithms, decisions become nontransparent. Skill learning is the most common application of machine learning algorithms in clinical decision making. These are a class of very general algorithms (artificial neural networks, classifiers, etc.), which are tuned based on examples to optimize the classification of new, unseen cases. It is pointless to ask for an explanation for a decision. A detailed understanding of the mathematical details of an AI algorithm may be possible for experts in statistics or computer science. However, when it comes to the fate of human beings, this ``developer's explanation'' is not sufficient. The concept of explainable AI (XAI) as a solution to this problem is attracting increasing scientific and regulatory interest. This review focuses on the requirement that XAIs must be able to explain in detail the decisions made by the AI to the experts in the field.
+Keywords:       data science; artificial intelligence; machine learning; patient­doctor relationship; digital medicine
+Author:         Jörn Lötsch, Dario Kringel and Alfred Ultsch
+Creator:        LaTeX with hyperref
+Producer:       pdfTeX-1.40.21
+CreationDate:   12/22/21 17:28:41
+ModDate:        12/22/21 10:32:55
+Tagged:         no
+Form:           none
+Pages:          17
+Encrypted:      no
+Page size:      595.276 x 841.89 pts (A4) (rotated 0 degrees)
+File size:      1623802 bytes
+Optimized:      no
+PDF version:    1.7

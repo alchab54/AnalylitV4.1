@@ -1,0 +1,636 @@
+Word Count = 4926
+Number of figures = 3
+Number of tables = 3
+Randomized trial of brief interpersonal psychotherapy and cognitive behavioral therapy for depression delivered both in-person and by telehealth
+Holly A. Swartz,*1 Lauren M. Bylsma,*1, Jay C. Fournier,3 Jeffrey M. Girard,3 Crystal Spotts,1 Jeffrey F. Cohn,1 Louis-Phillippe Morency4
+*Denotes shared first authorship
+1University of Pittsburgh, Pittsburgh, PA
+2The Ohio State University, Columbus, OH
+3University of Kansas, Lawrence, KA
+4Carnegie Mellon University, Pittsburgh, PA
+Corresponding Author:
+Holly A. Swartz, M.D.
+Professor of Psychiatry
+University of Pittsburgh School of Medicine
+3811 O’Hara Street
+Pittsburgh, PA 15213
+swartzha@upmc.edu
+Disclosures:
+Dr. Swartz has served as a consultant for Intracellular Therapeutics, Medscape/WebMD, Postgrad Physician Press, Clinical Education Alliance, and Mediflix. She receives royalties from American Psychiatric Association Publishing and Wolters Kluwer. Drs. Bylsma, Fournier, Girard, Cohen and Morency and Ms. Spotts have no disclosures.
+Funding Source: This work was supported by the U.S. National Science Foundation (SCH:INT 1721667) and the National Institute of Mental Health (U01MH116925.)
+© 2023 published by Elsevier. This manuscript is made available under the Elsevier user license https://www.elsevier.com/open-access/userlicense/1.0/
+Version of Record: https://www.sciencedirect.com/science/article/pii/S0165032723005529 Manuscript_6953804184e607a3fd216bf7035903ab
+
+
+ABSTRACT (250 words)
+Background: Expert consensus guidelines recommend Cognitive Behavioral Therapy (CBT) and
+Interpersonal Psychotherapy (IPT), interventions that were historically delivered face-to-face, as first-line
+treatments for Major Depressive Disorder (MDD). Despite ubiquity of telehealth following the COVID-19
+pandemic, little is known about differential outcomes with CBT versus IPT delivered in-person (IP) or via
+telehealth (TH) or whether working alliance is affected. Methods: Adults meeting DSM-5 criteria for MDD
+were randomly assigned to either 8 sessions of IPT or CBT (group). Mid-trial, COVID-19 forced a change
+of therapy delivery from IP to TH (study phase). We compared changes in Hamilton Rating Scale for
+Depression (HRSD-17) and Working Alliance Inventory (WAI) scores for individuals by group and phase:
+CBT-IP (n=24), CBT-TH (n=11), IPT-IP (n=25) and IPT-TH (n=17). Results: HRSD-17 scores declined
+significantly from pre to post treatment (pre: M=17.7, SD=4.4 vs. post: M=11.7, SD=5.9; p<.001; d=1.45)
+without significant group or phase effects. WAI scores did not differ by group or phase. Number of
+completed therapy sessions was greater for TH (M=7.8, SD=1.2) relative to IP (M=7.2, SD=1.6) (Mann
+Whitney U=387.50, z=-2.24, p=.025). Limitations: Participants were not randomly assigned to IP versus
+TH. Sample size is small. Conclusions: This study provides preliminary evidence supporting the efficacy
+of both brief IPT and CBT, delivered by either TH or IP, for depression. It showed that working alliance is
+preserved in TH, and delivery via TH may improve therapy adherence. Prospective, randomized
+controlled trials are needed to definitively test efficacy of brief IPT and CBT delivered via TH versus IP.
+KEY WORDS: Depression, psychotherapy, telehealth, cognitive behavioral therapy, interpersonal
+psychotherapy, working alliance
+
+
+1. INTRODUCTION
+Major Depressive Disorder (MDD) is among the most common psychiatric disorders, associated with
+substantial psychosocial impairment and morbidity (Hirschfeld et al., 2000; Kessler et al., 2003; Zhdanava
+et al., 2021). Underscoring its public health significance, depressive disorders are associated with
+increased risk for suicide (Oquendo et al., 2004) and projected to be among the three leading causes of
+global disease burden in 2030 (Mathers and Loncar, 2006).
+Medications are first-line treatments for MDD (Pilling et al., 2009), but a majority of patients prefer
+psychotherapy to medication (McHugh et al., 2013). Fortunately, research shows that several
+manualized psychotherapies are efficacious treatments for depression (Cuijpers et al., 2011; Cuijpers et
+al., 2010) with expert consensus guidelines typically recommending Cognitive Behavioral Therapy (CBT)
+and Interpersonal Psychotherapy (IPT) as first-line treatments. Although there has long been interest in
+comparative efficacy of psychotherapies (Luborsky and Singer, 1975), most studies find similar beneficial
+outcomes with IPT and CBT (Cuijpers et al., 2008; Lemmens et al., 2015) with few differential predictors
+of response to treatment (Huibers et al., 2014; van Bronswijk et al., 2018).
+The vast majority of studies used to generate expert consensus guidelines recommending IPT and CBT
+were conducted in-person (Clark, 2011), however researchers and policy-makers increasingly wish to
+understand whether psychotherapies can be effectively delivered via telehealth, a question made more
+urgent by the COVID-19 pandemic when many therapists switched to telepsychotherapy because of
+public health constraints (Swartz, 2021). Despite its ubiquity, there are relatively few studies testing the
+efficacy of telepsychotherapy specifically for MDD (Giovanetti et al., 2022; Guaiana et al., 2020;
+Markowitz et al., 2021). Most studies of remote therapy focus on telephone therapy (Bee et al., 2008),
+and these studies typically show equivalence to psychotherapy delivered in-person (Cuijpers et al.,
+2019a; Dennis et al., 2020; Mohr et al., 2012). A large meta-analysis encouragingly found non-inferiority
+of video-based psychotherapy to in-person treatment (Fernandez et al., 2021), with the caveat that all of
+the included studies pre-dated the massive acceleration in telehealth technology and uptake related to
+
+
+COVID-19 (Morris and Hirschtritt, 2020; Yellowlees et al., 2020). Thus, differences in access to and
+familiarity with telehealth platforms may limit relevance of earlier studies to the present telehealth era. No
+studies have examined whether there is a differential effect of format on the two first-line psychotherapies
+for depression, IPT and CBT.
+Treatment alliance has long been considered an important predictor of psychotherapy outcomes (Horvath
+and Luborsky, 1993). In a study comparing IPT to CBT as treatments for depression, therapeutic alliance
+had a significant effect on clinical outcomes for both psychotherapies (Krupnick et al., 1996). Meta
+analyses confirm the relationship between treatment alliance and outcomes across therapy modalities
+and conditions (Fluckiger et al., 2018; Horvath et al., 2011; Nienhuis et al., 2018), although controversies
+remain regarding the magnitude of the effects and causal relationships among therapeutic technique,
+alliance, and outcomes (Don et al., 2020; Feeley et al., 1999). These studies, however, focused solely on
+face-to-face therapy. Very little is known about treatment alliance when therapy is delivered in other
+formats. Indeed, concerns have been raised about the potential impact of remote treatments on alliance,
+given the effects of technology on nonverbal interactions (e.g., eye contact, head movements), screen
+based distractions (e.g., email, internet browsers), and tensions that arise for therapists when working
+from home (James et al., 2022; Markowitz et al., 2021). A small meta-analysis of psychotherapy delivered
+via videoconferencing found that working alliance in remotely delivered therapy was inferior to face-to
+face delivery (Norwood et al., 2018). However, the authors note that this finding may have been driven by
+therapists rating alliance lower than patients, perhaps related to their limited experience with the remote
+therapy format. Notably, this meta-analysis was conducted prior to the COVID-19 pandemic. A larger
+follow-up analysis by the same authors subsequently (post March 2020) found a significant relationship
+between alliance and videoconference-delivered psychotherapy outcomes (Norwood et al., 2021),
+contradicting earlier findings, and again emphasizing the importance of cohort effects in this literature. No
+studies have examined the effects of format on therapeutic alliance across different psychotherapeutic
+modalities.
+The purpose of this study is to examine comparative effects of modality (brief IPT versus CBT) and format
+(in-person versus telehealth) on depression outcomes and working alliance. We hypothesized that
+
+
+outcomes would not differ between IPT and CBT but that in-person therapy would result in greater
+improvements in depression scores compared to telehealth. We also hypothesized that there would be no
+difference in working alliance between IPT and CBT, but that in-person therapy would be associated with
+greater therapist and patient-reported working alliance.
+2. METHODS
+The study (Clinicaltrials.gov identifier NCT03594773) was conducted from July 2018 to March 2021 and
+enrolled patients at a large, urban, university-affiliated, mental health clinic. All study procedures were
+reviewed and approved by the Institutional Review Board of the University of Pittsburgh prior to the start
+of participant enrollment. Potential participants provided informed written consent after receiving a
+complete description of the study.
+2.1 Study Design
+This 10-week, randomized, parallel-group study enrolled adult participants with DSM-5-defined Major
+Depressive Disorder (MDD). We recruited study participants through University of Pittsburgh’s online
+research registry and by advertisement. The study is divided into two phases because of disruptions
+caused by the COVID-19 pandemic. In Phase 1, psychotherapy was administered in-person.
+Recruitment and study procedures were halted in March 2020. The study resumed in July 2020 as a
+completely remote study (Phase 2). In Phase 2, consent forms were sent to participants electronically and
+then reviewed by telephone. Psychotherapy was conducted over a secure video platform. This study is
+part of a larger project, Dyadic Behavior Informatics for Psychotherapy Process and Outcome (DAPPeR),
+in which data from this randomized controlled trial is used to model the dynamics of individual and dyadic
+behaviors on a moment-by-moment basis within each therapy session and over the course of treatment.
+Results from the DAPPeR project have been reported elsewhere (Vail et al., 2021; Vail et al., 2022).
+2.2 Eligibility
+Participants were adults who met the following criteria: (1) age 18-65; (2) DSM 5-defined (American
+Psychiatric Association, 2013) MDD, current episode (3) Hamilton Rating Scale for Depression-17 items
+
+
+(HRSD-17) (Hamilton, 1960) score ≥ 14; (5) if currently on antidepressant medication, on a stable dose
+for at least one month at the time of study entry and agreeable to remaining on that dose for study
+duration; (6) ability to read and speak English fluently, (5) capacity to give informed consent. For Phase 2
+(telehealth therapy), the following inclusion criteria were added: (6) a computer or smartphone with a
+camera and microphone; (7) headphones or earbuds that connect to device; (8) a private area to
+complete psychotherapy sessions without interruption; (9) broadband internet connection that meets the
+bandwidth criteria of minimum of 10Mb/sec for upload and download.
+Participants were excluded from the study if they met any of the following criteria: (1) high risk for suicide,
+that, in the clinical opinion of the investigator, would warrant a higher level of care such as hospitalization
+or intensive outpatient programs; (2) current depressive episode has psychotic features; (3) current
+depressive episode has been present for > 104 weeks; (4) substance use disorders, as defined by DSM
+5, in the past 3 months, except for caffeine or nicotine; (5) prior manic or hypomanic episode (bipolar I or
+II disorder) or a psychotic disorder including schizoaffective disorder or schizophrenia; (6) antisocial
+personality disorder; (7) significant, unstable, psychiatric co-morbidity that, in the opinion of the
+investigators, requires an alternative treatment approach (i.e., unstable eating disorder, unstable
+borderline personality disorder); (8) significant unstable medical illness that may explain depressive
+symptoms such as epilepsy, autoimmune disorder, chronic pain, or unstable endocrine disorder; (9)
+cognitive deficits that would preclude completion of study questionnaires or participation in
+psychotherapy; (10) unable or unwilling to comply with study requirements; (11) neurologic or medical
+condition that would interfere with nonverbal communication (e.g., severe visual impairment or facial
+paralysis).
+Therapists were also research participants in this study and consented to participation. Inclusion criteria
+for therapist-participants were: (1) currently functioning as a therapist or supervisor for the Center for
+Advanced Psychotherapy (CAP) clinic; (2) capacity to give informed consent. There were no exclusion
+criteria for therapists.
+2.3 Allocation
+
+
+As shown in the CONSORT diagrams for Phase I and 2 (Figure 1), 638 potential participants during the
+Phase 1 study period and 149 during Phase 2 agreed to initial screening for inclusion in the protocol to
+yield 49 individuals eligible for randomization in Phase 1 and 28 in Phase 2. Participants were randomly
+allocated to either brief CBT (n=24 in phase 1; n=11 in phase 2) or brief IPT (n=25 in phase 1; n=17 in
+phase 2) by an independent data manager not otherwise involved in the clinical trial using a permuted
+block strategy (Matts and Lachin, 1988). The allocation sequence was concealed from all study
+personnel. Randomization was stratified by gender and depression screening scores, which accounts for
+imbalances in cell sizes.
+2.4 Outcome Measures
+Raters blind to treatment assignment conducted assessments in person (phase 1) or by telephone (phase
+2) at baseline, midpoint (week 5), and post-treatment (week 10) except as indicated below. Self-report
+measures were collected online. Demographic data were recorded on standardized research forms.
+Psychiatric diagnoses were assigned using Mini-International Neuropsychiatric Interview (MINI version
+7.0) (Sheehan et al., 1998). Information about antisocial personality disorder diagnosis was collected
+using the Structured Clinical Interview for DSM 5—Personality Disorders (SCID-5-PD) (First et al., 2016)
+Depressive symptoms were assessed using the clinician-rated HRSD-17 (primary outcome measure) and
+Montgomery Asberg Depression Rating Scale (MADRS) (Montgomery and Asberg, 1979), and the self
+report Quick Inventory of Depressive Symptomatology-Self Report (QIDS-SR) (Rush et al., 2003). HRSD
+17 scores range from 0 to 52, MADRS scores range from 0 to 60, and QIDS-SR scores range from 0-27,
+with higher scores indicating greater depression severity on all depression measures. QIDS scores were
+collected at each therapy visit. Anxiety was rated using the self-reported 7-item Generalized Anxiety
+Disorder Assessment (GAD-7) (Spitzer et al., 2006) with scores ranging from 0 to 21, with higher scores
+indicating greater anxiety severity. The self-reported World Health Organization Disability Assessment
+Schedule 2.0 (WHODAS 2.0), a 36-item measure with higher scores indicating more impairment, was
+used to assess global functioning (Federici et al., 2017). Acceptability of the intervention was assessed
+
+
+post-treatment with the Client Satisfaction Questionnaire (CSQ) (Attkisson and Greenfield, 1994) which
+yields scores ranging from 8-32 with higher scores indicating greater levels of satisfaction.
+Both patients and therapists completed brief versions of the Working Alliance Inventory (WAI) (Horvath
+and Greenberg, 1989) after each therapy session. The therapist (10 items) and patient (12 items)
+versions of the WAI are designed to yield three alliance scales, corresponding to Bordin’s components:
+Goal, Task, and Bond (Bordin, 1979). Higher scores indicate a more positive rating of working alliance.
+Both patients and therapists completed the 21-item Strategies in Therapy Use Form (STUF) after each
+therapy session. The STUF measure, developed for this study, is derived from patient and therapist self
+report measures of the Psychotherapy Quality Questionnaire (PQQ) developed by Miranda and
+colleagues (Hepner et al., 2010; Miranda et al., 2010) to assess psychotherapy use in usual care settings.
+STUF measures therapeutic strategies used in sessions and is scored to yield IPT, CBT, and non-specific
+(NS) subscales. Higher scores on the STUF subscales indicate greater use of strategies related to the
+therapy modality. CBT, IPT and NS scales showed a high degree of internal reliability across all 8
+sessions for both the patient and therapist ratings (Cronbach alphas: .72 - .97; McDonald’s Omegas: .70 
+.97).
+2.5 Interventions
+Participants were assigned individual therapists who administered up to 8 sessions of psychotherapy
+weekly over a 10-week period, allowing for missed/rescheduled sessions. Each session lasted 50
+minutes. In Phase 1, psychotherapy was administered in person; in Phase 2, psychotherapy was
+delivered over a HIPAA-compliant version of Zoom.
+Brief IPT (IPT-B) addresses problematic interpersonal issues related to onset or maintenance of mood
+episodes (Weissman et al., 2018). IPT-B is designed to deliver a full course of IPT in 8 sessions, roughly
+half the length of “full dose” 16-session IPT (Swartz et al., 2004; Swartz et al., 2014). IPT-B offers the
+dual advantages of rapid relief from suffering and reduced practical barriers (time commitment) for
+overwhelmed populations (Swartz et al., 2014). In IPT-B, the therapist chooses one of three possible
+
+
+problem areas (grief, role disputes, or role transitions) to serve as the focus of treatment with the goal of
+selecting a relevant interpersonal issue that can be resolved in 8 sessions.
+For Brief CBT, we adapted a CBT protocol designed to be administered over 4-8 sessions as an 8
+session Brief CBT intervention (Cully and Teten, 2008). CBT focuses on modifying maladaptive thoughts
+and behaviors, using a combination of cognitive restructuring, behavioral activation, and problem solving
+and has a typical duration of 12-20 sessions (Beck et al., 1979). The first session consists of gathering
+additional information about current symptoms and goal setting. Each session began with setting an
+agenda and focusing on explicit goals, as well as eliciting feedback from the patient about the session.
+Patients were given homework assignments to practice skills between sessions. The relative focus on
+cognitive versus behavioral skills was adapted to the specific patient.
+2.6 Statistical analysis
+Analyses were conducted using SPSS28 and HLM8 (SSI, Inc.) statistical software using intent-to-treat
+principles. To compare groups by treatment and phase on baseline demographic and clinical
+characteristics, and treatment dropout rates and number of sessions completed, Cramer’s V and Mann
+Whitney Wilcoxon tests were used to compare nominal and ordinal variables, respectively. Independent
+samples t-tests were used to compare groups by treatment and phase on overall client satisfaction
+(CSQ). Analyses of outcome and process variables were conducted using hierarchical linear models
+(HLM, also known as linear mixed effects models) with weekly measures nested within persons (patients)
+and modeled with random slopes and intercepts, an unstructured variance/covariance matrix, and robust
+standard errors. HLM allows for inclusion of all subjects with at least baseline data and addresses missing
+data by using restricted maximum likelihood (REML) estimation. Time was centered at 10 weeks, and
+variables used for randomization stratification (gender and HRSD-17 screening scores) were included as
+covariates in all HLM models. STUF ratings were calculated only for those who participated in at least two
+therapy sessions; first session ratings were excluded since they were assessment focused. Cohen’s d
+type effect sizes (absolute values) were calculated from model estimates for HLM models and from raw
+values for simple t-tests.
+
+
+3. RESULTS
+3.1 Baseline Demographic and Clinical Characteristics of Patients and Therapists
+Baseline demographic and clinical screening characteristics are shown in Table 1. The final randomized
+sample was age 18-64 years (M=32.0, SD=13.6); 66.2% female, 28.6% male, and 5.2% non-binary or
+other gender identity. The overall racial and ethnic makeup of the sample was 68.8% White/Caucasian,
+11.7% Black/African American, 14.3% Asian, 2.6% Native American/Pacific Islander, and 5.3%
+Hispanic/Latinx. A majority of the sample was never married (71.6%) and completed a Bachelors’ degree
+or higher (57.5%). A majority of the sample reported an annual household income of under $20,000
+(37.1%) or $20-49,000 (37.1%). Most of the sample reported being either employed full time (29.7%) or a
+full-time student (25.7%).
+Independent samples two-sided t-tests showed no significant differences by treatment group or treatment
+phase for age (t=-.067, p=.947) or baseline depression severity (HRSD17: t=-1.49, p=.140; MADRS: t=
+.195, p=.846). Cramer’s V tests demonstrated no significant differences by treatment group or treatment
+phase for any of the categorical or ordinal demographic variables (ps>.05).
+[Table 1 about here]
+The final therapist sample was age 26-56 years at time of enrollment (M=34.1, SD=9.2); 81.3% female.
+The overall racial and ethnic makeup of the therapist sample was 87.5% White/Caucasian, 12.5%
+Black/African American, 6.3% Asian, 0% Native American/Pacific Islander, and 6.3% Hispanic/Latinx. In
+terms of experience and background, 62.5% (n=10) were trainees and 37.5% (n=6) were licensed
+professionals (including psychiatrists, psychologists, social workers). In terms of degree type, 12.5%
+(n=2) were MDs, 68.8% (n=12) were Clinical/Counseling Psychologists or Psychology Doctoral Trainees,
+and 12.5% (n=2) were social workers or social worker trainees. Although the groups did not differ
+significantly on any variable, IPT therapists had twice as many years of experience than CBT therapists
+on average (10.6 ± 10.2 v. 5.3 ± 4.7, p>.05).
+[Table 2 about here]
+
+
+3.2 Treatment Feasibility and Acceptability
+CONSORT diagrams for in person (IP) and telehealth (TH) treatment phases are presented in Figures 1a
+and 1b, respectively. In terms of participation feasibility, based on the ratio of patients enrolled relative to
+participants screened for eligibility (25.7% of those screened for the IP phase vs. 68.3% for the TH
+phase), it was more feasible to successfully enroll participants in the TH treatment phase in comparison to
+the IP treatment phase (χ2=11.65, p<.001), even with the additional technology and internet connectivity
+requirements for the former.
+Regarding acceptability, treatment dropout (completing <8 sessions) rates were significantly higher for the
+IP vs. TH treatment phases (Cramer’s V=0.30, p=.013; 25.6% vs. 7.4%). Of patients who initiated
+treatment (i.e., completed at least one session; n=65), number of completed sessions did not differ by
+treatment group (CBT M=7.7, SD=.76 vs. IPT M=7.4, SD=1.9; Whitney U=-495.50, z=-.517, p=.61) but
+was greater for TH (M=7.8, SD=1.2) relative to IP (M=7.2, SD=1.6) phase (Mann-Whitney U=387.50, z=
+2.24, p=.03). Overall satisfaction rates were high as measured by the CSQ-8 and did not significantly
+differ by treatment group (IPT M=27.5, SD=4.4; CBT M=27.2, SD=4.7; t=-.296, p=.769) or phase (IP
+M=27.3, SD=4.2; TH M=27.4, SD=5.0; t=-.088, p=.93).
+[Figures 1a/1b about here]
+3.3 Treatment Fidelity
+Treatment fidelity was supported by STUF therapist ratings, such that therapists providing CBT rated CBT
+components higher than IPT therapists (CBT 35.0 ± 6.3 vs. IPT 10.3 ± 4.3, t=18.00, p<.001), while
+therapists providing IPT rated IPT components higher than CBT therapists (IPT 22.7 ± 3.8 vs. CBT 13.5 ±
+6.3; t=6.74, p<.001).
+Similarly, patients receiving CBT rated CBT components higher than those receiving IPT (CBT 33.8 ± 6.2
+vs. IPT 27.7 ± 8.5; t=3.27, p=.002), while patients receiving IPT showed a trend toward rating IPT
+components higher (IPT 29.0 ± 8.4 vs. CBT 25.6 ± 9.1; t=1.51, p=.137).
+
+
+Therapist and patient ratings were significantly correlated on both CBT-specific (r=.358, p=.005) and IPT
+specific (r=.346, p=.006) components of the STUF. There was also significant correlation on overall
+ratings of non-specific (NS) strategies (r=.295, p=.021).
+When examining treatment groups separately, therapist- and patient-reported use of non-specific (NS)
+strategies diverged. Therapists providing CBT (NS 31.2 ± 6.7) and IPT (NS 26.0 ± 5.0) significantly
+differed in their ratings for use of non-specific components (t=3.42, p<.001), with CBT therapists reporting
+greater use of more non-specific strategies. In contrast to therapist ratings, patients receiving CBT (NS
+34.0 ± 6.2) and IPT (NS 32.7 ± 6.7) did not significantly differ in their ratings for non-specific components
+(t=.836, p=.41).
+3.4 Treatment Primary and Secondary Outcomes
+Primary outcome
+All groups showed a significant treatment effect, such that HRSD-17 scores significantly decreased from
+pre to post treatment (pre: M=17.7, SD=4.4 vs. post: M=11.7, SD=5.9; B=-0.53, SE=0.09, t=-5.98,
+p<.001; d=1.45). There were no significant group [CBT: pre M=17.2 (3.8) vs. post M=11.4 (5.4); IPT: pre
+M=18.3(4.8) vs. post M=11.9(6.3); d=0.12 ] or phase [IP: pre M=17.7 (4.5) vs. post M=12.2 (5.3); TH: pre
+M=18.0(4.4) vs. post M=11.0(6.620); d=0.18 ] effects for changes in HRSD-17 scores pre to post
+treatment (ps>.05), and no group by phase interactions (ps>.05). Follow-up analyses in which current
+antidepressant use was included as a covariate did not change these findings. See Table 3 and Figure 2.
+[ Figure 2 about here]
+Secondary outcomes
+Participants in both groups and phases similarly showed significant decreases in MADRS scores over the
+course of treatment (d=1.47, p<.001), and there were no significant group or phase effects or group-by
+phase interactions (ps>.05). See Table 3 and Figure 1S in Supplemental Materials.
+
+
+In terms of weekly symptom measures, patients across both phases and treatment groups showed a
+significant linear decrease in QIDS symptoms over the course of treatment (B=-0.42, SE=0.07, t=-5.94,
+p<.001, d=1.24). There were no significant group or phase main effects or group by phase interactions
+(ps>.05). See Figure 2S in Supplemental Materials.
+Participants in both groups and phases showed significant decreases in GAD-7 and WHODAS scores
+over the course of treatment (ds>0.41, ps<.02), and there were no significant group or phase effects or
+group by phase interactions (ps>.05).
+See Table 3 for multilevel regression results for primary and secondary outcomes.
+[Table 3 about here]
+3.5 Treatment Working Alliance
+Weekly patient-rated WAI scores showed linear increases over time across both groups and phases
+(B=0.84, SE=0.12, t=6.96, p<.001, d=1.50), and there were no significant group or phase main effects or
+group by phase interactions (ps>.05). Weekly therapist-rated WAI scores also showed linear increases
+over time (B=0.25, SE=0.11, t=2.20, p=.032, d=0.50). For the therapist-rated scores, we observed a
+significant group effect (B=0.47, SE=0.16, t=2.88, p=.006, d=0.97), such that the IPT-TH group showed a
+greater increase in therapist-rated working alliance over time relative to CBT. Further analysis revealed
+that this was due to differences between the conditions in therapist-rated WAI scores at the first session
+(therapist-rated WAI scores for IPT were significantly lower than those for CBT (IPT: M=36.6, SD=5.7;
+CBT: M=40.5, SD=4.5, t=2.98, p=.004). The two groups did not differ in estimated therapist-rated WAI
+scores in the final session (IPT: M=42.6, SD=5.8; CBT: M=43.5, SD=6.6, t=.548, p=.586).
+Although there were no main effects for phase (B=0.01, SE=0.19, t=0.07, p=0.942), there was a
+marginally significant group-by-phase interaction in WAI slopes (B=0.67, SE=0.35, t=1.93, p=0.059), such
+that the IPT-TH phase showed a trend toward a steeper increase in therapist-rated WAI compared to the
+other conditions. Again, this was due to differences during the first session, whereby the IPT-TH scores
+(M=33.1, SD=5.7) were lower than the therapist-rated WAI scores for all other conditions (Ms=39.4-40.5,
+
+
+SD=3.8-4.8; all ts > 3, all ps<0.01). At 10 weeks, the group-by-phase interaction in estimated therapist
+rated WAI scores was no longer significant [t(56)=-0.304 p=0.762].
+[Figure 3 about here]
+Overall, patient and therapist WAI scores were significantly correlated (r=.418, p<.001).
+4. DISCUSSION
+Both therapy groups improved significantly over time, with no differences between brief IPT and CBT on
+the primary outcome measure (HRSD-17) or secondary measures of depression, anxiety, and
+functioning. This was the first time that brief versions of IPT and CBT were compared, suggesting that
+shorter versions of both first-line treatments for MDD are associated with similar, beneficial outcomes.
+This is consistent with other studies that have found comparable outcomes with standard length IPT and
+CBT (Cuijpers et al., 2008; Lemmens et al., 2015). Findings from this study should reassure clinicians and
+patients that brief versions of IPT and CBT are both efficacious treatment options for depression.
+We hypothesized that outcomes associated with IP would be better than TH given literature raising
+concerns about the limitations of remote therapy, including potentially negative effects on the therapeutic
+alliance (Markowitz and Milrod, 2022; Markowitz et al., 2021). However, there were no differences in
+symptomatic or functional outcomes between phases in either treatment group suggesting that neither
+IPT nor CBT suffers when delivered by TH. Ongoing deployment of TH in routine practice, even as
+pandemic-related restrictions are lifted, makes it more important than ever to confirm comparability of
+therapy outcomes in TH (Blanco et al., 2022; Markowitz and Milrod, 2022; Swartz, 2021). Results of this
+study align with those of a pre-pandemic metanalysis suggesting that outcomes with IP and TH therapy
+do not differ (Fernandez et al., 2021).
+Measures of treatment fidelity showed that CBT therapists delivered predominantly CBT strategies,
+whether via IP or TH. Likewise, IPT therapists delivered predominantly IPT strategies across delivery
+formats. Because of concerns that therapist ratings may be biased and unreliable, we also collected
+ratings from patients. Of course, patient ratings may be unreliable for other reasons (i.e., lack of
+
+
+familiarity with therapy strategies). The finding of convergent therapists and patient ratings of IPT and
+CBT adherence gives added support to the assertion that manualized treatments can be reliably
+delivered across delivery formats, likely without loss of treatment fidelity. Objective ratings of recorded
+therapy sessions are needed to confirm this finding.
+Controversy abounds about the extent to whether common versus specific factors are more important in
+explaining variance in psychotherapy outcomes (Cuijpers et al., 2019b; Laska et al., 2014; Wampold and
+Imel, 2015). It was curious to note that CBT therapists endorsed greater use of non-specific/common
+factors strategies than IPT therapists, although this difference was not found in patient reports, perhaps
+indicating that it is easier for patients and therapists to agree on use of specific strategies rather than non
+specific strategies. It is also possible that these differences may be attributed to CBT therapists using
+CBT-specific strategies such asking about feelings every time that they complete a thought record, which
+would be coded as a non-specific factor, despite its centrality to the CBT model. Objective ratings of non
+specific factors in sessions might help clarify this discrepancy, but it was beyond the scope of this project
+to do so.
+Satisfaction was high in all groups and did not differ by treatment or phase, confirming a high degree of
+acceptability of both brief CBT and IPT, whether delivered via IP or TH. Mean number of sessions
+attended was higher in the TH group compared to IP, suggesting that it was easier for depressed
+individuals to attend remote rather than IP sessions. Increased participation in treatment through TH
+delivery of therapy may help address the vexing and widespread problem of poor mental health treatment
+adherence (Wells et al., 2013).
+From a feasibility and study management standpoint, it was easier to recruit participants for the TH phase
+of the study than for the IP phase, despite the added inclusion criteria for phase 2 (having access to
+broadband internet, having a computer or smartphone). This might be explained by the convenience of
+participating in fully remote consent, assessment, and therapy without the requirements of traveling to a
+clinic. Eagerness to participate in remote therapy may also reflect increased symptomatic burden
+engendered by the COVID-19 pandemic or related treatment scarcity. Nevertheless, investigators who
+
+
+have the option of deploying research procedures remotely may find that this approach enhances
+recruitment.
+Working alliance is thought to partially mediate outcomes in psychotherapy (Fluckiger et al., 2018).
+Conventional wisdom suggests that alliance is better when treatment is delivered IP rather than by TH,
+arguably because of the limited channels of communication available to dyads in the context of remote
+interactions (Bee et al., 2008; Markowitz et al., 2021). In this study, alliance did not differ by treatment or
+phase. High correlations between therapist and patient-rated alliance supports the trustworthiness of
+these ratings. Despite concerns that alliance suffers when moving to remote platforms, this study
+suggests otherwise. Future mediation studies should evaluate whether preserved efficacy in TH may be
+secondary to a robust working alliance.
+There are many limitations to this study. The comparison of IP to TH arose not from a prospectively
+designed study but rather from a “convenience” sample of trial participants recruited for a remote phase
+of the study beginning in the spring of 2020 because of COVID-19. Thus, comparisons between IP and
+TH are necessarily post hoc in nature. This comparison seems warranted, however, given the fact that
+the two samples were very similar, enrolled in the same trial that had consistent inclusion criteria (except
+the additional requirement of computer/broadband access in phase 2), and was conducted by the same
+study personnel.
+The study was underpowered to detect small differences between groups. We observed a standardized
+difference between slopes of d=0.12 for our primary outcome (HRSD-17). This value falls well below
+published guidelines for a clinically significant difference in depression scores and would conservatively
+require a sample of > 1,000 individuals per treatment arm to detect. With our current sample size, we
+would have 80% power to detect medium-to-large effects (d>0.70). Findings of no differences between
+IPT and CBT outcomes or between IP and TH outcomes does not prove non-inferiority.
+Baseline HRSD-17 scores were in the moderate range (17.69 ± 4.40), suggesting that findings may not
+generalize to more severely depressed patients. We were underpowered to detect differences in levels of
+
+
+experience in therapists between treatment groups, limiting conclusions that can be drawn about impact
+of therapist training status. Multiple testing without correction raises the possibility of spurious findings.
+Conclusion
+Necessity is the mother of invention. In the case of the COVID-19 pandemic, urgent need for social
+distancing prompted widespread adoption of TH, including remote delivery of psychotherapy. It also
+forced this study to change its procedures from IP to TH, allowing a comparison of two treatment delivery
+modalities within a single trial. TH has many advantages compared to IP, including flexibility, less patient
+burden for transportation and childcare, and convenience.
+Because of the rapid adoption of TH in the wake of the COVID-19 pandemic, there has been little time to
+accumulate data about the safety and efficacy of TH (Blanco et al., 2022). Concerns have been raised
+about potential negative impacts of remote treatments on outcomes and alliance, particularly given the
+effects of technology on non-verbal interactions and patient-therapist communication. Therefore, it is
+reassuring to find comparable outcomes in both brief IPT and CBT, regardless of delivery method. This
+study also showed that alliance is preserved across platforms. Perhaps not surprisingly, TH delivery
+improved rates of therapy participation suggesting some advantages to this approach. Additional
+prospective, randomized controlled trials are needed to definitively test the efficacy of brief IPT and CBT
+delivered via TH versus IP, but this study provides preliminary and reassuring data supporting both brief
+IPT and brief CBT, delivered either by TH or IP, as treatments for depression.
+
+
+Figure 1a. Phase 1 CONSORT Diagram (In Person)
+PHASE 1
+Assessed for eligibility (n=191)
+Excluded (n=27) (21%)
+♦ Not meeting inclusion criteria (n=25)
+♦ Declined to participate (n=2)
+♦ Lost to follow-up (n=0 )
+Completed CBT (n=19)
+Discontinued intervention (n=1; relocated)
+Discontinued intervention by PI (n=1; COVID-19)
+Allocated to CBT (n=24)
+♦ Received allocated intervention (n=21)
+♦ Did not receive allocated intervention (n=3, 1 lost to follow-up, 2=withdrew from study)
+ALLOCATION
+12 WEEK FOLLOW-UP
+Randomized (n=49)
+ENROLLMENT
+Allocated to IPT (n=25)
+♦ Received allocated intervention (n=19)
+♦ Did not receive allocated intervention (n=6, 3 lost to follow-up, 3 withdrew* from study)
+*one of these individuals had baseline data that was included in some post-screening analyses
+Completed IPT (n=14)
+Discontinued intervention (n=2; withdrew from study)
+Discontinued intervention by PI (n=3; COVID-19)
+Total Referrals (n= 638)
+Screened/consented (n=76)
+Excluded (n=115)
+♦ Not meeting inclusion criteria (n= 63)
+♦ Declined to participate (n=37)
+♦ Lost to follow-up (n= 15)
+Not Assessed (unable to reach) (n= 447)
+
+
+Figure 1b. Phase 2 CONSORT Diagram (Telehealth)
+PHASE 2
+Assessed for eligibility (n=43)
+Excluded (n=9) (%)
+♦ Not meeting inclusion criteria (n= 9)
+♦ Declined to participate (n=0)
+♦ Lost to follow-up (n=0)
+Completed CBT (n=8)
+Discontinued intervention (n=0)
+Discontinued intervention by PI
+(n=0)
+Allocated to CBT (n=11)
+♦ Received allocated intervention (n=8)
+♦ Did not receive allocated intervention (n=3: 1 too busy/time; 1=no longer interested; 1=lost to follow-up)
+ALLOCATION
+12 WEEK FOLLOW-UP
+Randomized (n=28)
+ENROLLMENT
+Allocated to IPT (n=17)
+♦ Received allocated intervention (n=17)
+♦ Did not receive allocated intervention (n=0)
+Completed IPT (n=16)
+Discontinued intervention (n=0)
+Discontinued intervention by PI (n=1; too many technological
+problems for virtual visits)
+Total Referrals (n=149)
+Screened/consented (n=37)
+Excluded (n=6)
+♦ Not meeting inclusion criteria (n=0 )
+♦ Declined to participate (n= 2)
+♦ Lost to follow-up (n= 4 )
+Not Assessed (unable to reach) (n= 106)
+
+
+Table 1. Baseline Pre-Treatment Demographic and Clinical Characteristics of Intent-to-Treat Patient Sample
+Variable Phase I (in person, IP) Phase II (telehealth, TH)
+IPT (n=25)
+CBT (n=24)
+IPT (n=17)
+CBT (n=11) Gender (N, %) Male Female Non-Binary/Other
+7, 26.9% 18, 69.2% 1, 3.8%
+5, 20.8% 18, 75.0% 1, 4.2%
+7, 41.2% 7, 41.2% 3, 17.6%
+3, 27.3% 8, 72.7% 0, 0%
+Age (M, SD) 33.76 (15.66) 33.29 (14.16) 29.65 (11.48) 28.82 (10.89)
+Ethnicity (N, %Hispanic/Latinx) 3, 12.0% 1, 4.2% 0, 0% 0, 0% Race (N, %) White/Caucasian 15, 60.0% 16, 66.7% 14, 82.4% 8, 72.7% Black/African American 4, 16.0% 4, 16.7% 0, 0% 1, 9.1% Asian 4, 16.0% 3, 12.5% 4, 23.5% 0, 0% Native American or Pacific Islander 0, 0% 1, 4.2% 1, 5.9% 0, 0%
+Marital Status (N, %) Never Married 17, 68.0% 16, 66.7% 12, 70.6% 8, 72.7% Married/Living as Married 5, 20% 3, 12.5% 4, 23.5% 1, 11.1% Separated/Divorced/3W. i1d2o.0w%ed 5, 20.8% 3, 12.0% 0, 0%
+Highest Education Level (N, %) High School Degree/Some College 11, 44.0% 7, 30.4% 4, 25.0% 4, 44.4% Associate/Technical Degree 0, 0% 4, 17.4% 1, 6.3% 0, 0% Bachelor’s Degree 9, 36.0% 8, 34.8% 8, 50.0% 2, 22.2% Graduate or Professional Degree 5, 20.0% 4, 17.4/% 3, 18.8% 3, 33.3%
+Total Annual Income (N, %) <$20,000 7, 28.0% 9, 42.9% 6, 40.0% 4, 44.4% $20,000-$49,999 10, 40.0% 7, 33.3% 6, 40.0% 3, 33.3% 50,000-99,999 4, 16.0% 3, 14.3% 1, 6.7% 1, 11.1% 100,000+ 4, 16.0% 2, 9.6% 2, 13.3% 1, 11.1%
+Taking Antidepressants (N, %) 12, 54.5% 10, 41.7% 9, 56.3% 6, 54.5% HRSD-17 (M, SD)—At Screening 19.60 (3.55) 18.75 (3.46) 19.12 (3.89) 17.09 (2.17) MADRS (M, SD)—At Screening 29.83 (5.11) 30.83 (4.41) 30.71 (5.18) 28.09 (5.41)
+
+
+Table 2. Demographic Characteristics (Therapists)
+IPT (N=8) CBT (N=8) Gender (N, % male) 0, 0% 3, 37.5% Age (mean, SD) 37.88 (11.05) 30.38 (5.04) Ethnicity (N, %Hispanic/Latinx) 1, 12.5% 0, 0% Race (N, %) White/Caucasian 8, 100% 5, 62.5% Black/African American 0, 0% 1, 12.5% Asian 0, 0% 1, 12.5% Other or Multiracial 0, 0% 1, 12.5% Years of experience (mean, SD) 10.63 (10.17) 5.25 (4.65) Current trainee (N, %) 4, 50% 6, 75%
+
+
+Figure 2. Hamilton Rating Scale for Depression (HRSD-17) Scores by Treatment Group and Phase
+
+
+Figures 3. Weekly Patient and Therapist Rated Working Alliance Inventory (WAI) scores by Treatment Group and Phase
+
+
+Table 3: Regression Coefficients (and Standard Errors) for the Multilevel Models for Each Primary and Secondary Outcome
+Predictor HRSD-17 MADRS QIDS WAI-Patient WAI-Therapist WHODAS GAD7
+Intercept (Patient level) 12.46 (.80)*** 17.03 (1.35)*** 8.46 (.79)*** 53.66 (1.44)*** 42.46 (1.26)*** .78 (.12) 7.64 (.92)
+Group -.25 (1.24) .12 (2.51) .75 (1.46) -2.33 (3.72) .32 (1.99) -.06 (.18) .28 (1.43)
+Phase -.57 (1.23) -3.47 (2.42) .66 (1.45) 1.57 (3.06) -1.36 (2.17) .04 (.19) 1.39 (1.34)
+Group × Phase 2.09 (2.43) .72 (5.14) 4.01 (2.95) -11.11 (6.70) -.59 (4.03) -.23 (.49) 1.81 (2.95)
+Gender_Male -2.34 (1.32) -1.14 (2.97) -1.55 (1.62) -4.43 (3.17) 2.20 (1.93) -.10 (.19) -.2.54 (1.26)*
+Gender_Other -1.02 (2.68) -1.57 (4.99) 0.80 (2.03) 0.77 (4.57) 5.80 (4.52) .13 (.34) -2.36 (2.64)
+Pretreatment Severity .89 (.21)*** .78 (.35) * .15 (.19) .39 (.46) -.04 (.11) .04 (.03) .29 (.23)
+Time Intercept -.53 (.09)*** -1.04 (.15)*** -.42 (.08)*** .84 (.12)*** .25 (.11)* -.02 (.01)* -.27 (.08)***
+Time × Group -.04 (.14) .05 (.24) .03 (.13) .22 (.26) .47 (.16)** -.01 (.02) .05 (.12)
+Time × Phase -.07 (.14) -.25 (.25) -.03 (.14) .14 (.22) .01 (.19) .02 (.02) .005 (.11)
+Time × Group × Phase -.06 (.26) -.20 (.49) .27 (.26) -.57 (.46) .67 (.35) .01 (.03) .16 (.23)
+Time × Gender_Male -.06 (.10) -.12 (.28) -.11 (.15) -.27 (.22) .15 (.17) -.001 (.02) .06 (.11)
+Time x Gender_Other -.04 (.27) -.10 (.58) 0.07 (.17) .98 (.63) .84 (.57) -.02 (.03) -.02 (.28)
+Time × Pretreatment
+Severity
+-.002 (.03) -.01 (.03) -.02 (.01) -.06 (.03) -.04 (.03) .002 (.002) -.001 (.02)
+Note: Pretreatment severity is operationalized as HRSD-17 total score at screening; *p<.05, **p<.01, ***p<.001
+Hamilton Rating Scale for Depression (HRSD), Montgomery Asberg Depression Rating Scale (MADRS), Quick Inventory of Depressive Symptomatology-Self Report (QIDS-SR),
+Working Alliance Inventory (WAI), World Health Organization Disability Assessment Schedule (WHODAS), Generalized Anxiety Disorder Assessment (GAD7)
+Gender reference category was set to female=0 with two dichotomous variables added for male=1 and other/non-binary gender=1, respectively.
+
+
+References
+American Psychiatric Association, 2013. Diagnostic and Statistical Manual of Mental Disorders, Fifth Edition. American Psychiatric Publishing, Inc., Washington, D.C.
+Beck, A.T., Rush, A.J., Shaw, B.F., Gary, E., 1979. Cognitive therapy of depression. Guilford Press, New York.
+Bee, P.E., Bower, P., Lovell, K., Gilbody, S., Richards, D., Gask, L., Roach, P., 2008. Psychotherapy mediated by remote communication technologies: a meta-analytic review. BMC Psychiatry 8, 60.
+Blanco, C., Wall, M.M., Olfson, M., 2022. Implications of Telepsychiatry for Cost, Quality, and Equity of Mental Health Care. JAMA Psychiatry.
+Bordin, E.S., 1979. The generalizability of the psychoanalytic concept of the working alliance. Psychotherapy: Theory, Research, and Practice 16, 252-260.
+Clark, D.M., 2011. Implementing NICE guidelines for the psychological treatment of depression and anxiety disorders: the IAPT experience. Int Rev Psychiatry 23, 318-327.
+Cuijpers, P., Geraedts, A.S., van Oppen, P., Andersson, G., Markowitz, J.C., van Straten, A., 2011. Interpersonal psychotherapy for depression: a meta-analysis. The American Journal of Psychiatry 168, 581-592.
+Cuijpers, P., Noma, H., Karyotaki, E., Cipriani, A., Furukawa, T.A., 2019a. Effectiveness and Acceptability of Cognitive Behavior Therapy Delivery Formats in Adults With Depression: A Network Meta-analysis. JAMA Psychiatry 76, 700-707.
+Cuijpers, P., Reijnders, M., Huibers, M.J.H., 2019b. The Role of Common Factors in Psychotherapy Outcomes. Annu Rev Clin Psychol 15, 207-231.
+Cuijpers, P., Smit, F., Bohlmeijer, E., Hollon, S.D., Andersson, G., 2010. Efficacy of cogntive-behavioural therapy and other psychological treatments for adult depression: meta-analytic study of publication bias. Br J Psychiatry March, 173-178.
+Cuijpers, P., van Straten, A., Andersson, G., van Oppen, P., 2008. Psychotherapy for depression in adults: a meta-analysis of comparative outcome studies. Journal of Consulting & Clinical Psychology 76, 909922.
+Cully, J.A., Teten, A.L., 2008. A therapist's guide to brief cognitive behavioral therapy, in: MIRECC, D.o.V.A.S.C. (Ed.).
+Dennis, C.L., Grigoriadis, S., Zupancic, J., Kiss, A., Ravitz, P., 2020. Telephone-based nurse-delivered interpersonal psychotherapy for postpartum depression: nationwide randomised controlled trial. Br J Psychiatry 216, 189-196.
+Don, F.J., Driessen, E., Peen, J., Spijker, J., DeRubeis, R.J., Blankers, M., Dekker, J.J.M., 2020. The Temporal Associations of Therapeutic Alliance and Manual Adherence With Depressive Symptom Change in Cognitive Behavioral Therapy for Adult Outpatient Major Depression. Front Psychiatry 11, 602294.
+
+
+Federici, S., Bracalenti, M., Meloni, F., Luciano, J.V., 2017. World Health Organization disability assessment schedule 2.0: An international systematic review. Disabil Rehabil 39, 2347-2380.
+Feeley, M., DeRubeis, R.J., Gelfand, L.A., 1999. The temporal relation of adherence and alliance to symptom change in cognitive therapy for depression. Journal of consulting and clinical psychology 67, 578-582.
+Fernandez, E., Woldgabreal, Y., Day, A., Pham, T., Gleich, B., Aboujaoude, E., 2021. Live psychotherapy by video versus in-person: A meta-analysis of efficacy and its relationship to types and targets of treatment. Clin Psychol Psychother 28, 1535-1549.
+First, M.B., Williams, J.B.W., Benjamin, L.S., Spitzer, R.L., 2016. Structured Clinical Interview for DSM5 Personality Disorders (SCID-5-PD). American Psychiatric Publishing, Washington, D.C.
+Fluckiger, C., Del Re, A.C., Wampold, B.E., Horvath, A.O., 2018. The alliance in adult psychotherapy: A meta-analytic synthesis. Psychotherapy (Chic) 55, 316-340.
+Giovanetti, A.K., Punt, S.E.W., Nelson, E.L., Ilardi, S.S., 2022. Teletherapy Versus In-Person Psychotherapy for Depression: A Meta-Analysis of Randomized Controlled Trials. Telemed J E Health 28, 1077-1089.
+Guaiana, G., Mastrangelo, J., Hendrikx, S., Barbui, C., 2020. A Systematic Review of the Use of Telepsychiatry in Depression. Community Ment Health J.
+Hamilton, M., 1960. A rating scale for depression. J Neurol Neurosurg Psychiatry 25, 56-62.
+Hepner, K.A., Azocar, F., Greenwood, G.L., Miranda, J., Burnam, M.A., 2010. Development of a clinician report measure to assess psychotherapy for depression in usual care settings. Adm Policy Ment Health 37, 221-229.
+Hirschfeld, R.M., Montgomery, S.A., Keller, M.B., Kasper, S., Schatzberg, A.F., Moller, H.J., Healy, D., Baldwin, D., Humble, M., Versiani, M., Montenegro, R., Bourgeois, M., 2000. Social functioning in depression: a review. Journal of Clinical Psychiatry 61, 268-275.
+Horvath, A.O., Del Re, A.C., Fluckiger, C., Symonds, D., 2011. Alliance in individual psychotherapy. Psychotherapy (Chic) 48, 9-16.
+Horvath, A.O., Greenberg, L.S., 1989. Development and validation of the Working Alliance Inventory. J Couns Psychol 36, 223-233.
+Horvath, A.O., Luborsky, L., 1993. The role of the therapeutic alliance in psychotherapy. Journal of Consulting & Clinical Psychology 61, 561-573.
+Huibers, M.J., van Breukelen, G., Roelofs, J., Hollon, S.D., Markowitz, J.C., van Os, J., Arntz, A., Peeters, F., 2014. Predicting response to cognitive therapy and interpersonal therapy, with or without antidepressant medication, for major depression: a pragmatic trial in routine practice. J Affect Disord 152-154, 146-154.
+James, G., Schroder, T., De Boos, D., 2022. Changing to remote psychological therapy during COVID-19: Psychological therapists' experience of the working alliance, therapeutic boundaries and work involvement. Psychol Psychother.
+
+
+Kessler, R.C., Berglund, P., Demler, O., Jin, R., Koretz, D., Merikangas, K.R., Rush, A.J., Walters, E.E., Wang, P.S., 2003. The epidemiology of major depressive disorder: results from the National Comorbidity Survey Replication (NCS-R). JAMA 289, 3095-3105.
+Krupnick, J.L., Sotsky, S.M., Simmens, S., Moyer, J., Elkin, I., Watkins, J., Pilkonis, P.A., 1996. The role of the therapeutic alliance in psychotherapy and pharmacotherapy outcome: findings in the National Institute of Mental Health Treatment of Depression Collaborative Research Program. Journal of Consulting & Clinical Psychology 64, 532-539.
+Laska, K.M., Gurman, A.S., Wampold, B.E., 2014. Expanding the lens of evidence-based practice in psychotherapy: a common factors perspective. Psychotherapy (Chic) 51, 467-481.
+Lemmens, L.H., Arntz, A., Peeters, F., Hollon, S.D., Roefs, A., Huibers, M.J., 2015. Clinical effectiveness of cognitive therapy v. interpersonal psychotherapy for depression: results of a randomized controlled trial. Psychol Med 45, 2095-2110.
+Luborsky, L., Singer, B., 1975. Comparative studies of psychotherapies. Is it true that "everywon has one and all must have prizes"? Archives of General Psychiatry 32, 995-1008.
+Markowitz, J.C., Milrod, B., 2022. Post-pandemic psychotherapy: still under seige. Psychiatric Services 73, 690-692.
+Markowitz, J.C., Milrod, B., Heckman, T.G., Bergman, M., Amsalem, D., Zalman, H., Ballas, T., Neria, Y., 2021. Psychotherapy at a Distance. Am J Psychiatry 178, 240-246.
+Mathers, C.D., Loncar, D., 2006. Projections of global mortality and burden of disease from 2002 to 2030. PLoS Med 3, e442.
+Matts, J.P., Lachin, J.M., 1988. Properties of permuted-block randomization in clinical trials. Control Clin Trials 9, 327-344.
+McHugh, R.K., Whitton, S.W., Peckham, A.D., Welge, J.A., Otto, M.W., 2013. Patient preference for psychological vs pharmacologic treatment of psychiatric disorders: a meta-analytic review. J Clin Psychiatry 74, 595-602.
+Miranda, J., Hepner, K.A., Azocar, F., Greenwood, G., Ngo, V., Burnam, M.A., 2010. Development of a patient-report measure of psychotherapy for depression. Adm Policy Ment Health 37, 245-253.
+Mohr, D.C., Ho, J., Duffecy, J., Reifler, D., Sokol, L., Burns, M.N., Jin, L., Siddique, J., 2012. Effect of telephone-administered vs face-to-face cognitive behavioral therapy on adherence to therapy and depression outcomes among primary care patients: a randomized trial. JAMA 307, 2278-2285.
+Montgomery, S.A., Asberg, M., 1979. A new depression scale designed to be sensitive to change. Br J Psychiatry 134, 382-389.
+Morris, N.P., Hirschtritt, M.E., 2020. Telepsychiatry, Hospitals, and the COVID-19 Pandemic. Psychiatr Serv 71, 1309-1312.
+Nienhuis, J.B., Owen, J., Valentine, J.C., Winkeljohn Black, S., Halford, T.C., Parazak, S.E., Budge, S., Hilsenroth, M., 2018. Therapeutic alliance, empathy, and genuineness in individual adult psychotherapy: A meta-analytic review. Psychother Res 28, 593-605.
+
+
+Norwood, C., Moghaddam, N.G., Malins, S., Sabin-Farrell, R., 2018. Working alliance and outcome effectiveness in videoconferencing psychotherapy: A systematic review and noninferiority metaanalysis. Clin Psychol Psychother 25, 797-808.
+Norwood, C., Sabin-Farrell, R., Malins, S., Moghaddam, N.G., 2021. An explanatory sequential investigation of the working alliance as a change process in videoconferencing psychotherapy. J Clin Psychol 77, 1330-1353.
+Oquendo, M.A., Lizardi, D., Greenwald, S., Weissman, M.M., Mann, J.J., 2004. Rates of lifetime suicide attempt and rates of lifetime major depression in different ethnic groups in the United States. Acta Psychiatr Scand 110, 446-451.
+Pilling, S., Anderson, I., Goldberg, D., Meader, N., Taylor, C., Two Guideline Development, G., 2009. Depression in adults, including those with a chronic physical health problem: summary of NICE guidance. BMJ 339, b4108.
+Rush, A.J., Trivedi, M.H., Ibrahim, H.M., Carmody, T.J., Arnow, B., Klein, D.N., Markowitz, J.C., Ninan, P.T., Kornstein, S., Manber, R., Thase, M.E., Kocsis, J.H., Keller, M.B., 2003. The 16-Item Quick Inventory of Depressive Symptomatology (QIDS), clinician rating (QIDS-C), and self-report (QIDS-SR): a psychometric evaluation in patients with chronic major depression. Biological Psychiatry 54, 573-583.
+Sheehan, D.V., Lecrubier, Y., Sheehan, K.H., Amorim, P., Janavs, J., Weiller, E., Hergueta, T., Baker, R., Dunbar, G.C., 1998. The Mini-International Neuropsychiatric Interview (M.I.N.I.): the development and validation of a structured diagnostic psychiatric interview for DSM-IV and ICD-10. Journal of Clinical Psychiatry 59 Suppl 20, 22-33.
+Spitzer, R.L., Kroenke, K., Williams, J.B.W., Lowe, B., 2006. A brief measure for assessing generalized anxiety disorder: The GAD-7. Archives of Internal Medicine.166, pp.
+Swartz, H.A., 2021. Telepsychotherapy: The New Normal. Am J Psychother 74, 2-3.
+Swartz, H.A., Frank, E., Shear, M.K., Thase, M.E., Fleming, M.A.D., Scott, J., 2004. A pilot study of brief interpersonal psychotherapy for depression in women. Psychiatric Services 55, 448-450.
+Swartz, H.A., Grote, N.K., Graham, P., 2014. Brief interpersonal psychotherapy (IPT-B): Overview and review of the evidence. Am J Psychother 68, 443-462.
+Vail, A.K., Girard, J., Bylsma, L., Cohn, J., Fournier, J., Swartz, H., Morency, L.P., 2021. Goals, Tasks, and Bonds: Toward the Computational Assessment of Therapist Versus Client Perception of Working Alliance. Proc Int Conf Autom Face Gesture Recognit 2021.
+Vail, A.K., Girard, J.M., Bylsma, L.M., Cohn, J.F., Fournier, J., Swartz, H.A., Morency, L.P., 2022. Toward causal understanding of therapist-client relationships: a study of language modality and social entrainment, ICMI, November 7-11, 2022, Bengaluru, India.
+van Bronswijk, S.C., Lemmens, L., Keefe, J.R., Huibers, M.J.H., DeRubeis, R.J., Peeters, F., 2018. A prognostic index for long-term outcome after successful acute phase cognitive therapy and interpersonal psychotherapy for major depressive disorder. Depress Anxiety.
+Wampold, B.E., Imel, Z.E., 2015. The Great Psychotherapy Debate, Second ed. Routledge, New York, NY.
+
+
+Weissman, M.M., Markowitz, J.C., Klerman, G.L., 2018. The Guide to Interpersonal Psychotherapy. Oxford University Press, New York, NY.
+Wells, J.E., Browne, M.O., Aguilar-Gaxiola, S., Al-Hamzawi, A., Alonso, J., Angermeyer, M.C., Bouzan, C., Bruffaerts, R., Bunting, B., Caldas-de-Almeida, J.M., de Girolamo, G., de Graaf, R., Florescu, S., Fukao, A., Gureje, O., Hinkov, H.R., Hu, C., Hwang, I., Karam, E.G., Kostyuchenko, S., Kovess-Masfety, V., Levinson, D., Liu, Z., Medina-Mora, M.E., Nizamie, S.H., Posada-Villa, J., Sampson, N.A., Stein, D.J., Viana, M.C., Kessler, R.C., 2013. Drop out from out-patient mental healthcare in the World Health Organization's World Mental Health Survey initiative. Br J Psychiatry 202, 42-49.
+Yellowlees, P., Nakagawa, K., Pakyurek, M., Hanson, A., Elder, J., Kales, H.C., 2020. Rapid Conversion of an Outpatient Psychiatric Clinic to a 100% Virtual Telepsychiatry Clinic in Response to COVID-19. Psychiatr Serv 71, 749-752.
+Zhdanava, M., Pilon, D., Ghelerter, I., Chow, W., Joshi, K., Lefebvre, P., Sheehan, J.J., 2021. The Prevalence and National Burden of Treatment-Resistant Depression and Major Depressive Disorder in the United States. J Clin Psychiatry 82.

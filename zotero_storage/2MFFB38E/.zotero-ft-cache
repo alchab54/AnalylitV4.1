@@ -1,0 +1,769 @@
+JMIR Preprints Shaker et al
+Capturing patients and clinicians experiences on using video consultations in mental health outpatient services: A qualitative study
+Ali Abbas Shaker, Erik Simonsen, Kristine Tarp, Radoslav Aleksandrov Borisov, John Aasted Sørensen, Henrik Bechmann, Stephen F. Austin
+Submitted to: JMIR Formative Research on: July 05, 2023
+Disclaimer: © The authors. All rights reserved. This is a privileged document currently under peer-review/community review. Authors have provided JMIR Publications with an exclusive license to publish this preprint on it's website for review purposes only. While the final peer-reviewed paper may be licensed under a CC BY license on publication, at this stage authors and publisher expressively prohibit redistribution of this draft paper other than for review purposes.
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+Table of Contents
+Original Manuscript....................................................................................................................................................................... 5
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+Capturing patients and clinicians experiences on using video consultations in mental health outpatient services: A qualitative study
+Ali Abbas Shaker1 PhD, MD, BEng; Erik Simonsen2, 3 MD, PhD; Kristine Tarp4 MSc, PhD; Radoslav Aleksandrov Borisov5 MD; John Aasted Sørensen6 MSc, PhD; Henrik Bechmann6 MSc, PhD; Stephen F. Austin1, 7 MSc, PhD
+1Psychiatric Research Unit Slagelse DK 2Department of Clinical Medicine, University of Copenhagen Copenhagen DK 3Mental Health Services East, Copenhagen University Hospital – Psychiatry Region Zealand Roskilde DK 4The National Research Centre for the Working Environment Copenhagen DK 5Mental Health Services South, Copenhagen University Hospital – Psychiatry Region Zealand Maribo DK 6Department of Engineering Technology and Didactics, Research unit: AI, Mathematics and Software, Technical University of Denmark Ballerup DK 7Institute of Psychology, University of Copenhagen Copenhagen DK
+Corresponding Author:
+Ali Abbas Shaker PhD, MD, BEng Psychiatric Research Unit Fælledvej 6 Bygning 3, 4. sal Slagelse DK
+Abstract
+Background: Over the last decade, there has been an increase in the evidence base supporting the efficacy of video consultations (VC) in mental health services. Furthermore, the COVID-19 pandemic has also demonstrated the potential of virtual treatment. Despite these promising results and conducive conditions for VC, several studies have highlighted that the uptake and implementation of VC continues to be slow, even post-pandemic. In order to facilitate and strengthen the implementation of VC and exploit its potential as a useful tool for mental health disorder treatment, there is a need for a deeper understanding of the issues and experiences of implementing and using VC as a treatment modality in clinical practice.
+Objective: To investigate patients' and clinicians' experiences and attitudes toward using VC in clinical practice.
+Methods: Qualitative interviews were conducted with patients (n=10) and clinicians (n=4) who participated in weekly virtual treatment over two months within a mental health outpatients services in Denmark. Data from these semi-structured interviews with patients and focus group interviews with clinicians were explored through thematic analysis.
+Results: Common themes constructed from the patient interviews yielded two main themes; (1) Adjusting to the practicality of the VC format and (2) The practice of therapy using VC. Patients experienced that using VC was easy and convenient, increased their treatment engagement, and helped establish and maintain a therapeutic alliance. The thematic analysis conducted on clinicians' experience with VC yielded three themes; (1) A change of mindset from resistance to one of acceptance, (2) The contact is different on video, and (3) A new way of working. Clinicians experienced their initial concerns and resistance towards VC implementation gradually diminishing, and gaining clinical experience using VC is a prerequisite for a successful VC implementation in mental health services.
+Conclusions: Both patients and clinicians experienced that VC enhanced access to treatment and could be meaningfully integrated into clinical practice. This study also found clinicians expressed initial concerns and some resistance towards VC, but this diminished with the utilization of VC. Future research is needed to facilitate clinicians' use of VC in clinical practice.
+(JMIR Preprints 05/07/2023:50580) DOI: https://doi.org/10.2196/preprints.50580
+Preprint Settings
+1) Would you like to publish your submitted manuscript as preprint?
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+Please make my preprint PDF available to anyone at any time (recommended).
+Please make my preprint PDF available only to logged-in users; I understand that my title and abstract will remain visible to all users. Only make the preprint title and abstract visible. No, I do not wish to publish my submitted manuscript as a preprint. 2) If accepted for publication in a JMIR journal, would you like the PDF to be visible to the public?
+Yes, please make my accepted manuscript PDF available to anyone at any time (Recommended).
+Yes, but please make my accepted manuscript PDF available only to logged-in users; I understand that the title and abstract will remain v Yes, but only make the title and abstract visible (see Important note, above). I understand that if I later pay to participate in <a href="http
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+Original Manuscript
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+ADMINISTRATIVE INFORMATION
+Authors Ali Abbas Shaker1, 2, , Kristine Tarp4, Radoslav Aleksandrov Borisov5, Henrik Bechmann6, John Aasted Sørensen7, Erik Simonsen2,8 Stephen F. Austin1,3 Corresponding author: AA, Shaker ashak@regionsjaelland.dk Author affiliations
+1Psychiatric Department, Region Zealand Psychiatry, Psychiatric Research Unit, Slagelse, Denmark 2Department of Clinical Medicine, University of Copenhagen, Copenhagen, Denmark 3Institute of Psychology, University of Copenhagen, Denmark 4Research Unit for Digital Psychiatry, Mental Health Services in the Region of Southern Denmark, Odense, Denmark 5Mental Health Services South, Copenhagen University Hospital – Psychiatry Region Zealand, Maribo, Denmark 6Department of Engineering Technology and Didactics, Research unit: AI, Mathematics and Software, Technical University of Denmark, Ballerup, Denmark 7Johan Jepsens St., Virum, 2830, Denmark 8Mental Health Services East, Copenhagen University Hospital – Psychiatry Region Zealand, Roskilde, Denmark Email: Ali Abbas Shaker ashak@regionsjaelland.dk - Stephen Austin stfa@regionsjaelland.dk - Kristine Tarp kristine.tarp@rsyd.dk - Radoslav Aleksandrov Borisov raab@regionsjaelland.dk - Henrik Bechmann hebec@dtu.dk - John A Sørensen john@aasted.dk - Erik Simonsen es@regionsjaelland.dk Ali Abbas Shaker https://orcid.org/0000-0001-9912-5134 Stephen F. Austin https://orcid.org/0000-0001-5988-0565 Kristine Tarp https://orcid.org/0000-0003-0901-855X Radoslav Aleksandrov Borisov https://orcid.org/0009-0005-8572-9873 John Aasted Sørensen https://orcid.org/0000-0003-2852-2292 Henrik Bechmann https://orcid.org/0000-0001-6463-4764 Erik Simonsen https://orcid.org/0000-0002-6134-2392
+Capturing patients and clinicians experiences on using video consultations in mental health
+outpatient services: A qualitative study.
+Abstract
+Background: Over the last decade, there has been an increase in the evidence base supporting the
+efficacy of video consultations (VC) in mental health services. Furthermore, the COVID-19
+pandemic has also demonstrated the potential of virtual treatment. Despite these promising results
+and conducive conditions for VC, several studies have highlighted that the uptake and
+implementation of VC continues to be slow, even post-pandemic. In order to facilitate and strengthen
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+the implementation of VC and exploit its potential as a useful tool for mental health disorder
+treatment, there is a need for a deeper understanding of the issues and experiences of implementing
+and using VC as a treatment modality in clinical practice.
+Objective: To investigate patients' and clinicians' experiences and attitudes toward using VC in
+clinical practice.
+Methods: Semi structured interviews were conducted individually with patients (n=10) and in a
+focus group with clinicians (n=4). Both groups had participated in weekly VC treatment over two
+months within a mental health outpatients services in Denmark. Data from these semi-structured
+interviews were analyzed using thematic analysis.
+Results: Common themes constructed from the patient interviews yielded two main themes; (1)
+Adjusting to the practicality of the VC format and (2) The practice of therapy using VC. Patients
+experienced that using VC was easy and convenient, and it was possible to establish and maintain a
+therapeutic alliance. They also described the contact as different to in-person therapy.
+The thematic analysis conducted on clinicians' experience with VC yielded three themes; (1) A
+change of mindset from resistance to one of acceptance, (2) The contact is different on video, and (3)
+A new way of working. Clinicians experienced their initial concerns and resistance towards VC
+implementation gradually diminished over time as they gained clinical experience using the
+modality. They expressed contact with patients can be different and it took time to adjust to new way
+of working therapeutically.
+Conclusions: Both patients and clinicians experienced that VC could enhance access to treatment
+and be meaningfully integrated into clinical practice. Additionally, both groups described the contact
+over VC was different to in-person therapy. Future research could examine patients and clinicians
+perceived differences of contact using the VC modality and the implications for therapeutic
+interventions.
+Introduction
+It is estimated that around 970 million (13%) people globally have a mental health disorder (pre
+pandemic 2019), and most of these people do not have access to an effective mental health
+services[1]. Mental health services is challenged worldwide by the disparity between the limited
+number of mental health practitioners and the increasing number of patients needing mental health
+assessment or treatment [2]. With the growing aging of western population and digitalization of
+people's behavior, communication, and lifestyle, there is a need for user-friendly and meaningful
+technological solutions that can adapt to these changes [1,2].
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+Over the last decade, researchers worldwide have investigated video consultation (VC) as an
+alternative mental health treatment modality, especially for rural patients. Qualitative studies have
+shown that VC can increase access to care not only for patients who live in rural areas but also for
+patients who have problems with mobility, access to transport, or economical limitations [3–8]. For
+patients with a busy daily life, e.g., due to work and school or conflicting schedules, VC can also be
+a preferred treatment modality, as it can offer the convenience and flexibility in the provision of
+mental health treatment [7]. It has also been reported that VC can reduce stigmatization as patients
+do not need to leave their homes for mental health services encounters [8]. Similar to the positive
+experiences reported in qualitative studies evaluating VC, quantitative studies have also reported that
+mental health services delivered via VC is equivalent to in-person consultation [9–12].
+Despite the growing body of evidence indicating equivalence between VC and in-person
+consultation, there are also several barriers and concerns to the implementation of VC in clinical
+practice. These barriers can generally be divided into three categories; (1) the technology itself, (2)
+characteristics of the (end-) users of the technology, and (3) the context in which technology is
+implemented.
+Firstly, barriers related to the technology and VC in particular, involve concerns about the user
+friendliness (easiness) of the technology, the accessibility of the technology, confidentiality, and the
+security features (such as encryptions, logins and authentications, software updates, etc.) [13–15].
+Secondly, barriers linked to the users of the technology (patients and clinicians) include, for example,
+the users' physical and mental state when using the technology, the users' experience and
+technological skills in using the technology (digital competency), and the users' transition phase from
+in-person to VC modality. In addition, using VC in clinical practice, particularly for therapeutic
+interventions requires establishing a virtual therapeutic alliance, which can be experienced as new
+and challenging for some users [15,16]. Thirdly, barriers related to the user context include whether
+VC is used for general assessment, diagnosis, or treatment and the physical settings/environments
+where VC is implemented, e.g., at the patient's/clinician's home, in a hospital, or in an outpatient
+service [17–19]. Finally, the medical tech industry is under constant development, and new
+technological tools or improvements to existing systems are regularly introduced to the healthcare
+systems [20,21]. This potentially leads to a demand from both patients and clinicians to access and
+use cutting-edge technology in clinical practice but also requires ongoing training of users and an
+adjustment of clinical workflows to accommodate this new development.
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+Understanding the interactions between humans and technology is an important
+factor in determining how a digital solution will be received and utilized in
+clinical practice. Technology acceptance is defined as an individuals intentional or
+voluntary use of a technology and is a core aspect in understanding the utilization
+of technology in the real world [22]. The Technology Acceptance Model (TAM)
+describes how perceived usefulness and ease of use of a technology impacts on
+attitudes, behavioral intention to use (intention) and actual use [23,24]. This
+theoretical framework can be used to understand how the attitudes and
+experiences of users (eg: clinicians and patients) may impact on the use of VC
+within clinical practice. Several reviews have shown that the TAM is a valid
+model to explain the utilization of technology in health settings [25]. This study
+explored patient and clinician experiences when using VC to provide insight into
+the factors that may impact on its uptake or utilization in clinical practice.
+Objective
+The objective of this study was to investigate patients' and clinicians' experiences and attitudes
+toward using VC in clinical practice. Understanding patients (service user) and clinicians’ (service
+provider) perspectives is a key factor to the successful implementation of VC in treatment.
+Developing a deeper understanding of the experience of users working with VC could help generate
+ideas to facilitate and strengthen the implementation of VC and exploit its full potential as a tool for
+treatment of mental health disorders.
+Methods
+Study Design
+A qualitative study design with an exploratory approach was utilized to investigate the experiences of
+patients and clinicians in using VC in clinical practice. The Consolidated Criteria for Reporting
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+Qualitative (COREQ) research guidelines were followed to report this study [26]. COREQ is a set of
+guidelines that aim to enhance the transparency of conducting and reporting qualitative research.
+It incorporates various aspects of the study, including study design and procedure, data collection and
+analysis, and reporting the study in a structured manner. This qualitative study was part of a larger
+study which collected quantitative data about how clinicians utilized VC in clinical practice and the
+results have been published elsewhere [25]
+Settings and Participants
+The study was conducted in a mental health outpatient service in the southern part of region Zealand,
+Denmark. The clinic treats around 550 adult patients (>18 years) annually with anxiety, post
+traumatic stress disorder (PTSD), depression, and personality disorders, both individually or group
+based. Nearly 50% of the patients are between 18 and 29 years. During the COVID-19 pandemic, the
+recommendations from the health government were to carry out VC with patients, but in-person
+consultation was still an option for patients. The VC system was available before the pandemic but
+not utilized sufficiently in clinical practice.
+A convenience sample of patients and clinicians that utilized VC in the treatment of non-psychotic
+disorders were invited to participate in interviews. Participants were recruited from an
+implementation study conducted at the same clinical site which collected data on a range of
+quantitative outcomes such as acceptance, demand, negative outcomes and reported focus for
+therapists for patients receiving treatment via VC (n=15) or in person treatment (n=19). A detailed
+description of the design and results of this study is contained in another publication [27].
+Patients were eligible to participate in the study if they were over 18 years old, were newly
+diagnosed with a non-psychotic disorder, and owned a smartphone or computer with the option of
+VC. Clinicians had an allied health background (e.g., psychologist, psychiatric nurse, or psychiatrist)
+and therapeutic education in cognitive behavioral therapy, mentalization-based therapy, schema
+focused therapy, or dialectical behavioral therapy, and a minimum of one year of clinical/therapeutic
+experience.
+Video consultations
+Patients received the diagnosis-specific treatment based on their needs, and treatment were
+conducted virtually through VC modality. This treatment typically consisted of 8 weekly sessions
+over a period of two months and usually included a combination of psychoeducation, psychotherapy,
+support, and medication. Psychotherapy had a focus of promoting a better understanding of
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+difficulties experienced, possible triggers and the development of appropriate strategies to deal with
+these difficulties. Patients receiving treatment via VC had indicated that they were open to
+participating in treatment via this modality. The participants (patients and clinicians) in the study had
+little or no in-person interactions prior to commencing treatment via VC.
+Procedure
+Patients and clinicians who had participated in the two-month treatment course via VC were invited
+to participate in interviews. The interviews in the study included individual semi-structured
+interviews with the patients and a focus group interview with the clinicians. An interview guide [28]
+was developed to facilitate the semi-structured interviews with the patients, while a discussion guide
+[29] was developed for the focus group interview with the clinicians. Both guides consisted of open
+ended questions and probes in order to cover the important aspects of utilizing VC in clinical
+practice. The guides were developed by researchers with experience in telemedicine research. The
+guides included (1) an introduction section that clarified the purpose of the interviews, followed by
+(2) general questions related to the experience of using VC, (3) questions regarding the use of VC in
+for clinical treatment , (4) probes regarding any perceived differences between VC and in-person
+consultation and (5) probes regarding suggestions for changes/improvements regarding the use of
+VC in clinical practice 6) question about other experiences and reflections about VC not already
+covered in the interview. The researcher conducting the interviews had no prior working relationship
+with the participants.
+The semi-structured interviews were conducted virtually or in-person at the patients' homes or the
+mental health outpatient service. The interviews took place after patients had completed the VC
+therapy course (eight video appointments). Patients were asked open-ended and probing questions,
+and the interviewer (AAS) was aware and reflective of his own beliefs regarding VC. The interview
+guide was designed to allow participants have the necessary time to elaborate on their own
+perceptions of VC for each of the topics covered in the interview guide. The interviews ranged from
+15 to 45 minutes and were audio recorded.
+The focus group interview was held in the mental health outpatient service at the end of the study,
+where the clinicians (psychiatrists, psychiatric nurses and psychologists) had their daily clinical
+work. The first author (AAS) mediated the focus group interview and facilitated discussion and
+dialogues between participants while keeping the focus group interview on track. The interview
+lasted one hour and were audio recorded.
+Data Analyses
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+The study took an inductive approach to collect information about patient and clinician experiences
+using VC as a treatment modality. Thematic analysis was used as a methodology to analyze the data
+generated during the interviews which followed guidelines outlined by Braun & Clarke [30]. The
+analysis aimed at identifying broader patterns of latent meanings by transcending the descriptive
+level of the data. A guiding principle was the “keyness” of theme in regards to its ability to capture
+important information to the research focus [30,31].
+The analytic procedure entailed (1) becoming familiar with the data which involved reading and re
+reading the data set and writing memos, (2) generating initial codes, where data was labelled and
+organized into meaningful groups. Codes were organized around central ideas or concepts (3)
+searching for themes; defining different theme properties (4) reviewing tentative themes: collapsing
+overlapping themes, reworking and refining codes and themes (5) labeling themes: fitting the broader
+data set to respond to the research questions and (6) summarizing the data. The themes were
+conceptualized as patterns of shared meaning, cohering around a central concept – the central idea or
+meaning.
+The primary author (AAS) who was a qualified IT engineer and medical doctor conducted the
+thematic analysis in consultation with the last author (SFA) to help construct codes and themes
+through an iterative process. The second author (KT) an expert in qualitative analysis provided
+overall guidance and supervision of the analysis. Two separate thematic analyses were conducted,
+one covering the patients' perspective and other the clinicians' perspectives of using VC in clinical
+practice.
+The thematic analysis emphasized the importance of the researcher’s subjectivity as analytic
+resource, and their reflexive engagement with theory, data and interpretation. Different strategies
+were used to increase the trustworthiness and promote reflexivity during the analysis [32,33]. Firstly,
+all interviews were recorded, transcribed verbatim, and uploaded to a secure central archive so that
+all coders could have prolonged engagement with the raw data and thereby improve the credibility of
+the analysis. Second, raw data were transferred to NVivo 12 Pro so that each step of the analysis
+could be documented. This created an audit trail and promoted confirmability. Thirdly, the two
+researchers (AS & SFA), who conducted the thematic analysis engaged in peer consultation to
+promote triangulation regarding the main themes. Furthermore, a third author (KT) was consulted in
+the peer consultation to clarify themes that could not be resolved between the two main authors.
+Finally, results from the thematic analysis was presented to the entire research team and their
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+reflections and ideas were incorporated into the analysis where it was deemed appropriate.
+Ethics
+All participants received verbal and written information about the research project prior to informed
+consent to their participation. All material from the interviews was anonymized and stored on a
+secure server. Approval for the study was obtained from Denmark Ethics Committee, Zealand
+(EMN-2021-00019) and from institutional review board (REG-003-2021).
+Results
+A total of 10 patients that received treatment via VC were interviewed. Participants had an age range
+between 18-40 years (mode 29 years), were predominantly female (7 out of 10) and either had a
+diagnosis of an anxiety disorder (n=5) or a borderline personality disorder (n=5). Patients that that
+participated in the semi-structured interviews were considered representative of the typical referrals
+to the clinic as over 80% invited into the study agreed to participate.
+The thematic analysis conducted based on the ten semi-structured interviews yielded two themes
+(Figure 1); (1) Adjusting to the practicalities of VC format and (2) The practice of therapy using VC.
+Figure 1 Thematic tree from patient experiences of the video consultation
+Theme 1: Adjusting to the practicalities of VC format
+The theme "Adjusting to the practicalities of VC format" described how patients experienced the
+Patients' experiences and attitudes
+toward using VC in clinical practice
+Theme 1
+Adjusting to the practicalities of VC format
+Theme 2
+The practice of therapy using VC
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+practical aspects concerning treatment conducted through VC. The theme's focus was generally
+characterized by the patients' experiences and descriptions, outlining that VC is a practical tool
+where they could participate in psychiatric treatment without interfering with their daily lives and
+routines. VC was perceived as particularly advantageous for patients who have a busy everyday life
+with school and work. . Some patients expressed that they probably would have to cancel their
+treatment appointments if VC were not an option:
+Well, I don't think we could have appointments that often. Especially because my school
+schedule is fluctuating, so it's quite possible that I'll have to cancel an appointment or
+two. Or many [P1].
+The theme covered other positive aspects from participants such as reduced travel time, related travel
+costs, and stress. The patients experienced that they could sit at home without spending time on
+practical preparations for treatment, i.e., transportation, getting dressed, and taking time off from
+school. VC was experienced as a valuable and stress-reducing treatment modality, which eliminates all
+these "unnecessary" preparations and practicalities.
+I think it has saved me a lot. I don't have to spend a lot of energy on traveling back and
+forth. And during the weeks when it has been tough and I've been extra tired, I could
+just do it over video, so in many ways, it has made it easier to do it over video. There
+were often times when I thought, "I have a meeting tomorrow," ah, it is nice that it's
+just over video. [P7]
+Both quotes highlight the perceived advantage of VC by patients as the treatment modality allowed
+greater flexibility which reflected the demands of everyday life. Participants described this
+flexibility as promoting attendance
+However, the patients also described that they sometimes experienced technical challenges
+associated with the VC technology. These challenges were generally related to poor sound and image
+quality. These practical experiences related to the technology were not to such an extent that they
+affected the overall positive patient experience regarding using VC in clinical practice. When
+technical challenges arose during the appointments, the patients and clinicians tried to collaborate to
+solve the technical issues.
+Well, you know, it's fantastic when it works. But the problems lie with the equipment the
+government has purchased. It's caused clinicians to make some phone calls. Three
+times she (clinician) sounded like a mouse. Ha ha. Then we figured out that I needed to
+switch devices. I also have a tablet. And it was the same issue there. Then she switched
+to a computer, and it worked. I mean, I have to say, what I had was so poor. Um, what's
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+it called. Having a headset helped a lot. What they're using doesn't work optimally, but
+they still use it. But the headset works just fine. [P5]
+This quotation highlights how relatively small technical issues could impact on the quality of
+communication over VC and the need for both parties to be tolerate and flexible in finding a
+solution.
+Theme 2: The practice of therapy using VC
+The second theme that was constructed from patient interviews covered how the patients experienced
+VC affected establishing and maintaining therapeutic engagement and alliance. The patients
+expressed that they were less affected by their anxiety symptoms when the appointment was
+conducted virtually, making it easier to relax and establish or maintain engagement in therapy.
+But it's also because I have no opportunity, I mean, regarding my anxiety, to go
+anywhere because it's so severe. So I think it was really good that they could do this
+video thing. Otherwise, I wouldn't have received any treatment. [P3]
+The patients also experienced that VC contributed to reducing stigma as it promoted access to
+psychiatric treatment giving them the possibility talk about the mental health problems with a
+therapist. The ability to access treatment was seen as the first step to establish meaningful
+engagement with psychiatric services.
+Well, also the fact that I could have the option to do it over video meant a lot to me, actually, because
+in the beginning, I was incredibly anxious about going to the psychiatric facility. I immediately
+thought I would be locked up and had all sorts of anxious thoughts. So I was really grateful for the
+opportunity to do it over video. [P2]
+Both of these quotations describe how treatment via VC modality was perceived to promote
+engagement in treatment by reducing anxiety when compared to face to face treatment.
+Regarding the therapeutic alliance, participants expressed that it could be established and maintained
+when treatment was conducted virtually. However, this alliance or contact with therapist was
+considered different and for some participants was not considered to be at the same level as in person
+therapy. This experience is reflected by one patient in the following quote:
+If we see it as a spectrum, then what's it called, being there in person would be 100%
+and video would be like 60-75%. But sometimes you need that 100% of being
+physically present. You can look at each other and see that she's there, but it's not the
+same as sitting in the same room. [P6]
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+Additionally, whilst patients described therapeutic alliance can be maintained sufficiently over video,
+there were also some challenges. These challenges to therapeutic alliance were often described when
+patients experienced powerful emotions or when dealing with complex and
+Yes, that's if I were to become very emotional, if I were to get very upset. In those
+moments, it would have been nice to have someone in-person to meet with. Because I
+know that if I start having anxiety attacks, I need someone to put their hand on my
+shoulder and give me a hug, which can't really be done through a video consultation.
+[P7]
+Whilst patients acknowledged that meaningful alliance could be achieved over VC, it was perceived
+to have a different quality. Additionally, contact via VC modality was described as insufficient when
+patients experienced extreme emotions and wanted some physical comforting.
+In summary, the patients experienced VC as a convenient tool, which could easily be integrated into
+their daily lives. The convenience of using the technology facilitated and contributed to increased
+engagement with the treatment, even though the participants also from experienced a difference in
+contact of VC compared to in-person therapy.
+Clinicians ́ focus group interview
+Four clinicians, three nurses and one psychologist, participated in the focus group interview and they
+had an average of 10 years of experience treating patients with anxiety, depressive and personality
+disorders using standard face to face treatment. Over the course of the study, each clinician
+conducted on average twenty-six virtual consultations. Thus, these clinicians had gained experience
+and familiarity with the video technology across several patient treatments.
+The thematic analysis conducted based on the focus group yielded three themes (Figure 2); (1)
+Shifting from a mindset of resistance to one of acceptance, (2) The contact is different using video,
+and (3) Adapting to a new way of working
+Clinicians' experiences and
+attitudes toward using VC in
+clinical practice
+Theme 1
+Shifting from a mindset of
+resistance to one of acceptance
+Theme 2
+The contact is different on
+video
+Theme 3
+New way of working
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+Theme 1: Shifting from a mindset of resistance to one of acceptance
+This theme was characterized by the clinicians experiencing a shift in their attitude toward using VC.
+At the beginning of the study, the clinicians described a perceived resistance to using VC in clinical
+practice; however, as they gained experience using VC, they developed a new and more nuanced
+attitude around using VC in clinical practice. Clinicians described a range of several reasons for their
+initial resistance. Firstly, the clinicians were worried that their professional identity would disappear
+when the treatment took place over VC:
+That it is just going to be robots, hahaha, and video, and there will be no human
+interaction with the mentally vulnerable people, and I don't like that... but I had a
+different experience along the way. [C1]
+Secondly, the resistance was also associated with whether VC would technically work and whether
+the clinicians possessed the technical skills to conduct VC:
+I thought... phew, I'm not very tech-savvy... I didn't grow up with this technology, so I
+found it a bit scary and a bit intimidating, but I also thought it was the future. [C4]
+Thirdly, resistance was also associated with clinicians' worries that VC would be less effective for
+the patients than in-person consultation:
+I had a bit of a prejudice that there was a difference and that it would lean more towards
+the advantage of in-person rather than video. That was my prejudice... I actually felt a
+bit embarrassed about it. [C2]
+However, over time the initial mindset of resistance shifted to a more accepting attitude, and worries
+diminished as clinicians utilized VC in clinical practice, illustrated by the following quotes:
+If I suggest video to the patients, they become ecstatically happy. Before this project, I
+would never, ever suggested video instead. But I do now. I do it a lot now. My prejudices
+have disappeared.
+My attitude has absolutely changed. Now I know it, I have tried it, and it makes so much
+sense for those patients who cannot leave their homes. [C3]
+Clinicians initial concerns rooted in their professional identity, doubts about their technical
+abilities and perceived effectiveness of treatment via VC was gradually changed from their
+experiences using VC in clinical practice.
+Theme 2: The contact is different when using video
+The clinicians experienced that contact via VC is different compared to in-person contact. For
+example, it was perceived that the contact via VC was artificial compared to in-person consultation,
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+and clinicians compensated or tried to reduce this feeling of "artificiality" by creating new routines:
+You could also say, "Have you had a cup of coffee over video" or "Are you going to get
+yourself a cup of coffee" or "I'm going to go get myself a coffee now." But to make it less
+artificial, you could say something like that. Or something else. Just to lighten it up for
+myself, you know. [C2]
+In addition, the clinicians felt that not all consultations were suitable to be conducted over video.
+Clinicians were more reluctant to discuss sensitive and complex topics with the patient that may
+induce emotional reactions:
+Well... now I have many borderline patients, and I feel... it's not easy because there are a
+lot of emotions involved. Sometimes they agree to video sessions. But then they say, "Oh,
+we can't do it after all." So I think it depends a lot on the patient group. [C1]
+The clinicians also felt that contact with patients with poor appointment adherence could be
+strengthened by offering them VC rather than terminating the patients' affiliation with the clinic.
+Also, if they cancel... then you can be cheeky. “Okay, what is it about? Should we change
+it to video calls instead if it's better?” And there are some who say yes to that... So we
+avoid some of those no-shows. [C3]
+The quotations highlight that clinicians clearly experienced that contact was different and were creative
+in new ways to build an alliance. Conversely they also voiced a concern about the ability to deal with
+complex emotions when using VC.
+Theme 3: Adapting to new way of working
+This theme describes how the clinicians perceived VC as a new way of working and how VC can be
+effectively integrated into a busy mental health outpatient service. The clinicians described that they
+needed time, training, and experience with the technology before it could be implemented
+successfully into clinical practice. The clinicians also recognized that introduction of VC as a tool
+within treatment could produce some tension. However, clinicians described that being open and
+transparent with the patients about the fact that VC is a new way of working was an important factor
+in easing the implementation of VC in practice.
+For many, VC is new, just like it is for us... so we have to address it... and maybe tell
+that both of us (patients and clinicians) are tense in this situation. [C4]
+The clinicians also described that the COVID-19 pandemic helped facilitate the implementation of
+VC; it also caused stress, as they experienced that implementation took place too quickly. They
+described that in the future a smoother transition at a more measured pace was necessary when new
+technology was introduced into clinical practice. Nevertheless, participating in the study and gaining
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+experience with providing virtual treatment made the clinicians more confident in using VC in
+clinical practice:
+I feel more comfortable now than in the beginning. I am more comfortable... And I can
+offer it to those who have difficulty leaving their homes. And I do it in an easier way than
+before. [C2]
+Overall, , clinicians initially experienced worries about whether VC could be used in clinical
+practice. These perceived concerns faded as they became familiar with VC technology and adapted
+to providing treatment using that modality in clinical settings. Clinicians described that there was a
+need for a maturation period to build up further experience with VC before it could be integrated into
+their daily working routines. Finally, there was a clear perception that contact was different using VC
+and this could potentially have clinical implications such as a reluctance to work with complex
+emotional states.
+Discussion
+This qualitative study investigated the patients' and clinicians' experience using VC in a mental
+health outpatient service. Findings indicated that VC could be meaningfully integrated into mental
+health services. Themes constructed from patient and clinician interviews highlighted various issues
+that could impact the utility and acceptance of VC as a modality for providing mental health
+treatment.
+There were a number of commonalities across the themes for patients and clinicians. Firstly, from
+both groups perceived that VC contributed to facilitating access to treatment. It facilitated accessing
+and providing treatment, especially for patients with a busy everyday life with school and work and
+those who cannot receive in-person treatment due to travel distance or being limited by their mental
+health disorders. Ashwick and colleagues who investigated the use of VC for patients with PTSD in a
+qualitative study. found that VC increased the patients' attendance and engagement with the virtual
+treatment [7], consistent with this study. The authors also described that the patients experienced
+"personal accountability" for maintaining attendance and engagement in the video treatment.
+Additionally, patients experienced finding a private room without the presence of partners and
+children could be challenging, and it was easier to postpone or not attend the virtual meeting at all if
+they did not have the energy to participate in the VC. Patients from this study did not describe
+“personal accountability” for VC although there were no PTSD patients were included in this study.
+Scientific literature indicates that patients with PTSD can have a low treatment adherence, with 35
+63% failing to complete a treatment course [34]. However, future studies should investigate how
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+virtual treatment engagement can be maintained and increased over time and space.
+A second common theme for both patients and clinicians was the perceived contact was different in
+VC compared to in-person consultation. Clinicians described a number of practical ways they
+attempted to create this bond or good contact with their patients despite this perceived difference
+with in person treatment. They also described different ways to make VC more "real or authentic"
+and potentially compensate for the fact that treatment was being conducted over video. Examples of
+these adjustments included asking patients virtually “if they have had a cup of coffee” at the start of a
+session or suggest that patients have an object (eg: cushion or something they could hold onto) that
+could help soothe them if they became upset. This "practice-orientated" mindset is an interesting
+finding and could be seen as a compensatory behavior to treatment that is conducted virtually.
+Both groups also described the perceived limitations of treatment or reservations of conducting
+treatment over VC in relation to discussing complex or sensitive issues, which could trigger strong
+emotional reactions. Several studies have reported similar findings that sensitive subjects arising
+during psychotherapeutic treatment can be challenging to carry out over video and described VC as
+superficial [13,17,18]. Interestingly, despite this perceived limitation with VC, many efficacy studies
+show that VC is equal as in-person consultation [9–12]. Future studies should address how in-depth
+consultations and complex subjects can be carried out virtually and which potential
+(positive/negative) effects it yields in clinical practice.
+Clinicians described an initial resistance to the use of VC for psychiatric treatment but this
+diminished once they gained experience with using VC. This change in attitude from clinicians how
+been found in a number of studies examining the implementation of VC [3,17]. Clinician attitudes
+are central to the uptake of VC in clinical practice as they are seen as the “gatekeepers” whether
+video consultations are offered to patients or not [16]. Thus, it is important that clinician experiences
+with VC are made accessible to all clinicians when considering to use VC or not.
+Patients largely experienced more positive views on VC compared to clinicians but they did describe
+that technical issues could be disruptive when receiving treatment. Some patients experienced that
+the screen froze and the sound was sometimes lacking. However, it was not a regular problem, and
+did not affect the generally positive attitude toward using VC in clinical settings. This finding is
+consistent with other studies showing that as long as the technical challenges are not persistent, they
+are perceived as less significant by the patients [13,14].
+Another common theme from clinicians was that the VC format introduced a new way of working
+and significant change to their clinical practice. The VC implementation and uptake need maturation
+time wherein clinicians can obtain routines and experience before it could become a permanent
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+practice in their clinical work. So even though the clinicians expressed that their mindset changed
+from "resistance to acceptance", there is still a need for maturation from “accepting to implementing”
+the technology in clinical practice. A recently published guide from WHO and a comprehensive
+systematic review recommends several interventions to strengthen the video implementation,
+including training and guidance for end users, technical support for end users, and continuous
+evaluations and improvements in workflows and technical solutions related to the application of the
+video system in the mental health care settings [35,36].
+Using the Technology Acceptance Model TAM [23] to frame the experiences of patients and
+clinicians on VC, there were a number of common themes which were consistent with aspects of
+TAM covering the ease of use, perceived usefulness and acceptance of VC as a treatment modality
+for mental health problems. Common themes that highlighted the advantages of VC (flexibility,
+saving time and energy) could be seen as increasing acceptance and utilization whilst common
+themes that concerned the limitations or challenges with VC (technical issues, difficulty discussing
+such as complex emotions, concerns about adequate technology literacy) may reduce VC acceptance
+and use in clinics.
+Given that quantitative data about the utilization of VC in clinical practice was also collected from
+these clinicians as part of another study [25], it was possible to explore the link between clinician
+experiences collected from interviews with how VC was actually used in practice. Self-reported data
+from these clinicians showed that VC was primarily used for a shorter time with a focus on
+supportive counselling (80% of sessions) compared to in person sessions which were significantly
+longer and had a much greater psychotherapy focus [25]. Thus, framing these outcomes using TAM
+it is possible to hypothesize that clinician attitudes concerning the limited usefulness of VC when
+used with complex emotional states directly impacted on the acceptance and use of VC in clinical
+practice (eg: VC was primarily used for supportive counselling rather than psychotherapy).
+Strength and Limitations
+One of the strengths of the study is that it captured patients' and clinicians' perspectives on using VC
+within the same mental health outpatient service. Analyzing experiences from treatment dyads
+generated a more holistic understanding of the VC experience. Additionally, interviewing both
+clinicians and patients, it allowed the exploration of commonalities and differences in the two user
+perspectives. A second strength is the study is that included people with a range of mental health
+disorders from a clinical setting which included a range of mental health professions. Thus, the
+participants were considered representative of a clinical setting which may increase the ecological
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+validity and generalizability of the results to other clinical settings. .
+The study also had several limitations. Firstly, the study included a self-selected convenience sample,
+consisting of participants who were willing to receive treatment via VC. This sample may be
+considered biased or this group may have a more positive or open attitude to VC which in turn could
+be reflected in the results. Secondly, the sample size for patients and clinicians was very small,
+potentially limiting the generalizability of the results to the clinical setting. Additionally, the study
+was conducted within a specific mental health outpatient service in Denmark which also limits the
+generalizability of the findings to broader populations and different healthcare systems. Thirdly, a
+deeper understanding of the clinicians' experiences might have been enhanced if individual semi
+structured interviews had been conducted rather than focus group. Fourthly, experiences collected
+were based on a relatively short intervention (2 months) making it difficult to understand experiences
+with VC may develop or change over time. Fifthly, it is important to acknowledge that the primary
+researchers’ (AAS) background and experience with VC may have influenced the interviews and
+subsequent analysis of qualitative data. As thematic analysis involves the construction of themes
+grounded in qualitative data, a range of strategies to promote trustworthiness in the analysis and
+themes constructed were undertaken. Finally, the study was conducted during the COVID-19
+pandemic which may have impacted on both patients and clinicians attitudes and behaviors regarding
+VC.
+Implications for Clinical Practice and Research
+This study has several important practical implications. Firstly, results from the study show that VC
+can be meaningfully implemented into mental health services and treatment via this modality can
+contribute to establishing and maintaining a therapeutic engagement. This finding is especially
+relevant for patients who, for various reasons, find it difficult to attend appointments in-person.
+Secondly, this study has demonstrated that clinicians are accepting and open to utilizing VC in
+clinical practice; however, this acceptance may take time to develop and may require maturation to
+acquire experiences and skills to incorporate VC into clinical practice.
+Interestingly, both patients and clinicians experienced that the contact via video differed from in
+person contact and in some cases it was described as "superficial and artificial". Both groups
+describe the perceived challenges of using VC in treatment with emotionally charged and complex
+issues. Future studies need to investigate the impact of this perceived different contact in VC and its
+implications for the application and adaptation of therapeutic techniques in psychiatric treatment.
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+Furthermore, one could move beyond the traditional understanding of VC and investigate how
+cutting-edge technologies, such as AI, augmented, and virtual reality telepsychiatry can reduce the
+“artificial experience” of VC and enhance telepresence, creating a new treatment environment where
+complex treatment issues can be meaningfully explored.
+Conclusions
+From the patients' perspective, VC was a convenient tool that could be integrated into their daily
+lives and promote treatment adherence. While clinicians experienced initial concerns and resistance
+toward VC implementation, these reservations diminished over time as they gained clinical
+experience using VC. Future studies could examine strategies to influence user attitudes and
+acceptance of VC particularly regarding its perceived limitations which may directly impact on the
+implementation and utilization of VC within mental health services.
+Acknowledgments and Funding
+The authors would like to thank all patients and clinicians from the Psychiatric Outpatient Clinic,
+Region Zealand, Denmark, for participating and engaging during the study. This research received no
+specific grant from any funding agency in the public, commercial or not-for-profit sectors.
+Authors’ Contributions
+AAS is the guarantor of the protocol and wrote the first draft of the manuscript. ES developed the
+idea and rationale for the study. SA was responsible for designing the study. KT contributed with
+scientific evidence regarding digital psychiatry and thematic analysis. RAB assisted in the
+recruitment of patients and clinicians. HB & JAAS provided healthcare technology perspective and
+insight. All authors revised and approved the final manuscript.
+Conflicts of Interest
+None declared.
+Abbreviations
+VC: Video Consultation
+TAM: Technology Acceptance Model
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+Data Sharing Statement
+Data are available upon reasonable request. Data from the study can be made available via Region
+Sjaelland following the Danish Data Protection Regulation
+References
+1. Freeman M. The World Mental Health Report: transforming mental health for all. World
+Psychiatry. 2022;21(3):391-392. doi:10.1002/wps.21018
+2. Patel V, Saxena S, Lund C, et al. The Lancet Commission on global mental health and
+sustainable development. Lancet. 2018;392(10157):1553-1598. doi:10.1016/S0140
+6736(18)31612-X
+3. Moeller AM, Hansen JP, Andersen PT. Patients’ experiences of home-based psychotherapy via
+videoconference: A qualitative study. Arch Psychiatr Nurs. 2022;39:91-96.
+doi:10.1016/J.APNU.2022.03.004
+4. Gullslett MK, Kristiansen E, Nilsen ER. Therapists’ Experience of Video Consultation in
+Specialized Mental Health Services During the COVID-19 Pandemic: Qualitative Interview
+Study. JMIR Hum factors. 2021;8(3). doi:10.2196/23150
+5. Budhwani S, Fujioka JK, Chu C, et al. Delivering mental health care virtually during the
+COVID-19 pandemic: Qualitative evaluation of provider experiences in a scaled context.
+JMIR Form Res. 2021;5(9). doi:10.2196/30280
+6. Nguyen MLT, Garcia F, Juarez J, et al. Satisfaction can co-exist with hesitation: qualitative
+analysis of acceptability of telemedicine among multi-lingual patients in a safety-net
+healthcare system during the COVID-19 pandemic. BMC Health Serv Res. 2022;22(1):1-9.
+doi:10.1186/S12913-022-07547-9/TABLES/3
+7. Ashwick R, Turgoose D, Murphy D. Exploring the acceptability of delivering Cognitive
+Processing Therapy (CPT) to UK veterans with PTSD over Skype: a qualitative study.
+Published online 2019. doi:10.1080/20008198.2019.1573128
+8. Frayn M, Fojtu C, Juarascio A. COVID-19 and binge eating: Patient perceptions of eating
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+disorder symptoms, tele-therapy, and treatment implications. doi:10.1007/s12144-021-01494
+0/Published
+9. Shaker AA, Austin SF, Storebø OJ, et al. Psychiatric Treatment Conducted via Telemedicine
+Versus In-Person Modality in Posttraumatic Stress Disorder, Mood Disorders, and Anxiety
+Disorders: Systematic Review and Meta-Analysis. JMIR Ment Heal 2023;10e44790
+https//mental.jmir.org/2023/1/e44790. 2023;10(1):e44790. doi:10.2196/44790
+10. Giovanetti AK, Punt SEW, Nelson EL, Ilardi SS. Teletherapy Versus In-Person Psychotherapy
+for Depression: A Meta-Analysis of Randomized Controlled Trials. Telemed e-Health.
+2022;28(8):1077-1089. doi:10.1089/tmj.2021.0294
+11. Batastini AB, Paprzycki P, Jones ACT, MacLean N. Are videoconferenced mental and
+behavioral health services just as good as in-person? A meta-analysis of a fast-growing
+practice. Clin Psychol Rev. 2021;83. doi:10.1016/j.cpr.2020.101944
+12. Drago A, Winding TN, Antypa N. Videoconferencing in psychiatry, a meta-analysis of
+assessment and treatment. Eur Psychiatry. 2016;36:29-37. doi:10.1016/j.eurpsy.2016.03.007
+13. Tarp K, Nielsen AS. Patient Perspectives on Videoconferencing-Based Treatment for Alcohol
+Use Disorders. Alcohol Treat Q. 2017;35(4):344-358. doi:10.1080/07347324.2017.1348785
+14. May C, Gask L, Ellis N, et al. Telepsychiatry evaluation in the north-west of England:
+Preliminary results of a qualitative study. J Telemed Telecare. 2000;6(SUPPL. 1).
+doi:10.1258/1357633001934618
+15. Scott Kruse C, Karem P, Shifflett K, Vegi L, Ravi K, Brooks M. Evaluating barriers to
+adopting telemedicine worldwide: A systematic review. J Telemed Telecare. 2018;24(1):4-12.
+doi:10.1177/1357633X16674087
+16. Cowan KE, McKean AJ, Gentry MT, Hilty DM. Barriers to Use of Telepsychiatry: Clinicians
+as Gatekeepers. Mayo Clin Proc. 2019;94(12):2510-2523.
+doi:10.1016/J.MAYOCP.2019.04.018
+17. Christensen LF, Wilson R, Hansen JP, Nielsen CT, Gildberg FA. A qualitative study of
+patients’ and providers’ experiences with the use of videoconferences by older adults with
+depression. Int J Ment Health Nurs. 2021;30(2):427-439. doi:10.1111/INM.12803
+18. Leukhardt A, Heider M, Reboly K, Franzen G, Eichenberg C. Video-based treatment in
+psychodynamic psychotherapy in times of the COVID-19 pandemic: Interview study with
+patients and psychotherapists. Psychotherapeut. 2021;66(5):398-405. doi:10.1007/S00278
+021-00532-3
+19. Mohr DC, Weingardt KR, Reddy M, Schueller SM. Three problems with current digital
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+mental health research. and three things we can do about them. Psychiatr Serv.
+2017;68(5):427-429. doi:10.1176/appi.ps.201600541
+20. Torous J, Bucci S, Bell IH, et al. The growing field of digital psychiatry: current evidence and
+the future of apps, social media, chatbots, and virtual reality. World Psychiatry.
+2021;20(3):318-335. doi:10.1002/wps.20883
+21. Ford TJ, Buchanan DM, Azeez A, et al. Taking modern psychiatry into the metaverse:
+Integrating augmented, virtual, and mixed reality technologies into psychiatric care. Front
+Digit Heal. 2023;5:35. doi:10.3389/fdgth.2023.1146806
+22. Davis FD, Bagozzi RP, Warshaw PR. User Acceptance of Computer Technology: A
+Comparison of Two Theoretical Models. Manage Sci. 1989;35(8):982-1003.
+doi:10.1287/MNSC.35.8.982
+23. Davis FD. Perceived usefulness, perceived ease of use, and user acceptance of information
+technology. MIS Q Manag Inf Syst. 1989;13(3):319-339. doi:10.2307/249008
+24. Bagozzi RP. The Legacy of the Technology Acceptance Model and a Proposal for a Paradigm
+Shift. J Assoc Inf Syst. 2007;8(4):12. doi:10.17705/1jais.00122
+25. Holden RJ, Karsh BT. The Technology Acceptance Model: Its past and its future in health
+care. Published online 2009. doi:10.1016/j.jbi.2009.07.002
+26. Tong A, Sainsbury P, Craig J. Consolidated criteria for reporting qualitative research
+(COREQ): a 32-item checklist for interviews and focus groups. Int J Qual Heal care J Int Soc
+Qual Heal Care. 2007;19(6):349-357. doi:10.1093/INTQHC/MZM042
+27. Shaker AA, Austin SF, Sørensen JA, Tarp KH, Bechmann H, Simonsen E. Implementing
+Video Consultations in a Rural Psychiatric Outpatient Clinic: A Feasibility Study. Published
+online 2023. doi:10.1155/2023/4282468
+28. McGrath C, Palmgren PJ, Liljedahl M. Twelve tips for conducting qualitative research
+interviews. Med Teach. 2019;41(9):1002-1006. doi:10.1080/0142159X.2018.1497149
+29. Powell RA, Single HM. Focus Groups. Int J Qual Heal Care. 1996;8(5):499-504.
+doi:10.1093/intqhc/8.5.499
+30. Braun V, Clarke V. Using thematic analysis in psychology. Qual Res Psychol. 2006;3(2):77
+101. doi:10.1191/1478088706qp063oa
+31. Braun V, Clarke V. Reflecting on reflexive thematic analysis. Qual Res Sport Exerc Heal.
+2019;11(4):589-597. doi:10.1080/2159676X.2019.1628806
+32. Berger R. Now I see it, now I don’t: researcher’s position and reflexivity in qualitative
+research. Qual Res. 2015;15(2):219-234. doi:10.1177/1468794112468475
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]
+
+
+JMIR Preprints Shaker et al
+33. Nowell LS, Norris JM, White DE, Moules NJ. Thematic Analysis: Striving to Meet the
+Trustworthiness Criteria. Int J Qual Methods. 2017;16(1).
+doi:10.1177/1609406917733847/ASSET/IMAGES/LARGE/10.1177_1609406917733847
+FIG4.JPEG
+34. Thompson-Hollands J, Burmeister LB, Rosen CS, O’Dougherty M, Erickson EPG, Meis LA.
+Veterans with poor PTSD treatment adherence: Exploring their loved ones’ experience of
+PTSD and understanding of PTSD treatment. Psychol Serv. 2021;18(2):216-226. doi:10.1037/
+SER0000389
+35. WHO. Consolidated Telemedicine Implementation Guide.; 2022. Accessed May 4, 2023.
+https://www.who.int/publications/i/item/9789240059184
+36. Appleton R, Barnett P, Vera San Juan N, et al. Implementation strategies for telemental health:
+a systematic review. BMC Health Serv Res. 2023;23(1):78. doi:10.1186/s12913-022-08993-1
+Powered by TCPDF (www.tcpdf.org)
+https://preprints.jmir.org/preprint/50580 [unpublished, peer-reviewed preprint]

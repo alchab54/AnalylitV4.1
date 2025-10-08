@@ -1,0 +1,776 @@
+J Genet Couns. 2025;34:e2013. | 1 of 11 https://doi.org/10.1002/jgc4.2013
+wileyonlinelibrary.com/journal/jgc4
+Received: 19 June 2024 | Revised: 2 December 2024 | Accepted: 4 December 2024
+DOI: 10.1002/jgc4.2013
+ORIGINAL ARTICLE
+Toward a therapeutic relationship: A randomized control trial of
+the physical environment and client-centered communication
+in genetic counseling
+Elizabeth Broadbridge1,2,3 | Debra L. Roter3 | Susan Persky4 | Lori H. Erby2,3,5
+1Department of Communication, Rutgers University, New Brunswick, New Jersey, USA
+2Medical Genomics and Metabolic Genetics Branch, National Human Genome Research Institute, NIH, Bethesda, Maryland, USA
+3Department of Health Behavior and Society, Johns Hopkins University, Baltimore, Maryland, USA
+4Social and Behavioral Research Branch, National Human Genome Research Institute, NIH, Bethesda, Maryland, USA
+5Center for Precision Health Research, National Human Genome Research Institute, NIH, Bethesda, Maryland, USA
+Correspondence
+Elizabeth Broadbridge, Department of Communication, Rutgers University, New Brunswick, NJ, USA.
+Email: broadbridgeea@gmail.com, liesl. broadbridge@rutgers.edu
+Funding information
+National Human Genome Research Institute
+Abstract
+Genetic counselors routinely provide service in many environments, including
+counseling-type and medical-type rooms; in this study, counseling environments
+are characterized by office décor that facilitates discussion around a seated table,
+while medical environments include an exam table and separate seating. Outside
+of the genetic counseling context, manipulation of the environment can influence
+client comfort in disclosing personal information, well-being, and overall satisfaction
+with clinician communication. However, there is little known about how clients
+experience genetic counseling in one environment versus the other and how that
+might influence their evaluation of genetic counselor communication. To explore the
+extent to which the physical environment influences client perceptions, we video
+recorded two simulated sessions addressing the same genetic counseling topic with
+two contrasting styles of communication (more and less patient-centered) in front of
+a greenscreen background. Videos were digitally placed in counseling and medical
+environments such that the same verbal and nonverbal communication was presented
+in the two environments, creating a total of four videos (e.g., a 2 × 2 experimental
+design). Participants (N = 861) were randomly assigned to observe one of the four
+videos and respond as if they were the client in the video (e.g., as analog clients).
+Overall, participants rated the less patient-centered communication more favorably
+(p < 0.05 across variables), contrary to our expectations. Structural equation modeling
+revealed that perceptions of nonverbal communication mediated the relationship
+between communication style and perceptions of the counselor's encouragement
+of participation in the session and the therapeutic bond. Results offer insight into
+how the physical environment might influence communication in genetic counseling,
+illustrating new avenues for improving client-counselor communication in this context.
+KEYWORDS
+communication, genetic counseling, genetic counselors, roter interaction analysis system, therapeutic bond, working alliance
+This is an open access article under the terms of the Creative Commons Attribution-NonCommercial-NoDerivs License, which permits use and distribution in any medium, provided the original work is properly cited, the use is non-commercial and no modifications or adaptations are made. © 2025 The Author(s). Journal of Genetic Counseling published by Wiley Periodicals LLC on behalf of National Society of Genetic Counselors. This article has been contributed to by U.S. Government employees and their work is in the public domain in the USA.
+Data collection was conducted while the first author was affiliated with Johns Hopkins University and the National Institutes of Health. During the analysis and manuscript drafting the first author was affiliated with Rutgers University.
+
+
+2 of 11 | BROADBRIDGE et al.
+1 | INTRODUCTION
+Establishing a therapeutic relationship is a key component to
+successful genetic counseling and can have tangible effects
+on clients' health and well-being. In psychotherapy, a strong
+therapeutic relationship is associated with better client outcomes,
+including better quality of life, satisfaction with care, and decreased
+symptoms of depression (Barber et al., 2000; Howgego et al., 2003).
+Moreover, a poor client-counselor relationship can actively worsen
+psychological symptoms (Goldsmith et al., 2015). Genetic counseling
+is often a short-term relationship, though this therapeutic bond has
+been demonstrated within single sessions (Caleshu et al., 2022; Erby
+et al., 2021; Murray et al., 2022). However, the circumstances that
+optimally support forming this bond have been under-researched in
+genetic counseling. This study aims to explore whether the physical
+environment in which genetic counseling takes place and the
+patient-centeredness of counselor communication affect the degree
+to which a therapeutic bond is formed in pre-test genetic counseling
+for hereditary cancer risk.
+1.1 | Patient-centered communication and the therapeutic bond in genetic counseling
+Patient-centered communication can be broadly conceptualized
+as communication that actively seeks to understand client
+perspectives, encourages participation, recognizes the client
+within a larger psychosocial context, and facilitates shared
+understanding and decision-making aligned with the clients'
+values (Epstein et al., 2005). Patient-centered communication
+includes verbal communication features, such as displaying
+understanding and empathy, as well as nonverbal communication,
+such as effective eye contact (Gorawara-Bhat & Cook, 2011).
+Patient-centeredness has been quantitatively operationalized
+using the Roter Interaction Analysis System (RIAS) in a variety of
+medical studies as well as specifically applied to genetic counseling
+communication (Roter et al., 2006; Roter & Larson, 2002). Patient
+centered communication is associated with better relationship
+building, patient satisfaction, psychological adjustment, and
+patient participation in care (Mead & Bower, 2000; Pinto
+et al., 2012; Wissow et al., 2010). In genetic counseling, patient
+centered communication has been seen to contribute to better
+ratings of genetic counselor affect, more satisfaction with the
+communication, and better ratings of nonverbal communication
+by simulated clients (Roter et al., 2006).
+1.2 | The physical environment and communication
+Although evidence supports the importance of patient-centered
+communication in genetic counseling and for establishing a
+therapeutic relationship in medical encounters, little is known
+about factors that might affect the patient-centeredness of
+genetic counseling communication. Research in the medical
+and counseling psychology fields has documented the ways in
+which variation of elements within the physical environment
+can influence perceptions of patient-centeredness (Ajiboye
+et al., 2015; Almquist et al., 2009; Okken et al., 2012). For
+example, in a randomized experiment investigating the physical
+environment in medical consultation rooms, clients who sat with
+a clinician at a table, rather than on an exam bed, were more
+satisfied with how clinicians engaged them about their health
+records (Ajiboye et al., 2015). Additionally, a simulated counseling
+study found that individuals who participated in counseling in an
+environment that included personal items (e.g., rugs and photos)
+rated the environment as more intimate, felt more relaxed, and self
+disclosed at a more intimate level than those who participated in
+the same environment without the personal items present (Chaikin
+et al., 1976). These examples demonstrate that manipulation of
+specific elements within the physical environment can influence
+both perceptions of communication as well as client participation
+in care. However, genetic counselors routinely provide service
+in both counseling-type and medical-type environments, and
+research is needed to understand how this element of the physical
+environment might influence perceptions of communication or
+relationship building in genetic counseling.
+In genetic counseling, a counseling-type environment is often
+characterized by office décor that facilitates discussion around
+a seated table, while medical-type environments, typical to out
+patient clinics, usually include an exam table and separate seat
+ing. Few studies have examined how the physical environment
+influences client-counselor communication across environments,
+rather than within environments. A retrospective study of client
+empowerment and self-efficacy after genetic counseling found
+that clients who were seen in a counseling room tended to re
+port more favorable ratings than those who were seen in medi
+cal exam rooms, though the effect was null (Morris et al., 2019).
+What is known about this topic?
+Previous work has demonstrated the importance of
+patient-centered communication in medical appointments,
+including genetic counseling sessions. The physical
+environment in which communication takes place has also
+been associated with client comfort in disclosing personal
+information, client well-being, and overall satisfaction with
+counselor communication.
+What this paper adds to the topic?
+The study provides evidence that client perceptions of
+the counseling environment can influence how favorably
+they view the genetic counselor's verbal and nonverbal
+communication and relationship-building.
+15733599, 2025, 2, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/jgc4.2013 by Cochrane France, Wiley Online Library on [01/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+| 3 of 11
+BROADBRIDGE et al.
+Null effects in this study may be due, in part, to the limitations
+of the retrospective design and a discrepancy in the distribution
+of clients who completed the survey data in each environment.
+Additionally, a qualitative study of women at risk for breast cancer
+found that changing the session context of the genetics clinic from
+a medical environment in a hospital to a house located across the
+street improved client comfort and alleviated feelings of being pre
+symptomatically pathologized (Phelps et al., 2008). Although these
+studies provide evidence that perhaps a counseling-type environ
+ment is preferable to clients who are receiving genetic counseling,
+further systematic research on the effects of the environment on
+client experiences is needed.
+2 | METHODS
+2.1 | Hypotheses and research question
+Based on the existing understanding of verbal and nonverbal
+patient-centered communication, their relationship to each other
+and to relationship-building, we propose the following hypotheses
+(see Figure 1 for the full hypothesized model):
+Hypothesis 1. More patient-centered verbal genetic
+counselor communication will be associated with
+better ratings of features of the counselor's (a) non
+verbal and (b) verbal communication (encouraging
+participation).
+Hypothesis 2. Better ratings of verbal patient
+centeredness features (encouraging participation) will
+be associated with better ratings of the therapeutic
+relationship.
+Hypothesis 3. Better ratings of nonverbal patient
+centeredness will be associated with better ratings
+of (a) features of verbal genetic counseling com
+munication (encouraging participation) and (b) the
+therapeutic relationship.
+Given the dearth of literature in this area, the following research
+question was proposed to investigate the effect of the physical envi
+ronment on analog client perceptions of genetic counseling commu
+nication and relationship building:
+RQ: Does the physical environment in which genetic
+counseling occurs moderate the relationship be
+tween genetic counselor communication and analog
+client perceptions of features of verbal and nonverbal
+patient-centeredness and the therapeutic bond?
+2.2 | Participants and procedures
+Participants were recruited through the Amazon Mechanical Turk
+crowdsourcing platform and CloudResearch participant manage
+ment system in August of 2020. CloudResearch was used to in
+crease the integrity of our data. Only users previously vetted by
+CloudResearch as having high-quality responses were invited to take
+part. Additionally, Qualtrics security metrics were turned on (e.g.,
+time tracking and preventing multiple submissions) and participants
+were asked to attest before and after the survey that they would re
+spond to the best of their ability. Recruitment was based on a power
+analysis that estimated 787 participants would be needed to detect
+a small effect size (f = 0.10) with two groups (two rooms) at 80%
+power and an alpha level of 0.05. We aimed to collect a final sample
+of 800 participants for the study. Accounting for potential attrition
+and/or insufficient quality of responses of 10% of participants, we
+aimed to enroll 900 participants (N = 902).
+Participants were randomly assigned to view one of four vid
+eos created for the study. Randomization was completed using
+Qualtrics block randomization with a quota of 225 for each exper
+imental condition. Each video depicted a 10-min simulated pre
+test genetic counseling session for hereditary breast and ovarian
+cancer. Details about each session type are expanded on below.
+After viewing, participants responded to a cross-sectional survey
+from the perspective of the client (i.e., responded as an analog
+client). Eligible participants were 18 years or older, identified as
+female or non-binary, able to read English, had Internet access to
+F I G U R E 1 Hypothesized model of communication and the therapeutic bond. Latent variables shown without error terms. Dashed arrow represents hypothesized moderation effect.
+15733599, 2025, 2, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/jgc4.2013 by Cochrane France, Wiley Online Library on [01/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+4 of 11 | BROADBRIDGE et al.
+connect to the survey, and were able to provide informed consent.
+Participation was limited to female and non-binary participants to
+enhance identification with the client actor, which is shown to in
+crease the similarity of ratings between analog and actual clients
+(Blanch-Hartigan et al., 2013; van Vliet et al., 2012). Participants
+who successfully completed the survey were compensated $5.00.
+This study was approved by the Johns Hopkins Bloomberg School
+of Public Health's institutional review board.
+2.3 | Experimental manipulation
+We employed a two-by-two study design. Independent variables
+included manipulation of the physical environment (counseling
+room and medical exam room) and communication styles (more
+and less patient-centered). Four video recordings were prepared
+as experimental stimuli. Two videos presented the genetic coun
+selor in front of a greenscreen background, which was substituted
+with an image of a counseling office or an image of a medical exam
+room. In each, a genetic counseling client was being addressed
+off-screen (Figure 2). This design allowed for the same verbal and
+nonverbal communication in the clinical teaching arm of the study
+to be presented in the counseling and medical environments, as
+well as the communication in the psychosocial counseling in the
+counseling and medical environments. Scripts for both sessions
+were based on previously collected video recordings of genetic
+counselors in simulated pre-test cancer genetic counseling ses
+sions that had been coded using the Roter Interaction Analysis
+System (RIAS) (Roter et al., 2006). The two models of genetic
+counseling were chosen for adaptation in this study because of
+their markedly different patterns of patient-centeredness; RIAS
+coding of clinical teaching sessions were characterized as sig
+nificantly less patient-centered than psychosocial counseling
+sessions. Content was arranged in approximately the same order
+and informational elements of each session were kept consist
+ent. Consistent with the earlier simulation study, clinical teaching
+communication was designed to be less patient-centered, charac
+terized by low amounts of relationship building (3.2% of session)
+and high amounts of client education (64.0% of session) as coded
+using RIAS. Additionally, the clinical teaching communication in
+cluded high verbal dominance of the genetic counselor (11:1 ratio
+of counselor to client word count). The psychosocial counseling
+communication style was designed to be more patient-centered,
+characterized by high amounts of relationship building (42.0% of
+session) and lower levels of education (27.0% of session) as coded
+using RIAS. The psychosocial counseling communication included
+low verbal dominance of the counselor (2.5:1 ratio of counselor
+to client word count). The scenario was read by multiple board
+certified genetic counselors to check for face validity. The genetic
+counselor and client actors made efforts to maintain similar non
+verbal communication in each scenario (e.g., keeping the same
+affect, rate of speech, and facial expressions). However, because
+the verbal communication was different across the two videos, it
+was not possible to have the exact same nonverbal communication
+across the two communication types. The final videos were also
+viewed by genetic counseling students and practicing counselors
+to ensure that the shortened sessions were representative of ac
+tual clinical encounters.
+2.4 | Measures
+The outcome of interest was analog client perceptions of the
+therapeutic bond. The predictor variable was scripted counse
+lor communication style. Mediating variables included ratings of
+nonverbal communication and ratings of features of verbal com
+munication (encouraging participation). Room type was treated
+as a moderating independent variable. For each unobserved vari
+able (perceptions of the bond, ratings of nonverbal communica
+tion, and ratings of encouraging participation), a series of initial
+analyses were conducted to assess scale reliability and dimension
+ality. Confirmatory factor analyses (CFA) were performed for each
+unobserved variable using combined data from all experimental
+groups. All CFA assumed a single latent variable in alignment with
+the expected unidimensional structures. Overall CFA fit was as
+sessed using a combination of metrics including confirmatory fit
+F I G U R E 2 Still frames from the simulated genetic counseling sessions. Image (a) is the medical exam room. Image (b) is the counseling office.
+15733599, 2025, 2, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/jgc4.2013 by Cochrane France, Wiley Online Library on [01/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+| 5 of 11
+BROADBRIDGE et al.
+index (CFI), root mean square error of approximation (RMSEA),
+standardized root mean square residual (SRMR), and χ2. The cut-offs
+for good fit were CFI > 0.95, RMSEA < 0.06, SRMR < 0.08, and an
+insignificant χ2 (Hu & Bentler, 1999). Adequate fit was considered
+at CFI > 0.90, RMSEA < 0.08, SRMR < 0.10, and χ2/df <3 (Herzog &
+Boomsma, 2009).
+2.4.1 | The therapeutic bond
+Perception of the therapeutic bond was assessed using the bond
+subscale of the observer version of the Working Alliance Inventory
+(Darchuck et al., 2000). The Working Alliance Inventory (WAI-O)
+bond scale is a 12-item measure on a 7-point Likert scale (never to
+always). Two modifications were made to the WAI-O to reflect the
+counseling setting: (1) the word therapist was changed to genetic
+counselor and (2) the phrase therapy session was changed to genetic
+counseling session. We used only the nine positively-worded items
+for analysis as described previously (Broadbridge et al., 2024).
+Items were averaged for a final score that could range from 1 to
+7. Higher scores indicate perception of a better bond. An example
+item from this measure includes, “the client feels that the genetic
+counselor appreciates her as a person.” The unidimensional factor
+structure (CFA) supported good model fit (χ2(35) = 119.78, p < 0.01;
+RMSEA = 0.05 (CI 0.04, 0.06); CFI = 0.99; SRMR = 0.02).
+2.4.2 | Genetic counselors' nonverbal communication
+Perception of nonverbal communication was assessed using a 6
+item questionnaire adapted from Roter et al. (2006). Participants
+rated nonverbal behaviors associated with patient-centered com
+munication, such as facial expressions, eye contact, and head nods
+(D'agostino & Bylund, 2011; Gorawara-Bhat & Cook, 2011). Based
+on factor loadings, model fit, and theoretical relatedness, one item
+(related to the counselor's use of silence) was not retained result
+ing in a final composite with five items. Modification indices sup
+ported two covariations between error terms, one between the
+use of eye contact and head nods, and the other between the use
+of head nods and facial expressions to facilitate communication.
+The final factor structure supported good model fit ( χ2(3) = 11.73,
+p = 0.01; RMSEA = 0.06 (CI 0.03, 0.09); CFI = 1.00; SRMR = 0.01).
+Items were averaged for a final score that could range from 1 to
+6. Higher scores indicate more favorable ratings of nonverbal
+communication.
+2.4.3 | Encouragement of client participation
+An important feature of patient-centered communication is en
+couraging client engagement in the decision-making process and
+in participating in care, conceptualized in this study as encouraging
+participation. Perceptions of encouraging participation were cap
+tured using two items adapted from Roter et al. (2006). Items were
+on 6-point semantic differential scales where lower scores were
+more favorable ratings of the counselor. The first item ranged from,
+“Encourages client involvement in decision-making” to “Discourages
+client involvement in decision-making”. The second item ranged from,
+“Encourages client questions” to “Discourages client questions”.
+Items were totaled for a score that could range from 2 to 12.
+2.5 | Analyses
+Preliminary analyses included pairwise correlations with Bonferroni
+adjusted significance levels across model variables (see Table 2). The
+relationships between counseling style and room type with the
+communication and relationship variables were explored using one
+way analysis of variance (ANOVA). Structural equation modeling
+(SEM) using maximum likelihood estimation was conducted to assess
+the overall fit of the proposed model. Two models were tested, one for
+each room type. Model fit was assessed for SEM as described above
+for CFA; the cut-offs for good fit were CFI > 0.95, RMSEA < 0.06,
+SRMR < 0.08, and an insignificant χ2 (Hu & Bentler, 1999). Adequate
+fit was considered at CFI > 0.90, RMSEA < 0.08, SRMR < 0.10, and
+χ2/df < 3 (Herzog & Boomsma, 2009). Data were analyzed using
+STATA (version 17.0).
+3 | RESULTS
+In total, 902 responses were collected. Participants were excluded
+from analyses if they self-selected an option indicating that their data
+was not quality (n = 2), if there was an issue with validity on a free
+text response (n = 9), or if they took less than 15 min to complete the
+study (n = 29; videos required 10 min to view). One participant who
+reported their age as greater than 800 years was excluded from the
+analyses. In total, 861 responses were included in subsequent analy
+ses. There were no significant differences in demographics across
+experimental conditions (see Table 1). Participants who viewed the
+clinical teaching experimental condition consistently reported bet
+ter ratings of the therapeutic bond, nonverbal communication, and
+encouraging participation than those who viewed the psychosocial
+counseling experimental condition, contrary to the hypothesized di
+rectionality (see Table 2). Participants who viewed the medical room
+experimental condition consistently reported better ratings than
+those who viewed the counseling room (see Table 2).
+3.1 | Structural equation models of
+communication and perceptions of the relationship
+Structural models were assembled using the measurement struc
+tures established through CFA. The counseling room model (CR
+Model) included only participants who viewed the counseling office.
+15733599, 2025, 2, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/jgc4.2013 by Cochrane France, Wiley Online Library on [01/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+6 of 11 | BROADBRIDGE et al.
+The medical room (MR Model) included only participants who
+viewed the medical exam room.
+3.1.1 | CR model: Counseling room
+The model of therapeutic bond in the counseling office was well
+supported by the data (χ2(113)= 218.31, p< 0.01; RMSEA =0.05
+(CI= 0.04, 0.06); CFI =0.98; SRMR =0.03). The model accounted for
+43.6% of the variance in ratings of the therapeutic bond, 96.7% of
+the variance in nonverbal communication ratings, and 51.4% of the
+variance in perceptions of the counselor encouraging participation.
+The path from communication style to encouraging participation was
+not significant (H1b not supported). The path from communication
+style to nonverbal communication was significant, though in the oppo
+site direction as originally hypothesized (H1a not supported). All other
+paths were supported in the hypothesized directions. Better ratings of
+encouraging participation in care were associated with better ratings
+of the therapeutic bond (H2 supported). Better ratings of the nonver
+bal communication were also associated with ratings of more encour
+agement of client participation and better ratings of the therapeutic
+bond (H3a and H3b supported). See Figure 3 for the final model.
+TA B L E 1 Participant characteristics and demographics.
+Psychosocial counseling Clinical teaching
+Counseling office Medical room Counseling office Medical room p-Value
+Age (mean) 40.6 41.4 39.1 38.7 0.11a
+Education
+Some high school 0 0 0 1 0.56b
+High school 26 25 18 22
+Some college 64 69 66 64
+Bachelor's degree 96 70 82 77
+Some graduate school 3 9 9 9
+Graduate degree 33 41 39 38
+Race/Ethnicity
+White/Caucasian 185 172 158 170 0.62b/0.55b
+Black/African American 15 20 22 14
+Asian/Pacific Islander 15 17 25 17
+American Indian/Alaska Native 1 2 1 1
+Multiple selected 4 3 7 7
+Other 2 0 1 2
+Hispanic/Latinx 16 18 12 19
+Gender
+Female 219 212 212 209 0.97b
+Non-binary 3 2 2 2
+Experience with genetic counseling
+Seen a genetic counselor or genetics provider personally
+24 25 17 21 0.69b
+Seen a genetic counselor or genetics provider with a friend or family member
+5 11 8 7
+Never seen a genetic counselor or genetics provider
+191 177 189 182
+Work with a genetic counselor 2 1 0 1
+Experience with breast or ovarian cancer
+No experience or prefer not to answer 81 67 76 76 0.15b
+“Other” experience 43 47 38 54
+Family history 93 87 94 77
+Personal history 5 13 6 4
+Total (n) 222 214 214 211
+aTwo- tailedt- test.
+bχ2 test.
+15733599, 2025, 2, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/jgc4.2013 by Cochrane France, Wiley Online Library on [01/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+| 7 of 11
+BROADBRIDGE et al.
+3.1.2 | MR model: Medical room
+Similarly, the model of therapeutic bond in the medical room
+was also well-supported by the data (χ2(113) = 224.19, p < 0.01;
+RMSEA = 0.05 (CI = 0.04, 0.06); CFI = 0.98; SRMR = 0.04). The
+model accounted for 41.3% of the variance in ratings of the thera
+peutic bond, 99.3% of the variance in nonverbal communication
+ratings, and 49.2% of the variance in perceptions of the counselor
+encouraging participation. By contrast to the counseling office,
+the path from communication style to nonverbal communication
+was not significant (H1a not supported). The path from commu
+nication style to encouraging participation was significant, but in
+the opposite direction as hypothesized (H1b not supported). All
+other paths were in the hypothesized directions. Better ratings
+of encouraging participation in care were associated with better
+ratings of the therapeutic bond (H2 supported). Better ratings of
+the nonverbal communication were also associated with ratings of
+more encouragement of client participation and better ratings of
+the therapeutic bond (H3a and H3b supported). See Figure 3 for
+the final model.
+3.1.3 | Model moderation
+To test RQ1, invariance across the CR and MR models was compared
+using a change in χ2 analysis, comparing a structurally constrained
+model to a fully unconstrained model. The models were signifi
+cantly different (Δχ2 = 166.87, Δdf = 118, p < 0.01), indicating that
+the constrained model fit the data better than the unconstrained
+model. In other words, these results supported a moderation effect
+of room type on the relationships between variables in the model.
+Unconstrained Wald tests of invariance between the models re
+vealed one significantly different structural path across CR and MR
+models. The path from communication style to encouraging partici
+pation in care significantly varied across models, with the path being
+stronger for the medical room (MR model) than for the counseling
+room (CR model) (p = 0.02). Though not statistically significant by in
+variance testing, other differences across the models were present.
+For both models, participants who viewed the clinical teaching style
+had more positive views of the counselor's nonverbal communica
+tion, though this relationship was only significant for the CR model.
+The clinical teaching style was also positively associated with per
+ceptions of more encouragement of participation, though this rela
+tionship was only significant for the MR model.
+Similarities across the models were also seen. Nonverbal com
+munication was strongly positively associated with better ratings of
+the therapeutic bond for both the CR and MR models (B = 0.40 and
+0.35). Nonverbal communication was also strongly positively asso
+ciated with perceptions of more encouragement of participation in
+the CR and MR models (B = 0.69 and 0.67). As hypothesized, higher
+ratings of encouraging participation were positively associated with
+better ratings of the therapeutic bond in both the CR and MR mod
+els (B = 0.41 and 0.43). In other words, in both models (e.g., both
+TA B L E 2 Descriptive statistics and correlations between model variables.
+Variable
+Descriptive statistics Correlations One-way ANOVA
+M SD α (1) (2) (3) (4)
+Counseling
+office Medical room
+Psychosocial
+counseling Clinical teaching
+(1) Communication style – – – 
+(2) Encouraging participation 10.77 1.86 0.74 0.16* – 10.67 (1.88) 10.86 (1.84) 10.48 (2.05) 11.06* (1.59)
+(3) Nonverbal communication 5.18 0.87 0.89 0.12* 0.56* – 5.13 (0.89) 5.23 (0.84) 5.08 (0.95) 5.28* (0.76)
+(4) Therapeutic bond 5.67 0.96 0.93 0.19* 0.61* 0.64* – 5.61 (1.00) 5.73 (0.91) 5.49 (1.05) 5.86* (0.82)
+Note: α = Cronbach's alpha, M = mean, SD = standard deviation. One-tailed Bonferroni corrected correlations between variables. Higher scores of the therapeutic bond and nonverbal communication reflect
+better ratings; lower ratings of verbal communication (decision-making, question-asking, dominance) reflect better ratings; one-way ANOVAs completed in STATA. *p < 0.001.
+15733599, 2025, 2, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/jgc4.2013 by Cochrane France, Wiley Online Library on [01/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+8 of 11 | BROADBRIDGE et al.
+environments), there was an indirect effect of communication style
+on the therapeutic bond that was mediated by perceptions of the
+genetic counselor's nonverbal communication (CR model) or percep
+tions of the genetic counselor's encouraging of participation in the
+appointment (MR model).
+4 | DISCUSSION
+This study explored the influence of the physical environment and
+communication style on analog clients' perceptions of communica
+tion and the therapeutic bond within simulated genetic counseling
+sessions. Overall, there was no direct effect of the experimentally
+manipulated room type on ratings of the therapeutic bond, ratings
+of nonverbal communication, or ratings of encouraging participa
+tion. By contrast, there was an effect related to counseling style;
+the clinical teaching was rated more favorably than the psychosocial
+counseling. This was contrary to our expectations. Although there
+were no direct effects of the physical environment observed, indi
+rect effects of the environment on the therapeutic relationship were
+seen via SEM.
+One potential reason for the unexpected findings may be
+attributed to participant expectations. Most participants had
+no experience with genetic counseling outside of the study (see
+Table 1). The communication manipulation may have confounded
+the naïve observer as to what in fact the objective of a genetic
+counseling session is. Where the clinical teaching approach could
+readily be seen as direct and relevant to someone seeking clin
+ical expertise, the counseling approach used less direct com
+munication and may have been perceived as uncertain or less
+relevant. In this way, observers may have been more critical of
+the genetic counselor using psychosocial counseling communica
+tion (cf., Blanch et al., 2009). It is also possible that the exper
+imental manipulation of communication had unintended effects.
+In the clinical teaching video, the client actor had very few lines,
+and therefore gave very few verbal indications about the extent
+to which her needs were being met. By contrast, in the psycho
+social counseling video, the genetic counselor spent more time
+eliciting the client's narrative, asking open-ended questions, and
+attending to the client's emotion statements. In this way, partic
+ipants who viewed the psychosocial counseling model may have
+had stronger reactions to the discussion and subsequently had
+higher expectations of what could have been accomplished in a
+genetic counseling session. Conversely, because there were very
+few emotional cues in the clinical teaching, participants may have
+had lower expectations for the relationship and have based the
+ratings more on the quality and pace of the information given.
+Although we chose to use markedly different styles of commu
+nication in this study, it is possible that this manipulation elicited
+different expectations of what a genetic counseling appointment
+could or should be. Similarly, it is possible that expectations set
+by the environments, coupled with the study design of viewing a
+single environment (rather than a cross-over design) produced the
+unanticipated findings. For example, participants may not expect
+a high degree of shared decision-making in a medical office. Thus,
+regardless of the type of communication they saw, their low ex
+pectations for shared decision-making could have been exceeded,
+resulting in higher ratings of patient- centeredness.
+4.1 | Theoretical contributions: Patient-centered communication in genetic counseling
+SEM revealed that, even when the counselor's communication
+was designed to be more patient-centered, participants' rat
+ings of the counselor's nonverbal behaviors mediated how they
+perceived verbal communication and ratings of the therapeutic
+bond between client and genetic counselor. This relationship was
+F I G U R E 3 Final models of communication and the therapeutic bond for the counseling office (CR model) and medical office (MR model; in parentheses). Parameter estimates are standardized. Model fit indices for the counseling office (paths outside of parentheses) were χ2(113) = 218.31, p < 0.01; RMSEA = 0.05 (CI = 0.04, 0.06); CFI = 0.98; SRMR = 0.03. Model fit indices for the medical room (paths
+inside parentheses) were χ2(113) = 224.19, p < 0.01; RMSEA = 0.05 (CI = 0.04, 0.06); CFI = 0.98; SRMR = 0.04. Path coefficients designated with * were significant at p < 0.01.
+15733599, 2025, 2, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/jgc4.2013 by Cochrane France, Wiley Online Library on [01/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+| 9 of 11
+BROADBRIDGE et al.
+consistent for both communication styles and across room types.
+In other words, regardless of the actual verbal communication or
+the physical environment viewed, when participants thought the
+nonverbal communication was effective, they perceived a stronger
+therapeutic bond. This finding emphasizes the importance of non
+verbal communication in establishing an effective relationship in
+genetic counseling.
+Patient-centeredness of communication predicted percep
+tions of nonverbal communication such that less patient-centered
+communication was associated with more positive ratings of the
+nonverbal communication when participants viewed the coun
+seling office, though not the medical room. Conversely, patient
+centeredness of communication predicted perceptions of verbal
+communication when participants viewed the medical, though not
+for the counseling office. This finding suggests that there may be
+a difference in how verbal and nonverbal communication behav
+iors are perceived within different clinical environments. Future
+research should consider collecting perceptions of both verbal
+and nonverbal communication behaviors when studying the in
+fluence of patient-centered communication on genetic counseling
+outcomes.
+Results of this study align with prior research showing that more
+patient-centered nonverbal communication, such as eye contact and
+head nodding, are associated with better ratings of health care pro
+fessionals (Griffith et al., 2003). However, the results diverge from
+current understanding of patient-centered verbal communication
+behaviors and their expected positive relationship with perceptions
+of nonverbal communication behaviors and participation in care
+(e.g., Pinto et al., 2012; Thom, 2001). Participants who viewed the
+patient-centered verbal communication rated the nonverbal com
+munication worse overall, though the association was only signifi
+cant in our model when participants viewed the counseling office
+and not the medical exam room. Although we attempted to have
+consistent nonverbal communication in the simulated sessions, it is
+possible that there were subtle differences across the two commu
+nication types that may have been amplified based on perceptions
+of the presented verbal communication. The unexpected findings
+support the need for additional considerations when employing ex
+perimentally manipulated communication, such as measurements of
+expectations of the environment before watching the interaction
+and warrant future research.
+4.2 | Strengths and limitations
+Although this study has provided preliminary evidence to suggest
+that perceptions of the physical environment are related to how
+participants perceived the genetic counseling communication and
+the therapeutic bond, there are limitations to these findings. First,
+the study was conducted using virtual simulated counseling ses
+sions and analog clients. Because of this, participants were not
+able to respond in real-time to the counselor and thus our study
+captured only participant's perceptions of the session, rather than
+the process of communication and relationship-building them
+selves. Future research should include methods that allow par
+ticipants to interact with and respond to the simulated genetic
+counselor. Second, this study used only one genetic counselor, one
+client actor, and one clinical scenario. Previous analog studies in
+genetic counseling have found that participants were able to re
+late well to a simulated session (Portnoy et al., 2010), though it
+is possible that participants did not connect with this particular
+client. A third limitation is the demographic make-up of our study.
+Because our scenario was for breast cancer risk assessment and
+we wanted to ensure similarity to the analog patient, we chose
+to only recruit female participants. While there is no data to sug
+gest that men would have different perceptions of these environ
+ments, this has not yet been investigated. Likewise, our sample
+was not diverse enough to investigate differences across racial
+and ethnic demographics. The composition of this sample being
+mostly non-Hispanic White limits the generalizability to individu
+als from varying cultural backgrounds. Knowing that concord
+ance between patients and clinicians across social demographics
+(e.g., race/ethnicity, gender, and age) can affect satisfaction with
+care overall (Thornton et al., 2011), it is possible that results of
+the mostly white sample would differ in a more diverse, and thus
+more racially discordant sample. Future research should examine
+whether the relationships among variables in this study replicate
+in more diverse populations, and in contexts that affect all gen
+ders. In addition to these limitations, the present study had sev
+eral important strengths. First, the use of video simulation and
+an analog client allowed for a well-controlled randomized study.
+Participants viewed the exact same interaction in the two envi
+ronments, with the same verbal and nonverbal communication
+and relationship-building characteristics. This design helped to
+better disentangle the effects of the physical environment from
+the effects of patient-counselor communication within a live ses
+sion. Additionally, the large sample size allowed for the detection
+of subtle effects on perceptions of the genetic counseling session
+and the use of structural equation modeling to investigate the re
+lationships between the variables of interest. Although we asked
+participants to imagine they were in the room with the counselor in
+the video, the greenscreen format of the videos shared character
+istics with video telehealth visits. As genetic counseling is increas
+ingly being offered via telemedicine (National Society of Genetic
+Counselors, 2022, 2023), our study provides additional insight into
+how clients may perceive the genetic counseling interaction when
+the counselor is in different environments. Future research focus
+ing specifically on the environment in genetic counseling delivered
+by telemedicine is needed to understand whether these results di
+rectly translate to that context.
+4.3 | Practice implications
+One implication for practicing genetic counselors is to explicitly ad
+dress the physical environment. For counselors who practice in both
+15733599, 2025, 2, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/jgc4.2013 by Cochrane France, Wiley Online Library on [01/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+10 of 11 | BROADBRIDGE et al.
+counseling and medical environments, it may be worth asking clients
+which room they would prefer. When there is no option for the type
+of environment, it may be important to help orient the session to the
+room. For example, genetic counselors practicing in medical-type
+environments may want to address that the client will not need to
+have a physical exam during the session and that the primary goal
+is to have a conversation about the client's experiences and values.
+While each genetic counseling client is unique, alleviating potential
+anxiety caused by being in a medical exam room may be one way to
+increase a client's perceptions of the room as comfortable and create
+a different expectation than the type of appointment that is typical
+in medical exam rooms. Likewise, it underscores the importance of
+agenda-setting in appointments that take place in counseling rooms,
+setting the expectation that both medical and counseling topics may
+be addressed.
+5 | CONCLUSIONS
+Overall, this research suggests that the physical environment can
+influence how clients experience genetic counseling sessions.
+Results provide evidence that the physical environment and the way
+it makes clients feel may affect client perceptions of communication
+and the therapeutic bond in genetic counseling sessions. These
+findings are important for practicing genetic counselors as they
+consider how best to facilitate an environment that is perceived as
+comfortable, no matter where they are located, and supports the
+need for future studies to explore how the physical environment
+influences the genetic counseling session and the genetic counseling
+process.
+AUTHOR CONTRIBUTIONS
+The research presented in the paper was conducted while the first
+author (EB) was in training and the original data collection was
+conducted by the first author to fulfill a degree requirement. EB was
+responsible for the conception of the original research project design,
+analysis, interpretation of the data, and drafting of the manuscript.
+The original data collection strategy was completed with advice from
+EB's thesis committee (authors LE, DR, and SP). Authors LE, DR, and
+SP provided review and editing of the manuscript. Authors EB and LE
+confirm that they had full access to all the data in the study and take
+responsibility for the integrity of the data and the accuracy of the
+data analysis. All of the authors gave final approval of this version to
+be published and agree to be accountable for all aspects of the work
+in ensuring that questions related to the accuracy or integrity of any
+part of the work are appropriately investigated and resolved.
+ACKNOWLEDGMENTS
+Data collection was conducted to fulfill a genetic counseling degree
+requirement of the first author (EB). Some of the analyses presented
+were completed during EB's doctoral training. The first author would
+like to thank Dr. Caralynn Wilczewski for her participation in cre
+ating the simulated genetic counseling sessions. Funding for data
+collection was provided by the National Human Genome Research
+Institute through the pre-doctoral research training award.
+CONFLICT OF INTEREST STATEMENT
+The authors declare no competing interests.
+DATA AVAIL ABILIT Y STATEMENT
+The data that support the findings of this study are available from
+the corresponding author.
+ETHICS STATEMENT
+Human studies and informed consent: The study for dataset 1 was
+approved by and conducted according to the ethical standards of
+the Johns Hopkins Bloomberg School of Public Health Institutional
+Review Board. (IRB no. 12958) All applicable international, national,
+and/or institutional guidelines were followed.
+Animal studies: No non-human animal studies were carried out
+by the authors for this article.
+ORCID
+Elizabeth Broadbridge https://orcid.org/0000-0003-4121-3697
+Debra L. Roter https://orcid.org/0000-0003-2203-9697
+Susan Persky https://orcid.org/0000-0002-7768-5744
+Lori H. Erby https://orcid.org/0000-0001-6200-9033
+REFERENCES
+Ajiboye, F., Dong, F., Moore, J., Kallail, K. J., & Baughman, A. (2015). Effects of revised consultation room design on patient-physician communication. Health Environments Research & Design Journal, 8(2), 8–17. https:// doi.org/10.1177/1937586714565604 Almquist, J. R., Kelly, C., Bromberg, J., Bryant, S. C., Christianson, T. J. H., & Montori, V. M. (2009). Consultation room design and the clinical encounter: The space and interaction randomized trial. HERD: Health Environments Research & Design Journal, 3(1), 41–78. https:// doi. org/10.1177/193758670900300106 Barber, J. P., Connolly, M. B., Crits-Christoph, P., Gladis, L., & Siqueland, L. (2000). Alliance predicts patients' outcome beyond in-treatment change in symptoms. Journal of Consulting and Clinical Psychology, 68(6), 1027–1032. https://doi.org/10.1037/00 22- 006X.68.6.1027 Blanch, D. C., Hall, J. A., Roter, D. L., & Frankel, R. M. (2009). Is it good to express uncertainty to a patient? Correlates and consequences for medical students in a standardized patient visit. Patient Education and Counseling, 76(3), 300–306. https:// doi.org/10.1016/j.pec. 2009. 06.002 Blanch-Hartigan, D., Hall, J. A., Krupat, E., & Irish, J. T. (2013). Can naive viewers put themselves in the patients' shoes?: Reliability and validity of the analogue patient methodology. Medical Care, 51(3), e16–e21. https:// doi.org/10.1097/MLR.0b013e31822945cc Broadbridge, E., Roter, D. L., Persky, S., & Erby, L. H. (2024). Measuring the therapeutic bond in genetic counseling: Testing measurement error in the bond subscale of the working Alliance inventory. Journal of Genetic Counseling. https:// doi.org/10.1002/jgc4.1844 Caleshu, C., Kim, H., Silver, J., Austin, J., Tibben, A., & Campion, M. (2022). Contributors to and consequences of burnout among clinical genetic counselors in the United States. Journal of Genetic Counseling, 31(1), 269–278. https:// doi.org/10.1002/jgc4.1485 Chaikin, A. L., Derlega, V. J., & Miller, S. J. (1976). Effects of room environment on self-disclosure in a counseling analogue. Journal of
+15733599, 2025, 2, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/jgc4.2013 by Cochrane France, Wiley Online Library on [01/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+
+| 11 of 11
+BROADBRIDGE et al.
+Counseling Psychology, 23(5), 479–481. https://doi.org/10.1037/ 0022- 0167.23.5.479 D'agostino, T. A., & Bylund, C. L. (2011). Communication study the nonverbal accommodation analysis system (NAAS): Initial application and evaluation. Patient Education and Counseling, 85(1), 33–39. https:// doi.org/10.1016/j.pec.2010.07.043 Darchuck, A., Wang, V., Weibel, D., Fende, J., Anderson, T., & Horvath, A. (2000). Manual for the working alliance inventory—Observer form (WAI-O): Revision IV. https:// www.profhorvath.com/sites/ default/ files/ upload/WAI- O%20Manual%20V4.pdf Epstein, R. M., Franks, P., Fiscella, K., Shields, C. G., Meldrum, S. C., Kravitz, R. L., & Duberstein, P. R. (2005). Measuring patientcentered communication in patient-physician consultations: Theoretical and practical issues. Social Science & Medicine, 61(7), 1516–1528. https:// doi.org/10.1016/j.socscimed.2005.02.001 Erby, L. H., Wisniewski, T., Lewis, K. L., Hernandez, C., Biesecker, L. G., & Biesecker, B. B. (2021). Adaptation of the working alliance inventory for the assessment of the therapeutic alliance in genetic counseling. Journal of Genetic Counseling, 30(1), 11–21. https://doi.org/ 10. 1002/jgc4.1378 Goldsmith, L. P., Lewis, S. W., Dunn, G., & Bentall, R. P. (2015). Psychological treatments for early psychosis can be beneficial or harmful, depending on the therapeutic alliance: An instrumental variable analysis. Psychological Medicine, 45(11), 2365–2373. https:// doi.org/10.1017/S003329171500032X Gorawara-Bhat, R., & Cook, M. A. (2011). Eye contact in patient-centered communication. Patient Education and Counseling, 82(3), 442–447. https:// doi.org/10.1016/j.pec.2010.12.002 Griffith, C. H., Wilson, J. F., Langer, S., & Haist, S. A. (2003). House staff nonverbal communication skills and standardized patient satisfaction. Journal of General Internal Medicine, 18(3), 170–174. https:// doi. org/10.1046/j.1525- 1497.2003.10506.x Herzog, W., & Boomsma, A. (2009). Small-sample robust estimators of noncentrality-based and incremental model fit. Structural Equation Modeling: A Multidisciplinary Journal, 16(1), 1–27. https://doi.org/10. 1080/10705510802561279 Howgego, I. M., Yellowlees, P., Owen, C., Meldrum, L., & Dark, F. (2003). The therapeutic alliance: The key to effective patient outcome? A descriptive review of the evidence in community mental health case management. The Australian and New Zealand Journal of Psychiatry, 37(2), 169–183. https:// doi.org/10.1046/j.1440- 1614.2003.01131.x Hu, L. T., & Bentler, P. M. (1999). Cutoff criteria for fit indexes in covariance structure analysis: Conventional criteria versus new alternatives. Structural Equation Modeling: A Multidisciplinary Journal, 6(1), 1–55. https:// doi.org/10.1080/10705519909540118 Mead, N., & Bower, P. (2000). Patient-centredness: A conceptual framework and review of the empirical literature. Social Science & Medicine, 51(7), 1087–1110. https:// doi.org/10.1016/S02779536(00) 00098- 8 Morris, E., Best, J., Inglis, A., & Austin, J. (2019). Impact of the physical environment on patient outcomes of genetic counseling: An exploratory study. Journal of Genetic Counseling, 28(4), 760–766. https:// doi. org/10.1002/JGC4.1111 Murray, B., Tichnell, C., Burch, A. E., Calkins, H., & James, C. A. (2022). Strength of the genetic counselor: Patient relationship is associated with extent of increased empowerment in patients with arrhythmogenic cardiomyopathy. Journal of Genetic Counseling, 31(2), 388–397. https://doi.org/10.1002/jgc4.1499
+National Society of Genetic Counselors. (2022). Professional status survey, 2022. https://www.nsgc.org/policy-research-and-publicatio ns/ professional- status- survey
+National Society of Genetic Counselors. (2023). Professional status survey. National Society of Genetic Counselors. Okken, V., van Rompay, T., & Pruyn, A. (2012). Exploring space in the consultation room: Environmental influences during patient–physician interaction. Journal of Health Communication, 17(4), 397–412. https:// doi.org/10.1080/10810730.2011.626498 Phelps, C., Horrigan, D., Protheroe, L. K., Hopkin, J., Jones, W., & Murray, A. (2008). “I wouldn't classify myself as a patient”: The importance of a “well-being” environment for individuals receiving counseling about familial cancer risk. Journal of Genetic Counseling, 17(4), 394405. https:// doi.org/10.1007/s10897- 008-9158-z Pinto, R. Z., Ferreira, M. L., Oliveira, V. C., Franco, M. R., Adams, R., Maher, C. G., & Ferreira, P. H. (2012). Patient-centred communication is associated with positive therapeutic alliance: A systematic review. Journal of Physiotherapy, 58(2), 77–87. https://doi.org/10. 1016/ S1836- 9553(12)70087- 5 Portnoy, D. B., Roter, D. L., & Erby, L. H. (2010). The role of numeracy on client knowledge in BRCA genetic counseling. Patient Education and Counseling, 81(1), 131–136. https:// doi.org/10.1016/j.pec.2009.09. 036 Roter, D. L., Ellington, L., Hamby Erby, L., Larson, S., & Dudley, W. (2006). The genetic counseling video project (GCVP): Models of practice. American Journal of Medical Genetics Part C: Seminars in Medical Genetics, 142(4), 209–220. https:// doi.org/10.1002/AJMG.C. 30094
+Roter, D. L., & Larson, S. (2002). The roter interaction analysis system (RIAS): Utility and flexibility for analysis of medical interactions. Patient Education and Counseling, 46(4), 243–251. https://doi.org/ 10. 1016/S0738- 3991(02)00012- 5 Thom, D. H. (2001). Physician behaviors that predict patient trust. Journal of Family Practice, 50(4), 323–328.
+Thornton, R. L. J., Powe, N. R., Roter, D. L., & Cooper, L. A. (2011). Patient–physician social concordance, medical visit communication and patients' perceptions of health care quality. Patient Education and Counseling, 85(3), e201–e208. https:// doi.org/10.1016/j.pec. 2011.07.015
+van Vliet, L. M., van der Wall, E., Albada, A., Spreeuwenberg, P. M. M., Verheul, W., & Bensing, J. M. (2012). The validity of using analogue patients in practitioner–patient communication research: Systematic review and meta-analysis. Journal of General Internal Medicine, 27(11), 1528–1543. https:// doi.org/10.1007/s1160 6- 012-2111-8 Wissow, L. S., Brown, J. D., & Krupnick, J. (2010). Therapeutic alliance in pediatric primary care: Preliminary evidence for a relationship with physician communication style and mothers' satisfaction. Journal of Developmental & Behavioral Pediatrics, 31(2), 83–91. https://doi.org/ 10. 1097/DBP.0b013e3181cda770
+How to cite this article: Broadbridge, E., Roter, D. L., Persky, S.,
+& Erby, L. H. (2025). Toward a therapeutic relationship: A
+randomized control trial of the physical environment and
+client-centered communication in genetic counseling. Journal
+of Genetic Counseling, 34, e2013. https://doi.org/10.1002/
+jgc4.2013
+15733599, 2025, 2, Downloaded from https://onlinelibrary.wiley.com/doi/10.1002/jgc4.2013 by Cochrane France, Wiley Online Library on [01/08/2025]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License

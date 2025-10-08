@@ -1,0 +1,417 @@
+RESEARCH ARTICLE
+Identifying central elements of the
+therapeutic alliance in the setting of
+telerehabilitation: A qualitative study
+Barbara SeebacherID1,2*, Carole Geimer3, Julia Neu3, Maria Schwarz4, Gudrun Diermayr3
+1 Clinical Department of Neurology, Medical University of Innsbruck, Innsbruck, Austria, 2 Department of Rehabilitation Science, Clinic for Rehabilitation M  ̈unster, M  ̈unster, Austria, 3 School of Therapeutic Sciences, SRH University Heidelberg, Heidelberg, Germany, 4 Department of Psychosocial Rehabilitation, Clinic for Rehabilitation M  ̈unster, M  ̈unster,  ̈Osterreich
+* barbara.seebacher@i-med.ac.at
+Abstract
+Introduction
+Therapeutic alliance is a relevant aspect of healthcare and may influence patient outcomes.
+So far, little is known about the therapeutic alliance in telerehabilitation.
+Purpose
+To identify and describe central elements of therapeutic alliance in the setting of telerehabil
+itation and compare it to those in conventional rehabilitation.
+Methods
+In this qualitative study, a literature search and in-depth semi-structured interviews with
+rehabilitation and telerehabilitation experts were conducted from 15.5.-10.8.2020 on ele
+ments influencing the therapeutic alliance in rehabilitation and telerehabilitation. Using a
+combined deductive and inductive approach, qualitative content analysis was used to iden
+tify categories and derive central themes.
+Results
+The elements bond, communication, agreement on goals and tasks and external factors
+were identified in the literature search and informed the development of the interview guide.
+Twelve purposively sampled experts from the fields of physiotherapy, occupational therapy,
+speech and language therapy, psychology, general medicine, sports science and telereh
+abilitation software development participated in the interviews. We identified three central
+themes: building effective communication; nurturing a mutual relationship of trust and
+respect; and agreement on goals and tasks and drivers of motivation.
+Conclusions
+In this qualitative study, key elements of therapeutic alliance in rehabilitation confirmed
+those reported in the literature, with additional elements in telerehabilitation comprising
+PLOS ONE
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 1 / 20
+a1111111111 a1111111111 a1111111111 a1111111111 a1111111111
+OPEN ACCESS
+Citation: Seebacher B, Geimer C, Neu J, Schwarz M, Diermayr G (2024) Identifying central elements of the therapeutic alliance in the setting of telerehabilitation: A qualitative study. PLoS ONE 19(3): e0299909. https://doi.org/10.1371/journal. pone.0299909
+Editor: Nadinne Alexandra Roman, Transilvania University of Brasov: Universitatea Transilvania din Brasov, ROMANIA
+Received: March 28, 2023
+Accepted: February 17, 2024
+Published: March 8, 2024
+Peer Review History: PLOS recognizes the benefits of transparency in the peer review process; therefore, we enable the publication of all of the content of peer review and author responses alongside final, published articles. The editorial history of this article is available here: https://doi.org/10.1371/journal.pone.0299909
+Copyright: © 2024 Seebacher et al. This is an open access article distributed under the terms of the Creative Commons Attribution License, which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.
+Data Availability Statement: All relevant data are within the manuscript and its Supporting information files.
+
+
+support from others for ensuring physical safety and technical connectedness, caregivers
+acting as co-therapists and applying professional touch, and promoting patient autonomy
+and motivation using specific strategies.
+Introduction
+Recent advances in the development of new technologies have pushed telerehabilitation as an add-on intervention to conventional rehabilitation. Telerehabilitation is the provision of remote rehabilitative services using information and communication technologies [1]. Telerehabilitation can reduce costs and facilitate the geographical accessibility of rehabilitation facilities in rural areas [1]. Furthermore, telerehabilitation allows for improved treatment continuity, an increase in the frequency of therapy [2], and promotes independence and self-efficacy in the home environment [1]. Despite this added value of telerehabilitation, technical problems, an inadequate internet connection or a low level of technical know-how of the therapist or patient impede its widespread application [2]. In addition, hands-on therapies cannot be carried out using telerehabilitation due to the lack of the therapist’s physical presence [3], and non-verbal messages are more difficult to interpret [4]. The latter aspects play a central role in motor rehabilitation in physiotherapy, occupational therapy, and speech and language therapy and can possibly influence the interaction between therapist and patient (i.e., the therapeutic alliance). Therapeutic alliance (TA), which originated in psychotherapy [5], has been defined as ‘a mutual collaboration and partnership between the therapist and client’ [6, page 1]. Central elements of TA are an individualised treatment, respect for human dignity and rights, congruence [7] and empathy [8]. Other aspects include a successful communication [9] and the promotion of self-efficacy and autonomy of those being treated [10]. Different concepts of TA have been proposed in the literature [11–13]. The well-known TA model of Bordin encompasses the agreement between the patient and therapist on the goals of therapy, the agreement on tasks to be worked on during therapy, and the quality of the emotional connection (‘bond’) including aspects of trust, respect and caring [11]. This alliance thus describes the quality of the working relationship between patient and therapist [11]. Recent meta-analyses have shown that successful TA is a significant predictor of reduced symptoms and a positive psychotherapy outcome [6, 10, 14]. Within the last decade, the term TA has increasingly been expanded to the context of social and health professions such as nursing, social work, counseling, psychiatry, rehabilitation [13] and mental e-health [15]. Moreover, TA has been explored in physiotherapy [16–19], occupational [20] and speech and language therapy [21]. Among others ‘stimulus to activity’ [20], ‘contextual shapers’, e.g., the patient’s family [21] and ‘establishing connections with the body being central’ [16] emerged as relevant themes of TA within motor rehabilitation. TA in telerehabilitation requires special attention due to several key factors. Firstly, utilising technology-mediated communication in telerehabilitation associated with the potential disruptions from technical issues may affect the establishment and maintenance of the TA. Secondly, telerehabilitation may complicate deciphering non-verbal cues, which hold a significant role in face-to-face interactions and can contribute to the development of TA. Finally, the challenges of building trust and sustaining patient engagement may be heightened in telerehabilitation due to the constraints of limited physical presence. Although existing frameworks of TA have been adapted to the fields of physio-, occupational or speech and language therapy,
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 2 / 20
+Funding: The authors received no specific funding for this work.
+Competing interests: The authors have declared that no competing interests exist.
+
+
+little is known about TA in telerehabilitation in the respective fields. Therefore, this study aimed to identify and describe the central elements of TA in the setting of telerehabilitation as experienced by physiotherapists, occupational and speech and language therapists and thereby expand those of conventional rehabilitation and compare it to those in conventional rehabilitation.
+Materials and methods
+Theoretical framework
+By addressing the relationship between the patient and therapist as viewed from different experts’ perspectives, a social constructivist worldview or research paradigm was chosen for this study [22]. Researchers recognised that both their interviewees and they themselves perceive and understand reality in a different way, embracing the ontological assumption of multiple truths and multiple realities [23]. They strived to uncover the implied meaning or latent content in interviewees’ experiences, reflected by themes [24]. Moreover, researchers acknowledge that their personal, professional, historical, and cultural backgrounds and experiences (S1 Table) influenced their interpretation of results [22]. Structuring qualitative content analysis according to Steigleder (2008) [25] appeared particularly suitable for the inductive approach to the expert interview analysis due to its focus on the methodically controlled, empirically guided revision of category systems.
+Research design, ethics, and data protection
+To gain insight into the TA in the setting of telerehabilitation, a combined deductive and inductive qualitative approach was chosen. Based on the results from a literature search, salient elements of the TA were identified from which interview guides were developed individually for each interviewee, depending on their professional background. The methodological approach and reporting were guided by the ‘Consolidated Criteria for Reporting Qualitative Research’ (COREQ) [26] (S1 File). The active study duration was from 15.5.2020 to 10.8.2020, followed by the data analysis. This study did not fall under the responsibility of the research ethics committees of the Medical University of Innsbruck, Austria, and SRH University Heidelberg, Germany as only academic, telerehabilitation and clinical experts were involved. The study was conducted according to the European Union General Data Protection Regulation (DSGVO 20216/679), the Austrian (DSG 2019) and German (BDSG 2017) Data Protection Laws, ethical principles stated in the Declaration of Helsinki (2013) and prospectively registered as part of a questionnaire development study in the ISRCTN Registry (ISRCTN10132326) on the 2.5.2020. Participant data were pseudonymised using an ID number and a separately stored coding list. Before the interviews began, all experts received a detailed letter explaining the research project and gave their written consent for participation and recording the interview. The participant identification list is only accessible to one person in the research group and will be destroyed after 10 years. Until then, the data is kept on a password-protected computer in an encrypted file.
+Literature search
+A literature search was conducted in April 2020 in the databases PubMed and Cochrane Library as well as in Google Scholar using the keywords detailed in the S2 Table. Aims of the literature review were to complement Bordin’s theoretical construct of TA within rehabilitation and telerehabilitation, particularly within the domains of physiotherapy, occupational therapy, or speech and language therapy. Peer-reviewed full-text articles, books, and
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 3 / 20
+
+
+conference proceedings in English or German language were included, that investigated relevant aspects of TA within rehabilitation or telerehabilitation and identified gaps in the literature, explored new perspectives, or proposed enhancements to existing TA frameworks. Based on the literature search results and researchers’ clinical expertise the interview guides were designed.
+Participants and recruitment
+Participants were recruited between 15.5.2020 and 10.8.2020. Experts were accessed via telephone or email by the author who conducted the qualitative interviews (CG), who had access to information that could identify individual participants during data collection. Semi-structured interviews with experts from rehabilitation and tele-rehabilitation on relevant elements influencing successful TA were conducted. Experts are understood as persons who have special knowledge due to their professional position or training [27]. The sample size was set in advance at 8–12 experts from different fields [28]. These were categorised into the following groups, each requiring a minimum of 2 experts, and purposive quota sampling [29] was performed: (1) experienced therapists in the field of physiotherapy, occupational therapy, and speech and language therapy; (2) therapists with an additional degree in psychology, (3) therapists with experience in using telerehabilitation and (4) experts with technical knowledge in telerehabilitation and software development.
+Interview guides and interview procedures
+The literature search results and clinical expertise of the researchers informed the development of the interview guides. Due to the different areas of knowledge and positions of the experts, the guides were designed individually for each expert group and adapted specifically for each expert (see S2 Table for elements of the literature search and an exemplary interview guide). In-depth semi-structured interviews included open questions about TA in motor rehabilitation in general [30–32], telerehabilitation and topics such as communication [33, 34], trust [35, 36], congruence [37], self-disclosure [37], respect [38], empathy [37, 39], therapist-patient relationship [37, 38], working alliance (incl. goal setting, tasks, motivation) [40–42], external influencing factors (e.g., relatives and/or caregivers, information and communication technology, safety, time) [21, 43, 44], roles and responsibilities [38, 42]. The interviews, which lasted 45–60 minutes, were conducted by telephone by a trained physiotherapist in the Master’s programme (CG) and recorded using a Philips voice tracer. One interview was carried out with each expert and any open questions clarified during the interview. To establish a relationship with the interviewees, they were introduced to the researcher’s professional background, personal goals, interests in the research topic and study purpose. Field notes were taken.
+Data analysis
+Recordings were transcribed using the transcription software f4transcript and using semanticcontent transcription rules according to Dresing and Pehl (2018) [45]. The subsequent data analysis was carried out using MaxQDA. A combined deductive and inductive qualitative approach was chosen. The theoretical framework of TA as derived from the literature search was further used to determine the initial main categories (pre-coding), whereas the refined main categories and sub-categories were created inductively from the interview material. To condense the data material to content of particular importance for the research project, the Steigleder (2008) modified variant of a structuring qualitative content analysis was used [25]. A latent qualitative content analysis approach was used to be able to interpret the underlying meaning of the text [24]. Representative quotations were assigned to main and sub-categories.
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 4 / 20
+
+
+The initial coding steps were performed by the second (CG) and third authors (JN) who double-coded all material [46]. Ensuring reliability is crucial in content analysis [47] because it guarantees consistency in coding decisions and assesses the rigour and transparency of the coding frame and its application to the data [48, 49]. To determine intercoder reliability, Cohen’s kappa along with its 95% confidence interval (CI) was calculated [50, 51] using GraphPad Prism 9, San Diego, California. McHugh recommends interpreting kappa values as follows: 0–0.20 indicating no agreement, 0.21–0.39 minimum agreement, 0.40–0.59 weak agreement, 0.60–0.79 moderate agreement, 0.80–0.90 strong agreement, and 0.91–1 almost perfect agreement [52]. Peer scrutiny and debriefing among the researchers were used throughout the process. Using a sequential process, the coding frame was constantly evaluated and adapted to the interview material [25]. Analysis steps involved familiarisation with the entire text material (preparation, step 1); structuring the material marking relevant text segments, establishing a criterion of segmentation and identifying units of analysis (pre-structuring, step 2); developing the main categories from the literature and theory of TA, based on findings from the text and the research question (pre-coding, step 3); specification, compilation, evaluation and revision of the subcategories and creation of a coding frame (step 4); specification of the coding rules including definitions, examination, and revision of categories (step 5). Further steps included screening of the material, coding frame-based grouping of relevant categories and iterative revisions of the coding frame; marking and saving of not assignable text segments as an external data file (step 6); examining the allocation of the text segments to the most appropriate subcategories (step 7); revising and extracting relevant text segments into a table; checking of the categories and extracted text segments for plausibility and congruency in content and creating central themes (step 8); and describing the results (step 9) [25].
+Results
+Literature search
+A total of 7,933 articles were initially identified after removing duplicates. Upon screening titles and abstracts, 7,821 studies were excluded. Subsequently, 182 potentially relevant papers underwent full-text evaluation. Following the full-text screening process, 145 studies were excluded for the following reasons: the evaluation solely focused on the effects of interventions on TA (n = 38); exclusive focus on the perceptions of patients or therapists regarding TA (n = 15); utilisation of Bordin’s theoretical construct of TA without extension (n = 14); investigation of TA in the domain of psychotherapy or psychology (n = 57); or exploration of TA in the field of telemedicine or digital healthcare (n = 23). Finally, 35 articles were included. Based on the construct of TA by Bordin (1979) [11] and the results of the literature review, elements and issues influencing successful TA in rehabilitation were identified, which informed the interview guide development: relationship between the patient and therapist, trust, communication, agreement on goals and tasks and external influencing factors. TA was explored in diverse contexts, contributing valuable insights into its dynamics.
+Relationship between the patient and therapist. The essence of the TA lies in the intricate bond between the patient and therapist, encompassing personal, emotional, and professional dimensions. The therapist’s crucial role involves displaying empathy and responsiveness, fostering mutual sharing of emotions, and engaging in self-revelation to build a strong personal relationship [37]. Emphasising the importance of a common focus among all parties, the patient should be forefronted, transcending the focus from the illness to their individual physical, psychological, cultural, and social characteristics and needs in relation to personal goals and therapy contents [30, 36, 38, 53]. Establishing a profound emotional and
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 5 / 20
+
+
+professional connection is essential for effective knowledge transmission at a professional level [40]. To maintain a client-centered approach, a clear distribution of roles and responsibilities is imperative to prevent conflict and encourage the active participation of the patient in the therapeutic process [41, 42]. Shared responsibility, identified as a key factor [32], necessitates a delicate balance between patient autonomy and therapist support, presenting a significant challenge [54]. Introducing humor serves to relegate the illness to the background, fostering an improved mood [37]. The therapist’s congruence, involving genuine, open, and authentic interactions, is pivotal at a professional level [37]. The physical presence of the therapist is deemed relevant, especially in tele-rehabilitation, where ensuring safety [55], conducting a comprehensive physical examination [55, 56], and providing both psychological and physical support are challenging [31, 32]. Lack of physical presence emerges as a barrier to TA in telerehabilitation [44]. Trust. Various aspects contribute to building mutual trust between the patient and therapist, including the exchange of information [38, 57], positive feedback, empathy and respect [38], along with sense of safety [55]. In tele-rehabilitation, the absence of direct safety guarantees poses a challenge to trust [35]. Information exchange is foundational for TA development [32], impacting interaction, satisfaction, and therapy success [58]. Communication. Effective communication enhances the rehabilitation process, enabling mutual understanding, shared decision-making, and person-centered communication [59]. Different communication channels, such as nonverbal, verbal, and paraverbal communication play crucial roles [18, 60, 61], with face-to-face communication being emphasised for nonverbal aspects [61]. Technical aspects in tele-rehabilitation [34], including distance [62] and timedelay [33, 63], technical aspects [34], limit non-verbal communication, underscoring the importance of face-to-face interaction [33]. Agreement on goals and tasks. Agreement on goals between the therapist and patient is pivotal for goal setting, decision-making [41], TA development, and therapy implementation [18]. Goal setting, aligned with patient needs, increases motivation [39], while the patient’s expectation of success, achievement of goals [40], autonomy, and self-management contribute to long-term therapy success [64]. Patient engagement becomes especially crucial in tele-rehabilitation [65–67]. External influencing factors. Relatives and/or caregivers form an integral part of the TA, often referred to as a triad [21]. Their support plays a significant role in promoting the rehabilitation process [37]. In cases involving children, a shared relationship is observed between the therapist, child, and parents [38]. Relatives and/or caregivers provide technical support during therapy preparation and procedure, ensuring safety [42] and the surroundings can influence TA development [21, 44]. Time is recognised as a valuable resource, influencing trust-building [68], communication, and the consideration of patient needs [43]. In tele-rehabilitation, spending more time with the patient is highlighted as a factor promoting TA [55]. Main and secondary elements of TA according to the literature search are presented in S3 Table.
+Expert interviews
+As shown in Table 1, 12 experts with different areas of expertise were interviewed in this phase. All experts approached by the research team agreed to being interviewed. Therapists worked in the fields of pediatrics, neurology, geriatrics, oncology, and musculoskeletal rehabilitation. Based on the results of the expert interviews, the elements already identified through the literature review were either confirmed, explored in more depth or new aspects were
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 6 / 20
+
+
+generated. Certain elements became apparent that are significant for a sustainable TA in telerehabilitation.
+Coding tree and themes
+We identified 9 unique codes and 50 subcodes as potential elements related to TA through qualitative content analysis in our interview data (Table 2; see S4 Table for the full coding tree including code descriptors). The intercoder reliability for the raters was determined to be Kappa = 0.900 (p<0.0001), 95% CI (0.873, 0.927). Further synthesis generated three central themes: building effective communication (theme 1); nurturing a mutual relationship of trust and respect (theme 2); agreement on goals and tasks and drivers of motivation (theme 3). Representative quotes are presented with the themes. We present these themes as a framework for potential facilitators associated with TA in telerehabilitation.
+Theme 1. Building effective communication. Communication through words, facial
+expressions, gestures, and therapeutic touch is considered a crucial element of the TA in rehabilitation, whereas in telerehabilitation the technical connection needs to be established and maintained for communication to be uninterrupted, and touch can only be applied by others acting as co-therapists. Healthcare experts considered both verbal and non-verbal communication an essential component of successful TA, with touch, so-called ‘hands-on’, being an essential source of the relationship between the patient and therapist.
+‘What also plays a big role, of course, is touch, I have had the experience that touch plays a very big role in therapy.’
+(ID 11, section 41)
+In telerehabilitation, the physical distance creates challenging situations for therapists, especially in situations where manual control or assistance is required.
+‘I felt that the patients felt well looked after and also that I demonstrated general exercises, but anything that would have needed hands-on somehow or a check with my hands, that didn’t work out so well.’
+(ID 11, section 7)
+Moreover, facial expressions and gestures were mentioned as important elements of nonverbal communication in telerehabilitation. They would be of central importance when it
+Table 1. Role and number of experts.
+Field of professional experience and knowledge Number and gender
+Clinically experienced therapists with a MSc or PhD degree and some experience in telerehabilitation (physiotherapy, speech and language therapy, occupational therapy)
+3 female
+Therapists with a MSc or PhD degree and an additional degree in psychology 2 female
+Therapists with a MSc degree and extensive experience in telerehabilitation 2 female, 2 male
+Experts with medical and technical knowledge with a PhD degree (general medicine, sports science and telerehabilitation software development)
+1 female, 2 male
+https://doi.org/10.1371/journal.pone.0299909.t001
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 7 / 20
+
+
+Table 2. Codes derived from expert interview data.
+Codes Subcodes
+Communication Effective communication
+Clear instructions
+Mutual feedback
+Touch
+Advising on safety
+Appropriate means of communication
+Bond Safeguarding
+Presence
+Responsiveness
+Openness
+Self-disclosure
+Genuinely caring
+Respect
+Acceptance
+Honesty
+Friendly interactions
+Self-reflexion
+Congruence and authenticity
+Humour
+Appreciation
+Building an emotional relationship
+Building a professional relationship
+Trust Safety
+Respect
+Transparency
+Empathy
+Mutual exchange
+Continuous care
+Agreeing on goals and tasks Similarity of goals
+Shared responsibility
+Goal setting
+Defining tasks
+Targeting
+Individualising
+Encouraging
+Adherence
+Congruence
+Patient autonomy and self-management Being prepared
+Self-efficacy
+Self-management
+Autonomy
+Motivation of the patient Motivating factors in rehabilitation and telerehabilitation
+Further motivating factors
+Agreeing on roles Roles of the therapist
+Roles of the patient
+Roles of the family and caregivers
+(Continued )
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 8 / 20
+
+
+came to assessing, whether the patient could adequately follow the instructions or how she/he was coping with the exercises. Video calls would be important in this regard.
+‘The advantage of the video is that you can really see what’s between the lines, for example when the patient has a face contorted with pain or when she/he seems desperate.’
+(ID 6, section 23)
+However, the technical aspects of tele-rehabilitation would lead to restrictions in non-verbal communication, for example due to a limited field of vision caused by the positioning of the camera or poor image quality. Especially people with low affinity to technology would experience such problems.
+‘What was also difficult indeed were partly the lighting conditions. Not in our therapy practice, but with the elderly it is just real /. I don’t know why they always have such dark apartments, but it was very dark, and you couldn’t see the people very well, which makes it even more difficult to understand each other.’
+(ID 8, section 11)
+Experts also attributed a key role to effective verbal communication throughout the therapeutic process. In the process of goal setting, it would also be relevant for both the patient and the therapist to effectively exchange information and have open communication.
+‘When it comes to agreeing on goals, self-disclosure is of course very important, so that you actually get to know what the patient wants to achieve.’ (ID 4, section 23). For the therapist, on the other hand, it would be essential from a professional point of view to disclose all necessary information to the patient that could influence her/his decisions and plans.
+‘Everything should be openly stated that could or should influence the patient’s decision.’
+(ID 5, section 9)
+Even verbal communication can be negatively influenced by using technical aids due to background noise or a poor internet connection. Due to potential restrictions in verbal and non-verbal communication, the experts emphasised the importance of verbal guidance in
+Table 2. (Continued)
+Codes Subcodes
+External factors Home environment
+Time
+Supporters
+Technology-related aspects to consider in telerehabilitation
+Potentially disruptive factors in telerehabilitation
+Differences between telerehabilitation and conventional therapy
+Preparation time
+Active role of the patient
+Change in interaction
+Hands-on
+Field of action
+https://doi.org/10.1371/journal.pone.0299909.t002
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 9 / 20
+
+
+telerehabilitation. Different approaches were mentioned to ensure the understanding of the patients and getting around technological problems. This could be improved by simplifying verbal statements and by their precision and clarity.
+‘So, I have to guide a lot more verbally, which otherwise would not have been an issue nonverbally’.
+(ID 1, section 21)
+‘I try to make my explanations even simpler’.
+(ID 11, section 13)
+If the patient had little technical ‘know-how’, verbal explanations would also be needed to make telerehabilitation possible at all, by supporting the implementation.
+‘And there is just, as I said, the communication with the elderly. Then the camera is sometimes askew, then somehow a woman in the background talks and there were already very many disruptive factors’.
+(ID 8, section 11)
+Theme 2. Nurturing a mutual relationship of trust and respect. An emotional and professional relationship between the patient and therapist is essential in rehabilitation, with the therapist being genuine, open, authentic, empathetic, humorous, and genuinely caring for the patient. Physical safety of the patient is a prerequisite for building trust and needs to be ensured in telerehabilitation by providing effective information and involving therapistinformed caregivers for technical and hands-on support. Additionally, professional competence of the therapist, his/her preparedness for telerehabilitation sessions, and mutual feedback in real-time are sources of TA in telerehabilitation. Clear, concise and individualised instructions and information delivered to the patient or caregivers to ensure their preparedness enhance understanding, professional relationship and trust. Establishing a mutual understanding of trust and respect between the patient and her/his therapist was considered of central importance. The therapist should be genuine, open, authentic, and empathetic and should use humor in an individualised way to distract the patient from her/his illness.
+‘Trust, self-disclosure, empathy, and humor are equally important BUT the difference is in the approach to each patient. So, the way I deal with a patient humorously, or how I am empathic, or how I disclose my thoughts or feelings /. I think that needs to be individualised to each patient, although all aspects are equally important with each patient.’
+(ID7, section 22)
+Most important, the therapist should know the patient from face-to-face treatments before using telerehabilitation. She/he should be genuinely caring for the patient.
+‘The therapist must have experience with telerehab, at least in the use of a specific tool. But he must also know the patient / well, I’m not necessarily a friend of the therapist treating a patient he has never even seen, and that is unlikely to happen in practice. So, you have to know the patient and be caring for the patient.’
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 10 / 20
+
+
+(ID 6, section 31)
+In telerehabilitation, due to limited non-verbal communication or technical influences, mutual feedback would be particularly important to ensure that instructions or exercises were understood correctly. Both text messages and video calls could be used for this purpose. Direct and real-time feedback regarding the performance of therapeutic actions would be clearly preferable for the patient’s learning process, as the following quote illustrates: ‘Feedback, on whether an exercise is right or wrong, must always be in real time in order to learn from it’. (ID 9, section 25) To facilitate the relationship, regular feedback on the course of therapy should be given from the therapist’s and patient’s perspective. Sufficient time resources should be allowed for this: ‘Feedback should be given to avoid misunderstandings. So, it is always important to have the opportunity to clarify things calmly, that the communication is indeed cross-checked. So to speak, in fact you have to examine yourself whether what was understood is what you intended to say.’ (ID 5, section 68) The interview analysis showed that the experts consider trust as an essential component of TA. Trust, as part of the emotional relationship, would be influenced, among other things, by the exchange of information. The more communication there was, whether verbal or non-verbal, the greater the trust in the other person and thus the quality of the relationship.
+‘The more the patient knows what the therapist wants from her/him, and the therapist knows what the patient wants from her/him, the more trust can be built up, which is for the therapeutic alliance is strengthening’.
+(ID 7, section 3).
+Furthermore, safety plays an important role in building trust and further influences the patient’s motivation to participate in therapy. According to the experts, the therapist could not motivate the patient without his or her trust, which would consequently lead to the patient dropping out of therapy.
+‘If the patient does not feel safe with me, either psychologically or physically,. . . then he loses his confidence, and I cannot motivate him,. . .’
+(ID 10, section 67)
+Trust in the therapist can thus be regarded as important for extrinsic motivation. As in conventional therapy, therapist’s professional competence and preparation of the session is necessary in telerehabilitation. However, this differs significantly in terms of its scope. Telerehabilitation sessions must be planned precisely in advance and the patients must be informed about and provided with the necessary materials.
+‘The family can be of great importance in telerehab, especially with stroke patients, if the person can no longer use the computer, then family members have to set up the devices, to use the devices for example, or then also operate the computer.’
+(ID 3, section 61)
+Theme 3. Agreement on goals and tasks and drivers of motivation. Agreeing on goals and tasks is a relevant aspect of TA in rehabilitation, which can be implemented in
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 11 / 20
+
+
+telerehabilitation based on patient autonomy and self-efficacy. Cognitive, physical, and technical support from others who may act as co-therapists may be necessary. Furthermore, shared decision-making, positive encouragement, and individualisation reflect well-functioning TA and together with goal attainment increase patients’ autonomy and motivation for rehabilitation. Additional technical options are available in telerehabilitation such as reminders, reward systems and display of therapy success. Setting goals tailored to the patient, continuity, and attaining goals would be relevant aspects through which trust between the patient and therapist could be built, and thus the success of the therapy enhanced.
+‘I try to build up trust with the patient with respect to the agreed goals and maintain a certain thread, along which the patient and I can navigate during the treatments.’
+(ID 3, section 7)
+‘It is important responding to the wishes of the patient, recognising their goals, aiming to really work on the goal of the patient. That you give him feedback, that you say ok, this is your current status, that you could achieve with that effort, that feedback is also given regularly, so to speak, or a repeat test is carried out.’
+(ID 2, section 18)
+According to the experts, family members should possibly be involved in clarifying individual needs in the goal-setting process. This would apply, for example, in the case of impaired communication skills.
+‘I just had to do more parent counseling to query in which areas what is developing and then adjust together with the patients’ caregivers whether we are now pursuing this goal or another goal.’
+(ID 1, section 33)
+Motivation could be influenced by additional aspects, for some of which relatives/caregiver support was necessary: the consideration of individual patient’s needs and goal setting process, positive encouragement, facilitating patients’ autonomy and self-efficacy, excellent preparedness for telerehabilitation, successful implementation of telerehabilitation and goal attainment. Goals should be realistic, achievable and time-limited. Regular adjustments of the therapeutic intervention to the patient’s performance would increase motivation.
+‘You can motivate through needs, that you first find out what the basic need is, and that you hold out the prospect of fulfilling the need.’
+(ID 4, section 71)
+‘I really try to think of the motivation and give the patient always a new input.’
+(ID 10, section 59).
+In telerehabilitation there would be additional possibilities to increase the motivation of the patients. These included reminders and reward systems (e.g., a high score) as well as displays of therapy progress. The experts reported a consistently high intrinsic motivation of the patients to participate in telerehabilitation. This was shown in different situations where no conventional therapy could take place.
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 12 / 20
+
+
+‘The fact that they did not have to be not afraid of (COVID-19) infection and could still do therapy, that they had the feeling that they can now use this time when they are homebound. They were a bit worried because we often work very close, that they would catch it. They were fully motivated, that was great.’
+(ID 1, section 69)
+‘In acute conditions, when a patient says that he fell and because of that he can’t come to the therapy and asks: can we find an alternative?’
+(ID11, sections 33 and 35)
+Experts unanimously rated self-management and thus a high autonomy of the patients in conventional therapy as essential.
+‘So, for me, it’s actually always the case that the responsibility, the recovery, always grows with the patient. So, he should make an effort, he should endeavor, and I support him with my expert knowledge.’
+(ID 4, section 55)
+They also referred to patients who consider the therapist responsible for the therapy and do not want to take personal responsibility.
+‘Some people, when they enter the therapy practice, they hand over self-responsibility at the door and don’t take it back until they leave the room at the earliest.’
+(ID 9, section 71)
+Telerehabilitation would only succeed through the autonomous action of the person being treated or supportive persons, both preparing for and during the therapy session. Despite the possibility of verbal therapeutic support, the technical requirements for telerehabilitation have to be met and the necessary materials be prepared.
+‘They have to manage themselves more because there is just no-one facing them and putting anything (material) down to them directly, which means they already have to structure themselves.’
+(ID 8, section 52)
+‘They have to be able to ensure their own safety, which means I can say, please see that just the table is nearby, put a chair to the side; or that the bed is nearby where they could then possibly sit down. I can give certain instructions or make suggestions, but the patient has to ensure that that’s the way it is then.’
+(ID 11, section 31).
+The expert interviews revealed that relatives and/or caregivers are occasionally involved in the conventional therapy process, but even more so in telerehabilitation. Some patients have limited technical knowledge, or their impairments hinder the independent use of technical devices.
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 13 / 20
+
+
+‘That, for example, their daughter or niece or granddaughter supports them in using technology.’
+(ID 11, section 35)
+‘Especially with stroke patients, if the person can no longer use the computer, then family members,. . . then they have to operate the computer.’
+(ID 3, section 61)
+Due to the physical distance in telerehabilitation, the therapist may not be able to support the patient to the necessary extent. Relatives and/or caregivers would therefore ‘act as co-therapist’ and as an ‘extended arm of the therapist’. They would take over therapeutic tasks, such as palpation and manual assistance with exercises.
+‘That the mother, with smaller children, actually became the co-therapist. She currently has to do a lot of things that I would otherwise have done in therapy. And with neurological patients, it is also the case that the relatives have been instructed to do more co-therapy than they previously had to do.’
+(ID1, section 39)
+‘If relatives are present, to involve them, e.g., that they “feel”.’
+(ID 11, section 13)
+Relatives and/or caregivers could also ensure the safety of patients in telerehabilitation, as well as provide assistance with and support in carrying out a task in therapy.
+‘If a patient is at risk of falling, then I MUST ensure that a relative is present.’
+(ID 11, section 15)
+‘I always told the parents to sit next to them so that they could help the child. I mailed or gave them sheets of paper, which they should then present to the child.’
+(ID 1, section 11)
+Discussion
+Using a literature search and semi-structured qualitative expert interviews, this study aimed to identify and describe central elements of TA in the setting of telerehabilitation and compare it to those in conventional rehabilitation. We identified three central themes from qualitative content analysis of interview data comprising building effective communication; nurturing a mutual relationship of trust and respect; and agreement on goals and tasks and drivers of motivation. Most of the results of this study are consistent with those from telepsychology. According to Bischoff et al. (2004), therapists and patients need to be able to make necessary adjustments to communication patterns in order to balance the influence of technology and thus develop good TA [69]. This includes, for example, validating the patient’s statements through extensive questioning by the therapist. Ghosh, McLaren, and Watson (1997) have found changes in communication in the context of telepsychology, such as the use of shorter sentences [70].
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 14 / 20
+
+
+Simpson and Reid (2014) have described exchanges via a video phone call in telepsychology as promoting the development of patients’ emotions and self-awareness as well as strong TA [71]. A review by Berger (2017) highlighted that active participation and assumption of responsibility by the client is significantly greater in internet-based psychotherapy [15]. This is in line with the relevance of patient autonomy in telerehabilitation identified by the experts in the present study. There are also significant differences between motor rehabilitation and psychotherapy in terms of TA. The home environment was seen by the experts as a challenge to ensure the patient’s safety and sense of security. In telepsychology, on the other hand, the home environment is perceived as a safe place [72]. In (tele-)psychotherapy, the therapeutic dialogue represents the main therapeutic agent, whereas in physio- or occupational therapy, safeguarding the patient and therapeutic touch are relevant elements. Themes and key aspects of TA in rehabilitation identified by our analysis confirmed those of existing (preliminary) frameworks of TA in physiotherapy, occupational therapy and speech and language therapy [16, 20, 21]. Additional aspects of TA in telerehabilitation as perceived by the experts included the support from others for ensuring physical safety, overall preparedness of the therapist and patient for telerehabilitation sessions and ensuring technical connectedness. Further aspects involved the necessity of relatives or caregivers applying touch after having received guidance i.e., acting as ‘co-therapists’, and promoting patient autonomy and motivation using additional digital options such as reminders, reward systems and display of therapy success. Considering these additional insights, our study contributes to a more comprehensive conceptualisation of TA in telerehabilitation. Apart from the TA between the patient and the therapist, it is important to acknowledge the impact of relatives or caregivers within both the physical and digital environment of the individual. Expanding the concept of TA may require an exploration of perspectives not only from therapists but also from patients and their family members. Furthermore, akin to physio-, occupational, or speech therapy [73], it seems crucial to address potential tensions or ruptures in the TA that may arise in telerehabilitation, requiring further attention in the development of an expanded concept of TA in this context.
+Reflexivity and limitations
+Based on the professional background of mainly physiotherapy, the female study team may have influenced the results of this study. Various measures for achieving trustworthiness including credibility, dependability and transferability were undertaken in this study, however [74, 75]. Credibility was enhanced by choosing experts with various genders, ages and professional backgrounds, and different experiences in TA and telerehabilitation [74]. Semi-structured interviews and open-ended questions were used to gather rich information of the phenomenon under study. The type of qualitative content analysis was carefully selected based on the worldview of the researchers, research question and the approach to analysis, aiming to identify categories and subcategories, from which to derive central themes covering all relevant data [76]. To enhance dependability or trust, researchers were immersed in the research with their personal values and various backgrounds and used peer scrutiny and debriefing, identifying connections within the text [75]. To facilitate transferability, a thick description of the research team, worldviews, setting, timeline, data collection, and analysis was provided [75]. To ensure standardisation of the interviews, they were conducted on the basis of interview guides. A weakness in this respect is that the guides were not pilot tested before the interviews were conducted. This can be justified by the individuality of the different interview guides. Transcripts were not returned to participants for comment and/or correction and participants did not provide feedback on the findings, which may be another limitation of the study.
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 15 / 20
+
+
+However, open questions were clarified during the interview. Given the small sample size, we may not have achieved saturation, which may be another limitation of this study [77]. Experts from various fields were interviewed, nonetheless, to gain insight into different perspectives on the research topic. Finally, we did not conduct interviews with patients to explore their views on establishing a trusting TA in telerehabilitation. Exploring the patient perspective on this matter is crucial for future research and the development of targeted interventions in this area.
+Conclusions
+In the context of telerehabilitation, TA might influence the outcomes of treatment similar to conventional rehabilitation. Based on the literature search and expert interviews, it was possible to delineate and holistically map elements influencing successful TA for the setting of telerehabilitation. Three central themes were identified: building effective communication; nurturing a mutual relationship of trust and respect; and agreement on goals and tasks and drivers of motivation. In this qualitative study, key elements of TA in rehabilitation were expanded with additional elements of TA in telerehabilitation comprising support from caregivers for ensuring physical safety and technical connectedness, caregivers acting as co-therapists and applying professional touch, and promoting patient autonomy and motivation using specific strategies.
+Supporting information
+S1 File. Consolidated criteria for reporting qualitative studies (COREQ): 32-item checklist. (PDF)
+S1 Table. Research team characteristics and attributes. (PDF)
+S2 Table. Keywords used for the literature search and exemplary interview guide. (PDF)
+S3 Table. Influencing elements of a successful therapeutic alliance based on literature search. (PDF)
+S4 Table. Coding tree with descriptors. (PDF)
+Acknowledgments
+We would like to thank all interviewed experts; without their willingness to provide information and commitment this work could not have been produced.
+Author Contributions
+Conceptualization: Barbara Seebacher, Carole Geimer, Gudrun Diermayr.
+Data curation: Barbara Seebacher, Carole Geimer, Maria Schwarz.
+Formal analysis: Barbara Seebacher, Carole Geimer, Julia Neu, Gudrun Diermayr.
+Investigation: Maria Schwarz.
+Methodology: Barbara Seebacher, Maria Schwarz, Gudrun Diermayr.
+Project administration: Barbara Seebacher.
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 16 / 20
+
+
+Software: Carole Geimer, Julia Neu.
+Supervision: Barbara Seebacher, Maria Schwarz, Gudrun Diermayr.
+Validation: Maria Schwarz.
+Writing – original draft: Barbara Seebacher.
+Writing – review & editing: Barbara Seebacher, Carole Geimer, Julia Neu, Maria Schwarz, Gudrun Diermayr.
+References
+1. Brienza DM, McCue M. Introduction to Telerehabilitation. In: Kumar S, Cohn ER, editors. Telerehabilitation. Health Informatics. London: Springer-Verlag; 2013. p. 1–12.
+2. Agostini M, Moja L, Banzi R, Pistotti V, Tonin P, Venneri A, et al. Telerehabilitation and recovery of motor function: a systematic review and meta-analysis. Journal of Telemedicine and Telecare. 2015; 21 (4):202–13. Epub 2015/02/26. https://doi.org/10.1177/1357633X15572201 PMID: 25712109.
+3. Laver KE, Adey-Wakeling Z, Crotty M, Lannin NA, George S, Sherrington C. Telerehabilitation services for stroke. Cochrane Database of Systematic Reviews. 2020; 1(12):CD010255. Epub 2020/02/01. https://doi.org/10.1002/14651858.CD010255.pub3 PMID: 32002991.
+4. Turgoose D, Ashwick R, Murphy D. Systematic review of lessons learned from delivering tele-therapy to veterans with post-traumatic stress disorder. Journal of Telemedicine and Telecare. 2018; 24 (9):575–85. https://doi.org/10.1177/1357633X17730443 PMID: 28958211
+5. Hentschel U. Die Therapeutische Allianz. Psychotherapeut. 2005; 50(5):305–17. https://doi.org/10. 1007/s00278-005-0440-3
+6. Fl  ̈uckiger C, Del Re AC, Wampold BE, Horvath AO. The alliance in adult psychotherapy: A meta-analytic synthesis. Psychotherapy. 2018; 55(4):316–40. https://doi.org/10.1037/pst0000172 PMID: 29792475
+7. Krampe H, Ehrenreich H. Therapeutische Allianz und multiple Beziehungsgestaltung im Kontext der Therapeutenrotation: Erfahrungen bei ALITA. Neurology, Psychiatry and Brain Research. 2012; 18 (4):153–68. https://doi.org/10.1016/j.npbr.2012.07.001
+8. Søndenå P, Dalusio-King G, Hebron C. Conceptualisation of the therapeutic alliance in physiotherapy: is it adequate? Musculoskeletal Science and Practice. 2020; 46:102131. https://doi.org/10.1016/j. msksp.2020.102131 PMID: 32217276
+9. Zimmermann L, Konrad A, M  ̈uller C, Rundel M, Ko ̈rner M. Patient perspectives of patient-centeredness in medical rehabilitation. Patient Education and Counseling. 2014; 96(1):98–105. https://doi.org/10. 1016/j.pec.2014.04.015 PMID: 24862911
+10. Del Re AC, Fl  ̈uckiger C, Horvath AO, Symonds D, Wampold BE. Therapist effects in the therapeutic alliance-outcome relationship: a restricted-maximum likelihood meta-analysis. Clinical psychology review. 2012; 32(7):642–9. Epub 2012/08/28. https://doi.org/10.1016/j.cpr.2012.07.002 PMID: 22922705.
+11. Bordin E. The generalizability of the psychoanalytic concept of the working alliance. Psychotherapy. 1979; 16:252–60.
+12. Ardito RB, Rabellino D. Therapeutic alliance and outcome of psychotherapy: historical excursus, measurements, and prospects for research. Frontiers in Psychology. 2011; 2:270. Epub 2011/10/27. https:// doi.org/10.3389/fpsyg.2011.00270 PMID: 22028698.
+13. Horvath A, Fl  ̈uckiger C, Del Re A, Jafari H, D S, Lee E. The relationship between helper and client: Looking beyond psychotherapy. 45 Society for Psychotherapy Research Congress; Copenhagen, Denmark2014.
+14. Fl  ̈uckiger C, Rubel J, Del Re AC, Horvath AO, Wampold BE, Crits-Christoph P, et al. The reciprocal relationship between alliance and early treatment symptoms: A two-stage individual participant data meta-analysis. Journal of Consulting and Clinical Psychology. 2020; 88(9):829–43. Epub 2020/08/08. https://doi.org/10.1037/ccp0000594 PMID: 32757587.
+15. Berger T. The therapeutic alliance in internet interventions: A narrative review and suggestions for future research. Psychotherapy Research. 2017; 27(5):511–24. Epub 2016/01/07. https://doi.org/10. 1080/10503307.2015.1119908 PMID: 26732852.
+16. Miciak M. Bedside Matters: A Conceptual Framework of the Therapeutic Relationship in Physiotherapy: University of Alberta; 2015. https://era.library.ualberta.ca/items/e89d2884-cac8-44da-a76b7d579d2e71b8#.WEWHhmQrIfE.
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 17 / 20
+
+
+17. Alodaibi F, Beneciuk J, Holmes R, Kareha S, Hayes D, Fritz J. The Relationship of the Therapeutic Alliance to Patient Characteristics and Functional Outcome During an Episode of Physical Therapy Care for Patients With Low Back Pain: An Observational Study. Physical Therapy. 2021; 101(4). Epub 2021/ 01/30. https://doi.org/10.1093/ptj/pzab026 PMID: 33513231.
+18. Babatunde F, MacDermid J, MacIntyre N. Characteristics of therapeutic alliance in musculoskeletal physiotherapy and occupational therapy practice: a scoping review of the literature. BMC health services research. 2017; 17(1):375. https://doi.org/10.1186/s12913-017-2311-3 PMID: 28558746
+19. Hall AM, Ferreira PH, Maher CG, Latimer J, Ferreira ML. The influence of the therapist-patient relationship on treatment outcome in physical rehabilitation: a systematic review. Physical Therapy. 2010; 90 (8):1099–110. Epub 2010/06/26. https://doi.org/10.2522/ptj.20090245 PMID: 20576715.
+20. Morrison TL, Smith JD. Working alliance development in occupational therapy: a cross-case analysis. Australian occupational therapy journal. 2013; 60(5):326–33. Epub 2013/10/05. https://doi.org/10.1111/ 1440-1630.12053 PMID: 24089984.
+21. Lawton M, Sage K, Haddock G, Conroy P, Serrant L. Speech and language therapists’ perspectives of therapeutic alliance construction and maintenance in aphasia rehabilitation post-stroke. International Journal of Language & Communication Disorders. 2018; 53(3):550–63. https://doi.org/10.1111/14606984.12368 PMID: 29349881
+22. Creswell JW. Research design. Qualitative, quantitative and mixed methods approaches. 3rd ed ed. Thousand Oaks: Sage; 2009.
+23. Erlingsson C, Brysiewicz P. Orientation among multiple truths: An introduction to qualitative research. African Journal of Emergency Medicine. 2013; 3(2):92–9. https://doi.org/10.1016/j.afjem.2012.04.005
+24. Downe-Wamboldt B. Content analysis: Method, applications, and issues. Health care for women international. 1992; 13(3):313–21. https://doi.org/10.1080/07399339209516006 PMID: 1399871
+25. Steigleder S. Die strukturierende qualitative Inhaltsanalyse im Praxistest: Eine konstruktiv kritische Studie zur Auswertungsmethodik von Philipp Mayring. Trier: Tectum Wissenschaftsverlag; 2008.
+26. Tong A, Sainsbury P, Craig J. Consolidated criteria for reporting qualitative research (COREQ): a 32item checklist for interviews and focus groups. International Journal for Quality in Health Care. 2007; 19 (6):349–57. https://doi.org/10.1093/intqhc/mzm042 PMID: 17872937
+27. Gl  ̈aser J, Laudel G. Experteninterviews und qualitative Inhaltsanalyse als Instrumente rekonstruierender Untersuchungen. 4. ed. Wiesbaden: VS Verlag; 2010.
+28. Helfferich C. Die Qualit ̈at qualitativer Daten. Manual f  ̈ur die Durchf ̈uhrung qualitativer Interviews. 4. ed: VS Verlag fu ̈r Sozialwissenschaften; 2011.
+29. Mason J. Qualitative researching. London: Sage Publications Ltd; 2017.
+30. Moore AJ, Holden MA, Foster NE, Jinks C. Therapeutic alliance facilitates adherence to physiotherapyled exercise and physical activity for older adults with knee pain: a longitudinal qualitative study. J Physiother. 2020; 66(1):45–53. Epub 2019/12/18. https://doi.org/10.1016/j.jphys.2019.11.004 PMID: 31843425.
+31. Miciak M, Mayan M, Brown C, Joyce AS, Gross DP. The necessary conditions of engagement for the therapeutic relationship in physiotherapy: an interpretive description study. Arch Physiother. 2018; 8:3. Epub 2018/02/23. https://doi.org/10.1186/s40945-018-0044-1 PMID: 29468089.
+32. Miciak M, Mayan M, Brown C, Joyce AS, Gross DP. A framework for establishing connections in physiotherapy practice. Physiotherapy Theory and Practice. 2019; 35(1):40–56. https://doi.org/10.1080/ 09593985.2018.1434707 PMID: 29432058
+33. Lie SS, Karlsen B, Graue M, Oftedal B. The influence of an eHealth intervention for adults with type 2 diabetes on the patient–nurse relationship: a qualitative study. Scandinavian Journal of Caring Sciences. 2019; 33(3):741–9. https://doi.org/10.1111/scs.12671 PMID: 30866066
+34. Wade SL, Raj SP, Moscato EL, Narad ME. Clinician perspectives delivering telehealth interventions to children/families impacted by pediatric traumatic brain injury. Rehabilitation Psychology. 2019; 64 (3):298–306. https://doi.org/10.1037/rep0000268 PMID: 30816734
+35. Held JP, Ferrer B, Mainetti R, Steblin A, Hertler B, Moreno-Conde A, et al. Autonomous rehabilitation at stroke patients home for balance and gait: safety, usability and compliance of a virtual reality system. European Journal of Physical and Rehabilitation Medicine 2018; 54(4):545–53. Epub 2017/09/28. https://doi.org/10.23736/S1973-9087.17.04802-X PMID: 28949120.
+36. Lawford BJ, Bennell KL, Campbell PK, Kasza J, Hinman RS. Therapeutic Alliance Between Physical Therapists and Patients With Knee Osteoarthritis Consulting Via Telephone: A Longitudinal Study. Arthritis Care & Research. 2020; 72(5):652–60. https://doi.org/10.1002/acr.23890 PMID: 30927509
+37. Bishop M, Kayes N, McPherson K. Understanding the therapeutic alliance in stroke rehabilitation. Disability and Rehabilitation. 2021; 43(8):1074–83. https://doi.org/10.1080/09638288.2019.1651909 PMID: 31433673
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 18 / 20
+
+
+38. Crom A, Paap D, Wijma A, Dijkstra PU, Pool G. Between the Lines: A Qualitative Phenomenological Analysis of the Therapeutic Alliance in Pediatric Physical Therapy. Physical & Occupational Therapy In Pediatrics. 2020; 40(1):1–14. https://doi.org/10.1080/01942638.2019.1610138 PMID: 31057028
+39. Oyake K, Suzuki M, Otaka Y, Tanaka S. Motivational Strategies for Stroke Rehabilitation: A Descriptive Cross-Sectional Study. Front Neurol. 2020; 11:553. Epub 2020/06/27. https://doi.org/10.3389/fneur. 2020.00553 PMID: 32587572.
+40. Vestøl I, Debesay J, Pajalic Z, Bergland A. The importance of a good therapeutic alliance in promoting exercise motivation in a group of older Norwegians in the subacute phase of hip fracture; a qualitative study. BMC Geriatrics. 2020; 20(1):118. https://doi.org/10.1186/s12877-020-01518-7 PMID: 32228477
+41. Ranner M, Guidetti S, von Koch L, Tham K. Experiences of participating in a client-centred ADL intervention after stroke. Disability and Rehabilitation. 2019; 41(25):3025–33. https://doi.org/10.1080/ 09638288.2018.1483434 PMID: 29961346
+42. Wilms IL. The computerized cognitive training alliance—A proposal for a therapeutic alliance model for home-based computerized cognitive training. Heliyon. 2020; 6(1):e03254. Epub 2020/02/12. https://doi. org/10.1016/j.heliyon.2020.e03254 PMID: 32042977.
+43. Gard G. Factors important for good interaction in physiotherapy treatment of persons who have undergone torture: A qualitative study. Physiotherapy Theory and Practice. 2007; 23(1):47–55. https://doi. org/10.1080/09593980701209584 PMID: 17454798
+44. Cranen K, Drossaert CHC, Brinkman ES, Braakman-Jansen ALM, Ijzerman MJ, Vollenbroek-Hutten MMR. An exploration of chronic pain patients’ perceptions of home telerehabilitation services. Health Expectations: An International Journal of Public Participation in Health Care & Health Policy. 2012; 15 (4):339–50. https://doi.org/10.1111/j.1369-7625.2011.00668.x PMID: 21348905
+45. Dresing T, Pehl T. Interview, Transkription & Analyse: Anleitungen und Regelsysteme f  ̈ur qualitativ Forschende. 8. ed. Marburg: Eigenverlag; 2018.
+46. Mayring P, Fenzl T. Qualitative Inhaltsanalyse. In: Baur N, Blasius J, editors. Handbuch Methoden der empirischen Sozialforschung. Wiesbaden: Springer Fachmedien; 2019. p. 633–48.
+47. Neuendorf KA. The Content Analysis Guidebook. Thousand Oaks, California2017. https://methods. sagepub.com/book/the-content-analysis-guidebook-2e.
+48. Hruschka DJ, Schwartz D, St.John DC, Picone-Decaro E, Jenkins RA, Carey JW. Reliability in Coding Open-Ended Data: Lessons Learned from HIV Behavioral Research. Field Methods. 2004; 16(3):30731. https://doi.org/10.1177/1525822X04266540
+49. MacPhail C, Khoza N, Abler L, Ranganathan M. Process guidelines for establishing Intercoder Reliability in qualitative studies. Qualitative Research. 2015; 16(2):198–212. https://doi.org/10.1177/ 1468794115577012
+50. Brennan RL, Prediger DJ. Coefficient Kappa: Some Uses, Misuses, and Alternatives. Educational and Psychological Measurement. 1981; 41(3):687–99. https://doi.org/10.1177/001316448104100307
+51. Cohen J. A Coefficient of Agreement for Nominal Scales. Educational and Psychological Measurement. 1960; 20(1):37–46. https://doi.org/10.1177/001316446002000104
+52. McHugh ML. Interrater reliability: the kappa statistic. Biochemia medica. 2012; 22(3):276–82. Epub 2012/10/25. https://doi.org/10.1016/j.jocd.2012.03.005 PMID: 23092060.
+53. Go ́mez Penedo JM, Babl AM, Grosse Holtforth M, Hohagen F, Krieger T, Lutz W, et al. The Association of Therapeutic Alliance With Long-Term Outcome in a Guided Internet Intervention for Depression: Secondary Analysis From a Randomized Control Trial. J Med Internet Res. 2020; 22(3):e15824. Epub 2020/03/25. https://doi.org/10.2196/15824 PMID: 32207689.
+54. Cott C. Client-centred rehabilitation: client perspectives. Disability and Rehabilitation. 2004; 26 (24):1411–22. https://doi.org/10.1080/09638280400000237 PMID: 15764361
+55. Shulver W, Killington M, Morris C, Crotty M. ‘Well, if the kids can do it, I can do it’: older rehabilitation patients’ experiences of telerehabilitation. Health Expectations. 2017; 20(1):120–9. https://doi.org/10. 1111/hex.12443 PMID: 26890025
+56. Kairy D, Tousignant M, Leclerc N, C ˆot  ́e A-M, Levasseur M, Researchers TT. The patient’s perspective of in-home telerehabilitation physiotherapy services following total knee arthroplasty. International journal of environmental research and public health. 2013; 10(9):3998–4011. https://doi.org/10.3390/ ijerph10093998 PMID: 23999548.
+57. Price B. Developing patient rapport, trust and therapeutic relationships. Nurs Stand. 2017; 31(50):5263. Epub 2017/08/10. https://doi.org/10.7748/ns.2017.e10909 PMID: 28792344.
+58. O’Keeffe M, Cullinane P, Hurley J, Leahy I, Bunzli S, O’Sullivan PB, et al. What Influences Patient-Therapist Interactions in Musculoskeletal Physical Therapy? Qualitative Systematic Review and Meta-Synthesis. Physical Therapy. 2016; 96(5):609–22. https://doi.org/10.2522/ptj.20150240 PMID: 26427530
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 19 / 20
+
+
+59. Jesus TS, Silva IL. Toward an evidence-based patient-provider communication in rehabilitation: linking communication elements to better rehabilitation outcomes. Clinical Rehabilitation. 2015; 30(4):315–28. https://doi.org/10.1177/0269215515585133 PMID: 25952588
+60. Fuchs T. Non-verbale Kommunikation: Pha ̈nomenologische, entwicklungspsychologische und therapeutische Aspekte. Zeitschrift f  ̈ur Klinische Psychologie und Psychotherapie. 2003; 51:333–45.
+61. Geuter U. Praxis K ̈orperpsychotherapie– 10 Prinzipien der Arbeit im therapeutischen Prozess. Berlin, Deutschland: Springer; 2019.
+62. Egolf DB. Nonverbal Communication and Telerehabilitation. In: Kumar S, Cohn ER, editors. Telerehabilitation. Health Informatics. London: Springer; 2013. p. 41–54.
+63. Oftedal B, Kolltveit B-CH, Graue M, Zoffmann V, Karlsen B, Thorne S, et al. Reconfiguring clinical communication in the electronic counselling context: The nuances of disruption. Nursing Open. 2019; 6 (2):393–400. https://doi.org/10.1002/nop2.218 PMID: 30918689
+64. Dobkin BH. Behavioral self-management strategies for practice and exercise should be included in neurologic rehabilitation trials and care. Current opinion in neurology. 2016; 29(6):693–9. 00019052201612000-00005. https://doi.org/10.1097/WCO.0000000000000380 PMID: 27608301
+65. Dinesen B, Nielsen G, Andreasen JJ, Spindler H. Integration of Rehabilitation Activities Into Everyday Life Through Telerehabilitation: Qualitative Study of Cardiac Patients and Their Partners. Journal of medical Internet research. 2019; 21(4):e13281. Epub 2019/04/16. https://doi.org/10.2196/13281 PMID: 30985284.
+66. Graffigna G, Barello S, Bonanomi A, Menichetti J. The Motivating Function of Healthcare Professional in eHealth and mHealth Interventions for Type 2 Diabetes Patients and the Mediating Role of Patient Engagement. Journal of Diabetes Research. 2016; 2016:2974521. https://doi.org/10.1155/2016/ 2974521 PMID: 26881243
+67. Gr  ̈unloh C, Myreteg G, Cajander Å, Rexhepi H. "Why Do They Need to Check Me?" Patient Participation Through eHealth and the Doctor-Patient Relationship: Qualitative Study. Journal of medical Internet research. 2018; 20(1):e11. Epub 2018/01/18. https://doi.org/10.2196/jmir.8444 PMID: 29335237.
+68. Wilson S, Chaloner N, Osborn M, Gauntlett-Gilbert J. Psychologically informed physiotherapy for chronic pain: patient experiences of treatment and therapeutic process. Physiotherapy. 2017; 103 (1):98–105. https://doi.org/10.1016/j.physio.2015.11.005 PMID: 27095482
+69. Bischoff RJ, Hollist CS, Smith CW, Flack P. Addressing the Mental Health Needs of the Rural Underserved: Findings from a Multiple Case Study of a Behavioral Telehealth Project. Contemporary Family Therapy. 2004; 26(2):179–98. https://doi.org/10.1023/B:COFT.0000031242.83259.fa
+70. Ghosh GJ, McLaren PM, Watson JP. Evaluating the alliance in videolink teletherapy. Journal of Telemedicine and Telecare. 1997; 3 Suppl 1:33–5. Epub 1997/01/01. https://doi.org/10.1258/ 1357633971930283 PMID: 9218376.
+71. Simpson SG, Reid CL. Therapeutic alliance in videoconferencing psychotherapy: a review. Australian Journal of Rural Health. 2014; 22(6):280–99. Epub 2014/12/17. https://doi.org/10.1111/ajr.12149 PMID: 25495622.
+72. Simpson S, Knox J, Mitchell D, Ferguson J, Brebner J, Brebner E. A multidisciplinary approach to the treatment of eating disorders via videoconferencing in north-east Scotland. Journal of Telemedicine and Telecare. 2003; 9 Suppl 1:S37–8. Epub 2003/09/04. https://doi.org/10.1258/135763303322196286 PMID: 12952717.
+73. Miciak M, Rossettini G. Looking at Both Sides of the Coin: Addressing Rupture of the Therapeutic Relationship in Musculoskeletal Physical Therapy/Physiotherapy. J Orthop Sports Phys Ther. 2022; 52 (8):500–4. Epub 2022/06/21. https://doi.org/10.2519/jospt.2022.11152 PMID: 35722761.
+74. Patton QM. How to use Qualitative Methods in Evaluation. Newsbury Park, London, New Dehli: Sage Publications Inc.; 1987.
+75. Lincoln YS, Guba EG. Naturalistic Inquiry. Newbury Park, London, New Delhi: Sage Publications Inc.; 1985.
+76. Graneheim UH, Lundman B. Qualitative content analysis in nursing research: concepts, procedures and measures to achieve trustworthiness. Nurse education today. 2004; 24(2):105–12. Epub 2004/02/ 11. https://doi.org/10.1016/j.nedt.2003.10.001 PMID: 14769454.
+77. Hennink M, Kaiser BN. Sample sizes for saturation in qualitative research: A systematic review of empirical tests. Social Science & Medicine. 2022; 292:114523. https://doi.org/10.1016/j.socscimed. 2021.114523 PMID: 34785096
+PLOS ONE Central elements of therapeutic alliance in telerehabilitation
+PLOS ONE | https://doi.org/10.1371/journal.pone.0299909 March 8, 2024 20 / 20

@@ -1,0 +1,594 @@
+Original Investigation | Pediatrics
+Feasibility of a Serious Illness Communication Program
+for Pediatric Advance Care Planning
+Danielle D. DeCourcey, MD, MPH; Rachelle E. Bernacki, MD, MS; Brett Nava-Coulter, MPH; Sithya Lach, BS; Niya Xiong, MSPH; Joanne Wolfe, MD, MPH
+Abstract
+IMPORTANCE Pediatric advance care planning (ACP), which aims to ensure care is aligned with
+family goals and values, is associated with better end-of-life outcomes; however, ACP in pediatrics
+remains uncommon.
+OBJECTIVES To determine the feasibility and acceptability of the Pediatric Serious Illness
+Communication Program (PediSICP) and explore family-centered outcomes.
+DESIGN, SETTING, AND PARTICIPANTS This cohort study was a single-group pilot study of the
+PediSICP in adolescents and young adults (AYAs; age 13 y) with serious illness, parents of seriously
+ill children, and interprofessional clinicians from April 2021 to March 2023 in a quaternary care
+pediatric hospital. Duration of follow-up was 1 month. Data were analyzed from January 2022 to
+March 2023.
+EXPOSURE The PediSICP includes clinician training preceding an ACP communication occasion
+supported by communication guides and a template for electronic medical record documentation.
+MAIN OUTCOMES AND MEASURES Outcomes of interest were parent, patient, and clinician
+experiences with and perceptions of the PediSICP. Feasibility was defined a priori as at least 70%
+clinician intervention completion rates.
+RESULTS A total of 10 virtual trainings were conducted among 40 clinicians, including 27 physicians,
+7 nurse practitioners, 5 nurses, and 1 respiratory therapist, and 30 trained clinicians (75%) conducted
+and documented 42 ACP conversations with 33 parents (median [IQR] age, 43 [35-51] years; 25
+[76%] female) and 5 AYAs (median [IQR] age, 19 [17-19] years; 3 [60%] female) who completed the
+intervention. The median (IQR) conversation duration was 27 (10-45) minutes. Most clinicians (29
+clinicians [97%]) agreed that they felt prepared for the conversation, and all clinicians recommended
+the PediSICP. Parents reported participation was worthwhile (27 parents [84%]), they felt listened
+to (31 parents [94%]), and would recommend the PediSICP (28 parents [85%]). Parents endorsed
+higher therapeutic alliance after the PediSICP intervention compared with before (The Human
+Connection scale mean [SD] score, 57.6 [6.4] vs 55.3 [7.8]; P = .03) and decreased anxiety
+immediately after the intervention (Generalized Anxiety Disorder–7-item mean [SD] score, 10.1 [7.3]
+vs 8.4 [6.9]; P = .003), which persisted at the 1-month follow-up (mean [SD] score, 7.7 [6.8]; P = .03).
+CONCLUSIONS AND RELEVANCE This pilot cohort study found that the PediSICP was feasible,
+acceptable, and highly valued by clinicians and parents of children with serious illness. These findings
+suggest that the PediSICP may empower interprofessional clinicians and improve ACP with families
+of children and AYAs who are seriously ill.
+JAMA Network Open. 2024;7(7):e2424626. doi:10.1001/jamanetworkopen.2024.24626
+Key Points
+Question Is a structured pediatric
+advance care planning (ACP)
+intervention feasible and acceptable and
+is it associated with improved family
+centered outcomes?
+Findings In this cohort study including
+40 interprofessional clinicians, 36
+parents, and 6 adolescents and young
+adults with serious illness, the
+structured ACP intervention was both
+feasible and acceptable. Parents
+reported higher therapeutic alliance
+immediately after the intervention and
+decreased anxiety, which persisted at
+the 1-month follow up.
+Meaning These findings suggest that
+this structured advanced care planning
+intervention was feasible, acceptable,
+and helpful to clinicians and parents of
+pediatric patients who are seriously ill.
++
+Supplemental content
+Author affiliations and article information are listed at the end of this article.
+Open Access. This is an open access article distributed under the terms of the CC-BY License.
+JAMA Network Open. 2024;7(7):e2424626. doi:10.1001/jamanetworkopen.2024.24626 (Reprinted) July 26, 2024 1/13
+Downloaded from jamanetwork.com by guest on 08/22/2025
+
+
+Introduction
+Children and adolescents and young adults (AYAs) with serious illness often have a variable clinical
+course with periods of stability alternating with life-threatening deteriorations; consequently, many
+children and AYAs experience health crises without opportunities to discuss preferences for medical
+care. Furthermore, bereaved parents report a lack of preparation to address their child’s medical and
+emotional needs at end of life (EOL).1,2 Advance care planning (ACP) is an iterative process to honor
+patient and family goals and values involving communication about prognosis and the formulation of
+care plans addressing symptom management, quality of life, preferences for life-sustaining
+interventions, and anticipatory guidance about EOL.3-6
+Adult studies have found that families who participate in ACP are more satisfied with the care
+their loved one receives, are more prepared for death, and have improved bereavement
+outcomes.7-10 Thus far, ACP outcomes research in pediatrics has been primarily focused on
+adolescents with HIV and cancer, where interventions improve concordance of patient and family
+preferences with the care they receive and are associated with higher ratings of care quality and
+decreased decisional regret.5,6,11-15 In a 2019 study from our group, ACP was also associated with
+superior parent-reported EOL care outcomes, including improved preparedness for EOL, the ability
+to plan their child’s location of death, and superior quality of life for their child.16 Additionally, ACP
+that included specific assessment of family goals was associated with decreases in perceived child
+suffering at EOL and parental decisional regret.16
+Despite these benefits and a desire for ACP by both parents and AYAs with serious illness, few
+generalizable, evidence-based ACP interventions exist, and large scale adoption of pediatric ACP
+remains unrealized.5,16-21 Additionally, many pediatric clinicians report both discomfort with and a
+lack of training in facilitating ACP.6,17,22-25
+Multifaceted interventions combining educational and systems-based approaches can increase
+timely ACP discussions and improve patient and clinician experiences.10,26,27 The Serious Illness
+Communication Guide (SICG) is 1 such tool that has been validated in adults to facilitate effective ACP
+communication.26,28-30 However, there is limited research on use of these guides in pediatrics to
+support clinician-led ACP. To address this gap, the Pediatric Serious Illness Communication Program
+(PediSICP) was designed using a stakeholder-driven formative research approach.24 The PediSICP is
+a structured ACP intervention consisting of clinician training preceding an ACP communication
+occasion supported by evidence-based communication guides and a template for electronic medical
+record (EMR) documentation.24 This pilot study aims to evaluate the feasibility and acceptability of
+the PediSICP with exploration of outcomes associated with program participation, including
+therapeutic alliance, shared decision-making, communication quality, depression, and anxiety.
+Methods
+Study Design and Population
+The protocol for this cohort study was approved by the Boston Children’s Hospital institutional
+review board. All clinicians and parents provided verbal informed consent to participate, and AYAs
+provided verbal assent or consent. This study was designed as a mixed-methods, pragmatic, single
+group, single-institution feasibility cohort pilot and was conducted at a quaternary care children’s
+hospital from April 2021 to March 2023. Here, we report on quantitative study results. Reporting
+followed the Strengthening the Reporting of Observational Studies in Epidemiology (STROBE)
+reporting guideline for cohort studies. Children and AYAs with serious illness were identified using
+Feudtner and colleagues definition of complex chronic conditions.31 AYAs aged 13 years and older
+with serious illness and parents of children with serious illness who could read and speak English and
+had at least 2 readmissions in 1 year or 1 admission lasting more than 2 weeks were eligible to
+participate. Interprofessional clinicians were eligible if they practiced in an inpatient location or
+specialty that cares for children and AYAs who are seriously ill.
+JAMA Network Open | Pediatrics Feasibility of a Serious Illness Communication Program for Pediatric Advance Care Planning
+JAMA Network Open. 2024;7(7):e2424626. doi:10.1001/jamanetworkopen.2024.24626 (Reprinted) July 26, 2024 2/13
+Downloaded from jamanetwork.com by guest on 08/22/2025
+
+
+Enrollment and Study Procedures
+Eligible clinicians were identified through a hospital database, invited once by email to participate,
+and enrolled from April to December 2021. Parents and AYAs were approached for enrollment
+between July 2021 and December 2022. A trained research assistant screened for eligible inpatient
+AYA and parents daily in the intensive care inpatient units and outpatient clinics of enrolled clinicians.
+For outpatients, participants were also identified through referral from enrolled clinicians. On
+recruitment, parents and AYAs were provided study information and made aware that an ACP
+conversation was the primary study intervention. To better understand the unique perceptions of
+the PediSICP, we did not enroll AYA-parent dyads and enrolled only 1 parent per family; however, both
+parents could participate in ACP conversations. Trained clinicians were notified when AYAs or parents
+they were caring for were enrolled. ACP conversations were conducted in-person either during
+admission with inpatient clinicians at a time convenient for the AYA or parent or at a previously
+scheduled clinic appointment for outpatient clinicians. Following the conversation, clinicians
+documented discussion content in the EMR using the PediSICP ACP note template.24 All participants
+received a 1-time retail gift card following intervention completion.
+Clinician Training
+In keeping with COVID-19 restrictions, 10 trainings, each with 4 to 8 interprofessional participants,
+were conducted virtually using Zoom video conferencing software (Zoom Video Communications)
+from April to December 2021. The 3-hour PediSICP clinician training consisted of a brief didactic
+session on the value of ACP, demonstration and discussion of the PediSICP, and associated EMR
+documentation, followed by skills practice using a trained actor along with individual coaching from
+facilitators with serious illness communication training.32
+Data Collection and Survey Instruments
+Clinicians completed surveys via electronic data capture before training and after the intervention
+following their first documented ACP conversation with an enrolled AYA or parent to measure
+intervention feasibility and acceptability and to explore changes in moral distress using the Moral
+Distress Scale–Revised (MDS-R).33 Preintervention and postintervention AYA and parent surveys
+were used to measure the intervention’s acceptability using an adaptation of the Lyon Satisfaction
+Questionnaire, which was developed to assess reactions to an ACP program.18 Surveys were also
+used to evaluate parent exploratory outcomes at 3 time points: before PediSICP intervention (T1), 2
+to 7 days after the intervention (T2), and at 1-month follow-up (T3), including parent report of shared
+decision-making (assessed using CollaboRATE-5,34 consisting of 3 items with 5-point Likert
+responses assessing patients’ perceptions of their involvement in decision-making, with higher
+scores indicating higher shared decision-making), therapeutic alliance (assessed using The Human
+Connection [THC] scale,35 consisting of 6 items with 4-point Likert responses assessing patient
+perceived therapeutic alliance, with scores ranging from 0-64 and higher scores reflecting stronger
+therapeutic alliance), communication quality (assessed using the Quality of Communication
+Questionnaire [QOC],36 a 17-item survey measuring general and EOL care communication skills on a
+scale from 0-10 with higher scores indicating higher communication quality), depression (assessed
+using the Patient Health Questionnaire 9-item scale [PHQ-9],28 a 27-point scale where scores of 5,
+10, 15, and 20 represent mild, moderate, moderately severe, and severe depression, respectively),
+and anxiety (measured using the Generalized Anxiety Disorder 7-item scale [GAD-7],37 with scores
+ranging from 0-21 and higher scores indicating higher levels of anxiety, with cut points of 5
+considered mild anxiety; 10, moderate anxiety; and 15, severe anxiety).
+Outcome Measures
+Our primary aims were to assess feasibility and acceptability. Feasibility was defined a priori as at
+least 70% of enrolled clinicians completing training and having at least 1 documented ACP
+conversation with an enrolled AYA or parent using the PediSICP framework. This threshold is
+JAMA Network Open | Pediatrics Feasibility of a Serious Illness Communication Program for Pediatric Advance Care Planning
+JAMA Network Open. 2024;7(7):e2424626. doi:10.1001/jamanetworkopen.2024.24626 (Reprinted) July 26, 2024 3/13
+Downloaded from jamanetwork.com by guest on 08/22/2025
+
+
+consistent with other feasibility studies among parents of children and adults with serious
+illness.38-40 We also assessed acceptability of the PediSICP among AYAs, parents, and
+interprofessional clinicians. Our primary acceptability end point was defined as at least 70% of
+parent participants would agree or strongly agree that the experience was worthwhile, that they felt
+listened to, and that they would recommend the intervention to other families, as measured on
+postintervention surveys. For clinicians, acceptability was defined as at least 70% of
+postintervention survey respondents would agree or strongly agree that they felt prepared for the
+ACP conversation, the guide was useful, and they would recommend the PediSICP to colleagues. This
+pilot study was not designed or powered to test intervention efficacy; however, to collect data for
+future clinical trials, exploratory outcomes were evaluated at 3 time points, as previously described.
+Statistical Analysis
+Self-reported participant characteristics, including race and ethnicity, were collected at enrollment,
+and reactions to the PediSICP were collected on the post-PediSICP survey and summarized using
+descriptive statistics. Race was classified as African American or Black, White, or other (including
+American Indian or Alaska Native, Asian, multiracial, and Native Hawaiian or Other Pacific Islander),
+and ethnicity was classified as Hispanic or Latino or not Hispanic or Latino. Participants could select
+multiple races and ethnicities.
+To compare participant characteristics by intervention completion status, continuous variables
+were tested by Wilcoxon rank sum test and categorical variables by Fisher exact test. Wilcoxon
+signed-rank tests were used to compare differences between instrument scores for exploratory
+outcomes for parents at 3 time points, as previously described. Given the low number, we did not
+perform testing to analyze for differences in AYA instrument scores. P values were 2-sided and
+considered statistically significant at P < .05. Analyses were conducted using R software version 4.3.1
+(R Project for Statistical Computing). Data were analyzed from January 2022 to March 2023.
+Results
+Study Population
+A total of 84 participants provided informed consent and 68 completed the intervention (Figure 1),
+including 30 clinicians (15 clinicians [50%] with 5-15 years of experience; 24 [80%] female) (Table 1),
+33 parents (median [IQR] age, 43 [35-51] years; 25 [76%] female), and 5 AYAs (median [IQR] age, 19
+[17-19] years; 3 [60%] female) (Table 2). There was 1 African American or Black clinician (3%) and 29
+White clinicians (97%); 1 clinician was Hispanic or Latinx and 29 clinicians (97%) were not Hispanic
+or Latinx. Most clinicians spoke English as their first language (28 clinicians [93%]) and worked in
+intensive care (19 clinicians [63%]) (Table 1). Among parents, 2 were African American or Black (6%),
+27 were White (82%), and 4 identified as other race (12%); 10 parents (30%) were Hispanic or Latino
+and 23 parents (70%) were not Hispanic or Latino. Among AYAs, 1 was African American or Black
+(20%), 4 were White (80%), and none identified as other race; 2 AYAs (40%) were Hispanic or
+Latino and 3 AYAs (60%) were not Hispanic or Latino (Table 2).
+Clinician Participation in the PediSICP Training and Feasibility
+We contacted 137 clinicians for participation in the PediSICP training; 40 clinicians enrolled in the
+study by completing the pretraining survey and participating in 1 of 10 virtual trainings (Figure 1).
+Thirty enrolled clinicians (75%), including 20 physicians, 6 nurse practitioners, 3 registered nurses, 1
+respiratory therapist, completed the PediSICP intervention by having and documenting an ACP
+conversation with an enrolled parent or AYA, thus meeting our feasibility goal. There were no
+significant differences in clinician characteristics between enrolled clinicians that completed the
+intervention and those who did not. Reasons for noncompletion were primarily due to the lack of an
+enrolled AYA or parent during a clinician’s service week or clinic time.
+JAMA Network Open | Pediatrics Feasibility of a Serious Illness Communication Program for Pediatric Advance Care Planning
+JAMA Network Open. 2024;7(7):e2424626. doi:10.1001/jamanetworkopen.2024.24626 (Reprinted) July 26, 2024 4/13
+Downloaded from jamanetwork.com by guest on 08/22/2025
+
+
+Parent Participation in PediSICP Intervention
+We screened 96 parents, of whom 73 were eligible and 46 enrolled, and 36 enrolled parents
+participated in an ACP conversation using the PediSICP framework, 33 parents completed the T2
+survey, and 27 parents completed the follow-up T3 survey (Figure 1). No significant demographic
+differences existed between enrolled parents who completed the T2 survey and parents who did
+not. However, the duration of their child’s illness differed between groups, with a median (IQR) illness
+duration of 7.3 (0.4-20.2) years for parents completing the intervention vs 2.0 (0.9-6.6) years for
+those who did not (P = .02).
+AYA Participation in the PediSICP Intervention
+We screened 19 AYAs, of whom 8 were eligible and enrolled (Figure 1). Six AYAs participated in an ACP
+conversation using the PediSICP framework, 5 AYAs completed the T2 and T3 surveys. One patient
+disenrolled after the ACP conversation at their parent’s request.
+Acceptability
+Figure 2 details clinician reactions to the ACP conversation using the PediSICP framework. Most
+clinicians (29 clinicians [97%]) agreed or strongly agreed that they felt prepared for the ACP
+conversation and the guide was useful; all clinicians reported that they would recommend the
+framework to colleagues, thus meeting our clinician acceptability targets. Most clinicians (29
+clinicians [97%]) agreed or strongly agreed that they learned something new about the family and 28
+clinicians (93%) felt more connected to the family after the conversation. Most clinicians (29
+Figure 1. Flowchart of Participant Recruitment to Pediatric Serious Illness Communication Program (PediSICP) Pilot Study
+Clinicians
+A Parents
+B Adolescents and young adults
+C
+137 Approached via email
+40 Enrolled and trained
+30 Completed PediSICP intervention
+5 Completed optional follow-up interview
+97 Nonresponsive to recruitment email
+10 Did not conduct a PediSICP conversation
+96 Screened
+46 Enrolled
+36 Participated in PediSICP conversation
+33 Completed postsurvey
+27 Completed follow-up survey
+3 Completed optional follow-up interview
+50 Excluded 23 Ineligible 12 8 3
+Limited English proficiency Ineligible diagnosis Child services involvement 16
+6 5
+Did not complete presurvey during admission Declined Discharged prior to enrollment
+10 Discharged prior to conversation with inpatient clinician
+3 Incomplete intervention 1 2
+Disenrolled after conversation Did not complete postsurvey
+19 Screened
+8 Eligible and enrolled
+6 Participated in PediSICP conversation
+5 Completed postsurvey
+1 Completed optional follow-up interview
+11 Ineligible diagnosis
+1 Discharged prior to conversation with inpatient clinician 1 Deceased
+1 Disenrolled after conversation
+JAMA Network Open | Pediatrics Feasibility of a Serious Illness Communication Program for Pediatric Advance Care Planning
+JAMA Network Open. 2024;7(7):e2424626. doi:10.1001/jamanetworkopen.2024.24626 (Reprinted) July 26, 2024 5/13
+Downloaded from jamanetwork.com by guest on 08/22/2025
+
+
+clinicians [97%]) disagreed or strongly disagreed that the conversation was burdensome, and 22
+clinicians (73%) disagreed or strongly disagreed that the conversation was stressful. The median
+(IQR) time spent having an ACP conversation was 27 (10-45) minutes.
+Of 32 enrolled parents, 27 (84%) agreed or strongly agreed that participation in the PediSICP
+was worthwhile, 31 (94%) reported that they felt listened to during the ACP conversation, and 28
+(85%) would recommend participation to other families (Figure 3), thus meeting our primary
+acceptability targets. Few parents (7 parents [21%]) reported feeling sad, and 6 parents (18%)
+reported feeling worried as a result of the ACP conversation; 27 parents (81%) reported feeling more
+reassured after the conversation.
+Most enrolled AYAs also reported that the PediSICP intervention was worthwhile (3 AYAs
+[60%]), that they felt listened to during the conversation (4 AYAs [80%]), and that they would
+recommend participation to others (3 AYAs [60%]) while the remaining 40% were unsure.
+Table 1. Characteristics of Interprofessional Clinician Participants Who Completed the Pediatric Serious Illness Communication Program Intervention
+Variable
+Clinicians, No. (%) (n = 30)
+Sex
+Female 24 (80)
+Male 6 (20)
+Racea,b
+African American or Black 1 (3)
+White 29 (97)
+Otherc 0
+Ethnicitya
+Hispanic or Latino 1 (3)
+Not Hispanic or Latino 29 (97)
+Degree
+Bachelor’s 3 (10)
+≥Master’s 27 (90)
+Professional role
+Attending physician 19 (63)
+Nurse practitioner 6 (20)
+Registered nurse 3 (10)
+Resident physician 1 (3)
+Respiratory therapist 1 (3)
+Provider specialty
+Cardiology 3 (10)
+Intermediate and complex care pediatrics 6 (20)
+Intensive care 19 (63)
+Pulmonary 2 (7)
+Experience, y
+<5 10 (33)
+5-15 15 (50)
+>15 5 (17)
+English as first language 28 (93)
+a Race and ethnicity are presented as characterized by self-report.
+b Multiple selections were allowed.
+c Other includes American Indian or Alaska Native, Asian, multiracial, and Native Hawaiian or Other Pacific Islander, based on self-report.
+JAMA Network Open | Pediatrics Feasibility of a Serious Illness Communication Program for Pediatric Advance Care Planning
+JAMA Network Open. 2024;7(7):e2424626. doi:10.1001/jamanetworkopen.2024.24626 (Reprinted) July 26, 2024 6/13
+Downloaded from jamanetwork.com by guest on 08/22/2025
+
+
+Parent and Clinician Exploratory Outcomes
+Parents reported significantly higher therapeutic alliance at T2 compared with T1 (HCS mean [SD]
+score, 57.6 [6.4] vs 55.3 [7.8]; P = .03), although this did not persist at the T3 survey (HCS mean [SD]
+score, 54.8 [8.7]; P = .97). There were no significant differences in parent report of shared decision
+making at T1 vs T2 (CollaboRATE-5 mean [SD] score, 4.2 [0.6] vs 4.3 [0.6]; P = .73) or vs T3
+(CollaboRATE-5 mean [SD] score, 4.2 [0.7]; P = .36]. Similarly, no significant variation existed at T1 vs
+T2 in quality of communication assessed with mean QOC scores (mean [SD] score, 8.1 [1.6] vs 8.5
+[1.6]; P = .25) or vs T3 (mean [SD] score, 8.1 [1.7]; P = .99). Parents endorsed moderate anxiety at T1
+(mean [SD] GAD-7 score, 10.1 [7.3), which was significantly reduced to mild anxiety at T2 (mean [SD]
+GAD-7 score, 8.4 [6.9]; P = .003) and remained low at T3 (mean [SD] GAD-7 score, 7.7 [6.8]; P = .03).
+Table 2. Demographics of AYA and Parent Participants Who Completed the Pediatric Serious Illness Communication Program Intervention
+Characteristics
+Participants, No. (%)
+Parents (n = 33) AYAs (n = 5) Sex
+Female 25 (76) 3 (60)
+Male 8 (24) 2 (40)
+Age, median (IQR), y 43 (35-51) 19 (17-19)
+Duration of illness, median (IQR), y 2 (0.9-6.6) 14.6 (13.9-18.9)
+Racea,b
+African American or Black 2 (6) 1 (20)
+White 27 (82) 4 (80)
+Otherc 4 (12) 0
+Ethnicitya
+Hispanic or Latino 10 (30) 2 (40)
+Not Hispanic or Latino 23 (70) 3 (60)
+English as first language 27 (81.8) 5 (100)
+Primary diagnosis category
+Congenital or genetic 19 (57.6) 1 (20)
+Cardiovascular 6 (18) 0
+Metabolic or mitochondrial 2 (6) 0
+Neurological 5 (15) 1 (20)
+Respiratory 1 (3) 2 (40)
+Kidney 0 1 (20)
+a Race and ethnicity are presented as characterized by self-report.
+b Multiple selections allowed.
+c Other includes American Indian or Alaska Native, Asian, multiracial, and Native Hawaiian or Other Pacific Islander, based on self-report.
+Figure 2. Clinician Reactions to Having an Advance Care Planning Conversation Using the Pediatric Serious Illness Communication Program Framework
+Statement
+Respondents, %
+0 20 40 60 80 100
+Recommend the conversation to colleagues
+Felt prepared
+Guide was useful
+Felt more connected
+Learned something new about the family
+Conversation was stressful
+Conversation was burdensome
+Strongly agree Agree Neutral Disagree Strongly disagree
+Reaction
+JAMA Network Open | Pediatrics Feasibility of a Serious Illness Communication Program for Pediatric Advance Care Planning
+JAMA Network Open. 2024;7(7):e2424626. doi:10.1001/jamanetworkopen.2024.24626 (Reprinted) July 26, 2024 7/13
+Downloaded from jamanetwork.com by guest on 08/22/2025
+
+
+Most parents endorsed mild depression at T1 (PHQ-9 mean [SD] score, 7.0 [6.6]), and there were no
+significant differences at T2 (PHQ-9 mean [SD] score, 7.4 [6.5]; P = .76) or T3 (PHQ-9 mean [SD]
+score, 7.9 [6.7]; P = .62) (eTable in Supplement 1). Participating clinicians reported no differences in
+moral distress before vs after the intervention (MDS-R mean [SD] score, 37.1 [15.8] vs 36.5
+[16.9]; P = .99).
+Discussion
+The results of this single-group pilot cohort study indicate that the PediSICP was both feasible and
+acceptable to a variety of stakeholders, including interprofessional clinicians and parents of seriously
+ill children and provide valuable insights into the benefits of utilizing a structured approach to ACP.
+The PediSICP was developed to provide a structured framework for pediatric clinicians without
+subspecialty palliative care training to engage in effective and efficient ACP.
+In the adult population, the efficacy of ACP and its evidence base have been called into
+question,41,42 and disagreement remains about the value of ACPs in clinical practice and
+research.43,44 While the value of ACP is not as controversial in pediatrics, given evidence of its
+positive impact,12-14,16,45-47 ACP remains an underused and complex endeavor, as implementation of
+ACP programs has historically encountered multiple barriers, including clinician discomfort and lack
+of formal communication training or an evidence-based framework6,24,25
+A noteworthy finding of this study is the successful implementation of pediatric clinician
+training using a communication guide as a foundational element, which has been shown to be
+effective in preparing clinicians for ACP in other subspecialties.48-51 Furthermore, this study targeted
+interprofessional clinicians, which is both novel and aligned with expert recommendations that stress
+the need to leverage nonphysicians to guide ACP.25,43,45 Another key strength of the PediSICP is its
+focus on enhancing communication, with most clinicians reporting that they learned something new
+about and felt more connected to the families they had ACP conversations with, suggesting the
+program may enhance clinician understanding of family priorities and build trust, which are essential
+for providing goal-concordant recommendations.
+The study also assessed the experiences of parents who engaged in ACP using the PediSICP
+framework and highlights the potential to enhance patient and family engagement in ACP. Most
+participating parents reported the intervention was worthwhile and that they would recommend the
+program to other families, even when these conversations caused sadness or worry. Notably, most
+parents and AYAs also reported that they felt listened to, which has been shown to build trust and
+Figure 3. Parent Reactions to Having an Advance Care Planning Conversation Using the Pediatric Serious Illness Communication Program Framework
+Statement
+Respondents, %
+0 20 40 60 80 100
+Would recommend to other families
+Participating was worthwhile
+Felt listened to
+Felt more reassured
+Felt sad
+Felt worried
+Strongly agree Agree Neutral Disagree Strongly disagree
+Reaction
+JAMA Network Open | Pediatrics Feasibility of a Serious Illness Communication Program for Pediatric Advance Care Planning
+JAMA Network Open. 2024;7(7):e2424626. doi:10.1001/jamanetworkopen.2024.24626 (Reprinted) July 26, 2024 8/13
+Downloaded from jamanetwork.com by guest on 08/22/2025
+
+
+lessen the likelihood of difficult family-clinician relationships52 and is essential to ensure value
+concordant decision-making, enhance dignity, and relieve suffering.53-55 Furthermore, our findings
+are consistent with the broader literature on pediatric ACP, which emphasizes the importance of
+considering parents’ unique perspectives and preferences in decision-making for their
+child.13,16,17,20,21,24,56-58
+The PediSICP’s preliminary findings regarding therapeutic alliance and anxiety among parents are
+particularly encouraging, as these results highlight that although ACP discussions can be stressful for
+clinicians, they do not cause harm to parents and patients, and in fact, can reduce emotional
+distress.19,59-62 In inquiring about goals and what is most important, clinicians can strengthen alignment
+and ensure that patients and families retain some control despite clinical uncertainty.63,64 The decrease
+in anxiety levels observed immediately after the intervention and at the 1-month follow-up, from mod
+erate to mild anxiety, aligns with the adult and pediatric advanced cancer literature, highlighting the
+potential psychological benefits of ACP for families facing serious illness.26,28,29,61,62,65 For therapeutic
+alliance, to our knowledge, there is no literature in pediatrics describing the minimally important clinical
+differences in THC scale scores; however, in pediatric advanced cancer populations, similar small statis
+tically significant differences in therapeutic alliance have been reported with advance care planning.35
+Future research in the form of an adequately powered randomized clinical trial will attempt to improve
+on the magnitude of this effect and its duration.
+Limitations
+This study has several important limitations. The requirement for participants to be English-speaking
+does not allow for a readily generalizable intervention for diverse populations. Additionally, 97% of
+the clinicians were White. More research is warranted to understand cultural barriers to ACP, such as
+race and language, that might impact the program’s feasibility. AYAs were underrepresented, as
+recruitment was limited owing to high medical burden and a large proportion of AYAs with severe
+neurologic impairment in our sample. Incorporating the voice of children and AYAs is an important
+future direction for this work. Because participation was voluntary and successful enrollment of
+clinicians was based on both self-selection and the ability to attend the training, participants may
+have been predisposed to feel favorably about the intervention. Additional selection bias may have
+been introduced by having outpatient clinicians serve as referral gatekeepers for some patients.
+Given the nature of this pilot study, we did not standardize the time between clinician training and
+participation in ACP conversations; thus, we were unable to determine whether booster training may
+be necessary. Furthermore, while we did not detect improvement among some outcome measures,
+such as quality of communication, as a pilot study, it was intentionally underpowered, and we may
+have missed identifying improvements in some outcomes. Alternatively, because the QOC
+questionnaire measures both general communication and communication about EOL care, it is
+possible that some items were not relevant or that parents or AYAs did not feel connected with the
+clinicians conducting ACP conversations.
+Conclusions
+The findings of this cohort study suggest that the PediSICP represents a significant step toward
+addressing the unmet need for pediatric ACP by providing a framework for clinicians caring for
+pediatric patients who are seriously ill and their families. The number of children living with serious
+illness is growing, which requires pediatric clinicians to become proficient in ACP to ensure the care
+they provide is concordant with patient and family goals and values.43,66,67 By equipping clinicians
+with the necessary training and tools, the PediSICP promotes meaningful ACP conversations that
+enhance clinician and family experiences and may improve therapeutic alliance and reduce anxiety.
+While findings of this pilot study are promising, future studies will evaluate the efficacy of the
+PediSICP on family-centered outcomes in a randomized controlled trial. Additionally, assessing the
+scalability and cost-effectiveness of the program will be essential for its widespread adoption.
+JAMA Network Open | Pediatrics Feasibility of a Serious Illness Communication Program for Pediatric Advance Care Planning
+JAMA Network Open. 2024;7(7):e2424626. doi:10.1001/jamanetworkopen.2024.24626 (Reprinted) July 26, 2024 9/13
+Downloaded from jamanetwork.com by guest on 08/22/2025
+
+
+ARTICLE INFORMATION Accepted for Publication: May 30, 2024.
+Published: July 26, 2024. doi:10.1001/jamanetworkopen.2024.24626
+Open Access: This is an open access article distributed under the terms of the CC-BY License. © 2024 DeCourcey DD et al. JAMA Network Open.
+Corresponding Author: Danielle D. DeCourcey, MD, MPH, Division of Medical Critical Care, Department of Pediatrics, Boston Children’s Hospital, 333 Longwood Ave, LO 012, Boston, MA 02115 (danielle.decourcey@childrens. harvard.edu).
+Author Affiliations: Department of Pediatrics, Division of Medical Critical Care, Boston Children’s Hospital, Boston, Massachusetts (DeCourcey, Nava-Coulter, Lach); Division of Psychosocial Oncology and Palliative Care, Dana Farber Cancer Institute, Boston, Massachusetts (Bernacki); Department of Data Science, Dana Farber Cancer Institute, Boston, Massachusetts (Xiong); Division of Supportive and Palliative Care, Mass General for Children, Boston, Massachusetts (Wolfe).
+Author Contributions: Dr DeCourcey and Ms Lack had full access to all of the data in the study and take responsibility for the integrity of the data and the accuracy of the data analysis.
+Concept and design: DeCourcey, Bernacki, Wolfe.
+Acquisition, analysis, or interpretation of data: All authors.
+Drafting of the manuscript: DeCourcey, Nava-Coulter, Lach.
+Critical review of the manuscript for important intellectual content: DeCourcey, Bernacki, Nava-Coulter, Xiong, Wolfe.
+Statistical analysis: DeCourcey, Lach, Xiong.
+Obtained funding: DeCourcey, Wolfe.
+Administrative, technical, or material support: DeCourcey, Bernacki, Lach.
+Supervision: DeCourcey, Wolfe.
+Conflict of Interest Disclosures: Dr Bernacki reported receiving grants from the Hillman Foundation and Cambia Foundation and personal fees from Havard Press outside the submitted work. No other disclosures were reported.
+Funding/Support: This work was supported by 2 grants from the Arthur Vining Davis Foundations (grant No. G-1805-18676).
+Role of the Funder/Sponsor: The funder had no role in the design and conduct of the study; collection, management, analysis, and interpretation of the data; preparation, review, or approval of the manuscript; and decision to submit the manuscript for publication.
+Data Sharing Statement: See Supplement 2.
+Additional Contributions: We thank the patients, families and clinicians who so generously gave their time to participate in this study. Emanuele Mazzola, PhD (Department of Biostatistics, Dana-Farber Cancer Institute) provided guidance in the analysis of data. Dr Mazzola was not compensated for this work outside of his usual salary.
+REFERENCES
+1. Bogetz JF, Revette A, Rosenberg AR, DeCourcey D. “I could never prepare for something like the death of my own child”: parental perspectives on preparedness at end of life for children with complex chronic conditions. J Pain Symptom Manage. 2020;60(6):1154-1162.e1. doi:10.1016/j.jpainsymman.2020.06.035
+2. Wiener L, Tager J, Mack J, Battles H, Bedoya SZ, Gerhardt CA. Helping parents prepare for their child’s end of life: a retrospective survey of cancer-bereaved parents. Pediatr Blood Cancer. 2020;67(2):e27993. doi:10.1002/ pbc.27993
+3. Sudore RL, Lum HD, You JJ, et al. Defining advance care planning for adults: a consensus definition from a multidisciplinary Delphi panel. J Pain Symptom Manage. 2017;53(5):821-832.e1. doi:10.1016/j.jpainsymman.2016. 12.331
+4. Dellon E, Goldfarb SB, Hayes D Jr, Sawicki GS, Wolfe J, Boyer D. Pediatric lung transplantation and end of life care in cystic fibrosis: barriers and successful strategies. Pediatr Pulmonol. 2017;52(S48):S61-S68. doi:10.1002/ ppul.23748
+5. Lotz JD, Jox RJ, Borasio GD, Führer M. Pediatric advance care planning: a systematic review. Pediatrics. 2013;131 (3):e873-e880. doi:10.1542/peds.2012-2394
+6. Lusney N, van Breemen C, Lim E, Pawliuk C, Hussein Z. Pediatric advance care planning: a scoping review. Children (Basel). 2023;10(7):1179. doi:10.3390/children10071179
+JAMA Network Open | Pediatrics Feasibility of a Serious Illness Communication Program for Pediatric Advance Care Planning
+JAMA Network Open. 2024;7(7):e2424626. doi:10.1001/jamanetworkopen.2024.24626 (Reprinted) July 26, 2024 10/13
+Downloaded from jamanetwork.com by guest on 08/22/2025
+
+
+7. Detering KM, Hancock AD, Reade MC, Silvester W. The impact of advance care planning on end of life care in elderly patients: randomised controlled trial. BMJ. 2010;340:c1345. doi:10.1136/bmj.c1345
+8. Molloy DW, Guyatt GH, Russo R, et al. Systematic implementation of an advance directive program in nursing homes: a randomized controlled trial. JAMA. 2000;283(11):1437-1444. doi:10.1001/jama.283.11.1437
+9. Covinsky KE, Fuller JD, Yaffe K, et al; The Study to Understand Prognoses and Preferences for Outcomes and Risks of Treatments. Communication and decision-making in seriously ill patients: findings of the SUPPORT project. J Am Geriatr Soc. 2000;48(S1)(suppl):S187-S193. doi:10.1111/j.1532-5415.2000.tb03131.x
+10. Curtis JR, Downey L, Back AL, et al. Effect of a patient and clinician communication-priming intervention on patient-reported goals-of-care discussions between patients with serious illness and clinicians: a randomized clinical trial. JAMA Intern Med. 2018;178(7):930-940. doi:10.1001/jamainternmed.2018.2317
+11. Kimmel AL, Wang J, Scott RK, Briggs L, Lyon ME. Family Centered (FACE) advance care planning: study design and methods for a patient-centered communication and decision-making intervention for patients with HIV/AIDS and their surrogate decision-makers. Contemp Clin Trials. 2015;43:172-178. doi:10.1016/j.cct.2015.06.003
+12. Lyon ME, Jacobs S, Briggs L, Cheng YI, Wang J. Family-centered advance care planning for teens with cancer. JAMA Pediatr. 2013;167(5):460-467. doi:10.1001/jamapediatrics.2013.943
+13. Thompkins JD, Needle J, Baker JN, et al. Pediatric advance care planning and families’ positive caregiving appraisals: an RCT. Pediatrics. 2021;147(6):e2020029330. doi:10.1542/peds.2020-029330
+14. Needle JS, Friebert S, Thompkins JD, et al. Effect of the family-centered advance care planning for teens with cancer intervention on sustainability of congruence about end-of-life treatment preferences: a randomized clinical trial. JAMA Netw Open. 2022;5(7):e2220696. doi:10.1001/jamanetworkopen.2022.20696
+15. Lichtenthal WG, Roberts KE, Catarozoli C, et al. Regret and unfinished business in parents bereaved by cancer: a mixed methods study. Palliat Med. 2020;34(3):367-377. doi:10.1177/0269216319900301
+16. DeCourcey DD, Silverman M, Oladunjoye A, Wolfe J. Advance care planning and parent-reported end-of-life outcomes in children, adolescents, and young adults with complex chronic conditions. Crit Care Med. 2019;47(1): 101-108. doi:10.1097/CCM.0000000000003472
+17. Orkin J, Beaune L, Moore C, et al. Toward an understanding of advance care planning in children with medical complexity. Pediatrics. 2020;145(3):e20192241. doi:10.1542/peds.2019-2241
+18. Lyon ME, Garvie PA, Briggs L, He J, McCarter R, D’Angelo LJ. Development, feasibility, and acceptability of the Family/Adolescent-Centered (FACE) advance care planning intervention for adolescents with HIV. J Palliat Med. 2009;12(4):363-372. doi:10.1089/jpm.2008.0261
+19. Wiener L, Zadeh S, Battles H, et al. Allowing adolescents and young adults to plan their end-of-life care. Pediatrics. 2012;130(5):897-905. doi:10.1542/peds.2012-0663
+20. Fahner JC, Thölking TW, Rietjens JAC, van der Heide A, van Delden JJM, Kars MC. Towards advance care planning in pediatrics: a qualitative study on envisioning the future as parents of a seriously ill child. Eur J Pediatr. 2020;179(9):1461-1468. doi:10.1007/s00431-020-03627-2
+21. Lotz JD, Daxer M, Jox RJ, Borasio GD, Führer M. “Hope for the best, prepare for the worst”: a qualitative interview study on parents’ needs and fears in pediatric advance care planning. Palliat Med. 2017;31(8):764-771. doi:10.1177/0269216316679913
+22. Davidson JE, Powers K, Hedayat KM, et al; American College of Critical Care Medicine Task Force 2004-2005, Society of Critical Care Medicine. Clinical practice guidelines for support of the family in the patient-centered intensive care unit: American College of Critical Care Medicine Task Force 2004-2005. Crit Care Med. 2007;35(2): 605-622. doi:10.1097/01.CCM.0000254067.14607.EB
+23. Durall A, Zurakowski D, Wolfe J. Barriers to conducting advance care discussions for children with lifethreatening conditions. Pediatrics. 2012;129(4):e975-e982. doi:10.1542/peds.2011-2695
+24. DeCourcey DD, Partin L, Revette A, Bernacki R, Wolfe J. Development of a stakeholder driven serious illness communication program for advance care planning in children, adolescents, and young adults with serious illness. J Pediatr. 2021;229:247-258.e8. doi:10.1016/j.jpeds.2020.09.030
+25. Basu MR, Partin L, Revette A, Wolfe J, DeCourcey DD. Clinician identified barriers and strategies for advance care planning in seriously ill pediatric patients. J Pain Symptom Manage. 2021;62(3):e100-e111. doi:10.1016/j. jpainsymman.2021.03.006
+26. Bernacki R, Paladino J, Neville BA, et al. Effect of the Serious Illness Care Program in outpatient oncology: a cluster randomized clinical trial. JAMA Intern Med. 2019;179(6):751-759. doi:10.1001/jamainternmed.2019.0077
+27. Abedini NC, Curtis JR. Implementing and enhancing multifaceted systems interventions to improve goalsof-care discussions among patients with serious illness—an opportunity for human-centered design. JAMA Netw Open. 2021;4(8):e2121497. doi:10.1001/jamanetworkopen.2021.21497
+JAMA Network Open | Pediatrics Feasibility of a Serious Illness Communication Program for Pediatric Advance Care Planning
+JAMA Network Open. 2024;7(7):e2424626. doi:10.1001/jamanetworkopen.2024.24626 (Reprinted) July 26, 2024 11/13
+Downloaded from jamanetwork.com by guest on 08/22/2025
+
+
+28. Bernacki R, Hutchings M, Vick J, et al. Development of the Serious Illness Care Program: a randomised controlled trial of a palliative care communication intervention. BMJ Open. 2015;5(10):e009032. doi:10.1136/ bmjopen-2015-009032
+29. Lakin JR, Koritsanszky LA, Cunningham R, et al. A systematic intervention to improve serious illness communication in primary care. Health Aff (Millwood). 2017;36(7):1258-1264. doi:10.1377/hlthaff.2017.0219
+30. Lamas DJ, Owens RL, Nace RN, et al. Conversations about goals and values are feasible and acceptable in longterm acute care hospitals: a pilot study. J Palliat Med. 2017;20(7):710-715. doi:10.1089/jpm.2016.0485
+31. Feudtner C, Feinstein JA, Zhong W, Hall M, Dai D. Pediatric complex chronic conditions classification system version 2: updated for ICD-10 and complex medical technology dependence and transplantation. BMC Pediatr. 2014;14:199. doi:10.1186/1471-2431-14-199
+32. DeCourcey D, Schwartz A, Bernacki R, Wolfe J. The Impact of a curriculum to teach advance care planning communication to pediatric interprofessional clinicians using a serious illness conversation guide. J Pain Symptom Manage. 2022;63(5):848-849. doi:10.1016/j.jpainsymman.2022.02.025
+33. Hamric AB, Borchers CT, Epstein EG. Development and testing of an instrument to measure moral distress in healthcare professionals. AJOB Prim Res. 2012;3(2):1-9. doi:10.1080/21507716.2011.652337
+34. Barr PJ, Thompson R, Walsh T, Grande SW, Ozanne EM, Elwyn G. The psychometric properties of CollaboRATE: a fast and frugal patient-reported measure of the shared decision-making process. J Med Internet Res. 2014; 16(1):e2. doi:10.2196/jmir.3085
+35. Mack JW, Block SD, Nilsson M, et al. Measuring therapeutic alliance between oncologists and patients with advanced cancer: The Human Connection scale. Cancer. 2009;115(14):3302-3311. doi:10.1002/cncr.24360
+36. Engelberg R, Downey L, Curtis JR. Psychometric characteristics of a quality of communication questionnaire assessing communication about end-of-life care. J Palliat Med. 2006;9(5):1086-1098. doi:10.1089/jpm.2006. 9.1086
+37. Spitzer RL, Kroenke K, Williams JBW, Löwe B. A brief measure for assessing generalized anxiety disorder: the GAD-7. Arch Intern Med. 2006;166(10):1092-1097. doi:10.1001/archinte.166.10.1092
+38. Thabane L, Ma J, Chu R, et al. A tutorial on pilot studies: the what, why and how. BMC Med Res Methodol. 2010;10(1):1. doi:10.1186/1471-2288-10-1
+39. Jones TA, Olds TS, Currow DC, Williams MT. Feasibility and pilot studies in palliative care research: a systematic review. J Pain Symptom Manage. 2017;54(1):139-151.e4. doi:10.1016/j.jpainsymman.2017.02.015
+40. Feraco AM, McCarthy SR, Revette AC, et al. Feasibility and acceptability of the “day 100 talk”: an interdisciplinary communication intervention during the first six months of childhood cancer treatment. Cancer. 2021;127(7):1134-1145. doi:10.1002/cncr.33362
+41. Sean Morrison R. Advance directives/care planning: clear, simple, and wrong. J Palliat Med. 2020;23(7): 878-879. doi:10.1089/jpm.2020.0272
+42. Morrison RS, Meier DE, Arnold RM. What’s wrong with advance care planning? JAMA. 2021;326(16): 1575-1576. doi:10.1001/jama.2021.16430
+43. Rosa WE, Izumi S, Sullivan DR, et al. Advance care planning in serious illness: a narrative review. J Pain Symptom Manage. 2023;65(1):e63-e78. doi:10.1016/j.jpainsymman.2022.08.012
+44. Graig L, Friedman K, Alper J, eds. The Challenges and Opportunities of Advance Care Planning: Proceedings of a Workshop. National Academies Press; 2021. doi:10.17226/26119
+45. Wiener L, Bell CJ, Spruit JL, Weaver MS, Thompson AL. The road to readiness: guiding families of children and adolescents with serious illness toward meaningful advance care planning discussions. NAM Perspect. Published online August 2, 2021. doi:10.31478/202108a
+46. Weaver MS, Anderson B, Cole A, Lyon ME. Documentation of advance directives and code status in electronic medical records to honor goals of care. J Palliat Care. 2020;35(4):217-220. doi:10.1177/0825859719860129
+47. Lin M, Sayeed S, DeCourcey DD, Wolfe J, Cummings C. The case for advance care planning in the NICU. Pediatrics. 2022;150(6):e2022057824. doi:10.1542/peds.2022-057824
+48. Paladino J, Kilpatrick L, O’Connor N, et al. Training clinicians in serious illness communication using a structured guide: evaluation of a training program in three health systems. J Palliat Med. 2020;23(3):337-345. doi: 10.1089/jpm.2019.0334
+49. Paladino J, Brannen E, Benotti E, et al. Implementing serious illness communication processes in primary care: a qualitative study. Am J Hosp Palliat Care. 2021;38(5):459-466. doi:10.1177/1049909120951095
+JAMA Network Open | Pediatrics Feasibility of a Serious Illness Communication Program for Pediatric Advance Care Planning
+JAMA Network Open. 2024;7(7):e2424626. doi:10.1001/jamanetworkopen.2024.24626 (Reprinted) July 26, 2024 12/13
+Downloaded from jamanetwork.com by guest on 08/22/2025
+
+
+50. Lagrotteria A, Swinton M, Simon J, et al. Clinicians’ perspectives after implementation of the serious illness care program: a qualitative study. JAMA Netw Open. 2021;4(8):e2121517. doi:10.1001/jamanetworkopen. 2021.21517
+51. Doherty M, Gujral P, Frenette M, Lusney N, van Breemen C. The Pediatric Serious Illness Conversation Program: Understanding challenges and experiences for clinicians after advance care planning training. Palliat Support Care. Published online June 8, 2023. doi:10.1017/S1478951523000500
+52. Mack JW, Ilowite M, Taddei S. Difficult relationships between parents and physicians of children with cancer: a qualitative study of parent and physician perspectives. Cancer. 2017;123(4):675-681. doi:10.1002/cncr.30395
+53. Gramling R, Stanek S, Ladwig S, et al; AAHPM Research Committee Writing Group. Feeling heard and understood: a patient-reported quality measure for the inpatient palliative care setting. J Pain Symptom Manage. 2016;51(2):150-154. doi:10.1016/j.jpainsymman.2015.10.018
+54. Epstein RM, Gramling RE. What is shared in shared decision making: complex decisions when the evidence is unclear. Med Care Res Rev. 2013;70(1)(suppl):94S-112S. doi:10.1177/1077558712459216
+55. Committee on Approaching Death: Addressing Key End of Life Issues; Institute of Medicine. Dying in America: Improving Quality and Honoring Individual Preferences Near the End of Life. National Academies Press; 2015.
+56. Weiner JS, Cole SA. Three principles to improve clinician communication for advance care planning: overcoming emotional, cognitive, and skill barriers. J Palliat Med. 2004;7(6):817-829. doi:10.1089/jpm. 2004.7.817
+57. Bogetz JF, Revette A, DeCourcey DD. Clinical care strategies that support parents of children with complex chronic conditions. Pediatr Crit Care Med. 2021;22(7):595-602. doi:10.1097/PCC.0000000000002726
+58. Bogetz JF, Revette A, Partin L, DeCourcey DD. Relationships and resources supporting children with serious illness and their parents. Hosp Pediatr. 2022;12(9):832-842. doi:10.1542/hpeds.2022-006596
+59. Golden SL, Nageswaran S. Caregiver voices: coordinating care for children with complex chronic conditions. Clin Pediatr (Phila). 2012;51(8):723-729. doi:10.1177/0009922812445920
+60. Pierce L, Hocking MC, Schwartz LA, Alderfer MA, Kazak AE, Barakat LP. Caregiver distress and patient healthrelated quality of life: psychosocial screening during pediatric cancer treatment. Psychooncology. 2017;26(10): 1555-1561. doi:10.1002/pon.4171
+61. Fladeboe KM, O’Donnell MB, Barton KS, et al. A novel combined resilience and advance care planning intervention for adolescents and young adults with advanced cancer: a feasibility and acceptability cohort study. Cancer. 2021;127(23):4504-4511. doi:10.1002/cncr.33830
+62. Wright AA, Zhang B, Ray A, et al. Associations between end-of-life discussions, patient mental health, medical care near death, and caregiver bereavement adjustment. JAMA. 2008;300(14):1665-1673. doi:10.1001/jama. 300.14.1665
+63. Sanders JJ, Johnson KS, Cannady K, et al. From barriers to assets: rethinking factors impacting advance care planning for African Americans. Palliat Support Care. 2019;17(3):306-313. doi:10.1017/S147895151800038X
+64. Paladino J, Koritsanszky L, Nisotel L, et al. Patient and clinician experience of a serious illness conversation guide in oncology: a descriptive analysis. Cancer Med. 2020;9(13):4550-4560. doi:10.1002/cam4.3102
+65. Paladino J, Bernacki R, Neville BA, et al. Evaluating an intervention to improve communication between oncology clinicians and patients with life-limiting cancer: a cluster randomized clinical trial of the Serious Illness Care program. JAMA Oncol. 2019;5(6):801-809. doi:10.1001/jamaoncol.2019.0292
+66. Bernacki RE, Block SD; American College of Physicians High Value Care Task Force. Communication about serious illness care goals: a review and synthesis of best practices. JAMA Intern Med. 2014;174(12):1994-2003. doi: 10.1001/jamainternmed.2014.5271
+67. Ruth AR, Boss RD, Donohue PK, Shapiro MC, Raisanen JC, Henderson CM. Living in the hospital: the vulnerability of children with chronic critical illness. J Clin Ethics. 2020;31(4):340-352. doi:10.1086/ JCE2020314340
+SUPPLEMENT 1.
+eTable. Assessment of Parent Exploratory Outcome Measures Before and After the PediSICP Intervention
+SUPPLEMENT 2. Data Sharing Statement
+JAMA Network Open | Pediatrics Feasibility of a Serious Illness Communication Program for Pediatric Advance Care Planning
+JAMA Network Open. 2024;7(7):e2424626. doi:10.1001/jamanetworkopen.2024.24626 (Reprinted) July 26, 2024 13/13
+Downloaded from jamanetwork.com by guest on 08/22/2025

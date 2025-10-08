@@ -1,0 +1,1041 @@
+Could neurofeedback improve therapist-patient communication? Considering the potential for
+neuroscience informed examinations of the psychotherapeutic relationship
+Gregory Morrissey, MD1; Aki Tsuchiyagaito, PhD1,2; Toru Takahashi, PhD1,3; John McMillin, MD4,5; Robin
+L. Aupperle, PhD1,2, Masaya Misaki, PhD1,2; Sahib S. Khalsa, MD, PhD1,2*
+1 Laureate Institute for Brain Research, Tulsa, Oklahoma, USA
+2 Oxley College of Health Sciences, University of Tulsa, Tulsa, Oklahoma, USA
+3 Japan Society for the Promotion of Science, Chiyoda-ku, Tokyo, Japan
+4 Advocate Medical Group, Downers Grove, Illinois, USA
+5 Department of Psychiatry, University of Oklahoma-Tulsa, Tulsa, Oklahoma, USA
+*Correspondence: skhalsa@laureateinstitute.org
+Keywords: Neurofeedback; therapeutic alliance; empathy; interactional synchrony; hyperscanning; theory of mind
+
+
+2
+Abstract:
+Empathic communications between a patient and therapist are an essential component of
+psychotherapy. However, objective neural markers of the quality of the psychotherapeutic relationship
+have been elusive. Here we conceptualize how a neuroscience-informed approach involving real-time
+neurofeedback, facilitated via existing functional magnetic resonance imaging (fMRI) and
+electroencephalography (EEG) technologies, has the potential to provide objective information for
+facilitating therapeutic rapport. We propose several neurofeedback-assisted psychotherapy (NF-AP)
+approaches that could offer the potential for optimizing the experience of the individual patient and
+therapist across the spectrum of psychotherapeutic treatment. Finally, we consider how the possible
+strengths of these approaches are balanced by the current limitations and discuss the prospects of NF
+AP.
+
+
+3
+1. Introduction
+The quality of the therapeutic relationship is one of the most established predictors of a
+patient’s ability to improve with psychotherapy (Arnow et al., 2003; Blatt et al., 1996; Martin et al.,
+2000; Marziali, 1984; Marziali and Alexander, 1991; McCabe and Priebe, 2004; Woollcott, 1985). With
+the advent and pervasive application of neuroscience methodologies such as functional neuroimaging, a
+substantial literature has emerged detailing the effects of various forms of psychotherapy on brain
+activity across numerous disorders (Barsaglini et al., 2014; Cozolino, 2017). Despite these advances,
+substantial gaps in our knowledge remain, particularly with respect to the manner in which functional
+neuroimaging tools can directly impact brain function—or potentially augment it. Here we conceptualize
+how a neuroscience-informed approach involving real-time neurofeedback, facilitated via existing
+functional magnetic resonance imaging (fMRI) and electroencephalography (EEG) technologies, might
+provide objective information for quantifying therapeutic rapport. Introducing the concept of
+neurofeedback-assisted psychotherapy (NF-AP), we describe approaches that could offer the potential
+for optimizing the experience of the individual patient and therapist across the spectrum of
+psychotherapeutic treatment. Given the nascent status of this emerging topic, we first (1) review
+definitions related to the therapy-client relationship and the ways in which neurofeedback could
+hypothetically be used to enhance this relationship and therapy outcomes, and then we (2) review
+findings from a scoping review of the available scientific studies in the area.
+1.1 Incorporating neurofeedback into therapist-patient communication
+Neurofeedback technologies provide an opportunity to observe brain activity in real time
+during affective and empathic components of the therapeutic process. It involves interventions that
+provide individuals with information about their brain activity with the goal of teaching them to
+modulate their brain activity by themselves. There are several methods for delivering neurofeedback,
+
+
+4
+including via a functional neuroimaging approach called real-time functional magnetic resonance
+(rtfMRI), via an electrophysiological approach such as electroencephalography (EEG), or via a
+combination of the two (Zotev et al., 2014). Previous studies using these technologies have shown that
+neurofeedback interventions can help humans to increase their control of emotional self-regulation
+(Zotev et al., 2014) or cognitive performance (Zoefel et al., 2011).
+The delivery of neurofeedback interventions in non-psychotherapeutic formats has shown
+potential clinical efficacy in improving mental health symptoms. An early experiment from our group
+utilized rtfMRI to map activity of in the left amygdala, a region of the brain known to be involved in
+emotional processing, when recalling positive memories in depressed individuals (Figure 1). Participants
+who were continuously shown their left amygdala activity and encouraged to increase hemodynamic
+activity in this region while recalling positive memories were able to significantly increase the activation
+of this area. Additionally, follow up a week later showed that, compared to a control group that
+underwent the same experiment but focused instead on a region of the parietal lobe not associated
+with emotional processing, the amygdala group achieved significant relief of depressive symptoms and
+better recall of positive memories (Young et al., 2017). In a recent proof-of-concept study in healthy
+individuals, we showed that changes in the functional connectivity of brain regions involved in repetitive
+negative thinking (i.e., rumination), specifically the precuneus and right temporo-parietal junction (rTPJ)
+could be successfully targeted using rtfMRI (Tsuchiyagaito et al., 2021a). These demonstrations raise the
+possibility that targeting the functional activity of individual neural structures or connectivity of multiple
+structures might be useful when applied as an augmenting tool in the context of ongoing
+psychotherapy.
+
+
+5
+Figure 1. Illustration of a closed-loop neurofeedback intervention. 1) A brain-based
+measurement tool (e.g., real-time functional magnetic resonance imaging (rtfMRI) or
+electroencephalography (EEG)) records neural signals from a patient in a region of interest (ROI). 2) The
+patient is presented an objective rendering of their neural activity that allows them to compare and
+attempt to match their neural activity with an instructed target. 3) The patient adjusts their self
+regulation strategy to achieve the desired signal. The gray arrows represent the feedback cycle, showing
+how real-time data informs the patient’s self-regulation strategies, which in turn affects the recorded
+brain activity, thus closing the loop. This process is iterative, with the patient attempting to self-regulate
+the brain activity more closely match the target level with each cycle.
+
+
+6
+The development of neurofeedback-assisted psychotherapy (NF-AP) provides a new opportunity
+to investigate the intersection of neuroscience and clinical practice. For example, NF-AP could stand not
+only as a tool for examining the basic neurophysiological underpinnings of therapist-client interactions
+but also as a means to actively enhance the therapeutic engagement. Although neurofeedback has been
+shown to be particularly effective when augmenting established psychotherapies such as Cognitive
+Behavioral Therapy (CBT) (Compere et al., 2023; MacDuffie et al., 2018) and Dialectical Behavior
+Therapy (DBT) (Paret et al., 2016; Zaehringer et al., 2019), these applications have typically involved
+pairing the application of standard neurofeedback tasks in patients undergoing standard psychotherapy.
+With NF-AP, we emphasize a more blended approach whereby the neurofeedback tools are integrated
+into the psychotherapy practice to better facilitate the awareness and self-regulation of neural patterns
+associated with specific behaviors or thought processes. Importantly, this review adopts a broad
+definition of psychotherapy. Generally speaking, we define psychotherapy (also commonly referred to
+as counseling or talk therapy) as a form of non-pharmacologic mental health treatment that involves
+conversational interactions between a therapist and a client focused on a set of symptoms or problems,
+aiming to help individuals identify and change unhealthy or maladaptive thoughts, emotions, and
+behaviors. Therapeutic alliance involves a trusting, cooperative relationship between therapist and client,
+which involves socio-emotional aspects of the personal relationship (e.g., mutual understanding and liking)
+and the collaborative, task-related aspects of the relationship (e.g., goal consensus)(Moss and Glowiak, 2013;
+Tschacher et al., 2015). The socio-emotional and task-related aspects of alliance can each be facilitated by the
+therapist, with approaches such as authenticity/genuineness, unconditional positive regard, and
+nonjudgment/acceptance supporting the former and communication of expert knowledge, therapeutic
+rationale, or confidence supporting the latter (Moss and Glowiak, 2013). Both of these aspects of alliance can
+be supported through what the therapist explicitly communicates as well as through behaviors that are often
+
+
+7
+referred to as “microcounseling skills”, involving active listening skills, eye contact, vocal tone, and attentive
+body language..
+Taking the application of NF-AP a step forward, ‘hyperscanning’ is a relatively recent functional
+neuroimaging technique that simultaneously acquires signals from the brain of more than one
+participant at the same time (Koike et al., 2015; Misaki et al., 2021). This methodology can be useful for
+probing the temporal coherence between the brain activity of two interacting individuals, for example,
+that of a parent and child (Hari and Kujala, 2009). Hyperscanning has been recently utilized to study
+empathy in several different experiments. For example, a recent study identified significant brain
+synchronization between two individuals engaged in an active listening exercise (Wang et al., 2022).
+Similar findings have emerged in hyperscanning studies of comforting touch (Long et al., 2021; Shamay
+Tsoory and Eisenberger, 2021) and sharing of painful memories (Peng et al., 2021). Finally, interbrain
+synchrony has been shown to increase when dyads cooperate, leading to better performance of tasks
+(Djalovski et al., 2021).
+In summary, we argue that NF-AP may have potential for improving our understanding the
+neural basis of dyadic interactions during psychotherapy, and for identifying how neural activity during
+such interactions exerts positive impacts on mental health. We subsequently explore how these
+approaches might be applied to dynamic social interactions in psychotherapy to investigate the
+enhancement of empathic communication between therapist and patient.
+1.1 The critical role of empathic interpersonal communication in the psychotherapeutic process
+Human communication involves a complex process of reciprocating interactions. A
+conversational interaction between two human beings requires each to pay attention to the other in a
+nuanced manner that involves more than simply language, or even speech. Nonverbal communication,
+such as facial gestures and body posture, conveys aspects of a person’s emotional experience of which
+
+
+8
+the individual may not even be aware (Meltzoff and Decety, 2003). At the neurophysiological level,
+there may be a process in which the speaker and the listener influence each other’s neural processes in
+order to engage in a regulated, turn-taking interaction. Elements of this process, including verbal and
+non-verbal cues, joint attention by two participants on an external object, and gaze following, have been
+hypothesized to underlie theory of mind (Baron-Cohen, 1995), which can be defined as the individual’s
+capacity to ascribe mental states to others. This allows them to recognize and respect how others’
+experiences differ from their own. Empathy comprises theory of mind but can be considered more
+broadly as the capacity to share the feelings of others (Singer and Klimecki, 2014). Empathy allows
+people to have the sense of a common emotional experience (e.g., vicariously feeling pain when seeing
+another suffer) and is a powerful way of connecting with others in social contexts (Decety, 2011). All of
+these functions are critical for maintaining effective communication in primary caregiving interactions.
+For example, delays in temporal coherence can lead to a breakdown in communication between a
+mother and child, with negative consequences (Wilson and Wilson, 2005).
+Human communication has evolved to such a point that it can be employed to therapeutically
+address psychopathology by means of psychotherapy (Scheflen, 1963). Psychotherapy can be delivered
+to individuals or group formats, though the most common form of occurs via interactions between an
+individual patient and therapist. A broad goal shared by most psychotherapies is to help the patient gain
+insight into their circumstances, to learn about themselves and about their environment, in order to
+improve their biopsychosocial health outcomes. The interaction between a patient and therapist, as
+with any empathic social interaction, depends on both participants attending to each other and
+continuously monitoring for turn-taking cues during the session (Campbell et al., 2013). These
+mechanical components of interaction can support the development of an empathic bond between the
+patient and therapist. However, fostering a successful patient-therapist dyad requires not only empathy
+on the part of therapist, but also their ability to supportively engage the patient to evaluate and
+
+
+9
+sometimes challenge their own internal experiences. Empathy attunes the therapist to the patient’s
+state of being and increases dyadic rapport while allowing the therapist to gently—or directly
+challenge the patient’s inaccurate or maladaptive perceptions. This combination is often considered
+essential to the achievement of beneficial change (Deits-Lebehn et al., 2020) but it requires a deft touch
+on the part of the therapist as well as a high degree of rapport, as facing or challenging inner
+experiences can elicit negative affective experiences or provoke other disorder-specific symptoms.
+Therapeutic alliance in the context of psychotherapy can be thought of as a dynamic process of
+achieving a therapeutic bond. It is achieved by an interactional process in which the patient responds to
+a therapist’s interventions (often in the form of questioning), followed by the therapist responding to
+the patient’s subsequent states. Indeed, numerous studies have shown that patient and therapist are
+highly reactive to each other, and that patient-therapist alliance is a significant predictor of positive
+therapeutic outcomes (Horvath et al., 2011). For example, one study found that patients’ responses to
+empathetic and confrontational approaches by their therapist could be reliably assessed through
+autonomic arousal and facial muscle activation (Voutilainen et al., 2018). An implication of this finding is
+that the explicit visualization of psychophysiological cues might be utilized as a form of feedback to be
+employed by the therapist and/or patient to increase positive outcomes during sessions (Deits-Lebehn
+et al., 2020). However, autonomic arousal and facial cues represent peripheral expressions of a central
+nervous system process and thus may be too indirect or insufficiently specific to rely on as objective
+indicators of emotional status (Quigley and Barrett, 2014). Neural examinations of the primary
+processes that underlie the cognitive states necessary for empathic communication may prove more
+fruitful.
+1.2 The Neurobiology of Empathy
+
+
+10
+While numerous central nervous system dependent processes contribute to the experience of
+empathy, studies suggest that empathy primarily comprises two distinct components: 1) an affective
+state that comprises shared emotional experiences (Shamay-Tsoory et al., 2009) and 2) a mentalizing (or
+theory of mind) state concerned with understanding mental status of others (Masten et al., 2011).
+Regarding the affective component of empathy, the neural networks responsible for the direct
+experience of affect seem to overlap considerably with the regions involved in generating empathic
+responses, and these networks are largely associated with the limbic system. For example, an empathic
+response to another’s physical pain is reflected in anterior insular cortex and anterior midcingulate
+cortex activity that are stimulated when experiencing physical pain first-hand (Engen and Singer, 2013).
+The mentalizing component of empathy involves higher order polymodal regions of the brain
+located within the prefrontal cortex. In one functional magnetic resonance imaging (fMRI) experiment,
+participants witnessing an episode of social exclusion showed increased activity in the medial prefrontal
+cortex in addition to the precuneus (Masten et al., 2011). Additionally, individuals scoring more highly
+on empathic measures activated the anterior insular cortex and dorsal anterior cingulate cortex, brain
+areas that have been implicated in both mentalizing and social pain-related processing. These findings
+suggest that complex empathic states, such as those relating to another person being ostracized, may
+require neurocircuitries dedicated to mentalizing and affective processing.
+Empathy also appears to be context specific. An experiment using fMRI to assess neural activity
+during observations of social exclusion found that, when observing a friend suffer, participants showed
+increased activity in affective pain regions of the brain (i.e., dorsal ACC and posterior/mid insular cortex)
+more so than when they watched strangers receive the same treatment (Meyer et al., 2013).
+Conversely, the mentalizing regions (i.e., dorsomedial prefrontal cortex, precuneus, temporal pole)
+showed increased activity when observing strangers. This suggests the possibility that empathy towards
+
+
+11
+friends provokes a more visceral empathic response, while empathy toward strangers is of a more
+distant and abstract variety.
+1.4 Hyperscanning in psychotherapy
+Building on individual neurofeedback, we expand into the realm of hyperscanning, which opens
+the door to observing and influencing the complex interplay of neural activities between patient and
+therapist. While distinct from a closed-loop neurofeedback system, hyperscanning can explore the
+neural synchronization during empathetic exchanges and cooperative tasks, suggesting a potential
+neural basis reflecting the human connection. In a therapeutic setting involving hyperscanning, there are
+potential opportunities for both the patient and therapist to detect dyadic influences on neural
+activation (Figure 2). Importantly, hyperscanning in a therapeutic context is not necessarily about
+modulating brain activity in a closed-loop process. Instead, it involves accessing and utilizing neural
+signatures (of either the patient, therapist, or both) as part of the therapeutic process. This can
+potentially improve symptoms either by enhancing understanding and empathy within the therapeutic
+relationship, or by engaging in direct, closed-loop neurofeedback.
+1.5 Aims of this scoping review
+The integration of empathic interpersonal communication, the neurobiology of empathy, and
+new technologies such as neurofeedback and hyperscanning leads to a novel paradigm in
+psychotherapy. NF-AP, supported by advancements in rtfMRI and EEG, have the potential to equip
+therapists with valuable insights into the neurodynamics of therapist-patient interactions, potentially
+enhancing the working alliance. This novel approach requires a detailed exploration of its potential
+applications, methodological considerations, and implications for psychotherapy. Our aim is to conduct
+a scoping review to provide deeper understanding of how NF-AP could be integrated into
+psychotherapeutic practice.
+
+
+12
+Figure 2. Some potential applications neurofeedback-assisted psychotherapy (NF-AP). A) The therapist can directly view and assess their patient’s neural activity in real-time during a session. B) The patient can directly view and assess their therapist’s neural activity in real-time during a session. C) Both the therapist and patient have simultaneous access to viewing and assessing each other’s neurofeedback signals as well as their own. Solid black arrows represent standard forms of audiovisual communication. Curved arrows represent the transfer of aspects of central nervous system activity into a graphical neurofeedback format. Black arrows represent conversational exchange of communication signals. Panels A) and B) represent a departure from standard neurofeedback delivery in which the user accesses their own neural activity and attempts to manipulate it (e.g., the closed neurofeedback loop depicted in Figure 1), because in each case, the user is only accessing the neural activity of their counterpart, while panel C) combines the standard neurofeedback delivery (i.e., self-monitoring and regulation) and its divergent use, where the user can see their counterpart’s neural activity to gain dyadic neural insight, and to potentially facilitate mutual understanding and interaction.
+2. Methods
+
+
+13
+2.1 Study design
+A scoping review was selected over a systematic review in order to synthesize and describe a
+wide range of studies using different research methodologies without making analytic comparisons. This
+approach allows for a comprehensive summary of the published literature and can provide guidance for
+future research directions (Munn et al., 2018).
+2.2 Identification of objectives and research questions for scoping review
+The main objective of this review is to comprehensively understand how NF-AP for dyadic
+interactions can be effectively utilized to enhance psychotherapeutic practices. Our goals include
+describing the current status of NF-AP and hyperscanning, identifying its potential advantages and
+challenges, and exploring its impact on communication and rapport in therapist-patient interactions.
+Additionally, we aim to identify the roles of advanced neuroimaging techniques, such as real-time fMRI,
+EEG, near-infrared spectroscopy (NIRS), magnetoencephalography (MEG), and hyperscanning, in
+optimizing NF-AP, exploring both the technological aspects and the effects of the closed-loop approach
+inherent in neurofeedback on therapeutic communication. This review also aims to provide
+recommendations for integrating neurofeedback into psychotherapy and identifying areas for future
+research. To achieve these objectives, we propose the following research questions:
+(1) How have neurofeedback and hyperscanning been utilized to investigate empathy,
+communications, and interactions in a psychotherapeutic context?
+(2) How can neurofeedback and hyperscanning be integrated with psychotherapy and applied to
+improve psychotherapeutic outcomes, potentially influenced by improved therapist-client
+relationships?
+The first question aims to uncover the ways in which neurofeedback and hyperscanning have
+been applied in research settings to analyze and understand the dynamics of empathy, interpersonal
+communication, and synchronization between individuals. The second question aims to explore
+
+
+14
+potential practical applications of neurofeedback and hyperscanning in enhancing therapy processes.
+These questions and objectives are designed to guide a thorough and systematic scoping review,
+providing a comprehensive understanding of the role of NF-AP with a particular focus on therapist
+patient communications.
+2.3 Definitions
+For the purposes of this review, NF-AP is defined as the application of neuroimaging techniques
+including real-time fMRI, EEG, NIRS, MEG, and hyperscanning, in order to analyze and interact with brain
+functions, with the aim of enhancing therapeutic outcomes by improving communication and
+synchronization between individuals, with a particular emphasis on therapist-patient communications.
+2.4 Inclusion criteria
+Inclusion criteria for studies were established using the PCC framework (i.e., population, concept,
+and context) (Munn et al., 2018; Pollock et al., 2023), as outlined in Table 1. This review generally
+included studies focusing on:
+• Research examining the application of neuroimaging techniques, such as real-time fMRI, EEG,
+NIRS, MEG, and hyperscanning.
+• Studies utilizing these techniques to interact with and influence specific brain functions.
+• Research discussing potential applications of these approaches in understanding and enhancing
+psychotherapeutic outcomes.
+• Written in English.
+Table 1. PCC framework for a scoping review
+P (Population) Important characteristics of participants, including age and other
+qualifying criteria
+
+
+15
+C (Concept) The core concept examined by the scoping review, such as the
+“interventions”, and/ or “phenomena of interest”, and/or “outcomes”.
+C (Context) Consideration of cultural factors, such as geographic location and/or
+specific social, cultural, or gender-based interests.
+Research question (1) How have neurofeedback and hyperscanning been utilized to
+investigate empathy, communications, and interactions in a
+psychotherapeutic context?
+(2) How can neurofeedback and hyperscanning be integrated with
+psychotherapy and applied to improve psychotherapeutic outcomes,
+potentially influenced by improved therapist-client relationships?
+P = Therapists and patients
+C = Neurofeedback (fMRI, EEG, NIRS, or MEG-based), hyperscanning,
+communication, therapeutic alliance, therapist-patient relationship,
+rapport, empathy, theory of mind, synchronization
+C = In psychotherapeutic context
+2.4 Exclusion criteria
+The exclusion criteria for this review include conference abstracts and studies not related to
+potential psychotherapeutic applications. This particularly excludes studies focused on cognitive
+enhancement and sports performance , as well as other topics not directly relevant to the
+psychotherapeutic context.
+2.5 Identification of relevant published literature
+Searches were performed using identified key words and related Medical Subject Headings
+(MeSH) terms across five domains of interest (see Tables 2 and 3 for list of keywords and search strings,
+
+
+16
+respectively). “We also reviewed the reference lists for the identified articles to search for any additional
+relevant manuscriptsA to identify seminal papers not found during the initial search. Screening
+procedures were conducted as follows: two researchers (AT, TT) independently screened titles and
+abstracts based on the inclusion and exclusion criteria. Full-text articles were retrieved for all potentially
+relevant studies, and then reviewed by the two researchers independently before the final inclusion.
+Any disagreements were resolved by consensus between the two researchers.
+Table 2. Conceptual domains of interest and related keywords.
+Main concepts Keywords
+Neurofeedback and
+hyperscanning
+Neurofeedback, biofeedback, fMRI (neuro)feedback, EEG
+(neuro)feedback, NIRS (neuro)feedback, MEG (neuro)feedback,
+hyperscanning, Brain-Computer Interface, BCI, neurotherapy,
+neuroscience-based intervention
+Psychotherapy Psychotherapy, counseling, psychological therapy, cognitive therapy,
+behavioral therapy, cognitive behavioral therapy, psychodynamic
+therapy, interpersonal therapy, play therapy, brief therapy, family
+therapy, process-based therapy, group therapy, therapeutic
+approaches, therapeutic techniques, psychotherapeutic process
+Therapist Therapists, psychiatrists, psychologists, psychotherapists, clinical
+psychologists, counselors, counsellors, practitioners, professionals,
+clinicians
+Patient Patients, clients, outpatients, inpatients
+Empathy Interpersonal communication, therapist-patient interaction,
+therapist- patient communication, therapist- patient relationship,
+
+
+17
+therapist- patient alliance, therapeutic interaction, therapeutic
+communication, therapeutic relationship, therapeutic alliance,
+rapport, empathy, theory of mind, synchronization
+Table 3. Keyword strings for the scoping review.
+Main concepts Keywords strings Number of
+literatures in
+PubMed
+(11/20/2023)
+Neurofeedback and
+hyperscanning
+"neurofeedback"[MeSH Terms] OR "Brain-Computer
+Interfaces"[MeSH Terms] OR "hyperscanning*"[All Fields]
+OR "hyper scanning"[All Fields] OR "hyper-scanning"[All
+Fields] OR "neurotherap*"[All Fields] OR "neurotherap*" OR
+"neuroscience-based intervention*"
+11,230
+Psychotherapy "Psychotherapy"[MeSH Terms] OR "Counseling"[MeSH
+Terms]
+263,847
+Therapist "therapist relationship*"[All Fields] OR "psychologist
+relationship*"[All Fields] OR "psychiatrist relationship*"[All
+Fields] OR "clinician relationship*"[All Fields] OR
+"practitioner relationship*"[All Fields] OR "therapist
+interaction*"[All Fields] OR "psychologist interaction*"[All
+Fields] OR "psychiatrist interaction*"[All Fields] OR "clinician
+1,284
+
+
+18
+interaction*"[All Fields] OR "practitioner interaction*"[All
+Fields]
+Patient "patient relationship*"[All Fields] OR "client
+relationship*"[All Fields] OR "patient interaction*"[All Fields]
+OR "client interaction*"[All Fields]
+29,032
+Empathy "Therapeutic Alliance"[MeSH Terms] OR "Empathy"[MeSH
+Terms] OR "Communication"[MeSH Terms] OR "Theory of
+Mind"[MeSH Terms] OR "rapport*"[All Fields] OR
+"synchronization"[All Fields]
+436,202
+Final search strings ("neurofeedback"[MeSH Terms] OR "Brain-Computer
+Interfaces"[MeSH Terms] OR "hyperscanning*"[All Fields]
+OR "hyper scanning"[All Fields] OR "hyper-scanning"[All
+Fields] OR "neurotherap*"[All Fields] OR "neuroscience
+based intervention*"[All Fields]) AND
+("Psychotherapy"[MeSH Terms] OR "Counseling"[MeSH
+Terms]) AND ("Therapeutic Alliance"[MeSH Terms] OR
+"Empathy"[MeSH Terms] OR "Communication"[MeSH
+Terms] OR "Theory of Mind"[MeSH Terms] OR "rapport*"[All
+Fields] OR "synchronization"[All Fields] OR "therapist
+relationship*"[All Fields] OR "psychologist relationship*"[All
+Fields] OR "psychiatrist relationship*"[All Fields] OR
+"clinician relationship*"[All Fields] OR "practitioner
+relationship*"[All Fields] OR "patient relationship*"[All
+Fields] OR "client relationship*"[All Fields] OR "therapist
+99
+
+
+19
+interaction*"[All Fields] OR "psychologist interaction*"[All
+Fields] OR "psychiatrist interaction*"[All Fields] OR "clinician
+interaction*"[All Fields] OR "practitioner interaction*"[All
+Fields] OR "patient interaction*"[All Fields] OR "client
+interaction*"[All Fields])
+3. Results
+3.1 Search results
+Figure 3 illustrates the flow chart of selected articles for this scoping review. Our final set of
+articles included eight peer reviewed articles. An overview of identified articles can be found in Table 4.
+
+
+20
+Figure 3. PRISMA flow chart of literature search.
+
+
+21
+Table 4. Functional neuroimaging studies using neurofeedback or hyperscanning to evaluate the roles of empathy, communication, and
+interpersonal interactions
+Authors, year
+Study design
+P (Population) C (Concept, Interventions)
+C
+(Concept, Closedloop)
+C (Concept, Phenomena of interest)
+C (Concept, Outcomes)
+Ellingse n et al. (2020)
+Randomized cross-over, counterbala nced design, one session for each condition
+20 patients with chronic pain and 20 licensed acupuncturists
+fMRIhyperscanning with clinical interaction condition vs. nonclinical interaction condition
+No Preestablished clinical rapport
+Therapeutic alliance, pain and affect ratings, facial mirroring, patientclinician dynamic concordance in brain activity Ellingse n et al. (2022)
+Cross-over, one session for each condition
+23 patients diagnosed with fibromyalgia and 22 licensed acupuncture practitioners
+fMRIhyperscanning with pain condition vs. pain treatment condition
+No Facial expressions in a therapeutic interaction
+Facial expressions of pain, patientclinician dynamic concordance in brain activity Kanel et al. (2019)
+Nonrandomized controlled trial, two sessions
+20 healthy participants
+fMRIneurofeedback upregulating right anterior insula (active vs. sham)
+Yes Empathetic response
+Right anterior insula activity, trait-empathy
+
+
+22
+Matiz et al. (2021)
+Randomized cross-over, counterbala nced design, one session for each condition
+32 expert meditators (16 couples)
+EEG hyperscanning with mindfulnessoriented meditation (MOM) and instructed mind-wandering (IMW) tasks in two conditions: once sitting in the same room (SR) and once in two different rooms (DR)
+No Impact of collaborative activity on mindfulness meditation
+Inter-brain coactivations during mindfulness meditation
+Moll et al. (2014)
+RCT, one session
+24 healthy participants
+fMRIneurofeedback upregulating multiple brain regions that have been implicated in affiliative emotions (active vs. nonfeedback)
+Yes Feelings of tenderness/a ffection
+Distributed brain activation patterns related to affiliative emotions such as tenderness/aff ection Yao et al. (2016)
+RCT, one session
+37 healthy participants
+fMRIneurofeedback upregulating left anterior insula (active vs. sham)
+Yes Pain empathy
+Left anterior insula activity/connec tivity and pain empathy
+Zhang et al. (2018)
+RCT, one session
+34 college students who voluntarily applied to receive psychological counseling at the college counseling center and three
+fNIRS-based hypescanning (counseling vs. chat)
+No Working alliance
+Interpersonal brain synchronizatio n of right temporoparietal junction (rTPJ)
+
+
+23
+licensed psychological counselors
+between counselors and clients
+Zhang et al. (2020)
+RCT, one session
+30 college students who voluntarily applied to receive psychological counseling at the college counseling center, five novice psychological counselors, and three licensed psychological counselors
+fNIRS-based hypescanning (novice counselor vs. experienced counselor)
+No Working alliance
+Interpersonal brain synchronizatio n of rTPJ between counselors and clients
+
+
+24
+3.2 Use of neuroimaging technique to investigate empathy, communication, and interaction
+Out of eight studies identified, various neuroimaging approaches were used: three implemented
+fMRI-neurofeedback, two utilized fMRI-based hyperscanning, one engaged EEG-based hyperscanning,
+and two employed fNIRS-based hyperscanning. The fMRI-neurofeedback studies aimed to modulate
+brain responses associated with empathy and tenderness for potential therapeutic benefits in
+individuals with limited emotional capacities (Kanel et al., 2019; Moll et al., 2014; Yao et al., 2016).
+Conversely, hyperscanning studies, which were observational rather than interventional, focused on the
+synchronization of brain activity between pairs during social interaction (Ellingsen et al., 2022; Ellingsen
+et al., 2020; Matiz et al., 2021; Zhang et al., 2018; Zhang et al., 2020). Four studies explored the
+therapist-patient dynamic, investigating the complexities of this therapeutic relationship (Ellingsen et al.,
+2022; Ellingsen et al., 2020; Zhang et al., 2018; Zhang et al., 2020).
+One study found that brain-to-brain concordance between the mid/posterior insular cortex of
+the patient and the anterior insular cortex of the therapist were positively associated with subjective
+assessments of therapeutic alliance (Ellingsen et al., 2022). Another study showed that among therapist
+and chronic pain patient dyads, brain-to-brain concordance in networks involved in mentalizing and
+social mirroring resulted in increased patient analgesia (Ellingsen et al., 2020). Further, a study
+employing fNIRS-based hyperscanning revealed that psychological counseling sessions, as opposed to
+chatting, led to stronger working alliances and increased interpersonal brain synchronization (IBS) in the
+rTPJ, a region integral to theory-of-mind processes (Zhang et al., 2018). Interestingly, experienced
+counselors demonstrated a time-lagged IBS that aligned with the therapeutic goals, suggesting their
+ability to attune their brain activity with clients in a goal-supportive manner (Zhang et al., 2020). These
+studies raise the possibility that optimizing neural networks involved in empathy may have the potential
+to lead to better therapeutic outcomes, while the mere presence of a therapist might influence these
+outcomes, as evidenced in (Matiz et al., 2021). They observed that mindfulness meditation elicits
+
+
+25
+distinct brain activations when practiced alone versus with a partner, with significant differences in
+gamma frequency EEG signals from putative limbic regions identified via source localization. Despite the
+intriguing possibilities afforded by this approach, broader investigations have been thus far hindered by
+the limited availability of this technology and the available expertise necessary to analyze such complex
+datasets.
+3.2 Use of neuroimaging technique to enhance empathy, communication, and interaction
+Neuroimaging, particularly fMRI-neurofeedback, has been utilized in modulating brain regions
+associated with empathy and affiliative emotions, as demonstrated in several studies (Kanel et al., 2019;
+Moll et al., 2014; Yao et al., 2016). These investigations have not only highlighted the potential of fMRI
+neurofeedback in enhancing emotional processing in healthy subjects but also its applicability to those
+with clinical needs. Two of those studies focused on the role of anterior insula and provided evidence
+that fMRI-neurofeedback could amplify the anterior insula’s activity, promoting an empathetic response
+to human voice (right anterior insula) (Kanel et al., 2019) or to pain (left anterior insula)(Yao et al.,
+2016). Further, another study reported that individuals could volitionally control multiple brain regions
+associated with tenderness and affection, thereby fostering prosocial behaviors (Moll et al., 2014).
+3.3 Identifying gaps in NF-AP for dyadic interactions
+These studies underscore the therapeutic potential of neurofeedback and hyperscanning in
+enhancing empathy, emotional processing, and interpersonal dynamics. However, this scoping review
+also makes clear how this field is still in its infancy, with numerous gaps in understanding and
+implementation. The field has not yet fully explored how NF-AP, when adapted for therapist-patient
+dyads, might enhance empathic interaction. This gap suggests the need for focused exploration into how
+NF-AP designed for dyadic settings could significantly improve psychotherapeutic practices, deepening
+our comprehension of the neural mechanisms underlying successful therapist-client working alliances
+and their influence on treatment outcomes. Addressing this gap involves further studies to capture and
+
+
+26
+analyze empathic responses during psychotherapy. By analyzing these data, researchers can
+demonstrate the presence of empathic responses in real-time during psychotherapy sessions.
+Additionally, it is important to investigate how NF-AP can be specifically designed and utilized to
+improve therapist-patient communication. This requires studies that not only observe empathic neural
+responses but also examine the impact of NF-AP on enhancing the quality of communication and
+therapeutic rapport in psychotherapy settings.
+3.4 Improving the psychotherapeutic relationship through neurofeedback
+Enhancing the working alliance through NF-AP involves leveraging neurofeedback to foster
+greater empathy and communication between therapist and patient. By providing visual feedback on
+neural activation patterns, NF-AP may help identify and reinforce moments of therapeutic connection,
+thus deepening the working alliance. For instance, during NF-AP sessions as illustrated in Figure 2.C,
+both therapist and patient might observe increased neural synchrony (i.e., correlated increases in the
+visualized fMRI signal from the targeted brain region) during moments of significant emotional
+exchange, reflecting the occurrence of an empathic connection. Such synchronic might guide therapists
+in modulating their interventions to strengthen the therapeutic bond. Similarly, patients can gain insight
+into their own neural responses to therapy, promoting self-awareness and enhancing engagement with
+the therapeutic process. Moreover, NF-AP can serve as an educational tool for therapists in training,
+heightening their sensitivity to the neurobiological aspects of empathy and connection.
+Accordingly, there have been attempts to match patients to therapists on the basis of
+compatible personality characteristics to further improve upon it (Gunderson, 1978). Positive therapist
+and patient perceptions of the quality of the therapeutic relationship are correlated with clinical
+improvement, and discrepancies in the quality this rating have been negatively correlated with patient
+outcomes (Cooley and Lajoy, 1980). This suggests that having objective markers of the quality of a
+
+
+27
+therapeutic relationship might be of potential therapeutic value at various stages of the
+psychotherapeutic process. One question then is: what type of objective markers might neurofeedback
+approaches provide?
+A potential avenue for inquiry is the degree of interactional synchrony between therapist and
+patient (i.e., temporally coupled activation between specific regions of each individuals brain during the
+communication process). Interactional synchrony has been correlated to joint attention, which has been
+implicated in theory of mind and empathy (Dumas et al., 2011). It might occur in a mirrored fashion
+between the same regions (e.g., anterior insular cortex activity in one person influencing anterior insular
+cortex activity in the other; rTPJ activity in client synched with rTPJ in therapist (Zhang et al., 2018;
+Zhang et al., 2020)). Another potential finding may be asynchronous but complimentary patterns that
+emerge during social interaction, whereby delayed effects occur, or effects are identified between
+different brain regions (e.g., medial prefrontal cortex activity in one individual influencing amygdala
+activity in the other individual; mid/posterior insular cortex of the patient with chronic pain influencing
+the anterior insular cortex of the therapist (Ellingsen et al., 2022)).
+On the other hand, NF-AP may be most effective in the application of CBT or DBT, which
+inherently focus on changing negative patterns and emotional regulation. This is because neurofeedback
+provides real-time feedback on brain activity, allowing for the modification of neural patterns associated
+with specific behaviors or thought processes. It aligns well with CBT, which focuses on identifying and
+changing negative thought patterns and behaviors. Additionally, therapies that focus on emotional
+regulation such as DBT, may benefit from neurofeedback because it can help patients recognize and
+regulate emotional responses. Its capacity to aid in self-regulation and awareness makes neurofeedback
+a valuable tool in these therapy forms. Furthermore, neurofeedback tools are capable of quantifying
+certain neural elements of the dyad through explicit visualization of regional neural activity reflecting
+information such as the degree of 1) motor synchronization (e.g., gaze, facial expression), 2) speech
+
+
+28
+synchronization (e.g., voice-tone, voice-speed, spacing such as pause, silence, and parroting), 3)
+physiological synchronization (e.g., breathing), 4) putative inner-experience synchronization (e.g.,
+mirroring, empathy, Theory of Mind), or 5) emotional regulation (e.g., responses to feeling upset,
+anxious, sad, or angry). Neurofeedback delivery of connectivity metrics (i.e., real-time indicators of the
+degree of correlated neural activity between two or more networked regions of an individual) is a more
+recent application (Tsuchiyagaito et al., 2023; Tsuchiyagaito et al., 2021a). As a form of neurofeedback,
+this information might allow the therapist to assess their patient’s neural activity directly and perhaps
+use it to optimize their communication with them (Figure 2). Conversely, neurofeedback might enable a
+patient to directly access their therapist’s brain activity in order to observe their neural response to
+information at critical junctures in the conversation. This form of NF-AP represents a departure from
+standard neurofeedback delivery in which the user accesses their own neural activity and attempts to
+manipulate it. This is because, in each case, the user is only accessing the neural activity of their
+counterpart and utilizing that information as they communicate with their counterpart. In the following
+sections we elaborate upon potential applications of NF-AP.
+3.5 Integrating neurofeedback into psychotherapy
+From a pragmatic perspective, we are not suggesting that NF-AP should be investigated for use
+in every session, as this could be disruptive and certainly infeasible from a cost/resource’s perspective.
+Rather, we propose that studies could evaluate its use at judicious timepoints, such as during the onset
+or termination of psychotherapy, or during other important milestones. Another application includes
+the use of standard neurofeedback as an augmenting tool to punctuate therapy with self-selection or
+algorithmic selection of specific neural regulation strategies that could further enhance a patient’s
+response to standard of care psychotherapies (Figure 4). Some initial goals of doing so within the
+context of psychotherapy might be to 1) identify objective measures associated with patient symptoms
+
+
+29
+or the quality of a psychotherapeutic relationship, 2) use these markers to make predictions about the
+psychotherapy treatment outcome, or 3) implement these predictions to guide the selection of
+psychotherapeutic treatment. Furthermore, NF-AP can be used to identify moments when the patient
+feels understood or when the therapist feels they have made a breakthrough, thereby reinforcing the
+therapeutic bond and working alliance. Next, we consider several possible stages at which
+neurofeedback might be investigated in service of these goals (Table 5).
+Figure 4: Potential applications of neurofeedback-assisted psychotherapy (NF-AP). 1) A therapist begins by assessing the patient’s symptoms. 2) Based on the assessment, the therapist selects a neurofeedback brain region of interest (ROI) such as A. Ventromedical prefrontal cortex (vmPFC), B. Insular cortex, or C. Amygdala, putatively involved in the pathophysiological expression of the disorder. 3) The neurofeedback ROI is then paired with various mental strategies (e.g., A. recalling autobiographical happy memories, B. evocative music listening, C. imaginal exposure to specific images) selected by the
+
+
+30
+therapist to help the patient modulate the activity within the ROI. The therapist and patient iteratively discuss the potential application of mental strategies to optimize the neural response in the ROI, for example, recalling happy memories to address anhedonia related to amygdala activity. 4) Using a brainbased measurement tool (e.g., real-time functional magnetic resonance imaging (rtfMRI) or electroencephalography (EEG)), neural signals from the patient’s ROI are recorded while the patient employs these strategies. 5) Both the therapist and patient review the neurofeedback effects in terms of changed or unchanged neural regulation, particularly in relation to the patient’s symptoms. In the case of unchanged regulation, the process is repeated, perhaps switching the selected ROI or mental strategy until achievement of increased regulation or symptom resolution. 6) Upon successful achievement of the targeted outcome (e.g., symptom reduction) or lack thereof, NF-AP treatment is ended. Black arrows represent the procedural workflow and decision-making process for choosing ROIs and self-regulation strategies.
+Prior to psychotherapy
+Therapist selection is already known to commonly proceed based on preferred demographic
+characteristics such as therapist sex, age, therapy modality and/or degree of experience perceived by
+the patient (Johnson et al., 2018). One application of NF-AP could be to help optimize the selection of
+the therapist-patient dyad, perhaps by using proximal neural markers of empathic engagement during a
+scripted interaction. While this is currently a tentative consideration given the paucity of available
+studies, there is data to suggest that initial empathic responses during psychotherapy correlate
+positively to good psychotherapy outcomes (Malin and Pos, 2015). Current paradigms for measuring the
+therapeutic relationship are based on therapist and patient self-report, observer report, or analysis of
+vocal or language style synchrony (Imel et al., 2014; Lord et al., 2015). By providing direct measures of
+brain activity associated with empathic interactions between a potential patient and therapist, NF-AP
+might be studied as a tool to augment the patient’s and therapist’s initial determination of whether they
+are a ‘good match’. However, we would emphasize that this conceptual suggestion is not meant as a
+replacement. It is rather speculative, and more research would be needed in order to determine what
+activation in various regions means (i.e., at this stage it would be difficult to trust insula
+activation/synchrony as a more precise measure of the therapeutic relationship than the client and
+therapist’s self-report, or objective ratings of the conversation). Another potential avenue of inquiry
+
+
+31
+would be to investigate utility of dyadic synchrony at the initial stages of treatment in prediction of
+patient outcomes.
+During psychotherapy
+One could argue that introducing an objective measure which relates to the quality of a
+therapeutic relationship may be helpful in assessing the effectiveness of a course of psychotherapy.
+There are two perspectives to consider in weighing the potential utility of investigating neurofeedback
+during psychotherapy – that of the therapist, and that of the patient. A psychotherapist may be able to
+use neurofeedback derived signals to assess whether their attempts to build rapport are successful. In
+addition, a psychotherapist might be able to receive a continuous feed of neural activity data to assess
+the degree of a patient’s neural engagement during the therapy session, or key portions of it. On the
+other hand, a patient might be able to use such data derived from their therapist’s brain as objective
+reassurance that an empathic response has occurred, which may be particularly useful for some
+individuals at the induction of therapy or during key portions of a therapeutic session. From an insight
+oriented perspective, patients might also be able to use this feedback to learn what an empathic
+response in another person looks and sounds like, and/or to retrain an empathic misperception. It
+seems plausible that such tools might prove useful in either improving the quality of long-term
+psychotherapeutic interactions (e.g., during psychodynamic psychotherapy), or for shorter-term
+therapies (e.g., manualized CBT, or even intensive short term psychodynamic therapy [ISTDP] (Caldiroli
+et al., 2020; Hoviatdoost et al., 2022)). Whether such an approach could reduce the number of sessions
+needed to achieve a standard clinical outcome, or alternately, to improve clinical outcomes, is unknown.
+While therapists are trained to have empathic awareness towards their patients, perhaps gaining further
+insight into the processes that underlie empathy and monitoring these in real time may provide
+information before either party is consciously aware of it and facilitate greater levels of insight and self
+
+
+32
+awareness on the part of both participants. Alternatively, NF-AP might be utilized as an instructive tool
+during training to help a therapist to be aware of their own countertransference to a patient at the level
+of their neural circuit responses during an exchange, either in real time (via display on a screen), or
+afterwards (in a didactic session with a training instructor). Despite the novelty of these potential
+applications, we should emphasize that adding other cognitive tasks into an already demanding and
+engrossing interaction carries the risk of distracting or diluting a therapist’s ability to be fully attentive
+and engaged to their patients’ verbal and nonverbal responses. Thus, we consider these potential
+applications of NF-AP to be best studied as additive or augmenting approaches.
+At the conclusion of psychotherapy
+Evaluation of NF-AP data at the conclusion of psychotherapy could allow for objective
+assessments of change in neural activity relative to the starting point, as well as correlative assessments
+of the degree of improvement in neural engagement (in the patient or therapist) and clinical outcomes.
+When combined with long term outcomes, this might be useful in informing the risk of relapse.
+Prediction of poor outcomes via low neural engagement might be another possibility worth
+investigating, especially in instances where the patient/therapist rate a high initial or sustained
+therapeutic bond. Lastly, therapists may consider the timing of introducing NF-AP in psychotherapy. For
+example, it might be beneficial during initial sessions to establish working alliance or during challenging
+moments when breakthroughs are critical. It is also important to note that while NF-AP has a potential
+to augment psychotherapy, it should not replace fundamental therapeutic skills and should be used
+judiciously to complement the therapist’s expertise.
+Table 5. Potential applications of neurofeedback assisted psychotherapy at different stages of the intervention process.
+Phase of psychotherapy Potential application
+Matching patient to therapist
+
+
+33
+Prior to psychotherapy Predicting ideal form of treatment (cognitive behavioral therapy, psychodynamic psychotherapy, behavioral activation therapy, exposure therapy, medication, etc.)
+During therapy
+Assess patient engagement/cue a change in therapeutic direction
+Provide biofeedback/demonstrate therapeutic progress to patient
+Demonstrate empathy to patient
+Cue patient and therapist to rupture in relationship outside of awareness
+Conclusion of therapy Assess treatment outcome
+Predict risk of relapse
+Feedback used for quality improvement and therapist training
+3.6 Critical Challenges in Neurofeedback Technology
+Before addressing the complexities of interpersonal dynamics and feasibility of NF-AP, it is
+important to acknowledge and address the unresolved technical, conceptual, and practical challenges
+within the neurofeedback field. These challenges could pose serious limitations to the different
+conceptual applications described here. In the following section, we will provide a summary of these
+challenges.
+Technical Challenges of Neurofeedback in Clinical Practice
+Neurofeedback systems rely on the accurate measurement and interpretation of brain signals, where
+the quality of signal acquisition depends on the equipment used such as EEG or fMRI. The presence of
+artifacts in the neurofeedback signal, stemming from physiological noises such as heartbeat, respiration,
+and movement, can significantly distort the feedback provided to the patient (Heunis et al., 2020; Misaki
+and Bodurka, 2021; Thibault et al., 2018; Weiss et al., 2020). Feedback contaminated with artifacts can
+lead to a misrepresentation of the patient’s brain activity, which may hamper the learning process and
+potentially reinforce maladaptive neural patterns.
+
+
+34
+Efforts to address these challenges have included the development of rtfMRI frameworks and
+consensus on reporting detailed processing and experimental setups (Ros et al., 2020). For example, the
+RTPSpy software library provides a customized rtfMRI system, with a comprehensive image processing
+pipeline with an option for physiological noise corrections and an interface for real-time brain activation
+signal reception (Misaki et al., 2022). The application of sophisticated signal processing techniques and
+artifact correction methods is essential to ensure the integrity of the neurofeedback signal.
+Conceptual Challenges in Neurofeedback Mechanisms
+The underlying potential mechanism of neurofeedback assumes a direct and linear relationship between
+neurophysiological processing and psychological states. This assumption could be an oversimplification,
+given the brain’s complexity and the dynamic nature. The neuromodulatory mechanisms of
+neurofeedback are not fully understood, leading to an active debate concerning the specificity and
+longevity of neurofeedback-induced brain changes (Ciccarelli et al., 2023; Melnikov, 2021; Paret et al.,
+2019; Sokunbi, 2017; Taschereau-Dumouchel et al., 2022; Tursic et al., 2020; Zuberer et al., 2015).
+Moreover, neurofeedback interventions are based on the concept of neuroplasticity; however, the
+extent and conditions under which neuroplastic changes can be guided through neurofeedback remain
+topics of ongoing research (Paret et al., 2019; Taschereau-Dumouchel et al., 2022).
+The selection of the target regions/circuit for neurofeedback training is another pivotal aspect,
+where a choice significantly impacts the outcome of the intervention. An inappropriate target selection
+may result in suboptimal or even adverse effects. For example, enhancing brain functions in a
+maladaptive neural activity or circuit could potentially exacerbate symptoms, especially in complex
+psychiatric conditions (Nagappan et al., 2021). The effective translation of neurofeedback into
+psychotherapeutic practice necessitates a nuanced understanding of these conceptual challenges. It
+
+
+35
+requires the development of refined neurofeedback protocols that are adaptable to individual
+complexities and can accurately influence psychological states in a therapeutically beneficial manner.
+Practical Challenges in Neurofeedback Implementation
+Beyond laboratory-based demonstrations of efficacy, the technical delivery of neurofeedback in
+real-world settings would also need to be improved substantially. In practice, the methodological
+differences in aspects such as the selection of the target brain signals (as we mentioned above), the
+selection of feedback modality (audio, visual, or tactile), and the duration and frequency of the sessions
+can all impact the efficacy of neurofeedback (Ros et al., 2020). A notable practical challenge is the
+substantial variability in individual responses to neurofeedback. While some individuals can successfully
+learn to modulate their neural activity, others may struggle to achieve meaningful volitional control
+(Alkoby et al., 2018; Haugg et al., 2021; Kadosh and Staunton, 2019; Tursic et al., 2020; Weber et al.,
+2020; Zuberer et al., 2015). This variability is influenced by a multitude of factors, including baseline
+cognitive functioning, psychological state, and the existence of neurological or psychiatric conditions.
+Differences in brain anatomy and physiology, such as cortical thickness, white matter integrity, and
+neurotransmitter receptor distribution, could affect neurofeedback learning rates and outcomes (Haugg
+et al., 2020; Li et al., 2021; Misaki et al., 2019; Ninaus et al., 2015; Tsuchiyagaito et al., 2021b; Weber et
+al., 2020; Zhao et al., 2021). However, the literature has yet to fully explore and integrate these
+individual differences. In a clinical context, this inter-subject variability presents multiple challenges.
+Tailoring neurofeedback protocols to each individual’s neurocognitive profile is important, and the
+integration of adaptive algorithms may be necessary to modify protocols responsively based on the
+patient’s progress.
+The need for basic patient knowledge in interpreting NF-AP involves educating patients to
+understand the meaning of feedback as a read-out from their neural signal images. This education is
+
+
+36
+crucial as NF-AP relies on patients’ ability to comprehend and respond to real-time feedback from their
+brain activity. Effective NF-AP requires patients to recognize patterns in their neural data, understand
+what these patterns signify regarding their mental state, and learn how to alter these patterns through
+therapeutic techniques. This process could empower patients to actively engage in their psychotherapy.
+Moreover, a critical role of therapists in the neurofeedback process is to educate and manage patient
+expectations, emphasizing that not achieving self-regulation is not indicative of personal failure. There
+must be clear communication that while neurofeedback offers promising benefits, it may not be
+universally effective for all patients (Nagappan et al., 2021).
+Financial and Logistical Barriers to Neurofeedback Integration
+The implementation of neurofeedback, especially fMRI-based neurofeedback, involves
+substantial costs related to the equipment, maintenance, and the operation of advanced neuroimaging
+technologies (Thibault and Raz, 2017; Tursic et al., 2020). These costs can significantly exceed those
+associated with traditional psychotherapeutic interventions and raise important questions about the
+cost-benefit ratio of such an approach. Beyond the direct costs, neurofeedback requires therapists to
+undergo specialized training, which may pose barriers to widespread adoption. This training goes
+beyond traditional psychotherapy curricula and involves understanding the technical aspects of
+neuroimaging, data analysis, and the operation of neurofeedback equipment.
+The logistical demands of neurofeedback pose significant challenges to equitable access in
+mental health care. The necessity for specialized equipment and a controlled environment, coupled with
+the need for sophisticated technical support, translates into high operational costs. These costs can
+create service availability gaps, disproportionately affecting those in socioeconomically disadvantaged or
+geographically isolated areas. Consequently, state-of-the-art approach like neurofeedback may become
+exclusive to individuals and communities with ample financial resources.
+
+
+37
+It is important to emphasize that these limitations pose a critical barrier to current or near-term
+clinical application. Thus, in order for the concepts articulated here to appreciably move towards
+integration within clinical settings, a number of advances must occur. These include methodologic
+improvements (i.e., improved signal processing, refined ROI specification, efficient denoising),
+technological hurdles overcome (i.e., device-based “bolt-on” application capable of pairing with a
+variety of MRI scanners, user-friendly setup and response detection interface), deployment (attentional
+training instruction, personalized trait-based selection at the individual level, standardized criteria for
+discerning trial-by-trial improvement), and evidence base (multiple clinical trials demonstrating efficacy
+for a given condition).
+4. Limitations and Future Directions of NF-AP
+Once foundational challenges are addressed, further obstacles become apparent in the specific
+application of NF-AP as a tool for enhancing the patient-therapist relationship. The first obstacle is
+establishing a definitive and reliable neural signature for empathy. Such a signature could be potentially
+influenced by individual difference variables such as a patient or therapist demographic characteristics
+(e.g., socioeconomic status, racial or ethnic origin, language fluency), or the type of psychotherapy being
+practiced (e.g., empathic communications during psychodynamic therapy may by quite differ from those
+provided during cognitive behavioral therapy or interpersonal therapy). Non-verbal expressions of
+empathy can also differ across cultures (Lorie et al., 2017), suggesting that cultural compatibility could
+be another factor needing to be considered. A related challenge is reliably determining which neural
+markers are directly associated with therapeutic improvement, particularly given the limited test-retest
+reliability that has been demonstrated with certain fMRI-based tasks. It is also possible to imagine
+situations where a strong empathic connection (and the associated neural indicators) may be present in
+the absence of psychotherapeutic improvement. From the therapist’s perspective, inordinate empathy
+
+
+38
+may undermine objectivity or could perhaps lead to ‘compassion fatigue’ (Stefanello, 2022). It may also
+be the case that certain components of empathy (e.g., the cognitive as opposed to the affective aspects)
+are better indicators of a successful therapeutic alliance (Decety, 2020).
+While an empathetic patient-therapist relationship is considered central to patient
+improvement in traditional forms of psychotherapy, newer forms have also emerged that do not
+emphasize in-person communication. For example, internet-based psychotherapy has shown efficacy in
+reducing mental health symptoms in several psychopathologies (Andrews and Williams, 2014; Seyffert
+et al., 2016), indicating that the empathic relationship between two people is not the only mechanism of
+change in psychotherapy. Finally, the success of animal-assisted psychotherapies, particularly with
+domesticated animals, such as dogs and horses, who have evolved to perceive emotional cues from
+humans (Nurenberg et al., 2015) raises additional opportunities for inquiry into the allospecific versus
+conspecific mechanisms of empathy.
+Neurofeedback (especially fMRI-based neurofeedback for dyadic interaction) is a time-intensive,
+expensive, and complicated approach. The fMRI environment and associated noise can be distracting,
+and the limited facial feedback imposed by head coils could be barriers to verbal and non-verbal aspects
+of communication, although this would be less of a concern for EEG applications. Social interactions and
+expressions of empathy unfold across millisecond timescales (e.g., slight movements of the mouth or
+eyebrows; a sigh; a blink; a change in vocal prosody; etc.) whereas fMRI feedback is delayed by at least 4
+to 6 seconds due to the physiology of the hemodynamic response function (Oblak et al., 2017). Such
+delays in feedback would need to be believably incorporated into ongoing interpersonal interactions.
+Beyond laboratory-based demonstrations of efficacy, the technical delivery of neurofeedback in real
+world settings would also need to be improved substantially. Addressing these technological hurdles
+must consider broader translation and accessible delivery with respect to cost. However, the value of
+the potential knowledge to be gained regarding the neural basis of how empathic interactions lead to
+
+
+39
+improved health outcomes suggests that this approach may be worth investigating from the initial
+standpoint of scientific inquiry. Incorporating a personalized medicine approach into neurofeedback
+research could lead to more sophisticated and effective interventions. This may involve multimodal
+assessments that combine neuroimaging, genetic, cognitive, and behavioral data to create
+comprehensive profiles, guiding individualized neurofeedback treatments. The significant and complex
+issue of inter-subject variability in neurofeedback efficacy also provides an opportunity to enhance our
+understanding of the brain-behavior relationship and refine neurofeedback as a therapeutic modality.
+By embracing this variability, we can progress toward a more personalized approach in neurofeedback
+application, thereby enhancing its therapeutic potential in psychotherapy. In the technical realm, the
+field is advancing from group-level-based target selection to individualized target selection (Taschereau
+Dumouchel et al., 2022). The importance of individualized target selection in neurofeedback, which may
+involve baseline neuroimaging assessments to tailor protocols to an individual’s unique neural
+architecture and functional characteristics, is becoming increasingly recognized. The potential for
+advanced machine learning techniques to analyze individual patterns of neural activity promises to
+further enhance the personalization of neurofeedback interventions.
+In addition to the aforementioned limitations, to reach a point in which NF-AP is truly feasible
+and helpful in actual clinical practice, it will be essential to establish (1) what the brain signal of interest
+means, (2) what needs to happen to that brain signal to enhance the relationships and/or therapy
+outcomes (i.e., up regulate, down regulate, synchronize), (3) when does that change in brain signal need
+to happen (e.g., at all times versus only when experiencing strong emotions? early versus late in
+therapy?), (4) what the therapist and/or patient can do to influence change in the brain signal (e.g. what
+verbal or nonverbal actions would be useful for doing so), (5) and whether there are factors to consider
+in personalization to each individual client (e.g., what is “optimal” for one person may not be optimal for
+another). Each of these aspects calls for a plethora of additional research, which will likely need to be
+
+
+40
+done in an iterative fashion, and with input from stakeholders (e.g., patients, clinicians) at each step to
+help support eventual practical utility.
+5. Conclusion
+Neurofeedback-assisted psychotherapy (NF-AP) is a novel neuroscience-informed approach to
+psychotherapy with potential applications for identifying neural markers of engagement during
+psychotherapy and for potentially shedding light on how empathic human interactions may help to
+facilitate improvements in mental health. The integration of neurofeedback into psychotherapy provides
+a unique opportunity to amplify the therapeutic relationship. NF-AP can enhance this relationship by: (1)
+allowing therapists to observe and respond to objective, real-time feedback on their patients’
+neurological responses, facilitating a more dynamic and responsive therapeutic process; and (2)
+empowering patients by giving them a more active role in their treatment through self-regulation,
+potentially increasing engagement and treatment adherence. Providing both therapist and patient with
+a shared language and visual representation of psychological states, which can be particularly valuable
+in expressing and understanding abstract concepts like emotions and thought patterns (Paret and
+Hendler, 2020).
+To fully assess whether NF-AP is the most cost-effective means to enhance the patient-therapist
+relationship and therapy effectiveness, it is necessary to measure the value of NF-AP not solely in cost
+aspects but also in its capacity to improve therapeutic outcomes. Does NF-AP provide a significant
+enough improvement in therapy to warrant its cost, and can these improvements be sustained long
+term? Can NF-AP lead to improvements that are unachievable through traditional methods alone?
+Those should be answered in future studies.
+
+
+41
+Acknowledgments
+The authors acknowledge and dedicate this work to Jerzy Bodurka, Ph.D. (1964-2021), for his critical
+intellectual and scientific contributions and for establishing the neurofeedback technologies and
+scientific discoveries that provided the foundation for the present work.
+
+
+42
+References
+Alkoby, O., Abu-Rmileh, A., Shriki, O., Todder, D., 2018. Can We Predict Who Will Respond to Neurofeedback? A Review of the Inefficacy Problem and Existing Predictors for Successful EEG Neurofeedback Learning. Neuroscience 378, 155-164.
+Andrews, G., Williams, A.D., 2014. Internet psychotherapy and the future of personalized treatment. Depress Anxiety 31, 912-915.
+Arnow, B.A., Manber, R., Blasey, C., Klein, D.N., Blalock, J.A., Markowitz, J.C., Rothbaum, B.O., Rush, A.J., Thase, M.E., Riso, L.P., Vivian, D., McCullough, J.P., Jr., Keller, M.B., 2003. Therapeutic reactance as a predictor of outcome in the treatment of chronic depression. J Consult Clin Psychol 71, 1025-1035.
+Baron-Cohen, S., 1995. Mindblindness: An Essay on Autism and Theory of Mind. The MIT Press.
+Barsaglini, A., Sartori, G., Benetti, S., Pettersson-Yeo, W., Mechelli, A., 2014. The effects of psychotherapy on brain function: a systematic and critical review. Prog Neurobiol 114, 1-14.
+Blatt, S.J., Quinlan, D.M., Zuroff, D.C., Pilkonis, P.A., 1996. Interpersonal factors in brief treatment of depression: further analyses of the National Institute of Mental Health Treatment of Depression Collaborative Research Program. J Consult Clin Psychol 64, 162-171.
+Caldiroli, A., Capuzzi, E., Riva, I., Russo, S., Clerici, M., Roustayan, C., Abbass, A., Buoli, M., 2020. Efficacy of intensive short-term dynamic psychotherapy in mood disorders: A critical review. J Affect Disord 273, 375-379.
+Campbell, L.F., Norcross, J.C., Vasquez, M.J., Kaslow, N.J., 2013. Recognition of psychotherapy effectiveness: the APA resolution. Psychotherapy (Chic) 50, 98-101.
+Ciccarelli, G., Federico, G., Mele, G., Di Cecca, A., Migliaccio, M., Ilardi, C.R., Alfano, V., Salvatore, M., Cavaliere, C., 2023. Simultaneous real-time EEG-fMRI neurofeedback: A systematic review. Front Hum Neurosci 17, 1123014.
+Compere, L., Siegle, G.J., Riley, E., Lazzaro, S., Strege, M., Pacoe, E., Canovali, G., Barb, S., Huppert, T., Young, K., 2023. Enhanced efficacy of CBT following augmentation with amygdala rtfMRI neurofeedback in depression. J Affect Disord 339, 495-501.
+Cooley, E.J., Lajoy, R., 1980. Therapeutic relationship and improvement as perceived by clients and therapists. Journal of clinical psychology 36, 562-570.
+Cozolino, L., 2017. The neuroscience of psychotherapy: healing the social brain, 3rd edition ed. W. W. Norton & Company.
+Decety, J., 2011. The neuroevolution of empathy. Ann N Y Acad Sci 1231, 35-45.
+Decety, J., 2020. Empathy in Medicine: What It Is, and How Much We Really Need It. Am J Med 133, 561566.
+Deits-Lebehn, C., Baucom, K.J.W., Crenshaw, A.O., Smith, T.W., Baucom, B.R.W., 2020. Incorporating physiology into the study of psychotherapy process. Journal of counseling psychology 67, 488.
+
+
+43
+Djalovski, A., Dumas, G., Kinreich, S., Feldman, R., 2021. Human attachments shape interbrain synchrony toward efficient performance of social goals. Neuroimage 226, 117600.
+Dumas, G., Lachat, F., Martinerie, J., Nadel, J., George, N., 2011. From social behaviour to brain synchronization: Review and perspectives in hyperscanning. Irbm 32, 48-53.
+Ellingsen, D.M., Duggento, A., Isenburg, K., Jung, C., Lee, J., Gerber, J., Mawla, I., Sclocco, R., Edwards, R.R., Kelley, J.M., Kirsch, I., Kaptchuk, T.J., Toschi, N., Napadow, V., 2022. Patient-clinician brain concordance underlies causal dynamics in nonverbal communication and negative affective expressivity. Transl Psychiatry 12, 44.
+Ellingsen, D.M., Isenburg, K., Jung, C., Lee, J., Gerber, J., Mawla, I., Sclocco, R., Jensen, K.B., Edwards, R.R., Kelley, J.M., Kirsch, I., Kaptchuk, T.J., Napadow, V., 2020. Dynamic brain-to-brain concordance and behavioral mirroring as a mechanism of the patient-clinician interaction. Sci Adv 6, eabc1304.
+Engen, H.G., Singer, T., 2013. Empathy circuits. Curr Opin Neurobiol 23, 275-282.
+Gunderson, J.G., 1978. Patient-therapist matching: a research evaluation. The American journal of psychiatry 135, 1193-1197.
+Hari, R., Kujala, M.V., 2009. Brain basis of human social interaction: from concepts to brain imaging. Physiological reviews 89, 453-479.
+Haugg, A., Renz, F.M., Nicholson, A.A., Lor, C., Gotzendorfer, S.J., Sladky, R., Skouras, S., McDonald, A., Craddock, C., Hellrung, L., Kirschner, M., Herdener, M., Koush, Y., Papoutsi, M., Keynan, J., Hendler, T., Cohen Kadosh, K., Zich, C., Kohl, S.H., Hallschmid, M., MacInnes, J., Adcock, R.A., Dickerson, K.C., Chen, N.K., Young, K., Bodurka, J., Marxen, M., Yao, S., Becker, B., Auer, T., Schweizer, R., Pamplona, G., Lanius, R.A., Emmert, K., Haller, S., Van De Ville, D., Kim, D.Y., Lee, J.H., Marins, T., Megumi, F., Sorger, B., Kamp, T., Liew, S.L., Veit, R., Spetter, M., Weiskopf, N., Scharnowski, F., Steyrl, D., 2021. Predictors of real-time fMRI neurofeedback performance and improvement - A machine learning mega-analysis. Neuroimage 237, 118207.
+Haugg, A., Sladky, R., Skouras, S., McDonald, A., Craddock, C., Kirschner, M., Herdener, M., Koush, Y., Papoutsi, M., Keynan, J.N., Hendler, T., Cohen Kadosh, K., Zich, C., MacInnes, J., Adcock, R.A., Dickerson, K., Chen, N.K., Young, K., Bodurka, J., Yao, S., Becker, B., Auer, T., Schweizer, R., Pamplona, G., Emmert, K., Haller, S., Van De Ville, D., Blefari, M.L., Kim, D.Y., Lee, J.H., Marins, T., Fukuda, M., Sorger, B., Kamp, T., Liew, S.L., Veit, R., Spetter, M., Weiskopf, N., Scharnowski, F., 2020. Can we predict real-time fMRI neurofeedback learning success from pretraining brain activity? Hum Brain Mapp 41, 3839-3854.
+Heunis, S., Lamerichs, R., Zinger, S., Caballero-Gaudes, C., Jansen, J.F.A., Aldenkamp, B., Breeuwer, M., 2020. Quality and denoising in real-time functional magnetic resonance imaging neurofeedback: A methods review. Hum Brain Mapp 41, 3439-3467.
+Horvath, A.O., Del Re, A.C., Fluckiger, C., Symonds, D., 2011. Alliance in individual psychotherapy. Psychotherapy (Chic) 48, 9-16.
+Hoviatdoost, P., Schweitzer, R., Bandarian-Balooch, S., Arthey, S., Izadikhah, Z., 2022. Using the Achievement of Therapeutic Objectives Scale to Operationalize "Unlocking" of the Unconscious. Am J Psychother 75, 161-167.
+
+
+44
+Imel, Z.E., Barco, J.S., Brown, H.J., Baucom, B.R., Baer, J.S., Kircher, J.C., Atkins, D.C., 2014. The association of therapist empathy and synchrony in vocally encoded arousal. Journal of counseling psychology 61, 146-153.
+Johnson, T.S., Ganz, A., Berger, S., Ganguly, A., Koritzky, G., 2018. Service Members Prefer a Psychotherapist Who Is a Veteran. Front Psychol 9, 1068.
+Kadosh, K.C., Staunton, G., 2019. A systematic review of the psychological factors that influence neurofeedback learning outcomes. Neuroimage 185, 545-555.
+Kanel, D., Al-Wasity, S., Stefanov, K., Pollick, F.E., 2019. Empathy to emotional voices and the use of realtime fMRI to enhance activation of the anterior insula. Neuroimage 198, 53-62.
+Koike, T., Tanabe, H.C., Sadato, N., 2015. Hyperscanning neuroimaging technique to reveal the "two-inone" system in social interactions. Neurosci Res 90, 25-32.
+Li, L., Wang, Y., Zeng, Y., Hou, S., Huang, G., Zhang, L., Yan, N., Ren, L., Zhang, Z., 2021. Multimodal Neuroimaging Predictors of Learning Performance of Sensorimotor Rhythm Up-Regulation Neurofeedback. Front Neurosci 15, 699999.
+Long, Y., Zheng, L., Zhao, H., Zhou, S., Zhai, Y., Lu, C., 2021. Interpersonal Neural Synchronization during Interpersonal Touch Underlies Affiliative Pair Bonding between Romantic Couples. Cerebral Cortex 31, 1647-1659.
+Lord, S.P., Sheng, E., Imel, Z.E., Baer, J., Atkins, D.C., 2015. More than reflections: empathy in motivational interviewing includes language style synchrony between therapist and client. Behavior therapy 46, 296-303.
+Lorie, A., Reinero, D.A., Phillips, M., Zhang, L., Riess, H., 2017. Culture and nonverbal expressions of empathy in clinical settings: A systematic review. Patient Educ Couns 100, 411-424.
+MacDuffie, K.E., MacInnes, J., Dickerson, K.C., Eddington, K.M., Strauman, T.J., Adcock, R.A., 2018. Single session real-time fMRI neurofeedback has a lasting impact on cognitive behavioral therapy strategies. NeuroImage: Clinical 19, 868-875.
+Malin, A.J., Pos, A.E., 2015. The impact of early empathy on alliance building, emotional processing, and outcome during experiential treatment of depression. Psychotherapy research : journal of the Society for Psychotherapy Research 25, 445-459.
+Martin, D.J., Garske, J.P., Davis, M.K., 2000. Relation of the therapeutic alliance with outcome and other variables: a meta-analytic review. J Consult Clin Psychol 68, 438-450.
+Marziali, E., 1984. Three viewpoints on the therapeutic alliance. Similarities, differences, and associations with psychotherapy outcome. J Nerv Ment Dis 172, 417-423.
+Marziali, E., Alexander, L., 1991. The power of the therapeutic relationship. Am J Orthopsychiatry 61, 383-391.
+
+
+45
+Masten, C.L., Morelli, S.A., Eisenberger, N.I., 2011. An fMRI investigation of empathy for 'social pain' and subsequent prosocial behavior. Neuroimage 55, 381-388.
+Matiz, A., Crescentini, C., Bergamasco, M., Budai, R., Fabbro, F., 2021. Inter-brain co-activations during mindfulness meditation. Implications for devotional and clinical settings. Conscious Cogn 95, 103210.
+McCabe, R., Priebe, S., 2004. The therapeutic relationship in the treatment of severe mental illness: a review of methods and findings. Int J Soc Psychiatry 50, 115-128.
+Melnikov, M.Y., 2021. The Current Evidence Levels for Biofeedback and Neurofeedback Interventions in Treating Depression: A Narrative Review. Neural Plast 2021, 8878857.
+Meltzoff, A.N., Decety, J., 2003. What imitation tells us about social cognition: a rapprochement between developmental psychology and cognitive neuroscience. Philos Trans R Soc Lond B Biol Sci 358, 491-500.
+Meyer, M.L., Masten, C.L., Ma, Y., Wang, C., Shi, Z., Eisenberger, N.I., Han, S., 2013. Empathy for the social suffering of friends and strangers recruits distinct patterns of brain activation. Soc Cogn Affect Neurosci 8, 446-454.
+Misaki, M., Bodurka, J., 2021. The impact of real-time fMRI denoising on online evaluation of brain activity and functional connectivity. J Neural Eng 18, 046092.
+Misaki, M., Bodurka, J., Paulus, M., 2022. A Library for fMRI Real-Time Processing Systems in Python (RTPSpy) With Comprehensive Online Noise Reduction, Fast and Accurate Anatomical Image Processing, and Online Processing Simulation. Front Neurosci 16, 834827.
+Misaki, M., Kerr, K.L., Ratliff, E.L., Cosgrove, K.T., Simmons, W.K., Morris, A.S., Bodurka, J., 2021. Beyond synchrony: the capacity of fMRI hyperscanning for the study of human social interaction. Soc Cogn Affect Neurosci 16, 84-92.
+Misaki, M., Phillips, R., Zotev, V., Wong, C.K., Wurfel, B.E., Krueger, F., Feldner, M., Bodurka, J., 2019. Brain activity mediators of PTSD symptom reduction during real-time fMRI amygdala neurofeedback emotional training. Neuroimage Clin 24, 102047.
+Moll, J., Weingartner, J.H., Bado, P., Basilio, R., Sato, J.R., Melo, B.R., Bramati, I.E., de Oliveira-Souza, R., Zahn, R., 2014. Voluntary enhancement of neural signatures of affiliative emotion using FMRI neurofeedback. PLoS One 9, e97343.
+Moss, R., Glowiak, M.V., 2013. Therapeutic alliance and the helping relationship, in: Gross, D.C.a.D.R. (Ed.), Introduction to the Counseling Profession, 6th edition ed. Routledge, Sussex, UK, pp. 3-29.
+Munn, Z., Peters, M.D.J., Stern, C., Tufanaru, C., McArthur, A., Aromataris, E., 2018. Systematic review or scoping review? Guidance for authors when choosing between a systematic or scoping review approach. BMC Med Res Methodol 18, 143.
+Nagappan, A., Kalokairinou, L., Wexler, A., 2021. Ethical and Legal Considerations of Alternative Neurotherapies. AJOB Neurosci 12, 257-269.
+
+
+46
+Ninaus, M., Kober, S.E., Witte, M., Koschutnig, K., Neuper, C., Wood, G., 2015. Brain volumetry and selfregulation of brain activity relevant for neurofeedback. Biol Psychol 110, 126-133.
+Nurenberg, J.R., Schleifer, S.J., Shaffer, T.M., Yellin, M., Desai, P.J., Amin, R., Bouchard, A., Montalvo, C., 2015. Animal-assisted therapy with chronic psychiatric inpatients: equine-assisted psychotherapy and aggressive behavior. Psychiatric services (Washington, D.C.) 66, 80-86.
+Oblak, E.F., Lewis-Peacock, J.A., Sulzer, J.S., 2017. Self-regulation strategy, feedback timing and hemodynamic properties modulate learning in a simulated fMRI neurofeedback environment. PLoS Comput Biol 13, e1005681.
+Paret, C., Goldway, N., Zich, C., Keynan, J.N., Hendler, T., Linden, D., Cohen Kadosh, K., 2019. Current progress in real-time functional magnetic resonance-based neurofeedback: Methodological challenges and achievements. Neuroimage 202, 116107.
+Paret, C., Hendler, T., 2020. Live from the "regulating brain": Harnessing the brain to change emotion. Emotion 20, 126-131.
+Paret, C., Kluetsch, R., Zaehringer, J., Ruf, M., Demirakca, T., Bohus, M., Ende, G., Schmahl, C., 2016. Alterations of amygdala-prefrontal connectivity with real-time fMRI neurofeedback in BPD patients. Soc Cogn Affect Neurosci 11, 952-960.
+Peng, W., Lou, W., Huang, X., Ye, Q., Tong, R.K.-Y., Cui, F., 2021. Suffer together, bond together: Brainto-brain synchronization and mutual affective empathy when sharing painful experiences. NeuroImage 238, 118249.
+Pollock, D., Peters, M.D.J., Khalil, H., McInerney, P., Alexander, L., Tricco, A.C., Evans, C., de Moraes, E.B., Godfrey, C.M., Pieper, D., Saran, A., Stern, C., Munn, Z., 2023. Recommendations for the extraction, analysis, and presentation of results in scoping reviews. JBI Evid Synth 21, 520-532.
+Quigley, K.S., Barrett, L.F., 2014. Is there consistency and specificity of autonomic changes during emotional episodes? Guidance from the Conceptual Act Theory and psychophysiology. Biol Psychol 98, 82-94.
+Ros, T., Enriquez-Geppert, S., Zotev, V., Young, K.D., Wood, G., Whitfield-Gabrieli, S., Wan, F., Vuilleumier, P., Vialatte, F., Van De Ville, D., Todder, D., Surmeli, T., Sulzer, J.S., Strehl, U., Sterman, M.B., Steiner, N.J., Sorger, B., Soekadar, S.R., Sitaram, R., Sherlin, L.H., Schönenberg, M., Scharnowski, F., Schabus, M., Rubia, K., Rosa, A., Reiner, M., Pineda, J.A., Paret, C., Ossadtchi, A., Nicholson, A.A., Nan, W., Minguez, J., Micoulaud-Franchi, J.A., Mehler, D.M.A., Lührs, M., Lubar, J., Lotte, F., Linden, D.E.J., Lewis-Peacock, J.A., Lebedev, M.A., Lanius, R.A., Kübler, A., Kranczioch, C., Koush, Y., Konicar, L., Kohl, S.H., Kober, S.E., Klados, M.A., Jeunet, C., Janssen, T.W.P., Huster, R.J., Hoedlmoser, K., Hirshberg, L.M., Heunis, S., Hendler, T., Hampson, M., Guggisberg, A.G., Guggenberger, R., Gruzelier, J.H., Göbel, R.W., Gninenko, N., Gharabaghi, A., Frewen, P., Fovet, T., Fernández, T., Escolano, C., Ehlis, A.C., Drechsler, R., Christopher deCharms, R., Debener, S., De Ridder, D., Davelaar, E.J., Congedo, M., Cavazza, M., Breteler, M.H.M., Brandeis, D., Bodurka, J., Birbaumer, N., Bazanova, O.M., Barth, B., Bamidis, P.D., Auer, T., Arns, M., Thibault, R.T., 2020. Consensus on the reporting and experimental design of clinical and cognitivebehavioural neurofeedback studies (CRED-nf checklist). Brain 143, 1674-1685.
+Scheflen, A.E., 1963. Communication and regulation in psychotherapy. Psychiatry 26, 126-136.
+
+
+47
+Seyffert, M., Lagisetty, P., Landgraf, J., Chopra, V., Pfeiffer, P.N., Conte, M.L., Rogers, M.A., 2016. Internet-Delivered Cognitive Behavioral Therapy to Treat Insomnia: A Systematic Review and MetaAnalysis. PLoS One 11, e0149139.
+Shamay-Tsoory, S.G., Aharon-Peretz, J., Perry, D., 2009. Two systems for empathy: a double dissociation between emotional and cognitive empathy in inferior frontal gyrus versus ventromedial prefrontal lesions. Brain 132, 617-627.
+Shamay-Tsoory, S.G., Eisenberger, N.I., 2021. Getting in touch: A neural model of comforting touch. Neuroscience & Biobehavioral Reviews 130, 263-273.
+Singer, T., Klimecki, O.M., 2014. Empathy and compassion. Curr Biol 24, R875-R878.
+Sokunbi, M.O., 2017. Feedback of real-time fMRI signals: From concepts and principles to therapeutic interventions. Magn Reson Imaging 35, 117-124.
+Stefanello, E., 2022. Your pain is not mine: A critique of clinical empathy. Bioethics 36, 486-493.
+Taschereau-Dumouchel, V., Cushing, C.A., Lau, H., 2022. Real-Time Functional MRI in the Treatment of Mental Health Disorders. Annual review of clinical psychology 18, 125-154.
+Thibault, R.T., MacPherson, A., Lifshitz, M., Roth, R.R., Raz, A., 2018. Neurofeedback with fMRI: A critical systematic review. Neuroimage 172, 786-807.
+Thibault, R.T., Raz, A., 2017. The psychology of neurofeedback: Clinical intervention even if applied placebo. The American psychologist 72, 679-688.
+Tschacher, W., Haken, H., Kyselo, M., 2015. Alliance: a common factor of psychotherapy modeled by structural theory. Frontiers in psychology 6, 421.
+Tsuchiyagaito, A., Misaki, M., Kirlic, N., Yu, X., Sánchez, S.M., Cochran, G., Stewart, J.L., Smith, R., Fitzgerald, K.D., Rohan, M.L., Paulus, M.P., Guinjoan, S.M., 2023. Real-Time fMRI Functional Connectivity Neurofeedback Reducing Repetitive Negative Thinking in Depression: A Double-Blind, Randomized, Sham-Controlled Proof-of-Concept Trial. Psychother Psychosom, 1-14.
+Tsuchiyagaito, A., Misaki, M., Zoubi, O.A., Tulsa, I., Paulus, M., Bodurka, J., 2021a. Prevent breaking bad: A proof of concept study of rebalancing the brain's rumination circuit with real-time fMRI functional connectivity neurofeedback. Hum Brain Mapp 42, 922-940.
+Tsuchiyagaito, A., Smith, J.L., El-Sabbagh, N., Zotev, V., Misaki, M., Al Zoubi, O., Kent Teague, T., Paulus, M.P., Bodurka, J., Savitz, J., 2021b. Real-time fMRI neurofeedback amygdala training may influence kynurenine pathway metabolism in major depressive disorder. Neuroimage Clin 29, 102559.
+Tursic, A., Eck, J., Luhrs, M., Linden, D.E.J., Goebel, R., 2020. A systematic review of fMRI neurofeedback reporting and effects in clinical populations. Neuroimage Clin 28, 102496.
+Voutilainen, L., Henttonen, P., Kahri, M., Ravaja, N., Sams, M., Perakyla, A., 2018. Empathy, Challenge, and Psychophysiological Activation in Therapist-Client Interaction. Front Psychol 9, 530.
+
+
+48
+Wang, S., Lu, J., Yu, M., Wang, X., Shangguan, C., 2022. “I'm listening, did it make any difference to your negative emotions?” Evidence from hyperscanning. Neuroscience Letters 788, 136865.
+Weber, L.A., Ethofer, T., Ehlis, A.C., 2020. Predictors of neurofeedback training outcome: A systematic review. Neuroimage Clin 27, 102301.
+Weiss, F., Zamoscik, V., Schmidt, S.N.L., Halli, P., Kirsch, P., Gerchen, M.F., 2020. Just a very expensive breathing training? Risk of respiratory artefacts in functional connectivity-based real-time fMRI neurofeedback. Neuroimage 210, 116580.
+Wilson, M., Wilson, T.P., 2005. An oscillator model of the timing of turn-taking. Psychonomic bulletin & review 12, 957-968.
+Woollcott, P., Jr., 1985. Prognostic indicators in the psychotherapy of borderline patients. Am J Psychother 39, 17-29.
+Yao, S., Becker, B., Geng, Y., Zhao, Z., Xu, X., Zhao, W., Ren, P., Kendrick, K.M., 2016. Voluntary control of anterior insula and its functional connections is feedback-independent and increases pain empathy. Neuroimage 130, 230-240.
+Young, K.D., Siegle, G.J., Zotev, V., Phillips, R., Misaki, M., Yuan, H., Drevets, W.C., Bodurka, J., 2017. Randomized Clinical Trial of Real-Time fMRI Amygdala Neurofeedback for Major Depressive Disorder: Effects on Symptoms and Autobiographical Memory Recall. Am J Psychiatry 174, 748-755.
+Zaehringer, J., Ende, G., Santangelo, P., Kleindienst, N., Ruf, M., Bertsch, K., Bohus, M., Schmahl, C., Paret, C., 2019. Improved emotion regulation after neurofeedback: A single-arm trial in patients with borderline personality disorder. Neuroimage Clin 24, 102032.
+Zhang, Y., Meng, T., Hou, Y., Pan, Y., Hu, Y., 2018. Interpersonal brain synchronization associated with working alliance during psychological counseling. Psychiatry Res Neuroimaging 282, 103-109.
+Zhang, Y., Meng, T., Yang, Y., Hu, Y., 2020. Experience-Dependent Counselor-Client Brain Synchronization during Psychological Counseling. eNeuro 7.
+Zhao, Z., Yao, S., Zweerings, J., Zhou, X., Zhou, F., Kendrick, K.M., Chen, H., Mathiak, K., Becker, B., 2021. Putamen volume predicts real-time fMRI neurofeedback learning success across paradigms and neurofeedback target regions. Hum Brain Mapp 42, 1879-1887.
+Zoefel, B., Huster, R.J., Herrmann, C.S., 2011. Neurofeedback training of the upper alpha frequency band in EEG improves cognitive performance. Neuroimage 54, 1427-1431.
+Zotev, V., Phillips, R., Yuan, H., Misaki, M., Bodurka, J., 2014. Self-regulation of human brain activity using simultaneous real-time fMRI and EEG neurofeedback. Neuroimage 85 Pt 3, 985-995.
+Zuberer, A., Brandeis, D., Drechsler, R., 2015. Are treatment effects of neurofeedback training in children with ADHD related to the successful regulation of brain activity? A review on the learning of regulation of brain activity and a contribution to the discussion on specificity. Front Hum Neurosci 9, 135.
