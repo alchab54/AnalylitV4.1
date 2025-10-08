@@ -51,7 +51,7 @@ services:
     container_name: analylit_redis_dev
     ports:
       - "6380:6379"
-    command: ["redis-server", "--maxmemory", "1gb", "--maxmemory-policy", "allkeys-lru"]
+    command: ["redis-server", "--maxmemory", "2gb", "--maxmemory-policy", "allkeys-lru"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -73,9 +73,10 @@ services:
       - OLLAMA_KEEP_ALIVE=24h
       - OLLAMA_HOST=0.0.0.0
       - OLLAMA_ORIGINS=*
-      - OLLAMA_NUM_PARALLEL=4        # Parallélisation maximale
-      - OLLAMA_MAX_LOADED_MODELS=2   # Modèles en mémoire
-      - NVIDIA_VISIBLE_DEVICES=all   # GPU complet si disponible
+      - OLLAMA_NUM_PARALLEL=6        # ✅ OPTIMISÉ: 6 workers screening
+      - OLLAMA_MAX_LOADED_MODELS=3   # ✅ 3 modèles en mémoire RTX 2060
+      - NVIDIA_VISIBLE_DEVICES=all
+      - OLLAMA_GPU_LAYERS=35 
     deploy:
       resources:
         reservations:
@@ -87,9 +88,9 @@ services:
       - analylit-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:11434"]
-      interval: 30s
+      interval: 20s
       timeout: 15s
-      retries: 3
+      retries: 5
     restart: unless-stopped
 
   # ================================================================
@@ -135,6 +136,10 @@ services:
       REDIS_HOST: redis
       OLLAMA_BASE_URL: http://ollama:11434
       PYTHONPATH: /home/appuser/app
+      # ✅ SCORING ATN ACTIVÉ
+      ATN_SCORING_ENABLED: "true"
+      ATN_ALGORITHM_VERSION: "2.1"
+      ATN_SHOW_JUSTIFICATIONS: "true"
     
     volumes:
       - .:/home/appuser/app
@@ -253,10 +258,8 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-      args:
-        BASE_IMAGE: analylit-base-cpu:latest
     container_name: analylit_worker_screening_1
-    command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue"]
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue", "atn_scoring_queue"]
     depends_on:
       redis:
         condition: service_started
@@ -271,10 +274,12 @@ services:
       REDIS_URL: redis://redis:6379/0
       OLLAMA_BASE_URL: http://ollama:11434
       PYTHONPATH: /home/appuser/app
-      WORKER_TYPE: screening
+      WORKER_TYPE: screening_optimized
       WORKER_ID: screening-1
-      # Modèle léger pour screening rapide
       PREFERRED_MODEL: phi3:mini
+      # ✅ SCORING ATN ACTIVÉ
+      ATN_SCORING_ENABLED: "true"
+      ATN_DETAILED_LOGGING: "true"
     volumes:
       - .:/home/appuser/app
     networks:
@@ -285,10 +290,8 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-      args:
-        BASE_IMAGE: analylit-base-cpu:latest
     container_name: analylit_worker_screening_2
-    command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue"]
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue", "atn_scoring_queue"]
     depends_on:
       redis:
         condition: service_started
@@ -303,9 +306,10 @@ services:
       REDIS_URL: redis://redis:6379/0
       OLLAMA_BASE_URL: http://ollama:11434
       PYTHONPATH: /home/appuser/app
-      WORKER_TYPE: screening
+      WORKER_TYPE: screening_optimized
       WORKER_ID: screening-2
       PREFERRED_MODEL: phi3:mini
+      ATN_SCORING_ENABLED: "true"
     volumes:
       - .:/home/appuser/app
     networks:
@@ -316,10 +320,8 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-      args:
-        BASE_IMAGE: analylit-base-cpu:latest
     container_name: analylit_worker_screening_3
-    command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue"]
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue", "atn_scoring_queue"]
     depends_on:
       redis:
         condition: service_started
@@ -334,9 +336,101 @@ services:
       REDIS_URL: redis://redis:6379/0
       OLLAMA_BASE_URL: http://ollama:11434
       PYTHONPATH: /home/appuser/app
-      WORKER_TYPE: screening
+      WORKER_TYPE: screening_optimized
       WORKER_ID: screening-3
       PREFERRED_MODEL: phi3:mini
+      ATN_SCORING_ENABLED: "true"
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  # ✅ NOUVEAUX WORKERS SCREENING (4-6)
+  worker-screening-4:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    container_name: analylit_worker_screening_4
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue", "atn_scoring_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: screening_optimized
+      WORKER_ID: screening-4
+      PREFERRED_MODEL: phi3:mini
+      ATN_SCORING_ENABLED: "true"
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  worker-screening-5:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    container_name: analylit_worker_screening_5
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue", "atn_scoring_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: screening_optimized
+      WORKER_ID: screening-5
+      PREFERRED_MODEL: phi3:mini
+      ATN_SCORING_ENABLED: "true"
+    volumes:
+      - .:/home/appuser/app
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  worker-screening-6:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    container_name: analylit_worker_screening_6
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue", "atn_scoring_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: screening_optimized
+      WORKER_ID: screening-6
+      PREFERRED_MODEL: phi3:mini
+      ATN_SCORING_ENABLED: "true"
     volumes:
       - .:/home/appuser/app
     networks:
@@ -370,7 +464,10 @@ services:
       WORKER_TYPE: extraction
       WORKER_ID: extraction-1
       PREFERRED_MODEL: llama3:8b  # Modèle lourd pour extractions
-      CUDA_VISIBLE_DEVICES: "0"   # GPU prioritaire
+      # ✅ OPTIMISATION GPU RTX 2060
+      CUDA_VISIBLE_DEVICES: "0"
+      OLLAMA_GPU_LAYERS: 35
+      OLLAMA_GPU_MEMORY_FRACTION: 0.7
     volumes:
       - .:/home/appuser/app
     networks:
@@ -401,7 +498,10 @@ services:
       PYTHONPATH: /home/appuser/app
       WORKER_TYPE: extraction
       WORKER_ID: extraction-2
-      PREFERRED_MODEL: llama3:8b
+      # ✅ OPTIMISATION GPU RTX 2060
+      CUDA_VISIBLE_DEVICES: "0"
+      OLLAMA_GPU_LAYERS: 35
+      OLLAMA_GPU_MEMORY_FRACTION: 0.7
     volumes:
       - .:/home/appuser/app
     networks:
@@ -432,7 +532,10 @@ services:
       PYTHONPATH: /home/appuser/app
       WORKER_TYPE: extraction
       WORKER_ID: extraction-3
-      PREFERRED_MODEL: llama3:8b
+      # ✅ OPTIMISATION GPU RTX 2060
+      CUDA_VISIBLE_DEVICES: "0"
+      OLLAMA_GPU_LAYERS: 35
+      OLLAMA_GPU_MEMORY_FRACTION: 0.7
     volumes:
       - .:/home/appuser/app
     networks:
@@ -463,7 +566,10 @@ services:
       PYTHONPATH: /home/appuser/app
       WORKER_TYPE: extraction
       WORKER_ID: extraction-4
-      PREFERRED_MODEL: llama3:8b
+      # ✅ OPTIMISATION GPU RTX 2060
+      CUDA_VISIBLE_DEVICES: "0"
+      OLLAMA_GPU_LAYERS: 35
+      OLLAMA_GPU_MEMORY_FRACTION: 0.7
     volumes:
       - .:/home/appuser/app
     networks:
@@ -479,7 +585,7 @@ services:
       args:
         BASE_IMAGE: analylit-base-cpu:latest
     container_name: analylit_worker_analysis_1
-    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue"]
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue", "atn_scoring_queue"]
     depends_on:
       redis:
         condition: service_started
@@ -496,7 +602,11 @@ services:
       RQ_WORKER_TIMEOUT: "600"
       OLLAMA_REQUEST_TIMEOUT: "300"
       PYTHONPATH: /home/appuser/app
-      WORKER_TYPE: analysis
+      WORKER_TYPE: analysis_atn
+      # ✅ SCORING ATN INTÉGRÉ
+      ATN_SCORING_ENABLED: "true"
+      ATN_ALGORITHM_VERSION: "2.1"
+      ATN_DETAILED_JUSTIFICATIONS: "true"
       WORKER_ID: analysis-1
       REQUEST_TIMEOUT: "600"        # Au lieu de REQUEST_TIMEOUT=600
       RQ_JOB_TIMEOUT: "600"
@@ -521,7 +631,7 @@ services:
       args:
         BASE_IMAGE: analylit-base-cpu:latest
     container_name: analylit_worker_analysis_2
-    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue"]
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue", "atn_scoring_queue"]
     depends_on:
       redis:
         condition: service_started
@@ -538,7 +648,11 @@ services:
       RQ_WORKER_TIMEOUT: "600"
       OLLAMA_REQUEST_TIMEOUT: "300"
       PYTHONPATH: /home/appuser/app
-      WORKER_TYPE: analysis
+      WORKER_TYPE: analysis_atn
+      # ✅ SCORING ATN INTÉGRÉ
+      ATN_SCORING_ENABLED: "true"
+      ATN_ALGORITHM_VERSION: "2.1"
+      ATN_DETAILED_JUSTIFICATIONS: "true"
       WORKER_ID: analysis-2
       REQUEST_TIMEOUT: "600"        # Au lieu de REQUEST_TIMEOUT=600
       RQ_JOB_TIMEOUT: "600"
