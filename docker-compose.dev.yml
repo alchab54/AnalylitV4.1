@@ -31,6 +31,7 @@ services:
       POSTGRES_USER: analylit_user
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_test_db
+      TZ: Europe/Paris
     ports:
       - "5434:5432"
     volumes:
@@ -77,6 +78,7 @@ services:
       - OLLAMA_MAX_LOADED_MODELS=3   # ✅ 3 modèles en mémoire RTX 2060
       - NVIDIA_VISIBLE_DEVICES=all
       - OLLAMA_GPU_LAYERS=35 
+      - TZ=Europe/Paris
     deploy:
       resources:
         reservations:
@@ -108,6 +110,7 @@ services:
       REDIS_URL: redis://redis:6379/0
       PYTHONUNBUFFERED: 1
       PYTHONPATH: /home/appuser/app
+      TZ: Europe/Paris
     command: ["python", "-m", "alembic", "-c", "alembic.ini", "upgrade", "head"]
     depends_on:
       test-db:
@@ -140,7 +143,7 @@ services:
       ATN_SCORING_ENABLED: "true"
       ATN_ALGORITHM_VERSION: "2.1"
       ATN_SHOW_JUSTIFICATIONS: "true"
-    
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     depends_on:
@@ -176,6 +179,7 @@ services:
       REDIS_HOST: redis
       OLLAMA_BASE_URL: http://ollama:11434
       PYTHONPATH: /home/appuser/app
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     depends_on:
@@ -218,6 +222,8 @@ services:
       PYTHONPATH: /home/appuser/app
       WORKER_TYPE: import
       WORKER_ID: import-1
+      TZ: Europe/Paris
+
     volumes:
       - .:/home/appuser/app
     networks:
@@ -246,6 +252,7 @@ services:
       PYTHONPATH: /home/appuser/app
       WORKER_TYPE: import
       WORKER_ID: import-2
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     networks:
@@ -280,6 +287,7 @@ services:
       # ✅ SCORING ATN ACTIVÉ
       ATN_SCORING_ENABLED: "true"
       ATN_DETAILED_LOGGING: "true"
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     networks:
@@ -310,6 +318,7 @@ services:
       WORKER_ID: screening-2
       PREFERRED_MODEL: phi3:mini
       ATN_SCORING_ENABLED: "true"
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     networks:
@@ -340,6 +349,7 @@ services:
       WORKER_ID: screening-3
       PREFERRED_MODEL: phi3:mini
       ATN_SCORING_ENABLED: "true"
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     networks:
@@ -371,6 +381,7 @@ services:
       WORKER_ID: screening-4
       PREFERRED_MODEL: phi3:mini
       ATN_SCORING_ENABLED: "true"
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     networks:
@@ -401,6 +412,7 @@ services:
       WORKER_ID: screening-5
       PREFERRED_MODEL: phi3:mini
       ATN_SCORING_ENABLED: "true"
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     networks:
@@ -431,6 +443,7 @@ services:
       WORKER_ID: screening-6
       PREFERRED_MODEL: phi3:mini
       ATN_SCORING_ENABLED: "true"
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     networks:
@@ -468,6 +481,7 @@ services:
       CUDA_VISIBLE_DEVICES: "0"
       OLLAMA_GPU_LAYERS: 35
       OLLAMA_GPU_MEMORY_FRACTION: 0.7
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     networks:
@@ -502,6 +516,7 @@ services:
       CUDA_VISIBLE_DEVICES: "0"
       OLLAMA_GPU_LAYERS: 35
       OLLAMA_GPU_MEMORY_FRACTION: 0.7
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     networks:
@@ -536,6 +551,7 @@ services:
       CUDA_VISIBLE_DEVICES: "0"
       OLLAMA_GPU_LAYERS: 35
       OLLAMA_GPU_MEMORY_FRACTION: 0.7
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     networks:
@@ -570,6 +586,7 @@ services:
       CUDA_VISIBLE_DEVICES: "0"
       OLLAMA_GPU_LAYERS: 35
       OLLAMA_GPU_MEMORY_FRACTION: 0.7
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     networks:
@@ -610,6 +627,7 @@ services:
       WORKER_ID: analysis-1
       REQUEST_TIMEOUT: "600"        # Au lieu de REQUEST_TIMEOUT=600
       RQ_JOB_TIMEOUT: "600"
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     deploy:
@@ -656,6 +674,7 @@ services:
       WORKER_ID: analysis-2
       REQUEST_TIMEOUT: "600"        # Au lieu de REQUEST_TIMEOUT=600
       RQ_JOB_TIMEOUT: "600"
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     deploy:
@@ -697,6 +716,7 @@ services:
       WORKER_TYPE: synthesis
       WORKER_ID: synthesis-1
       PREFERRED_MODEL: llama3:8b  # Modèle performant pour synthèses
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     networks:
@@ -728,6 +748,7 @@ services:
       WORKER_TYPE: synthesis
       WORKER_ID: synthesis-2
       PREFERRED_MODEL: llama3:8b
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     networks:
@@ -761,6 +782,7 @@ services:
       PYTHONPATH: /home/appuser/app
       WORKER_TYPE: discussion
       WORKER_ID: discussion-1
+      TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
     networks:
@@ -779,6 +801,7 @@ services:
       - "9181:9181"
     environment:
       RQ_DASHBOARD_REDIS_URL: redis://redis:6379/0
+      TZ: Europe/Paris
     depends_on:
       redis:
         condition: service_started

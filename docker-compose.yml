@@ -29,6 +29,7 @@ services:
     container_name: analylit_db
     environment:
       POSTGRES_USER: analylit_user
+      TZ: Europe/Paris  
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_db
     volumes:
@@ -112,7 +113,7 @@ services:
     ports: []
     environment:
       REDIS_HOST: redis
-
+      TZ: Europe/Paris  
       FLASK_APP: backend/server_v4_complete.py
       FLASK_ENV: production
       WAIT_HOSTS: db:5432,redis:6379,ollama:11434
@@ -165,6 +166,7 @@ services:
     container_name: analylit_migrate
     environment:
       FLASK_ENV: production
+      TZ: Europe/Paris  
       WAIT_HOSTS: db:5432
       WAIT_TIMEOUT: "30"
       PYTHONPATH: /home/appuser/app:/home/appuser/.local/lib/python3.11/site-packages
@@ -199,6 +201,7 @@ services:
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "fast_queue"]
     environment:
       DATABASE_HOST: db
+      TZ: Europe/Paris  
       POSTGRES_USER: analylit_user
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_db
@@ -234,6 +237,7 @@ services:
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "default_queue"]
     environment:
       DATABASE_HOST: db
+      TZ: Europe/Paris  
       POSTGRES_USER: analylit_user
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_db
@@ -281,6 +285,7 @@ services:
     user: root
     environment:
       DATABASE_HOST: db
+      TZ: Europe/Paris  
       POSTGRES_USER: analylit_user
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_db
@@ -311,6 +316,7 @@ services:
       - ollama_data:/root/.ollama
     environment:
       OLLAMA_HOST: 0.0.0.0
+      TZ: Europe/Paris  
       OLLAMA_ORIGINS: "*"
       CUDA_VISIBLE_DEVICES: "0"
       OLLAMA_FLASH_ATTENTION: "true"
@@ -347,6 +353,7 @@ services:
         condition: service_started
     environment:
       # ✅ Utiliser la DB de production
+      TZ: Europe/Paris  
       DATABASE_URL: postgresql://analylit_user:strong_password@db:5432/analylit_db
       DATABASE_HOST: db
       POSTGRES_USER: analylit_user
