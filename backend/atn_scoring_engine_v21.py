@@ -246,7 +246,8 @@ class ATNScoringEngineV22:
             
         # Si aucun critère sémantique n'a été trouvé mais que le score provient des bonus.
         if not detailed_justifications and total_score > 0:
-            recency_bonus = total_score  # Le score ne vient que des bonus
+            # Le score ne vient que des bonus (actualité, étude longitudinale)
+            recency_bonus = total_score 
             bonus_justification_text = (
                 f"Aucun critère sémantique ATN détecté. "
                 f"Le score provient uniquement de bonus contextuels ({recency_justification})."

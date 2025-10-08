@@ -689,6 +689,100 @@ services:
       - analylit-network
     restart: unless-stopped
 
+  worker-analysis-:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_analysis_3
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue", "atn_scoring_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      ollama:
+        condition: service_started  
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      RQ_WORKER_TIMEOUT: "600"
+      OLLAMA_REQUEST_TIMEOUT: "300"
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: analysis_atn
+      # ✅ SCORING ATN INTÉGRÉ
+      ATN_SCORING_ENABLED: "true"
+      ATN_ALGORITHM_VERSION: "2.1"
+      ATN_DETAILED_JUSTIFICATIONS: "true"
+      WORKER_ID: analysis-1
+      REQUEST_TIMEOUT: "600"        # Au lieu de REQUEST_TIMEOUT=600
+      RQ_JOB_TIMEOUT: "600"
+      TZ: Europe/Paris
+    volumes:
+      - .:/home/appuser/app
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+    networks:
+      - analylit-network
+    restart: unless-stopped
+
+  worker-analysis-4:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+      args:
+        BASE_IMAGE: analylit-base-cpu:latest
+    container_name: analylit_worker_analysis_4
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue", "atn_scoring_queue"]
+    depends_on:
+      redis:
+        condition: service_started
+      test-db:
+        condition: service_healthy
+      ollama:
+        condition: service_started  
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      RQ_WORKER_TIMEOUT: "600"
+      OLLAMA_REQUEST_TIMEOUT: "300"
+      PYTHONPATH: /home/appuser/app
+      WORKER_TYPE: analysis_atn
+      # ✅ SCORING ATN INTÉGRÉ
+      ATN_SCORING_ENABLED: "true"
+      ATN_ALGORITHM_VERSION: "2.1"
+      ATN_DETAILED_JUSTIFICATIONS: "true"
+      WORKER_ID: analysis-1
+      REQUEST_TIMEOUT: "600"        # Au lieu de REQUEST_TIMEOUT=600
+      RQ_JOB_TIMEOUT: "600"
+      TZ: Europe/Paris
+    volumes:
+      - .:/home/appuser/app
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+    networks:
+      - analylit-network
+    restart: unless-stopped
+  
   # --- ÉTAPE 5: SYNTHÈSE + REPORTING (2 WORKERS) ---
   
   worker-synthesis-1:
