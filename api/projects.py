@@ -86,19 +86,14 @@ def handle_project(project_id):
 def add_manual_articles_endpoint(project_id):
     payload = request.get_json()
     items_to_add = payload.get('items', [])
-    
-    # LA LIGNE DE CORRECTION FINALE EST ICI
     use_full_data_flag = payload.get('use_full_data', False)
-
     if items_to_add:
-        # On passe les deux arguments à la tâche
         task = background_queue.enqueue(
-            'backend.tasks_v4_complete.add_manual_articles_task', 
+            'backend.tasks_v4_complete.add_manual_articles_task',
             args=(project_id, items_to_add, use_full_data_flag),
             job_timeout=600
         )
         return jsonify({"task_id": task.id}), 202
-    
     return jsonify({"error": "No items provided"}), 400
 
 @projects_bp.route('/projects/<project_id>/search-results', methods=['GET'])
