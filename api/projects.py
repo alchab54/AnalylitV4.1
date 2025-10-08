@@ -82,6 +82,25 @@ def handle_project(project_id):
         db.session.commit()
         return '', 204
 
+@projects_bp.route('/<project_id>/add-manual-articles', methods=['POST'])
+def add_manual_articles_endpoint(project_id):
+    payload = request.get_json()
+    items_to_add = payload.get('items', [])
+    
+    # LA LIGNE DE CORRECTION FINALE EST ICI
+    use_full_data_flag = payload.get('use_full_data', False)
+
+    if items_to_add:
+        # On passe les deux arguments à la tâche
+        task = background_queue.enqueue(
+            'backend.tasks_v4_complete.add_manual_articles_task', 
+            args=(project_id, items_to_add, use_full_data_flag),
+            job_timeout=600
+        )
+        return jsonify({"task_id": task.id}), 202
+    
+    return jsonify({"error": "No items provided"}), 400
+
 @projects_bp.route('/projects/<project_id>/search-results', methods=['GET'])
 def get_project_search_results(project_id):
     """Retourne les résultats de recherche paginés pour un projet."""
@@ -453,25 +472,6 @@ def save_rob_assessment(project_id, article_id):
     response_data['random_sequence_generation'] = rob_assessment.domain_1_bias
     response_data['allocation_concealment_notes'] = rob_assessment.domain_2_justification
     return jsonify(response_data), status_code
-
-@projects_bp.route('/<project_id>/add-manual-articles', methods=['POST'])
-def add_manual_articles_endpoint(project_id):
-    payload = request.get_json()
-    items_to_add = payload.get('items', [])
-    
-    # LA LIGNE DE CORRECTION FINALE EST ICI
-    use_full_data_flag = payload.get('use_full_data', False)
-
-    if items_to_add:
-        # On passe les deux arguments à la tâche
-        task = background_queue.enqueue(
-            'backend.tasks_v4_complete.add_manual_articles_task', 
-            args=(project_id, items_to_add, use_full_data_flag),
-            job_timeout=600
-        )
-        return jsonify({"task_id": task.id}), 202
-    
-    return jsonify({"error": "No items provided"}), 400
 
 @projects_bp.route('/projects/<project_id>/calculate-kappa', methods=['POST'])
 def calculate_kappa(project_id):
