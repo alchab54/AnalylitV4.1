@@ -86,11 +86,11 @@ services:
               capabilities: [gpu]
     networks:
       - analylit-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434"]
-      interval: 20s
-      timeout: 15s
-      retries: 5
+    # healthcheck:
+      # test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      # interval: 20s
+      # timeout: 15s
+      # retries: 5
     restart: unless-stopped
 
   # ================================================================
@@ -149,7 +149,7 @@ services:
       redis:
         condition: service_started
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     networks:
@@ -184,7 +184,7 @@ services:
       redis:
         condition: service_started
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     networks:
@@ -266,7 +266,7 @@ services:
       test-db:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     environment:
@@ -298,7 +298,7 @@ services:
       test-db:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     environment:
@@ -328,7 +328,7 @@ services:
       test-db:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     environment:
@@ -359,7 +359,7 @@ services:
       test-db:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     environment:
@@ -389,7 +389,7 @@ services:
       test-db:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     environment:
@@ -419,7 +419,7 @@ services:
       test-db:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     environment:
@@ -453,7 +453,7 @@ services:
       test-db:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     environment:
@@ -488,7 +488,7 @@ services:
       test-db:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     environment:
@@ -522,7 +522,7 @@ services:
       test-db:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     environment:
@@ -556,7 +556,7 @@ services:
       test-db:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     environment:
@@ -592,7 +592,7 @@ services:
       test-db:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     environment:
@@ -638,7 +638,7 @@ services:
       test-db:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     environment:
@@ -686,7 +686,7 @@ services:
       test-db:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     environment:
@@ -717,7 +717,7 @@ services:
       test-db:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     environment:
@@ -751,7 +751,7 @@ services:
       test-db:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  
       migrate:
         condition: service_completed_successfully
     environment:
