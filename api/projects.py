@@ -454,12 +454,12 @@ def save_rob_assessment(project_id, article_id):
     response_data['allocation_concealment_notes'] = rob_assessment.domain_2_justification
     return jsonify(response_data), status_code
 
-@app.route('/api/projects/<project_id>/add-manual-articles', methods=['POST'])
+@projects_bp.route('/<project_id>/add-manual-articles', methods=['POST'])
 def add_manual_articles_endpoint(project_id):
     payload = request.get_json()
     items_to_add = payload.get('items', [])
     
-    # ✅ LA LIGNE DE CORRECTION FINALE EST ICI
+    # LA LIGNE DE CORRECTION FINALE EST ICI
     use_full_data_flag = payload.get('use_full_data', False)
 
     if items_to_add:
