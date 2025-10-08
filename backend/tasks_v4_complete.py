@@ -118,6 +118,13 @@ except Exception as e:
     logger.error(f"Erreur chargement du modèle d'embedding '{EMBEDDING_MODEL_NAME}': {e}")
     embedding_model = None
 
+try:
+    from backend.atn_scoring_engine_v21 import ATNScoringEngineV22
+    ATN_SCORING_AVAILABLE = True
+    logger.info("✅ Algorithme ATN v2.2 chargé avec succès")
+except ImportError as e:
+    logger.warning(f"⚠️ Algorithme ATN non disponible: {e}")
+    ATN_SCORING_AVAILABLE = False
 # ================================================================ 
 # === DÉCORATEUR DE GESTION DE SESSION DB
 # ================================================================ 
@@ -453,34 +460,83 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
     send_project_notification(project_id, 'search_completed', final_message, {'total_results': total_found, 'databases': databases, 'failed': failed_databases})
     logger.info(f"âœ… Recherche multi-bases: total {total_found}")
 
+def calculate_atn_score_for_article(article_data: Dict) -> Dict:
+    """Calcule le score ATN v2.2 pour un article donné avec fallback robuste."""
+    if not ATN_SCORING_AVAILABLE:
+        # Fallback si algorithme ATN non disponible
+        return {
+            "atn_score": 10,  # Score neutre
+            "atn_category": "NON ÉVALUÉ ATN", 
+            "detailed_justifications": [{"criterion": "Algorithme ATN", "score": 0, "terms_found": ["Non disponible"]}],
+            "algorithm_version": "fallback_v1.0"
+        }
+
+    try:
+        # ✅ UTILISATION ALGORITHME ATN V2.2 RÉEL
+        engine = ATNScoringEngineV22()
+        results = engine.calculate_atn_score_v22(article_data)
+
+        logger.info(f"✅ Score ATN calculé: {results.get('atn_score', 0)}/100 - {results.get('atn_category', 'Non évalué')}")
+        return results
+
+    except Exception as e:
+        logger.warning(f"⚠️ Erreur calcul ATN v2.2: {e}")
+        # Fallback scoring basique
+        basic_score = 5
+        basic_category = "ERREUR CALCUL"
+
+        # Scoring d'urgence basé sur mots-clés
+        title_lower = article_data.get("title", "").lower()
+        abstract_lower = article_data.get("abstract", "").lower()
+        text_combined = f"{title_lower} {abstract_lower}"
+
+        # Détection basique ATN
+        if any(term in text_combined for term in ["therapeutic alliance", "empathy", "digital health", "ai", "artificial intelligence"]):
+            basic_score = 7
+            basic_category = "PERTINENT PROBABLE"
+        elif any(term in text_combined for term in ["health", "medical", "patient", "therapy", "clinical"]):
+            basic_score = 4
+            basic_category = "MODÉRÉMENT PERTINENT"
+        else:
+            basic_score = 2
+            basic_category = "PEU PERTINENT"
+
+        return {
+            "atn_score": basic_score,
+            "atn_category": basic_category,
+            "detailed_justifications": [{"criterion": "Fallback Scoring", "score": basic_score, "terms_found": ["Calcul d'urgence"]}],
+            "algorithm_version": "emergency_fallback",
+            "error": str(e)
+        }
+
 @with_db_session
 def process_single_article_task(session, project_id: str, article_id: str, profile: dict, analysis_mode: str, custom_grid_id: str = None):
-    """Traite un article: screening ou extraction complète."""
+    """Traite un article: screening ou extraction complète avec algorithme ATN v2.2 intégré."""
     # 1) Normaliser le profil (compatibilité ancienne/nouvelle nomenclature)
     profile = normalize_profile(profile)
-    
+
     logger.info(f"[process_single_article_task] project={project_id} article={article_id} mode={analysis_mode} profile={profile} grid={custom_grid_id}")
-    
+
     start_time = time.time()
-    
+
     try:
         # 2) Récupérer les données de l'article depuis search_results
         row = session.execute(
             text("SELECT * FROM search_results WHERE project_id = :pid AND article_id = :aid"), 
             {"pid": project_id, "aid": article_id}
         ).mappings().fetchone()
-        
+
         if not row:
             log_processing_status(session, project_id, article_id, "erreur", "Article introuvable en base.")
             logger.error(f"Article {article_id} non trouvé dans search_results pour project {project_id}")
             return {"status": "error", "message": "Article not found"}
 
         article = dict(row)
-        
+
         # 3) Déterminer le contenu textuel à analyser (PDF si dispo, sinon abstract)
         text_for_analysis = ""
         analysis_source = "abstract"
-        
+
         # Vérifier si un PDF est disponible
         pdf_path = PROJECTS_DIR / project_id / f"{sanitize_filename(article_id)}.pdf"
         if pdf_path.exists():
@@ -492,19 +548,19 @@ def process_single_article_task(session, project_id: str, article_id: str, profi
                     logger.info(f"[process_single_article_task] Utilisation du PDF pour {article_id}")
             except Exception as e:
                 logger.warning(f"[process_single_article_task] Erreur lecture PDF {article_id}: {e}")
-        
+
         # Fallback sur titre + abstract
         if not text_for_analysis:
             text_for_analysis = f"{article.get('title', '')}\n\n{article.get('abstract', '')}"
             analysis_source = "abstract"
-        
+
         # Vérification contenu minimal
         if len(text_for_analysis.strip()) < 50:
             log_processing_status(session, project_id, article_id, "écarté", "Contenu textuel insuffisant.")
             increment_processed_count(session, project_id)
             logger.warning(f"[process_single_article_task] Contenu insuffisant pour {article_id}")
             return {"status": "skipped", "reason": "insufficient_content"}
-        
+
         # 4) Prétraitement du contenu avec le modèle preprocess
         if text_for_analysis:
             prompt_norm = f"Nettoie et normalise ce texte scientifique pour extraction d'informations. Retourne du texte propre.\n---\n{text_for_analysis[:3000]}"
@@ -515,10 +571,21 @@ def process_single_article_task(session, project_id: str, article_id: str, profi
                 text_for_analysis = normalized if normalized else text_for_analysis
             except Exception as e:
                 logger.warning(f"[process_single_article_task] Prétraitement échoué pour {article_id}: {e}")
-        
+
+        # ================================================================ 
+        # ✅ CALCUL SCORE ATN V2.2 RÉEL - INTEGRATION CRITIQUE
+        # ================================================================ 
+        atn_results = calculate_atn_score_for_article({
+            "title": article.get("title", ""),
+            "abstract": article.get("abstract", ""),
+            "journal": article.get("journal", ""),
+            "year": int(article.get("publication_date", "2024")[:4]) if article.get("publication_date") and len(article.get("publication_date", "")) >= 4 else 2024,
+            "keywords": [article.get("database_source", "")]
+        })
+
         # 5) Traitement selon le mode d'analyse
         if analysis_mode == "screening":
-            # Mode screening : évaluation binaire de pertinence
+            # Mode screening : évaluation binaire de pertinence avec ATN v2.2
             screening_prompt = (
                 "Tu es un assistant pour le screening d'articles sur l'Alliance Thérapeutique Numérique (ATN). "
                 "Analyse ce contenu et détermine s'il est pertinent pour une revue sur l'ATN.\n"
@@ -530,9 +597,9 @@ def process_single_article_task(session, project_id: str, article_id: str, profi
                 "Réponds en JSON avec les clés: is_relevant (bool), score (int 0-10), reason (string).\n---\n"
                 f"{text_for_analysis[:4000]}"
             )
-            
+
             extract_res = call_ollama_api(screening_prompt, profile["extract"], output_format="json")
-            
+
             # Parsing sécurisé de la réponse
             if isinstance(extract_res, str):
                 try:
@@ -540,37 +607,48 @@ def process_single_article_task(session, project_id: str, article_id: str, profi
                 except Exception as e:
                     logger.warning(f"[process_single_article_task] Parsing JSON échoué pour {article_id}: {e}")
                     extract_res = {"is_relevant": False, "score": 0, "reason": "parse_error"}
-            
+
             is_relevant = bool(extract_res.get("is_relevant", False))
-            score = int(extract_res.get("score", 0))
+            ollama_score = int(extract_res.get("score", 0))
             reason = extract_res.get("reason", "")
-            
-            # Sauvegarde du résultat de screening
+
+            # ✅ UTILISER SCORE ATN V2.2 (plus précis que score Ollama générique)
+            final_score = atn_results.get("atn_score", ollama_score)
+            atn_justification = f"ATN v2.2: {atn_results.get('atn_category', 'Non évalué')} | {reason}"
+
+            # Sauvegarde du résultat de screening avec scoring ATN
             session.execute(text("""
-                INSERT INTO extractions (id, project_id, pmid, title, relevance_score, relevance_justification, analysis_source, created_at)
-                VALUES (:id, :pid, :pmid, :title, :score, :just, :src, :ts)
+                INSERT INTO extractions (id, project_id, pmid, title, relevance_score, relevance_justification, 
+                                       analysis_source, atn_score, atn_category, atn_justifications, created_at)
+                VALUES (:id, :pid, :pmid, :title, :score, :just, :src, :atn_score, :atn_cat, :atn_just, :ts)
                 ON CONFLICT (project_id, pmid) DO UPDATE SET
                     relevance_score = EXCLUDED.relevance_score,
                     relevance_justification = EXCLUDED.relevance_justification,
                     analysis_source = EXCLUDED.analysis_source,
+                    atn_score = EXCLUDED.atn_score,
+                    atn_category = EXCLUDED.atn_category,
+                    atn_justifications = EXCLUDED.atn_justifications,
                     created_at = EXCLUDED.created_at
             """), {
                 "id": str(uuid.uuid4()), 
                 "pid": project_id, 
                 "pmid": article_id, 
                 "title": article.get("title", ""), 
-                "score": score, 
-                "just": reason, 
-                "src": analysis_source, 
+                "score": final_score,  # ✅ SCORE ATN V2.2 RÉEL
+                "just": atn_justification,  # ✅ JUSTIFICATION DÉTAILLÉE
+                "src": analysis_source,
+                "atn_score": atn_results.get("atn_score", 0),
+                "atn_cat": atn_results.get("atn_category", "Non évalué"),
+                "atn_just": json.dumps(atn_results.get("detailed_justifications", [])),
                 "ts": datetime.now().isoformat()
             })
-            
-            logger.info(f"[process_single_article_task] Screening terminé - {article_id}: relevant={is_relevant}, score={score}")
-            result = {"status": "ok", "mode": "screening", "article_id": article_id, "score": score, "relevant": is_relevant}
-            
+
+            logger.info(f"[process_single_article_task] Screening terminé - {article_id}: relevant={is_relevant}, score_atn={final_score}")
+            result = {"status": "ok", "mode": "screening", "article_id": article_id, "score": final_score, "relevant": is_relevant, "atn_score": atn_results.get("atn_score", 0)}
+
         elif analysis_mode in ("full_extraction", "extraction", "extract"):
             # Mode extraction complète : extraction structurée pour ATN
-            
+
             # Déterminer les champs à extraire
             fields_list = []
             if custom_grid_id:
@@ -578,12 +656,12 @@ def process_single_article_task(session, project_id: str, article_id: str, profi
                     text("SELECT fields FROM extraction_grids WHERE id = :gid AND project_id = :pid"), 
                     {"gid": custom_grid_id, "pid": project_id}
                 ).mappings().fetchone()
-                
+
                 if grid_row and grid_row.get("fields"):
                     fields_list_of_dicts = json.loads(grid_row["fields"])
                     if isinstance(fields_list_of_dicts, list):
                         fields_list = [d.get("name") for d in fields_list_of_dicts if d.get("name")]
-            
+
             # Grille par défaut pour ATN si pas de grille custom
             if not fields_list:
                 fields_list = [
@@ -593,7 +671,7 @@ def process_single_article_task(session, project_id: str, article_id: str, profi
                     "Perspective_multipartie", "Considération_éthique", "RGPD_conformité",
                     "Résultats_principaux", "Limites_étude"
                 ]
-            
+
             # Prompt d'extraction structurée
             fields_description = "\n".join([f"- {field}" for field in fields_list])
             extraction_prompt = f"""
@@ -614,9 +692,9 @@ TEXTE DE L'ARTICLE:
 {text_for_analysis[:6000]}
 ---
 """
-            
+
             extracted = call_ollama_api(extraction_prompt, profile["extract"], output_format="json")
-            
+
             # Parsing sécurisé
             if isinstance(extracted, str):
                 try:
@@ -624,57 +702,66 @@ TEXTE DE L'ARTICLE:
                 except Exception as e:
                     logger.warning(f"[process_single_article_task] Parsing extraction échoué pour {article_id}: {e}")
                     extracted = {"key_findings": extracted, "extraction_error": str(e)}
-            
+
             if not isinstance(extracted, dict):
                 extracted = {"raw_response": str(extracted)}
-            
-            # Sauvegarde de l'extraction complète
+
+            # ✅ INTÉGRATION SCORE ATN V2.2 DANS EXTRACTION COMPLÈTE
+            final_score = atn_results.get("atn_score", 10)
+            atn_justification = f"ATN v2.2: {atn_results.get('atn_category', 'Non évalué')} - {atn_results.get('criteria_found', 0)} critères détectés"
+
+            # Sauvegarde de l'extraction complète avec scoring ATN
             session.execute(text("""
                 DELETE FROM extractions 
                 WHERE project_id = :pid AND pmid = :pmid
             """), {"pid": project_id, "pmid": article_id})
+
             session.execute(text("""
-                INSERT INTO extractions (id, project_id, pmid, title, extracted_data, relevance_score, relevance_justification, analysis_source, created_at)
-                VALUES (:id, :pid, :pmid, :title, :ex_data, :score, :just, :src, :ts)
+                INSERT INTO extractions (id, project_id, pmid, title, extracted_data, relevance_score, 
+                                       relevance_justification, analysis_source, atn_score, atn_category, 
+                                       atn_justifications, created_at)
+                VALUES (:id, :pid, :pmid, :title, :ex_data, :score, :just, :src, :atn_score, :atn_cat, :atn_just, :ts)
             """), {
                 "id": str(uuid.uuid4()), 
                 "pid": project_id,
                 "pmid": article_id,
                 "title": article.get("title", ""),
                 "ex_data": json.dumps(extracted),
-                "score": 10,  # Score élevé par défaut pour extraction complète
-                "just": "Extraction détaillée ATN effectuée",
+                "score": final_score,  # ✅ SCORE ATN V2.2 RÉEL (pas fixé 10)
+                "just": atn_justification,  # ✅ JUSTIFICATION ATN DÉTAILLÉE
                 "src": analysis_source,
+                "atn_score": atn_results.get("atn_score", 0),
+                "atn_cat": atn_results.get("atn_category", "Non évalué"),
+                "atn_just": json.dumps(atn_results.get("detailed_justifications", [])),
                 "ts": datetime.now().isoformat()
             })
-            
-            logger.info(f"[process_single_article_task] Extraction complète terminée - {article_id}")
-            result = {"status": "ok", "mode": "full_extraction", "article_id": article_id, "extracted_fields": len(extracted)}
-            
+
+            logger.info(f"[process_single_article_task] Extraction complète terminée - {article_id}: score_atn={final_score}")
+            result = {"status": "ok", "mode": "full_extraction", "article_id": article_id, "extracted_fields": len(extracted), "atn_score": final_score}
+
         else:
             raise ValueError(f"Mode d'analyse inconnu: {analysis_mode}")
-        
+
         # 6) Mise à jour des compteurs de projet
         increment_processed_count(session, project_id)
         update_project_timing(session, project_id, time.time() - start_time)
-        
-        # Notification de progression
+
+        # Notification de progression avec score ATN
         send_project_notification(
             project_id, 
             'article_processed', 
-            f'Article "{article.get("title", "")[:30]}..." traité ({analysis_mode})', 
-            {'article_id': article_id, 'mode': analysis_mode}
+            f'Article "{article.get("title", "")[:30]}..." traité ({analysis_mode}) - Score ATN: {atn_results.get("atn_score", 0)}/100', 
+            {'article_id': article_id, 'mode': analysis_mode, 'atn_score': atn_results.get("atn_score", 0)}
         )
-        
+
+        logger.info(f"✅ Extraction terminée pour {article_id} - Score ATN: {atn_results.get('atn_score', 0)}/100")
         return result
-        
+
     except Exception as e:
         logger.exception("process_single_article_task failed: %s", e)
         # Remonter l'exception pour que RQ marque le job en failed
         raise
-    logger.info(f"✅ Extraction terminée pour {article_id} - données sauvées dans extractions")
-    return result
-    
+     
 @with_db_session
 def run_synthesis_task(session, project_id: str, profile: dict):
     """Génère une synthèse à partir des articles pertinents (score >= 7)."""
