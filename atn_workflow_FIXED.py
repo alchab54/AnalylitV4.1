@@ -48,7 +48,7 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 
 CONFIG = {
     "chunk_size": 20,              # Réduit pour éviter timeouts
-    "max_articles": 300,           # Dataset thèse
+    "max_articles": 350,           # Dataset thèse
     "extraction_timeout": 3600,    # 1h
     "task_polling": 30,            # Check 30s
     "validation_threshold": 8      # Seuil ≥8/10
