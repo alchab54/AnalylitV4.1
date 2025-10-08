@@ -461,52 +461,49 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
     send_project_notification(project_id, 'search_completed', final_message, {'total_results': total_found, 'databases': databases, 'failed': failed_databases})
     logger.info(f"âœ… Recherche multi-bases: total {total_found}")
 
-def calculate_atn_score_for_article(article_data: Dict) -> Dict:
-    """Calcule le score ATN v2.2 pour un article donné avec fallback robuste."""
-    if not ATN_SCORING_AVAILABLE:
-        # Fallback si algorithme ATN non disponible
-        return {
-            "atn_score": 10,  # Score neutre
-            "atn_category": "NON ÉVALUÉ ATN", 
-            "detailed_justifications": [{"criterion": "Algorithme ATN", "score": 0, "terms_found": ["Non disponible"]}],
-            "algorithm_version": "fallback_v1.0"
-        }
-
+def calculate_atn_score_for_article(article_data: dict) -> dict:
+    """
+    Wrapper ROBUSTE pour appeler le moteur de scoring ATN.
+    En cas d'erreur fatale, retourne un résultat indiquant l'échec
+    pour éviter les "faux scores" silencieux.
+    """
     try:
-        # ✅ UTILISATION ALGORITHME ATN V2.2 RÉEL
+        # Assurez-vous que ces imports sont bien en haut de votre fichier
+        # from backend.services.atn_scoring_engine import ATNScoringEngineV22, ATN_SCORING_AVAILABLE
+        
+        # Vérification si le moteur est volontairement désactivé
+        if not ATN_SCORING_AVAILABLE:
+            logger.warning("⚠️ Algorithme ATN non disponible, utilisation du fallback système.")
+            return {
+                "atn_score": 0, # Un score de 0 pour ne pas fausser les moyennes
+                "atn_category": "NON ÉVALUÉ (MOTEUR ATN INACTIF)",
+                "detailed_justifications": [{"criterion": "Système", "terms_found": ["Moteur de scoring ATN désactivé dans la configuration."]}],
+                "algorithm_version": "system_fallback_v1.0"
+            }
+
+        # Instance et exécution du moteur de scoring réel
         engine = ATNScoringEngineV22()
         results = engine.calculate_atn_score_v22(article_data)
-
-        logger.info(f"✅ Score ATN calculé: {results.get('atn_score', 0)}/100 - {results.get('atn_category', 'Non évalué')}")
+        
         return results
 
     except Exception as e:
-        logger.warning(f"⚠️ Erreur calcul ATN v2.2: {e}")
-        # Fallback scoring basique
-        basic_score = 5
-        basic_category = "ERREUR CALCUL"
-
-        # Scoring d'urgence basé sur mots-clés
-        title_lower = article_data.get("title", "").lower()
-        abstract_lower = article_data.get("abstract", "").lower()
-        text_combined = f"{title_lower} {abstract_lower}"
-
-        # Détection basique ATN
-        if any(term in text_combined for term in ["therapeutic alliance", "empathy", "digital health", "ai", "artificial intelligence"]):
-            basic_score = 7
-            basic_category = "PERTINENT PROBABLE"
-        elif any(term in text_combined for term in ["health", "medical", "patient", "therapy", "clinical"]):
-            basic_score = 4
-            basic_category = "MODÉRÉMENT PERTINENT"
-        else:
-            basic_score = 2
-            basic_category = "PEU PERTINENT"
-
+        # Capture une erreur critique inattendue dans le moteur de scoring.
+        # Il est VITAL de ne pas retourner un score numérique qui pourrait être
+        # interprété comme valide (comme votre "7").
+        
+        article_id = article_data.get('article_id', 'ID inconnu')
+        logger.error(f"❌ ERREUR FATALE DANS LE MOTEUR DE SCORING pour l'article {article_id}: {e}", exc_info=True)
+        
+        # Retourner une structure d'erreur claire et non ambiguë
         return {
-            "atn_score": basic_score,
-            "atn_category": basic_category,
-            "detailed_justifications": [{"criterion": "Fallback Scoring", "score": basic_score, "terms_found": ["Calcul d'urgence"]}],
-            "algorithm_version": "emergency_fallback",
+            "atn_score": 0,  # Un score de 0 clair pour l'analyse des données
+            "atn_category": "ERREUR MOTEUR SCORING",
+            "detailed_justifications": [{
+                "criterion": "Erreur Critique du Moteur", 
+                "terms_found": [f"Exception: {str(e)[:150]}..."]
+            }],
+            "algorithm_version": "error_state_v1.0",
             "error": str(e)
         }
 
