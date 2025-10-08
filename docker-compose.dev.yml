@@ -116,7 +116,7 @@ services:
       test-db:
         condition: service_healthy
     volumes:
-      - .:/home/appuser/app:ro
+      - .:/home/appuser/app:rw
     networks: 
       - analylit-network
 

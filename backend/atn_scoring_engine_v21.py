@@ -220,6 +220,44 @@ class ATNScoringEngineV22:
             category = {"name": "FAIBLEMENT PERTINENT", "symbol": "[~]", "color": "yellow"}
         else:
             category = {"name": "PEU PERTINENT ATN", "symbol": "[-]", "color": "red"}
+        
+        # Si aucune justification n'a été générée mais que le score n'est pas nul,
+        # c'est que le score provient uniquement des bonus.
+        if not justifications and score > 0:
+            justification_text = (
+                f"Aucun critère sémantique correspondant à l'ATN n'a été détecté. "
+                f"Le score de {score:.1f} provient uniquement des bonus (ex: date, type d'étude)."
+            )
+            justifications.append({
+                "criterion": "Analyse Sémantique",
+                "justification": justification_text,
+                "score_impact": 0 # Le score ne vient pas d'ici
+            })
+            # Forcer la catégorie pour être cohérent
+            category = "PEU PERTINENT ATN"
+
+        # Assurer que la catégorie est toujours définie
+        if score < self.thresholds['pertinent']:
+            category = "PEU PERTINENT ATN"
+        elif score < self.thresholds['tres_pertinent']:
+            category = "PERTINENT ATN"
+        else:
+            category = "TRÈS PERTINENT ATN"
+            
+        # Si aucun critère sémantique n'a été trouvé mais que le score provient des bonus.
+        if not detailed_justifications and total_score > 0:
+            recency_bonus = total_score  # Le score ne vient que des bonus
+            bonus_justification_text = (
+                f"Aucun critère sémantique ATN détecté. "
+                f"Le score provient uniquement de bonus contextuels ({recency_justification})."
+            )
+            detailed_justifications.append({
+                "criterion": "Analyse Contextuelle (Bonus)",
+                "score": recency_bonus,
+                "max_score": 15,  # 10 (actualité) + 5 (longitudinal)
+                "terms_found": [recency_justification],
+                "percentage": round((recency_bonus / 15) * 100, 1)
+            })
 
         return {
             "atn_score": final_score,

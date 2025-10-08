@@ -43,10 +43,11 @@ from utils.models import (
     Project, SearchResult, Extraction, Grid, ChatMessage, AnalysisProfile, RiskOfBias,
     SCHEMA  # ✅ CORRECTION: Importer la variable SCHEMA pour la configuration de l'engine.
 )
+
 #
 import traceback
 from sqlalchemy.orm import Session # Explicitly import Session for type hinting if needed, though Session is already defined below
-
+from .atn_scoring_engine_v21 import ATNScoringEngineV22
 
 # --- Importer les helpers/utilitaires applicatifs ---
 from utils.fetchers import db_manager, fetch_unpaywall_pdf_url, fetch_article_details
@@ -510,31 +511,27 @@ def calculate_atn_score_for_article(article_data: Dict) -> Dict:
         }
 
 @with_db_session
-def process_single_article_task(session, project_id: str, article_id: str, profile: dict, analysis_mode: str, custom_grid_id: str = None):
-    """Traite un article: screening ou extraction complète avec algorithme ATN v2.2 intégré."""
-    # 1) Normaliser le profil (compatibilité ancienne/nouvelle nomenclature)
+def process_single_article_task(session, project_id: str, article_data: dict, profile: dict, analysis_mode: str, custom_grid_id: str = None):
+    """Traite un article à partir des données fournies directement pour éviter les race conditions."""
+    # 1) Normaliser le profil
     profile = normalize_profile(profile)
 
-    logger.info(f"[process_single_article_task] project={project_id} article={article_id} mode={analysis_mode} profile={profile} grid={custom_grid_id}")
-
+    # ✅ CORRECTION: Utiliser directement article_data au lieu de lire la BDD
+    article = article_data 
+    article_id = article.get("article_id")
+    
+    logger.info(f"[process_single_article_task] project={project_id} article={article_id} mode={analysis_mode}")
     start_time = time.time()
 
     try:
-        # 2) Récupérer les données de l'article depuis search_results
-        row = session.execute(
-            text("SELECT * FROM search_results WHERE project_id = :pid AND article_id = :aid"), 
-            {"pid": project_id, "aid": article_id}
-        ).mappings().fetchone()
+        article = article_data 
+        article_id = article.get("article_id")
+        logger.info(f"[process_single_article_task] Traitement de {article_id} avec données directes.")
 
-        if not row:
-            log_processing_status(session, project_id, article_id, "erreur", "Article introuvable en base.")
-            logger.error(f"Article {article_id} non trouvé dans search_results pour project {project_id}")
-            return {"status": "error", "message": "Article not found"}
-
-        article = dict(row)
 
         # 3) Déterminer le contenu textuel à analyser (PDF si dispo, sinon abstract)
-        text_for_analysis = ""
+        text_for_analysis = f"{article.get('title', '')}\n\n{article.get('abstract', '')}"
+
         analysis_source = "abstract"
 
         # Vérifier si un PDF est disponible
@@ -1586,13 +1583,26 @@ def add_manual_articles_task(session, project_id: str, identifiers: list):
                 default_profile = normalize_profile(config_profile)
 
     logger.info(f"Lancement extraction automatique pour {len(successful_articles)} articles avec profile {default_profile}")
-    for article_id in successful_articles:
+    for record_data in records_to_insert:
+        # Préparer un dictionnaire propre pour le worker
+        article_payload = {
+            "article_id": record_data["aid"],
+            "title": record_data["title"],
+            "abstract": record_data["abstract"],
+            "journal": record_data["journal"],
+            "publication_date": record_data["pub_date"],
+            "database_source": record_data["src"]
+        }
+        
         analysis_queue.enqueue(
             'backend.tasks_v4_complete.process_single_article_task',
-            project_id=project_id, article_id=article_id,
-            profile=default_profile, analysis_mode="full_extraction",
+            project_id=project_id, 
+            article_data=article_payload,  # ✅ PASSER LE DICTIONNAIRE COMPLET
+            profile=default_profile, 
+            analysis_mode="full_extraction",
             job_timeout=600
-        )
+        )   
+        
 
 
 @with_db_session
