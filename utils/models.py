@@ -9,6 +9,7 @@ import uuid
 import json
 from .db_base import Base  # Importer la Base partagée
 from decimal import Decimal
+from sqlalchemy.dialects.postgresql import JSONB
 
 SCHEMA = "analylit_schema"
 
@@ -126,6 +127,14 @@ class Extraction(Base):
     ai_type = Column(String)
     platform_used = Column(String)
 
+    # COLONNES ATN CORRIGÉES
+    atn_score = Column(Numeric(3, 1), default=0.0)
+    atn_category = Column(String(100), default='NON_EVALUE')
+    atn_justifications = Column(JSONB, default=lambda: [])
+    atn_algorithm_version = Column(String(10), default='2.2')
+    atn_processing_time = Column(Numeric, default=0)
+
+    
     def to_dict(self):
         return {
             "id": self.id,
