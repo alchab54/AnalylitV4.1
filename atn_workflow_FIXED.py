@@ -8,6 +8,7 @@
 ✅ CORRECTION CRITIQUE: Format données API compatible
 ✅ Fix KeyError: 'pmid' → Mapping article_id correct
 ✅ Import articles fonctionnel avec endpoints réels
+✅ Import articles fonctionnel avec endpoints réels
 ✅ Scoring ATN v2.2 + grille 30 champs + PDFs
 ✅ Test final AnalyLit V4.1 niveau thèse
 
@@ -40,7 +41,7 @@ if sys.platform.startswith('win'):
 # CONFIGURATION CORRIGÉE
 API_BASE = "http://localhost:8080"
 WEB_BASE = "http://localhost:3000"
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent
 ANALYLIT_JSON_PATH = PROJECT_ROOT / "Analylit.json"
 OUTPUT_DIR = PROJECT_ROOT / "resultats_atn_fixed"
 OUTPUT_DIR.mkdir(exist_ok=True)
