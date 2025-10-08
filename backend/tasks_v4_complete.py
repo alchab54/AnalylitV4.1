@@ -590,6 +590,8 @@ def process_single_article_task(session, project_id: str, article_data: dict, pr
             "keywords": article.get("keywords", []),  # ✅ Liste vide si inexistant
             "database_source": article.get("database_source", "")
         }
+        
+        logger.info(f"[DEBUG_SCORING] Données envoyées au moteur pour {article_id}: {data_for_scoring}")
 
         # Appel du moteur de scoring ATN v2.2 avec données complètes
         atn_results = calculate_atn_score_for_article(data_for_scoring)
