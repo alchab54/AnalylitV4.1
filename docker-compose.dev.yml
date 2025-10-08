@@ -689,7 +689,7 @@ services:
       - analylit-network
     restart: unless-stopped
 
-  worker-analysis-:
+  worker-analysis-3:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
