@@ -507,28 +507,38 @@ def calculate_atn_score_for_article(article_data: dict) -> dict:
             "error": str(e)
         }
 
+
+# ==============================================================================
+# 🏆 PROCESS SINGLE ARTICLE TASK - VERSION FINALE "VICTORY"
+# ==============================================================================
+# Date: 08 octobre 2025
+# Correction: Transmission complète des données au moteur ATN v2.2
+# Plus de scores constants à 9.1 - calcul précis basé sur le contenu réel
+# ==============================================================================
+
 @with_db_session
 def process_single_article_task(session, project_id: str, article_data: dict, profile: dict, analysis_mode: str, custom_grid_id: str = None):
-    """Traite un article à partir des données fournies directement pour éviter les race conditions."""
-    # 1) Normaliser le profil
+    """
+    VERSION VICTORY - Traite un article à partir des données fournies directement,
+    et garantit la transmission correcte des données au moteur de scoring.
+    """
     profile = normalize_profile(profile)
-
-    # ✅ CORRECTION: Utiliser directement article_data au lieu de lire la BDD
     article = article_data 
     article_id = article.get("article_id")
     
     logger.info(f"[process_single_article_task] project={project_id} article={article_id} mode={analysis_mode}")
+    logger.info(f"[process_single_article_task] Traitement de {article_id} avec données directes.")
+    
     start_time = time.time()
 
     try:
-        article = article_data 
-        article_id = article.get("article_id")
-        logger.info(f"[process_single_article_task] Traitement de {article_id} avec données directes.")
-
-
-        # 3) Déterminer le contenu textuel à analyser (PDF si dispo, sinon abstract)
+        # ======================================================================
+        # ✅ DÉTERMINATION DU CONTENU TEXTUEL À ANALYSER
+        # ======================================================================
+        # Priority 1: PDF complet si disponible
+        # Priority 2: Titre + Abstract depuis les données fournies
+        
         text_for_analysis = f"{article.get('title', '')}\n\n{article.get('abstract', '')}"
-
         analysis_source = "abstract"
 
         # Vérifier si un PDF est disponible
@@ -543,8 +553,8 @@ def process_single_article_task(session, project_id: str, article_data: dict, pr
             except Exception as e:
                 logger.warning(f"[process_single_article_task] Erreur lecture PDF {article_id}: {e}")
 
-        # Fallback sur titre + abstract
-        if not text_for_analysis:
+        # Fallback sur titre + abstract si PDF indisponible
+        if not text_for_analysis or len(text_for_analysis.strip()) < 50:
             text_for_analysis = f"{article.get('title', '')}\n\n{article.get('abstract', '')}"
             analysis_source = "abstract"
 
@@ -555,7 +565,40 @@ def process_single_article_task(session, project_id: str, article_data: dict, pr
             logger.warning(f"[process_single_article_task] Contenu insuffisant pour {article_id}")
             return {"status": "skipped", "reason": "insufficient_content"}
 
-        # 4) Prétraitement du contenu avec le modèle preprocess
+        # ======================================================================
+        # ✅ PRÉPARATION DONNÉES POUR SCORING ATN V2.2 - CORRECTION FINALE
+        # ======================================================================
+        # C'est ici que nous corrigeons le bug du 9.1 constant.
+        # Le moteur de scoring doit recevoir toutes les données nécessaires.
+        
+        # Extraction propre de l'année
+        try:
+            publication_date = str(article.get("publication_date", "") or article.get("year", ""))
+            if publication_date and len(publication_date) >= 4:
+                year = int(publication_date[:4])
+            else:
+                year = datetime.now().year
+        except (ValueError, TypeError):
+            year = datetime.now().year
+
+        # Dictionnaire de données COMPLET pour le scoring ATN
+        data_for_scoring = {
+            "title": article.get("title", ""),
+            "abstract": article.get("abstract", ""),  # ✅ GARANTI d'être passé
+            "journal": article.get("journal", ""),
+            "year": year,
+            "keywords": article.get("keywords", []),  # ✅ Liste vide si inexistant
+            "database_source": article.get("database_source", "")
+        }
+
+        # Appel du moteur de scoring ATN v2.2 avec données complètes
+        atn_results = calculate_atn_score_for_article(data_for_scoring)
+        
+        logger.info(f"[ATN_SCORING] Article {article_id}: Score={atn_results.get('atn_score', 0)}, Catégorie={atn_results.get('atn_category', 'Non évalué')}")
+
+        # ======================================================================
+        # ✅ PRÉTRAITEMENT DU CONTENU TEXTUEL
+        # ======================================================================
         if text_for_analysis:
             prompt_norm = f"Nettoie et normalise ce texte scientifique pour extraction d'informations. Retourne du texte propre.\n---\n{text_for_analysis[:3000]}"
             try:
@@ -566,18 +609,10 @@ def process_single_article_task(session, project_id: str, article_data: dict, pr
             except Exception as e:
                 logger.warning(f"[process_single_article_task] Prétraitement échoué pour {article_id}: {e}")
 
-        # ================================================================ 
-        # ✅ CALCUL SCORE ATN V2.2 RÉEL - INTEGRATION CRITIQUE
-        # ================================================================ 
-        atn_results = calculate_atn_score_for_article({
-            "title": article.get("title", ""),
-            "abstract": article.get("abstract", ""),
-            "journal": article.get("journal", ""),
-            "year": int(article.get("publication_date", "2024")[:4]) if article.get("publication_date") and len(article.get("publication_date", "")) >= 4 else 2024,
-            "keywords": [article.get("database_source", "")]
-        })
-
-        # 5) Traitement selon le mode d'analyse
+        # ======================================================================
+        # ✅ TRAITEMENT SELON LE MODE D'ANALYSE
+        # ======================================================================
+        
         if analysis_mode == "screening":
             # Mode screening : évaluation binaire de pertinence avec ATN v2.2
             screening_prompt = (
@@ -607,8 +642,8 @@ def process_single_article_task(session, project_id: str, article_data: dict, pr
             reason = extract_res.get("reason", "")
 
             # ✅ UTILISER SCORE ATN V2.2 (plus précis que score Ollama générique)
-            final_score = atn_results.get("atn_score", ollama_score)
-            atn_justification = f"ATN v2.2: {atn_results.get('atn_category', 'Non évalué')} | {reason}"
+            final_score = atn_results.get("atn_score", 0)
+            atn_justification = f"ATN v2.2: {atn_results.get('atn_category', 'Non évalué')} | Ollama: {reason}"
 
             # Sauvegarde du résultat de screening avec scoring ATN
             session.execute(text("""
@@ -638,11 +673,11 @@ def process_single_article_task(session, project_id: str, article_data: dict, pr
             })
 
             logger.info(f"[process_single_article_task] Screening terminé - {article_id}: relevant={is_relevant}, score_atn={final_score}")
-            result = {"status": "ok", "mode": "screening", "article_id": article_id, "score": final_score, "relevant": is_relevant, "atn_score": atn_results.get("atn_score", 0)}
+            result = {"status": "ok", "mode": "screening", "article_id": article_id, "score": final_score, "relevant": is_relevant}
 
         elif analysis_mode in ("full_extraction", "extraction", "extract"):
-            # Mode extraction complète : extraction structurée pour ATN
-
+            # ✅ MODE EXTRACTION COMPLÈTE AVEC SCORING ATN V2.2 INTÉGRÉ
+            
             # Déterminer les champs à extraire
             fields_list = []
             if custom_grid_id:
@@ -701,28 +736,32 @@ TEXTE DE L'ARTICLE:
                 extracted = {"raw_response": str(extracted)}
 
             # ✅ INTÉGRATION SCORE ATN V2.2 DANS EXTRACTION COMPLÈTE
-            final_score = atn_results.get("atn_score", 10)
+            final_score = atn_results.get("atn_score", 0)
             atn_justification = f"ATN v2.2: {atn_results.get('atn_category', 'Non évalué')} - {atn_results.get('criteria_found', 0)} critères détectés"
 
             # Sauvegarde de l'extraction complète avec scoring ATN
-            session.execute(text("""
-                DELETE FROM extractions 
-                WHERE project_id = :pid AND pmid = :pmid
-            """), {"pid": project_id, "pmid": article_id})
-
             session.execute(text("""
                 INSERT INTO extractions (id, project_id, pmid, title, extracted_data, relevance_score, 
                                        relevance_justification, analysis_source, atn_score, atn_category, 
                                        atn_justifications, created_at)
                 VALUES (:id, :pid, :pmid, :title, :ex_data, :score, :just, :src, :atn_score, :atn_cat, :atn_just, :ts)
+                ON CONFLICT (project_id, pmid) DO UPDATE SET 
+                    extracted_data = EXCLUDED.extracted_data,
+                    relevance_score = EXCLUDED.relevance_score,
+                    relevance_justification = EXCLUDED.relevance_justification,
+                    analysis_source = EXCLUDED.analysis_source,
+                    atn_score = EXCLUDED.atn_score,
+                    atn_category = EXCLUDED.atn_category,
+                    atn_justifications = EXCLUDED.atn_justifications,
+                    created_at = EXCLUDED.created_at
             """), {
                 "id": str(uuid.uuid4()), 
                 "pid": project_id,
                 "pmid": article_id,
                 "title": article.get("title", ""),
                 "ex_data": json.dumps(extracted),
-                "score": final_score,  # ✅ SCORE ATN V2.2 RÉEL (pas fixé 10)
-                "just": atn_justification,  # ✅ JUSTIFICATION ATN DÉTAILLÉE
+                "score": final_score,  # ✅ SCORE ATN V2.2 CALCULÉ AVEC DONNÉES COMPLÈTES
+                "just": atn_justification,
                 "src": analysis_source,
                 "atn_score": atn_results.get("atn_score", 0),
                 "atn_cat": atn_results.get("atn_category", "Non évalué"),
@@ -736,26 +775,30 @@ TEXTE DE L'ARTICLE:
         else:
             raise ValueError(f"Mode d'analyse inconnu: {analysis_mode}")
 
-        # 6) Mise à jour des compteurs de projet
+        # ======================================================================
+        # ✅ FINALISATION ET NOTIFICATIONS
+        # ======================================================================
+        
         increment_processed_count(session, project_id)
         update_project_timing(session, project_id, time.time() - start_time)
-
-        # Notification de progression avec score ATN
+        
         send_project_notification(
             project_id, 
             'article_processed', 
-            f'Article "{article.get("title", "")[:30]}..." traité ({analysis_mode}) - Score ATN: {atn_results.get("atn_score", 0)}/100', 
-            {'article_id': article_id, 'mode': analysis_mode, 'atn_score': atn_results.get("atn_score", 0)}
+            f'Article "{article.get("title", "")[:30]}..." traité - Score ATN: {atn_results.get("atn_score", 0)}', 
+            {'article_id': article_id, 'atn_score': atn_results.get("atn_score", 0)}
         )
-
+        
         logger.info(f"✅ Extraction terminée pour {article_id} - Score ATN: {atn_results.get('atn_score', 0)}/100")
+
         return result
 
     except Exception as e:
-        logger.exception("process_single_article_task failed: %s", e)
-        # Remonter l'exception pour que RQ marque le job en failed
+        logger.exception(f"ERREUR CRITIQUE dans process_single_article_task pour {article_id}: {e}")
+        increment_processed_count(session, project_id)
+        log_processing_status(session, project_id, article_id, "erreur", f"Erreur fatale: {str(e)[:100]}")
         raise
-     
+   
 @with_db_session
 def run_synthesis_task(session, project_id: str, profile: dict):
     """Génère une synthèse à partir des articles pertinents (score >= 7)."""
