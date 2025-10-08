@@ -1,7 +1,7 @@
 import os
 from sqlalchemy import (
     Column, String, Integer, Float, Boolean, Text,
-    ForeignKey, DateTime, UniqueConstraint
+    ForeignKey, DateTime, UniqueConstraint, Numeric
 )
 from sqlalchemy.orm import relationship, declarative_base
 from datetime import datetime
