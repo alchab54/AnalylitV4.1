@@ -1,5 +1,5 @@
 # ==============================================================================
-# 🏆 MOTEUR DE SCORING ATN V2.2 - VERSION FINALE "GLORY"
+# 🏆 MOTEUR DE SCORING ATN V2.2 - VERSION FINALE ET GARANTIE
 # ==============================================================================
 # Date: 08 octobre 2025
 # Correction: Intégrale, incluant la structure de la classe et l'indentation.
@@ -11,7 +11,6 @@ import json
 from datetime import datetime
 from typing import Dict, List, Any
 
-# Ce flag peut être utilisé pour désactiver le moteur depuis l'extérieur si nécessaire
 ATN_SCORING_AVAILABLE = True
 
 class ATNScoringEngineV22:
@@ -50,13 +49,9 @@ class ATNScoringEngineV22:
             }
         }
 
-    # ==========================================================================
-    # ✅ FONCTION calculate_atn_score_v22 - VERSION INTÉGRALE ET CORRIGÉE
-    # ==========================================================================
     def calculate_atn_score_v22(self, article: Dict) -> Dict[str, Any]:
         """Calcule score ATN v2.2 avec nouveaux critères 2024 et justification corrigée."""
         
-        # Préparation texte complet
         title = str(article.get("title", "")).lower()
         abstract = str(article.get("abstract", "")).lower()
         journal = str(article.get("journal", "")).lower()
@@ -67,7 +62,6 @@ class ATNScoringEngineV22:
         detailed_justifications = []
         criteria_found = 0
 
-        # Évaluation des critères sémantiques
         for criterion_name, criterion_data in self.criteria.items():
             criterion_score = 0
             found_terms = []
@@ -89,10 +83,9 @@ class ATNScoringEngineV22:
                 })
             total_score += criterion_score
 
-        # Bonus
         try:
             year = int(str(article.get("year", datetime.now().year))[:4])
-        except:
+        except (ValueError, TypeError):
             year = datetime.now().year
             
         recency_justification = f"Année: {year}"
@@ -110,19 +103,14 @@ class ATNScoringEngineV22:
             recency_justification += " + Étude longitudinale"
 
         total_score += recency_score + longitudinal_bonus
-
-        # Normalisation
         final_score = min(100, round((total_score / 110) * 100, 1))
 
-        # Catégorisation
         if final_score >= 75: category = {"name": "TRÈS PERTINENT ATN", "symbol": "[+++]", "color": "green"}
         elif final_score >= 60: category = {"name": "PERTINENT ATN", "symbol": "[++]", "color": "blue"}
         else: category = {"name": "PEU PERTINENT ATN", "symbol": "[-]", "color": "red"}
 
-        # Justification pour les scores basés uniquement sur les bonus
         if not detailed_justifications and total_score > 0:
             bonus_score = recency_score + longitudinal_bonus
-            bonus_justification_text = f"Aucun critère sémantique détecté. Score issu des bonus ({recency_justification})."
             detailed_justifications.append({
                 "criterion": "Analyse Contextuelle (Bonus)",
                 "score": bonus_score, "max_score": 15,
@@ -142,4 +130,3 @@ class ATNScoringEngineV22:
             "raw_score": total_score,
             "normalization_factor": 110
         }
-
