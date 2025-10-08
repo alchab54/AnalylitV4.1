@@ -1553,80 +1553,86 @@ def run_risk_of_bias_task(session, project_id: str, article_id: str):
 # ================================================================ 
 
 @with_db_session
-def add_manual_articles_task(session, project_id: str, identifiers: list):
+def add_manual_articles_task(session, project_id: str, items: list, use_full_data: bool = False):
     """
-    Tâche d'arrière-plan pour ajouter des articles manuellement.
-
+    Tâche d'arrière-plan pour ajouter des articles.
+    VERSION VICTORY: Gère les données complètes (depuis le workflow) ou les simples identifiants.
     """
-
-    logger.info(f"ðŸ“  Ajout manuel d'articles pour le projet {project_id}")
-    if not identifiers:
-        logger.warning(f"Aucun identifiant fourni pour le projet {project_id}.")
+    logger.info(f"🧬 Ajout manuel VICTORY pour projet {project_id}. Utilisation données complètes: {use_full_data}")
+    if not items:
+        logger.warning(f"Aucun item fourni pour le projet {project_id}.")
         return
 
     records_to_insert = []
-    for article_id in identifiers:
+    
+    # BOUCLE PRINCIPALE CORRIGÉE POUR LA VICTOIRE
+    for item_data in items:
         try:
+            details = {}
+            if use_full_data and isinstance(item_data, dict):
+                # ✅ NOUVELLE LOGIQUE: Utiliser les données complètes déjà fournies
+                details = item_data 
+                article_id = details.get('article_id') or details.get('pmid')
+                logger.debug(f"Données complètes utilisées pour: {article_id}")
+            else:
+                # ANCIENNE LOGIQUE (pour la rétrocompatibilité)
+                article_id = str(item_data)
+                details = fetch_article_details(article_id)
 
-            details = fetch_article_details(article_id)
-        except Exception as e:
-            logger.warning(f"Impossible de récupérer les détails pour {article_id}: {e}")
-            continue
-        try:
-            exists = session.execute(text("SELECT 1 FROM search_results WHERE project_id = :pid AND article_id = :aid"), {"pid": project_id, "aid": details.get('id') or article_id}).fetchone()
+            if not article_id:
+                logger.warning(f"Item sans ID ignoré: {str(item_data)[:100]}")
+                continue
+
+            # Vérification de l'existence de l'article pour éviter les doublons
+            exists = session.execute(text("SELECT 1 FROM search_results WHERE project_id = :pid AND article_id = :aid"), {"pid": project_id, "aid": article_id}).fetchone()
             if exists:
-
+                logger.debug(f"Article {article_id} déjà existant, ignoré.")
                 continue
             
+            # Création de l'enregistrement à insérer avec TOUTES les données
             records_to_insert.append({
-                "id": str(uuid.uuid4()), "pid": project_id, "aid": details.get('id') or article_id,
-                "title": details.get('title', '') or f"Article {article_id}", "abstract": details.get('abstract', '') or '',
-                "authors": details.get('authors', '') or '', "pub_date": details.get('publication_date', '') or '',
-                "journal": details.get('journal', '') or '', "doi": details.get('doi', '') or '',
-                "url": details.get('url', '') or '', "src": details.get('database_source', 'manual'),
+                "id": str(uuid.uuid4()), 
+                "pid": project_id, 
+                "aid": article_id,
+                "title": details.get('title', f"Article {article_id}"),
+                "abstract": details.get('abstract', 'Résumé non disponible.'),
+                "authors": details.get('authors', 'Auteurs non spécifiés'),
+                "pub_date": details.get('publication_date', '') or str(details.get('year', '')),
+                "journal": details.get('journal', 'Journal non spécifié'),
+                "doi": details.get('doi', ''),
+                "url": details.get('url', ''),
+                "src": details.get('database_source', 'zotero_real' if use_full_data else 'manual'),
                 "ts": datetime.now().isoformat()
             })
 
         except Exception as e:
-            logger.warning(f"Ajout manuel ignoré pour {article_id}: {e}")
+            logger.error(f"Erreur lors du traitement de l'item {str(item_data)[:100]}: {e}", exc_info=True)
             continue
     
-    if records_to_insert:
-        session.execute(text("""
-            INSERT INTO search_results (id, project_id, article_id, title, abstract, authors, publication_date, journal, doi, url, database_source, created_at)
-            VALUES (:id, :pid, :aid, :title, :abstract, :authors, :pub_date, :journal, :doi, :url, :src, :ts)
-        """), records_to_insert)
+    if not records_to_insert:
+        logger.info(f"Aucun nouvel article à ajouter pour {project_id}.")
+        send_project_notification(project_id, 'import_completed', f'Import terminé: Aucun nouvel article ajouté.')
+        return
 
+    # Insertion en base de données
+    session.execute(text("""
+        INSERT INTO search_results (id, project_id, article_id, title, abstract, authors, publication_date, journal, doi, url, database_source, created_at)
+        VALUES (:id, :pid, :aid, :title, :abstract, :authors, :pub_date, :journal, :doi, :url, :src, :ts)
+    """), records_to_insert)
 
+    # Mise à jour du projet et notification
+    session.execute(text("UPDATE projects SET pmids_count = (SELECT COUNT(*) FROM search_results WHERE project_id = :pid), updated_at = :ts WHERE id = :pid"), {"pid": project_id, "ts": datetime.now().isoformat()})
+    send_project_notification(project_id, 'import_completed', f'Ajout manuel terminé: {len(records_to_insert)} article(s) ajouté(s).')
+    logger.info(f"✅ Ajout manuel VICTORY terminé pour {project_id}. {len(records_to_insert)} articles ajoutés.")
 
-    successful_articles = [record['aid'] for record in records_to_insert]
-
-    session.execute(text("UPDATE projects SET pmids_count = (SELECT COUNT(*) FROM search_results WHERE project_id = :pid), updated_at = :ts WHERE id = :pid"), {"pid": project_id, "ts": datetime.now().isoformat()})  # This line was fixed
-
-    send_project_notification(project_id, 'import_completed', f'Ajout manuel terminé: {len(records_to_insert)} article(s) ajouté(s).') # This line was fixed
-
-    logger.info(f"âœ… Ajout manuel terminé pour le projet {project_id}. {len(records_to_insert)} articles ajoutés.") # This line was fixed
-    # Lancer l'extraction automatique pour tous les articles ajoutés
+    # Lancement de l'extraction automatique pour les nouveaux articles
     project = session.query(Project).filter_by(id=project_id).first()
     profile_used = project.profile_used if project else 'standard'
-    default_profile = {
-        'preprocess': 'phi3:mini',
-        'extract': 'llama3:8b', 
-        'synthesis': 'llama3:8b'
-    }
+    default_profile = { 'preprocess': 'phi3:mini', 'extract': 'phi3:mini', 'synthesis': 'llama3:8b' }
 
-    # Optionnel: utiliser la config si disponible
-    if hasattr(config, 'DEFAULT_MODELS') and config.DEFAULT_MODELS:
-        available_models = list(config.DEFAULT_MODELS.keys())
-        if available_models:
-            model_key = available_models[0]  # Prendre le premier disponible
-            config_profile = config.DEFAULT_MODELS[model_key]
-            if isinstance(config_profile, dict):
-                default_profile = normalize_profile(config_profile)
-
-    logger.info(f"Lancement extraction automatique pour {len(successful_articles)} articles avec profile {default_profile}")
+    logger.info(f"Lancement extraction automatique pour {len(records_to_insert)} articles avec profile {default_profile}")
     for record_data in records_to_insert:
-        # Préparer un dictionnaire propre pour le worker
+        # ✅ C'est ici que la magie opère : `record_data` contient maintenant le VRAI titre et abstract
         article_payload = {
             "article_id": record_data["aid"],
             "title": record_data["title"],
@@ -1638,14 +1644,9 @@ def add_manual_articles_task(session, project_id: str, identifiers: list):
         
         analysis_queue.enqueue(
             'backend.tasks_v4_complete.process_single_article_task',
-            project_id=project_id, 
-            article_data=article_payload,  # ✅ PASSER LE DICTIONNAIRE COMPLET
-            profile=default_profile, 
-            analysis_mode="full_extraction",
-            job_timeout=600
-        )   
-        
-
+            args=(project_id, article_payload, default_profile, "full_extraction"),
+            job_timeout=1200 # Timeout augmenté pour les vrais articles
+        )        
 
 @with_db_session
 def import_from_zotero_json_task(session, project_id: str, items_list: list):

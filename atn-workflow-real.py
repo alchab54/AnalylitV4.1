@@ -386,7 +386,10 @@ class ATNWorkflowReal:
                     "database_source": "zotero_real"
                 })
             
-            data = {"items": items_data}
+            data = {
+                "items": items_data,  # items_data contient déjà toutes les infos
+                "use_full_data": True # Un drapeau pour dire à la tâche d'utiliser ces données
+            }
             
             result = api_request_real(
                 "POST", 
