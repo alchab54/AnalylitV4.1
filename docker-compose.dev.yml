@@ -65,10 +65,12 @@ services:
 
   # Ollama avec optimisation GPU
   ollama:
-    image: ollama/ollama:latest
+    build:
+      context: .
+      dockerfile: docker/ollama/Dockerfile
     container_name: analylit_ollama_dev
     ports:
-      - "11434:11434"
+    - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
       - ./files:/app/zotero_storage
