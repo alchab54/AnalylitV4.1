@@ -276,7 +276,7 @@ class ATNWorkflowGlory:
 
     def load_articles_glory(self) -> bool:
         """Charge articles avec parser compatible."""
-        log_section("CHARGEMENT ARTICLES - GLORY")
+        log_section("CHARGEMENT ARTICLES - GLORY (AVEC PDF PATH)")
 
         self.articles = parse_analylit_json_glory(
             ANALYLIT_JSON_PATH,
