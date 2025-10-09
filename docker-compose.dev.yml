@@ -36,7 +36,7 @@ services:
       - "5434:5432"
     volumes:
       - test_postgres_data:/var/lib/postgresql/data
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
     networks:
       - analylit-network
     healthcheck:
@@ -71,7 +71,7 @@ services:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
     environment:
       - OLLAMA_KEEP_ALIVE=24h
       - OLLAMA_HOST=0.0.0.0
@@ -119,7 +119,7 @@ services:
         condition: service_healthy
     volumes:
       - .:/home/appuser/app:rw
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
     networks: 
       - analylit-network
 
@@ -149,7 +149,8 @@ services:
       TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
+      
     depends_on:
       test-db:
         condition: service_healthy
@@ -186,7 +187,7 @@ services:
       TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
     depends_on:
       test-db:
         condition: service_healthy
@@ -231,7 +232,7 @@ services:
 
     volumes:
       - .:/home/appuser/app
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
     networks:
       - analylit-network
     restart: unless-stopped
@@ -296,7 +297,7 @@ services:
       TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
     networks:
       - analylit-network
     restart: unless-stopped
@@ -328,7 +329,7 @@ services:
       TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
     networks:
       - analylit-network
     restart: unless-stopped
@@ -359,7 +360,7 @@ services:
       ATN_SCORING_ENABLED: "true"
       TZ: Europe/Paris
     volumes:
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
       - .:/home/appuser/app
     networks:
       - analylit-network
@@ -423,7 +424,7 @@ services:
       ATN_SCORING_ENABLED: "true"
       TZ: Europe/Paris
     volumes:
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
       - .:/home/appuser/app
     networks:
       - analylit-network
@@ -455,7 +456,7 @@ services:
       ATN_SCORING_ENABLED: "true"
       TZ: Europe/Paris
     volumes:
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
       - .:/home/appuser/app
     networks:
       - analylit-network
@@ -494,7 +495,7 @@ services:
       OLLAMA_GPU_MEMORY_FRACTION: 0.7
       TZ: Europe/Paris
     volumes:
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
       - .:/home/appuser/app
     networks:
       - analylit-network
@@ -530,7 +531,7 @@ services:
       OLLAMA_GPU_MEMORY_FRACTION: 0.7
       TZ: Europe/Paris
     volumes:
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
       - .:/home/appuser/app
     networks:
       - analylit-network
@@ -566,7 +567,7 @@ services:
       OLLAMA_GPU_MEMORY_FRACTION: 0.7
       TZ: Europe/Paris
     volumes:
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
       - .:/home/appuser/app
     networks:
       - analylit-network
@@ -602,7 +603,7 @@ services:
       OLLAMA_GPU_MEMORY_FRACTION: 0.7
       TZ: Europe/Paris
     volumes:
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
       - .:/home/appuser/app
     networks:
       - analylit-network
@@ -644,7 +645,7 @@ services:
       RQ_JOB_TIMEOUT: "600"
       TZ: Europe/Paris
     volumes:
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
       - .:/home/appuser/app
     deploy:
       resources:
@@ -692,7 +693,7 @@ services:
       RQ_JOB_TIMEOUT: "600"
       TZ: Europe/Paris
     volumes:
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
       - .:/home/appuser/app
     deploy:
       resources:
@@ -740,7 +741,7 @@ services:
       RQ_JOB_TIMEOUT: "600"
       TZ: Europe/Paris
     volumes:
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
       - .:/home/appuser/app
     deploy:
       resources:
@@ -788,7 +789,7 @@ services:
       RQ_JOB_TIMEOUT: "600"
       TZ: Europe/Paris
     volumes:
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
       - .:/home/appuser/app
     deploy:
       resources:
@@ -831,7 +832,7 @@ services:
       PREFERRED_MODEL: llama3:8b  # Modèle performant pour synthèses
       TZ: Europe/Paris
     volumes:
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
       - .:/home/appuser/app
     networks:
       - analylit-network
@@ -864,7 +865,7 @@ services:
       PREFERRED_MODEL: llama3:8b
       TZ: Europe/Paris
     volumes:
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
       - .:/home/appuser/app
     networks:
       - analylit-network
@@ -899,7 +900,7 @@ services:
       WORKER_ID: discussion-1
       TZ: Europe/Paris
     volumes:
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
       - .:/home/appuser/app
     networks:
       - analylit-network
@@ -932,7 +933,7 @@ services:
     ports:
       - "9000:9000"
     volumes:
-      - ./zotero_storage:/app/zotero_storage:ro
+      - ./files:/app/zotero_storage
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
     networks:
