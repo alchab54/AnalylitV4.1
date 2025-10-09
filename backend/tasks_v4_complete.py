@@ -1734,41 +1734,33 @@ def add_manual_articles_task(session, project_id: str, items: list, use_full_dat
     # Lancement de l'extraction automatique pour les nouveaux articles
     project = session.query(Project).filter_by(id=project_id).first()
     profile_used = project.profile_used if project else 'standard'
+    # Utilisation d'un profil par défaut simple, car c'est un import de masse
     default_profile = { 'preprocess': 'phi3:mini', 'extract': 'phi3:mini', 'synthesis': 'llama3:8b' }
 
-    logger.info(f"✅ Ajout manuel VICTORY terminé pour {project_id}. {len(records_to_insert)} articles ajoutés.")
-
-    # ======================================================================
-    # === CORRECTION DÉFINITIVE : LANCEMENT DES TÂCHES D'ANALYSE ROBUSTE ===
-    # ======================================================================
-    if not records_to_insert:
-        logger.info("Aucun nouvel article à analyser.")
+    if not items:
+        logger.info("Aucun article original fourni pour l'analyse, fin de la tâche.")
         return
 
-    logger.info(f"Préparation de l'analyse pour {len(records_to_insert)} nouveaux articles...")
+    logger.info(f"Préparation de l'analyse pour les {len(items)} articles soumis...")
 
-    # On crée un dictionnaire des articles originaux pour un accès instantané
-    items_by_id = { (item.get('article_id') or item.get('pmid')): item for item in items }
-    
-    # On itère sur les articles qui ont été VRAIMENT ajoutés à la base
-    for new_record in records_to_insert:
-        article_id = new_record['aid']
+    # On itère sur la liste originale `items` qui contient TOUTES les données
+    for article_data_item in items:
+        article_id = article_data_item.get('article_id') or article_data_item.get('pmid')
         
-        # On retrouve l'objet article original complet grâce à son ID
-        original_item_data = items_by_id.get(article_id)
-
-        if not original_item_data:
-            logger.error(f"[FATAL] Impossible de retrouver les données originales pour l'article {article_id}. Tâche annulée pour cet article.")
+        if not article_id:
+            logger.warning("Item sans ID ignoré lors de la mise en file d'attente de l'analyse.")
             continue
 
-        logger.info(f"Mise en file de l'article {article_id} avec ses données complètes (PDF potentiels inclus).")
+        logger.info(f"Mise en file d'attente de l'analyse pour l'article {article_id}...")
         
-        # ✅ VICTOIRE : On passe l'objet 'original_item_data' COMPLET et non l'ID.
+        # ✅ VICTOIRE : On passe l'objet article complet (le dictionnaire) à la tâche.
         analysis_queue.enqueue(
             'backend.tasks_v4_complete.process_single_article_task',
-            args=(project_id, original_item_data, default_profile, "full_extraction"),
-            job_timeout=1800
+            args=(project_id, article_data_item, default_profile, "full_extraction"),
+            job_timeout=3600  # Timeout étendu pour l'analyse complète
         )
+
+    logger.info(f"✅ Toutes les tâches d'analyse pour les {len(items)} articles ont été mises en file d'attente.")
 
 @with_db_session
 def import_from_zotero_json_task(session, project_id: str, items_list: list):
