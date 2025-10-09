@@ -1709,25 +1709,28 @@ def add_manual_articles_task(session, project_id: str, items: list, use_full_dat
 
     logger.info(f"Préparation de l'analyse pour {len(records_to_insert)} nouveaux articles...")
 
-    # On crée un set des ID des articles qui viennent d'être ajoutés, pour un accès ultra-rapide.
-    newly_inserted_ids = {r['aid'] for r in records_to_insert}
+    # On crée un dictionnaire des articles originaux pour un accès instantané
+    items_by_id = { (item.get('article_id') or item.get('pmid')): item for item in items }
     
-    # On itère sur les 'items' d'origine, qui sont les seuls à contenir les données COMPLÈTES (avec 'attachments').
-    for original_item_data in items:
-        # On récupère l'ID de l'article original, qu'il soit dans 'pmid' ou 'article_id'.
-        article_id = original_item_data.get('article_id') or original_item_data.get('pmid')
+    # On itère sur les articles qui ont été VRAIMENT ajoutés à la base
+    for new_record in records_to_insert:
+        article_id = new_record['aid']
+        
+        # On retrouve l'objet article original complet grâce à son ID
+        original_item_data = items_by_id.get(article_id)
 
-        # On ne met en file que les articles qui viennent d'être insérés dans la base.
-        if article_id in newly_inserted_ids:
-            logger.info(f"Mise en file de l'article {article_id} avec ses données complètes (PDF potentiels inclus).")
-            
-            # ✅ VICTOIRE : On passe l'objet 'original_item_data' COMPLET et non modifié.
-            # La clé 'attachments' est donc préservée.
-            analysis_queue.enqueue(
-                'backend.tasks_v4_complete.process_single_article_task',
-                args=(project_id, original_item_data, default_profile, "full_extraction"),
-                job_timeout=1800 # Timeout augmenté pour traitement PDF
-            )
+        if not original_item_data:
+            logger.error(f"[FATAL] Impossible de retrouver les données originales pour l'article {article_id}. Tâche annulée pour cet article.")
+            continue
+
+        logger.info(f"Mise en file de l'article {article_id} avec ses données complètes (PDF potentiels inclus).")
+        
+        # ✅ VICTOIRE : On passe l'objet 'original_item_data' COMPLET et non l'ID.
+        analysis_queue.enqueue(
+            'backend.tasks_v4_complete.process_single_article_task',
+            args=(project_id, original_item_data, default_profile, "full_extraction"),
+            job_timeout=1800
+        )
 
 @with_db_session
 def import_from_zotero_json_task(session, project_id: str, items_list: list):
