@@ -180,7 +180,7 @@ def parse_analylit_json_glory(json_path: Path, max_articles: int = None) -> List
             article_id = generate_unique_article_id(item)
 
             # Format API compatible
-                article = {
+            article = {
                 "pmid": article_id,
                 "article_id": article_id,
                 "title": title,
@@ -195,7 +195,7 @@ def parse_analylit_json_glory(json_path: Path, max_articles: int = None) -> List
                 'relevance_score': 0,
                 'has_pdf_potential': bool(doi or 'pubmed' in url.lower()),
                 'attachments': item.get('attachments', []) # ✅ LA LIGNE DE LA VICTOIRE
-                }
+            }
             articles.append(article)
 
             # Progress pour gros fichiers
