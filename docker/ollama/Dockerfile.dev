@@ -1,21 +1,12 @@
-# Chemin : docker/ollama/Dockerfile.dev
-# --- VERSION DE LA VICTOIRE FINALE ---
-
+# --- CHEMIN: docker/ollama/Dockerfile.dev (VERSION FINALE) ---
 FROM ollama/ollama:latest
 
-# Copier le script qui sera utilisé LORSQUE le conteneur s'exécutera
+# Copier notre script de démarrage intelligent
 COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# LA CORRECTION ULTIME :
-# Créer un script qui démarre le serveur, télécharge les modèles,
-# puis s'arrête. Le tout dans une seule couche RUN.
-RUN \
-    ollama serve & \
-    sleep 5 && \
-    ollama pull phi3:mini && \
-    ollama pull llama3:8b && \
-    pkill ollama
+# Définir une zone de stockage persistante pour les modèles téléchargés
+VOLUME /root/.ollama
 
-# Le point d'entrée pour le conteneur final (après la construction)
+# Quand le conteneur démarrera, il exécutera notre script. C'est tout.
 ENTRYPOINT ["/entrypoint.sh"]
