@@ -1694,23 +1694,25 @@ def add_manual_articles_task(session, project_id: str, items: list, use_full_dat
     profile_used = project.profile_used if project else 'standard'
     default_profile = { 'preprocess': 'phi3:mini', 'extract': 'phi3:mini', 'synthesis': 'llama3:8b' }
 
-    logger.info(f"Lancement extraction automatique pour {len(records_to_insert)} articles avec profile {default_profile}")
-    for record_data in records_to_insert:
-        # ✅ C'est ici que la magie opère : `record_data` contient maintenant le VRAI titre et abstract
-        article_payload = {
-            "article_id": record_data["aid"],
-            "title": record_data["title"],
-            "abstract": record_data["abstract"],
-            "journal": record_data["journal"],
-            "publication_date": record_data["pub_date"],
-            "database_source": record_data["src"]
-        }
+    logger.info(f"Lancement extraction automatique pour {len(items)} articles...")
+
+    # On itère sur les items originaux qui contiennent TOUTES les données
+    for item_data in items: 
+        article_id_to_process = item_data.get('article_id') or item_data.get('pmid')
         
-        analysis_queue.enqueue(
-            'backend.tasks_v4_complete.process_single_article_task',
-            args=(project_id, article_payload, default_profile, "full_extraction"),
-            job_timeout=1200 # Timeout augmenté pour les vrais articles
-        )        
+        # On vérifie que cet article fait bien partie de ceux qu'on vient d'insérer
+        # pour ne pas traiter des doublons.
+        is_newly_inserted = any(rec['aid'] == article_id_to_process for rec in records_to_insert)
+
+        if article_id_to_process and is_newly_inserted:
+            # ✅ SOLUTION : On passe l'objet 'item_data' COMPLET, qui contient la clé 'attachments'
+            logger.info(f"Mise en file de l'article {article_id_to_process} avec ses données complètes pour traitement.")
+            
+            analysis_queue.enqueue(
+                'backend.tasks_v4_complete.process_single_article_task',
+                args=(project_id, item_data, default_profile, "full_extraction"),
+                job_timeout=1800 # Timeout un peu plus long pour le traitement PDF
+            )      
 
 @with_db_session
 def import_from_zotero_json_task(session, project_id: str, items_list: list):

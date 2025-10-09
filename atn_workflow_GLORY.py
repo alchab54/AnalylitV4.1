@@ -180,22 +180,22 @@ def parse_analylit_json_glory(json_path: Path, max_articles: int = None) -> List
             article_id = generate_unique_article_id(item)
 
             # Format API compatible
-            article = {
+                article = {
                 "pmid": article_id,
                 "article_id": article_id,
                 "title": title,
-                "authors": authors_str,
+                "authors": str(authors) if authors else 'Auteur non spécifié',
                 "year": year,
-                "abstract": str(item.get("abstract", "")).strip()[:2000],
-                "journal": str(item.get("container-title", "")).strip() or "Journal à identifier",
+                "abstract": str(item.get('abstract', '')).strip()[:20000],
+                "journal": str(item.get('container-title', '')).strip() or 'Journal non identifié',
                 "doi": doi,
                 "url": url,
-                "database_source": "zotero_analylit",
+                "database_source": 'zotero_analylit',
                 "publication_date": f"{year}-01-01",
-                "relevance_score": 0,
-                "has_pdf_potential": bool(doi or "pubmed" in url.lower())
+                'relevance_score': 0,
+                'has_pdf_potential': bool(doi or 'pubmed' in url.lower()),
+                'attachments': item.get('attachments', []) # ✅ LA LIGNE DE LA VICTOIRE
             }
-
             articles.append(article)
 
             # Progress pour gros fichiers
