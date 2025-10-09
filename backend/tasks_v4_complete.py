@@ -786,6 +786,8 @@ def process_single_article_task(project_id, article, profile, analysis_mode, job
             
             # Déterminer les champs à extraire
             fields_list = []
+            custom_grid_id = None
+            
             if custom_grid_id:
                 grid_row = session.execute(
                     text("SELECT fields FROM extraction_grids WHERE id = :gid AND project_id = :pid"), 
