@@ -1694,26 +1694,35 @@ def add_manual_articles_task(session, project_id: str, items: list, use_full_dat
     profile_used = project.profile_used if project else 'standard'
     default_profile = { 'preprocess': 'phi3:mini', 'extract': 'phi3:mini', 'synthesis': 'llama3:8b' }
 
-    logger.info(f"Lancement extraction automatique pour les nouveaux articles...")
-    
-    # On itère sur les 'items' originaux qui contiennent TOUTES les données
-    for item_data in items: 
-        # On retrouve l'ID de l'article original
-        article_id_to_process = item_data.get('article_id') or item_data.get('pmid')
-        
-        # On vérifie qu'il fait bien partie des articles NOUVELLEMENT insérés
-        # pour éviter de traiter des doublons qui étaient déjà dans la base
-        is_newly_inserted = any(rec['aid'] == article_id_to_process for rec in records_to_insert)
+    logger.info(f"✅ Ajout manuel VICTORY terminé pour {project_id}. {len(records_to_insert)} articles ajoutés.")
 
-        if article_id_to_process and is_newly_inserted:
-            # ✅ SOLUTION FINALE : On passe l'objet 'item_data' COMPLET, 
-            # qui contient la clé 'attachments' et toutes les autres métadonnées.
-            logger.info(f"Mise en file de l'article {article_id_to_process} avec ses données complètes (PDF inclus).")
+    # ======================================================================
+    # === CORRECTION DÉFINITIVE : LANCEMENT DES TÂCHES D'ANALYSE ROBUSTE ===
+    # ======================================================================
+    if not records_to_insert:
+        logger.info("Aucun nouvel article à analyser.")
+        return
+
+    logger.info(f"Préparation de l'analyse pour {len(records_to_insert)} nouveaux articles...")
+
+    # On crée un set des ID des articles qui viennent d'être ajoutés, pour un accès ultra-rapide.
+    newly_inserted_ids = {r['aid'] for r in records_to_insert}
+    
+    # On itère sur les 'items' d'origine, qui sont les seuls à contenir les données COMPLÈTES (avec 'attachments').
+    for original_item_data in items:
+        # On récupère l'ID de l'article original, qu'il soit dans 'pmid' ou 'article_id'.
+        article_id = original_item_data.get('article_id') or original_item_data.get('pmid')
+
+        # On ne met en file que les articles qui viennent d'être insérés dans la base.
+        if article_id in newly_inserted_ids:
+            logger.info(f"Mise en file de l'article {article_id} avec ses données complètes (PDF potentiels inclus).")
             
+            # ✅ VICTOIRE : On passe l'objet 'original_item_data' COMPLET et non modifié.
+            # La clé 'attachments' est donc préservée.
             analysis_queue.enqueue(
                 'backend.tasks_v4_complete.process_single_article_task',
-                args=(project_id, item_data, default_profile, "full_extraction"),
-                job_timeout=1800 # Timeout confortable pour le traitement des PDF
+                args=(project_id, original_item_data, default_profile, "full_extraction"),
+                job_timeout=1800 # Timeout augmenté pour traitement PDF
             )
 
 @with_db_session

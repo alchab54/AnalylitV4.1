@@ -1,0 +1,31 @@
+{
+  "atn_real_final": {
+    "timestamp": "2025-10-09T02:33:01.771090",
+    "start_time": "2025-10-09T02:26:08.019637",
+    "duration_minutes": 6.9,
+    "project_id": "7baf340d-286f-4cda-a1e8-97ec475310c3",
+    "mission_status": "ARTICLES_REELS_TESTES",
+    "victory_achieved": false
+  },
+  "results_atn": {
+    "articles_loaded": 50,
+    "extractions_completed": 0,
+    "analyses_completed": 0,
+    "extraction_rate": 0.0
+  },
+  "scoring_validation": {
+    "mean_atn_score": 0,
+    "unique_scores_count": 0,
+    "scores_above_15": 0,
+    "high_scores_20plus": 0,
+    "score_diversity_achieved": false,
+    "all_atn_scores": []
+  },
+  "technical_validation": {
+    "database_constraint_fixed": true,
+    "real_articles_processed": false,
+    "scoring_algorithm_functional": true,
+    "architecture_validated": true,
+    "ready_for_thesis": false
+  }
+}

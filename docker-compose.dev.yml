@@ -149,6 +149,7 @@ services:
       TZ: Europe/Paris
     volumes:
       - .:/home/appuser/app
+      - ./zotero_storage:/app/zotero_storage:ro
     depends_on:
       test-db:
         condition: service_healthy

@@ -184,7 +184,8 @@ def parse_analylit_json_real(json_path: Path, max_articles: int = None) -> List[
                     pass
                 
                 # Données réelles complètes
-                doi = str(item.get("DOI", "")).strip()
+                doi = str(item.get('DOI', '')).strip()
+                pmid_from_zotero = str(item.get('PMID', '')).strip() # Recherche du vrai PMID   
                 url = str(item.get("URL", "")).strip()
                 abstract = str(item.get("abstract", "")).strip()
                 journal = str(item.get("container-title", "")).strip() or "Journal à identifier"
@@ -194,6 +195,18 @@ def parse_analylit_json_real(json_path: Path, max_articles: int = None) -> List[
                 unique_hash = hashlib.md5(content.encode('utf-8')).hexdigest()[:10]
                 article_id = f"real_{unique_hash}"
                 
+                # ✅ LOGIQUE D'ID PRIORISÉE
+                if pmid_from_zotero and pmid_from_zotero.isdigit():
+                    article_id = pmid_from_zotero
+                elif doi:
+                    # Utiliser le DOI comme fallback s'il est unique
+                    article_id = doi
+                else:
+                    # En dernier recours, générer un ID unique et stable
+                    content = f"{title[:50]}{year}".lower()
+                    unique_hash = hashlib.md5(content.encode('utf-8')).hexdigest()[:10]
+                    article_id = f"real_{unique_hash}"
+
                 article = {
                     "pmid": article_id,
                     "article_id": article_id,
@@ -207,8 +220,9 @@ def parse_analylit_json_real(json_path: Path, max_articles: int = None) -> List[
                     "database_source": "zotero_real",
                     "publication_date": f"{year}-01-01",
                     "relevance_score": 0,
-                    "has_pdf_potential": bool(doi or "pubmed" in url.lower())
-                }
+                    "has_pdf_potential": bool(doi or "pubmed" in url.lower()),
+                    'attachments': item.get('attachments', []) # Ne pas oublier cette ligne cruciale
+                    }
                 
                 articles.append(article)
                 
