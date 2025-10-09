@@ -34,7 +34,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, scoped_session
 from redis import Redis
-from rq import get_current_job, Queue, job as rq_job 
+from rq import get_current_job, Queue
+from rq.decorators import job as rq_job
 
 
 # --- Importer la config de l'application ---
@@ -581,7 +582,7 @@ def process_single_article_task(project_id, article, profile, analysis_mode, job
         )
         
         # Tentative de récupération en chargeant l'article depuis la DB
-        session = SessionLocal()
+        session = SessionFactory()
         try:
             article_obj = session.query(Article).filter_by(article_id=article).first()
             if not article_obj:
@@ -604,7 +605,7 @@ def process_single_article_task(project_id, article, profile, analysis_mode, job
         finally:
             session.close()
 
-    session = SessionLocal() 
+    session = SessionFactory() 
     
     # On utilise 'article' partout dans la fonction maintenant.
     logger.info(f"[process_single_article_task] Traitement de l'article avec ID: {article.get('article_id') or article.get('pmid')}")
