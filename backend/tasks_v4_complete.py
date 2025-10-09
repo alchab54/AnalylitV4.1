@@ -564,14 +564,18 @@ def get_pdf_text(article_data, project_id):
     return None
 
 @with_db_session
-def process_single_article_task(session, project_id: str, article_data: dict, profile: dict, analysis_mode: str, custom_grid_id: str = None):
-    """
-    VERSION VICTORY - Traite un article à partir des données fournies directement,
-    et garantit la transmission correcte des données au moteur de scoring.
-    """
+def process_single_article_task(project_id, article, profile, mode, use_full_data=False):
+    # ✅ SÉCURITÉ ABSOLUE : Vérification dès l'entrée
+    if not article:
+        logger.error(f"[FATAL] La tâche pour le projet {project_id} a été reçue sans données d'article. Abandon.")
+        return
+
+    # On utilise 'article' partout dans la fonction maintenant.
+    logger.info(f"[process_single_article_task] Traitement de l'article avec ID: {article.get('article_id') or article.get('pmid')}")
+
     profile = normalize_profile(profile)
     article = article_data 
-    article_id = article.get("article_id")
+    article_id = article.get('article_id') or article.get('pmid')    
     
     logger.info(f"[process_single_article_task] project={project_id} article={article_id} mode={analysis_mode}")
     logger.info(f"[process_single_article_task] Traitement de {article_id} avec données directes.")
