@@ -611,7 +611,6 @@ def process_single_article_task(project_id, article, profile, analysis_mode, job
     logger.info(f"[process_single_article_task] Traitement de l'article avec ID: {article.get('article_id') or article.get('pmid')}")
 
     profile = normalize_profile(profile)
-    article = article_data 
     article_id = article.get('article_id') or article.get('pmid')    
     
     logger.info(f"[process_single_article_task] project={project_id} article={article_id} mode={analysis_mode}")
