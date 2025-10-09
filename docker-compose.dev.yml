@@ -66,8 +66,8 @@ services:
   # Ollama avec optimisation GPU
   ollama:
     build:
-      context: .
-      dockerfile: docker/ollama/Dockerfile
+      context: ./docker/ollama .
+      dockerfile: Dockerfile.dev
     container_name: analylit_ollama_dev
     ports:
     - "11434:11434"
@@ -88,7 +88,7 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              count: all
+              count: 1
               capabilities: [gpu]
     networks:
       - analylit-network
