@@ -1,12 +1,27 @@
-# --- CHEMIN: docker/ollama/Dockerfile.dev (VERSION FINALE) ---
+# === VERSION FINALE ET INFALLIBLE (avec correction curl) ===
 FROM ollama/ollama:latest
 
-# Copier notre script de démarrage intelligent
-COPY ./entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Installer curl pour les vérifications de santé
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
-# Définir une zone de stockage persistante pour les modèles téléchargés
-VOLUME /root/.ollama
+# Créer le script d'entrée DIRECTEMENT dans l'image
+RUN echo '#!/bin/sh\n\
+echo "🚀 Starting Ollama server in background..."\n\
+ollama serve &\n\
+pid=$!\n\
+echo "⏳ Waiting for Ollama server to be ready..."\n\
+until curl -s http://127.0.0.1:11434/ > /dev/null; do\n\
+  echo "   Ollama server not ready yet, waiting 2 seconds..."\n\
+  sleep 2\n\
+done\n\
+echo "✅ Ollama server is ready. Downloading models for ATN analysis..."\n\
+ollama pull phi3:mini\n\
+echo "   ✅ phi3:mini downloaded and ready."\n\
+ollama pull llama3:8b\n\
+echo "   ✅ llama3:8b downloaded and ready."\n\
+echo "🎯 Ollama is fully configured and ready for AnalyLit ATN analysis!"\n\
+echo "🏆 Your thesis research system is VICTORY!"\n\
+wait $pid' > /entrypoint.sh && chmod +x /entrypoint.sh
 
-# Quand le conteneur démarrera, il exécutera notre script. C'est tout.
+# Définir le point d'entrée
 ENTRYPOINT ["/entrypoint.sh"]

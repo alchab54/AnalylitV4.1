@@ -74,6 +74,7 @@ services:
     volumes:
       - ollama_data:/root/.ollama
       - ./files:/app/zotero_storage
+
     environment:
       - OLLAMA_KEEP_ALIVE=24h
       - OLLAMA_HOST=0.0.0.0
