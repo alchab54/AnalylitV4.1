@@ -34,7 +34,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, scoped_session
 from redis import Redis
-from rq import get_current_job
+from rq import get_current_job, Queue, job as rq_job 
+
 
 # --- Importer la config de l'application ---
 from backend.config.config_v4 import get_config
@@ -563,13 +564,48 @@ def get_pdf_text(article_data, project_id):
     logger.info(f"[{article_data.get('article_id')}] Aucun PDF valide trouvé dans les pièces jointes.")
     return None
 
-@with_db_session
-def process_single_article_task(project_id, article, profile, mode, use_full_data=False):
-    # ✅ SÉCURITÉ ABSOLUE : Vérification dès l'entrée
-    if not article:
-        logger.error(f"[FATAL] La tâche pour le projet {project_id} a été reçue sans données d'article. Abandon.")
-        return
+@rq_job('analysis_queue', timeout='1h')
+def process_single_article_task(project_id, article, profile, analysis_mode, job_id=None):
+    # =========================================================================
+    # BLINDAGE DÉFENSIF CONTRE LES TÂCHES CORROMPUES
+    # =========================================================================
+    if isinstance(article, str):
+        # Cette tâche provient d'une source inconnue et obsolète.
+        # Nous la neutralisons et la traçons.
+        logger.critical(
+            f"TÂCHE CORROMPUE DÉTECTÉE ! "
+            f"Project ID: {project_id}, "
+            f"Type de 'article': {type(article)}, "
+            f"Contenu de 'article': {article}. "
+            f"Cette tâche est anormale et provient probablement d'un ancien code."
+        )
+        
+        # Tentative de récupération en chargeant l'article depuis la DB
+        session = SessionLocal()
+        try:
+            article_obj = session.query(Article).filter_by(article_id=article).first()
+            if not article_obj:
+                logger.error(f"ÉCHEC DE LA RÉCUPÉRATION : Article ID {article} non trouvé dans la DB.")
+                # Si nous ne pouvons pas récupérer, nous abandonnons la tâche.
+                return f"Abandon: Tâche corrompue et article introuvable pour ID {article}"
+            
+            # Conversion en dictionnaire pour la suite du traitement
+            article = {
+                "article_id": article_obj.article_id,
+                "pmid": article_obj.pmid,
+                "title": article_obj.title,
+                "abstract": article_obj.abstract,
+                "authors": article_obj.authors,
+                "publication_date": article_obj.publication_date.isoformat() if article_obj.publication_date else None,
+                "attachments": article_obj.attachments,
+            }
+            logger.warning(f"RÉCUPÉRATION RÉUSSIE. L'article {article['article_id']} a été chargé depuis la DB.")
+            
+        finally:
+            session.close()
 
+    session = SessionLocal() 
+    
     # On utilise 'article' partout dans la fonction maintenant.
     logger.info(f"[process_single_article_task] Traitement de l'article avec ID: {article.get('article_id') or article.get('pmid')}")
 
