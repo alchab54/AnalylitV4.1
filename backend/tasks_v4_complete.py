@@ -1674,40 +1674,42 @@ def add_manual_articles_task(session, project_id: str, items: list, use_full_dat
     # BOUCLE PRINCIPALE CORRIGÉE POUR LA VICTOIRE
     for item_data in items:
         try:
-            details = {}
-            if use_full_data and isinstance(item_data, dict):
-                # ✅ NOUVELLE LOGIQUE: Utiliser les données complètes déjà fournies
-                details = item_data 
-                article_id = details.get('article_id') or details.get('pmid')
-                logger.debug(f"Données complètes utilisées pour: {article_id}")
-            else:
-                # ANCIENNE LOGIQUE (pour la rétrocompatibilité)
-                article_id = str(item_data)
-                details = fetch_article_details(article_id)
-
-            if not article_id:
-                logger.warning(f"Item sans ID ignoré: {str(item_data)[:100]}")
+            # ÉTAPE 1: Isoler l'ID de manière fiable
+            # On s'assure que item_data est bien un dictionnaire
+            if not isinstance(item_data, dict):
+                logger.warning(f"Item n'est pas un dictionnaire, ignoré: {str(item_data)[:100]}")
                 continue
 
-            # Vérification de l'existence de l'article pour éviter les doublons
-            exists = session.execute(text("SELECT 1 FROM search_results WHERE project_id = :pid AND article_id = :aid"), {"pid": project_id, "aid": article_id}).fetchone()
-            if exists:
-                logger.debug(f"Article {article_id} déjà existant, ignoré.")
+            # On extrait l'ID simple. C'est notre clé unique.
+            article_id_simple = item_data.get('article_id') or item_data.get('pmid')
+
+            if not article_id_simple:
+                logger.warning(f"Item sans ID valide ignoré: {str(item_data)[:100]}")
                 continue
             
-            # Création de l'enregistrement à insérer avec TOUTES les données
+            # Le reste des données
+            details = item_data
+
+            # ÉTAPE 2: Vérification de l'existence AVEC L'ID SIMPLE
+            exists = session.execute(text("SELECT 1 FROM search_results WHERE project_id = :pid AND article_id = :aid"), 
+                                     {"pid": project_id, "aid": article_id_simple}).fetchone()
+            if exists:
+                logger.debug(f"Article {article_id_simple} déjà existant, ignoré.")
+                continue
+            
+            # ÉTAPE 3: Insertion en base de données AVEC L'ID SIMPLE
             records_to_insert.append({
                 "id": str(uuid.uuid4()), 
                 "pid": project_id, 
-                "aid": article_id,
-                "title": details.get('title', f"Article {article_id}"),
+                "aid": article_id_simple, # ✅ LA CORRECTION CRUCIALE EST ICI
+                "title": details.get('title', f"Article {article_id_simple}"),
                 "abstract": details.get('abstract', 'Résumé non disponible.'),
-                "authors": details.get('authors', 'Auteurs non spécifiés'),
-                "pub_date": details.get('publication_date', '') or str(details.get('year', '')),
+                "authors": str(details.get('authors', 'Auteurs non spécifiés')), # Assurer que c'est une chaîne
+                "pub_date": str(details.get('publication_date', '')) or str(details.get('year', '')),
                 "journal": details.get('journal', 'Journal non spécifié'),
                 "doi": details.get('doi', ''),
                 "url": details.get('url', ''),
-                "src": details.get('database_source', 'zotero_real' if use_full_data else 'manual'),
+                "src": details.get('database_source', 'zotero_glory'),
                 "ts": datetime.now().isoformat()
             })
 
