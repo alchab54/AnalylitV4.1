@@ -24,6 +24,10 @@ COPY alembic.ini .
 COPY migrations ./migrations
 COPY utils/ ./utils/
 
+# Installer l'application en mode "éditable"
+# Cette commande résout les problèmes de PYTHONPATH pour Gunicorn et RQ
+RUN pip install -e .
+
 # Set ownership
 USER root
 RUN chown -R appuser:appuser /home/appuser/app

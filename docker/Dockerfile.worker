@@ -16,3 +16,7 @@ USER root
 # ✅ CORRECTION: Copier l'intégralité du code source de l'application.
 # Cela garantit que les workers ont accès à tous les modules, y compris les tâches.
 COPY --chown=appuser:appuser . .
+
+# Installer l'application en mode "éditable"
+# Cette commande résout les problèmes de PYTHONPATH pour Gunicorn et RQ
+RUN pip install -e .
