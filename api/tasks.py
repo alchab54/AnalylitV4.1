@@ -1,6 +1,6 @@
 # api/tasks.py
 
-import logging
+
 from flask import Blueprint, jsonify
 from utils.app_globals import redis_conn
 from rq import Queue

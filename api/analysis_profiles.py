@@ -1,6 +1,6 @@
 # api/analysis_profiles.py
 
-import logging
+
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
 from utils.extensions import db
@@ -84,7 +84,7 @@ def get_profiles_simple():
 @limiter.limit("50 per minute")
 def get_all_analysis_profiles():
     """Retourne tous les profils d'analyse."""
-    try:
+    try:  
         from sqlalchemy import select
         stmt = select(AnalysisProfile)
         profiles = db.session.execute(stmt).scalars().all()

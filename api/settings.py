@@ -1,6 +1,6 @@
 # api/settings.py
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 import logging
 from utils.extensions import db
 

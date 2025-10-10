@@ -1,8 +1,6 @@
 # api/projects.py
 
 import json
-import logging
-import uuid
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
 

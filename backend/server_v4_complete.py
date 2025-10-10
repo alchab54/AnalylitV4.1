@@ -51,7 +51,7 @@ from api.stakeholders import stakeholders_bp
 from api.tasks import tasks_bp
 
 # Utilitaires et Configuration
-from utils.extensions import db, migrate
+from utils.extensions import db, migrate, limiter
 from utils.app_globals import redis_conn, analysis_queue, limiter
 from utils.models import Project, Extraction, SearchResult, AnalysisProfile # Import direct du modèle
 from backend.config.config_v4 import get_config
@@ -68,7 +68,6 @@ else:
 logger = logging.getLogger(__name__)
 
 # --- INITIALISATION GLOBALE DES EXTENSIONS ---
-# Déclarées ici pour être accessibles dans la factory d'application.
 socketio = SocketIO()
 
 def create_app(config_override=None):
@@ -102,12 +101,26 @@ def create_app(config_override=None):
 
     # --- INITIALISATION DES EXTENSIONS FLASK AVEC L'APP ---
     db.init_app(app)
-    migrate.init_app(app, db)
+    migrate.init_app(app, db)    
     limiter.init_app(app)
+
     # Initialisation de SocketIO avec async_mode='gevent' et la queue Redis
     socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent', message_queue=app.config['REDIS_URL'])
 
     # --- ENREGISTREMENT DES BLUEPRINTS (ROUTES API) ---
+    # --- IMPORTANT : Imports locaux ---
+    # Importer les blueprints A L'INTERIEUR de la fonction
+    from api.admin import admin_bp
+    from api.analysis_profiles import analysis_profiles_bp
+    from api.extensions import extensions_bp
+    from api.files import files_bp
+    from api.projects import projects_bp
+    from api.reporting import reporting_bp
+    from api.search import search_bp
+    from api.selection import selection_bp
+    from api.prompts import prompts_bp
+    from api.settings import settings_bp
+    from api.stakeholders import stakeholders_bp
     app.register_blueprint(admin_bp, url_prefix='/api')
     app.register_blueprint(analysis_profiles_bp, url_prefix='/api')
     app.register_blueprint(extensions_bp, url_prefix='/api')
@@ -120,7 +133,6 @@ def create_app(config_override=None):
     app.register_blueprint(settings_bp, url_prefix='/api')
     app.register_blueprint(stakeholders_bp, url_prefix='/api')
     app.register_blueprint(tasks_bp, url_prefix='/api')
-
     # --- COMMANDES CLI (ex: `flask seed_db`) ---
     @app.cli.command("seed_db")
     def seed_db():
@@ -218,6 +230,7 @@ def create_app(config_override=None):
     return app
 
 # --- POINT D'ENTRÉE PRINCIPAL ---
+
 # Crée l'instance de l'application au niveau du module pour qu'elle soit importable par Gunicorn/WSGI
 app = create_app()
 
@@ -226,4 +239,3 @@ if __name__ == "__main__":
     # Idéal pour le débogage local. NE PAS UTILISER EN PRODUCTION.
     logger.info("🚀 Lancement du serveur de développement Flask-SocketIO...")
     socketio.run(app, host="0.0.0.0", port=5000, debug=True, use_reloader=False)
-

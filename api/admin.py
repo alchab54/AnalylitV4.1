@@ -1,9 +1,9 @@
 # api/admin.py
 from flask import Blueprint, jsonify, request
 from utils.app_globals import redis_conn, limiter, models_queue
+from utils.app_globals import import_queue
 from rq import Queue, Worker
-import time
-from backend.tasks_v4_complete import pull_ollama_model_task
+
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -46,6 +46,15 @@ def get_queue_detailed_stats():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@admin_bp.route('/admin/pull-model', methods=['POST'])
+def pull_model():
+    data = request.get_json()
+    model_name = data.get('model_name')
+    if not model_name:
+        return jsonify({'error': 'model_name requis'}), 400
+    job = import_queue.enqueue('backend.tasks_v4_complete.pull_ollama_model_task', model_name=model_name)
+    return jsonify({"message": "Tâche lancée", "task_id": job.id}), 202
 
 @admin_bp.route('/queues/clear', methods=['POST'])
 @limiter.limit("10 per minute")

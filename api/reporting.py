@@ -1,6 +1,6 @@
 # api/reporting.py
 
-import logging
+
 import json
 from flask import Blueprint, jsonify, request, send_file
 from utils.extensions import db
