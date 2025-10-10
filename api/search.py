@@ -6,7 +6,6 @@ from datetime import datetime
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from utils.extensions import db
-from utils.app_globals import background_queue
 
 
 logger = logging.getLogger(__name__)
@@ -59,7 +58,7 @@ def search_multiple_databases():
         "project_id": project_id, "query": simple_query, "databases": databases,
         "max_results_per_db": max_results_per_db, "expert_queries": expert_queries
     }
-    job = background_queue.enqueue(multi_database_search_task, **task_kwargs)
+    job = import_queue.enqueue(multi_database_search_task, **task_kwargs)
     return jsonify({'message': f'Recherche lancée dans {len(databases)} base(s)', 'job_id': job.id}), 202
 
 @search_bp.route('/projects/<project_id>/search-stats', methods=['GET'])

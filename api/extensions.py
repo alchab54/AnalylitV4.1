@@ -24,6 +24,6 @@ def run_extension():
     return jsonify({"message": "Tâche d'extension lancée", "job_id": job.id}), 202
 
 @extensions_bp.route('/processed', methods=['POST'])  # ✅ Ajouter POST
-def processed():
+def processed():  
     """Logique extension"""
     return jsonify({'status': 'processed'}), 202

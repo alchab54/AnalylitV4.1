@@ -31,14 +31,10 @@ if not hasattr(feedparser, '_FeedParserMixin'):
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from sqlalchemy.orm import sessionmaker
-from rq.exceptions import NoSuchJobError
-from flask_socketio import SocketIO
-
 # --- IMPORTS DES MODULES DE L'APPLICATION ---
 
 # Blueprints (Routes API modulaires)
 from api.admin import admin_bp
-from api.analysis_profiles import analysis_profiles_bp
 from api.extensions import extensions_bp
 from api.files import files_bp
 from api.projects import projects_bp
@@ -46,7 +42,6 @@ from api.reporting import reporting_bp
 from api.search import search_bp
 from api.selection import selection_bp
 from api.prompts import prompts_bp
-from api.settings import settings_bp
 from api.stakeholders import stakeholders_bp
 from api.tasks import tasks_bp
 
@@ -67,9 +62,6 @@ else:
 
 logger = logging.getLogger(__name__)
 
-# --- INITIALISATION GLOBALE DES EXTENSIONS ---
-socketio = SocketIO()
-
 def create_app(config_override=None):
     """
     Factory pour créer et configurer l'instance de l'application Flask.
@@ -77,6 +69,11 @@ def create_app(config_override=None):
     """
     # Correction pour servir le frontend depuis le bon dossier
     app = Flask(__name__,
+from api.admin import admin_bp
+    from api.analysis_profiles import analysis_profiles_bp
+    from api.extensions import extensions_bp
+    from api.files import files_bp
+    from api.projects import projects_bp
                 static_folder='../web',
                 static_url_path='') # URL racine vide pour servir index.html et autres
 
@@ -97,7 +94,9 @@ def create_app(config_override=None):
     if 'SQLALCHEMY_DATABASE_URI' not in (config_override or {}):
         app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_URL
 
+    limiter.init_app(app)
     CORS(app, resources={r"/api/*": {"origins": "*"}})
+    socketio = SocketIO()
 
     # --- INITIALISATION DES EXTENSIONS FLASK AVEC L'APP ---
     db.init_app(app)
@@ -132,7 +131,6 @@ def create_app(config_override=None):
     app.register_blueprint(selection_bp, url_prefix='/api')
     app.register_blueprint(settings_bp, url_prefix='/api')
     app.register_blueprint(stakeholders_bp, url_prefix='/api')
-    app.register_blueprint(tasks_bp, url_prefix='/api')
     # --- COMMANDES CLI (ex: `flask seed_db`) ---
     @app.cli.command("seed_db")
     def seed_db():

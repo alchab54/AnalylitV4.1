@@ -29,4 +29,5 @@ def get_settings_models():
         return jsonify([]), 200
     except Exception as e:
         logger.error(f"Erreur lors de la récupération des modèles: {e}")
+
         return jsonify({"error": "Erreur serveur"}), 500

@@ -78,6 +78,7 @@ def update_stakeholder(project_id, stakeholder_id):
         db.session.commit()
         return jsonify(stakeholder.to_dict()), 200
     except IntegrityError:
+
         db.session.rollback()
         return jsonify({"error": "Erreur lors de la mise à jour du stakeholder"}), 500
 

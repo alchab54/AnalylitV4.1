@@ -38,7 +38,7 @@ def create_analysis_profile():
         return jsonify({"error": "Un profil avec ce nom existe déjà"}), 409
 
 @analysis_profiles_bp.route('/profiles', methods=['GET'])
-def get_profiles_simple():    
+def get_profiles_simple():
     """Endpoint simplifié pour récupérer les profils sans dépendance DB."""
     try:
         # Profils hardcodés pour éviter les erreurs DB

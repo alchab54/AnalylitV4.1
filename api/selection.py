@@ -4,6 +4,7 @@ from flask import Blueprint, request, jsonify
 import logging
 from utils.app_globals import analysis_queue
 
+
 logger = logging.getLogger(__name__)
 
 selection_bp = Blueprint("selection", __name__)

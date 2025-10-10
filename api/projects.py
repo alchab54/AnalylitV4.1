@@ -371,7 +371,7 @@ def import_zotero_pdfs(project_id):
     if not zotero_user_id or not zotero_api_key:
         return jsonify({"error": "Identifiants Zotero requis"}), 400
 
-    job = background_queue.enqueue(
+    job = import_queue.enqueue(
         import_pdfs_from_zotero_task,
         project_id=project_id,
         pmids=pmids,
@@ -428,7 +428,7 @@ def upload_zotero_file(project_id):
         filename = secure_filename(file.filename)
         file_path = save_file_to_project_dir(file, project_id, filename, PROJECTS_DIR)
         
-        job = background_queue.enqueue(
+        job = import_queue.enqueue(
             import_from_zotero_file_task,
             project_id=project_id,
             json_file_path=file_path,
@@ -440,7 +440,7 @@ def upload_zotero_file(project_id):
         return jsonify({"error": "Erreur interne du serveur"}), 500
     
 @projects_bp.route('/projects/<project_id>/run-rob-analysis', methods=['POST'])
-def run_rob_analysis(project_id):
+def run_rob_analysis(project_id): # ✅ Injection
     data = request.get_json()
     article_ids = data.get('article_ids', [])
 

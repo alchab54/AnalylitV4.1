@@ -26,7 +26,7 @@ def generate_bibliography(project_id):
         return jsonify({"error": "Projet non trouvé"}), 404
 
     # Enfiler une tâche de fond pour la génération de la bibliographie
-    job = background_queue.enqueue(generate_bibliography_task, project_id=project_id, job_timeout='10m')
+    job = import_queue.enqueue(generate_bibliography_task, project_id=project_id, job_timeout='10m')
     return jsonify({"message": "Génération de la bibliographie lancée", "job_id": job.id}), 202
 
 @reporting_bp.route('/projects/<project_id>/summary-table', methods=['POST'])
@@ -39,7 +39,7 @@ def generate_summary_table(project_id):
         return jsonify({"error": "Projet non trouvé"}), 404
 
     # Enfiler une tâche de fond pour la génération du tableau de synthèse
-    job = background_queue.enqueue(generate_summary_table_task, project_id=project_id, job_timeout='10m')
+    job = import_queue.enqueue(generate_summary_table_task, project_id=project_id, job_timeout='10m')
     return jsonify({"message": "Génération du tableau de synthèse lancée", "job_id": job.id}), 202
 
 @reporting_bp.route('/projects/<project_id>/excel-export', methods=['POST'])
@@ -53,5 +53,5 @@ def export_summary_table_excel(project_id):
         return jsonify({"error": "Projet non trouvé"}), 404
 
     # Enfiler une tâche de fond pour l'export Excel
-    job = background_queue.enqueue(export_excel_report_task, project_id=project_id, job_timeout='10m')
+    job = import_queue.enqueue(export_excel_report_task, project_id=project_id, job_timeout='10m')
     return jsonify({"message": "Export Excel lancé", "job_id": job.id}), 202
