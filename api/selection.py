@@ -66,7 +66,7 @@ def run_screening(project_id):
         return jsonify({"error": "Liste d'articles vide"}), 400
 
     from backend.tasks_v4_complete import process_single_article_task
-    task = analysis_queue.enqueue(
+    task = import_queue.enqueue(
         process_single_article_task, # <-- Use the function object
         project_id=project_id,
         article_ids=articles,

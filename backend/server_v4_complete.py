@@ -68,14 +68,14 @@ def create_app(config_override=None):
     Cette structure permet de créer différentes instances de l'app (ex: pour les tests).
     """
     # Correction pour servir le frontend depuis le bon dossier
-    app = Flask(__name__,
-from api.admin import admin_bp
+    app = Flask(__name__),
+    from api.admin import admin_bp
     from api.analysis_profiles import analysis_profiles_bp
     from api.extensions import extensions_bp
     from api.files import files_bp
     from api.projects import projects_bp
-                static_folder='../web',
-                static_url_path='') # URL racine vide pour servir index.html et autres
+    static_folder='../web',
+    static_url_path='' # URL racine vide pour servir index.html et autres
 
     # --- CONFIGURATION DE L'APPLICATION ---
     config = get_config()

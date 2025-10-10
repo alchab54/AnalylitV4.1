@@ -35,11 +35,9 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 # --- IMPORTS DES MODULES LOCAUX DE L'APPLICATION ---
 # Modèles de base de données
-
-from utils.models import (
-from flask import current_app
-    Project, SearchResult, Extraction, Grid, ChatMessage, AnalysisProfile, RiskOfBias, SCHEMA
+from utils.models import (Project, SearchResult, Extraction, Grid, ChatMessage, AnalysisProfile, RiskOfBias, SCHEMA
 )
+from flask import current_app
 from backend.atn_scoring_engine_v21 import ATNScoringEngineV22
 # Fonctions utilitaires
 from utils.zotero_parser import parse_zotero_rdf
