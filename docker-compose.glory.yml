@@ -36,6 +36,7 @@ x-gpu-worker-base: &gpu-worker-base
             capabilities: [gpu]
   environment:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      TZ: Europe/Paris
 # =================================================================
 # === SERVICES D'INFRASTRUCTURE
 # =================================================================
@@ -43,7 +44,7 @@ services:
   test-db:
     image: postgres:15-alpine
     container_name: analylit_db
-    environment: { POSTGRES_USER: analylit_user, POSTGRES_PASSWORD: strong_password, POSTGRES_DB: analylit_test_db }
+    environment: { POSTGRES_USER: analylit_user, POSTGRES_PASSWORD: strong_password, POSTGRES_DB: analylit_test_db, TZ: Europe/Paris }
     ports: [ "5434:5432" ]
     volumes: [ "test_postgres_data:/var/lib/postgresql/data" ]
     networks: [ "analylit-network" ]
@@ -58,7 +59,7 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-  
+      TZ: Europe/Paris
   ollama:
     # MODIFICATION: On passe de 'image' à 'build'
     build:
@@ -73,6 +74,7 @@ services:
       - OLLAMA_NUM_PARALLEL=8
       - OLLAMA_MAX_LOADED_MODELS=3
       - NVIDIA_VISIBLE_DEVICES=all
+      - TZ=Europe/Paris
     deploy:
       resources:
         reservations:
@@ -92,6 +94,9 @@ services:
     # S'assure qu'il a les mêmes variables d'environnement que le service web
     environment:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      FLASK_APP: "backend/server_v4_complete.py"
+      TZ: Europe/Paris
+    command: ["/bin/sh", "-c", "flask db upgrade && flask seed_db"]
     networks: [ "analylit-network" ]
     command: ["/bin/sh", "-c", "flask db upgrade && flask seed_db"]
   
@@ -155,10 +160,12 @@ services:
     image: eoranged/rq-dashboard
     ports: [ "9181:9181" ]
     environment:
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      RQ_DASHBOARD_REDIS_URL : redis://redis:6379/0
+      RQ_DASHBOARD_REDIS_URL: redis://redis:6379/0
+      TZ: Europe/Paris
+    depends_on:
+      redis:
+        condition: service_started
     networks: [ "analylit-network" ]
-    depends_on: [ "redis" ]
     restart: unless-stopped
 
 # =================================================================
