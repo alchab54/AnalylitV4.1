@@ -18,7 +18,7 @@ from datetime import datetime
 from functools import wraps
 from pathlib import Path
 from typing import Dict, List, Optional, Any
-from rq import job as rq_job
+from rq import job
 from utils.app_globals import PROJECTS_DIR
 import numpy as np
 import matplotlib.pyplot as plt
@@ -497,7 +497,7 @@ def get_pdf_text(article_data, project_id):
     logger.info(f"[{article_data.get('article_id')}] Aucun PDF valide trouvé dans les pièces jointes.")
     return None
 
-@rq_job('analysis_queue', timeout='1h')
+@job('analysis_queue', timeout='1h')
 def process_single_article_task(project_id, article, profile, analysis_mode, job_id=None):
     # =========================================================================
     # BLINDAGE DÉFENSIF CONTRE LES TÂCHES CORROMPUES
