@@ -57,6 +57,8 @@ wheel>=0.38.0
 async_timeout==4.0.3
 feedparser==6.0.11
 pypdf
+rdflib
+
 
 # --- Testing CRITIQUE ---
 pytest==7.4.3
