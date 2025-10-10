@@ -79,7 +79,12 @@ services:
       dockerfile: docker/Dockerfile.worker
     container_name: analylit_web
     <<: *common-config
-    command: gunicorn --bind 0.0.0.0:5000 --workers=10 --worker-class=gevent "backend.wsgi:app"
+    command: >
+        gunicorn --bind 0.0.0.0:5000
+           --workers=10
+           --worker-class=gevent
+           --preload
+           "backend.wsgi:app"
     ports: ["8080:5000"]
     depends_on:
       migrate: { condition: service_completed_successfully }
