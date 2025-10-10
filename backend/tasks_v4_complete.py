@@ -30,8 +30,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from rq import get_current_job
 
 # --- IMPORTS CENTRAUX DE L'APPLICATION (LA CLÉ DE LA SOLUTION) ---
-# Importe l'instance unique de l'application Flask depuis le point d'entrée WSGI
-from backend.wsgi import app
+
 # Importe les extensions partagées (DB)
 from utils.extensions import db
 # Importe les queues RQ partagées
