@@ -1,9 +1,11 @@
 # api/tasks.py
 import logging
 
-
+from utils.app_globals import (
+    import_queue, screening_queue, atn_scoring_queue, extraction_queue,
+    analysis_queue, synthesis_queue, discussion_draft_queue, extension_queue, redis_conn
+)
 from rq import Queue
-from utils.app_globals import redis_conn  # ← AJOUT
 from flask import Blueprint, jsonify
 from rq.exceptions import NoSuchJobError
 from rq.job import Job
@@ -12,12 +14,32 @@ logger = logging.getLogger(__name__)
 
 @tasks_bp.route('/queues/info', methods=['GET'])
 def get_queues_info():
+    """Récupère les détails d'une queue spécifique"""
+    queue_map = {
+        'import_queue': import_queue,
+        'screening_queue': screening_queue,
+        'atn_scoring_queue': atn_scoring_queue,
+        'extraction_queue': extraction_queue,
+        'analysis_queue': analysis_queue,
+        'synthesis_queue': synthesis_queue,
+        'discussion_draft_queue': discussion_draft_queue,
+        'extension_queue': extension_queue
+    }
+    
+    queue = queue_map.get(queue_name)
+    if queue:
+        return {
+            'name': queue_name,
+            'length': len(queue),
+            'is_empty': queue.is_empty,
+            'jobs': [job.id for job in queue.jobs[:10]]  # 10 premiers jobs
+        }
     """Récupérer l'état des files d'attente"""
     try:
         queues_to_check = [
-            'processing_queue', 'synthesis_queue', 'analysis_queue',
-            'import_queue ', 'models_queue', 'extension_queue',
-            'fast_queue', 'default_queue', 'ai_queue'
+            'import_queue', 'screening_queue', 'atn_scoring_queue', 
+            'extraction_queue', 'analysis_queue', 'synthesis_queue',
+            'discussion_draft_queue', 'extension_queue'
         ]
 
         queues_info = []
@@ -64,9 +86,9 @@ def get_all_tasks_status():
     """Retourne le statut de toutes les tâches dans les files d'attente surveillées."""
     try:
         queues_to_check = [
-            'processing_queue', 'synthesis_queue', 'analysis_queue',
-            'import_queue ', 'models_queue', 'extension_queue',
-            'fast_queue', 'default_queue', 'ai_queue'
+            'import_queue', 'screening_queue', 'atn_scoring_queue', 
+            'extraction_queue', 'analysis_queue', 'synthesis_queue',
+            'discussion_draft_queue', 'extension_queue'
         ]
         
         all_jobs = []
