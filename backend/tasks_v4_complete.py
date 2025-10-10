@@ -906,6 +906,49 @@ TEXTE DE L'ARTICLE:
         increment_processed_count(session, project_id)
         log_processing_status(session, project_id, article_id, "erreur", f"Erreur fatale: {str(e)[:100]}")
         raise
+
+def import_from_zotero_rdf_task(project_id, rdf_file_path, zotero_storage_path):
+    """
+    Tâche RQ pour parser un fichier RDF, trouver les PDFs associés,
+    et les ajouter à la base de données.
+    """
+    with db.session.begin():
+        logger.info(f"Démarrage de l'import RDF pour le projet {project_id}...")
+        
+        try:
+            # Étape 1: Parser le fichier RDF
+            articles = parse_zotero_rdf(rdf_file_path, zotero_storage_path)
+            if not articles:
+                logger.warning("Aucun article trouvé dans le fichier RDF.")
+                return {"status": "completed", "message": "Aucun article trouvé."}
+
+            logger.info(f"{len(articles)} articles parsés depuis le RDF.")
+
+            # Étape 2: Ajouter les articles à la base de données
+            # (Cette logique peut être externalisée dans une fonction helper si besoin)
+            new_articles_count = 0
+            for article_data in articles:
+                # Vérifier si l'article existe déjà pour éviter les doublons
+                existing_article = db.session.scalar(
+                    select(SearchResult).filter_by(project_id=project_id, pmid=article_data['pmid'])
+                )
+                if not existing_article:
+                    new_article = SearchResult(project_id=project_id, **article_data)
+                    db.session.add(new_article)
+                    new_articles_count += 1
+            
+            db.session.commit()
+            logger.info(f"{new_articles_count} nouveaux articles ajoutés à la base de données.")
+            
+            # (Optionnel) Lancer automatiquement le screening ou l'extraction après l'import
+            # ...
+
+            return {"status": "success", "articles_added": new_articles_count}
+
+        except Exception as e:
+            logger.error(f"Erreur critique durant l'import RDF: {e}", exc_info=True)
+            db.session.rollback()
+            return {"status": "failed", "error": str(e)}
    
 @with_db_session
 def run_synthesis_task(session, project_id: str, profile: dict):

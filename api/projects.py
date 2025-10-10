@@ -20,6 +20,7 @@ from backend.tasks_v4_complete import (
     run_discussion_generation_task,
     answer_chat_question_task,
     process_single_article_task,
+    import_from_zotero_rdf_task,
     run_meta_analysis_task,
     run_atn_score_task,
     run_knowledge_graph_task,
@@ -380,6 +381,39 @@ def import_zotero_pdfs(project_id):
         job_timeout=3600
     )
     return jsonify({"message": "Importation Zotero lancée", "job_id": job.id}), 202
+
+@projects_bp.route('/projects/<project_id>/import-zotero-rdf', methods=['POST'])
+def import_zotero_rdf_endpoint(project_id):
+    """
+    Lance l'importation à partir d'un fichier RDF et de son stockage Zotero.
+    C'est la nouvelle méthode privilégiée par atn_workflow_GLORY.py.
+    """
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Données JSON invalides"}), 400
+
+    rdf_file_path = data.get('rdf_file_path')
+    zotero_storage_path = data.get('zotero_storage_path')
+
+    if not rdf_file_path or not zotero_storage_path:
+        return jsonify({"error": "Les chemins 'rdf_file_path' et 'zotero_storage_path' sont requis."}), 400
+    
+    # Validation du projet
+    project = db.session.get(Project, project_id)
+    if not project:
+        return jsonify({"error": "Projet non trouvé"}), 404
+
+    # Lancer la tâche de fond avec la nouvelle fonction
+    job = background_queue.enqueue(
+        import_from_zotero_rdf_task,
+        args=(project_id, rdf_file_path, zotero_storage_path),
+        job_timeout=3600  # 1 heure
+    )
+
+    log_message = f"Tâche d'import RDF lancée pour le projet {project_id}."
+    logger.info(log_message)
+    
+    return jsonify({"message": log_message, "task_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/upload-zotero', methods=['POST'])
 def upload_zotero_file(project_id):

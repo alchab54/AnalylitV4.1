@@ -332,9 +332,18 @@ class ATNWorkflowGlory:
         path_in_container = f"/app/source/{ANALYLIT_RDF_PATH.name}"
 
         data = {
-            "rdf_file_path": path_in_container,
+            "rdf_file_path": f"/app/source/{ANALYLIT_RDF_PATH.name}",
             "zotero_storage_path": "/app/zotero-storage"
         }
+        
+        log("INFO", f"📦 Envoi de la tâche d'import pour {data['rdf_file_path']}...")
+        
+        result = api_request_glory(
+            "POST",
+            f"/api/projects/{self.project_id}/import-zotero-rdf", # 🎯 UTILISER LA NOUVELLE ROUTE
+            data,
+            timeout=60
+        )
 
         log("INFO", f"📦 Envoi de la tâche d'import pour {path_in_container}...")
         
