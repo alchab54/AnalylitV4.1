@@ -5,8 +5,8 @@ import logging  # ✅ AJOUT
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
 from utils.app_globals import (
-    background_queue, processing_queue, analysis_queue, discussion_draft_queue, synthesis_queue,
-    extension_queue
+    import_queue, screening_queue, atn_scoring_queue, extraction_queue, analysis_queue, 
+    synthesis_queue, discussion_draft_queue, extension_queue
 )
 from utils.extensions import db  # ✅ AJOUT
 from datetime import datetime
@@ -91,7 +91,7 @@ def add_manual_articles_endpoint(project_id):
     items_to_add = payload.get('items', [])
     use_full_data_flag = payload.get('use_full_data', False)
     if items_to_add:
-        task = background_queue.enqueue(
+        task = import_queue.enqueue(
             'backend.tasks_v4_complete.add_manual_articles_task',
             args=(project_id, items_to_add, use_full_data_flag),
             job_timeout=600
@@ -286,7 +286,7 @@ def chat_with_project(project_id):
     question = data.get('question')    
     if not question:
         return jsonify({"error": "Question is required"}), 400
-    job = background_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout=900)
+    job = import_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout=900)
     return jsonify({"message": "Question soumise", "job_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/run', methods=['POST'])
@@ -308,7 +308,7 @@ def run_pipeline(project_id):
 
     task_ids = []
     for article_id in article_ids:
-        job = processing_queue.enqueue(
+        job = screening_queue.enqueue(
             process_single_article_task,
             project_id=project_id,
             article_id=article_id,
@@ -406,7 +406,7 @@ def import_zotero_rdf_endpoint(project_id):
         return jsonify({"error": "Projet non trouvé"}), 404
 
     # Lancer la tâche de fond avec la nouvelle fonction
-    job = background_queue.enqueue(
+    job = import_queue.enqueue(
         import_from_zotero_rdf_task,
         args=(project_id, rdf_file_path, zotero_storage_path),
         job_timeout=3600  # 1 heure
@@ -605,7 +605,7 @@ def upload_pdfs_bulk(project_id):
                 from utils.app_globals import PROJECTS_DIR
                 filename = secure_filename(file.filename)
                     #logger.info(f"Fichier {filename} uploadé, mais aucune tâche de traitement n'est définie pour l'upload de PDF en masse.")
-                job = background_queue.enqueue(add_manual_articles_task, project_id=project_id, identifiers=[filename], job_timeout='10m')
+                job = import_queue.enqueue(add_manual_articles_task, project_id=project_id, identifiers=[filename], job_timeout='10m')
                 task_ids.append(job.id)
                 successful_uploads.append(filename)
             except Exception as e:
