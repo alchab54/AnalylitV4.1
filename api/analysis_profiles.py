@@ -1,9 +1,8 @@
 # api/analysis_profiles.py
 
-import logging
+
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
-from utils.extensions import db
 from utils.models import AnalysisProfile
 from utils.app_globals import limiter
 
@@ -38,7 +37,7 @@ def create_analysis_profile():
         return jsonify({"error": "Un profil avec ce nom existe déjà"}), 409
 
 @analysis_profiles_bp.route('/profiles', methods=['GET'])
-def get_profiles_simple():
+def get_profiles_simple():    
     """Endpoint simplifié pour récupérer les profils sans dépendance DB."""
     try:
         # Profils hardcodés pour éviter les erreurs DB
@@ -85,10 +84,12 @@ def get_profiles_simple():
 def get_all_analysis_profiles():
     """Retourne tous les profils d'analyse."""
     try:  
+
         from sqlalchemy import select
         stmt = select(AnalysisProfile)
         profiles = db.session.execute(stmt).scalars().all()
         return jsonify([p.to_dict() for p in profiles]), 200
+
     except Exception as e:
         logger.error(f"Erreur lors de la récupération des profils d'analyse: {e}", exc_info=True)
         db.session.rollback()

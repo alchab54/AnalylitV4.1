@@ -1,9 +1,8 @@
 # api/admin.py
 from flask import Blueprint, jsonify, request
-from utils.app_globals import redis_conn, limiter, models_queue
-from utils.app_globals import import_queue
-from rq import Queue, Worker
+from utils.app_globals import redis_conn, import_queue
 from utils.extensions import limiter
+from rq import Queue, Worker
 
 
 admin_bp = Blueprint('admin', __name__)
@@ -14,9 +13,13 @@ def get_queue_detailed_stats():
     """Statistiques détaillées des queues avec workers"""
     try:
         queues_to_check = [
-            'processing_queue', 'synthesis_queue', 'analysis_queue', 
-            'background_queue', 'models_queue', 'extension_queue',
-            'fast_queue', 'default_queue', 'ai_queue'
+            'import_queue',
+            'screening_queue',
+            'atn_scoring_queue',
+            'extraction_queue',
+            'analysis_queue',
+            'synthesis_queue',
+            'discussion_draft_queue'
         ]
         
         queues_stats = []
@@ -84,9 +87,13 @@ def clear_all_queues():
     """Vider TOUTES les queues"""
     try:
         queues_to_clear = [
-            'processing_queue', 'synthesis_queue', 'analysis_queue', 
-            'background_queue', 'models_queue', 'extension_queue',
-            'fast_queue', 'default_queue', 'ai_queue'
+            'import_queue',
+            'screening_queue',
+            'atn_scoring_queue',
+            'extraction_queue',
+            'analysis_queue',
+            'synthesis_queue',
+            'discussion_draft_queue'
         ]
         total_cleared = 0
         for queue_name in queues_to_clear:

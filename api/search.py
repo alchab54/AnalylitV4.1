@@ -1,5 +1,4 @@
 # api/search.py
-from flask import Blueprint, jsonify, request
 import json
 import uuid
 from datetime import datetime
