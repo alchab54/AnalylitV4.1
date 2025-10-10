@@ -1,7 +1,7 @@
 # api/admin.py
 from flask import Blueprint, jsonify, request
 from utils.app_globals import redis_conn, import_queue
-from utils.extensions import limiter
+from utils.extensions import limiter, logging
 from rq import Queue, Worker
 import time
 

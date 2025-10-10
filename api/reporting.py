@@ -2,7 +2,7 @@
 
 
 import json
-import logging  # ✅ AJOUT
+import logging
 from flask import Blueprint, jsonify, request, send_file
 from utils.extensions import db
 from utils.app_globals import analysis_queue 
@@ -24,6 +24,7 @@ def generate_bibliography(project_id):
     Peut enfiler une tâche de fond si la génération est complexe.
     """
     project = db.session.query(Project).filter_by(id=project_id).first()
+
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
 

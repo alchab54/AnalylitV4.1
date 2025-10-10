@@ -1,6 +1,7 @@
 # api/tasks.py
 import logging
-from rq import Queue  # ← AJOUT
+
+from rq import Queue
 from utils.app_globals import redis_conn  # ← AJOUT
 from flask import Blueprint, jsonify
 from rq.exceptions import NoSuchJobError

@@ -1,11 +1,12 @@
 # api/search.py
-import json
+import logging
 import uuid
+
 from datetime import datetime
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from utils.extensions import db
-from flask import Blueprint, request, jsonify  # ← AJOUT
+from flask import Blueprint, jsonify, request
 from utils.app_globals import import_queue 
 from backend.tasks_v4_complete import multi_database_search_task
 
