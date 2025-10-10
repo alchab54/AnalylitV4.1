@@ -841,39 +841,6 @@ services:
       - analylit-network
     restart: unless-stopped
 
-  worker-synthesis-2:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.worker
-      args:
-        BASE_IMAGE: analylit-base-cpu:latest
-    container_name: analylit_worker_synthesis_2
-    command: ["rq", "worker", "--url", "redis://redis:6379/0", "synthesis_queue", "reporting_queue"]
-    depends_on:
-      redis:
-        condition: service_started
-      test-db:
-        condition: service_healthy
-      ollama:
-        condition: service_started  
-      migrate:
-        condition: service_completed_successfully
-    environment:
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      REDIS_URL: redis://redis:6379/0
-      OLLAMA_BASE_URL: http://ollama:11434
-      PYTHONPATH: /home/appuser/app
-      WORKER_TYPE: synthesis
-      WORKER_ID: synthesis-2
-      PREFERRED_MODEL: llama3:8b
-      TZ: Europe/Paris
-    volumes:
-      - ./files:/app/zotero_storage
-      - .:/home/appuser/app
-    networks:
-      - analylit-network
-    restart: unless-stopped
-
   # --- WORKERS SPÉCIAUX ---
   
   # Worker Discussion + Chat RAG

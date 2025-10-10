@@ -1,0 +1,190 @@
+version: '3.9'
+
+# =================================================================
+# === TEMPLATES D'OPTIMISATION "GLORY"
+# =================================================================
+x-worker-base: &worker-base
+  build:
+    context: .
+    dockerfile: docker/Dockerfile.worker
+  restart: unless-stopped
+  depends_on:
+    redis: { condition: service_started }
+    test-db: { condition: service_healthy }
+    ollama: { condition: service_started }
+  environment:
+    DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+    REDIS_URL: redis://redis:6379/0
+    OLLAMA_BASE_URL: http://ollama:11434
+    PYTHONPATH: /app
+    TZ: Europe/Paris
+  volumes:
+    - .:/app:rw
+    - ./zotero-storage:/app/zotero-storage
+    - ./source:/app/source
+  networks:
+    - analylit-network
+
+x-gpu-worker-base: &gpu-worker-base
+  <<: *worker-base
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: 1
+            capabilities: [gpu]
+  environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+# =================================================================
+# === SERVICES D'INFRASTRUCTURE
+# =================================================================
+services:
+  test-db:
+    image: postgres:15-alpine
+    container_name: analylit_db
+    environment: { POSTGRES_USER: analylit_user, POSTGRES_PASSWORD: strong_password, POSTGRES_DB: analylit_test_db }
+    ports: [ "5434:5432" ]
+    volumes: [ "test_postgres_data:/var/lib/postgresql/data" ]
+    networks: [ "analylit-network" ]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U analylit_user"], interval: 10s, timeout: 5s, retries: 5 }
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: analylit_redis
+    ports: [ "6380:6379" ]
+    networks: [ "analylit-network" ]
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+  
+  ollama:
+    # MODIFICATION: On passe de 'image' à 'build'
+    build:
+      context: ./docker/ollama  # Assurez-vous que votre Dockerfile.dev est ici
+      dockerfile: Dockerfile.dev
+    container_name: analylit_ollama
+    ports: [ "11434:11434" ]
+    volumes: [ "ollama_data:/root/.ollama" ]
+    # AJOUT: Recopier les variables d'environnement cruciales de l'ancien fichier
+    environment:
+      - DATABASE_URL=postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      - OLLAMA_NUM_PARALLEL=8
+      - OLLAMA_MAX_LOADED_MODELS=3
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks: [ "analylit-network" ]
+    restart: unless-stopped
+  
+  migrate:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.migrate
+    depends_on:
+      test-db: { condition: service_healthy }
+    # S'assure qu'il a les mêmes variables d'environnement que le service web
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+    networks: [ "analylit-network" ]
+    # Ce service ne doit pas redémarrer, il s'exécute une fois et c'est tout.
+
+  
+  web:
+    <<: *worker-base
+    container_name: analylit_web
+    command: ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+    ports: [ "8080:5000" ]
+    environment:
+      FLASK_APP: backend/server_v4_complete.py
+      FLASK_ENV: development
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      PYTHONPATH: /app
+      TZ: Europe/Paris
+      SECRET_KEY: "e59f870770e54e7572855f427eb84079d4d8818bea54b1402274ea6d57e12dbf"
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      test-db: { condition: service_healthy }
+      redis: { condition: service_started }
+# =================================================================
+# === WORKERS HAUTE-PERFORMANCE - ARCHITECTURE "GLORY"
+# =================================================================
+
+  worker-import:
+    <<: *worker-base
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "import_queue"]
+    deploy: { replicas: 1 }
+
+  worker-screening:
+    <<: *gpu-worker-base # Le screening peut utiliser un peu de GPU
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue", "atn_scoring_queue"]
+    deploy:
+      replicas: 2
+      resources: { reservations: { devices: [{ driver: nvidia, count: 1, capabilities: [gpu] }] } }
+
+  worker-extraction:
+    <<: *gpu-worker-base
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "extraction_queue"]
+    deploy:
+      replicas: 6 # 🔥 Beaucoup de workers pour l'extraction
+      resources: { reservations: { devices: [{ driver: nvidia, count: 1, capabilities: [gpu] }] } }
+
+  worker-analysis:
+    <<: *gpu-worker-base
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue"]
+    deploy:
+      replicas: 6 # 🔥 Et encore plus pour l'analyse
+      resources: { reservations: { devices: [{ driver: nvidia, count: 1, capabilities: [gpu] }] } }
+
+  worker-synthesis:
+    <<: *gpu-worker-base
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "synthesis_queue", "discussion_draft_queue"]
+    deploy: { replicas: 2 }
+
+# =================================================================
+# === MONITORING
+# =================================================================
+  rq-dashboard:
+    image: eoranged/rq-dashboard
+    ports: [ "9181:9181" ]
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      RQ_DASHBOARD_REDIS_URL : redis://redis:6379/0
+    networks: [ "analylit-network" ]
+    depends_on: [ "redis" ]
+    restart: unless-stopped
+
+# =================================================================
+  # === SERVICE DE MONITORING "GLORY"
+  # =================================================================
+  resource-monitor:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.monitor
+    container_name: analylit_monitor
+    restart: unless-stopped
+    volumes:
+      # Crucial: permet au conteneur de parler au daemon Docker de l'hôte
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Mappe le dossier des résultats pour y écrire les logs
+      - ./resultats_atn_glory:/output
+    networks:
+      - analylit-network
+    environment:
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+
+networks:
+  analylit-network:
+    driver: bridge
+
+volumes:
+  test_postgres_data:
+  ollama_data:

@@ -1,0 +1,14 @@
+# Utilise une image de base légère avec les outils nécessaires
+FROM alpine:latest
+
+# Installe le client Docker et bash
+RUN apk add --no-cache docker-cli bash
+
+# Copie le script de monitoring
+COPY monitor.sh /usr/local/bin/monitor.sh
+
+# Donne les droits d'exécution
+RUN chmod +x /usr/local/bin/monitor.sh
+
+# Point d'entrée
+CMD ["/usr/local/bin/monitor.sh"]

@@ -1716,6 +1716,14 @@ def add_manual_articles_task(session, project_id: str, items: list, use_full_dat
         except Exception as e:
             logger.error(f"Erreur lors du traitement de l'item {str(item_data)[:100]}: {e}", exc_info=True)
             continue
+        
+        try:
+            session.commit()
+            logger.info(f"✅ COMMIT SUCCESS: {len(records_to_insert)} articles successfully saved to database for project {project_id}.")
+        except Exception as e:
+            logger.error(f"❌ CRITICAL COMMIT FAILED for project {project_id}: {e}")
+            session.rollback()
+            raise  
     
     if not records_to_insert:
         logger.info(f"Aucun nouvel article à ajouter pour {project_id}.")
