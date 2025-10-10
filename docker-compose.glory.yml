@@ -1,36 +1,22 @@
-version: '3.9'
 
-# =================================================================
-# ===         ANALYLIT V4.2 - ARCHITECTURE "GLORY"              ===
-# ===     CONFIGURATION DE PRODUCTION FINALE ET STABILISÉE      ===
-# =================================================================
-
-x-worker-base: &worker-base
-  build:
-    context: .
-    dockerfile: docker/Dockerfile.worker
+x-common-config: &common-config
   restart: unless-stopped
   working_dir: /app
-  depends_on:
-    redis: { condition: service_started }
-    test-db: { condition: service_healthy }
-    ollama: { condition: service_started }
-  environment:
-    &worker-env
-    DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-    REDIS_URL: redis://redis:6379/0
-    OLLAMA_BASE_URL: http://ollama:11434
-    PYTHONPATH: /app
-    TZ: Europe/Paris
   volumes:
     - .:/app:rw
     - ./source:/app/source
     - ./zotero-storage:/app/zotero-storage
   networks:
     - analylit-network
+  environment:
+    &common-env
+    DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+    REDIS_URL: redis://redis:6379/0
+    OLLAMA_BASE_URL: http://ollama:11434
+    PYTHONPATH: /app
+    TZ: Europe/Paris
 
-x-gpu-worker-base: &gpu-worker-base
-  <<: *worker-base
+x-gpu-resources: &gpu-resources
   deploy:
     resources:
       reservations:
@@ -48,9 +34,9 @@ services:
       POSTGRES_USER: analylit_user
       POSTGRES_PASSWORD: strong_password
       POSTGRES_DB: analylit_test_db
-    ports: [ "5434:5432" ]
-    volumes: [ "test_postgres_data:/var/lib/postgresql/data" ]
-    networks: [ "analylit-network" ]
+    ports: ["5434:5432"]
+    volumes: ["test_postgres_data:/var/lib/postgresql/data"]
+    networks: ["analylit-network"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U analylit_user -d analylit_test_db"]
       interval: 10s
@@ -61,21 +47,17 @@ services:
   redis:
     image: redis:7-alpine
     container_name: analylit_redis
-    ports: [ "6380:6379" ]
-    networks: [ "analylit-network" ]
+    ports: ["6380:6379"]
+    networks: ["analylit-network"]
     restart: unless-stopped
 
   ollama:
-    build:
+    build: 
       context: ./docker/ollama
       dockerfile: Dockerfile.dev
     container_name: analylit_ollama
-    ports: [ "11434:11434" ]
-    volumes: [ "ollama_data:/root/.ollama" ]
-    environment:
-      - OLLAMA_NUM_PARALLEL=8
-      - OLLAMA_MAX_LOADED_MODELS=3
-      - NVIDIA_VISIBLE_DEVICES=all
+    ports: ["11434:11434"]
+    volumes: ["ollama_data:/root/.ollama"]
     deploy:
       resources:
         reservations:
@@ -83,73 +65,83 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    networks: [ "analylit-network" ]
+    networks: ["analylit-network"]
     restart: unless-stopped
 
   # --- SERVICES APPLICATIFS ---
   migrate:
+    <<: *common-config
     build:
       context: .
       dockerfile: docker/Dockerfile.migrate
-    working_dir: /app
-    container_name: analylit-migrate-1
+    container_name: analylit-migrate
     depends_on:
       test-db: { condition: service_healthy }
     environment:
-      FLASK_APP: "backend.server_v4_complete"
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      PYTHONPATH: /app
-    command: ["/bin/sh", "-c", "flask db upgrade && flask seed_db"]
-    volumes: [ ".:/app" ]
-    networks: [ "analylit-network" ]
+      <<: *common-env
+      FLASK_APP: "backend.server_v4_complete:create_app()"
+    command: ["flask", "db", "upgrade"]
     restart: "no"
 
   web:
-    <<: *worker-base
+    <<: *common-config
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
     container_name: analylit_web
     command: ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--worker-class", "gevent", "backend.wsgi:app"]
-    ports: [ "8080:5000" ]
-    environment:
-      <<: *worker-env
-      FLASK_APP: "backend.server_v4_complete"
-      FLASK_ENV: "production"
+    ports: ["8080:5000"]
     depends_on:
       migrate: { condition: service_completed_successfully }
 
   # --- WORKERS ---
   worker-import:
-    <<: *worker-base
+    <<: *common-config
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "import_queue"]
     deploy: { replicas: 1 }
 
   worker-screening:
-    <<: *gpu-worker-base
+    <<: [*common-config, *gpu-resources]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue", "atn_scoring_queue"]
     deploy: { replicas: 2 }
 
   worker-extraction:
-    <<: *gpu-worker-base
+    <<: [*common-config, *gpu-resources]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "extraction_queue"]
     deploy: { replicas: 6 }
 
   worker-analysis:
-    <<: *gpu-worker-base
+    <<: [*common-config, *gpu-resources]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue"]
     deploy: { replicas: 6 }
 
   worker-synthesis:
-    <<: *gpu-worker-base
+    <<: [*common-config, *gpu-resources]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "synthesis_queue", "discussion_draft_queue"]
     deploy: { replicas: 2 }
 
   # --- MONITORING ---
   rq-dashboard:
     image: eoranged/rq-dashboard
-    ports: [ "9181:9181" ]
-    environment:
-      RQ_DASHBOARD_REDIS_URL: redis://redis:6379/0
-    networks: [ "analylit-network" ]
-    depends_on: [ "redis" ]
+    ports: ["9181:9181"]
+    environment: { RQ_DASHBOARD_REDIS_URL: "redis://redis:6379/0" }
+    networks: ["analylit-network"]
+    depends_on: ["redis"]
     restart: unless-stopped
 
   resource-monitor:
@@ -161,9 +153,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./resultats_atn_glory:/output
-    networks: [ "analylit-network" ]
+    networks: ["analylit-network"]
 
-# --- RESEAUX & VOLUMES ---
 networks:
   analylit-network:
     driver: bridge
