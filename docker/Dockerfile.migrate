@@ -1,34 +1,31 @@
-# This ARG is global and can be used in FROM instructions
-ARG BASE_IMAGE=analylit-base-cpu:latest
-
-# Stage 1: Prepare the script
+# Stage 1: Préparation du script wait-for-it.sh
 FROM alpine as script_copier
 COPY scripts/wait-for-it.sh /wait-for-it.sh
 RUN chmod +x /wait-for-it.sh
 
-# Stage 2: Main build
-FROM ${BASE_IMAGE}
+# Stage 2: Build principal pour la migration
+FROM analylit-base-cpu:latest
 
-# Set the working directory
 WORKDIR /home/appuser/app
 
-# Install migration dependencies
-RUN echo "alembic\npsycopg2-binary\nSQLAlchemy\npython-dotenv\ngreenlet" > requirements-migrate.txt && \
+# Copier uniquement ce qui est nécessaire à la migration
+# (Inclut setup.py pour que l'installation fonctionne)
+COPY --chown=appuser:appuser alembic.ini .
+COPY --chown=appuser:appuser setup.py .
+COPY --chown=appuser:appuser migrations ./migrations
+COPY --chown=appuser:appuser utils/ ./utils/
+COPY --chown=appuser:appuser backend/ ./backend
+
+# Installer les dépendances de migration
+# (psycopg2-binary est déjà dans l'image de base, mais on le garde pour la clarté)
+RUN echo "alembic\npsycopg2-binary\nSQLAlchemy\npython-dotenv" > requirements-migrate.txt && \
     pip install -r requirements-migrate.txt
 
-# Copy the wait-for-it script from the first stage
-COPY --from=script_copier /wait-for-it.sh scripts/wait-for-it.sh
-
-# Copy other necessary files
-COPY alembic.ini .
-COPY migrations ./migrations
-COPY utils/ ./utils/
-
-# Installer l'application en mode "éditable"
-# Cette commande résout les problèmes de PYTHONPATH pour Gunicorn et RQ
+# Installer notre application pour que les modèles SQLAlchemy soient trouvables
 RUN pip install -e .
 
-# Set ownership
-USER root
-RUN chown -R appuser:appuser /home/appuser/app
-USER appuser
+# Copier le script d'attente
+COPY --from=script_copier /wait-for-it.sh scripts/wait-for-it.sh
+
+# Commande par défaut
+CMD ["alembic", "upgrade", "head"]
