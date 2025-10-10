@@ -1,16 +1,15 @@
 # api/projects.py
 
 import json
+import logging  # ✅ AJOUT
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
-
-import logging
 from utils.app_globals import (
     background_queue, processing_queue, analysis_queue, discussion_draft_queue, synthesis_queue,
     extension_queue
 )
+from utils.extensions import db  # ✅ AJOUT
 from datetime import datetime
-from utils.extensions import db  # ← AJOUT
 from utils.app_globals import import_queue
 from utils.extensions import db
 from utils.models import Project, Grid, Extraction, AnalysisProfile, RiskOfBias, Analysis, SearchResult, ChatMessage

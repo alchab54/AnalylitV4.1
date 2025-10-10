@@ -2,10 +2,11 @@
 
 
 import json
+import logging  # ✅ AJOUT
 from flask import Blueprint, jsonify, request, send_file
 from utils.extensions import db
+from utils.app_globals import analysis_queue 
 from utils.models import Project
-from utils.app_globals import background_queue
 from backend.tasks_v4_complete import (
     generate_bibliography_task,
     generate_summary_table_task,
