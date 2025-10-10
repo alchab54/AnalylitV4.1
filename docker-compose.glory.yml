@@ -65,7 +65,6 @@ services:
         DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
         REDIS_URL: redis://redis:6379/0
         OLLAMA_BASE_URL: http://ollama:11434
-        PYTHONPATH: /app
         TZ: Europe/Paris
     depends_on:
       test-db: { condition: service_healthy }
