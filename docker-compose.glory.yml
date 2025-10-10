@@ -21,7 +21,6 @@ services:
     container_name: analylit_redis
     ports: ["6380:6379"]
     networks: ["analylit-network"]
-    # Ajout d'un healthcheck pour s'assurer que Redis est prêt
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -40,7 +39,6 @@ services:
       resources:
         reservations:
           devices:
-            # Correction: 'count: -1' pour allouer tous les GPUs disponibles
             - driver: nvidia
               count: -1 
               capabilities: [gpu]
@@ -59,16 +57,20 @@ services:
         - .:/app:rw
         - ./source:/app/source
         - ./zotero-storage:/app/zotero-storage
+        - ./output:/app/output
+        - ./data:/app/data
       networks:
         - analylit-network
       environment: &common-env
         DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
         REDIS_URL: redis://redis:6379/0
         OLLAMA_BASE_URL: http://ollama:11434
+        SECRET_KEY: "8cfb18e58a85676a34a6658a0263b48b85c7479edb807f38"
+        FLASK_ENV: production  # ✅ AJOUT
+        PYTHONPATH: /app       # ✅ AJOUT pour éviter les erreurs d'import
         TZ: Europe/Paris
     depends_on:
       test-db: { condition: service_healthy }
-    # Suppression de la duplication de l'environnement
     command: ["alembic", "upgrade", "head"]
     restart: "no"
 
@@ -82,13 +84,17 @@ services:
         gunicorn --bind 0.0.0.0:5000
            --workers=10
            --worker-class=gevent
+           --worker-connections=1000
+           --max-requests=1000
+           --timeout=30
            "backend.wsgi:app"
     ports: ["8080:5000"]
     volumes:
-      - ./source:/app/source:ro                    # ✅ RDF Zotero (lecture seule)
-      - ./zotero-storage:/app/zotero-storage:ro    # ✅ PDFs (lecture seule)
-      - ./output:/app/output                       # ✅ Exports et logs
-      - ./data:/app/data                           # ✅ Données de recherche
+      - ./source:/app/source:ro
+      - ./zotero-storage:/app/zotero-storage:ro
+      - ./output:/app/output
+      - ./data:/app/data
+      - ./templates:/app/templates:ro  # ✅ AJOUT pour templates d'export
     depends_on:
       migrate: { condition: service_completed_successfully }
 
@@ -175,10 +181,8 @@ services:
     ports: ["9181:9181"]
     environment: { RQ_DASHBOARD_REDIS_URL: "redis://redis:6379/0" }
     networks: ["analylit-network"]
-    # Syntaxe longue pour la cohérence et la clarté
     depends_on:
-      redis:
-        condition: service_started
+      redis: { condition: service_started }
     restart: unless-stopped
 
   resource-monitor:
@@ -189,7 +193,7 @@ services:
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./resultats_atn_glory:/output
+      - ./output:/output  # ✅ CORRECTION : chemin simplifié
     networks: ["analylit-network"]
 
 networks:
@@ -199,4 +203,3 @@ networks:
 volumes:
   test_postgres_data:
   ollama_data:
-
