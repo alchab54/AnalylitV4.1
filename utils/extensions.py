@@ -2,6 +2,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from utils.db_base import Base
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 # Instancier les extensions sans les lier à une application.
 # Elles seront liées plus tard dans la factory d'application.
