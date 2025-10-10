@@ -19,6 +19,11 @@ from functools import wraps
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 
+from utils.app_globals import PROJECTS_DIR
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
 # --- IMPORTS EXTERNES (3rd PARTY) ---
 from sentence_transformers import SentenceTransformer, util
 from sqlalchemy.exc import SQLAlchemyError

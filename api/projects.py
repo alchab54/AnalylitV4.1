@@ -10,6 +10,8 @@ from utils.app_globals import (
     extension_queue
 )
 from datetime import datetime
+from utils.extensions import db  # ← AJOUT
+from utils.app_globals import import_queue
 from utils.extensions import db
 from utils.models import Project, Grid, Extraction, AnalysisProfile, RiskOfBias, Analysis, SearchResult, ChatMessage
 from utils.file_handlers import save_file_to_project_dir

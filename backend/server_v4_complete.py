@@ -117,6 +117,7 @@ def create_app(config_override=None):
         ]
 
         with app.app_context():
+            from utils.models import AnalysisProfile  # ← AJOUT DANS LA FONCTION
             for profile_data in initial_profiles:
                 exists = db.session.query(AnalysisProfile.id).filter_by(id=profile_data['id']).first() is not None
                 if not exists:

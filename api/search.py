@@ -5,7 +5,9 @@ from datetime import datetime
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from utils.extensions import db
-
+from flask import Blueprint, request, jsonify  # ← AJOUT
+from utils.app_globals import import_queue 
+from backend.tasks_v4_complete import multi_database_search_task
 
 logger = logging.getLogger(__name__)
 search_bp = Blueprint('search_api', __name__)

@@ -1,10 +1,10 @@
 # api/analysis_profiles.py
 
-
+import logging
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
 from utils.models import AnalysisProfile
-from utils.extensions import limiter
+from utils.extensions import db, limiter 
 
 analysis_profiles_bp = Blueprint('analysis_profiles_bp', __name__)
 logger = logging.getLogger(__name__)
