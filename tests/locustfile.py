@@ -32,7 +32,7 @@ class AnalyLitUser(HttpUser):
     def run_search_and_analysis_pipeline(self):
         """
         Simule le workflow le plus lourd : 
-        1. Lancer une recherche (tâche background_queue).
+        1. Lancer une recherche (tâche import_queue ).
         2. Lancer un screening IA (N tâches processing_queue).
         3. Lancer une analyse RoB (N tâches analysis_queue).
         """

@@ -141,7 +141,7 @@ class TestWorkersPerformance:
             conn = Redis(host=redis_host, port=6379, db=0)
             
             # Créer des queues de test
-            queues = ['high', 'default', 'low', 'background_queue']
+            queues = ['high', 'default', 'low', 'import_queue ']
             for queue_name in queues:
                 q = Queue(queue_name, connection=conn)
                 # Queue créée avec succès si pas d'exception

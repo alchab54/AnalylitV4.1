@@ -1,9 +1,9 @@
 # utils/queues.py
-_background_queue = None
+_import_queue  = None
 
-def set_background_queue(q):
-    global _background_queue
-    _background_queue = q
+def set_import_queue (q):
+    global _import_queue 
+    _import_queue  = q
 
-def get_background_queue():
-    return _background_queue
+def get_import_queue ():
+    return _import_queue 

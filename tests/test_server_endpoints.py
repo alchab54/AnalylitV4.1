@@ -227,7 +227,7 @@ def test_api_run_discussion_draft_enqueues_task(mock_enqueue, client, db_session
     response_data = json.loads(response.data) # type: ignore
     assert response_data['job_id'] == "mocked_job_id_123"
 
-@patch('api.projects.background_queue.enqueue')
+@patch('api.projects.import_queue .enqueue')
 @pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_post_chat_message_enqueues_task(mock_enqueue, client, db_session):
     """
@@ -267,7 +267,7 @@ def test_api_post_chat_message_enqueues_task(mock_enqueue, client, db_session):
 # === DÉBUT DES NOUVEAUX TESTS AJOUTÉS (Couverture restante) ===
 # =================================================================
 
-@patch('api.search.background_queue.enqueue')
+@patch('api.search.import_queue .enqueue')
 @pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_search_enqueues_task(mock_enqueue, client, db_session):
     """
@@ -377,7 +377,7 @@ def test_api_run_advanced_analysis_enqueues_tasks(mock_enqueue, analysis_type, e
         job_timeout=1800
     )
 
-@patch('api.projects.background_queue.enqueue')
+@patch('api.projects.import_queue .enqueue')
 @pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
     """
@@ -417,7 +417,7 @@ def test_api_import_zotero_enqueues_task(mock_enqueue, client, db_session):
         job_timeout=3600 
     )
 
-@patch('api.projects.background_queue.enqueue')
+@patch('api.projects.import_queue .enqueue')
 @patch('api.projects.save_file_to_project_dir')
 @pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_import_zotero_file_enqueues_task(mock_save_file, mock_enqueue, client, setup_project):

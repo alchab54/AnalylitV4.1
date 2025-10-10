@@ -1,12 +1,14 @@
 # api/prompts.py - Routes complètes corrigées
 from flask import Blueprint, jsonify, request
-from utils.extensions import db
+import logging
+
 from utils.models import Prompt
-import logging
-from utils.app_globals import limiter
-import logging
+from utils.extensions import limiter, db
+
 logger = logging.getLogger(__name__)
 prompts_bp = Blueprint('prompts', __name__)
+
+
 
 @prompts_bp.route('', methods=['GET'])
 @limiter.limit("50/minute")

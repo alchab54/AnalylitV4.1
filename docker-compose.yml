@@ -270,7 +270,7 @@ services:
         BASE_IMAGE: analylit-base-gpu:latest
     image: analylit-worker-ai:latest
     container_name: analylit_worker_ai
-    command: sh -c "chown -R appuser:appuser /home/appuser/app/projects && exec su appuser -c 'rq worker --url redis://redis:6379/0 ai_queue background_queue analysis_queue extension_queue'"
+    command: sh -c "chown -R appuser:appuser /home/appuser/app/projects && exec su appuser -c 'rq worker --url redis://redis:6379/0 ai_queue import_queue  analysis_queue extension_queue'"
     env_file:
       - .env
     deploy:

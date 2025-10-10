@@ -173,7 +173,7 @@ def test_api_admin_queues_status(mock_redis_conn, mock_worker, client: FlaskClie
     assert 'queues' in queues_data
     assert isinstance(queues_data['queues'], list)
 
-@patch('api.projects.background_queue.enqueue')
+@patch('api.projects.import_queue .enqueue')
 @pytest.mark.usefixtures("mock_redis_and_rq")
 def test_api_upload_pdfs_bulk(mock_enqueue, client: FlaskClient, setup_project: Project):
     """Teste l'endpoint d'upload de PDF en masse."""

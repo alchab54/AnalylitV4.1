@@ -135,7 +135,7 @@ def test_get_jobs_status(client):
         # 2. get_job_ids() (pour les queued jobs)
         # 3. finished_job_registry
         # 4. failed_job_registry 
-        # Et cela pour chaque queue (processing_queue, synthesis_queue, analysis_queue, background_queue)
+        # Et cela pour chaque queue (processing_queue, synthesis_queue, analysis_queue, import_queue )
         # Pour ce test, nous allons simuler les réponses pour la première queue seulement
         # et des listes vides pour les appels suivants pour les autres queues.
         mock_fetch_many.side_effect = [
@@ -147,7 +147,7 @@ def test_get_jobs_status(client):
             # Répéter des listes vides pour les autres queues
             [], [], [], [], # synthesis_queue
             [], [], [], [], # analysis_queue
-            [], [], [], [], # background_queue
+            [], [], [], [], # import_queue 
             [], [], [], []  # <-- AJOUTEZ CETTE LIGNE (pour extension_queue)
         ]
         

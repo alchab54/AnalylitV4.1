@@ -16,5 +16,5 @@ migrate = Migrate()
 # Initialise l'objet Limiter ici, il sera configuré dans la factory
 limiter = Limiter(
     key_func=get_remote_address,
-    default_limits=["100 per minute"]  # Limite par défaut
+    default_limits=["100 per minute"]
 )

@@ -1,11 +1,10 @@
 # api/projects.py
 
 import json
-import logging  # ✅ AJOUT
+import logging
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
-from utils.app_globals import (
-    import_queue, screening_queue, atn_scoring_queue, extraction_queue, analysis_queue, 
+from utils.app_globals import (import_queue, screening_queue, atn_scoring_queue, extraction_queue, analysis_queue,
     synthesis_queue, discussion_draft_queue, extension_queue
 )
 from utils.extensions import db  # ✅ AJOUT
@@ -13,6 +12,7 @@ from datetime import datetime
 from utils.app_globals import import_queue
 from utils.extensions import db
 from utils.models import Project, Grid, Extraction, AnalysisProfile, RiskOfBias, Analysis, SearchResult, ChatMessage
+
 from utils.file_handlers import save_file_to_project_dir
 from backend.tasks_v4_complete import (
 
@@ -38,6 +38,7 @@ from backend.tasks_v4_complete import (
 )
 from utils.helpers import format_bibliography
 from utils.decorators import require_api_key
+
 from werkzeug.utils import secure_filename
 from sqlalchemy import select
 
@@ -53,7 +54,7 @@ def handle_projects():
         data = request.get_json()
         if not data or not data.get('name'):
             return jsonify({"error": "Project name is required"}), 400
-        
+
         new_project = Project(
             name=data['name'],
             description=data.get('description', ''),
@@ -106,7 +107,7 @@ def get_project_search_results(project_id):
     per_page = request.args.get('per_page', 20, type=int)
     sort_by = request.args.get('sort_by', 'created_at')
     sort_order = request.args.get('sort_order', 'desc')
-    
+
     stmt = select(SearchResult).filter_by(project_id=project_id)
     if hasattr(SearchResult, sort_by):
         order_column = getattr(SearchResult, sort_by)
@@ -211,7 +212,7 @@ def update_grid(project_id, grid_id):
     grid.name = data.get('name', grid.name)
     if 'fields' in data and isinstance(data['fields'], list):
         grid.fields = json.dumps(data['fields'])
-    
+
     db.session.commit()
     return jsonify(grid.to_dict()), 200
 
@@ -262,6 +263,7 @@ def import_validations(project_id):
             if not article_id or not decision:
                 continue
 
+
             extraction = db.session.scalar(select(Extraction).filter_by(project_id=project_id, pmid=article_id))
             if extraction:
                 validations = json.loads(extraction.validations) if extraction.validations else {}
@@ -283,7 +285,7 @@ def run_discussion_draft(project_id):
 @projects_bp.route('/projects/<project_id>/chat', methods=['POST'])
 def chat_with_project(project_id):
     data = request.get_json()
-    question = data.get('question')    
+    question = data.get('question')
     if not question:
         return jsonify({"error": "Question is required"}), 400
     job = import_queue.enqueue(answer_chat_question_task, project_id=project_id, question=question, job_timeout=900)
@@ -291,7 +293,7 @@ def chat_with_project(project_id):
 
 @projects_bp.route('/projects/<project_id>/run', methods=['POST'])
 def run_pipeline(project_id):
-    data = request.get_json()    
+    data = request.get_json()
     article_ids = data.get('articles', [])
     profile_id = data.get('profile')
     analysis_mode = data.get('analysis_mode', 'screening')
@@ -342,7 +344,7 @@ def run_analysis(project_id):
 
     if analysis_type in analysis_tasks:
         task_func, queue, timeout = analysis_tasks[analysis_type]
-        
+
         kwargs = {'project_id': project_id, 'job_timeout': timeout}
         if analysis_type == 'synthesis':
             project = db.session.get(Project, project_id)            
@@ -400,6 +402,7 @@ def import_zotero_rdf_endpoint(project_id):
     if not rdf_file_path or not zotero_storage_path:
         return jsonify({"error": "Les chemins 'rdf_file_path' et 'zotero_storage_path' sont requis."}), 400
     
+
     # Validation du projet
     project = db.session.get(Project, project_id)
     if not project:
@@ -414,7 +417,7 @@ def import_zotero_rdf_endpoint(project_id):
 
     log_message = f"Tâche d'import RDF lancée pour le projet {project_id}."
     logger.info(log_message)
-    
+
 
     return jsonify({"message": log_message, "task_id": job.id}), 202
 
@@ -428,7 +431,7 @@ def upload_zotero_file(project_id):
 
     try:
         from utils.app_globals import PROJECTS_DIR
-        
+
         filename = secure_filename(file.filename)
         file_path = save_file_to_project_dir(file, project_id, filename, PROJECTS_DIR)
         
@@ -508,6 +511,7 @@ def save_rob_assessment(project_id, article_id):
 @projects_bp.route('/projects/<project_id>/calculate-kappa', methods=['POST'])
 def calculate_kappa(project_id):
     """Lance la tâche de calcul du Kappa de Cohen."""
+
     #✅ CORRECTION : La clé task_id est ici
     from backend.tasks_v4_complete import calculate_kappa_task
     job = analysis_queue.enqueue(calculate_kappa_task, project_id=project_id, job_timeout='5m')
@@ -547,7 +551,7 @@ def export_thesis(project_id):
     import io
     from sqlalchemy import text
     import logging
-    from utils.app_globals import background_queue
+
     from utils.extensions import db
     from datetime import datetime
     from flask import send_file
@@ -555,8 +559,9 @@ def export_thesis(project_id):
     try:
         search_results = db.session.scalars(select(SearchResult).filter_by(project_id=project_id)).all()
         
+
         included_article_ids = db.session.scalars(select(Extraction.pmid).filter_by(project_id=project_id, user_validation_status='include')).all()
-        
+
         if included_article_ids:
             articles_to_export = [r.to_dict() for r in search_results if r.article_id in included_article_ids]
         else:
@@ -570,7 +575,7 @@ def export_thesis(project_id):
         df.to_excel(excel_buffer, index=False, sheet_name='Articles Inclus')
         excel_buffer.seek(0)
 
-        bibliography_text = format_bibliography(articles_to_export)
+        bibliography_text = format_bibliography(articles_to_export)   
         
         zip_buffer = io.BytesIO()
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
@@ -593,7 +598,7 @@ def upload_pdfs_bulk(project_id):
     """Upload en masse de PDFs."""
     if 'files' not in request.files:
         return jsonify({"error": "Aucun fichier n'a été envoyé."}), 400
-    
+
     files = request.files.getlist('files')
     if not files or all(f.filename == '' for f in files):
         return jsonify({"error": "Aucun fichier sélectionné pour l'upload."}), 400
@@ -603,7 +608,7 @@ def upload_pdfs_bulk(project_id):
         if file and file.filename.endswith('.pdf'):
             try:
                 from utils.app_globals import PROJECTS_DIR
-                filename = secure_filename(file.filename)
+                filename = secure_filename(file.filename)   
                     #logger.info(f"Fichier {filename} uploadé, mais aucune tâche de traitement n'est définie pour l'upload de PDF en masse.")
                 job = import_queue.enqueue(add_manual_articles_task, project_id=project_id, identifiers=[filename], job_timeout='10m')
                 task_ids.append(job.id)
@@ -657,6 +662,7 @@ def launch_atn_workflow(project_id):
             WHERE id = :pid
         """), {"pid": project_id, "ts": datetime.now().isoformat()})
         db.session.commit()
+
         
         return jsonify({
             'message': 'Workflow ATN séquentiel démarré',

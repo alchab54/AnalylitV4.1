@@ -247,7 +247,7 @@ services:
       args:
         BASE_IMAGE: analylit-base-cpu:latest
     container_name: analylit_worker_import_2
-    command: ["rq", "worker", "--url", "redis://redis:6379/0", "import_queue", "background_queue"]
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "import_queue", "import_queue "]
     depends_on:
       redis:
         condition: service_started

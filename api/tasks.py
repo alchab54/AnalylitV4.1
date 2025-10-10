@@ -1,6 +1,7 @@
 # api/tasks.py
 import logging
 
+
 from rq import Queue
 from utils.app_globals import redis_conn  # ← AJOUT
 from flask import Blueprint, jsonify
@@ -15,7 +16,7 @@ def get_queues_info():
     try:
         queues_to_check = [
             'processing_queue', 'synthesis_queue', 'analysis_queue',
-            'background_queue', 'models_queue', 'extension_queue',
+            'import_queue ', 'models_queue', 'extension_queue',
             'fast_queue', 'default_queue', 'ai_queue'
         ]
 
@@ -64,7 +65,7 @@ def get_all_tasks_status():
     try:
         queues_to_check = [
             'processing_queue', 'synthesis_queue', 'analysis_queue',
-            'background_queue', 'models_queue', 'extension_queue',
+            'import_queue ', 'models_queue', 'extension_queue',
             'fast_queue', 'default_queue', 'ai_queue'
         ]
         
