@@ -4,7 +4,7 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
 from utils.models import AnalysisProfile
-from utils.app_globals import limiter
+from utils.extensions import limiter
 
 analysis_profiles_bp = Blueprint('analysis_profiles_bp', __name__)
 logger = logging.getLogger(__name__)
