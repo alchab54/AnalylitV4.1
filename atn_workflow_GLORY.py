@@ -340,7 +340,7 @@ class ATNWorkflowGlory:
         
         result = api_request_glory(
             "POST",
-            f"/api/projects/{self.project_id}/import-zotero", # La nouvelle route magique
+            f"/api/projects/{self.project_id}/import-zotero-pdfs", # La nouvelle route magique
             data,
             timeout=60
         )

@@ -28,7 +28,8 @@ config.set_main_option('sqlalchemy.url', db_url)
 
 # Configuration du logging
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    # fileConfig(config.config_file_name)
+    pass 
 
 # --- LA LIGNE LA PLUS IMPORTANTE ---
 # Dites à Alembic que la définition de vos tables vient de vos modèles. Point.

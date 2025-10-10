@@ -1,3 +1,4 @@
+version: '3.9'
 
 x-common-config: &common-config
   restart: unless-stopped
@@ -52,7 +53,7 @@ services:
     restart: unless-stopped
 
   ollama:
-    build: 
+    build:
       context: ./docker/ollama
       dockerfile: Dockerfile.dev
     container_name: analylit_ollama
@@ -70,25 +71,25 @@ services:
 
   # --- SERVICES APPLICATIFS ---
   migrate:
-    <<: *common-config
     build:
       context: .
       dockerfile: docker/Dockerfile.migrate
     container_name: analylit-migrate
+    <<: *common-config
     depends_on:
       test-db: { condition: service_healthy }
     environment:
       <<: *common-env
-      FLASK_APP: "backend.server_v4_complete:create_app()"
-    command: ["flask", "db", "upgrade"]
+    # ULTIME CORRECTION : On utilise la commande directe et robuste de l'environnement de dev
+    command: ["alembic", "upgrade", "head"]
     restart: "no"
 
   web:
-    <<: *common-config
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
     container_name: analylit_web
+    <<: *common-config
     command: ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--worker-class", "gevent", "backend.wsgi:app"]
     ports: ["8080:5000"]
     depends_on:
@@ -96,42 +97,42 @@ services:
 
   # --- WORKERS ---
   worker-import:
-    <<: *common-config
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
+    <<: *common-config
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "import_queue"]
     deploy: { replicas: 1 }
 
   worker-screening:
-    <<: [*common-config, *gpu-resources]
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
+    <<: [*common-config, *gpu-resources]
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue", "atn_scoring_queue"]
     deploy: { replicas: 2 }
 
   worker-extraction:
-    <<: [*common-config, *gpu-resources]
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
+    <<: [*common-config, *gpu-resources]
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "extraction_queue"]
     deploy: { replicas: 6 }
 
   worker-analysis:
-    <<: [*common-config, *gpu-resources]
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
+    <<: [*common-config, *gpu-resources]
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue"]
     deploy: { replicas: 6 }
 
   worker-synthesis:
-    <<: [*common-config, *gpu-resources]
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
+    <<: [*common-config, *gpu-resources]
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "synthesis_queue", "discussion_draft_queue"]
     deploy: { replicas: 2 }
 
