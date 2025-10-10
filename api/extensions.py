@@ -1,6 +1,6 @@
 # api/extensions.py
 
-
+import logging
 from flask import Blueprint, jsonify, request
 
 from utils.app_globals import extension_queue

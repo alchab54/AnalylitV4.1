@@ -1,8 +1,8 @@
 # api/search.py
 
 import json
+import uuid
 from datetime import datetime
-from flask import Blueprint, jsonify, request
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from utils.extensions import db

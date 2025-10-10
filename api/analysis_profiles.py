@@ -1,6 +1,6 @@
 # api/analysis_profiles.py
 
-
+import logging
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
 from utils.extensions import db

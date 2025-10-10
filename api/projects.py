@@ -32,7 +32,7 @@ from backend.tasks_v4_complete import (
     add_manual_articles_task,
     run_descriptive_stats_task,
     run_atn_stakeholder_analysis_task,
-    run_extension_task
+    run_extension_task,
 )
 from utils.helpers import format_bibliography
 from utils.decorators import require_api_key
@@ -40,6 +40,7 @@ from werkzeug.utils import secure_filename
 from sqlalchemy import select
 
 projects_bp = Blueprint('projects_bp', __name__)
+from sqlalchemy import text
 logger = logging.getLogger(__name__)
 
 # ✅ **CORRECTION MAJEURE : Aligner toutes les routes sur la convention `/projects`**
