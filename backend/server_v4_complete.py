@@ -1,10 +1,9 @@
 # ===============================================================
-# ===         ANALYLIT V4.2 - SERVEUR PRINCIPAL "GLORY"       ===
-# ===          VERSION FINALE, CORRIGÉE ET STABILISÉE         ===
+# ===         ANALYLIT V4.2 - SERVEUR PRINCIPAL "GLORY"         ===
+# ===           VERSION FINALE, CORRIGÉE ET STABILISÉE          ===
 # ===============================================================
 
 # --- PATCH GEVEBT : DOIT ÊTRE LA TOUTE PREMIÈRE CHOSE EXÉCUTÉE ---
-# Correction cruciale pour la compatibilité entre Flask-SocketIO, gevent et Redis.
 from gevent import monkey
 monkey.patch_all()
 
@@ -12,47 +11,23 @@ monkey.patch_all()
 import logging
 import sys
 import os
-import json
-import uuid
 from pathlib import Path
 
 # --- AJOUT DE LA RACINE DU PROJET AU PYTHONPATH ---
-# Garantit que les modules locaux sont trouvables, peu importe comment le script est lancé.
 project_root = Path(__file__).resolve().parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
 # --- IMPORT DES DÉPENDANCES EXTERNES ---
-# Patch pour une version de feedparser qui peut être capricieuse
-import feedparser
-if not hasattr(feedparser, '_FeedParserMixin'):
-    feedparser._FeedParserMixin = type('_FeedParserMixin', (object,), {})
-
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
-from sqlalchemy.orm import sessionmaker
+from flask_socketio import SocketIO
+
 # --- IMPORTS DES MODULES DE L'APPLICATION ---
-
-# Blueprints (Routes API modulaires)
-from api.admin import admin_bp
-from api.extensions import extensions_bp
-from api.files import files_bp
-from api.projects import projects_bp
-from api.reporting import reporting_bp
-from api.search import search_bp
-from api.selection import selection_bp
-from api.prompts import prompts_bp
-from api.stakeholders import stakeholders_bp
-from api.tasks import tasks_bp
-
-# Utilitaires et Configuration
 from utils.extensions import db, migrate, limiter
-from utils.app_globals import redis_conn, analysis_queue, limiter
-from utils.models import Project, Extraction, SearchResult, AnalysisProfile # Import direct du modèle
 from backend.config.config_v4 import get_config
 
 # --- CONFIGURATION DU LOGGING ---
-# Bascule entre une configuration de développement (plus verbeuse) et de production.
 if os.getenv('FLASK_ENV') == 'development':
     from utils.logging_config_dev import setup_logging
     setup_logging()
@@ -62,20 +37,15 @@ else:
 
 logger = logging.getLogger(__name__)
 
+# Crée l'instance de SocketIO ici, sans l'attacher à une app pour l'instant
+socketio = SocketIO()
+
 def create_app(config_override=None):
     """
     Factory pour créer et configurer l'instance de l'application Flask.
-    Cette structure permet de créer différentes instances de l'app (ex: pour les tests).
     """
-    # Correction pour servir le frontend depuis le bon dossier
-    app = Flask(__name__),
-    from api.admin import admin_bp
-    from api.analysis_profiles import analysis_profiles_bp
-    from api.extensions import extensions_bp
-    from api.files import files_bp
-    from api.projects import projects_bp
-    static_folder='../web',
-    static_url_path='' # URL racine vide pour servir index.html et autres
+    # CORRECTION : La création de l'objet Flask était incorrecte.
+    app = Flask(__name__, static_folder='../web', static_url_path='')
 
     # --- CONFIGURATION DE L'APPLICATION ---
     config = get_config()
@@ -83,55 +53,54 @@ def create_app(config_override=None):
     if config_override:
         app.config.update(config_override)
 
-    # Configuration du schéma PostgreSQL pour l'isolation des données
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_pre_ping': True,
-        "connect_args": {
-            "options": f"-c search_path={config.DB_SCHEMA},public"
-        }
+        "connect_args": {"options": f"-c search_path={config.DB_SCHEMA},public"}
     }
     
     if 'SQLALCHEMY_DATABASE_URI' not in (config_override or {}):
         app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_URL
 
-
     CORS(app, resources={r"/api/*": {"origins": "*"}})
-    socketio = SocketIO()
 
     # --- INITIALISATION DES EXTENSIONS FLASK AVEC L'APP ---
     db.init_app(app)
-    migrate.init_app(app, db)    
+    migrate.init_app(app, db)
     limiter.init_app(app)
-
-
-    # Initialisation de SocketIO avec async_mode='gevent' et la queue Redis
     socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent', message_queue=app.config['REDIS_URL'])
 
     # --- ENREGISTREMENT DES BLUEPRINTS (ROUTES API) ---
-    # --- IMPORTANT : Imports locaux ---
-    # Importer les blueprints A L'INTERIEUR de la fonction
-    from api.admin import admin_bp
-    from api.analysis_profiles import analysis_profiles_bp
-    from api.extensions import extensions_bp
-    from api.files import files_bp
-    from api.projects import projects_bp
-    from api.reporting import reporting_bp
-    from api.search import search_bp
-    from api.selection import selection_bp
-    from api.prompts import prompts_bp
-    from api.settings import settings_bp
-    from api.stakeholders import stakeholders_bp
-    app.register_blueprint(admin_bp, url_prefix='/api')
-    app.register_blueprint(analysis_profiles_bp, url_prefix='/api')
-    app.register_blueprint(extensions_bp, url_prefix='/api')
-    app.register_blueprint(files_bp, url_prefix='/api')
-    app.register_blueprint(projects_bp, url_prefix='/api')
-    app.register_blueprint(prompts_bp, url_prefix='/api/prompts')
-    app.register_blueprint(reporting_bp, url_prefix='/api')
-    app.register_blueprint(search_bp, url_prefix='/api')
-    app.register_blueprint(selection_bp, url_prefix='/api')
-    app.register_blueprint(settings_bp, url_prefix='/api')
-    app.register_blueprint(stakeholders_bp, url_prefix='/api')
+    with app.app_context():
+        # Imports locaux pour briser les boucles d'importation
+        from api.admin import admin_bp
+        from api.analysis_profiles import analysis_profiles_bp
+        from api.extensions import extensions_bp
+        from api.files import files_bp
+        from api.projects import projects_bp
+        from api.reporting import reporting_bp
+        from api.search import search_bp
+        from api.selection import selection_bp
+        from api.prompts import prompts_bp
+        from api.settings import settings_bp
+        from api.stakeholders import stakeholders_bp
+        from api.tasks import tasks_bp
+        
+        # Enregistrement
+        app.register_blueprint(admin_bp, url_prefix='/api')
+        app.register_blueprint(analysis_profiles_bp, url_prefix='/api')
+        app.register_blueprint(extensions_bp, url_prefix='/api')
+        app.register_blueprint(files_bp, url_prefix='/api')
+        app.register_blueprint(projects_bp, url_prefix='/api')
+        app.register_blueprint(prompts_bp, url_prefix='/api/prompts')
+        app.register_blueprint(reporting_bp, url_prefix='/api')
+        app.register_blueprint(search_bp, url_prefix='/api')
+        app.register_blueprint(selection_bp, url_prefix='/api')
+        app.register_blueprint(settings_bp, url_prefix='/api')
+        app.register_blueprint(stakeholders_bp, url_prefix='/api')
+        app.register_blueprint(tasks_bp, url_prefix='/api/tasks')
+        
+        # Import des modèles pour s'assurer qu'ils sont connus de SQLAlchemy
+        from utils import models
     # --- COMMANDES CLI (ex: `flask seed_db`) ---
     @app.cli.command("seed_db")
     def seed_db():
