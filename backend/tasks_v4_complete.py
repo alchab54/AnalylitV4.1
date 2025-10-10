@@ -27,7 +27,13 @@ import matplotlib.pyplot as plt
 from pyzotero import zotero
 from scipy import stats
 from sklearn.metrics import cohen_kappa_score
-
+from backend.wsgi import app
+# Importe les extensions partagées
+from utils.extensions import db
+from utils.app_globals import (
+    import_queue, screening_queue, extraction_queue, analysis_queue,
+    synthesis_queue, atn_scoring_queue, discussion_draft_queue
+)
 import chromadb
 from sentence_transformers import SentenceTransformer, util
 from sqlalchemy.exc import SQLAlchemyError
@@ -83,14 +89,6 @@ logger = logging.getLogger(__name__)
 PROJECTS_DIR = Path('/home/appuser/app/projects')
 PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 
-# --- Base de Données (SQLAlchemy Uniquement pour les tâches) ---
-# ✅ CORRECTION: Rétablir une factory de session pour les workers RQ,
-from rq import Queue
-from redis import Redis
-# mais le décorateur ci-dessous s'assurera que les tests utilisent leur propre session.
-# ✅ CORRECTION FINALE: La connexion DB des workers doit être sensible au mode de test.
-# Si la variable d'environnement TESTING est 'true', on utilise la base de données de test.
-# C'est la correction clé pour les tests qui bloquent.
 is_testing = os.getenv('TESTING') == 'true'
 db_url = os.getenv('TEST_DATABASE_URL') if is_testing else config.DATABASE_URL
 
@@ -107,7 +105,6 @@ engine = create_engine(
 )
 SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
-config = get_config()
 redis_conn = Redis.from_url(config.REDIS_URL)
 analysis_queue = Queue('analysis_queue', connection=redis_conn, job_timeout=600)
 # --- Embeddings / Vector store (RAG) ---
@@ -141,33 +138,27 @@ except ImportError as e:
 # ================================================================ 
 
 def with_db_session(func):
-    # Assurer que le logging est configuré au début de la tâche
-    setup_logging()
-
+    """
+    Décorateur qui fournit un contexte d'application et une session DB
+    aux tâches RQ. Garantit que la tâche s'exécute dans le même
+    environnement que l'application web.
+    """
     @wraps(func)
     def wrapper(*args, **kwargs):
-        # ✅ CORRECTION FINALE: Logique de session robuste pour les tests et la production.
-        # Si le premier argument est déjà une session SQLAlchemy (fournie par une fixture de test),
-        # on l'utilise directement.
-        if args and hasattr(args[0], 'query'): # Détecte si une session est déjà passée
-            # La session est déjà fournie (cas des tests)
-            return func(*args, **kwargs)
-        
-        # Cas normal (exécution par RQ) : créer une nouvelle session pour la durée de la tâche.
-        session = SessionFactory()
-        try:
-            # Injecter la session comme premier argument pour standardiser la signature des tâches.
-            result = func(session, *args, **kwargs)
-            session.commit()
-            return result
-        except Exception as e:
-            session.rollback()
-            logger.error(f"Erreur dans la tâche {func.__name__}: {e}", exc_info=True)
-            raise # Propager l'exception pour que RQ marque la tâche comme échouée
-        finally:
-            session.close() # Toujours fermer la session pour libérer la connexion.
+        # Utilise le contexte de l'application principale
+        with app.app_context():
+            try:
+                # Exécute la fonction de la tâche
+                result = func(*args, **kwargs)
+                # Le commit est géré par la tâche elle-même ou à la fin si nécessaire
+                db.session.commit()
+                return result
+            except Exception as e:
+                # En cas d'erreur, on annule la transaction
+                logger.error(f"Erreur dans la tâche {func.__name__}: {e}", exc_info=True)
+                db.session.rollback()
+                raise  # Propage l'erreur pour que RQ marque la tâche comme échouée
     return wrapper
-
 
 # ================================================================ 
 # === FONCTIONS UTILITAIRES DB-SAFE (SQLAlchemy)
@@ -309,11 +300,12 @@ def _mock_multi_database_search_task(session, project_id: str, query: str, datab
 
 
 @with_db_session
-def multi_database_search_task(session, project_id: str, query: str, databases: list, max_results_per_db: int = 50, expert_queries: dict = None):
+def multi_database_search_task(project_id: str, query: str, databases: list, max_results_per_db: int = 50, expert_queries: dict = None):
     """
     Recherche dans plusieurs bases et insère les résultats dans search_results.
     Gère à la fois les requêtes simples et les requêtes expertes spécifiques à chaque base.
     """
+    session = SessionFactory()
 
     if os.environ.get("ANALYLIT_TEST_MODE") == "true":
         _mock_multi_database_search_task(session, project_id, query, databases, max_results_per_db)
@@ -331,7 +323,7 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
     total_found = 0
 
     # S'assurer que le projet existe avant de continuer
-    if not session.get(Project, project_id):
+    if not db.session.get(Project, project_id):
         logger.error(f"Erreur critique: Le projet {project_id} n'existe pas au début de la tâche de recherche.")
         return
 
@@ -423,7 +415,7 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
             failed_databases.append(db_name)
 
     if all_records_to_insert:
-        session.execute(text("""
+        db.session.execute(text("""
             INSERT INTO search_results (id, project_id, article_id, title, abstract, authors, publication_date, journal, doi, url, database_source, created_at)
             VALUES (:id, :pid, :aid, :title, :abstract, :authors, :pub_date, :journal, :doi, :url, :src, :ts) 
             ON CONFLICT (project_id, article_id) DO NOTHING
@@ -435,13 +427,13 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
         logger.info(f"🚀 Enqueuing {len(all_records_to_insert)} screening tasks...")
 
         # Récupérer le projet et le profil associé pour obtenir les modèles
-        project = session.get(Project, project_id)
+        project = db.session.get(Project, project_id)
 
         # Logique simplifiée et plus robuste
         profile_name = 'standard' # Toujours commencer avec le défaut
         if project and project.profile_used:
             # Chercher le profil par son nom/id dans la DB
-            profile_from_db = session.query(AnalysisProfile).filter_by(name=project.profile_used).first()
+            profile_from_db = db.session.query(AnalysisProfile).filter_by(name=project.profile_used).first()
             if profile_from_db:
                 profile_name = profile_from_db.name.lower()
             else:
@@ -465,9 +457,9 @@ def multi_database_search_task(session, project_id: str, query: str, databases: 
         logger.info("✅ Screening tasks enqueued.")
 
 
-    session.execute(text("UPDATE projects SET status = 'search_completed', pmids_count = :n, updated_at = :ts WHERE id = :id"), {"n": total_found, "ts": datetime.now().isoformat(), "id": project_id})
+    db.session.execute(text("UPDATE projects SET status = 'search_completed', pmids_count = :n, updated_at = :ts WHERE id = :id"), {"n": total_found, "ts": datetime.now().isoformat(), "id": project_id})
     
-    session.commit() # Commit the status update
+    db.session.commit() # Commit the status update
     # Amélioration de la notification finale
     final_message = f'Recherche terminée: {total_found} articles trouvés.'
 
@@ -748,7 +740,7 @@ def process_single_article_task(project_id, article, profile, analysis_mode, job
             reason = extract_res.get("reason", "")
 
             # ✅ UTILISER SCORE ATN V2.2 (plus précis que score Ollama générique)
-            final_score = atn_results.get("atn_score", 0)
+            final_score = atn_results.get("atn_score", 0)   
             atn_justification = f"ATN v2.2: {atn_results.get('atn_category', 'Non évalué')} | Ollama: {reason}"
 
             # Sauvegarde du résultat de screening avec scoring ATN
@@ -882,7 +874,7 @@ TEXTE DE L'ARTICLE:
 
         else:
             raise ValueError(f"Mode d'analyse inconnu: {analysis_mode}")
-
+    
         # ======================================================================
         # ✅ FINALISATION ET NOTIFICATIONS
         # ======================================================================
@@ -951,13 +943,13 @@ def import_from_zotero_rdf_task(project_id, rdf_file_path, zotero_storage_path):
             return {"status": "failed", "error": str(e)}
    
 @with_db_session
-def run_synthesis_task(session, project_id: str, profile: dict):
+def run_synthesis_task(project_id: str, profile: dict):
     """Génère une synthèse à partir des articles pertinents (score >= 7)."""
-    update_project_status(session, project_id, 'synthesizing')
-    project = session.execute(text("SELECT description FROM projects WHERE id = :pid"), {"pid": project_id}).mappings().fetchone()
+    update_project_status(db.session, project_id, 'synthesizing')
+    project = db.session.execute(text("SELECT description FROM projects WHERE id = :pid"), {"pid": project_id}).mappings().fetchone()
     project_description = project['description'] if project else "Non spécifié"
 
-    rows = session.execute(text("SELECT s.title, s.abstract FROM extractions e JOIN search_results s ON e.project_id = s.project_id AND e.pmid = s.article_id WHERE e.project_id = :pid AND e.relevance_score >= 7 ORDER BY e.relevance_score DESC LIMIT 30"), {"pid": project_id}).mappings().all()
+    rows = db.session.execute(text("SELECT s.title, s.abstract FROM extractions e JOIN search_results s ON e.project_id = s.project_id AND e.pmid = s.article_id WHERE e.project_id = :pid AND e.relevance_score >= 7 ORDER BY e.relevance_score DESC LIMIT 30"), {"pid": project_id}).mappings().all()
     if not rows:
         update_project_status(session, project_id, 'failed')
         send_project_notification(project_id, 'synthesis_failed', 'Aucun article pertinent (score >= 7).')
@@ -975,17 +967,17 @@ def run_synthesis_task(session, project_id: str, profile: dict):
     output = call_ollama_api(prompt, profile.get('synthesis_model', 'llama3.1:8b'), output_format="json")
     try:
         if output and isinstance(output, dict):
-            update_project_status(session, project_id, status='completed', result=output)
+            update_project_status(db.session, project_id, status='completed', result=output)
             send_project_notification(project_id, 'synthesis_completed', 'Synthèse générée.')
         else:
-            update_project_status(session, project_id, status='failed')
+            update_project_status(db.session, project_id, status='failed')
             send_project_notification(project_id, 'synthesis_failed', 'Réponse IA invalide.')
     except Exception as e:
         logger.error(f"Erreur dans la tâche de synthèse : {e}", exc_info=True)
         raise
 
 @with_db_session
-def run_discussion_generation_task(session, project_id: str):
+def run_discussion_generation_task(project_id: str):
     """Génère le brouillon de la discussion."""
     try:
 
@@ -1000,23 +992,23 @@ def run_discussion_generation_task(session, project_id: str):
         # That line does not exist in this file. The logic for enqueuing tasks is in `server_v4_complete.py`.
         # The most similar logic in this file is the call to `generate_discussion_draft` below.
         # I will assume the intent was to ensure this part is correct, which it appears to be.
-        # No changes are made based on the user's specific instruction for line 300 as it's not applicable here.
+        # No changes are made based on the user's specific instruction for line 300 as it's not applicable here
         df = pd.DataFrame(rows)
-        profile = session.execute(text("SELECT profile_used FROM projects WHERE id = :pid"), {"pid": project_id}).scalar_one_or_none() or 'standard'
+        profile = db.session.execute(text("SELECT profile_used FROM projects WHERE id = :pid"), {"pid": project_id}).scalar_one_or_none() or 'standard'
         # The following line correctly calls the local function `generate_discussion_draft`
         model_name = config.DEFAULT_MODELS.get(profile, {}).get('synthesis', 'llama3.1:8b')
         draft = generate_discussion_draft(df, lambda p, m: call_ollama_api(p, m, temperature=0.7), model_name)
 
-        update_project_status(session, project_id, status='completed', discussion=draft)
+        update_project_status(db.session, project_id, status='completed', discussion=draft)
         send_project_notification(project_id, 'analysis_completed', 'Le brouillon de discussion a été généré.', {'discussion_draft': draft})
     except Exception as e:
         logger.error(f"Erreur dans la tâche de discussion : {e}", exc_info=True)
         raise
 
 @with_db_session
-def run_knowledge_graph_task(session, project_id: str):
+def run_knowledge_graph_task(project_id: str):
     """Génère un graphe de connaissances JSON à partir des titres d'articles extraits."""
-    update_project_status(session, project_id, status='generating_graph')
+    update_project_status(db.session, project_id, status='generating_graph')
     
     # Utiliser le modèle de synthèse pour cette tâche, car il est plus adapté à la génération de JSON structuré.
     profile_info = session.query(Project).filter_by(id=project_id).first()
@@ -1038,8 +1030,8 @@ Titres:
 {json.dumps(titles, indent=2)}"""
     graph = call_ollama_api(prompt, model=model_to_use, output_format="json")
     
-    if graph and isinstance(graph, dict) and 'nodes' in graph and 'edges' in graph:
-        update_project_status(session, project_id, status='completed', graph=graph)
+    if graph and isinstance(graph, dict) and 'nodes' in graph and 'edges' in graph:   
+        update_project_status(db.session, project_id, status='completed', graph=graph)
         send_project_notification(project_id, 'analysis_completed', 'Le graphe de connaissances est prêt.', {'analysis_type': 'knowledge_graph'})
     else:
         update_project_status(session, project_id, status='failed')
@@ -1047,22 +1039,22 @@ Titres:
 
 @with_db_session
 def run_prisma_flow_task(session, project_id: str):
-    """Génère un diagramme PRISMA simplifié et stocke l'image sur disque."""
+    """Génère un diagramme PRISMA simplifié et stocke l'image sur disque.   
     update_project_status(session, project_id, status='generating_prisma')
     
-    total_found = session.execute(text("SELECT COUNT(*) FROM search_results WHERE project_id = :pid"), {"pid": project_id}).scalar_one()
-    n_included = session.execute(text("SELECT COUNT(*) FROM extractions WHERE project_id = :pid"), {"pid": project_id}).scalar_one()
+    total_found = session.execute(text("SELECT COUNT(*) FROM search_results WHERE project_id = :pid"), {"pid": project_id}).scalar_one()   
+    n_included = session.execute(text("SELECT COUNT(*) FROM extractions WHERE project_id = :pid"), {"pid": project_id}).scalar_one()   
     
     if total_found == 0:
         update_project_status(session, project_id, status='completed')
         return
     
     n_after_duplicates, n_excluded_screening = total_found, total_found - n_included
-    
+        
     fig, ax = plt.subplots(figsize=(12, 16), dpi=300)
     plt.style.use('seaborn-v0_8-whitegrid')
     box_props = dict(boxstyle="round,pad=0.8", facecolor='lightblue', edgecolor='navy', linewidth=2, alpha=0.8)
-    font_props = {'fontsize': 12, 'fontweight': 'bold', 'fontfamily': 'serif'}
+    font_props = {'fontsize': 12, 'fontweight': 'bold', 'fontfamily': 'serif'}   
     
     ax.text(0.5, 0.9, f'Articles identifiés\nn = {total_found}', ha='center', va='center', bbox=box_props, **font_props)
     ax.text(0.5, 0.7, f'Après exclusion doublons\nn = {n_after_duplicates}', ha='center', va='center', bbox=box_props, **font_props)
@@ -1074,12 +1066,13 @@ def run_prisma_flow_task(session, project_id: str):
     p_dir = PROJECTS_DIR / project_id
     p_dir.mkdir(exist_ok=True)
     image_path = str(p_dir / 'prisma_flow.png')
+    
     plt.savefig(image_path, bbox_inches='tight', dpi=300, format='png')
     pdf_path = str(p_dir / 'prisma_flow.pdf') 
     plt.savefig(pdf_path, bbox_inches='tight', format='pdf')
     plt.close(fig)
 
-    update_project_status(session, project_id, status='completed', prisma_path=image_path)
+    update_project_status(session, project_id, status='completed', prisma_path=image_path)  
     send_project_notification(project_id, 'analysis_completed', 'Le diagramme PRISMA est prêt.', {'analysis_type': 'prisma_flow'})
 
 @with_db_session
@@ -1134,7 +1127,7 @@ def run_descriptive_stats_task(session, project_id: str):
         'min_score': float(np.min(scores)), 'max_score': float(np.max(scores))
     }
     
-    update_project_status(session, project_id, status='completed', analysis_result=stats_result)
+    update_project_status(db.session, project_id, status='completed', analysis_result=stats_result)
     session.commit() # Commit the status update
     send_project_notification(project_id, 'analysis_completed', 'Statistiques descriptives générées')
 
@@ -1143,7 +1136,7 @@ def run_descriptive_stats_task(session, project_id: str):
 # ================================================================ 
 
 @with_db_session
-def answer_chat_question_task(session, project_id: str, question: str):
+def answer_chat_question_task(project_id: str, question: str):
     """Répond à une question via RAG sur les PDFs indexés."""
     logger.info(f"ðŸ’¬ Question chat pour projet {project_id}")
     
@@ -1172,7 +1165,7 @@ Réponds de façon concise et précise."""
         except Exception:
             response = "Erreur lors de la recherche dans la base de connaissances."
     
-    session.execute(text("INSERT INTO chat_messages (id, project_id, role, content, timestamp) VALUES (:id1, :pid, 'user', :q, :ts1), (:id2, :pid, 'assistant', :a, :ts2)"), {"id1": str(uuid.uuid4()), "id2": str(uuid.uuid4()), "pid": project_id, "q": question, "a": response, "ts1": datetime.now().isoformat(), "ts2": datetime.now().isoformat()})
+    db.session.execute(text("INSERT INTO chat_messages (id, project_id, role, content, timestamp) VALUES (:id1, :pid, 'user', :q, :ts1), (:id2, :pid, 'assistant', :a, :ts2)"), {"id1": str(uuid.uuid4()), "pid": project_id, "q": question, "ts1": datetime.now().isoformat(), "id2": str(uuid.uuid4()), "a": response, "ts2": datetime.now().isoformat()})
     return response
 
 # ================================================================ 
@@ -1220,7 +1213,7 @@ def import_from_zotero_file_task(session, project_id: str, json_file_path: str):
         logger.warning(f"Impossible de supprimer le fichier temporaire {json_file_path}: {e}")
 
 def import_pdfs_from_zotero_task(project_id: str, pmids: list, zotero_user_id: str, zotero_api_key: str):
-    
+
     """Importe les PDFs depuis Zotero pour les articles spécifiés."""
     logger.info(f"ðŸ“„ Import PDFs Zotero pour {len(pmids)} articles")
     try:
@@ -1864,9 +1857,9 @@ def import_from_zotero_json_task(session, project_id: str, items_list: list):
     msg = f"Importation Zotero (Extension) terminée : {len(new_articles)} articles ajoutés, {failed_imports} échecs."
     send_project_notification(project_id, 'import_completed', msg)
     logger.info(msg)
-
 def run_extension_task(session, project_id: str, extension_name: str):
     """
+
     Placeholder task for running a specific extension.
     """
     logger.info(f"🚀 Exécution de l'extension '{extension_name}' pour le projet {project_id}")
