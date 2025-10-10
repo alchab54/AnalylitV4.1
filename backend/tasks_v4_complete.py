@@ -1318,6 +1318,7 @@ def pull_ollama_model_task(model_name: str):
     
     try:
         import requests
+
         url = f"{config.OLLAMA_BASE_URL}/api/pull"
         payload = {"name": model_name, "stream": False}
         response = requests.post(url, json=payload, timeout=3600)
