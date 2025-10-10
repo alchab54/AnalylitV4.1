@@ -79,6 +79,7 @@ docker system prune -af
 docker compose --profile build-only build base-cpu
 docker compose --profile build-only build base-gpu
 docker-compose -f docker-compose.glory.yml up --build -d
+sleep 60
 python atn_workflow_GLORY.py
 docker-compose -f docker-compose.glory.yml stop resource-monitor
 

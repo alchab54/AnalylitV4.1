@@ -1,0 +1,79 @@
+timestamp,container_name,cpu_percent,mem_usage_mb,gpu_percent,gpu_mem_percent
+2025-10-10T01:07:37Z,analylit_db,106.08%,32MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:07:37Z,analylit_redis,0.36%,3.195MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:07:37Z,analylit_monitor,0.16%,9.176MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:07:37Z,analylit-rq-dashboard-1,0.01%,19.62MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:07:37Z,analylit_ollama,0.00%,21.69MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:07:37Z,nvidia_gpu,N/A,N/A,
+2025-10-10T01:07:45Z,analylit-rq-dashboard-1,0.01%,19.62MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:07:45Z,analylit_db,0.03%,28.86MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:07:45Z,analylit_redis,0.46%,3.195MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:07:45Z,analylit_ollama,130.51%,48.5MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:07:45Z,analylit_monitor,0.00%,8.996MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:07:45Z,nvidia_gpu,N/A,N/A,
+2025-10-10T01:07:53Z,analylit-rq-dashboard-1,0.02%,19.62MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:07:53Z,analylit_db,0.30%,28.88MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:07:53Z,analylit_redis,0.39%,3.195MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:07:53Z,analylit_ollama,132.67%,58.04MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:07:53Z,analylit_monitor,0.00%,9.223MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:07:53Z,nvidia_gpu,N/A,N/A,
+2025-10-10T01:08:01Z,analylit-rq-dashboard-1,0.01%,19.62MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:01Z,analylit_db,0.03%,28.85MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:01Z,analylit_redis,0.46%,3.195MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:01Z,analylit_ollama,258.77%,65.68MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:01Z,analylit_monitor,0.00%,8.945MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:01Z,nvidia_gpu,N/A,N/A,
+2025-10-10T01:08:09Z,analylit-rq-dashboard-1,0.02%,19.62MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:09Z,analylit_db,0.06%,30.52MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:09Z,analylit_redis,0.44%,3.195MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:09Z,analylit_ollama,130.85%,72.13MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:09Z,analylit_monitor,0.18%,9.199MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:09Z,nvidia_gpu,N/A,N/A,
+2025-10-10T01:08:19Z,analylit-rq-dashboard-1,0.02%,19.62MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:19Z,analylit_db,38.87%,30.5MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:19Z,analylit_redis,0.41%,3.195MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:19Z,analylit_ollama,286.79%,143.2MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:19Z,analylit_monitor,0.08%,9.344MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:19Z,nvidia_gpu,N/A,N/A,
+2025-10-10T01:08:28Z,analylit-rq-dashboard-1,0.01%,19.62MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:29Z,analylit_db,0.04%,30.72MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:29Z,analylit_redis,0.42%,3.195MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:29Z,analylit_ollama,331.00%,130.2MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:29Z,analylit_monitor,0.09%,9MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:29Z,nvidia_gpu,N/A,N/A,
+2025-10-10T01:08:36Z,analylit-rq-dashboard-1,0.01%,19.62MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:36Z,analylit_db,0.02%,30.71MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:36Z,analylit_redis,0.48%,3.195MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:36Z,analylit_ollama,221.09%,82.96MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:36Z,analylit_monitor,0.26%,9.16MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:36Z,nvidia_gpu,N/A,N/A,
+2025-10-10T01:08:44Z,analylit-rq-dashboard-1,0.02%,19.62MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:44Z,analylit_db,0.02%,31.8MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:44Z,analylit_redis,0.54%,3.195MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:44Z,analylit_ollama,151.44%,111.1MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:44Z,analylit_monitor,0.13%,9.16MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:44Z,nvidia_gpu,N/A,N/A,
+2025-10-10T01:08:53Z,analylit-rq-dashboard-1,0.02%,19.62MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:53Z,analylit_db,0.02%,31.8MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:53Z,analylit_redis,0.39%,3.195MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:53Z,analylit_ollama,173.69%,92.81MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:53Z,analylit_monitor,0.00%,9.141MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:08:53Z,nvidia_gpu,N/A,N/A,
+2025-10-10T01:09:01Z,analylit-rq-dashboard-1,0.01%,19.62MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:09:01Z,analylit_db,0.01%,31.75MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:09:01Z,analylit_redis,0.45%,3.195MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:09:01Z,analylit_ollama,87.87%,100MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:09:01Z,analylit_monitor,0.05%,9.242MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:09:01Z,nvidia_gpu,N/A,N/A,
+2025-10-10T01:09:09Z,analylit-rq-dashboard-1,0.01%,19.62MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:09:09Z,analylit_db,0.03%,31.76MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:09:09Z,analylit_redis,0.36%,3.195MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:09:09Z,analylit_ollama,6.18%,99.2MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:09:09Z,analylit_monitor,0.00%,9.055MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:09:09Z,nvidia_gpu,N/A,N/A,
+2025-10-10T01:09:17Z,analylit-rq-dashboard-1,0.01%,19.62MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:09:17Z,analylit_db,0.03%,31.75MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:09:17Z,analylit_redis,0.34%,3.195MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:09:17Z,analylit_ollama,99.63%,126.3MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:09:17Z,analylit_monitor,0.00%,9.195MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:09:17Z,nvidia_gpu,N/A,N/A,

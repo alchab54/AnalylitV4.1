@@ -1,4 +1,4 @@
-version: '3.9'
+# version: '3.9'
 
 # =================================================================
 # === TEMPLATES D'OPTIMISATION "GLORY"
@@ -93,8 +93,7 @@ services:
     environment:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
     networks: [ "analylit-network" ]
-    # Ce service ne doit pas redémarrer, il s'exécute une fois et c'est tout.
-
+    command: ["/bin/sh", "-c", "flask db upgrade && flask seed_db"]
   
   web:
     <<: *worker-base

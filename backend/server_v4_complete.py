@@ -1,25 +1,42 @@
+# ===============================================================
+# ===         ANALYLIT V4.2 - SERVEUR PRINCIPAL "GLORY"       ===
+# ===          VERSION FINALE, CORRIGÉE ET STABILISÉE         ===
+# ===============================================================
+
+# --- PATCH GEVEBT : DOIT ÊTRE LA TOUTE PREMIÈRE CHOSE EXÉCUTÉE ---
+# Correction cruciale pour la compatibilité entre Flask-SocketIO, gevent et Redis.
+from gevent import monkey
+monkey.patch_all()
+
+# --- IMPORTS SYSTÈME ET STANDARDS ---
 import logging
 import sys
+import os
+import json
+import uuid
 from pathlib import Path
 
-# Ajoute la racine du projet au chemin Python
+# --- AJOUT DE LA RACINE DU PROJET AU PYTHONPATH ---
+# Garantit que les modules locaux sont trouvables, peu importe comment le script est lancé.
 project_root = Path(__file__).resolve().parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
+# --- IMPORT DES DÉPENDANCES EXTERNES ---
+# Patch pour une version de feedparser qui peut être capricieuse
 import feedparser
 if not hasattr(feedparser, '_FeedParserMixin'):
     feedparser._FeedParserMixin = type('_FeedParserMixin', (object,), {})
 
-import os
-import json
-import uuid
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from sqlalchemy.orm import sessionmaker
 from rq.exceptions import NoSuchJobError
+from flask_socketio import SocketIO
 
-# --- Import des Blueprints API ---
+# --- IMPORTS DES MODULES DE L'APPLICATION ---
+
+# Blueprints (Routes API modulaires)
 from api.admin import admin_bp
 from api.analysis_profiles import analysis_profiles_bp
 from api.extensions import extensions_bp
@@ -33,14 +50,14 @@ from api.settings import settings_bp
 from api.stakeholders import stakeholders_bp
 from api.tasks import tasks_bp
 
-# --- Imports des utilitaires et de la configuration ---
-from flask_socketio import SocketIO
+# Utilitaires et Configuration
 from utils.extensions import db, migrate
 from utils.app_globals import redis_conn, analysis_queue, limiter
-from utils.models import Project, Extraction, SearchResult
+from utils.models import Project, Extraction, SearchResult, AnalysisProfile # Import direct du modèle
 from backend.config.config_v4 import get_config
 
-# --- Configuration du logging selon l'environnement ---
+# --- CONFIGURATION DU LOGGING ---
+# Bascule entre une configuration de développement (plus verbeuse) et de production.
 if os.getenv('FLASK_ENV') == 'development':
     from utils.logging_config_dev import setup_logging
     setup_logging()
@@ -50,44 +67,47 @@ else:
 
 logger = logging.getLogger(__name__)
 
-# --- Initialisation des extensions ---
+# --- INITIALISATION GLOBALE DES EXTENSIONS ---
+# Déclarées ici pour être accessibles dans la factory d'application.
 socketio = SocketIO()
 
 def create_app(config_override=None):
-    """Factory pour créer et configurer l'application Flask."""
-    # ✅✅✅ **CORRECTION FINALE POUR LES FICHIERS STATIQUES** ✅✅✅
-    # Définir correctement les dossiers static et template
-    app = Flask(__name__, 
-                static_folder='../web',           # Dossier des fichiers statiques
-                static_url_path='/static')               # URL racine pour les statiques
+    """
+    Factory pour créer et configurer l'instance de l'application Flask.
+    Cette structure permet de créer différentes instances de l'app (ex: pour les tests).
+    """
+    # Correction pour servir le frontend depuis le bon dossier
+    app = Flask(__name__,
+                static_folder='../web',
+                static_url_path='') # URL racine vide pour servir index.html et autres
 
-    # Configuration
+    # --- CONFIGURATION DE L'APPLICATION ---
     config = get_config()
     app.config.from_object(config)
     if config_override:
         app.config.update(config_override)
 
-    # Configuration de la base de données avec le schéma
+    # Configuration du schéma PostgreSQL pour l'isolation des données
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_pre_ping': True,
         "connect_args": {
             "options": f"-c search_path={config.DB_SCHEMA},public"
         }
     }
-
-    # Set the database URI from the configuration, allowing override
+    
     if 'SQLALCHEMY_DATABASE_URI' not in (config_override or {}):
         app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_URL
 
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-    # Initialisation des extensions
+    # --- INITIALISATION DES EXTENSIONS FLASK AVEC L'APP ---
     db.init_app(app)
     migrate.init_app(app, db)
     limiter.init_app(app)
+    # Initialisation de SocketIO avec async_mode='gevent' et la queue Redis
     socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent', message_queue=app.config['REDIS_URL'])
 
-    # Enregistrement des blueprints
+    # --- ENREGISTREMENT DES BLUEPRINTS (ROUTES API) ---
     app.register_blueprint(admin_bp, url_prefix='/api')
     app.register_blueprint(analysis_profiles_bp, url_prefix='/api')
     app.register_blueprint(extensions_bp, url_prefix='/api')
@@ -101,103 +121,76 @@ def create_app(config_override=None):
     app.register_blueprint(stakeholders_bp, url_prefix='/api')
     app.register_blueprint(tasks_bp, url_prefix='/api')
 
+    # --- COMMANDES CLI (ex: `flask seed_db`) ---
+    @app.cli.command("seed_db")
+    def seed_db():
+        """Peuple la base de données avec les profils d'analyse initiaux."""
+        logger.info("🌱 Seeding database with initial analysis profiles...")
+        
+        # Définition des profils par défaut à insérer
+        initial_profiles = [
+            {'id': 'fast-local', 'name': '⚡ Rapide (Local)', 'description': 'Pour tests et développement. Utilise les plus petits modèles locaux. 100% hors-ligne.', 'preprocess_model': 'phi3:mini', 'extract_model': 'phi3:mini', 'synthesis_model': 'llama3:8b', 'is_custom': False},
+            {'id': 'standard-local', 'name': ' balanced Standard (Local)', 'description': 'Bon équilibre vitesse/qualité pour le travail quotidien. 100% hors-ligne.', 'preprocess_model': 'phi3:mini', 'extract_model': 'llama3:8b', 'synthesis_model': 'llama3:8b', 'is_custom': False},
+            {'id': 'deep-local', 'name': '🔬 Approfondi (Local)', 'description': 'Qualité maximale en local. Nécessite une machine puissante (GPU). 100% hors-ligne.', 'preprocess_model': 'llama3:8b', 'extract_model': 'mixtral:8x7b', 'synthesis_model': 'llama3:70b', 'is_custom': False},
+            {'id': 'cloud-balanced', 'name': '☁️ Cloud Équilibré', 'description': 'Qualité supérieure via le cloud. Idéal pour des analyses robustes. Connexion requise.', 'preprocess_model': 'llama3:8b', 'extract_model': 'gpt-oss:20b-cloud', 'synthesis_model': 'gpt-oss:120b-cloud', 'is_custom': False},
+            {'id': 'cloud-maximum', 'name': '🏆 Cloud Maximum (Qualité Thèse)', 'description': "Qualité d'analyse ultime pour la publication. Utilise les plus grands modèles cloud.", 'preprocess_model': 'llama3:8b', 'extract_model': 'deepseek-v3.1:671b-cloud', 'synthesis_model': 'deepseek-v3.1:671b-cloud', 'is_custom': False}
+        ]
 
-    # --- Routes Spécifiques ---
+        with app.app_context():
+            for profile_data in initial_profiles:
+                exists = db.session.query(AnalysisProfile.id).filter_by(id=profile_data['id']).first() is not None
+                if not exists:
+                    new_profile = AnalysisProfile(**profile_data)
+                    db.session.add(new_profile)
+                    logger.info(f"  -> Added profile: {profile_data['name']}")
+                else:
+                    logger.info(f"  -> Profile already exists: {profile_data['name']}")
+            db.session.commit()
+        logger.info("✅ Database seeding complete.")
+
+    # --- ROUTES SPÉCIFIQUES À L'APPLICATION ---
     @app.route('/')
     def serve_frontend():
-        """Serve the index HTML file."""
+        """Sert le point d'entrée du frontend (Single Page Application)."""
         return send_from_directory(app.static_folder, 'index.html')
     
     @app.route('/<path:filename>')
     def serve_static(filename):
-        """Serves static files (CSS, JS, images) - useful for SPA routing."""
-        return send_from_directory(app.static_folder, filename)
+        """Sert les fichiers statiques (JS, CSS, images, etc.)."""
+        # Ne sert que si le fichier existe pour éviter les conflits avec les routes API
+        if os.path.exists(os.path.join(app.static_folder, filename)):
+            return send_from_directory(app.static_folder, filename)
+        # Si le fichier n'existe pas, on redirige vers l'index pour la SPA
+        return send_from_directory(app.static_folder, 'index.html')
     
     @app.route('/api/databases', methods=['GET'])
     def get_databases():
-        """Retourne la liste des bases de données disponibles pour la recherche."""
+        """Retourne la liste statique des bases de données de recherche."""
         databases = [
-            {
-                'id': 'pubmed',
-                'name': 'PubMed',
-                'description': 'Base de données biomédicale principale',
-                'enabled': True,
-                'icon': '🏥'
-            },
-            {
-                'id': 'semantic_scholar',
-                'name': 'Semantic Scholar',
-                'description': 'Recherche académique IA-powered',
-                'enabled': True,
-                'icon': '🎓'
-            },
-            {
-                'id': 'arxiv',
-                'name': 'arXiv',
-                'description': 'Prépublications scientifiques',
-                'enabled': True,
-                'icon': '📄'
-            },
-            {
-                'id': 'crossref',
-                'name': 'CrossRef',
-                'description': 'Métadonnées de publications',
-                'enabled': True,
-                'icon': '🔗'
-            }
+            {'id': 'pubmed', 'name': 'PubMed', 'description': 'Base de données biomédicale principale', 'enabled': True, 'icon': '🏥'},
+            {'id': 'semantic_scholar', 'name': 'Semantic Scholar', 'description': 'Recherche académique IA-powered', 'enabled': True, 'icon': '🎓'},
+            {'id': 'arxiv', 'name': 'arXiv', 'description': 'Prépublications scientifiques', 'enabled': True, 'icon': '📄'},
+            {'id': 'crossref', 'name': 'CrossRef', 'description': 'Métadonnées de publications', 'enabled': True, 'icon': '🔗'}
         ]
         return jsonify(databases)
     
     @app.route('/api/health', methods=['GET'])
     def health_check():
+        """Point de terminaison de santé pour les checks de l'infrastructure."""
         return jsonify({"status": "healthy"}), 200
-
-    @app.errorhandler(429)
-    def ratelimit_handler(e):
-        return jsonify({
-            "error": "ratelimit exceeded",
-            "description": "Too many requests, please try again later." # I think you want this.
-        }), 429
-
-    @app.errorhandler(500)
-    def internal_server_error(e):
-        app.logger.error(f"Erreur interne du serveur: {e}")
-        return jsonify(error="Internal server error"), 500
-
-
-    @app.route('/api/prompts', methods=['GET', 'POST'])
-    def api__prompts():
-        try:
-            # Your existing code
-            if request.method == 'POST':
-                # Handle POST request
-                result = {} # Replace this with actual result
-            else:
-                # Handle GET request
-                result = {} # Replace this with actual result
-            return jsonify(result)
-        except Exception as e:
-            app.logger.error(f"Error in api_prompts: {e}")
-            return jsonify({'error': 'Erreur interne du serveur'}), 500
-
-    def normalize_profile(profile: dict) -> dict:
-        """
-        Normalizes the profile dictionary to support both old and new keys.
-        """
-        return {
-            'preprocess': profile.get('preprocess') or profile.get('preprocess_model') or 'phi3:mini',
-            'extract': profile.get('extract') or profile.get('extract_model') or 'llama3.1:8b',
-            'synthesis': profile.get('synthesis') or profile.get('synthesis_model') or 'llama3.1:8b'}
-
-
 
     @app.route('/api/projects/<project_id>/extractions', methods=['GET'])
     def get_project_extractions(project_id):
-        """Retourne les extractions avec l'abstract de l'article."""
-        Session = sessionmaker(bind=db.engine)
-        session = Session()
+        """Retourne les extractions d'un projet avec l'abstract de l'article associé."""
         try:
-            results = session.query(Extraction, SearchResult.abstract, SearchResult.title).outerjoin(SearchResult, (Extraction.pmid == SearchResult.article_id) & (Extraction.project_id == SearchResult.project_id)).filter(Extraction.project_id == project_id).all()
+            results = db.session.query(
+                Extraction, 
+                SearchResult.abstract, 
+                SearchResult.title
+            ).outerjoin(
+                SearchResult, 
+                (Extraction.pmid == SearchResult.article_id) & (Extraction.project_id == SearchResult.project_id)
+            ).filter(Extraction.project_id == project_id).all()
 
             combined_results = []
             for extraction, abstract, title in results:
@@ -205,17 +198,32 @@ def create_app(config_override=None):
                 extraction_dict['abstract'] = abstract or "Abstract non disponible."
                 extraction_dict['title'] = title or extraction.title
                 combined_results.append(extraction_dict)
-
             return jsonify(combined_results)
-        finally:
-            session.close()
+        except Exception as e:
+            logger.error(f"Error fetching extractions for project {project_id}: {e}", exc_info=True)
+            return jsonify({"error": "Failed to fetch extractions"}), 500
+
+    # --- GESTIONNAIRES D'ERREURS GLOBAUX ---
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        """Gère les erreurs de limitation de débit (rate limiting)."""
+        return jsonify(error="ratelimit exceeded", description=str(e)), 429
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        """Gère les erreurs internes du serveur non interceptées."""
+        logger.error(f"Internal Server Error: {e}", exc_info=True)
+        return jsonify(error="Internal server error"), 500
 
     return app
 
-# ✅ Créer l'instance de l'application au niveau du module
+# --- POINT D'ENTRÉE PRINCIPAL ---
+# Crée l'instance de l'application au niveau du module pour qu'elle soit importable par Gunicorn/WSGI
 app = create_app()
 
 if __name__ == "__main__":
-    import gevent.monkey
-    gevent.monkey.patch_all() # Patch all for production and local
+    # Ce bloc ne s'exécute que lors d'un lancement direct (ex: `python server_v4_complete.py`)
+    # Idéal pour le débogage local. NE PAS UTILISER EN PRODUCTION.
+    logger.info("🚀 Lancement du serveur de développement Flask-SocketIO...")
     socketio.run(app, host="0.0.0.0", port=5000, debug=True, use_reloader=False)
+
