@@ -98,8 +98,8 @@ services:
       TZ: Europe/Paris
     command: ["/bin/sh", "-c", "flask db upgrade && flask seed_db"]
     networks: [ "analylit-network" ]
-    command: ["/bin/sh", "-c", "flask db upgrade && flask seed_db"]
-  
+    restart: "no" 
+
   web:
     <<: *worker-base
     container_name: analylit_web

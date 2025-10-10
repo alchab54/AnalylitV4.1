@@ -1,0 +1,52 @@
+timestamp,container_name,cpu_percent,mem_usage_mb,gpu_percent,gpu_mem_percent
+2025-10-10T01:23:08Z,analylit_monitor,0.68%,9.477MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-rq-dashboard-1,0.01%,20.7MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit_db,0.01%,18.95MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit_redis,0.39%,3.906MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit_ollama,0.00%,22.04MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-synthesis-2,0.05%,22.83MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-import-1,0.05%,22.06MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-extraction-5,0.04%,22.02MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-screening-2,0.04%,22MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-analysis-5,0.05%,22.03MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-synthesis-1,0.06%,22.05MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-extraction-2,0.04%,22.02MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-screening-1,0.04%,22.04MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-analysis-3,0.04%,22.02MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-extraction-3,0.05%,22.04MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-analysis-6,0.04%,22.03MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-analysis-4,0.05%,22.04MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-extraction-1,0.04%,22.04MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-extraction-4,6.30%,22.07MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-analysis-2,11.90%,22.47MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-extraction-6,0.03%,23.95MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,analylit-worker-analysis-1,0.04%,22.15MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:08Z,nvidia_gpu,N/A,N/A,
+2025-10-10T01:23:16Z,analylit-worker-analysis-5,0.04%,22.02MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-worker-analysis-3,0.03%,22.02MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-worker-analysis-6,0.03%,22.03MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-worker-extraction-5,0.03%,22.02MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-worker-extraction-2,0.03%,22.02MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-worker-analysis-4,0.03%,22.04MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-worker-synthesis-2,0.03%,22.83MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-worker-extraction-3,0.03%,22.04MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-worker-extraction-1,0.03%,22.04MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-worker-analysis-2,0.04%,22.47MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-worker-extraction-4,0.03%,22.07MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-worker-import-1,0.04%,22.06MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-worker-extraction-6,0.03%,23.94MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-worker-analysis-1,0.03%,22.15MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-worker-synthesis-1,0.04%,22.05MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-worker-screening-2,0.03%,22MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-worker-screening-1,0.04%,22.03MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit_monitor,0.58%,12.14MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit_ollama,0.00%,25.43MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit-rq-dashboard-1,0.01%,20.7MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit_db,0.01%,18.96MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,analylit_redis,0.36%,4.023MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:16Z,nvidia_gpu,N/A,N/A,
+2025-10-10T01:23:25Z,analylit_monitor,0.42%,12.53MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:25Z,analylit_ollama,0.00%,25.43MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:25Z,analylit-rq-dashboard-1,0.01%,20.7MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:25Z,analylit_redis,0.89%,4.184MiB / 13.65GiB,N/A,N/A
+2025-10-10T01:23:25Z,nvidia_gpu,N/A,N/A,
