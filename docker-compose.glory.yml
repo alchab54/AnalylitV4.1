@@ -84,6 +84,11 @@ services:
            --worker-class=gevent
            "backend.wsgi:app"
     ports: ["8080:5000"]
+    volumes:
+      - ./source:/app/source:ro                    # ✅ RDF Zotero (lecture seule)
+      - ./zotero-storage:/app/zotero-storage:ro    # ✅ PDFs (lecture seule)
+      - ./output:/app/output                       # ✅ Exports et logs
+      - ./data:/app/data                           # ✅ Données de recherche
     depends_on:
       migrate: { condition: service_completed_successfully }
 

@@ -1,14 +1,14 @@
 # ===================================================================
-# == .dockerignore ULTRA-SÉCURISÉ - ANALYLIT v4.1 ==
+# == .dockerignore ULTRA-SÉCURISÉ - ANALYLIT V4.2 ATN ==
 # ===================================================================
 #
 # Approche par "liste blanche" : tout ignorer, puis ré-inclure le strict nécessaire.
-# Cela garantit un contexte de build minimal et des builds beaucoup plus rapides.
+# Optimisé pour la thèse Alliance Thérapeutique Numérique
 
-# 1. Ignorer absolument tout par défaut.
+# 1. Ignorer absolument tout par défaut
 **
 
-# 2. Ré-inclure les fichiers et dossiers essentiels pour le build.
+# 2. Ré-inclure les fichiers et dossiers essentiels pour le build
 !api/
 !backend/
 !database/
@@ -21,9 +21,22 @@
 !docker-compose.yml
 !requirements.txt
 !setup.py
-# ===============================================
+
+# ===================================================================
+# == DONNÉES DE RECHERCHE ATN (INCLUSES DANS L'IMAGE) ==
+# ===================================================================
+
+source/                    # ❌ Monté via volume
+zotero-storage/           # ❌ Monté via volume  
+output/                   # ❌ Monté via volume
+data/                     # ❌ Monté via volume
+
+!templates/                 # ✅ Templates d'export thèse
+!grille-ATN.json            # ✅ Grille extraction ATN
+
+# ===================================================================
 # == EXCLUSIONS DE SÉCURITÉ CRITIQUES ==
-# ===============================================
+# ===================================================================
 .env
 .env.*
 !.env.example
@@ -32,5 +45,28 @@
 *.p12
 *.crt
 *.csr
+
+# ===================================================================
+# == EXCLUSIONS DÉVELOPPEMENT LOURDES ==
+# ===================================================================
+node_modules/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+.git/
+.gitignore
+*.log
+*.tmp
+
+# ===================================================================
+# == EXCLUSIONS FICHIERS VOLUMINEUX NON-ESSENTIELS ==
+# ===================================================================
 *.rar
 *.7z
+*.zip
+*.tar.gz
+output/logs/               # Logs de monitoring (persistants via volumes)
+downloads/                 # Téléchargements temporaires
+cache/                     # Cache applicatif
