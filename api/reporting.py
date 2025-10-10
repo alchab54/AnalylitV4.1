@@ -1,12 +1,12 @@
 # api/reporting.py
 
 
-import json
 import logging
+import json
 from flask import Blueprint, jsonify, request, send_file
 from utils.extensions import db
-from utils.app_globals import analysis_queue 
 from utils.models import Project
+from utils.app_globals import import_queue
 from backend.tasks_v4_complete import (
     generate_bibliography_task,
     generate_summary_table_task,
@@ -24,7 +24,6 @@ def generate_bibliography(project_id):
     Peut enfiler une tâche de fond si la génération est complexe.
     """
     project = db.session.query(Project).filter_by(id=project_id).first()
-
     if not project:
         return jsonify({"error": "Projet non trouvé"}), 404
 

@@ -1,4 +1,6 @@
 # utils/extensions.py
+import logging
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from utils.db_base import Base
@@ -16,4 +18,3 @@ limiter = Limiter(
     key_func=get_remote_address,
     default_limits=["100 per minute"]  # Limite par défaut
 )
-
