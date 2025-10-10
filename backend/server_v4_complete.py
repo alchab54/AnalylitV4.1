@@ -94,7 +94,7 @@ def create_app(config_override=None):
     if 'SQLALCHEMY_DATABASE_URI' not in (config_override or {}):
         app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_URL
 
-    limiter.init_app(app)
+
     CORS(app, resources={r"/api/*": {"origins": "*"}})
     socketio = SocketIO()
 
@@ -102,6 +102,7 @@ def create_app(config_override=None):
     db.init_app(app)
     migrate.init_app(app, db)    
     limiter.init_app(app)
+
 
     # Initialisation de SocketIO avec async_mode='gevent' et la queue Redis
     socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent', message_queue=app.config['REDIS_URL'])
