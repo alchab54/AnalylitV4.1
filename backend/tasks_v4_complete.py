@@ -31,7 +31,7 @@ from backend.wsgi import app # La tâche a besoin du CONTEXTE de l'app
 from utils.extensions import db
 # Importe les queues RQ partagées
 from utils.app_globals import import_queue, screening_queue, extraction_queue, analysis_queue, synthesis_queue
-
+from sqlalchemy import text
 
 # --- IMPORTS DES MODULES LOCAUX DE L'APPLICATION ---
 # Modèles de base de données
@@ -39,7 +39,6 @@ from utils.models import (
 from flask import current_app
     Project, SearchResult, Extraction, Grid, ChatMessage, AnalysisProfile, RiskOfBias, SCHEMA
 )
-# Moteur de scoring
 from backend.atn_scoring_engine_v21 import ATNScoringEngineV22
 # Fonctions utilitaires
 from utils.zotero_parser import parse_zotero_rdf
@@ -60,7 +59,7 @@ from utils.prompt_templates import (
     get_effective_prompt_template,
     
 )
-
+import numpy as np
 # --- CONFIGURATION DU LOGGER ---
 # Le logger est déjà configuré par la factory de l'application, on le récupère simplement.
 logger = logging.getLogger(__name__)
@@ -383,6 +382,7 @@ def multi_database_search_task(project_id: str, query: str, databases: list, max
                 profile_name = profile_from_db.name.lower()
             else:
                 logger.warning(f"Profil '{project.profile_used}' non trouvé dans la base de données. Using default 'standard'.")
+
 
         # Utiliser le nom du profil pour obtenir les modèles depuis la config
         profile_name = profile_name.strip()  # Trim leading/trailing whitespace from profile_name

@@ -1,5 +1,5 @@
 # api/search.py
-
+from flask import Blueprint, jsonify, request
 import json
 import uuid
 from datetime import datetime
@@ -7,7 +7,6 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from utils.extensions import db
 from utils.app_globals import background_queue
-from backend.tasks_v4_complete import multi_database_search_task
 
 
 logger = logging.getLogger(__name__)
@@ -51,6 +50,7 @@ def search_multiple_databases():
         """), {"q": main_query_to_save, "dbs": json.dumps(databases), "now": datetime.now().isoformat(), "pid": project_id})
         db.session.commit() # Commit the changes to the database
     except SQLAlchemyError as e:
+
         logger.error(f"Erreur DB saving search params: {e}", exc_info=True)
         db.session.rollback() # Rollback in case of error
         return jsonify({'error': 'Erreur interne'}), 500
