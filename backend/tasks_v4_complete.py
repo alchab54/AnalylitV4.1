@@ -37,7 +37,7 @@ from redis import Redis
 from rq import get_current_job, Queue
 from rq.decorators import job as rq_job
 
-
+from utils.zotero_parser import parse_zotero_rdf
 # --- Importer la config de l'application ---
 from backend.config.config_v4 import get_config
 

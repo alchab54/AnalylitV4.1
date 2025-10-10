@@ -2566,3 +2566,10 @@ timestamp,container_name,cpu_percent,mem_usage_mb,gpu_percent,gpu_mem_percent
 2025-10-10T03:15:54Z,analylit-worker-analysis-5,4.27%,22.07MiB / 13.65GiB,N/A,N/A
 2025-10-10T03:15:55Z,analylit_monitor,1.03%,10.97MiB / 13.65GiB,N/A,N/A
 2025-10-10T03:15:55Z,nvidia_gpu,N/A,N/A,
+2025-10-10T03:16:02Z,analylit_web,332.18%,2.118GiB / 13.65GiB,N/A,N/A
+2025-10-10T03:16:02Z,analylit-rq-dashboard-1,0.01%,23.19MiB / 13.65GiB,N/A,N/A
+2025-10-10T03:16:02Z,analylit_db,0.00%,27.82MiB / 13.65GiB,N/A,N/A
+2025-10-10T03:16:02Z,analylit_redis,0.37%,4.727MiB / 13.65GiB,N/A,N/A
+2025-10-10T03:16:02Z,analylit_ollama,0.00%,25.02MiB / 13.65GiB,N/A,N/A
+2025-10-10T03:16:02Z,analylit_monitor,0.09%,9.102MiB / 13.65GiB,N/A,N/A
+2025-10-10T03:16:02Z,nvidia_gpu,N/A,N/A,

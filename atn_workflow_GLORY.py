@@ -327,29 +327,18 @@ class ATNWorkflowGlory:
         """Lance la tâche d'import RDF directement via l'API."""
         log_section("LANCEMENT DE L'IMPORT ZOTERO RDF (AVEC PDFS)")
 
-        # IMPORTANT: Le chemin doit être accessible par le conteneur Docker
-        # Nous utilisons le chemin relatif depuis la racine du projet mappée dans le volume
         path_in_container = f"/app/source/{ANALYLIT_RDF_PATH.name}"
 
         data = {
-            "rdf_file_path": f"/app/source/{ANALYLIT_RDF_PATH.name}",
+            "rdf_file_path": path_in_container,
             "zotero_storage_path": "/app/zotero-storage"
         }
-        
-        log("INFO", f"📦 Envoi de la tâche d'import pour {data['rdf_file_path']}...")
-        
-        result = api_request_glory(
-            "POST",
-            f"/api/projects/{self.project_id}/import-zotero-rdf", # 🎯 UTILISER LA NOUVELLE ROUTE
-            data,
-            timeout=60
-        )
 
         log("INFO", f"📦 Envoi de la tâche d'import pour {path_in_container}...")
         
         result = api_request_glory(
             "POST",
-            f"/api/projects/{self.project_id}/import-zotero-pdfs", # La nouvelle route magique
+            f"/api/projects/{self.project_id}/import-zotero-rdf", # L'unique et bonne route
             data,
             timeout=60
         )
