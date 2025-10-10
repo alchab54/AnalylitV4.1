@@ -6,5 +6,12 @@ from utils.db_base import Base
 # Instancier les extensions sans les lier à une application.
 # Elles seront liées plus tard dans la factory d'application.
 # ✅ CORRECTION CRITIQUE : Utiliser la même Base pour Flask-SQLAlchemy
+migrate = Migrate()
+
+# Initialise l'objet Limiter ici, il sera configuré dans la factory
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["100 per minute"]  # Limite par défaut
+)
 db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
