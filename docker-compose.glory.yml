@@ -50,7 +50,7 @@ services:
   migrate:
     build:
       context: .
-      dockerfile: Dockerfile.migrate
+      dockerfile: docker/Dockerfile.migrate
     container_name: analylit-migrate
     <<: &common-config
       restart: unless-stopped
@@ -92,7 +92,7 @@ services:
   worker-import:
     build:
       context: .
-      dockerfile: Dockerfile.worker
+      dockerfile: docker/Dockerfile.worker
     <<: *common-config
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "import_queue"]
     deploy:
@@ -106,7 +106,7 @@ services:
   worker-screening:
     build:
       context: .
-      dockerfile: Dockerfile.worker
+      dockerfile: docker/Dockerfile.worker
     <<: *common-config
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue", "atn_scoring_queue"]
     deploy:
@@ -122,7 +122,7 @@ services:
   worker-extraction:
     build:
       context: .
-      dockerfile: Dockerfile.worker
+      dockerfile: docker/Dockerfile.worker
     <<: *common-config
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "extraction_queue"]
     deploy:
@@ -138,7 +138,7 @@ services:
   worker-analysis:
     build:
       context: .
-      dockerfile: Dockerfile.worker
+      dockerfile: docker/Dockerfile.worker
     <<: *common-config
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue"]
     deploy:
@@ -154,7 +154,7 @@ services:
   worker-synthesis:
     build:
       context: .
-      dockerfile: Dockerfile.worker
+      dockerfile: docker/Dockerfile.worker
     <<: *common-config
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "synthesis_queue", "discussion_draft_queue"]
     deploy:

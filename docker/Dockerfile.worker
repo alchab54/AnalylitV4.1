@@ -1,0 +1,21 @@
+# Utilise l'image de base qui contient déjà toutes les dépendances Python
+FROM analylit-base-cpu:latest
+
+# Définit le répertoire de travail
+WORKDIR /home/appuser/app
+
+# Crée les répertoires nécessaires avec les bonnes permissions
+# On passe temporairement root pour créer les dossiers et assigner les droits
+USER root
+RUN mkdir -p /home/appuser/app/projects /home/appuser/app/logs && \
+    chown -R appuser:appuser /home/appuser/app
+USER appuser
+
+# Copier TOUT le code source du projet (le contexte est la racine du projet)
+COPY --chown=appuser:appuser . .
+
+# Installer notre projet comme un package Python pour des imports stables
+RUN pip install -e .
+
+# La commande par défaut (sera surchargée par docker-compose)
+CMD ["echo", "Worker image ready."]

@@ -20,7 +20,7 @@
 !alembic.ini
 !docker-compose.yml
 !requirements.txt
-
+!setup.py
 # ===============================================
 # == EXCLUSIONS DE SÉCURITÉ CRITIQUES ==
 # ===============================================
