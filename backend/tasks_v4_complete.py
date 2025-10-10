@@ -32,6 +32,7 @@ from utils.extensions import db
 # Importe les queues RQ partagées
 from utils.app_globals import import_queue, screening_queue, extraction_queue, analysis_queue, synthesis_queue
 from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 # --- IMPORTS DES MODULES LOCAUX DE L'APPLICATION ---
 # Modèles de base de données
