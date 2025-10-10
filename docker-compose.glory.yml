@@ -1,4 +1,4 @@
-version: '3.9'
+# version: '3.9' # L'attribut 'version' est obsolète, nous le retirons pour la propreté.
 
 x-common-config: &common-config
   restart: unless-stopped
@@ -103,6 +103,11 @@ services:
     <<: *common-config
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "import_queue"]
     deploy: { replicas: 1 }
+    resources: 
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
 
   worker-screening:
     build:
@@ -111,6 +116,9 @@ services:
     <<: [*common-config, *gpu-resources]
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue", "atn_scoring_queue"]
     deploy: { replicas: 2 }
+    resources:
+        reservations:
+          memory: 1G
 
   worker-extraction:
     build:
@@ -119,6 +127,9 @@ services:
     <<: [*common-config, *gpu-resources]
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "extraction_queue"]
     deploy: { replicas: 6 }
+    resources:
+        reservations:
+          memory: 1G
 
   worker-analysis:
     build:
@@ -127,6 +138,9 @@ services:
     <<: [*common-config, *gpu-resources]
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue"]
     deploy: { replicas: 6 }
+    resources:
+        reservations:
+          memory: 1G
 
   worker-synthesis:
     build:
@@ -135,6 +149,9 @@ services:
     <<: [*common-config, *gpu-resources]
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "synthesis_queue", "discussion_draft_queue"]
     deploy: { replicas: 2 }
+    resources:
+        reservations:
+          memory: 2G
 
   # --- MONITORING ---
   rq-dashboard:
