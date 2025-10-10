@@ -33,9 +33,9 @@ from utils.extensions import db
 from utils.app_globals import import_queue, screening_queue, extraction_queue, analysis_queue, synthesis_queue
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-
 # --- IMPORTS DES MODULES LOCAUX DE L'APPLICATION ---
 # Modèles de base de données
+
 from utils.models import (
 from flask import current_app
     Project, SearchResult, Extraction, Grid, ChatMessage, AnalysisProfile, RiskOfBias, SCHEMA
