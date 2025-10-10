@@ -1,0 +1,27 @@
+timestamp,container_name,cpu_percent,mem_usage_mb,gpu_percent,gpu_mem_percent
+2025-10-10T12:34:35Z,analylit_db,8.72%,18.11MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:35Z,analylit-worker-import-1,0.05%,22.66MiB / 4GiB,N/A,N/A
+2025-10-10T12:34:35Z,analylit_redis,0.38%,5.543MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:35Z,analylit_monitor,0.27%,9.293MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:35Z,analylit-rq-dashboard-1,0.01%,21.07MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:35Z,analylit_ollama,0.00%,23.02MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:43Z,analylit-rq-dashboard-1,0.25%,21.57MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:43Z,analylit_redis,0.36%,5.547MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:43Z,analylit_db,0.03%,18.11MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:43Z,analylit_ollama,0.00%,27.66MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:43Z,analylit_monitor,0.16%,9.594MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:43Z,analylit-worker-import-1,0.05%,22.65MiB / 4GiB,N/A,N/A
+2025-10-10T12:34:51Z,analylit_web,373.27%,1.571GiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:51Z,analylit-rq-dashboard-1,0.04%,21.35MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:51Z,analylit_redis,0.58%,5.297MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:51Z,analylit_db,0.06%,19.51MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:51Z,analylit_ollama,0.00%,27.66MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:51Z,analylit_monitor,0.27%,9.516MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:51Z,analylit-worker-import-1,0.05%,22.65MiB / 4GiB,N/A,N/A
+2025-10-10T12:34:58Z,analylit_web,67.92%,2.109GiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:58Z,analylit-rq-dashboard-1,0.01%,21.35MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:58Z,analylit_redis,0.40%,5.301MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:58Z,analylit_db,0.04%,20.44MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:58Z,analylit_ollama,0.00%,27.66MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:58Z,analylit_monitor,0.23%,9.797MiB / 13.65GiB,N/A,N/A
+2025-10-10T12:34:58Z,analylit-worker-import-1,0.05%,22.65MiB / 4GiB,N/A,N/A
