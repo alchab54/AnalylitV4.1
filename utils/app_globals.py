@@ -18,6 +18,7 @@ extraction_queue = Queue('extraction_queue', connection=redis_conn)
 analysis_queue = Queue('analysis_queue', connection=redis_conn)
 synthesis_queue = Queue('synthesis_queue', connection=redis_conn)
 discussion_draft_queue = Queue('discussion_draft_queue', connection=redis_conn)
+extension_queue = Queue('extension_queue', connection=redis_conn)
 
 # --- PAS DE Limiter ou d'autres configurations ici ---
 # Cela sera géré dans la factory de l'application pour éviter les imports circulaires.
