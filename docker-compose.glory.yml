@@ -44,11 +44,22 @@ services:
   test-db:
     image: postgres:15-alpine
     container_name: analylit_db
-    environment: { POSTGRES_USER: analylit_user, POSTGRES_PASSWORD: strong_password, POSTGRES_DB: analylit_test_db, TZ: Europe/Paris }
+    environment: 
+      POSTGRES_USER: analylit_user
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: analylit_test_db
+      TZ: Europe/Paris
     ports: [ "5434:5432" ]
-    volumes: [ "test_postgres_data:/var/lib/postgresql/data" ]
+    volumes:
+      - test_postgres_data:/var/lib/postgresql/data
+      - ./files:/app/zotero_storage
     networks: [ "analylit-network" ]
-    healthcheck: { test: ["CMD-SHELL", "pg_isready -U analylit_user"], interval: 10s, timeout: 5s, retries: 5 }
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U analylit_user -d analylit_test_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     restart: unless-stopped
 
   redis:
@@ -60,6 +71,7 @@ services:
     environment:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       TZ: Europe/Paris
+      
   ollama:
     # MODIFICATION: On passe de 'image' à 'build'
     build:
@@ -89,17 +101,22 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.migrate
-    depends_on:
-      test-db: { condition: service_healthy }
-    # S'assure qu'il a les mêmes variables d'environnement que le service web
     environment:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      FLASK_APP: "backend/server_v4_complete.py"
+      REDIS_URL: redis://redis:6379/0
+      PYTHONUNBUFFERED: 1
+      PYTHONPATH: /home/appuser/app
       TZ: Europe/Paris
     command: ["/bin/sh", "-c", "flask db upgrade && flask seed_db"]
-    networks: [ "analylit-network" ]
-    restart: "no" 
-
+    networks: 
+      - analylit-network 
+    volumes:
+      - .:/home/appuser/app:rw
+      - ./files:/app/zotero_storage
+    depends_on:
+      test-db:
+        condition: service_healthy
+        
   web:
     <<: *worker-base
     container_name: analylit_web
@@ -111,13 +128,30 @@ services:
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
       REDIS_URL: redis://redis:6379/0
       OLLAMA_BASE_URL: http://ollama:11434
-      PYTHONPATH: /app
+      PYTHONPATH: /home/appuser/app
+      # ✅ SCORING ATN ACTIVÉ
+      ATN_SCORING_ENABLED: "true"
+      ATN_ALGORITHM_VERSION: "2.1"
+      ATN_SHOW_JUSTIFICATIONS: "true"
       TZ: Europe/Paris
       SECRET_KEY: "e59f870770e54e7572855f427eb84079d4d8818bea54b1402274ea6d57e12dbf"
+    volumes:
+      - .:/home/appuser/app
+      - ./files:/app/zotero_storage
     depends_on:
-      migrate: { condition: service_completed_successfully }
-      test-db: { condition: service_healthy }
-      redis: { condition: service_started }
+      test-db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      ollama:
+        condition: service_started  
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - analylit-network
+    ports:
+      - "8080:5000"
+    restart: unless-stopped
 # =================================================================
 # === WORKERS HAUTE-PERFORMANCE - ARCHITECTURE "GLORY"
 # =================================================================
