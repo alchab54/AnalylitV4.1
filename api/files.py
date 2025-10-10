@@ -1,5 +1,6 @@
 # api/files.py
 
+import logging
 from flask import Blueprint, jsonify, request
 from werkzeug.utils import secure_filename
 from utils.app_globals import PROJECTS_DIR

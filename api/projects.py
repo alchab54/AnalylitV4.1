@@ -4,11 +4,12 @@ import json
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
 
-
+import logging
 from utils.app_globals import (
     background_queue, processing_queue, analysis_queue, discussion_draft_queue, synthesis_queue,
     extension_queue
 )
+from datetime import datetime
 from utils.extensions import db
 from utils.models import Project, Grid, Extraction, AnalysisProfile, RiskOfBias, Analysis, SearchResult, ChatMessage
 from utils.file_handlers import save_file_to_project_dir
@@ -84,6 +85,7 @@ def handle_project(project_id):
 
 @projects_bp.route('/projects/<project_id>/add-manual-articles', methods=['POST'])
 def add_manual_articles_endpoint(project_id):
+    from utils.app_globals import import_queue
     payload = request.get_json()
     items_to_add = payload.get('items', [])
     use_full_data_flag = payload.get('use_full_data', False)
@@ -412,6 +414,7 @@ def import_zotero_rdf_endpoint(project_id):
     log_message = f"Tâche d'import RDF lancée pour le projet {project_id}."
     logger.info(log_message)
     
+
     return jsonify({"message": log_message, "task_id": job.id}), 202
 
 @projects_bp.route('/projects/<project_id>/upload-zotero', methods=['POST'])
@@ -541,6 +544,11 @@ def export_thesis(project_id):
     import pandas as pd
     import zipfile
     import io
+    from sqlalchemy import text
+    import logging
+    from utils.app_globals import background_queue
+    from utils.extensions import db
+    from datetime import datetime
     from flask import send_file
     
     try:
