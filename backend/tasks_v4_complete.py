@@ -1,6 +1,9 @@
-# ================================================================ 
-# AnalyLit V4.1 - Tâches RQ (100% PostgreSQL/SQLAlchemy) - CORRIGÉ 
-# ================================================================ 
+# ================================================================
+# ===         ANALYLIT V4.2 - TÂCHES RQ CENTRALISÉES           ===
+# ================================================================
+# Fichier: backend/tasks_v4_complete.py
+
+# --- IMPORTS SYSTÈME ET STANDARDS ---
 import os
 import io
 import time
@@ -9,121 +12,55 @@ import uuid
 import math
 import logging
 import random
-from datetime import datetime
 import re
+import traceback
+from datetime import datetime
 from functools import wraps
 from pathlib import Path
 from typing import Dict, List, Optional, Any
-from pypdf import PdfReader 
 
-# --- CORRECTIF DE COMPATIBILITÉ PYZOTERO / FEEDPARSER ---
-# pyzotero tente de patcher une méthode interne de feedparser qui n'existe plus.
-# Nous appliquons manuellement un patch compatible avant d'importer pyzotero.
-import numpy as np
-import pandas as pd
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-from pyzotero import zotero
-from scipy import stats
-from sklearn.metrics import cohen_kappa_score
-from backend.wsgi import app
-# Importe les extensions partagées
-from utils.extensions import db
-from utils.app_globals import (
-    import_queue, screening_queue, extraction_queue, analysis_queue,
-    synthesis_queue, atn_scoring_queue, discussion_draft_queue
-)
-import chromadb
+# --- IMPORTS EXTERNES (3rd PARTY) ---
 from sentence_transformers import SentenceTransformer, util
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker, scoped_session
-from redis import Redis
-from rq import get_current_job, Queue
-from rq.decorators import job as rq_job
+from rq import get_current_job
 
-from utils.zotero_parser import parse_zotero_rdf
-# --- Importer la config de l'application ---
-from backend.config.config_v4 import get_config
+# --- IMPORTS CENTRAUX DE L'APPLICATION (LA CLÉ DE LA SOLUTION) ---
+# Importe l'instance unique de l'application Flask depuis le point d'entrée WSGI
+from backend.wsgi import app
+# Importe les extensions partagées (DB)
+from utils.extensions import db
+# Importe les queues RQ partagées
+from utils.app_globals import import_queue, screening_queue, extraction_queue, analysis_queue, synthesis_queue
 
-# --- Importer les modèles de la base de données ---
+
+# --- IMPORTS DES MODULES LOCAUX DE L'APPLICATION ---
+# Modèles de base de données
 from utils.models import (
-    Project, SearchResult, Extraction, Grid, ChatMessage, AnalysisProfile, RiskOfBias,
-    SCHEMA  # ✅ CORRECTION: Importer la variable SCHEMA pour la configuration de l'engine.
+    Project, SearchResult, Extraction, Grid, ChatMessage, AnalysisProfile, RiskOfBias, SCHEMA
 )
-
-#
-import traceback
-from sqlalchemy.orm import Session # Explicitly import Session for type hinting if needed, though Session is already defined below
-from .atn_scoring_engine_v21 import ATNScoringEngineV22
-
-# --- Importer les helpers/utilitaires applicatifs ---
-
+# Moteur de scoring
+from backend.atn_scoring_engine_v21 import ATNScoringEngineV22
+# Fonctions utilitaires
+from utils.zotero_parser import parse_zotero_rdf
 from utils.fetchers import db_manager, fetch_unpaywall_pdf_url, fetch_article_details
 from utils.ai_processors import call_ollama_api
 from utils.file_handlers import sanitize_filename, extract_text_from_pdf
 from utils.analysis import generate_discussion_draft
 from utils.notifications import send_project_notification
 from utils.helpers import http_get_with_retries
-from utils.importers import ZoteroAbstractExtractor
-from utils.importers import process_zotero_item_list
-
-# Prompts templates
+from utils.importers import ZoteroAbstractExtractor, process_zotero_item_list
+# Templates de prompts
 from utils.prompt_templates import (
     get_screening_prompt_template,
     get_full_extraction_prompt_template,
     get_synthesis_prompt_template,
     get_rag_chat_prompt_template,
     get_effective_prompt_template,
-
-) # Import de la fonction centralisée
-from utils.logging_config import setup_logging
-
-# --- Configuration globale ---
-config = get_config()
-
-logger = logging.getLogger(__name__)
-# ✅ CORRECTION: The project data directory should be at the root of the app workspace,
-# not inside the backend config. This resolves the PermissionError in tests.
-PROJECTS_DIR = Path('/home/appuser/app/projects')
-PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
-
-is_testing = os.getenv('TESTING') == 'true'
-db_url = os.getenv('TEST_DATABASE_URL') if is_testing else config.DATABASE_URL
-
-if is_testing and not db_url:
-    # Fallback pour s'assurer que les tests ne touchent jamais la DB de prod par accident
-    db_url = 'postgresql://user:pass@localhost:5432/test_db_fallback'
-
-engine = create_engine(
-    db_url,
-    pool_pre_ping=True,
-    pool_recycle=1800,  # Recycle connections every 30 minutes
-    connect_args={"options": f"-csearch_path={SCHEMA},public"} 
-
 )
-SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
-redis_conn = Redis.from_url(config.REDIS_URL)
-analysis_queue = Queue('analysis_queue', connection=redis_conn, job_timeout=600)
-# --- Embeddings / Vector store (RAG) ---
-
-EMBEDDING_MODEL_NAME = getattr(config, "EMBEDDING_MODEL", "all-MiniLM-L6-v2")
-EMBED_BATCH = getattr(config, "EMBED_BATCH", 32)
-MIN_CHUNK_LEN = getattr(config, "MIN_CHUNK_LEN", 250)
-USE_QUERY_EMBED = getattr(config, "USE_QUERY_EMBED", True)
-CHUNK_SIZE = getattr(config, "CHUNK_SIZE", 1200)
-CHUNK_OVERLAP = getattr(config, "CHUNK_OVERLAP", 200)
-
-# Charge un modèle d'embedding localement
-try:
-
-    embedding_model = SentenceTransformer(EMBEDDING_MODEL_NAME)
-except Exception as e:
-    logger.error(f"Erreur chargement du modèle d'embedding '{EMBEDDING_MODEL_NAME}': {e}")
-    embedding_model = None
-
+# --- CONFIGURATION DU LOGGER ---
+# Le logger est déjà configuré par la factory de l'application, on le récupère simplement.
+logger = logging.getLogger(__name__)
 
 try:
     from backend.atn_scoring_engine_v21 import ATNScoringEngineV22
@@ -163,7 +100,7 @@ def with_db_session(func):
 # ================================================================ 
 # === FONCTIONS UTILITAIRES DB-SAFE (SQLAlchemy)
 # ================================================================ 
-def update_project_status(session, project_id: str, status: str, result: dict = None, discussion: str = None,
+def update_project_status(project_id: str, status: str, result: dict = None, discussion: str = None,
                           graph: dict = None, prisma_path: str = None, analysis_result: dict = None,
                           analysis_plot_path: str = None):
     """Met à jour le statut et/ou champs résultat d'un projet."""
@@ -193,13 +130,13 @@ def update_project_status(session, project_id: str, status: str, result: dict = 
         params["pp"] = analysis_plot_path
 
     stmt = f"UPDATE projects SET {', '.join(set_clauses)} WHERE id = :pid"
-    session.execute(text(stmt), params)
+    db.session.execute(text(stmt), params)
 
 
-def log_processing_status(session, project_id: str, article_id: str, status: str, details: str):
+def log_processing_status(project_id: str, article_id: str, status: str, details: str):
     """Enregistre un événement de traitement dans processing_log."""
     
-    # Nous devons générer manuellement l'UUID car nous utilisons du SQL brut.
+        # Nous devons générer manuellement l'UUID car nous utilisons du SQL brut.
     log_id = str(uuid.uuid4()) 
 
     
@@ -215,14 +152,14 @@ def log_processing_status(session, project_id: str, article_id: str, status: str
         "details": details, 
         "ts": datetime.now()
     })
-    
 
-def increment_processed_count(session, project_id: str):
+
+def increment_processed_count(project_id: str):
     """Incrémente processed_count du projet."""
-    session.execute(text("UPDATE projects SET processed_count = processed_count + 1 WHERE id = :id"), {"id": project_id})
+    db.session.execute(text("UPDATE projects SET processed_count = processed_count + 1 WHERE id = :id"), {"id": project_id})
 
 
-def update_project_timing(session, project_id: str, duration: float):
+def update_project_timing(project_id: str, duration: float):
     """Ajoute une durée au total_processing_time."""
     session.execute(text("UPDATE projects SET total_processing_time = total_processing_time + :d WHERE id = :id"), {"d": float(duration), "id": project_id})
 
@@ -241,6 +178,7 @@ def normalize_profile(profile: dict) -> dict:
     return {
         'preprocess': profile.get('preprocess') or profile.get('preprocess_model') or 'phi3:mini',
         'extract': profile.get('extract') or profile.get('extract_model') or 'llama3.1:8b',
+
         'synthesis': profile.get('synthesis') or profile.get('synthesis_model') or 'llama3.1:8b'
     }
 
@@ -305,10 +243,8 @@ def multi_database_search_task(project_id: str, query: str, databases: list, max
     Recherche dans plusieurs bases et insère les résultats dans search_results.
     Gère à la fois les requêtes simples et les requêtes expertes spécifiques à chaque base.
     """
-    session = SessionFactory()
-
     if os.environ.get("ANALYLIT_TEST_MODE") == "true":
-        _mock_multi_database_search_task(session, project_id, query, databases, max_results_per_db)
+        _mock_multi_database_search_task(db.session, project_id, query, databases, max_results_per_db)
         return
 
     # Logique pour déterminer la requête principale à afficher (pour la compatibilité)
@@ -470,8 +406,7 @@ def multi_database_search_task(project_id: str, query: str, databases: list, max
     logger.info(f"âœ… Recherche multi-bases: total {total_found}")
 
 def calculate_atn_score_for_article(article_data: dict) -> dict:
-    """
-    Wrapper ROBUSTE pour appeler le moteur de scoring ATN.
+    """Wrapper ROBUSTE pour appeler le moteur de scoring ATN.
     En cas d'erreur fatale, retourne un résultat indiquant l'échec
     pour éviter les "faux scores" silencieux.
     """
@@ -574,7 +509,7 @@ def process_single_article_task(project_id, article, profile, analysis_mode, job
         )
         
         # Tentative de récupération en chargeant l'article depuis la DB
-        session = SessionFactory()
+        
         try:
             article_obj = session.query(Article).filter_by(article_id=article).first()
             if not article_obj:
@@ -595,9 +530,9 @@ def process_single_article_task(project_id, article, profile, analysis_mode, job
             logger.warning(f"RÉCUPÉRATION RÉUSSIE. L'article {article['article_id']} a été chargé depuis la DB.")
             
         finally:
-            session.close()
+            pass
 
-    session = SessionFactory() 
+     
     
     # On utilise 'article' partout dans la fonction maintenant.
     logger.info(f"[process_single_article_task] Traitement de l'article avec ID: {article.get('article_id') or article.get('pmid')}")
@@ -647,8 +582,8 @@ def process_single_article_task(project_id, article, profile, analysis_mode, job
             combined_text = f"{article.get('title', '')}\n\n{article.get('abstract', '')}\n\n{full_text}"
 
         # Vérification contenu minimal
-        if len(text_for_analysis.strip()) < 50:
-            log_processing_status(session, project_id, article_id, "écarté", "Contenu textuel insuffisant.")
+        if len(text_for_analysis.strip()) < 50:     
+            log_processing_status(project_id, article_id, "écarté", "Contenu textuel insuffisant.")
             increment_processed_count(session, project_id)
             logger.warning(f"[process_single_article_task] Contenu insuffisant pour {article_id}")
             return {"status": "skipped", "reason": "insufficient_content"}
@@ -744,7 +679,7 @@ def process_single_article_task(project_id, article, profile, analysis_mode, job
             atn_justification = f"ATN v2.2: {atn_results.get('atn_category', 'Non évalué')} | Ollama: {reason}"
 
             # Sauvegarde du résultat de screening avec scoring ATN
-            session.execute(text("""
+            db.session.execute(text("""
                 INSERT INTO extractions (id, project_id, pmid, title, relevance_score, relevance_justification, 
                                        analysis_source, atn_score, atn_category, atn_justifications, created_at)
                 VALUES (:id, :pid, :pmid, :title, :score, :just, :src, :atn_score, :atn_cat, :atn_just, :ts)
@@ -782,7 +717,7 @@ def process_single_article_task(project_id, article, profile, analysis_mode, job
             
             if custom_grid_id:
                 grid_row = session.execute(
-                    text("SELECT fields FROM extraction_grids WHERE id = :gid AND project_id = :pid"), 
+                    text("SELECT fields FROM extraction_grids WHERE id = :gid AND project_id = :pid"),
                     {"gid": custom_grid_id, "pid": project_id}
                 ).mappings().fetchone()
 
@@ -840,7 +775,7 @@ TEXTE DE L'ARTICLE:
             atn_justification = f"ATN v2.2: {atn_results.get('atn_category', 'Non évalué')} - {atn_results.get('criteria_found', 0)} critères détectés"
 
             # Sauvegarde de l'extraction complète avec scoring ATN
-            session.execute(text("""
+            db.session.execute(text("""
                 INSERT INTO extractions (id, project_id, pmid, title, extracted_data, relevance_score, 
                                        relevance_justification, analysis_source, atn_score, atn_category, 
                                        atn_justifications, created_at)
@@ -880,8 +815,8 @@ TEXTE DE L'ARTICLE:
         # ======================================================================
         
         increment_processed_count(session, project_id)
-        update_project_timing(session, project_id, time.time() - start_time)
-        
+        update_project_timing(project_id, time.time() - start_time)
+
         send_project_notification(
             project_id, 
             'article_processed', 
@@ -896,7 +831,7 @@ TEXTE DE L'ARTICLE:
     except Exception as e:
         logger.exception(f"ERREUR CRITIQUE dans process_single_article_task pour {article_id}: {e}")
         increment_processed_count(session, project_id)
-        log_processing_status(session, project_id, article_id, "erreur", f"Erreur fatale: {str(e)[:100]}")
+        log_processing_status(project_id, article_id, "erreur", f"Erreur fatale: {str(e)[:100]}")
         raise
 
 def import_from_zotero_rdf_task(project_id, rdf_file_path, zotero_storage_path):
@@ -945,12 +880,12 @@ def import_from_zotero_rdf_task(project_id, rdf_file_path, zotero_storage_path):
 @with_db_session
 def run_synthesis_task(project_id: str, profile: dict):
     """Génère une synthèse à partir des articles pertinents (score >= 7)."""
-    update_project_status(db.session, project_id, 'synthesizing')
+    update_project_status(project_id, 'synthesizing')
     project = db.session.execute(text("SELECT description FROM projects WHERE id = :pid"), {"pid": project_id}).mappings().fetchone()
     project_description = project['description'] if project else "Non spécifié"
 
     rows = db.session.execute(text("SELECT s.title, s.abstract FROM extractions e JOIN search_results s ON e.project_id = s.project_id AND e.pmid = s.article_id WHERE e.project_id = :pid AND e.relevance_score >= 7 ORDER BY e.relevance_score DESC LIMIT 30"), {"pid": project_id}).mappings().all()
-    if not rows:
+    if not rows:  
         update_project_status(session, project_id, 'failed')
         send_project_notification(project_id, 'synthesis_failed', 'Aucun article pertinent (score >= 7).')
         return
@@ -967,24 +902,24 @@ def run_synthesis_task(project_id: str, profile: dict):
     output = call_ollama_api(prompt, profile.get('synthesis_model', 'llama3.1:8b'), output_format="json")
     try:
         if output and isinstance(output, dict):
-            update_project_status(db.session, project_id, status='completed', result=output)
+            update_project_status(project_id, status='completed', result=output)
             send_project_notification(project_id, 'synthesis_completed', 'Synthèse générée.')
         else:
-            update_project_status(db.session, project_id, status='failed')
+            update_project_status(project_id, status='failed')
             send_project_notification(project_id, 'synthesis_failed', 'Réponse IA invalide.')
     except Exception as e:
         logger.error(f"Erreur dans la tâche de synthèse : {e}", exc_info=True)
         raise
 
 @with_db_session
-def run_discussion_generation_task(project_id: str):
-    """Génère le brouillon de la discussion."""
+def run_discussion_generation_task(project_id: str):  
+    """Génère le brouillon de la discussion"""
     try:
 
-        update_project_status(session, project_id, 'generating_analysis')
+        update_project_status(project_id, 'generating_analysis')
         rows = session.execute(text("SELECT e.extracted_data, e.pmid, s.title, e.relevance_score FROM extractions e JOIN search_results s ON e.project_id = s.project_id AND e.pmid = s.article_id WHERE e.project_id = :pid AND e.relevance_score >= 7 AND e.extracted_data IS NOT NULL"), {"pid": project_id}).mappings().all()
         if not rows: # Ne pas lever d'erreur, mais mettre à jour le statut et notifier.
-            update_project_status(session, project_id, status='failed')
+            update_project_status(project_id, status='failed')
             send_project_notification(project_id, 'analysis_failed', "Aucune donnée d'extraction pertinente trouvée pour générer la discussion.")
             return
 
@@ -999,16 +934,16 @@ def run_discussion_generation_task(project_id: str):
         model_name = config.DEFAULT_MODELS.get(profile, {}).get('synthesis', 'llama3.1:8b')
         draft = generate_discussion_draft(df, lambda p, m: call_ollama_api(p, m, temperature=0.7), model_name)
 
-        update_project_status(db.session, project_id, status='completed', discussion=draft)
+        update_project_status(project_id, status='completed', discussion=draft)
         send_project_notification(project_id, 'analysis_completed', 'Le brouillon de discussion a été généré.', {'discussion_draft': draft})
     except Exception as e:
         logger.error(f"Erreur dans la tâche de discussion : {e}", exc_info=True)
         raise
 
 @with_db_session
-def run_knowledge_graph_task(project_id: str):
-    """Génère un graphe de connaissances JSON à partir des titres d'articles extraits."""
-    update_project_status(db.session, project_id, status='generating_graph')
+def run_knowledge_graph_task(project_id: str):  
+    """Génère un graphe de connaissances JSON à partir des titres d'articles extraits"""
+    update_project_status(project_id, status='generating_graph')
     
     # Utiliser le modèle de synthèse pour cette tâche, car il est plus adapté à la génération de JSON structuré.
     profile_info = session.query(Project).filter_by(id=project_id).first()
@@ -1031,15 +966,15 @@ Titres:
     graph = call_ollama_api(prompt, model=model_to_use, output_format="json")
     
     if graph and isinstance(graph, dict) and 'nodes' in graph and 'edges' in graph:   
-        update_project_status(db.session, project_id, status='completed', graph=graph)
+        update_project_status(project_id, status='completed', graph=graph)
         send_project_notification(project_id, 'analysis_completed', 'Le graphe de connaissances est prêt.', {'analysis_type': 'knowledge_graph'})
     else:
-        update_project_status(session, project_id, status='failed')
+        update_project_status(project_id, status='failed')
         send_project_notification(project_id, 'analysis_failed', 'La génération du graphe de connaissances a échoué.', {'analysis_type': 'knowledge_graph'})
 
 @with_db_session
-def run_prisma_flow_task(session, project_id: str):
-    """Génère un diagramme PRISMA simplifié et stocke l'image sur disque.   
+def run_prisma_flow_task(project_id: str):
+    """Génère un diagramme PRISMA simplifié et stocke l'image sur disque."""
     update_project_status(session, project_id, status='generating_prisma')
     
     total_found = session.execute(text("SELECT COUNT(*) FROM search_results WHERE project_id = :pid"), {"pid": project_id}).scalar_one()   
@@ -1072,7 +1007,7 @@ def run_prisma_flow_task(session, project_id: str):
     plt.savefig(pdf_path, bbox_inches='tight', format='pdf')
     plt.close(fig)
 
-    update_project_status(session, project_id, status='completed', prisma_path=image_path)  
+    update_project_status(db.session, project_id, status='completed', prisma_path=image_path)  
     send_project_notification(project_id, 'analysis_completed', 'Le diagramme PRISMA est prêt.', {'analysis_type': 'prisma_flow'})
 
 @with_db_session
@@ -1110,7 +1045,7 @@ def run_meta_analysis_task(session, project_id: str):
     send_project_notification(project_id, 'analysis_completed', 'Méta-analyse terminée.')
 
 @with_db_session
-def run_descriptive_stats_task(session, project_id: str):
+def run_descriptive_stats_task(project_id: str):
     """Génère des statistiques descriptives sur les extractions."""
     logger.info(f"ðŸ“Š Statistiques descriptives pour projet {project_id}")
     update_project_status(session, project_id, 'generating_analysis')
@@ -1127,7 +1062,7 @@ def run_descriptive_stats_task(session, project_id: str):
         'min_score': float(np.min(scores)), 'max_score': float(np.max(scores))
     }
     
-    update_project_status(db.session, project_id, status='completed', analysis_result=stats_result)
+    update_project_status(project_id, status='completed', analysis_result=stats_result)
     session.commit() # Commit the status update
     send_project_notification(project_id, 'analysis_completed', 'Statistiques descriptives générées')
 
@@ -1173,12 +1108,12 @@ Réponds de façon concise et précise."""
 # ================================================================ 
 
 @with_db_session
-def import_from_zotero_file_task(session, project_id: str, json_file_path: str):
+def import_from_zotero_file_task(project_id: str, json_file_path: str):  
     """Importe les articles depuis un fichier JSON Zotero en utilisant le parseur robuste."""
     logger.info(f"ðŸ“š Import Zotero depuis {json_file_path} pour projet {project_id}")
     extractor = ZoteroAbstractExtractor(json_file_path)
     records = extractor.process()
-
+    
     if not records:
         send_project_notification(project_id, 'import_failed', 'Aucun article valide trouvé dans le fichier Zotero.')
         return
@@ -1196,13 +1131,13 @@ def import_from_zotero_file_task(session, project_id: str, json_file_path: str):
             })
     
     if records_to_insert:
-        session.execute(text("""
+        db.session.execute(text("""
             INSERT INTO search_results (id, project_id, article_id, title, abstract, authors, publication_date, journal, doi, url, database_source, created_at)
             VALUES (:id, :pid, :aid, :title, :abstract, :authors, :pub_date, :journal, :doi, :url, :src, :ts)
             ON CONFLICT (project_id, article_id) DO NOTHING
         """), records_to_insert)
 
-    total_articles = session.execute(text("SELECT COUNT(*) FROM search_results WHERE project_id = :pid"), {"pid": project_id}).scalar_one()
+    total_articles = db.session.execute(text("SELECT COUNT(*) FROM search_results WHERE project_id = :pid"), {"pid": project_id}).scalar_one()
     session.execute(text("UPDATE projects SET pmids_count = :count WHERE id = :pid"), {"count": total_articles, "pid": project_id})
 
     send_project_notification(project_id, 'import_completed', f'Import Zotero terminé: {len(records_to_insert)} nouveaux articles ajoutés.')
@@ -1252,7 +1187,7 @@ def import_pdfs_from_zotero_task(project_id: str, pmids: list, zotero_user_id: s
         send_project_notification(project_id, 'import_failed', f'Erreur Zotero: {e}')
 
 @with_db_session
-def index_project_pdfs_task(session, project_id: str): # Ajout de 'session'
+def index_project_pdfs_task(project_id: str): # Ajout de 'session'
     """Indexe les PDFs d'un projet pour le RAG."""
     logger.info(f"ðŸ”  Indexation des PDFs pour projet {project_id}")
     try:
@@ -1332,7 +1267,7 @@ def index_project_pdfs_task(session, project_id: str): # Ajout de 'session'
         send_project_notification(project_id, 'indexing_failed', f'Erreur lors de l\'indexation: {e}', {'task_name': 'indexation'})
 
 @with_db_session
-def fetch_online_pdf_task(session, project_id: str, article_id: str):
+def fetch_online_pdf_task(project_id: str, article_id: str):
     """Récupère un PDF en ligne pour un article via Unpaywall si possible."""
     logger.info(f"ðŸ“„ Récupération PDF en ligne pour {article_id}")
     try: # Le bloc try/finally n'est plus nécessaire grâce au décorateur
@@ -1398,7 +1333,7 @@ def pull_ollama_model_task(model_name: str):
 # ================================================================ 
 
 @with_db_session
-def calculate_kappa_task(session, project_id: str):
+def calculate_kappa_task(project_id: str):
     """Calcule le coefficient Kappa de Cohen pour la validation inter-évaluateurs."""
     logger.info(f"ðŸ“Š Calcul du Kappa pour projet {project_id}")
     rows = session.execute(text("SELECT validations FROM extractions WHERE project_id = :pid AND validations IS NOT NULL"), {"pid": project_id}).mappings().all()
@@ -1441,12 +1376,13 @@ def calculate_kappa_task(session, project_id: str):
     message = f"Kappa = {kappa:.3f} ({interpretation}), n = {len(eval1_decisions)}"
     send_project_notification(project_id, 'kappa_calculated', message)
 
+
 # ================================================================ 
 # === SCORES ATN
 # ================================================================ 
 
 @with_db_session
-def run_atn_stakeholder_analysis_task(session, project_id: str):
+def run_atn_stakeholder_analysis_task(project_id: str):
     """Analyse multipartie prenante spécialisée pour l'ATN."""
     update_project_status(session, project_id, 'analyzing')
     rows = session.execute(text("SELECT extracted_data, stakeholder_perspective, ai_type, platform_used FROM extractions WHERE project_id = :pid AND extracted_data IS NOT NULL"), {"pid": project_id}).mappings().all()
@@ -1497,7 +1433,7 @@ def run_atn_stakeholder_analysis_task(session, project_id: str):
     send_project_notification(project_id, 'atn_analysis_completed', 'Analyse ATN multipartie prenante terminée.')
 
 @with_db_session  
-def run_atn_score_task(session, project_id: str):
+def run_atn_score_task(project_id: str):
     """Calcule les scores ATN pour tous les articles extraits du projet."""
     logger.info(f"📊 Calcul des scores ATN pour le projet {project_id}")
     
@@ -1630,7 +1566,7 @@ def run_atn_score_task(session, project_id: str):
 # ================================================================ 
 
 @with_db_session
-def run_risk_of_bias_task(session, project_id: str, article_id: str):
+def run_risk_of_bias_task(project_id: str, article_id: str):
     """
     Tâche pour évaluer le risque de biais d'un article en utilisant l'IA.
     Ceci est une version simplifiée inspirée de RoB 2.
@@ -1695,7 +1631,7 @@ def run_risk_of_bias_task(session, project_id: str, article_id: str):
 # ================================================================ 
 
 @with_db_session
-def add_manual_articles_task(session, project_id: str, items: list, use_full_data: bool = False):
+def add_manual_articles_task(project_id: str, items: list, use_full_data: bool = False):
     """
     Tâche d'arrière-plan pour ajouter des articles.
     VERSION VICTORY: Gère les données complètes (depuis le workflow) ou les simples identifiants.
@@ -1809,7 +1745,7 @@ def add_manual_articles_task(session, project_id: str, items: list, use_full_dat
     logger.info(f"✅ Toutes les tâches d'analyse pour les {len(items)} articles ont été mises en file d'attente.")
 
 @with_db_session
-def import_from_zotero_json_task(session, project_id: str, items_list: list):
+def import_from_zotero_json_task(project_id: str, items_list: list):
     """
     Tâche asynchrone pour importer une LISTE d'objets JSON Zotero (envoyée par l'extension)
     et les convertir en SearchResult dans la base de données.
@@ -1857,7 +1793,7 @@ def import_from_zotero_json_task(session, project_id: str, items_list: list):
     msg = f"Importation Zotero (Extension) terminée : {len(new_articles)} articles ajoutés, {failed_imports} échecs."
     send_project_notification(project_id, 'import_completed', msg)
     logger.info(msg)
-def run_extension_task(session, project_id: str, extension_name: str):
+def run_extension_task(project_id: str, extension_name: str):
     """
 
     Placeholder task for running a specific extension.
@@ -1873,7 +1809,7 @@ def run_extension_task(session, project_id: str, extension_name: str):
 
 
 @with_db_session
-def generate_bibliography_task(session, project_id: str):
+def generate_bibliography_task(project_id: str):
     """
     Génère une bibliographie pour le projet spécifié et la sauvegarde.
     """
@@ -1919,7 +1855,7 @@ def generate_bibliography_task(session, project_id: str):
 
 
 @with_db_session
-def generate_summary_table_task(session, project_id: str):
+def generate_summary_table_task(project_id: str):
     """
     Génère un tableau de synthèse des extractions pour le projet spécifié et le sauvegarde.
     """
@@ -1972,7 +1908,7 @@ def generate_summary_table_task(session, project_id: str):
 
 
 @with_db_session
-def export_excel_report_task(session, project_id: str):
+def export_excel_report_task(project_id: str):
     """
     Exporte toutes les données pertinentes du projet vers un fichier Excel.
     """
@@ -2033,10 +1969,10 @@ def export_excel_report_task(session, project_id: str):
         logger.error(f"Erreur lors de l'export Excel pour le projet {project_id}: {e}", exc_info=True)
         send_project_notification(project_id, 'report_failed', f'Erreur lors de l\'export Excel: {e}')
 
-print(f"DEBUG: tasks_v4_complete.py loaded. run_extension_task is defined: {'run_extension_task' in globals()}")
+print(f"DEBUG: tasks_v4_complete.py loaded. run_extension_task is defined: {'run_extension_task' in globals()}")   
 
 @with_db_session
-def run_atn_specialized_extraction_task(session, project_id: str, **kwargs):
+def run_atn_specialized_extraction_task(project_id: str, **kwargs):
     """Dummy task for ATN specialized extraction."""
     logger.info(f"Running ATN specialized extraction for project {project_id}")
     send_project_notification(project_id, 'analysis_completed', 'ATN specialized extraction completed.', {'analysis_type': 'atn_specialized_extraction'})
@@ -2045,6 +1981,7 @@ def run_atn_specialized_extraction_task(session, project_id: str, **kwargs):
 def run_empathy_comparative_analysis_task(session, project_id: str, **kwargs):
     """Dummy task for empathy comparative analysis."""
     logger.info(f"Running empathy comparative analysis for project {project_id}")
+
     send_project_notification(project_id, 'analysis_completed', 'Empathy comparative analysis completed.', {'analysis_type': 'empathy_comparative_analysis'})
 
 # ============================================================================
@@ -2052,7 +1989,7 @@ def run_empathy_comparative_analysis_task(session, project_id: str, **kwargs):
 # ============================================================================
 
 @with_db_session
-def run_batch_screening_task(session, project_id: str, profile: Dict):
+def run_batch_screening_task(project_id: str, profile: Dict):
     """Screening en lot de tous les articles du projet"""
     logger.info(f"🔍 Screening en lot pour projet {project_id}")
     
@@ -2151,7 +2088,7 @@ Réponds UNIQUEMENT en JSON avec :
     return {"status": "completed", "screened": len(articles), "relevant": total_relevant}
 
 @with_db_session  
-def run_atn_extraction_task(session, project_id: str, profile: Dict, use_atn_grid: bool = True):
+def run_atn_extraction_task(project_id: str, profile: Dict, use_atn_grid: bool = True):
     """Extraction complète avec grille ATN standardisée"""
     logger.info(f"🔬 Extraction ATN pour projet {project_id}")
     
@@ -2284,7 +2221,7 @@ RÉPONSE ATTENDUE : Objet JSON avec les 30 champs ATN comme clés.
     return {"status": "completed", "extracted": len(extraction_results)}
 
 @with_db_session
-def run_parallel_pdf_fetch_task(session, project_id: str, article_ids: List[str]):
+def run_parallel_pdf_fetch_task(project_id: str, article_ids: List[str]):
     """Récupération parallèle des PDFs pour une liste d'articles"""
     logger.info(f"📄 Récupération parallèle de {len(article_ids)} PDFs")
     
