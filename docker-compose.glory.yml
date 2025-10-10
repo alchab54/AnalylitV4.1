@@ -21,6 +21,12 @@ services:
     container_name: analylit_redis
     ports: ["6380:6379"]
     networks: ["analylit-network"]
+    # Ajout d'un healthcheck pour s'assurer que Redis est prêt
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
     restart: unless-stopped
 
   ollama:
@@ -34,8 +40,9 @@ services:
       resources:
         reservations:
           devices:
+            # Correction: 'count: -1' pour allouer tous les GPUs disponibles
             - driver: nvidia
-              count: all
+              count: -1 
               capabilities: [gpu]
     networks: ["analylit-network"]
     restart: unless-stopped
@@ -45,53 +52,44 @@ services:
       context: .
       dockerfile: docker/Dockerfile.migrate
     container_name: analylit-migrate
-    restart: "no"
-    networks: [analylit-network]
-    working_dir: /app
-    volumes: [".:/app:rw", "./source:/app/source", "./zotero-storage:/app/zotero-storage"]
-    environment:
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      REDIS_URL: redis://redis:6379/0
-      OLLAMA_BASE_URL: http://ollama:11434
-      PYTHONPATH: /app
-      TZ: Europe/Paris
+    <<: &common-config
+      restart: unless-stopped
+      working_dir: /app
+      volumes:
+        - .:/app:rw
+        - ./source:/app/source
+        - ./zotero-storage:/app/zotero-storage
+      networks:
+        - analylit-network
+      environment: &common-env
+        DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+        REDIS_URL: redis://redis:6379/0
+        OLLAMA_BASE_URL: http://ollama:11434
+        PYTHONPATH: /app
+        TZ: Europe/Paris
     depends_on:
       test-db: { condition: service_healthy }
+    # Suppression de la duplication de l'environnement
     command: ["alembic", "upgrade", "head"]
+    restart: "no"
 
   web:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
     container_name: analylit_web
-    restart: unless-stopped
-    networks: [analylit-network]
-    working_dir: /app
-    volumes: [".:/app:rw", "./source:/app/source", "./zotero-storage:/app/zotero-storage"]
-    environment:
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      REDIS_URL: redis://redis:6379/0
-      OLLAMA_BASE_URL: http://ollama:11434
-      PYTHONPATH: /app
-      TZ: Europe/Paris
-    command: gunicorn --bind 0.0.0.0:5000 --workers=4 --worker-class=geventwebsocket.gunicorn.workers.GeventWebSocketWorker "backend.wsgi:app"
+    <<: *common-config
+    command: gunicorn --bind 0.0.0.0:5000 --workers=2 --timeout 120 "backend.wsgi:app"
     ports: ["8080:5000"]
     depends_on:
       migrate: { condition: service_completed_successfully }
 
   worker-import:
-    build: { context: ., dockerfile: docker/Dockerfile.worker }
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    <<: *common-config
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "import_queue"]
-    restart: unless-stopped
-    networks: [analylit-network]
-    working_dir: /app
-    volumes: [".:/app:rw", "./source:/app/source", "./zotero-storage:/app/zotero-storage"]
-    environment:
-      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-      REDIS_URL: redis://redis:6379/0
-      OLLAMA_BASE_URL: http://ollama:11434
-      PYTHONPATH: /app
-      TZ: Europe/Paris
     deploy:
       replicas: 1
       resources:
@@ -100,21 +98,90 @@ services:
         reservations:
           memory: 2G
 
-  # ... (Définissez les autres workers sur ce modèle si nécessaire, pour l'instant, seul import est critique)
+  worker-screening:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    <<: *common-config
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue", "atn_scoring_queue"]
+    deploy:
+      replicas: 2
+      resources:
+        reservations:
+          memory: 1G
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  worker-extraction:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    <<: *common-config
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "extraction_queue"]
+    deploy:
+      replicas: 6
+      resources:
+        reservations:
+          memory: 1G
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  worker-analysis:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    <<: *common-config
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue"]
+    deploy:
+      replicas: 6
+      resources:
+        reservations:
+          memory: 1G
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  worker-synthesis:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    <<: *common-config
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "synthesis_queue", "discussion_draft_queue"]
+    deploy:
+      replicas: 2
+      resources:
+        reservations:
+          memory: 2G
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
   rq-dashboard:
     image: eoranged/rq-dashboard
     ports: ["9181:9181"]
     environment: { RQ_DASHBOARD_REDIS_URL: "redis://redis:6379/0" }
     networks: ["analylit-network"]
-    depends_on: ["redis"]
+    # Syntaxe longue pour la cohérence et la clarté
+    depends_on:
+      redis:
+        condition: service_started
     restart: unless-stopped
 
   resource-monitor:
-    build: { context: ./docker, dockerfile: Dockerfile.monitor }
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.monitor
     container_name: analylit_monitor
     restart: unless-stopped
-    volumes: ["/var/run/docker.sock:/var/run/docker.sock", "./resultats_atn_glory:/output"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./resultats_atn_glory:/output
     networks: ["analylit-network"]
 
 networks:
@@ -124,3 +191,4 @@ networks:
 volumes:
   test_postgres_data:
   ollama_data:
+
