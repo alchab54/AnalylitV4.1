@@ -18,7 +18,7 @@ from datetime import datetime
 from functools import wraps
 from pathlib import Path
 from typing import Dict, List, Optional, Any
-
+from rq import job as rq_job
 from utils.app_globals import PROJECTS_DIR
 import numpy as np
 import matplotlib.pyplot as plt
