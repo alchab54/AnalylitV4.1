@@ -18,7 +18,7 @@ from datetime import datetime
 from functools import wraps
 from pathlib import Path
 from typing import Dict, List, Optional, Any
-from scipy import stats
+
 # --- IMPORTS EXTERNES (3rd PARTY) ---
 from sentence_transformers import SentenceTransformer, util
 from sqlalchemy.exc import SQLAlchemyError
@@ -26,18 +26,19 @@ from rq import get_current_job
 
 # --- IMPORTS CENTRAUX DE L'APPLICATION (LA CLÉ DE LA SOLUTION) ---
 # Importe l'instance unique de l'application Flask depuis le point d'entrée WSGI
-from backend.wsgi import app # La tâche a besoin du CONTEXTE de l'app
+from backend.wsgi import app
 # Importe les extensions partagées (DB)
 from utils.extensions import db
 # Importe les queues RQ partagées
 from utils.app_globals import import_queue, screening_queue, extraction_queue, analysis_queue, synthesis_queue
-from sqlalchemy import text
-from sqlalchemy.orm import Session
+
+
 # --- IMPORTS DES MODULES LOCAUX DE L'APPLICATION ---
 # Modèles de base de données
-from utils.models import (Project, SearchResult, Extraction, Grid, ChatMessage, AnalysisProfile, RiskOfBias, SCHEMA
+from utils.models import (
+    Project, SearchResult, Extraction, Grid, ChatMessage, AnalysisProfile, RiskOfBias, SCHEMA
 )
-from flask import current_app
+# Moteur de scoring
 from backend.atn_scoring_engine_v21 import ATNScoringEngineV22
 # Fonctions utilitaires
 from utils.zotero_parser import parse_zotero_rdf
@@ -47,7 +48,6 @@ from utils.file_handlers import sanitize_filename, extract_text_from_pdf
 from utils.analysis import generate_discussion_draft
 from utils.notifications import send_project_notification
 from utils.helpers import http_get_with_retries
-from pypdf import PdfReader
 from utils.importers import ZoteroAbstractExtractor, process_zotero_item_list
 # Templates de prompts
 from utils.prompt_templates import (
@@ -56,9 +56,8 @@ from utils.prompt_templates import (
     get_synthesis_prompt_template,
     get_rag_chat_prompt_template,
     get_effective_prompt_template,
-    
 )
-import numpy as np
+
 # --- CONFIGURATION DU LOGGER ---
 # Le logger est déjà configuré par la factory de l'application, on le récupère simplement.
 logger = logging.getLogger(__name__)
@@ -76,7 +75,6 @@ except ImportError as e:
 # ================================================================ 
 
 def with_db_session(func):
-
     """
     Décorateur qui fournit un contexte d'application et une session DB
     aux tâches RQ. Garantit que la tâche s'exécute dans le même
@@ -141,7 +139,7 @@ def log_processing_status(project_id: str, article_id: str, status: str, details
         # Nous devons générer manuellement l'UUID car nous utilisons du SQL brut.
     log_id = str(uuid.uuid4()) 
 
-
+    
     session.execute(text("""
         INSERT INTO processing_log (id, project_id, pmid, task_name, status, details, \"timestamp\")
         VALUES (:id, :project_id, :pmid, :task_name, :status, :details, :ts)
@@ -154,7 +152,7 @@ def log_processing_status(project_id: str, article_id: str, status: str, details
         "details": details, 
         "ts": datetime.now()
     })
-    db.session.commit()
+
 
 def increment_processed_count(project_id: str):
     """Incrémente processed_count du projet."""
@@ -163,8 +161,7 @@ def increment_processed_count(project_id: str):
 
 def update_project_timing(project_id: str, duration: float):
     """Ajoute une durée au total_processing_time."""
-    db.session.execute(text("UPDATE projects SET total_processing_time = total_processing_time + :d WHERE id = :id"), {"d": float(duration), "id": project_id})
-
+    session.execute(text("UPDATE projects SET total_processing_time = total_processing_time + :d WHERE id = :id"), {"d": float(duration), "id": project_id})
 
 # ================================================================ 
 # === Tâches RQ (100% SQLAlchemy)
@@ -184,6 +181,7 @@ def normalize_profile(profile: dict) -> dict:
 
         'synthesis': profile.get('synthesis') or profile.get('synthesis_model') or 'llama3.1:8b'
     }
+
 
 
 # --- Mock function for E2E tests ---
@@ -232,7 +230,7 @@ def _mock_multi_database_search_task(session, project_id: str, query: str, datab
         ON CONFLICT (project_id, article_id) DO NOTHING
     """), dummy_results)
     
-    total_found = len(dummy_results)    
+    total_found = len(dummy_results)
     session.execute(text("UPDATE projects SET status = 'search_completed', pmids_count = :n, updated_at = :ts WHERE id = :id"), {"n": total_found, "ts": datetime.now().isoformat(), "id": project_id})
     send_project_notification(project_id, 'search_completed', f'MOCK Recherche terminée: {total_found} articles trouvés', {'total_results': total_found, 'databases': databases})
     logger.info(f"âœ… MOCK Recherche multi-bases: total {total_found}")
@@ -290,7 +288,6 @@ def multi_database_search_task(project_id: str, query: str, databases: list, max
             logger.info(f"Requête vide pour {db_name}, base de données ignorée.")
             continue
 
-
         logger.info(f"ðŸ“š Recherche dans {db_name}...")
         try:
             if db_name == 'pubmed':
@@ -298,14 +295,12 @@ def multi_database_search_task(project_id: str, query: str, databases: list, max
                 from Bio import Entrez
                 Entrez.email = config.UNPAYWALL_EMAIL
                 
-
                 max_results = min(max_results_per_db, config.MAX_PUBMED_RESULTS)
                 page_size = config.PAGE_SIZE_PUBMED
                 retstart = 0
                 all_ids = []
 
                 logger.info(f"Récupération de jusqu'à {max_results} articles de PubMed par pages de {page_size}...")
-
 
                 while retstart < max_results:
                     handle = Entrez.esearch(
@@ -359,7 +354,7 @@ def multi_database_search_task(project_id: str, query: str, databases: list, max
     if all_records_to_insert:
         db.session.execute(text("""
             INSERT INTO search_results (id, project_id, article_id, title, abstract, authors, publication_date, journal, doi, url, database_source, created_at)
-            VALUES (:id, :pid, :aid, :title, :abstract, :authors, :pub_date, :journal, :doi, :url, :src, :ts)
+            VALUES (:id, :pid, :aid, :title, :abstract, :authors, :pub_date, :journal, :doi, :url, :src, :ts) 
             ON CONFLICT (project_id, article_id) DO NOTHING
 
         """), all_records_to_insert)
@@ -369,7 +364,6 @@ def multi_database_search_task(project_id: str, query: str, databases: list, max
         logger.info(f"🚀 Enqueuing {len(all_records_to_insert)} screening tasks...")
 
         # Récupérer le projet et le profil associé pour obtenir les modèles
-
         project = db.session.get(Project, project_id)
 
         # Logique simplifiée et plus robuste
@@ -381,7 +375,6 @@ def multi_database_search_task(project_id: str, query: str, databases: list, max
                 profile_name = profile_from_db.name.lower()
             else:
                 logger.warning(f"Profil '{project.profile_used}' non trouvé dans la base de données. Using default 'standard'.")
-
 
         # Utiliser le nom du profil pour obtenir les modèles depuis la config
         profile_name = profile_name.strip()  # Trim leading/trailing whitespace from profile_name
@@ -418,7 +411,6 @@ def calculate_atn_score_for_article(article_data: dict) -> dict:
     En cas d'erreur fatale, retourne un résultat indiquant l'échec
     pour éviter les "faux scores" silencieux.
     """
-
     try:
         # Assurez-vous que ces imports sont bien en haut de votre fichier
         # from backend.services.atn_scoring_engine import ATNScoringEngineV22, ATN_SCORING_AVAILABLE
@@ -472,7 +464,6 @@ def get_pdf_text(article_data, project_id):
     """
     Tente de trouver et d'extraire le texte intégral d'un PDF associé à un article,
     en utilisant le volume Docker partagé.
-
     """
     if 'attachments' not in article_data or not article_data['attachments']:
         logger.info(f"[{article_data.get('article_id')}] Pas de section 'attachments' dans les données Zotero.")
@@ -502,14 +493,14 @@ def get_pdf_text(article_data, project_id):
     logger.info(f"[{article_data.get('article_id')}] Aucun PDF valide trouvé dans les pièces jointes.")
     return None
 
-@with_db_session
+@rq_job('analysis_queue', timeout='1h')
 def process_single_article_task(project_id, article, profile, analysis_mode, job_id=None):
     # =========================================================================
     # BLINDAGE DÉFENSIF CONTRE LES TÂCHES CORROMPUES
     # =========================================================================
     if isinstance(article, str):
         # Cette tâche provient d'une source inconnue et obsolète.
-        # Nous la neutralisons et la traçons.        
+        # Nous la neutralisons et la traçons.
         logger.critical(
             f"TÂCHE CORROMPUE DÉTECTÉE ! "
             f"Project ID: {project_id}, "
@@ -554,7 +545,8 @@ def process_single_article_task(project_id, article, profile, analysis_mode, job
     logger.info(f"[process_single_article_task] Traitement de {article_id} avec données directes.")
     
     start_time = time.time()
-    try:   
+
+    try:
         # ======================================================================
         # ✅ DÉTERMINATION DU CONTENU TEXTUEL À ANALYSER
         # ======================================================================
@@ -562,7 +554,6 @@ def process_single_article_task(project_id, article, profile, analysis_mode, job
         # Priority 2: Titre + Abstract depuis les données fournies
         
         text_for_analysis = f"{article.get('title', '')}\n\n{article.get('abstract', '')}"
-
         analysis_source = "abstract"
 
         # Vérifier si un PDF est disponible
@@ -597,7 +588,6 @@ def process_single_article_task(project_id, article, profile, analysis_mode, job
             increment_processed_count(session, project_id)
             logger.warning(f"[process_single_article_task] Contenu insuffisant pour {article_id}")
             return {"status": "skipped", "reason": "insufficient_content"}
-
 
         # ======================================================================
         # ✅ PRÉPARATION DONNÉES POUR SCORING ATN V2.2 - CORRECTION FINALE
@@ -811,7 +801,6 @@ TEXTE DE L'ARTICLE:
                 "src": analysis_source,
                 "atn_score": atn_results.get("atn_score", 0),
                 "atn_cat": atn_results.get("atn_category", "Non évalué"),
-
                 "atn_just": json.dumps(atn_results.get("detailed_justifications", [])),
                 "ts": datetime.now().isoformat()
             })
@@ -1349,6 +1338,7 @@ def pull_ollama_model_task(model_name: str):
 def calculate_kappa_task(project_id: str):
     """Calcule le coefficient Kappa de Cohen pour la validation inter-évaluateurs."""
     logger.info(f"ðŸ“Š Calcul du Kappa pour projet {project_id}")
+
     rows = session.execute(text("SELECT validations FROM extractions WHERE project_id = :pid AND validations IS NOT NULL"), {"pid": project_id}).mappings().all()
     if not rows:
         send_project_notification(project_id, 'kappa_failed', 'Aucune validation trouvée.')

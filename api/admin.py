@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 from utils.app_globals import redis_conn, limiter, models_queue
 from utils.app_globals import import_queue
 from rq import Queue, Worker
+from utils.extensions import limiter
 
 
 admin_bp = Blueprint('admin', __name__)

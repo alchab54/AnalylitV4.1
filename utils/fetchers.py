@@ -21,6 +21,7 @@ class DatabaseManager:
     def _parse_pubmed_xml(self, xml_data: str) -> List[Dict[str, Any]]:
         """Parse le XML de la réponse eFetch de PubMed."""
         results = []
+
         try:
             root = ET.fromstring(xml_data)
             for article in root.findall('.//PubmedArticle'):

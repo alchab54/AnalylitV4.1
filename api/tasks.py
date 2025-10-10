@@ -6,7 +6,6 @@ from utils.app_globals import redis_conn
 from rq import Queue
 from rq.exceptions import NoSuchJobError
 from rq.job import Job
-
 tasks_bp = Blueprint('tasks', __name__)
 logger = logging.getLogger(__name__)
 
