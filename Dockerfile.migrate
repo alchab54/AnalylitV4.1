@@ -1,0 +1,16 @@
+# Utilise la même base que les workers
+FROM analylit-base-cpu:latest
+
+WORKDIR /home/appuser/app
+USER appuser
+
+# Copier tout le code source (plus simple et plus robuste)
+COPY --chown=appuser:appuser . .
+
+# Installer le projet pour que Alembic trouve les modèles SQLAlchemy
+RUN pip install -e .
+
+# Installer les dépendances spécifiques à la migration
+RUN pip install alembic python-dotenv
+
+CMD ["alembic", "upgrade", "head"]
