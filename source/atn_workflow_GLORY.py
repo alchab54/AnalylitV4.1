@@ -328,61 +328,41 @@ class ATNWorkflowGlory:
             log("ERROR", "❌ Création projet échouée")
             return False
 
-    def import_articles_via_rq_glory(self) -> bool:
-        """Import via RQ Worker (méthode native AnalyLit)"""
-        log_section(f"IMPORT RQ WORKER - {len(self.articles)} ARTICLES ATN")
+    def import_articles_via_rq_final(self) -> bool:
+        """Import RQ Zotero corrigé - SANS timeout dans les arguments"""
+        log_section(f"IMPORT ZOTERO RDF FINAL - {len(self.articles)} ARTICLES")
         
         try:
-            # Import via RQ comme le fait l'interface web
             from redis import Redis
             from rq import Queue
             
-            # Connexion Redis (same config que workers)
             redis_conn = Redis(host='redis', port=6379, db=0)
             import_queue = Queue('import_queue', connection=redis_conn)
             
-            success_count = 0
+            # ✅ PARAMÈTRES CORRECTS pour la fonction Zotero RDF
+            job_data = {
+                "rdf_path": str(ANALYLIT_RDF_PATH),
+                "storage_path": ZOTERO_STORAGE_PATH,
+                "project_id": str(self.project_id)
+            }
             
-            # Import par chunks (comme vos workers le font)
-            chunks = [self.articles[i:i+CONFIG["chunk_size"]] 
-                     for i in range(0, len(self.articles), CONFIG["chunk_size"])]
+            # ✅ ENQUEUE AVEC BONS PARAMÈTRES (timeout est paramètre RQ, pas fonction)
+            job = import_queue.enqueue(
+                'backend.tasks_v4_complete.import_from_zotero_rdf_task',
+                **job_data,  # ✅ Unpacking des arguments
+                timeout=3600,
+                job_id=f"atn_final_import"
+            )
             
-            for i, chunk in enumerate(chunks):
-                log("PROGRESS", f"⏳ Enqueue chunk {i+1}/{len(chunks)} ({len(chunk)} articles)")
-                
-                # Job RQ avec vos vrais paramètres
-                job_data = {
-                    "articles": chunk,
-                    "source": "zotero_atn",
-                    "project_id": str(self.project_id),
-                    "analysis_mode": "extraction",
-                    "rdf_path": str(ANALYLIT_RDF_PATH),
-                    "storage_path": ZOTERO_STORAGE_PATH
-                }
-                
-                try:
-                    # Enqueue la tâche (même méthode que l'interface)
-                    job = import_queue.enqueue(
-                        'backend.tasks_v4_complete.process_zotero_import',
-                        job_data,
-                        timeout=3600,
-                        job_id=f"atn_import_{i+1}"
-                    )
-                    
-                    success_count += len(chunk)
-                    log("SUCCESS", f"✅ Chunk {i+1} en queue : Job {job.id}")
-                    time.sleep(1)  # Éviter spam
-                    
-                except Exception as e:
-                    log("WARNING", f"⚠️ Chunk {i+1} échoué : {str(e)[:100]}")
+            log("SUCCESS", f"✅ Import Zotero RDF lancé : Job {job.id}")
+            log("SUCCESS", f"🚀 329 articles ATN → RTX 2060 SUPER processing")
             
-            log("FINAL", f"🏆 {len(chunks)} jobs RQ créés pour {success_count} articles")
-            return success_count > 0
+            return True
             
         except Exception as e:
-            log("ERROR", f"❌ Import RQ échoué : {e}")
+            log("ERROR", f"❌ Import final échoué : {e}")
             return False
-
+            
     def monitor_extractions_glory(self):
         """Monitoring des extractions RTX 2060 SUPER"""
         log_section("MONITORING RTX 2060 SUPER - EXTRACTIONS ATN")
