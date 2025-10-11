@@ -871,7 +871,21 @@ def import_from_zotero_rdf_task(project_id, rdf_file_path, zotero_storage_path):
                 )
 
                 if not existing_article:
-                    new_article = SearchResult(project_id=project_id, **article_data)
+                    # Mapping correct des champs article_data → SearchResult
+                    article_data_mapped = {
+                        'article_id': article_data.get('pmid', ''),          # ✅ pmid → article_id
+                        'title': article_data.get('title', ''),
+                        'abstract': article_data.get('abstract', ''), 
+                        'authors': article_data.get('authors', ''),
+                        'publication_date': str(article_data.get('year', '')),
+                        'journal': article_data.get('journal', ''),
+                        'doi': article_data.get('doi', ''),
+                        'url': article_data.get('url', ''),
+                        'database_source': article_data.get('database_source', 'zotero'),
+                        'query': article_data.get('query', 'ATN Import')
+                    }
+
+                    new_article = SearchResult(project_id=project_id, **article_data_mapped)
                     db.session.add(new_article)
                     new_articles_count += 1
 
