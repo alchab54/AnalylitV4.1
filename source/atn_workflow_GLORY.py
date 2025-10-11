@@ -26,6 +26,7 @@ import uuid
 import hashlib
 import re
 from datetime import datetime
+import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 import pandas as pd
@@ -33,6 +34,9 @@ import pandas as pd
 # ENCODAGE UTF-8
 if sys.platform.startswith('win'):
     try:
+        logging.basicConfig(level=logging.INFO,
+                            format='%(asctime)s - %(levelname)s - %(message)s')
+        logger = logging.getLogger(__name__)
         sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
         sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
     except Exception as e:
@@ -41,10 +45,10 @@ if sys.platform.startswith('win'):
 # CONFIGURATION GLORY - CHEMINS CORRIGÉS POUR EXPORT ZOTERO ATN
 API_BASE = "http://localhost:5000"         # Port Docker interne ✅
 WEB_BASE = "http://localhost:8080"         # ✅ CORRECTION : Port 8080 au lieu de 3000  
-PROJECT_ROOT = Path("/app/source")         # ✅ CORRECTION : Dossier Docker monté
+PROJECT_ROOT = Path("/app/source")  # ✅ CORRECTION : Dossier Docker monté
 ANALYLIT_RDF_PATH = PROJECT_ROOT / "Analylit" / "Analylit.rdf"  # ✅ CORRECTION : Sous-dossier Analylit
-OUTPUT_DIR = Path("/app/output")           # ✅ CORRECT
-OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
+OUTPUT_DIR = Path("/app/output")  # ✅ CORRECT
+
 ZOTERO_STORAGE_PATH = "/app/zotero-storage"  # Correspond au montage files/
 
 CONFIG = {
@@ -281,7 +285,23 @@ class ATNWorkflowGlory:
         log_section("VÉRIFICATION SOURCE DE DONNÉES - ZOTERO RDF")
         if not ANALYLIT_RDF_PATH.is_file():
             log("ERROR", f"❌ Fichier RDF introuvable : {ANALYLIT_RDF_PATH}")
-            return False
+        
+        # Logs avant le parsing
+        log("INFO", "Vérification de l'existence et de la taille des répertoires et fichiers :")
+
+        rdf_exists = os.path.exists(ANALYLIT_RDF_PATH)
+        pdf_dir_exists = os.path.isdir(ZOTERO_STORAGE_PATH)
+        try:
+            pdf_count = len(os.listdir(ZOTERO_STORAGE_PATH))
+        except FileNotFoundError:
+            pdf_count = "Repertoire PDF non trouvé"
+
+        log("INFO", f"  - ANALYLIT_RDF_PATH existe : {rdf_exists}")
+        log("INFO", f"  - ZOTERO_STORAGE_PATH existe : {pdf_dir_exists}")
+        log("INFO", f"  - Nombre de PDFs dans ZOTERO_STORAGE_PATH : {pdf_count}")
+
+
+        return False
         
         log("SUCCESS", f"✅ Fichier RDF prêt pour l'import : {ANALYLIT_RDF_PATH.name}")
         self.articles = [1] * 328 # Simule le nombre d'articles pour les logs

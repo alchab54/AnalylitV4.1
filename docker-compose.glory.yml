@@ -54,8 +54,8 @@ services:
     working_dir: /app
     volumes:
       # ✅ VOLUMES CORRIGÉS POUR EXPORT ZOTERO ATN
-      - ./export_zotero_atn:/app/source:ro                           # Dossier parent export  
-      - ./source/Analylit/files:/app/zotero-storage:ro    # PDFs au bon endroit
+      - .:/app
+      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro
       - ./output:/app/output                                         # Output avec permissions
       - ./data:/app/data                                             # Base de données
       - .:/app:rw                                                    # Code source
@@ -81,8 +81,8 @@ services:
     working_dir: /app
     volumes:
       # ✅ VOLUMES IDENTIQUES POUR TOUS LES SERVICES
-      - ./export_zotero_atn:/app/source:ro                           # Dossier parent export  
-      - ./source/Analylit/files:/app/zotero-storage:ro    # PDFs au bon endroit
+      - .:/app
+      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro    # PDFs au bon endroit
       - ./output:/app/output                                         # Output avec permissions
       - ./data:/app/data                                             # Base de données
       - .:/app:rw                                                    # Code source
@@ -109,8 +109,8 @@ services:
     working_dir: /app
     volumes:
       # ✅ VOLUMES IDENTIQUES - CRUCIAL POUR ACCÈS RDF/PDFs
-      - ./export_zotero_atn:/app/source:ro                           # Dossier parent export  
-      - ./source/Analylit/files:/app/zotero-storage:ro    # PDFs au bon endroit
+      - .:/app                           # Dossier parent export  
+      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro    # PDFs au bon endroit
       - ./output:/app/output                                         # Output avec permissions
       - ./data:/app/data                                             # Base de données
       - .:/app:rw                                                    # Code source
@@ -133,8 +133,8 @@ services:
     restart: unless-stopped
     working_dir: /app
     volumes:
-      - ./export_zotero_atn:/app/source:ro                           
-      - ./source/Analylit/files:/app/zotero-storage:ro    
+      - .:/app                           
+      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro    
       - ./output:/app/output                                         
       - ./data:/app/data                                             
       - .:/app:rw                                                    
@@ -158,8 +158,8 @@ services:
     restart: unless-stopped
     working_dir: /app
     volumes:
-      - ./export_zotero_atn:/app/source:ro                           
-      - ./source/Analylit/files:/app/zotero-storage:ro    
+      - .:/app                           
+      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro    
       - ./output:/app/output                                         
       - ./data:/app/data                                             
       - .:/app:rw                                                    
@@ -183,8 +183,8 @@ services:
     restart: unless-stopped
     working_dir: /app
     volumes:
-      - ./export_zotero_atn:/app/source:ro                           
-      - ./source/Analylit/files:/app/zotero-storage:ro    
+      - .:/app                           
+      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro    
       - ./output:/app/output                                         
       - ./data:/app/data                                             
       - .:/app:rw                                                    
@@ -208,8 +208,8 @@ services:
     restart: unless-stopped
     working_dir: /app
     volumes:
-      - ./export_zotero_atn:/app/source:ro                           
-      - ./source/Analylit/files:/app/zotero-storage:ro    
+      - .:/app                           
+      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro    
       - ./output:/app/output                                         
       - ./data:/app/data                                             
       - .:/app:rw                                                    

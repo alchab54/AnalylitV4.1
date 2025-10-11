@@ -85,7 +85,7 @@ PMCID: PMC12203671</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9037">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9037/Schäfer et al. - 2025 - Exploring user characteristics, motives, and expectations and the therapeutic alliance in the mental.pdf"/>
+        <z:attachment rdf:resource="files/9037/Schäfer et al. - 2025 - Exploring user characteristics, motives, and expectations and the therapeutic alliance in the mental.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -556,7 +556,7 @@ PMCID: PMC12169703</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9038">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9038/van Benthem et al. - 2025 - A dyadic approach of assessing the therapeutic alliance in youth mental health and addiction treatme.pdf"/>
+        <z:attachment rdf:resource="files/9038/van Benthem et al. - 2025 - A dyadic approach of assessing the therapeutic alliance in youth mental health and addiction treatme.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -704,7 +704,7 @@ PMCID: PMC12107005</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9031">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9031/Vitali et al. - 2025 - Delivering the Lee Silverman voice treatment-loud method in-site versus telerehabilitation in people.pdf"/>
+        <z:attachment rdf:resource="files/9031/Vitali et al. - 2025 - Delivering the Lee Silverman voice treatment-loud method in-site versus telerehabilitation in people.pdf"/>
         <dc:title>SAGE PDF Full Text</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -827,7 +827,7 @@ PMCID: PMC12107005</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9039">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9039/Wienhold et al. - 2025 - The relationship of early life adversity and physiological synchrony within the therapeutic triad in.pdf"/>
+        <z:attachment rdf:resource="files/9039/Wienhold et al. - 2025 - The relationship of early life adversity and physiological synchrony within the therapeutic triad in.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -968,7 +968,7 @@ PMCID: PMC12098529</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9025">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9025/Lalk et al. - 2025 - Employing large language models for emotion detection in psychotherapy transcripts.pdf"/>
+        <z:attachment rdf:resource="files/9025/Lalk et al. - 2025 - Employing large language models for emotion detection in psychotherapy transcripts.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -981,7 +981,7 @@ PMCID: PMC12098529</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9035">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9035/Lalk et al. - 2025 - Employing large language models for emotion detection in psychotherapy transcripts.pdf"/>
+        <z:attachment rdf:resource="files/9035/Lalk et al. - 2025 - Employing large language models for emotion detection in psychotherapy transcripts.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -1335,7 +1335,7 @@ PMCID: PMC12086859</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9026">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9026/Trimble et al. - 2025 - Hybrid Virtual Group Model for Substance Use Disorder Therapy A Scoping Review.pdf"/>
+        <z:attachment rdf:resource="files/9026/Trimble et al. - 2025 - Hybrid Virtual Group Model for Substance Use Disorder Therapy A Scoping Review.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -1348,7 +1348,7 @@ PMCID: PMC12086859</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9030">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9030/Trimble et al. - 2025 - Hybrid Virtual Group Model for Substance Use Disorder Therapy A Scoping Review.pdf"/>
+        <z:attachment rdf:resource="files/9030/Trimble et al. - 2025 - Hybrid Virtual Group Model for Substance Use Disorder Therapy A Scoping Review.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -1522,7 +1522,7 @@ PMCID: PMC12080457</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9029">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9029/Teague et al. - 2025 - User-centred design and evaluation of an mHealth app for fathers' perinatal mental health a feasibi.pdf"/>
+        <z:attachment rdf:resource="files/9029/Teague et al. - 2025 - User-centred design and evaluation of an mHealth app for fathers' perinatal mental health a feasibi.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -1626,7 +1626,7 @@ PMCID: PMC12083506</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9034">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9034/Lakhan - 2025 - Introducing Digital Pharmacometrics A Pharmacokinetics (PK)Pharmacodynamics (PD) Framework for Pre.pdf"/>
+        <z:attachment rdf:resource="files/9034/Lakhan - 2025 - Introducing Digital Pharmacometrics A Pharmacokinetics (PK)Pharmacodynamics (PD) Framework for Pre.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -1755,7 +1755,7 @@ PMCID: PMC12081631</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9024">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9024/Lin et al. - 2025 - COMPASS Computational mapping of patient-therapist alliance strategies with language modeling.pdf"/>
+        <z:attachment rdf:resource="files/9024/Lin et al. - 2025 - COMPASS Computational mapping of patient-therapist alliance strategies with language modeling.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -1877,7 +1877,7 @@ PMCID: PMC12059440</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9023">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9023/Huang et al. - 2025 - How digital therapeutic alliances influence the perceived helpfulness of online mental health Q&amp;A A.pdf"/>
+        <z:attachment rdf:resource="files/9023/Huang et al. - 2025 - How digital therapeutic alliances influence the perceived helpfulness of online mental health Q&amp;A A.pdf"/>
         <dc:title>SAGE PDF Full Text</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -1942,7 +1942,7 @@ CONCLUSIONS: The WAI-SR is a reliable and valid tool for assessing therapeutic a
     </bib:Journal>
     <z:Attachment rdf:about="#item_9027">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9027/Stefana - 2025 - Evidence of Measurement Invariance in the Working Alliance Inventory Across In-Person and Videoconfe.pdf"/>
+        <z:attachment rdf:resource="files/9027/Stefana - 2025 - Evidence of Measurement Invariance in the Working Alliance Inventory Across In-Person and Videoconfe.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -1955,7 +1955,7 @@ CONCLUSIONS: The WAI-SR is a reliable and valid tool for assessing therapeutic a
     </z:Attachment>
     <z:Attachment rdf:about="#item_9028">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9028/Stefana - 2025 - Evidence of Measurement Invariance in the Working Alliance Inventory Across In-Person and Videoconfe.pdf"/>
+        <z:attachment rdf:resource="files/9028/Stefana - 2025 - Evidence of Measurement Invariance in the Working Alliance Inventory Across In-Person and Videoconfe.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -2467,7 +2467,7 @@ PMCID: PMC12044884</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9033">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9033/Barger - 2024 - Artificial intelligence vs. human coaches examining the development of working alliance in a single.pdf"/>
+        <z:attachment rdf:resource="files/9033/Barger - 2024 - Artificial intelligence vs. human coaches examining the development of working alliance in a single.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -2632,7 +2632,7 @@ PMCID: PMC12040759</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9022">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9022/Carpallo-Porcar et al. - 2025 - Perceptions and Experiences of a Multimodal Rehabilitation Program for People With Post-Acute COVID-.pdf"/>
+        <z:attachment rdf:resource="files/9022/Carpallo-Porcar et al. - 2025 - Perceptions and Experiences of a Multimodal Rehabilitation Program for People With Post-Acute COVID-.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -2766,7 +2766,7 @@ CONCLUSION: Findings underscore the potential of digital alliance in enhancing e
     </bib:Article>
     <z:Attachment rdf:about="#item_8964">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/8964/Macrynikola et al. - 2025 - Is digital alliance associated with engagement &amp; outcomes in guided digital interventions An analys.pdf"/>
+        <z:attachment rdf:resource="files/8964/Macrynikola et al. - 2025 - Is digital alliance associated with engagement &amp; outcomes in guided digital interventions An analys.pdf"/>
         <dc:title>PDF</dc:title>
         <link:type>application/pdf</link:type>
     </z:Attachment>
@@ -2859,7 +2859,7 @@ PMCID: PMC12006724</dc:description>
     </bib:Article>
     <z:Attachment rdf:about="#item_9032">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9032/Albert et Back - 2025 - Psychoanalytically informed MDMA-assisted therapy for pathological narcissism a novel theoretical a.pdf"/>
+        <z:attachment rdf:resource="files/9032/Albert et Back - 2025 - Psychoanalytically informed MDMA-assisted therapy for pathological narcissism a novel theoretical a.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -3016,7 +3016,7 @@ PMCID: PMC12022526</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_8963">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/8963/Schuler et al. - 2025 - Examining a Telemedicine-Based Virtual Reality Clinic in Treating Adults With Specific Phobia Proto.pdf"/>
+        <z:attachment rdf:resource="files/8963/Schuler et al. - 2025 - Examining a Telemedicine-Based Virtual Reality Clinic in Treating Adults With Specific Phobia Proto.pdf"/>
         <dc:title>PDF</dc:title>
         <link:type>application/pdf</link:type>
     </z:Attachment>
@@ -3164,7 +3164,7 @@ PMCID: PMC12015344</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_8962">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/8962/Wüllner et al. - 2025 - The Use of Mobile Apps in Adolescent Psychotherapy Assessment of Psychotherapists' Perspectives.pdf"/>
+        <z:attachment rdf:resource="files/8962/Wüllner et al. - 2025 - The Use of Mobile Apps in Adolescent Psychotherapy Assessment of Psychotherapists' Perspectives.pdf"/>
         <dc:title>PDF</dc:title>
         <link:type>application/pdf</link:type>
     </z:Attachment>
@@ -3276,7 +3276,7 @@ PMCID: PMC11940304</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9036">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9036/Rodriguez Mateos et al. - 2025 - The Role of Life History Questionnaires in Defining Individualised Goals of Care for Clinical Cognit.pdf"/>
+        <z:attachment rdf:resource="files/9036/Rodriguez Mateos et al. - 2025 - The Role of Life History Questionnaires in Defining Individualised Goals of Care for Clinical Cognit.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -3531,7 +3531,7 @@ CONCLUSION: Our findings suggest that using ESM self-monitoring tools can help f
     </bib:Journal>
     <z:Attachment rdf:about="#item_8965">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/8965/Alshami et al. - 2025 - Artificial Intelligence in rehabilitation A narrative review on advancing patient care.pdf"/>
+        <z:attachment rdf:resource="files/8965/Alshami et al. - 2025 - Artificial Intelligence in rehabilitation A narrative review on advancing patient care.pdf"/>
         <dc:title>PDF</dc:title>
         <link:type>application/pdf</link:type>
     </z:Attachment>
@@ -3661,7 +3661,7 @@ PMCID: PMC11923929</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9880">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9880/Broadbridge et al. - 2025 - Toward a therapeutic relationship A randomized control trial of the physical environment and client.pdf"/>
+        <z:attachment rdf:resource="files/9880/Broadbridge et al. - 2025 - Toward a therapeutic relationship A randomized control trial of the physical environment and client.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -3995,7 +3995,7 @@ PMCID: PMC11898254</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9892">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9892/Berrio Cuartas et al. - 2025 - Acceptability of VloV, a Mobile App Developed in Latin America for People with Substance Use Disorde.pdf"/>
+        <z:attachment rdf:resource="files/9892/Berrio Cuartas et al. - 2025 - Acceptability of VloV, a Mobile App Developed in Latin America for People with Substance Use Disorde.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -4612,7 +4612,7 @@ PMCID: PMC11848888</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9444">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9444/Kashefi et al. - 2025 - Tales of hope and hesitation Smoking cessation experts' views on the opportunities and risks of dig.pdf"/>
+        <z:attachment rdf:resource="files/9444/Kashefi et al. - 2025 - Tales of hope and hesitation Smoking cessation experts' views on the opportunities and risks of dig.pdf"/>
         <dc:title>SAGE PDF Full Text</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -4957,7 +4957,7 @@ PMCID: PMC12171660</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9876">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9876/Barakat et al. - 2025 - User Experience and Therapeutic Alliance of Treatment Completers of Clinician-Supported Versus Self-.pdf"/>
+        <z:attachment rdf:resource="files/9876/Barakat et al. - 2025 - User Experience and Therapeutic Alliance of Treatment Completers of Clinician-Supported Versus Self-.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -5501,7 +5501,7 @@ PMCID: PMC11822986</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9445">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9445/Flix-Valle et al. - 2025 - Therapeutic alliance in a stepped digital psychosocial intervention for breast cancer patients find.pdf"/>
+        <z:attachment rdf:resource="files/9445/Flix-Valle et al. - 2025 - Therapeutic alliance in a stepped digital psychosocial intervention for breast cancer patients find.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -5694,7 +5694,7 @@ PMCID: PMC11762742</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9446">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9446/Arnout et Alshehri - 2024 - Causal Relationships Between the Use of AI, Therapeutic Alliance, and Job Engagement Among Psycholog.pdf"/>
+        <z:attachment rdf:resource="files/9446/Arnout et Alshehri - 2024 - Causal Relationships Between the Use of AI, Therapeutic Alliance, and Job Engagement Among Psycholog.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -6178,7 +6178,7 @@ PMCID: PMC11721487</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9447">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9447/Villani et al. - 2025 - From Symptoms to Satisfaction Optimizing Patient-Centered Care in Dry Eye Disease.pdf"/>
+        <z:attachment rdf:resource="files/9447/Villani et al. - 2025 - From Symptoms to Satisfaction Optimizing Patient-Centered Care in Dry Eye Disease.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -6324,7 +6324,7 @@ PMCID: PMC11705707</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9889">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9889/Aarabi et al. - 2025 - Tele-rehabilitation for children with physical disabilities qualitative exploration of challenges i.pdf"/>
+        <z:attachment rdf:resource="files/9889/Aarabi et al. - 2025 - Tele-rehabilitation for children with physical disabilities qualitative exploration of challenges i.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -6472,7 +6472,7 @@ PMCID: PMC11675968</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9448">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9448/Sagui Henson et al. - 2024 - Utilization, Satisfaction, and Clinical Outcomes of People of Color and White Adults Using an Employ.pdf"/>
+        <z:attachment rdf:resource="files/9448/Sagui Henson et al. - 2024 - Utilization, Satisfaction, and Clinical Outcomes of People of Color and White Adults Using an Employ.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -6574,7 +6574,7 @@ PMCID: PMC11700981</dc:description>
     </bib:Article>
     <z:Attachment rdf:about="#item_9894">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9894/Kamp et al. - 2024 - The additional value of self-reflection and feedback on therapy outcome a pilot study.pdf"/>
+        <z:attachment rdf:resource="files/9894/Kamp et al. - 2024 - The additional value of self-reflection and feedback on therapy outcome a pilot study.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -7009,7 +7009,7 @@ PMCID: PMC11648025</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9449">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9449/Brotherdale et al. - 2024 - A qualitative study exploring the digital therapeutic alliance with fully automated smartphone apps.pdf"/>
+        <z:attachment rdf:resource="files/9449/Brotherdale et al. - 2024 - A qualitative study exploring the digital therapeutic alliance with fully automated smartphone apps.pdf"/>
         <dc:title>SAGE PDF Full Text</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -7185,7 +7185,7 @@ PMCID: PMC11645680</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9878">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9878/Beg et Verma - 2024 - Exploring the Potential and Challenges of Digital and AI-Driven Psychotherapy for ADHD, OCD, Schizop.pdf"/>
+        <z:attachment rdf:resource="files/9878/Beg et Verma - 2024 - Exploring the Potential and Challenges of Digital and AI-Driven Psychotherapy for ADHD, OCD, Schizop.pdf"/>
         <dc:title>SAGE PDF Full Text</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -7647,7 +7647,7 @@ PMCID: PMC11623782</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9450">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9450/Weck et al. - 2024 - Clinical supervision based on video vs. verbal report a randomized controlled trial.pdf"/>
+        <z:attachment rdf:resource="files/9450/Weck et al. - 2024 - Clinical supervision based on video vs. verbal report a randomized controlled trial.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -7983,7 +7983,7 @@ PMCID: PMC11574991</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9451">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9451/Lamarche et al. - 2024 - It is time to address fear of cancer recurrence in family caregivers protocol for the feasibility a.pdf"/>
+        <z:attachment rdf:resource="files/9451/Lamarche et al. - 2024 - It is time to address fear of cancer recurrence in family caregivers protocol for the feasibility a.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -8410,7 +8410,7 @@ CONCLUSION: The pursuit of equitable health care for First Nations communities d
     </bib:Journal>
     <z:Attachment rdf:about="#item_9886">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9886/Petry Moecke et al. - 2024 - First Nations Peoples' perspectives on telehealth physiotherapy a qualitative study focused on the.pdf"/>
+        <z:attachment rdf:resource="files/9886/Petry Moecke et al. - 2024 - First Nations Peoples' perspectives on telehealth physiotherapy a qualitative study focused on the.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -8790,7 +8790,7 @@ PMCID: PMC11528129</dc:description>
     </bib:Article>
     <z:Attachment rdf:about="#item_9452">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9452/Rodolico et al. - 2024 - Developing STEP-SE A Qualitative Usability Study of a Novel Patient-Reported Outcomes Tool for Mana.pdf"/>
+        <z:attachment rdf:resource="files/9452/Rodolico et al. - 2024 - Developing STEP-SE A Qualitative Usability Study of a Novel Patient-Reported Outcomes Tool for Mana.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -8885,7 +8885,7 @@ PMCID: PMC11520710</dc:description>
     </bib:Article>
     <z:Attachment rdf:about="#item_9879">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9879/Bormann et al. - 2024 - Patient Perceived Impact of Outpatient Group Substance Use Disorder Treatment in a Hybrid Model or V.pdf"/>
+        <z:attachment rdf:resource="files/9879/Bormann et al. - 2024 - Patient Perceived Impact of Outpatient Group Substance Use Disorder Treatment in a Hybrid Model or V.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -9091,7 +9091,7 @@ PMCID: PMC11476181</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9453">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9453/Stocker et al. - 2024 - Acceptability of DIDE, a mobile application designed at facilitating care adherence of patients wi.pdf"/>
+        <z:attachment rdf:resource="files/9453/Stocker et al. - 2024 - Acceptability of DIDE, a mobile application designed at facilitating care adherence of patients wi.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -9692,7 +9692,7 @@ PMCID: PMC11493873</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9454">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9454/Aragona et al. - 2024 - Utilising Narrative Medicine to Identify Key Factors Affecting Quality of Life in Dry Eye Disease A.pdf"/>
+        <z:attachment rdf:resource="files/9454/Aragona et al. - 2024 - Utilising Narrative Medicine to Identify Key Factors Affecting Quality of Life in Dry Eye Disease A.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -9792,7 +9792,7 @@ PMCID: PMC11421382</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9455">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9455/Lim et al. - 2024 - Synchrony within, synchrony without establishing the link between interpersonal behavioural and bra.pdf"/>
+        <z:attachment rdf:resource="files/9455/Lim et al. - 2024 - Synchrony within, synchrony without establishing the link between interpersonal behavioural and bra.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -9951,7 +9951,7 @@ PMCID: PMC11366565</dc:description>
     </bib:Article>
     <z:Attachment rdf:about="#item_9456">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9456/Joseph et Babu - 2024 - Transference and the psychological interplay in AI-enhanced mental healthcare.pdf"/>
+        <z:attachment rdf:resource="files/9456/Joseph et Babu - 2024 - Transference and the psychological interplay in AI-enhanced mental healthcare.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -10086,7 +10086,7 @@ PMCID: PMC11375385</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9457">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9457/Shaker et al. - 2024 - Capturing Patients' and Clinicians' Experiences of Using Video Consultations in Mental Health Outpat.pdf"/>
+        <z:attachment rdf:resource="files/9457/Shaker et al. - 2024 - Capturing Patients' and Clinicians' Experiences of Using Video Consultations in Mental Health Outpat.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -10165,7 +10165,7 @@ PMCID: PMC11331869</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9458">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9458/Lundqvist et al. - 2024 - Swedish elite athletes' experiences of psychotherapy for mental health concerns provided by licensed.pdf"/>
+        <z:attachment rdf:resource="files/9458/Lundqvist et al. - 2024 - Swedish elite athletes' experiences of psychotherapy for mental health concerns provided by licensed.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -10460,7 +10460,7 @@ PMCID: PMC11336496</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9459">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9459/He et al. - 2024 - Effectiveness and User Experience of a Smoking Cessation Chatbot Mixed Methods Study Comparing Moti.pdf"/>
+        <z:attachment rdf:resource="files/9459/He et al. - 2024 - Effectiveness and User Experience of a Smoking Cessation Chatbot Mixed Methods Study Comparing Moti.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -10564,7 +10564,7 @@ PMCID: PMC11336496</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9881">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9881/Choong - 2024 - Digital-first primary care An ambivalent legacy of Covid-19.pdf"/>
+        <z:attachment rdf:resource="files/9881/Choong - 2024 - Digital-first primary care An ambivalent legacy of Covid-19.pdf"/>
         <dc:title>SAGE PDF Full Text</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -10710,7 +10710,7 @@ PMCID: PMC11282445</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9460">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9460/DeCourcey et al. - 2024 - Feasibility of a Serious Illness Communication Program for Pediatric Advance Care Planning.pdf"/>
+        <z:attachment rdf:resource="files/9460/DeCourcey et al. - 2024 - Feasibility of a Serious Illness Communication Program for Pediatric Advance Care Planning.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -10837,7 +10837,7 @@ CONCLUSION: Digital treatment delivery was in general perceived as a time-effici
     </bib:Journal>
     <z:Attachment rdf:about="#item_9461">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9461/Cronström et Sjödahl Hammarlund - 2025 - A feeling of being part of the future a qualitative study on physical therapists' experiences of.pdf"/>
+        <z:attachment rdf:resource="files/9461/Cronström et Sjödahl Hammarlund - 2025 - A feeling of being part of the future a qualitative study on physical therapists' experiences of.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -10972,7 +10972,7 @@ PMCID: PMC11264746</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9462">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9462/Krasovsky et al. - 2024 - Hybrid approaches to allied health services for children and young people a scoping review.pdf"/>
+        <z:attachment rdf:resource="files/9462/Krasovsky et al. - 2024 - Hybrid approaches to allied health services for children and young people a scoping review.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -11673,7 +11673,7 @@ PMCID: PMC11179025</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9463">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9463/Doukani et al. - 2024 - Comparison of the Working Alliance in Blended Cognitive Behavioral Therapy and Treatment as Usual fo.pdf"/>
+        <z:attachment rdf:resource="files/9463/Doukani et al. - 2024 - Comparison of the Working Alliance in Blended Cognitive Behavioral Therapy and Treatment as Usual fo.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -12115,7 +12115,7 @@ PMCID: PMC11083959</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9464">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9464/Schramm et al. - 2024 - Algorithm-based modular psychotherapy vs. cognitive-behavioral therapy for patients with depression,.pdf"/>
+        <z:attachment rdf:resource="files/9464/Schramm et al. - 2024 - Algorithm-based modular psychotherapy vs. cognitive-behavioral therapy for patients with depression,.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -12302,7 +12302,7 @@ PMCID: PMC11083959</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9465">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9465/Stern et al. - 2025 - Redefining the relationship in digital care A qualitative study of the Digital Therapeutic Alliance.pdf"/>
+        <z:attachment rdf:resource="files/9465/Stern et al. - 2025 - Redefining the relationship in digital care A qualitative study of the Digital Therapeutic Alliance.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -12444,7 +12444,7 @@ PMCID: PMC11109852</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9466">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9466/O'Kane et al. - 2024 - Correction Development of Therapeutic Alliance and Social Presence in a Digital Intervention for Pe.pdf"/>
+        <z:attachment rdf:resource="files/9466/O'Kane et al. - 2024 - Correction Development of Therapeutic Alliance and Social Presence in a Digital Intervention for Pe.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -12642,7 +12642,7 @@ PMCID: PMC11064757</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9467">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9467/Sicard et al. - 2024 - Acceptability, usability, and credibility of a mindfulness-based digital therapeutic for pediatric c.pdf"/>
+        <z:attachment rdf:resource="files/9467/Sicard et al. - 2024 - Acceptability, usability, and credibility of a mindfulness-based digital therapeutic for pediatric c.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -12778,7 +12778,7 @@ PMCID: PMC11064757</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9468">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9468/Morrissey et al. - 2024 - Could neurofeedback improve therapist-patient communication Considering the potential for neuroscie.pdf"/>
+        <z:attachment rdf:resource="files/9468/Morrissey et al. - 2024 - Could neurofeedback improve therapist-patient communication Considering the potential for neuroscie.pdf"/>
         <dc:title>Version soumise</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -12939,7 +12939,7 @@ PMCID: PMC11017492</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9469">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9469/Yao et al. - 2024 - The impact of scaffolded and non-scaffolded suicidal virtual human interaction training on clinician.pdf"/>
+        <z:attachment rdf:resource="files/9469/Yao et al. - 2024 - The impact of scaffolded and non-scaffolded suicidal virtual human interaction training on clinician.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -13332,7 +13332,7 @@ PMCID: PMC11004048</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9470">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9470/Cevasco et al. - 2024 - Patient Engagement with Conversational Agents in Health Applications 2016-2022 A Systematic Review.pdf"/>
+        <z:attachment rdf:resource="files/9470/Cevasco et al. - 2024 - Patient Engagement with Conversational Agents in Health Applications 2016-2022 A Systematic Review.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -13514,7 +13514,7 @@ PMCID: PMC11196307</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9471">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9471/Lalk et al. - 2024 - Measuring Alliance and Symptom Severity in Psychotherapy Transcripts Using Bert Topic Modeling.pdf"/>
+        <z:attachment rdf:resource="files/9471/Lalk et al. - 2024 - Measuring Alliance and Symptom Severity in Psychotherapy Transcripts Using Bert Topic Modeling.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -13882,7 +13882,7 @@ PMCID: PMC10945007</dc:description>
     </bib:Article>
     <z:Attachment rdf:about="#item_9472">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9472/Brand et al. - 2024 - The effect of the cultural formulation interview on therapeutic working alliance a study protocol.pdf"/>
+        <z:attachment rdf:resource="files/9472/Brand et al. - 2024 - The effect of the cultural formulation interview on therapeutic working alliance a study protocol.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -14285,7 +14285,7 @@ PMCID: PMC10973955</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9473">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9473/Thibaudeau et al. - 2024 - Navigating Social Cognitive Impairments in Schizophrenia Spectrum Disorders Protocol for a Pilot Pr.pdf"/>
+        <z:attachment rdf:resource="files/9473/Thibaudeau et al. - 2024 - Navigating Social Cognitive Impairments in Schizophrenia Spectrum Disorders Protocol for a Pilot Pr.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -14395,7 +14395,7 @@ PMCID: PMC10897019</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9474">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9474/Kuhn et al. - 2024 - Eliciting perspectives on remote healthcare delivery from service users with psychosis in the commun.pdf"/>
+        <z:attachment rdf:resource="files/9474/Kuhn et al. - 2024 - Eliciting perspectives on remote healthcare delivery from service users with psychosis in the commun.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -14526,7 +14526,7 @@ PMCID: PMC10885453</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9475">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9475/Mayer et al. - 2024 - Views of German mental health professionals on the use of digital mental health interventions for ea.pdf"/>
+        <z:attachment rdf:resource="files/9475/Mayer et al. - 2024 - Views of German mental health professionals on the use of digital mental health interventions for ea.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -14688,7 +14688,7 @@ PMCID: PMC10912991</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9476">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9476/Thapar et al. - 2024 - Patient and Therapist Perceptions of a Publicly Funded Internet-Based Cognitive Behavioral Therapy (.pdf"/>
+        <z:attachment rdf:resource="files/9476/Thapar et al. - 2024 - Patient and Therapist Perceptions of a Publicly Funded Internet-Based Cognitive Behavioral Therapy (.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -14840,7 +14840,7 @@ PMCID: PMC10869898</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9477">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9477/Cohen Rodrigues et al. - 2024 - Human cues in eHealth to promote lifestyle change An experimental field study to examine adherence.pdf"/>
+        <z:attachment rdf:resource="files/9477/Cohen Rodrigues et al. - 2024 - Human cues in eHealth to promote lifestyle change An experimental field study to examine adherence.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -15214,7 +15214,7 @@ PMCID: PMC10807288</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9478">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9478/Saccà et al. - 2023 - The ménage à trois of healthcare the actors in after-AI era under patient consent.pdf"/>
+        <z:attachment rdf:resource="files/9478/Saccà et al. - 2023 - The ménage à trois of healthcare the actors in after-AI era under patient consent.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -15440,7 +15440,7 @@ PMCID: PMC10809066</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9479">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9479/Sirohi et al. - 2024 - High-Quality eHealth Websites for Information on Endometriosis Systematic Search.pdf"/>
+        <z:attachment rdf:resource="files/9479/Sirohi et al. - 2024 - High-Quality eHealth Websites for Information on Endometriosis Systematic Search.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -15590,7 +15590,7 @@ PMCID: PMC10809066</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9480">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9480/Hinz - 2024 - Filling the form Expressive Therapies Continuum-guided treatment of narcissistic personality disord.pdf"/>
+        <z:attachment rdf:resource="files/9480/Hinz - 2024 - Filling the form Expressive Therapies Continuum-guided treatment of narcissistic personality disord.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -15693,7 +15693,7 @@ PMCID: PMC10809066</dc:description>
     </bib:Article>
     <z:Attachment rdf:about="#item_9481">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9481/Bird et Caligor - 2024 - A case report of the treatment of narcissistic personality disorder with transference focused psycho.pdf"/>
+        <z:attachment rdf:resource="files/9481/Bird et Caligor - 2024 - A case report of the treatment of narcissistic personality disorder with transference focused psycho.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -15848,7 +15848,7 @@ CONCLUSIONS: The results of this study show that video-based physiotherapy, whil
     </z:Attachment>
     <z:Attachment rdf:about="#item_9482">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9482/Lange et Danielsson - 2024 - Reaching for connection a qualitative study of communication and interaction in video-based physiot.pdf"/>
+        <z:attachment rdf:resource="files/9482/Lange et Danielsson - 2024 - Reaching for connection a qualitative study of communication and interaction in video-based physiot.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -16126,7 +16126,7 @@ CONCLUSIONS: Fair accuracies were only attainable by involving information from 
     </z:Attachment>
     <z:Attachment rdf:about="#item_9483">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9483/Hammelrath et al. - 2024 - Select or adjust How information from early treatment stages boosts the prediction of non-response.pdf"/>
+        <z:attachment rdf:resource="files/9483/Hammelrath et al. - 2024 - Select or adjust How information from early treatment stages boosts the prediction of non-response.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -16340,7 +16340,7 @@ PMCID: PMC10706943</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9484">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9484/Cercato et al. - 2023 - Narrative Medicine A Digital Diary in the Management of Patients with Bone and Soft Tissue Sarcoma-.pdf"/>
+        <z:attachment rdf:resource="files/9484/Cercato et al. - 2023 - Narrative Medicine A Digital Diary in the Management of Patients with Bone and Soft Tissue Sarcoma-.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -16431,7 +16431,7 @@ PMCID: PMC10706943</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9891">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9891/Aouacheria - 2023 - [Should we be afraid of dental robots].pdf"/>
+        <z:attachment rdf:resource="files/9891/Aouacheria - 2023 - [Should we be afraid of dental robots].pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -16568,7 +16568,7 @@ PMCID: PMC10722365</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9485">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9485/Hasan et al. - 2023 - The Efficacy and Therapeutic Alliance of Augmented Reality Exposure Therapy in Treating Adults With.pdf"/>
+        <z:attachment rdf:resource="files/9485/Hasan et al. - 2023 - The Efficacy and Therapeutic Alliance of Augmented Reality Exposure Therapy in Treating Adults With.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -16653,7 +16653,7 @@ PMCID: PMC10663264</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9486">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9486/Khawaja et Bélisle-Pipon - 2023 - Your robot therapist is not your therapist understanding the role of AI-powered mental health chatb.pdf"/>
+        <z:attachment rdf:resource="files/9486/Khawaja et Bélisle-Pipon - 2023 - Your robot therapist is not your therapist understanding the role of AI-powered mental health chatb.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -16803,7 +16803,7 @@ PMCID: PMC10682917</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9487">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9487/von Wulffen et al. - 2023 - German Version of the Mobile Agnew Relationship Measure Translation and Validation Study.pdf"/>
+        <z:attachment rdf:resource="files/9487/von Wulffen et al. - 2023 - German Version of the Mobile Agnew Relationship Measure Translation and Validation Study.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -16915,7 +16915,7 @@ EXPERT OPINION: WB001 is a dynamic and personalized tool with which patients may
     </bib:Journal>
     <z:Attachment rdf:about="#item_9488">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9488/Darcy et al. - 2023 - Anatomy of a Woebot® (WB001) agent guided CBT for women with postpartum depression.pdf"/>
+        <z:attachment rdf:resource="files/9488/Darcy et al. - 2023 - Anatomy of a Woebot® (WB001) agent guided CBT for women with postpartum depression.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -17003,7 +17003,7 @@ PMCID: PMC10627438</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9489">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9489/Kiburi et al. - 2023 - Exploring user experiences of a text message-delivered intervention among individuals on opioid use.pdf"/>
+        <z:attachment rdf:resource="files/9489/Kiburi et al. - 2023 - Exploring user experiences of a text message-delivered intervention among individuals on opioid use.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -17170,7 +17170,7 @@ PMCID: PMC10660207</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9490">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9490/Lv et al. - 2023 - Association Between User Interaction and Treatment Response of a Voice-Based Coach for Treating Depr.pdf"/>
+        <z:attachment rdf:resource="files/9490/Lv et al. - 2023 - Association Between User Interaction and Treatment Response of a Voice-Based Coach for Treating Depr.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -17273,7 +17273,7 @@ PMCID: PMC10588464</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9491">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9491/Lochner et al. - 2023 - Editorial Obsessive-compulsive related disorders (OCRD) across the lifespan.pdf"/>
+        <z:attachment rdf:resource="files/9491/Lochner et al. - 2023 - Editorial Obsessive-compulsive related disorders (OCRD) across the lifespan.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -17696,7 +17696,7 @@ PMCID: PMC10612009</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9492">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9492/Hoffman et al. - 2023 - User Engagement Clusters of an 8-Week Digital Mental Health Intervention Guided by a Relational Agen.pdf"/>
+        <z:attachment rdf:resource="files/9492/Hoffman et al. - 2023 - User Engagement Clusters of an 8-Week Digital Mental Health Intervention Guided by a Relational Agen.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -17790,7 +17790,7 @@ PMCID: PMC10612009</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9493">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9493/Preisz - 2023 - Social media use and paediatric practice Hippocratic help, hype or harm.pdf"/>
+        <z:attachment rdf:resource="files/9493/Preisz - 2023 - Social media use and paediatric practice Hippocratic help, hype or harm.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -17917,7 +17917,7 @@ PMCID: PMC10612009</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9494">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9494/Barnes et al. - 2024 - Practitioner warmth and empathy attenuates the nocebo effect and enhances the placebo effect.pdf"/>
+        <z:attachment rdf:resource="files/9494/Barnes et al. - 2024 - Practitioner warmth and empathy attenuates the nocebo effect and enhances the placebo effect.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -18303,7 +18303,7 @@ PMCID: PMC10565637</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9495">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9495/Wutz et al. - 2023 - Factors Influencing the Acceptability, Acceptance, and Adoption of Conversational Agents in Health C.pdf"/>
+        <z:attachment rdf:resource="files/9495/Wutz et al. - 2023 - Factors Influencing the Acceptability, Acceptance, and Adoption of Conversational Agents in Health C.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -18536,7 +18536,7 @@ PMCID: PMC10503929</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9496">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9496/Berk et al. - 2023 - Comorbidity between major depressive disorder and physical diseases a comprehensive review of epide.pdf"/>
+        <z:attachment rdf:resource="files/9496/Berk et al. - 2023 - Comorbidity between major depressive disorder and physical diseases a comprehensive review of epide.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -18841,7 +18841,7 @@ PMCID: PMC10512110</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9497">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9497/Huffman et al. - 2023 - Satisfaction, Perceived Usefulness, and Therapeutic Alliance as Correlates of Participant Engagement.pdf"/>
+        <z:attachment rdf:resource="files/9497/Huffman et al. - 2023 - Satisfaction, Perceived Usefulness, and Therapeutic Alliance as Correlates of Participant Engagement.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -19201,7 +19201,7 @@ PMCID: PMC10466152</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9498">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9498/Solness et al. - 2023 - Relationship Factors in Internet-Delivered Psychological Interventions for Veterans Experiencing Pos.pdf"/>
+        <z:attachment rdf:resource="files/9498/Solness et al. - 2023 - Relationship Factors in Internet-Delivered Psychological Interventions for Veterans Experiencing Pos.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -19396,7 +19396,7 @@ PMCID: PMC9885927</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9499">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9499/Dambi et al. - 2023 - The impact of working alliance in managing youth anxiety and depression a scoping review.pdf"/>
+        <z:attachment rdf:resource="files/9499/Dambi et al. - 2023 - The impact of working alliance in managing youth anxiety and depression a scoping review.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -19482,7 +19482,7 @@ PMCID: PMC10352334</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9500">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9500/Wei et al. - 2023 - A randomised controlled test of emotional attributes of a virtual coach within a virtual reality (VR.pdf"/>
+        <z:attachment rdf:resource="files/9500/Wei et al. - 2023 - A randomised controlled test of emotional attributes of a virtual coach within a virtual reality (VR.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -19593,7 +19593,7 @@ PMCID: PMC10382949</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9501">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9501/Ezawa et al. - 2023 - Examining Predictors of Depression and Anxiety Symptom Change in Cognitive Behavioral Immersion Obs.pdf"/>
+        <z:attachment rdf:resource="files/9501/Ezawa et al. - 2023 - Examining Predictors of Depression and Anxiety Symptom Change in Cognitive Behavioral Immersion Obs.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -19697,7 +19697,7 @@ PMCID: PMC10342975</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9502">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9502/Heredia-Callejón et al. - 2023 - Influence of the Therapeutic Alliance on the Rehabilitation of Stroke A Systematic Review of Qualit.pdf"/>
+        <z:attachment rdf:resource="files/9502/Heredia-Callejón et al. - 2023 - Influence of the Therapeutic Alliance on the Rehabilitation of Stroke A Systematic Review of Qualit.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -19909,7 +19909,7 @@ PMCID: PMC10342975</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9503">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9503/Smith et al. - 2023 - A case study of virtually delivered emotion-focused family therapy.pdf"/>
+        <z:attachment rdf:resource="files/9503/Smith et al. - 2023 - A case study of virtually delivered emotion-focused family therapy.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -20183,7 +20183,7 @@ PMCID: PMC10283211</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9504">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9504/Mills et al. - 2023 - Comparison of MI-oriented versus CBT-oriented adjunctive treatments impacts on therapeutic alliance.pdf"/>
+        <z:attachment rdf:resource="files/9504/Mills et al. - 2023 - Comparison of MI-oriented versus CBT-oriented adjunctive treatments impacts on therapeutic alliance.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -20344,7 +20344,7 @@ PMCID: PMC10293846</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9505">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9505/Ellingsen et al. - 2023 - Brain-to-brain mechanisms underlying pain empathy and social modulation of pain in the patient-clini.pdf"/>
+        <z:attachment rdf:resource="files/9505/Ellingsen et al. - 2023 - Brain-to-brain mechanisms underlying pain empathy and social modulation of pain in the patient-clini.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -20458,7 +20458,7 @@ PMCID: PMC10267322</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9506">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9506/Grodniewicz et Hohol - 2023 - Waiting for a digital therapist three challenges on the path to psychotherapy delivered by artifici.pdf"/>
+        <z:attachment rdf:resource="files/9506/Grodniewicz et Hohol - 2023 - Waiting for a digital therapist three challenges on the path to psychotherapy delivered by artifici.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -20575,7 +20575,7 @@ PMCID: PMC10267322</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9883">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9883/Folke et al. - 2023 - Feasibility of Virtual Reality Exposure Therapy in the Treatment of Danish Veterans with Post-Trauma.pdf"/>
+        <z:attachment rdf:resource="files/9883/Folke et al. - 2023 - Feasibility of Virtual Reality Exposure Therapy in the Treatment of Danish Veterans with Post-Trauma.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -20748,7 +20748,7 @@ PMCID: PMC10357375</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9507">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9507/Shaker et al. - 2023 - Psychiatric Treatment Conducted via Telemedicine Versus In-Person Modality in Posttraumatic Stress D.pdf"/>
+        <z:attachment rdf:resource="files/9507/Shaker et al. - 2023 - Psychiatric Treatment Conducted via Telemedicine Versus In-Person Modality in Posttraumatic Stress D.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -20853,7 +20853,7 @@ PMCID: PMC10235420</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9508">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9508/Carlbring et al. - 2023 - A new era in Internet interventions The advent of Chat-GPT and AI-assisted therapist guidance.pdf"/>
+        <z:attachment rdf:resource="files/9508/Carlbring et al. - 2023 - A new era in Internet interventions The advent of Chat-GPT and AI-assisted therapist guidance.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -20956,7 +20956,7 @@ PMCID: PMC10233974</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9509">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9509/Fritz et Kongsted - 2023 - A new paradigm for musculoskeletal pain care moving beyond structural impairments. Conclusion of a.pdf"/>
+        <z:attachment rdf:resource="files/9509/Fritz et Kongsted - 2023 - A new paradigm for musculoskeletal pain care moving beyond structural impairments. Conclusion of a.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -21049,7 +21049,7 @@ PMCID: PMC10233974</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9890">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9890/Alfonso - 2023 - Clinical Implications of Countertransference in the Treatment of Addictions.pdf"/>
+        <z:attachment rdf:resource="files/9890/Alfonso - 2023 - Clinical Implications of Countertransference in the Treatment of Addictions.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -21156,7 +21156,7 @@ PMCID: PMC10225921</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9510">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9510/Ryu et al. - 2023 - A natural language processing approach reveals first-person pronoun usage and non-fluency as markers.pdf"/>
+        <z:attachment rdf:resource="files/9510/Ryu et al. - 2023 - A natural language processing approach reveals first-person pronoun usage and non-fluency as markers.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -21261,7 +21261,7 @@ PMCID: PMC10225735</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9511">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9511/Horigome et al. - 2023 - Modification of the therapist's facial expressions using virtual reality technology during the treat.pdf"/>
+        <z:attachment rdf:resource="files/9511/Horigome et al. - 2023 - Modification of the therapist's facial expressions using virtual reality technology during the treat.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -21371,7 +21371,7 @@ PMCID: PMC10212105</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9512">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9512/Hannigan et al. - 2023 - Factors associated with the outcomes of a novel virtual reality therapy for military veterans with P.pdf"/>
+        <z:attachment rdf:resource="files/9512/Hannigan et al. - 2023 - Factors associated with the outcomes of a novel virtual reality therapy for military veterans with P.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -21572,7 +21572,7 @@ PMCID: PMC10333891</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9513">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9513/Auxier et al. - 2023 - Patient engagement practice within perinatal eHealth A scoping review.pdf"/>
+        <z:attachment rdf:resource="files/9513/Auxier et al. - 2023 - Patient engagement practice within perinatal eHealth A scoping review.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -21690,7 +21690,7 @@ PMCID: PMC10182448</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9514">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9514/Andrews et al. - 2023 - Evaluation of Various Support Intensities of Digital Mental Health Treatment for Reducing Anxiety an.pdf"/>
+        <z:attachment rdf:resource="files/9514/Andrews et al. - 2023 - Evaluation of Various Support Intensities of Digital Mental Health Treatment for Reducing Anxiety an.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -21827,7 +21827,7 @@ PMCID: PMC10173033</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9515">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9515/Zech et al. - 2023 - An Integrative Engagement Model of Digital Psychotherapy Exploratory Focus Group Findings.pdf"/>
+        <z:attachment rdf:resource="files/9515/Zech et al. - 2023 - An Integrative Engagement Model of Digital Psychotherapy Exploratory Focus Group Findings.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -21956,7 +21956,7 @@ PMCID: PMC10173033</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9516">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9516/Tong et al. - 2023 - Conceptualizing the digital therapeutic alliance in the context of fully automated mental health app.pdf"/>
+        <z:attachment rdf:resource="files/9516/Tong et al. - 2023 - Conceptualizing the digital therapeutic alliance in the context of fully automated mental health app.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -22046,7 +22046,7 @@ PMCID: PMC10040602</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9517">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9517/Spitzer et al. - 2023 - Digital twins and the future of precision mental health.pdf"/>
+        <z:attachment rdf:resource="files/9517/Spitzer et al. - 2023 - Digital twins and the future of precision mental health.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -22122,7 +22122,7 @@ PMCID: PMC10058075</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9518">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9518/Kopka et al. - 2023 - Exploring how informed mental health app selection may impact user engagement and satisfaction.pdf"/>
+        <z:attachment rdf:resource="files/9518/Kopka et al. - 2023 - Exploring how informed mental health app selection may impact user engagement and satisfaction.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -22341,7 +22341,7 @@ PMCID: PMC10131838</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9519">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9519/Vollert et al. - 2023 - Effectiveness of an App-Based Short Intervention to Improve Sleep Randomized Controlled Trial.pdf"/>
+        <z:attachment rdf:resource="files/9519/Vollert et al. - 2023 - Effectiveness of an App-Based Short Intervention to Improve Sleep Randomized Controlled Trial.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -22441,7 +22441,7 @@ PMCID: PMC10009260</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9520">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9520/McParlin et al. - 2023 - Therapeutic touch and therapeutic alliance in pediatric care and neonatology An active inference fr.pdf"/>
+        <z:attachment rdf:resource="files/9520/McParlin et al. - 2023 - Therapeutic touch and therapeutic alliance in pediatric care and neonatology An active inference fr.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -22542,7 +22542,7 @@ PMCID: PMC10001645</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9521">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9521/Kali et Malka - 2023 - It's Not Just Me, It's Us, Together The Embodied of the Wounded Healer in the Role of Sex Trade Sur.pdf"/>
+        <z:attachment rdf:resource="files/9521/Kali et Malka - 2023 - It's Not Just Me, It's Us, Together The Embodied of the Wounded Healer in the Role of Sex Trade Sur.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -22721,7 +22721,7 @@ PMCID: PMC10024210</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9522">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9522/Chiauzzi et al. - 2023 - A Relational Agent Intervention for Adolescents Seeking Mental Health Treatment Protocol for a Rand.pdf"/>
+        <z:attachment rdf:resource="files/9522/Chiauzzi et al. - 2023 - A Relational Agent Intervention for Adolescents Seeking Mental Health Treatment Protocol for a Rand.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -22905,7 +22905,7 @@ PMCID: PMC9925417</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9523">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9523/van Rooij et al. - 2023 - Youth care in time of COVID-19 Experiences of professionals and adolescent clients with telehealth.pdf"/>
+        <z:attachment rdf:resource="files/9523/van Rooij et al. - 2023 - Youth care in time of COVID-19 Experiences of professionals and adolescent clients with telehealth.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -23053,7 +23053,7 @@ PMCID: PMC9951081</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9524">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9524/Currey et Torous - 2023 - Digital Phenotyping Data to Predict Symptom Improvement and Mental Health App Personalization in Col.pdf"/>
+        <z:attachment rdf:resource="files/9524/Currey et Torous - 2023 - Digital Phenotyping Data to Predict Symptom Improvement and Mental Health App Personalization in Col.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -23173,7 +23173,7 @@ PMCID: PMC9887144</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9525">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9525/Morrow et al. - 2022 - Artificial intelligence technologies and compassion in healthcare A systematic scoping review.pdf"/>
+        <z:attachment rdf:resource="files/9525/Morrow et al. - 2022 - Artificial intelligence technologies and compassion in healthcare A systematic scoping review.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -23347,7 +23347,7 @@ PMCID: PMC9743966</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9526">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9526/Li et al. - 2022 - Development of a measure quantifying helpful psychotherapy interventions The Helpful Therapeutic At.pdf"/>
+        <z:attachment rdf:resource="files/9526/Li et al. - 2022 - Development of a measure quantifying helpful psychotherapy interventions The Helpful Therapeutic At.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -23436,7 +23436,7 @@ PMCID: PMC9743966</dc:description>
     </bib:Article>
     <z:Attachment rdf:about="#item_9527">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9527/Goldman et Goldstein - 2023 - Guiding task work in the context of an emotion-focused relationship.pdf"/>
+        <z:attachment rdf:resource="files/9527/Goldman et Goldstein - 2023 - Guiding task work in the context of an emotion-focused relationship.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -23518,7 +23518,7 @@ PMCID: PMC9719035</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9528">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9528/Scheuer et Torous - 2022 - Usable Data Visualization for Digital Biomarkers An Analysis of Usability, Data Sharing, and Clinic.pdf"/>
+        <z:attachment rdf:resource="files/9528/Scheuer et Torous - 2022 - Usable Data Visualization for Digital Biomarkers An Analysis of Usability, Data Sharing, and Clinic.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -23738,7 +23738,7 @@ PMCID: PMC9661449</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9529">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9529/Witteveen et al. - 2022 - Remote mental health care interventions during the COVID-19 pandemic An umbrella review.pdf"/>
+        <z:attachment rdf:resource="files/9529/Witteveen et al. - 2022 - Remote mental health care interventions during the COVID-19 pandemic An umbrella review.pdf"/>
         <dc:title>Version acceptée</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -23829,7 +23829,7 @@ PMCID: PMC9667335</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9530">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9530/Notermans et Philippot - 2022 - Psychotherapy Under Lockdown The Use and Experience of Teleconsultation by Psychotherapists During.pdf"/>
+        <z:attachment rdf:resource="files/9530/Notermans et Philippot - 2022 - Psychotherapy Under Lockdown The Use and Experience of Teleconsultation by Psychotherapists During.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -23943,7 +23943,7 @@ PMCID: PMC9667344</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9531">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9531/Hofmann et al. - 2022 - What Is the Common Ground for Modern Psychotherapy A Discussion Paper Based on EACLIPT's 1st Webina.pdf"/>
+        <z:attachment rdf:resource="files/9531/Hofmann et al. - 2022 - What Is the Common Ground for Modern Psychotherapy A Discussion Paper Based on EACLIPT's 1st Webina.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -24061,7 +24061,7 @@ PMCID: PMC9664669</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9532">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9532/Saragiotto et al. - 2022 - Can you be a manual therapist without using your hands.pdf"/>
+        <z:attachment rdf:resource="files/9532/Saragiotto et al. - 2022 - Can you be a manual therapist without using your hands.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -24437,7 +24437,7 @@ PMCID: PMC9680932</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9533">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9533/He et al. - 2022 - Mental Health Chatbot for Young Adults With Depressive Symptoms During the COVID-19 Pandemic Single.pdf"/>
+        <z:attachment rdf:resource="files/9533/He et al. - 2022 - Mental Health Chatbot for Young Adults With Depressive Symptoms During the COVID-19 Pandemic Single.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -24525,7 +24525,7 @@ PMCID: PMC9679949</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9534">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9534/Hallgren - 2022 - Remotely Assessing Mechanisms of Behavioral Change in Community Substance Use Disorder Treatment to.pdf"/>
+        <z:attachment rdf:resource="files/9534/Hallgren - 2022 - Remotely Assessing Mechanisms of Behavioral Change in Community Substance Use Disorder Treatment to.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -24706,7 +24706,7 @@ PMCID: PMC9675017</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9535">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9535/Paetzold et al. - 2022 - A Hybrid Ecological Momentary Compassion-Focused Intervention for Enhancing Resilience in Help-Seeki.pdf"/>
+        <z:attachment rdf:resource="files/9535/Paetzold et al. - 2022 - A Hybrid Ecological Momentary Compassion-Focused Intervention for Enhancing Resilience in Help-Seeki.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -24840,7 +24840,7 @@ PMCID: PMC10092498</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9536">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9536/Oudshoorn et al. - 2023 - Measuring working alliance and technical alliance from the perspective of healthcare professionals w.pdf"/>
+        <z:attachment rdf:resource="files/9536/Oudshoorn et al. - 2023 - Measuring working alliance and technical alliance from the perspective of healthcare professionals w.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -25008,7 +25008,7 @@ PMCID: PMC9647453</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9537">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9537/Vitger et al. - 2022 - A Smartphone App to Promote Patient Activation and Support Shared Decision-making in People With a D.pdf"/>
+        <z:attachment rdf:resource="files/9537/Vitger et al. - 2022 - A Smartphone App to Promote Patient Activation and Support Shared Decision-making in People With a D.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -25151,7 +25151,7 @@ PMCID: PMC9644251</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9538">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9538/Amarti et al. - 2022 - Feasibility of Digital Cognitive Behavioral Therapy for Depressed Older Adults With the Moodbuster P.pdf"/>
+        <z:attachment rdf:resource="files/9538/Amarti et al. - 2022 - Feasibility of Digital Cognitive Behavioral Therapy for Depressed Older Adults With the Moodbuster P.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -25264,7 +25264,7 @@ PMCID: PMC9636526</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9539">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9539/Mehta et al. - 2022 - Motor Resonance During Action Observation and Its Relevance to Virtual Clinical Consultations Obser.pdf"/>
+        <z:attachment rdf:resource="files/9539/Mehta et al. - 2022 - Motor Resonance During Action Observation and Its Relevance to Virtual Clinical Consultations Obser.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -25380,7 +25380,7 @@ PMCID: PMC9803736</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9540">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9540/Heafala et al. - 2022 - Informing care through lived experiences perspectives of consumers and carers regarding dietetic ca.pdf"/>
+        <z:attachment rdf:resource="files/9540/Heafala et al. - 2022 - Informing care through lived experiences perspectives of consumers and carers regarding dietetic ca.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -25466,7 +25466,7 @@ PMCID: PMC9510258</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9541">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9541/Christopher et Tamplin - 2022 - The Use of Kinesthetic Empathy with Adults Living with Treatment Resistant Depression A Survey Stud.pdf"/>
+        <z:attachment rdf:resource="files/9541/Christopher et Tamplin - 2022 - The Use of Kinesthetic Empathy with Adults Living with Treatment Resistant Depression A Survey Stud.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -25529,7 +25529,7 @@ PMCID: PMC9510258</dc:description>
     </bib:BookSection>
     <z:Attachment rdf:about="#item_9440">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9440/NBK608012.html"/>
+        <z:attachment rdf:resource="files/9440/NBK608012.html"/>
         <dc:title>Printable HTML</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -25661,7 +25661,7 @@ PMCID: PMC9510258</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9798">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9798/Pullman et al. - 2023 - Impact of strengths model training and supervision on the therapeutic practice of Australian mental.pdf"/>
+        <z:attachment rdf:resource="files/9798/Pullman et al. - 2023 - Impact of strengths model training and supervision on the therapeutic practice of Australian mental.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -25759,7 +25759,7 @@ PMCID: PMC9469965</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9799">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9799/Hollo et al. - 2022 - Physicians' perspectives on Extreme Risk Protection Orders (ERPOs) in the clinical setting Challeng.pdf"/>
+        <z:attachment rdf:resource="files/9799/Hollo et al. - 2022 - Physicians' perspectives on Extreme Risk Protection Orders (ERPOs) in the clinical setting Challeng.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -26040,7 +26040,7 @@ PMCID: PMC9388362</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9800">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9800/Jongebloed-Westra et al. - 2022 - Attitudes and experiences towards the application of motivational interviewing by podiatrists workin.pdf"/>
+        <z:attachment rdf:resource="files/9800/Jongebloed-Westra et al. - 2022 - Attitudes and experiences towards the application of motivational interviewing by podiatrists workin.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -26132,7 +26132,7 @@ PMCID: PMC9364285</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9801">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9801/Faith et al. - 2023 - Metacognitive Reflection and Insight Therapy (MERIT) Delivered Virtually During the COVID-19 Pandemi.pdf"/>
+        <z:attachment rdf:resource="files/9801/Faith et al. - 2023 - Metacognitive Reflection and Insight Therapy (MERIT) Delivered Virtually During the COVID-19 Pandemi.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -26249,7 +26249,7 @@ PMCID: PMC10087225</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9802">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9802/Leigh et Clark - 2023 - Internet-delivered therapist-assisted cognitive therapy for adolescent social anxiety disorder (OSCA.pdf"/>
+        <z:attachment rdf:resource="files/9802/Leigh et Clark - 2023 - Internet-delivered therapist-assisted cognitive therapy for adolescent social anxiety disorder (OSCA.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -26585,7 +26585,7 @@ PMCID: PMC9344874</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9803">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9803/Doukani et al. - 2022 - Practitioners' experience of the working alliance in a blended cognitive-behavioural therapy interve.pdf"/>
+        <z:attachment rdf:resource="files/9803/Doukani et al. - 2022 - Practitioners' experience of the working alliance in a blended cognitive-behavioural therapy interve.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -26700,7 +26700,7 @@ PMCID: PMC9278317</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9804">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9804/Sagui-Henson et al. - 2022 - Understanding Components of Therapeutic Alliance and Well-Being from Use of a Global Digital Mental.pdf"/>
+        <z:attachment rdf:resource="files/9804/Sagui-Henson et al. - 2022 - Understanding Components of Therapeutic Alliance and Well-Being from Use of a Global Digital Mental.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -26811,7 +26811,7 @@ PMCID: PMC9280207</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9805">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9805/McParlin et al. - 2022 - Therapeutic Alliance as Active Inference The Role of Therapeutic Touch and Biobehavioural Synchrony.pdf"/>
+        <z:attachment rdf:resource="files/9805/McParlin et al. - 2022 - Therapeutic Alliance as Active Inference The Role of Therapeutic Touch and Biobehavioural Synchrony.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -27079,7 +27079,7 @@ PMCID: PMC9256980</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9806">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9806/Tong et al. - 2022 - Digital Therapeutic Alliance With Fully Automated Mental Health Smartphone Apps A Narrative Review.pdf"/>
+        <z:attachment rdf:resource="files/9806/Tong et al. - 2022 - Digital Therapeutic Alliance With Fully Automated Mental Health Smartphone Apps A Narrative Review.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -27235,7 +27235,7 @@ PMCID: PMC9561694</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9807">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9807/Morvillers et al. - 2022 - [Therapeutic alliance between sectorial psychiatry inpatients and nurses and aides A prospective, o.pdf"/>
+        <z:attachment rdf:resource="files/9807/Morvillers et al. - 2022 - [Therapeutic alliance between sectorial psychiatry inpatients and nurses and aides A prospective, o.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -27457,7 +27457,7 @@ EXPERT OPINION: WB001 is a dynamic and personalized tool with which patients may
     </bib:Article>
     <z:Attachment rdf:about="#item_9808">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9808/Darcy et al. - 2022 - Anatomy of a Woebot® (WB001) agent guided CBT for women with postpartum depression.pdf"/>
+        <z:attachment rdf:resource="files/9808/Darcy et al. - 2022 - Anatomy of a Woebot® (WB001) agent guided CBT for women with postpartum depression.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -28053,7 +28053,7 @@ PMCID: PMC9103707</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9809">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9809/Hynie et al. - 2022 - Assessing Virtual Mental Health Access for Refugees during the COVID-19 Pandemic Using the Levesque.pdf"/>
+        <z:attachment rdf:resource="files/9809/Hynie et al. - 2022 - Assessing Virtual Mental Health Access for Refugees during the COVID-19 Pandemic Using the Levesque.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -28161,7 +28161,7 @@ PMCID: PMC9143772</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9810">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9810/Zentner et al. - 2022 - Clinicians' Attitudes Toward Telepsychology in Addiction and Mental Health Services, and Prediction.pdf"/>
+        <z:attachment rdf:resource="files/9810/Zentner et al. - 2022 - Clinicians' Attitudes Toward Telepsychology in Addiction and Mental Health Services, and Prediction.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -28224,7 +28224,7 @@ PMCID: PMC9153756</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9811">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9811/Bate et Tsakas - 2022 - Facilitative interpersonal skills are relevant in child therapy too, so why don't we measure them.pdf"/>
+        <z:attachment rdf:resource="files/9811/Bate et Tsakas - 2022 - Facilitative interpersonal skills are relevant in child therapy too, so why don't we measure them.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -28366,7 +28366,7 @@ PMCID: PMC9244656</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9812">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9812/Leung et al. - 2022 - The Effects of Nonclinician Guidance on Effectiveness and Process Outcomes in Digital Mental Health.pdf"/>
+        <z:attachment rdf:resource="files/9812/Leung et al. - 2022 - The Effects of Nonclinician Guidance on Effectiveness and Process Outcomes in Digital Mental Health.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -28484,7 +28484,7 @@ PMCID: PMC9112077</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9813">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9813/Mercadal Rotger et Cabré - 2022 - Therapeutic Alliance in Online and Face-to-face Psychological Treatment Comparative Study.pdf"/>
+        <z:attachment rdf:resource="files/9813/Mercadal Rotger et Cabré - 2022 - Therapeutic Alliance in Online and Face-to-face Psychological Treatment Comparative Study.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -28587,7 +28587,7 @@ PMCID: PMC9035685</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9814">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9814/Beatty et al. - 2022 - Evaluating the Therapeutic Alliance With a Free-Text CBT Conversational Agent (Wysa) A Mixed-Method.pdf"/>
+        <z:attachment rdf:resource="files/9814/Beatty et al. - 2022 - Evaluating the Therapeutic Alliance With a Free-Text CBT Conversational Agent (Wysa) A Mixed-Method.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -28734,7 +28734,7 @@ PMCID: PMC9096630</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9815">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9815/Cloitre et al. - 2022 - Comparing the Ratio of Therapist Support to Internet Sessions in a Blended Therapy Delivered to Trau.pdf"/>
+        <z:attachment rdf:resource="files/9815/Cloitre et al. - 2022 - Comparing the Ratio of Therapist Support to Internet Sessions in a Blended Therapy Delivered to Trau.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -28904,7 +28904,7 @@ PMCID: PMC9096656</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9816">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9816/Nißen et al. - 2022 - The Effects of Health Care Chatbot Personas With Different Social Roles on the Client-Chatbot Bond a.pdf"/>
+        <z:attachment rdf:resource="files/9816/Nißen et al. - 2022 - The Effects of Health Care Chatbot Personas With Different Social Roles on the Client-Chatbot Bond a.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -29037,7 +29037,7 @@ PMCID: PMC9028033</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9817">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9817/Sherriff et al. - 2022 - Impact of contextual factors on patient outcomes following conservative low back pain treatment sys.pdf"/>
+        <z:attachment rdf:resource="files/9817/Sherriff et al. - 2022 - Impact of contextual factors on patient outcomes following conservative low back pain treatment sys.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -29280,7 +29280,7 @@ PMCID: PMC9873386</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9818">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9818/Greenwood et al. - 2022 - The service user experience of SlowMo therapy A co-produced thematic analysis of service users' sub.pdf"/>
+        <z:attachment rdf:resource="files/9818/Greenwood et al. - 2022 - The service user experience of SlowMo therapy A co-produced thematic analysis of service users' sub.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -29391,7 +29391,7 @@ PMCID: PMC9013879</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9819">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9819/Wilczewski et al. - 2022 - Perceptions of Telemental Health Care Delivery During COVID-19 A Cross-Sectional Study With Provide.pdf"/>
+        <z:attachment rdf:resource="files/9819/Wilczewski et al. - 2022 - Perceptions of Telemental Health Care Delivery During COVID-19 A Cross-Sectional Study With Provide.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -29614,7 +29614,7 @@ PMCID: PMC9003955</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9820">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9820/He et al. - 2022 - Can chatbots help to motivate smoking cessation A study on the effectiveness of motivational interv.pdf"/>
+        <z:attachment rdf:resource="files/9820/He et al. - 2022 - Can chatbots help to motivate smoking cessation A study on the effectiveness of motivational interv.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -29711,7 +29711,7 @@ PMCID: PMC8977831</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9821">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9821/Abdulrahman et al. - 2022 - Exploring the influence of a user-specific explainable virtual advisor on health behaviour change in.pdf"/>
+        <z:attachment rdf:resource="files/9821/Abdulrahman et al. - 2022 - Exploring the influence of a user-specific explainable virtual advisor on health behaviour change in.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -29809,7 +29809,7 @@ PMCID: PMC8978774</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9822">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9822/Orlowski et al. - 2022 - Couple and family therapists' experiences with Telehealth during the COVID-19 pandemic a phenomenol.pdf"/>
+        <z:attachment rdf:resource="files/9822/Orlowski et al. - 2022 - Couple and family therapists' experiences with Telehealth during the COVID-19 pandemic a phenomenol.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -29913,7 +29913,7 @@ PMCID: PMC8978774</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9823">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9823/Sedlakova et Trachsel - 2023 - Conversational Artificial Intelligence in Psychotherapy A New Therapeutic Tool or Agent.pdf"/>
+        <z:attachment rdf:resource="files/9823/Sedlakova et Trachsel - 2023 - Conversational Artificial Intelligence in Psychotherapy A New Therapeutic Tool or Agent.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -30059,7 +30059,7 @@ CONCLUSIONS: The dimensions of perspective taking and empathic concern seem to f
     </z:Attachment>
     <z:Attachment rdf:about="#item_9824">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9824/Rodríguez-Nogueira et al. - 2022 - The association between empathy and the physiotherapy-patient therapeutic alliance A cross-sectiona.pdf"/>
+        <z:attachment rdf:resource="files/9824/Rodríguez-Nogueira et al. - 2022 - The association between empathy and the physiotherapy-patient therapeutic alliance A cross-sectiona.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -30291,7 +30291,7 @@ PMCID: PMC9015778</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9825">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9825/Gupta et al. - 2022 - Delivery of a Mental Health Intervention for Chronic Pain Through an Artificial Intelligence-Enabled.pdf"/>
+        <z:attachment rdf:resource="files/9825/Gupta et al. - 2022 - Delivery of a Mental Health Intervention for Chronic Pain Through an Artificial Intelligence-Enabled.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -30386,7 +30386,7 @@ PMCID: PMC8931418</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9826">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9826/Sekula et al. - 2022 - Virtual Reality as a Moderator of Psychedelic-Assisted Psychotherapy.pdf"/>
+        <z:attachment rdf:resource="files/9826/Sekula et al. - 2022 - Virtual Reality as a Moderator of Psychedelic-Assisted Psychotherapy.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -30499,7 +30499,7 @@ PMCID: PMC8918841</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9827">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9827/Braun et al. - 2022 - Acceptance of E-Mental Health Services for Different Application Purposes Among Psychotherapists in.pdf"/>
+        <z:attachment rdf:resource="files/9827/Braun et al. - 2022 - Acceptance of E-Mental Health Services for Different Application Purposes Among Psychotherapists in.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -30660,7 +30660,7 @@ PMCID: PMC8941429</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9828">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9828/Meyer et al. - 2022 - Coaching to Support Mental Health Apps Exploratory Narrative Review.pdf"/>
+        <z:attachment rdf:resource="files/9828/Meyer et al. - 2022 - Coaching to Support Mental Health Apps Exploratory Narrative Review.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -30751,7 +30751,7 @@ PMCID: PMC8933380</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9829">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9829/Smith et al. - 2022 - Improving the Safety of Medicines via Digital Technology An Assessment of the Scope and Quality of.pdf"/>
+        <z:attachment rdf:resource="files/9829/Smith et al. - 2022 - Improving the Safety of Medicines via Digital Technology An Assessment of the Scope and Quality of.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -30843,7 +30843,7 @@ PMCID: PMC8933380</dc:description>
     </bib:Article>
     <z:Attachment rdf:about="#item_9898">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9898/Ullrich - 2022 - Culture, Empathy, and the Therapeutic Alliance.pdf"/>
+        <z:attachment rdf:resource="files/9898/Ullrich - 2022 - Culture, Empathy, and the Therapeutic Alliance.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -30918,7 +30918,7 @@ PMCID: PMC8933380</dc:description>
     </bib:Article>
     <z:Attachment rdf:about="#item_9897">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9897/Ullrich - 2022 - Annotation to Culture, Empathy, and the Therapeutic Alliance (Ullrich, 2019).pdf"/>
+        <z:attachment rdf:resource="files/9897/Ullrich - 2022 - Annotation to Culture, Empathy, and the Therapeutic Alliance (Ullrich, 2019).pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -31057,7 +31057,7 @@ PMCID: PMC8933380</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9830">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9830/Aisbitt et al. - 2023 - Editorial Perspective The digital divide - inequalities in remote therapy for children and adolesce.pdf"/>
+        <z:attachment rdf:resource="files/9830/Aisbitt et al. - 2023 - Editorial Perspective The digital divide - inequalities in remote therapy for children and adolesce.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -31197,7 +31197,7 @@ PMCID: PMC8852665</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9831">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9831/Bellier et al. - 2022 - Effectiveness of a multifaceted intervention to improve interpersonal skills of physicians in medica.pdf"/>
+        <z:attachment rdf:resource="files/9831/Bellier et al. - 2022 - Effectiveness of a multifaceted intervention to improve interpersonal skills of physicians in medica.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -31316,7 +31316,7 @@ PMCID: PMC8841060</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9832">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9832/Phillips et al. - 2022 - Preferences of psychotherapists for blended care in Germany a discrete choice experiment.pdf"/>
+        <z:attachment rdf:resource="files/9832/Phillips et al. - 2022 - Preferences of psychotherapists for blended care in Germany a discrete choice experiment.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -31503,7 +31503,7 @@ PMCID: PMC8811551</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9833">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9833/Arnfred et al. - 2022 - Group cognitive behavioural therapy with virtual reality exposure versus group cognitive behavioural.pdf"/>
+        <z:attachment rdf:resource="files/9833/Arnfred et al. - 2022 - Group cognitive behavioural therapy with virtual reality exposure versus group cognitive behavioural.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -31713,7 +31713,7 @@ PMCID: PMC8859529</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9834">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9834/Cercato et al. - 2022 - Narrative medicine feasibility of a digital narrative diary application in oncology.pdf"/>
+        <z:attachment rdf:resource="files/9834/Cercato et al. - 2022 - Narrative medicine feasibility of a digital narrative diary application in oncology.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -31876,7 +31876,7 @@ PMCID: PMC8799700</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9835">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9835/Ellingsen et al. - 2022 - Patient-clinician brain concordance underlies causal dynamics in nonverbal communication and negativ.pdf"/>
+        <z:attachment rdf:resource="files/9835/Ellingsen et al. - 2022 - Patient-clinician brain concordance underlies causal dynamics in nonverbal communication and negativ.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -32285,7 +32285,7 @@ PMCID: PMC8779279</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9836">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9836/Cercato et al. - 2022 - Narrative Medicine A Digital Diary in the Management of Bone and Soft Tissue Sarcoma Patients. Prel.pdf"/>
+        <z:attachment rdf:resource="files/9836/Cercato et al. - 2022 - Narrative Medicine A Digital Diary in the Management of Bone and Soft Tissue Sarcoma Patients. Prel.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -32411,7 +32411,7 @@ PMCID: PMC9122412</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9837">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9837/Dong et al. - 2022 - How is patient-centred care conceptualized in obstetrical health comparison of themes from concept.pdf"/>
+        <z:attachment rdf:resource="files/9837/Dong et al. - 2022 - How is patient-centred care conceptualized in obstetrical health comparison of themes from concept.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -32568,7 +32568,7 @@ PMCID: PMC10686580</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9838">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9838/Topitzer et al. - 2022 - How Differing Audiences Were Associated with User Emotional Expression on a Well-Being App.pdf"/>
+        <z:attachment rdf:resource="files/9838/Topitzer et al. - 2022 - How Differing Audiences Were Associated with User Emotional Expression on a Well-Being App.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -32696,7 +32696,7 @@ PMCID: PMC8726023</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9839">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9839/Wu et al. - 2021 - Examining the Impact of Digital Components Across Different Phases of Treatment in a Blended Care Co.pdf"/>
+        <z:attachment rdf:resource="files/9839/Wu et al. - 2021 - Examining the Impact of Digital Components Across Different Phases of Treatment in a Blended Care Co.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -32884,7 +32884,7 @@ PMCID: PMC8666832</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9840">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9840/Montesano et al. - 2021 - Does virtual reality increase the efficacy of psychotherapy for young adults with mild-to-moderate d.pdf"/>
+        <z:attachment rdf:resource="files/9840/Montesano et al. - 2021 - Does virtual reality increase the efficacy of psychotherapy for young adults with mild-to-moderate d.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -33127,7 +33127,7 @@ PMCID: PMC8620318</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9841">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9841/Völter et al. - 2022 - [Teletherapy after cochlear implantation during the COVID-19 pandemic].pdf"/>
+        <z:attachment rdf:resource="files/9841/Völter et al. - 2022 - [Teletherapy after cochlear implantation during the COVID-19 pandemic].pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -33236,7 +33236,7 @@ PMCID: PMC8557110</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9842">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9842/Francese et al. - 2021 - Thea empowering the therapeutic alliance of children with ASD by multimedia interaction.pdf"/>
+        <z:attachment rdf:resource="files/9842/Francese et al. - 2021 - Thea empowering the therapeutic alliance of children with ASD by multimedia interaction.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -33345,7 +33345,7 @@ DISCUSSION: The physiotherapists in this focus group study expressed a shared vi
     </z:Attachment>
     <z:Attachment rdf:about="#item_9843">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9843/Unsgaard-Tøndel et Søderstrøm - 2022 - Building therapeutic alliances with patients in treatment for low back pain A focus group study.pdf"/>
+        <z:attachment rdf:resource="files/9843/Unsgaard-Tøndel et Søderstrøm - 2022 - Building therapeutic alliances with patients in treatment for low back pain A focus group study.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -33555,7 +33555,7 @@ PMCID: PMC8460973</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9844">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9844/Chiauzzi et Wicks - 2021 - Beyond the Therapist's Office Merging Measurement-Based Care and Digital Medicine in the Real World.pdf"/>
+        <z:attachment rdf:resource="files/9844/Chiauzzi et Wicks - 2021 - Beyond the Therapist's Office Merging Measurement-Based Care and Digital Medicine in the Real World.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -33915,7 +33915,7 @@ PMCID: PMC8521857</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9845">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9845/van Lotringen et al. - 2021 - Responsible Relations A Systematic Scoping Review of the Therapeutic Alliance in Text-Based Digital.pdf"/>
+        <z:attachment rdf:resource="files/9845/van Lotringen et al. - 2021 - Responsible Relations A Systematic Scoping Review of the Therapeutic Alliance in Text-Based Digital.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -34032,7 +34032,7 @@ PMCID: PMC8521857</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9846">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9846/Garrote-Caparrós et al. - 2022 - Effectiveness of mindfulness-based interventions on psychotherapy processes A systematic review.pdf"/>
+        <z:attachment rdf:resource="files/9846/Garrote-Caparrós et al. - 2022 - Effectiveness of mindfulness-based interventions on psychotherapy processes A systematic review.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -34138,7 +34138,7 @@ PMCID: PMC8475888</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9847">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9847/Brouzos et al. - 2021 - Therapeutic Factors and Member Satisfaction in an Online Group Intervention During the COVID-19 Pand.pdf"/>
+        <z:attachment rdf:resource="files/9847/Brouzos et al. - 2021 - Therapeutic Factors and Member Satisfaction in an Online Group Intervention During the COVID-19 Pand.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -34249,7 +34249,7 @@ PMCID: PMC8450495</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9848">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9848/Vitger et al. - 2021 - Digital Shared Decision-Making Interventions in Mental Healthcare A Systematic Review and Meta-Anal.pdf"/>
+        <z:attachment rdf:resource="files/9848/Vitger et al. - 2021 - Digital Shared Decision-Making Interventions in Mental Healthcare A Systematic Review and Meta-Anal.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -34357,7 +34357,7 @@ PMCID: PMC8438131</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9849">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9849/Ribeiro et al. - 2021 - Observing the Working Alliance in Videoconferencing Psychotherapy for Alcohol Addiction Reliability.pdf"/>
+        <z:attachment rdf:resource="files/9849/Ribeiro et al. - 2021 - Observing the Working Alliance in Videoconferencing Psychotherapy for Alcohol Addiction Reliability.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -34498,7 +34498,7 @@ PMCID: PMC8379655</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9850">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9850/Kaye et al. - 2021 - Facilitators Associated With Building and Sustaining Therapeutic Alliance in Advanced Pediatric Canc.pdf"/>
+        <z:attachment rdf:resource="files/9850/Kaye et al. - 2021 - Facilitators Associated With Building and Sustaining Therapeutic Alliance in Advanced Pediatric Canc.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -34613,7 +34613,7 @@ PMCID: PMC8369773</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9851">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9851/Petrozzi et al. - 2021 - A process evaluation of the Mind Your Back trial examining psychologically informed physical treatme.pdf"/>
+        <z:attachment rdf:resource="files/9851/Petrozzi et al. - 2021 - A process evaluation of the Mind Your Back trial examining psychologically informed physical treatme.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -34712,7 +34712,7 @@ PMCID: PMC8369773</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9887">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9887/Skoufalos et al. - 2021 - Leveraging Digital Medicine to Support Providers and Their Patients in Managing Serious Mental Illne.pdf"/>
+        <z:attachment rdf:resource="files/9887/Skoufalos et al. - 2021 - Leveraging Digital Medicine to Support Providers and Their Patients in Managing Serious Mental Illne.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -34811,7 +34811,7 @@ PMCID: PMC8339462</dc:description>
     </bib:Article>
     <z:Attachment rdf:about="#item_9852">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9852/Békés et al. - 2021 - Psychotherapists' Challenges With Online Therapy During COVID-19 Concerns About Connectedness Predi.pdf"/>
+        <z:attachment rdf:resource="files/9852/Békés et al. - 2021 - Psychotherapists' Challenges With Online Therapy During COVID-19 Concerns About Connectedness Predi.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -35051,7 +35051,7 @@ PMCID: PMC8335609</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9853">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9853/Lederman et D'Alfonso - 2021 - The Digital Therapeutic Alliance Prospects and Considerations.pdf"/>
+        <z:attachment rdf:resource="files/9853/Lederman et D'Alfonso - 2021 - The Digital Therapeutic Alliance Prospects and Considerations.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -35169,7 +35169,7 @@ PMCID: PMC8277930</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9854">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9854/Zimmermann et al. - 2021 - Movement Synchrony in the Psychotherapy of Adolescents With Borderline Personality Pathology - A Dya.pdf"/>
+        <z:attachment rdf:resource="files/9854/Zimmermann et al. - 2021 - Movement Synchrony in the Psychotherapy of Adolescents With Borderline Personality Pathology - A Dya.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -35244,7 +35244,7 @@ PMCID: PMC8252401</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9855">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9855/Müssener - 2021 - Digital encounters Human interactions in mHealth behavior change interventions.pdf"/>
+        <z:attachment rdf:resource="files/9855/Müssener - 2021 - Digital encounters Human interactions in mHealth behavior change interventions.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -35370,7 +35370,7 @@ PMCID: PMC8118492</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9856">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9856/Hill - 2021 - It's Not You, It's Me Learning to Navigate the Patient-Physician Relationship.pdf"/>
+        <z:attachment rdf:resource="files/9856/Hill - 2021 - It's Not You, It's Me Learning to Navigate the Patient-Physician Relationship.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -35656,7 +35656,7 @@ PMCID: PMC8362145</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9857">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9857/Meyerbröker et Morina - 2021 - The use of virtual reality in assessment and treatment of anxiety and related disorders.pdf"/>
+        <z:attachment rdf:resource="files/9857/Meyerbröker et Morina - 2021 - The use of virtual reality in assessment and treatment of anxiety and related disorders.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -35799,7 +35799,7 @@ PMCID: PMC8149946</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9858">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9858/Yuan et al. - 2021 - Communicating With Parents and Preschool Children A Qualitative Exploration of Dental Professional-.pdf"/>
+        <z:attachment rdf:resource="files/9858/Yuan et al. - 2021 - Communicating With Parents and Preschool Children A Qualitative Exploration of Dental Professional-.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -35986,7 +35986,7 @@ PMCID: PMC8160118</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9859">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9859/Baumeister et al. - 2021 - Clinical and Cost-Effectiveness of PSYCHOnlineTHERAPY Study Protocol of a Multicenter Blended Outpa.pdf"/>
+        <z:attachment rdf:resource="files/9859/Baumeister et al. - 2021 - Clinical and Cost-Effectiveness of PSYCHOnlineTHERAPY Study Protocol of a Multicenter Blended Outpa.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -36130,7 +36130,7 @@ PMCID: PMC8453826</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9860">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9860/Albano et al. - 2021 - The relationship between working alliance with peer mentors and eating psychopathology in a digital.pdf"/>
+        <z:attachment rdf:resource="files/9860/Albano et al. - 2021 - The relationship between working alliance with peer mentors and eating psychopathology in a digital.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -36276,7 +36276,7 @@ PMCID: PMC8128123</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9861">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9861/Bauer et al. - 2021 - A Resource Building Virtual Care Programme improving symptoms and social functioning among female a.pdf"/>
+        <z:attachment rdf:resource="files/9861/Bauer et al. - 2021 - A Resource Building Virtual Care Programme improving symptoms and social functioning among female a.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -36407,7 +36407,7 @@ PMCID: PMC7942239</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9862">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9862/Ochoa-Arnedo et al. - 2021 - E-health ecosystem with integrated and stepped psychosocial services for breast cancer survivors st.pdf"/>
+        <z:attachment rdf:resource="files/9862/Ochoa-Arnedo et al. - 2021 - E-health ecosystem with integrated and stepped psychosocial services for breast cancer survivors st.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -36734,7 +36734,7 @@ PMCID: PMC8150389</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9863">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9863/Darcy et al. - 2021 - Evidence of Human-Level Bonds Established With a Digital Conversational Agent Cross-sectional, Retr.pdf"/>
+        <z:attachment rdf:resource="files/9863/Darcy et al. - 2021 - Evidence of Human-Level Bonds Established With a Digital Conversational Agent Cross-sectional, Retr.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -36848,7 +36848,7 @@ PMCID: PMC8112046</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9864">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9864/Petersén et al. - 2021 - Staff experiences of encountering and treating outpatients with substance use disorder in the psychi.pdf"/>
+        <z:attachment rdf:resource="files/9864/Petersén et al. - 2021 - Staff experiences of encountering and treating outpatients with substance use disorder in the psychi.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -36998,7 +36998,7 @@ PMCID: PMC8112046</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9877">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9877/Barth et al. - 2021 - Digital Consultations During COVID-19 A Multiperspective Mixed-Methods Study in an Integrative Medi.pdf"/>
+        <z:attachment rdf:resource="files/9877/Barth et al. - 2021 - Digital Consultations During COVID-19 A Multiperspective Mixed-Methods Study in an Integrative Medi.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -37293,7 +37293,7 @@ PMCID: PMC8190651</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9865">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9865/Gross et al. - 2021 - Personalization of Conversational Agent-Patient Interaction Styles for Chronic Disease Management T.pdf"/>
+        <z:attachment rdf:resource="files/9865/Gross et al. - 2021 - Personalization of Conversational Agent-Patient Interaction Styles for Chronic Disease Management T.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -37683,7 +37683,7 @@ PRACTITIONER POINTS: There is a shift in practice and increasingly positive view
     </z:Attachment>
     <z:Attachment rdf:about="#item_9866">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9866/Simon et al. - 2021 - Internet-based psychological therapies A qualitative study of National Health Service commissioners.pdf"/>
+        <z:attachment rdf:resource="files/9866/Simon et al. - 2021 - Internet-based psychological therapies A qualitative study of National Health Service commissioners.pdf"/>
         <dc:title>Version acceptée</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -37800,7 +37800,7 @@ PRACTITIONER POINTS: There is a shift in practice and increasingly positive view
     </z:Attachment>
     <z:Attachment rdf:about="#item_9867">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9867/Wolf et al. - 2021 - Dental care of patients exposed to sexual abuse Need for alliance between staff and patients.pdf"/>
+        <z:attachment rdf:resource="files/9867/Wolf et al. - 2021 - Dental care of patients exposed to sexual abuse Need for alliance between staff and patients.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -37946,7 +37946,7 @@ IMPACT: This research examined the effects of an intervention aimed at improving
     </z:Attachment>
     <z:Attachment rdf:about="#item_9868">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9868/Moreno-Poyato et al. - 2021 - The impact of a participatory intervention on the therapeutic relationship in mental health nurses.pdf"/>
+        <z:attachment rdf:resource="files/9868/Moreno-Poyato et al. - 2021 - The impact of a participatory intervention on the therapeutic relationship in mental health nurses.pdf"/>
         <dc:title>Version acceptée</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -38020,7 +38020,7 @@ PMCID: PMC7925139</dc:description>
     </bib:Article>
     <z:Attachment rdf:about="#item_9893">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9893/Earle et Freddolino - 2022 - Meeting the Practice Challenges of COVID-19 MSW Students' Perceptions of E-Therapy and the Therapeu.pdf"/>
+        <z:attachment rdf:resource="files/9893/Earle et Freddolino - 2022 - Meeting the Practice Challenges of COVID-19 MSW Students' Perceptions of E-Therapy and the Therapeu.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -38126,7 +38126,7 @@ PMCID: PMC7934980</dc:description>
     </bib:Article>
     <z:Attachment rdf:about="#item_9869">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9869/Lewis et al. - 2021 - The abrupt transition from face-to-face to online treatment for eating disorders a pilot examinatio.pdf"/>
+        <z:attachment rdf:resource="files/9869/Lewis et al. - 2021 - The abrupt transition from face-to-face to online treatment for eating disorders a pilot examinatio.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -38295,7 +38295,7 @@ PMCID: PMC7906313</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9870">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9870/Asher et al. - 2021 - Like a doctor, like a brother Achieving competence amongst lay health workers delivering communit.pdf"/>
+        <z:attachment rdf:resource="files/9870/Asher et al. - 2021 - Like a doctor, like a brother Achieving competence amongst lay health workers delivering communit.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -38387,7 +38387,7 @@ PMCID: PMC7875073</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9871">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9871/Řiháček et al. - 2020 - Facets of the psychotherapy relationship a metaphorical approach.pdf"/>
+        <z:attachment rdf:resource="files/9871/Řiháček et al. - 2020 - Facets of the psychotherapy relationship a metaphorical approach.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -38611,7 +38611,7 @@ PMCID: PMC7886615</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9872">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9872/Bur et al. - 2021 - Optimizing the Context of Support to Improve Outcomes of Internet-Based Self-help in Individuals Wit.pdf"/>
+        <z:attachment rdf:resource="files/9872/Bur et al. - 2021 - Optimizing the Context of Support to Improve Outcomes of Internet-Based Self-help in Individuals Wit.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -38900,7 +38900,7 @@ PMCID: PMC7929753</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9873">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9873/Kowatsch et al. - 2021 - Conversational Agents as Mediating Social Actors in Chronic Disease Management Involving Health Care.pdf"/>
+        <z:attachment rdf:resource="files/9873/Kowatsch et al. - 2021 - Conversational Agents as Mediating Social Actors in Chronic Disease Management Involving Health Care.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -38982,7 +38982,7 @@ PMCID: PMC7805257</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9874">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9874/Eichenberg - 2021 - [Online psychotherapy in times of the corona pandemic].pdf"/>
+        <z:attachment rdf:resource="files/9874/Eichenberg - 2021 - [Online psychotherapy in times of the corona pandemic].pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -39089,7 +39089,7 @@ PMCID: PMC7803473</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9875">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9875/D'Alfonso et al. - 2020 - The Digital Therapeutic Alliance and Human-Computer Interaction.pdf"/>
+        <z:attachment rdf:resource="files/9875/D'Alfonso et al. - 2020 - The Digital Therapeutic Alliance and Human-Computer Interaction.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -39633,7 +39633,7 @@ PMCID: PMC7960525</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9884">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9884/Hunik et al. - 2021 - Exploring the psychometric properties of the Working Alliance Inventory in general practice a cross.pdf"/>
+        <z:attachment rdf:resource="files/9884/Hunik et al. - 2021 - Exploring the psychometric properties of the Working Alliance Inventory in general practice a cross.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -39658,7 +39658,7 @@ PMCID: PMC7960525</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9899">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9899/Hunik et al. - 2021 - Exploring the psychometric properties of the Working Alliance Inventory in general practice a cross.pdf"/>
+        <z:attachment rdf:resource="files/9899/Hunik et al. - 2021 - Exploring the psychometric properties of the Working Alliance Inventory in general practice a cross.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -39849,7 +39849,7 @@ PMCID: PMC7577722</dc:description>
     </bib:Journal>
     <z:Attachment rdf:about="#item_9882">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9882/Ellingsen et al. - 2020 - Dynamic brain-to-brain concordance and behavioral mirroring as a mechanism of the patient-clinician.pdf"/>
+        <z:attachment rdf:resource="files/9882/Ellingsen et al. - 2020 - Dynamic brain-to-brain concordance and behavioral mirroring as a mechanism of the patient-clinician.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -39874,7 +39874,7 @@ PMCID: PMC7577722</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9900">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9900/Ellingsen et al. - 2020 - Dynamic brain-to-brain concordance and behavioral mirroring as a mechanism of the patient-clinician.pdf"/>
+        <z:attachment rdf:resource="files/9900/Ellingsen et al. - 2020 - Dynamic brain-to-brain concordance and behavioral mirroring as a mechanism of the patient-clinician.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -40183,7 +40183,7 @@ PMCID: PMC7504280</dc:description>
     </bib:Article>
     <z:Attachment rdf:about="#item_9895">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9895/Köhne et al. - 2020 - Therapeutic Relationship in eHealth-A Pilot Study of Similarities and Differences between the Online.pdf"/>
+        <z:attachment rdf:resource="files/9895/Köhne et al. - 2020 - Therapeutic Relationship in eHealth-A Pilot Study of Similarities and Differences between the Online.pdf"/>
         <dc:title>Full Text PDF</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -40208,7 +40208,7 @@ PMCID: PMC7504280</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9901">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9901/Köhne et al. - 2020 - Therapeutic Relationship in eHealth-A Pilot Study of Similarities and Differences between the Online.pdf"/>
+        <z:attachment rdf:resource="files/9901/Köhne et al. - 2020 - Therapeutic Relationship in eHealth-A Pilot Study of Similarities and Differences between the Online.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -40328,7 +40328,7 @@ PMCID: PMC7484770</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9896">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9896/Singla et al. - 2020 - Implementing Psychological Interventions Through Nonspecialist Providers and Telemedicine in High-In.pdf"/>
+        <z:attachment rdf:resource="files/9896/Singla et al. - 2020 - Implementing Psychological Interventions Through Nonspecialist Providers and Telemedicine in High-In.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -40341,7 +40341,7 @@ PMCID: PMC7484770</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9902">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9902/Singla et al. - 2020 - Implementing Psychological Interventions Through Nonspecialist Providers and Telemedicine in High-In.pdf"/>
+        <z:attachment rdf:resource="files/9902/Singla et al. - 2020 - Implementing Psychological Interventions Through Nonspecialist Providers and Telemedicine in High-In.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -40446,7 +40446,7 @@ PMCID: PMC7442952</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9888">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9888/Tremain et al. - 2020 - The Therapeutic Alliance in Digital Mental Health Interventions for Serious Mental Illnesses Narrat.pdf"/>
+        <z:attachment rdf:resource="files/9888/Tremain et al. - 2020 - The Therapeutic Alliance in Digital Mental Health Interventions for Serious Mental Illnesses Narrat.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -40459,7 +40459,7 @@ PMCID: PMC7442952</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9903">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9903/Tremain et al. - 2020 - The Therapeutic Alliance in Digital Mental Health Interventions for Serious Mental Illnesses Narrat.pdf"/>
+        <z:attachment rdf:resource="files/9903/Tremain et al. - 2020 - The Therapeutic Alliance in Digital Mental Health Interventions for Serious Mental Illnesses Narrat.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -40595,7 +40595,7 @@ PMCID: PMC7324929</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9904">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9904/Rodriguez-Villa et al. - 2020 - The digital clinic Implementing technology and augmenting care for mental health.pdf"/>
+        <z:attachment rdf:resource="files/9904/Rodriguez-Villa et al. - 2020 - The digital clinic Implementing technology and augmenting care for mental health.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -40608,7 +40608,7 @@ PMCID: PMC7324929</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9906">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9906/Rodriguez-Villa et al. - 2020 - The digital clinic Implementing technology and augmenting care for mental health.pdf"/>
+        <z:attachment rdf:resource="files/9906/Rodriguez-Villa et al. - 2020 - The digital clinic Implementing technology and augmenting care for mental health.pdf"/>
         <dc:title>Texte intégral</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -40718,7 +40718,7 @@ PMCID: PMC7324929</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9885">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9885/Moreno-Poyato et al. - 2021 - The association between empathy and the nurse-patient therapeutic relationship in mental health unit.pdf"/>
+        <z:attachment rdf:resource="files/9885/Moreno-Poyato et al. - 2021 - The association between empathy and the nurse-patient therapeutic relationship in mental health unit.pdf"/>
         <dc:title>Version acceptée</dc:title>
         <dc:identifier>
             <dcterms:URI>
@@ -40731,7 +40731,7 @@ PMCID: PMC7324929</dc:description>
     </z:Attachment>
     <z:Attachment rdf:about="#item_9905">
         <z:itemType>attachment</z:itemType>
-        <z:linkResource rdf:resource="files/9905/Moreno-Poyato et al. - 2021 - The association between empathy and the nurse-patient therapeutic relationship in mental health unit.pdf"/>
+        <z:attachment rdf:resource="files/9905/Moreno-Poyato et al. - 2021 - The association between empathy and the nurse-patient therapeutic relationship in mental health unit.pdf"/>
         <dc:title>Version acceptée</dc:title>
         <dc:identifier>
             <dcterms:URI>
