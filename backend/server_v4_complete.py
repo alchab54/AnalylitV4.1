@@ -68,8 +68,12 @@ def create_app(config_override=None):
     migrate.init_app(app, db)
     limiter.init_app(app)
 
-    socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent', message_queue=app.config['REDIS_URL'])
-
+    if not os.getenv('DISABLE_SOCKETIO', '').lower() == 'true':
+        socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent', message_queue=app.config['REDIS_URL'])
+        logger.info("🔌 SocketIO activé")
+    else:
+        logger.info("🚫 SocketIO désactivé via DISABLE_SOCKETIO")
+        
     # --- ENREGISTREMENT DES BLUEPRINTS (ROUTES API) ---
     with app.app_context():
         # Imports locaux pour briser les boucles d'importation
