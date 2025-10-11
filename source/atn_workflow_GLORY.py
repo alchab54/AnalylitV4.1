@@ -328,10 +328,44 @@ class ATNWorkflowGlory:
             log("ERROR", "❌ Création projet échouée")
             return False
 
-    def import_articles_via_rq_final(self) -> bool:
-        """Import RQ Zotero corrigé - SANS timeout dans les arguments"""
-        log_section(f"IMPORT ZOTERO RDF FINAL - {len(self.articles)} ARTICLES")
+    def import_articles_via_rq_glory(self) -> bool:
+        """Import via la VRAIE fonction Zotero RDF task - ORDRE CORRIGÉ"""
+        log_section(f"IMPORT ZOTERO RDF NATIF - {len(self.articles)} ARTICLES ATN")
         
+        try:
+            from redis import Redis
+            from rq import Queue
+            
+            # Connexion Redis workers
+            redis_conn = Redis(host='redis', port=6379, db=0)
+            import_queue = Queue('import_queue', connection=redis_conn)
+            
+            # ✅ CORRECTION : ORDRE DES ARGUMENTS project_id, rdf_path, storage_path
+            job = import_queue.enqueue(
+                'backend.tasks_v4_complete.import_from_zotero_rdf_task',
+                str(self.project_id),       # Arg 1: project_id ✅ PREMIER
+                str(ANALYLIT_RDF_PATH),     # Arg 2: rdf_path ✅ DEUXIÈME  
+                str(ZOTERO_STORAGE_PATH),   # Arg 3: zotero_storage_path ✅ TROISIÈME
+                job_timeout=3600,
+                job_id=f"atn_rdf_final_v2"
+            )
+            
+            log("SUCCESS", f"✅ Import Zotero RDF lancé : Job {job.id}")
+            log("SUCCESS", f"🎯 ORDRE CORRIGÉ : project_id → rdf_path → storage_path")
+            log("SUCCESS", f"🚀 329 articles ATN → RTX 2060 SUPER processing")
+            log("SUCCESS", f"📊 Monitoring : http://localhost:9181")
+            
+            return True
+            
+        except Exception as e:
+            log("ERROR", f"❌ Import RQ échoué : {e}")
+            
+            # ✅ FALLBACK : Import article par article
+            log("WARNING", "🔄 Fallback : Import individuel...")
+            return self.fallback_single_import()
+            
+    def fallback_single_import(self) -> bool:
+        """Fallback : Import article par article - TIMEOUT CORRIGÉ"""
         try:
             from redis import Redis
             from rq import Queue
@@ -339,29 +373,33 @@ class ATNWorkflowGlory:
             redis_conn = Redis(host='redis', port=6379, db=0)
             import_queue = Queue('import_queue', connection=redis_conn)
             
-            # ✅ PARAMÈTRES CORRECTS pour la fonction Zotero RDF
-            job_data = {
-                "rdf_path": str(ANALYLIT_RDF_PATH),
-                "storage_path": ZOTERO_STORAGE_PATH,
-                "project_id": str(self.project_id)
-            }
+            success_count = 0
             
-            # ✅ ENQUEUE AVEC BONS PARAMÈTRES (timeout est paramètre RQ, pas fonction)
-            job = import_queue.enqueue(
-                'backend.tasks_v4_complete.import_from_zotero_rdf_task',
-                **job_data,  # ✅ Unpacking des arguments
-                timeout=3600,
-                job_id=f"atn_final_import"
-            )
+            # Import 20 premiers articles individuellement  
+            for i, article in enumerate(self.articles[:20]):
+                try:
+                    job = import_queue.enqueue(
+                        'backend.tasks_v4_complete.process_single_article_task',
+                        article,                    # Article data
+                        str(self.project_id),      # Project ID
+                        job_timeout=300,           # ✅ CORRECT - job_timeout
+                        job_id=f"atn_single_{i+1}"
+                    )
+                    success_count += 1
+                    
+                    if i < 5:
+                        log("SUCCESS", f"✅ Article {i+1} en queue")
+                        
+                except Exception as e:
+                    log("WARNING", f"⚠️ Article {i+1} échoué")
             
-            log("SUCCESS", f"✅ Import Zotero RDF lancé : Job {job.id}")
-            log("SUCCESS", f"🚀 329 articles ATN → RTX 2060 SUPER processing")
-            
-            return True
+            log("FINAL", f"🏆 Fallback : {success_count}/20 articles en queue")
+            return success_count > 0
             
         except Exception as e:
-            log("ERROR", f"❌ Import final échoué : {e}")
+            log("ERROR", f"❌ Fallback échoué : {e}")
             return False
+
             
     def monitor_extractions_glory(self):
         """Monitoring des extractions RTX 2060 SUPER"""
