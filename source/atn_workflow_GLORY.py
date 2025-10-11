@@ -357,6 +357,26 @@ class ATNWorkflowGlory:
             
             return True
             
+            if args.auto_screening:
+                logger.info("🚀 LANCEMENT AUTO-SCREENING...")
+                
+                # API call pour démarrer le screening
+                screening_payload = {
+                    "analysis_profile": "standard-local",
+                    "auto_mode": True
+                }
+                
+                response = requests.post(
+                    f"{base_url}/api/projects/{project_id}/start-screening",
+                    json=screening_payload,
+                    headers=headers
+                )
+                
+                if response.status_code == 200:
+                    logger.info("✅ Auto-screening lancé avec succès!")
+                else:
+                    logger.error(f"❌ Erreur auto-screening: {response.text}")
+        
         except Exception as e:
             log("ERROR", f"❌ Import RQ échoué : {e}")
             
