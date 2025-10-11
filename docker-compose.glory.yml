@@ -55,7 +55,7 @@ services:
     volumes:
       # ✅ VOLUMES CORRIGÉS POUR EXPORT ZOTERO ATN
       - ./export_zotero_atn:/app/source:ro                           # Dossier parent export  
-      - ./export_zotero_atn/Analylit/files:/app/zotero-storage:ro    # PDFs au bon endroit
+      - ./source/Analylit/files:/app/zotero-storage:ro    # PDFs au bon endroit
       - ./output:/app/output                                         # Output avec permissions
       - ./data:/app/data                                             # Base de données
       - .:/app:rw                                                    # Code source
@@ -82,7 +82,7 @@ services:
     volumes:
       # ✅ VOLUMES IDENTIQUES POUR TOUS LES SERVICES
       - ./export_zotero_atn:/app/source:ro                           # Dossier parent export  
-      - ./export_zotero_atn/Analylit/files:/app/zotero-storage:ro    # PDFs au bon endroit
+      - ./source/Analylit/files:/app/zotero-storage:ro    # PDFs au bon endroit
       - ./output:/app/output                                         # Output avec permissions
       - ./data:/app/data                                             # Base de données
       - .:/app:rw                                                    # Code source
@@ -110,7 +110,7 @@ services:
     volumes:
       # ✅ VOLUMES IDENTIQUES - CRUCIAL POUR ACCÈS RDF/PDFs
       - ./export_zotero_atn:/app/source:ro                           # Dossier parent export  
-      - ./export_zotero_atn/Analylit/files:/app/zotero-storage:ro    # PDFs au bon endroit
+      - ./source/Analylit/files:/app/zotero-storage:ro    # PDFs au bon endroit
       - ./output:/app/output                                         # Output avec permissions
       - ./data:/app/data                                             # Base de données
       - .:/app:rw                                                    # Code source
@@ -134,7 +134,7 @@ services:
     working_dir: /app
     volumes:
       - ./export_zotero_atn:/app/source:ro                           
-      - ./export_zotero_atn/Analylit/files:/app/zotero-storage:ro    
+      - ./source/Analylit/files:/app/zotero-storage:ro    
       - ./output:/app/output                                         
       - ./data:/app/data                                             
       - .:/app:rw                                                    
@@ -159,7 +159,7 @@ services:
     working_dir: /app
     volumes:
       - ./export_zotero_atn:/app/source:ro                           
-      - ./export_zotero_atn/Analylit/files:/app/zotero-storage:ro    
+      - ./source/Analylit/files:/app/zotero-storage:ro    
       - ./output:/app/output                                         
       - ./data:/app/data                                             
       - .:/app:rw                                                    
@@ -184,7 +184,7 @@ services:
     working_dir: /app
     volumes:
       - ./export_zotero_atn:/app/source:ro                           
-      - ./export_zotero_atn/Analylit/files:/app/zotero-storage:ro    
+      - ./source/Analylit/files:/app/zotero-storage:ro    
       - ./output:/app/output                                         
       - ./data:/app/data                                             
       - .:/app:rw                                                    
@@ -209,7 +209,7 @@ services:
     working_dir: /app
     volumes:
       - ./export_zotero_atn:/app/source:ro                           
-      - ./export_zotero_atn/Analylit/files:/app/zotero-storage:ro    
+      - ./source/Analylit/files:/app/zotero-storage:ro    
       - ./output:/app/output                                         
       - ./data:/app/data                                             
       - .:/app:rw                                                    
