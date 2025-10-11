@@ -866,7 +866,7 @@ def import_from_zotero_rdf_task(project_id, rdf_file_path, zotero_storage_path):
                 existing_article = db.session.scalar(
                     select(SearchResult).where(
                         SearchResult.project_id == project_id,
-                        SearchResult.pmid == article_data['pmid']
+                        SearchResult.article_id == article_data['pmid']  # ✅ article_id existe
                     )
                 )
 
