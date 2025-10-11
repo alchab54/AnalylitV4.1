@@ -33,7 +33,7 @@ def parse_zotero_rdf(rdf_path: str, storage_path: str) -> list:
 
     articles = []
     # Itère sur tous les sujets de type "Document" en utilisant l'URI directe
-    for s in g.subjects(predicate=URIRef("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), object=BIBO_DOC_URI):
+    for s in g.subjects(predicate=URIRef("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), object=URIRef("http://purl.org/net/biblio#Article")):
         try:
             title = g.value(s, DCTERMS.title)
             if not title:
