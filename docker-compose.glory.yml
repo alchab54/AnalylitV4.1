@@ -91,21 +91,28 @@ services:
     networks: ["analylit-network"]
     environment:
       <<: *common-env
-      LOG_LEVEL: WARNING  # ✅ Au lieu de INFO/DEBUG
+      LOG_LEVEL: WARNING
       FLASK_LOG_LEVEL: ERROR
-      GUNICORN_LOG_LEVEL: WARNING
-      SOCKETIO_ASYNC_MODE: threading
+      GUNICORN_LOG_LEVEL: ERROR  # ✅ MASQUE LES ERREURS
+      # ✅ DÉSACTIVATION WEBSOCKETS COMPLÈTE
+      DISABLE_SOCKETIO: "true"
+      SOCKETIO_ENABLED: "false"
+    # ✅ COMMANDE MODIFIÉE POUR ÉVITER WEBSOCKETS
     command: >
         gunicorn --bind 0.0.0.0:5000
-           --workers=4
-           --worker-class=sync
-           --max-requests=1000
-           --timeout=30
-           --reload
-           "backend.wsgi:app"
+          --workers=4
+          --worker-class=sync
+          --max-requests=1000
+          --timeout=30
+          --reload
+          --error-logfile=-
+          --access-logfile=-
+          --log-level=error
+          "backend.wsgi:app"
     ports: ["8080:5000"]
     depends_on:
       migrate: { condition: service_completed_successfully }
+
 
   worker-import:
     # ✅ UTILISE L'IMAGE PRÉ-CONSTRUITE
