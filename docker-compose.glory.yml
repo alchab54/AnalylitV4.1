@@ -89,7 +89,11 @@ services:
       - ./data:/app/data
       - ./templates:/app/templates:ro
     networks: ["analylit-network"]
-    environment: *common-env
+    environment:
+      <<: *common-env
+      LOG_LEVEL: WARNING  # ✅ Au lieu de INFO/DEBUG
+      FLASK_LOG_LEVEL: ERROR
+      GUNICORN_LOG_LEVEL: WARNING
     command: >
         gunicorn --bind 0.0.0.0:5000
            --workers=10
