@@ -12,7 +12,7 @@
 ✅ Scoring ATN v2.2: Intégration workers complète
 
 VICTOIRE TOTALE - AnalyLit V4.1 Thèse Doctorale
-Date: 08 octobre 2025 17:21 - Version GLORY finale
+Date: 11 octobre 2025 - Version GLORY FINALE CORRIGÉE
 ═══════════════════════════════════════════════════════════════════════════════
 """
 
@@ -24,32 +24,30 @@ import time
 import os
 import uuid
 import hashlib
-import re
 from datetime import datetime
 import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Any
-import pandas as pd
 
 # ENCODAGE UTF-8
 if sys.platform.startswith('win'):
     try:
         logging.basicConfig(level=logging.INFO,
-                            format='%(asctime)s - %(levelname)s - %(message)s')
+                            format="%(asctime)s - %(levelname)s - %(message)s")
         logger = logging.getLogger(__name__)
         sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
         sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
     except Exception as e:
         print(f"WARNING: Could not set UTF-8 stdout/stderr: {e}")
 
-# CONFIGURATION GLORY - CHEMINS CORRIGÉS POUR EXPORT ZOTERO ATN
-API_BASE = "http://localhost:5000"         # Port Docker interne ✅
-WEB_BASE = "http://localhost:8080"         # ✅ CORRECTION : Port 8080 au lieu de 3000  
-PROJECT_ROOT = Path("/app/source")  # ✅ CORRECTION : Dossier Docker monté
-ANALYLIT_RDF_PATH = PROJECT_ROOT / "Analylit" / "Analylit.rdf"  # ✅ CORRECTION : Sous-dossier Analylit
-OUTPUT_DIR = Path("/app/output")  # ✅ CORRECT
+# CONFIGURATION GLORY - CHEMINS CONTENEUR UNIFIÉS
+API_BASE = "http://localhost:5000"
+WEB_BASE = "http://localhost:8080"
+OUTPUT_DIR = Path("/app/output")
 
-ZOTERO_STORAGE_PATH = "/app/zotero-storage"  # Correspond au montage files/
+# ✅ CORRECTION MAJEURE : Chemins unifiés vers /app/zotero-storage
+ANALYLIT_RDF_PATH = Path("/app/zotero-storage/Analylit.rdf")
+ZOTERO_STORAGE_PATH = "/app/zotero-storage/files"
 
 CONFIG = {
     "chunk_size": 20,
@@ -63,7 +61,6 @@ CONFIG = {
 }
 
 def log(level: str, message: str, indent: int = 0):
-    """Affiche un message de log formaté avec timestamp et emoji."""
     ts = datetime.now().strftime("%H:%M:%S")
     indent_str = "  " * indent
     emoji_map = {
@@ -75,16 +72,13 @@ def log(level: str, message: str, indent: int = 0):
     print(f"[{ts}] {indent_str}{emoji} {level}: {message}")
 
 def log_section(title: str):
-    """Affiche un séparateur de section."""
     print("\n" + "═" * 80)
     print(f"  {title}")
     print("═" * 80 + "\n")
 
 def api_request_glory(method: str, endpoint: str, data: Optional[Dict] = None,
-                     timeout: int = 300) -> Optional[Any]:
-    """Requête API GLORY avec gestion correcte des listes vides."""
+                      timeout: int = 300) -> Optional[Any]:
     url = f"{API_BASE}{endpoint}"
-
     try:
         if method.upper() == "GET":
             resp = requests.get(url, timeout=timeout)
@@ -97,8 +91,8 @@ def api_request_glory(method: str, endpoint: str, data: Optional[Dict] = None,
         if resp.status_code in [200, 201, 202]:
             try:
                 json_result = resp.json()
-                log("DEBUG", f"🐛 {endpoint} → {resp.status_code} → {str(json_result)[:100]}...")
-                return json_result  # Peut être [] et c'est OK !
+                log("DEBUG", f"🐛 {endpoint} → {resp.status_code} → {str(json_result)[:120]}...")
+                return json_result
             except Exception as json_error:
                 log("ERROR", f"❌ JSON parse error: {json_error}")
                 return None
@@ -108,123 +102,29 @@ def api_request_glory(method: str, endpoint: str, data: Optional[Dict] = None,
         else:
             log("WARNING", f"⚠️ API {resp.status_code}: {endpoint}")
             return None
-
     except requests.exceptions.RequestException as e:
         log("ERROR", f"❌ Exception API {endpoint}: {str(e)[:100]}")
         return None
 
 def generate_unique_article_id(article: Dict) -> str:
-    """Génère un ID unique pour chaque article."""
     try:
         title = str(article.get("title", "")).strip()
         year = 2024
-
-        if "issued" in article and "date-parts" in article["issued"]:
-            try:
-                year = int(article["issued"]["date-parts"][0][0])
-            except:
-                pass
-
         content = f"{title[:50]}_{year}".lower()
         unique_hash = hashlib.md5(content.encode('utf-8')).hexdigest()[:10]
         return f"atn_{unique_hash}"
-
     except Exception:
         return f"safe_{str(uuid.uuid4())[:10]}"
 
-def parse_analylit_json_glory(json_path: Path, max_articles: int = None) -> List[Dict]:
-    """Parser Analylit.json avec format API compatible."""
-    log_section("CHARGEMENT ANALYLIT.JSON - FORMAT API COMPATIBLE")
-
-    if not json_path.is_file():
-        log("ERROR", f"❌ Fichier introuvable: {json_path}")
-        return []
-
-    try:
-        with open(json_path, 'r', encoding='utf-8') as f:
-            items = json.load(f)
-
-        if max_articles and len(items) > max_articles:
-            items = items[:max_articles]
-
-        log("SUCCESS", f"✅ {len(items)} articles chargés depuis Zotero")
-
-    except Exception as e:
-        log("ERROR", f"❌ Erreur lecture JSON: {e}")
-        return []
-
-    articles = []
-    for i, item in enumerate(items):
-        try:
-            title = str(item.get("title", f"Article {i+1}")).strip()
-
-            # Auteurs
-            authors = []
-            if "author" in item and isinstance(item["author"], list):
-                for auth in item["author"][:5]:
-                    if isinstance(auth, dict):
-                        name_parts = []
-                        if auth.get("given"):
-                            name_parts.append(str(auth["given"]))
-                        if auth.get("family"):
-                            name_parts.append(str(auth["family"]))
-                        if name_parts:
-                            authors.append(" ".join(name_parts))
-
-            authors_str = ", ".join(authors) if authors else "Auteur non spécifié"
-
-            # Année
-            year = 2024
-            try:
-                if "issued" in item and "date-parts" in item["issued"]:
-                    year = int(item["issued"]["date-parts"][0][0])
-            except:
-                pass
-
-            doi = str(item.get("DOI", "")).strip()
-            url = str(item.get("URL", "")).strip()
-            article_id = generate_unique_article_id(item)
-
-            # Format API compatible
-            article = {
-                "pmid": article_id,
-                "article_id": article_id,
-                "title": title,
-                "authors": str(authors) if authors else 'Auteur non spécifié',
-                "year": year,
-                "abstract": str(item.get('abstract', '')).strip()[:20000],
-                "journal": str(item.get('container-title', '')).strip() or 'Journal non identifié',
-                "doi": doi,
-                "url": url,
-                "database_source": 'zotero_analylit',
-                "publication_date": f"{year}-01-01",
-                'relevance_score': 0,
-                'has_pdf_potential': bool(doi or 'pubmed' in url.lower()),
-                'attachments': item.get('attachments', []) # ✅ LA LIGNE DE LA VICTOIRE
-            }
-            articles.append(article)
-
-            # Progress pour gros fichiers
-            if i > 0 and i % 100 == 0:
-                log("PROGRESS", f"⏳ Parsé: {i} articles", 1)
-
-        except Exception as e:
-            log("WARNING", f"⚠️ Skip article {i}: {e}")
-            continue
-
-    log("SUCCESS", f"📚 {len(articles)} articles formatés API")
-    return articles
-
 class ATNWorkflowGlory:
-    """Workflow ATN GLORY avec correction finale."""
+    """Workflow ATN GLORY robuste avec parsing RDF"""
 
     def __init__(self):
-        self.project_id = None
-        self.articles = []
+        self.project_id: Optional[int] = None
+        self.articles: List[Dict] = []
         self.start_time = datetime.now()
 
     def run_glory_workflow(self) -> bool:
-        """Workflow GLORY avec correction du bug liste vide."""
         log_section("🏆 WORKFLOW ATN GLORY - CORRECTION BUG LISTE VIDE")
         log("GLORY", "👑 Bug [] vs None résolu - lancement définitif")
 
@@ -257,60 +157,128 @@ class ATNWorkflowGlory:
             return False
 
     def check_api_glory(self) -> bool:
-        """Vérification API avec correction liste vide."""
         log_section("VÉRIFICATION API GLORY - BUG [] RÉSOLU")
 
-        # Test 1: Health check
         log("DEBUG", "🐛 Test /api/health...")
         health = api_request_glory("GET", "/api/health")
-        if health is None:  # ✅ CORRECTION: is None au lieu de not
+        if health is None:
             log("ERROR", "❌ /api/health inaccessible")
             return False
         log("SUCCESS", "✅ /api/health validé")
 
-        # Test 2: Projects list  
         log("DEBUG", "🐛 Test /api/projects...")
         projects = api_request_glory("GET", "/api/projects")
-        if projects is None:  # ✅ CORRECTION FINALE: is None au lieu de not
+        if projects is None:
             log("ERROR", "❌ /api/projects inaccessible")
             return False
 
-        # ✅ CORRECTION: Liste vide [] est valide !
         log("SUCCESS", f"✅ /api/projects validé - {len(projects)} projet(s)")
         log("GLORY", "👑 API COMPLÈTEMENT FONCTIONNELLE - BUG RÉSOLU!")
         return True
 
     def load_articles_glory(self) -> bool:
-        """Vérifie simplement que le fichier RDF existe."""
+        """✅ CORRECTION : Vérifie fichiers, compte PDFs récursivement, parse RDF robuste"""
         log_section("VÉRIFICATION SOURCE DE DONNÉES - ZOTERO RDF")
-        if not ANALYLIT_RDF_PATH.is_file():
-            log("ERROR", f"❌ Fichier RDF introuvable : {ANALYLIT_RDF_PATH}")
-        
-        # Logs avant le parsing
-        log("INFO", "Vérification de l'existence et de la taille des répertoires et fichiers :")
 
-        rdf_exists = os.path.exists(ANALYLIT_RDF_PATH)
+        # Vérification existence
+        rdf_exists = ANALYLIT_RDF_PATH.is_file()
         pdf_dir_exists = os.path.isdir(ZOTERO_STORAGE_PATH)
-        try:
-            pdf_count = len(os.listdir(ZOTERO_STORAGE_PATH))
-        except FileNotFoundError:
-            pdf_count = "Repertoire PDF non trouvé"
+
+        # ✅ CORRECTION : Comptage récursif des PDFs avec échantillons
+        pdf_count = 0
+        pdf_samples: List[str] = []
+        if pdf_dir_exists:
+            for root, _, files in os.walk(ZOTERO_STORAGE_PATH):
+                for f in files:
+                    if f.lower().endswith(".pdf"):
+                        pdf_count += 1
+                        if len(pdf_samples) < 5:
+                            pdf_samples.append(os.path.join(root, f))
 
         log("INFO", f"  - ANALYLIT_RDF_PATH existe : {rdf_exists}")
         log("INFO", f"  - ZOTERO_STORAGE_PATH existe : {pdf_dir_exists}")
-        log("INFO", f"  - Nombre de PDFs dans ZOTERO_STORAGE_PATH : {pdf_count}")
+        log("INFO", f"  - Nombre de PDFs détectés (récursif) : {pdf_count}")
+        if pdf_samples:
+            log("DEBUG", f"  - Échantillons PDF: {pdf_samples}")
 
+        if not rdf_exists:
+            log("ERROR", f"❌ Fichier RDF introuvable : {ANALYLIT_RDF_PATH}")
+            return False
 
-        return False
-        
-        log("SUCCESS", f"✅ Fichier RDF prêt pour l'import : {ANALYLIT_RDF_PATH.name}")
-        self.articles = [1] * 328 # Simule le nombre d'articles pour les logs
+        # ✅ CORRECTION : Parse RDF avec fallback robuste
+        items = self.parse_zotero_rdf_robuste(str(ANALYLIT_RDF_PATH))
+        log("INFO", f"📚 RDF items parsés: {len(items)}")
+
+        if len(items) == 0:
+            log("WARNING", "⚠️ 0 item parsé depuis RDF - vérifier le RDF")
+            return False
+
+        self.articles = items
+        log("SUCCESS", f"✅ Fichier RDF prêt : {ANALYLIT_RDF_PATH.name} ({len(self.articles)} items)")
         return True
 
-    def create_project_glory(self) -> bool:
-        """Crée le projet GLORY."""
-        log_section("CRÉATION PROJET GLORY")
+    def parse_zotero_rdf_robuste(self, rdf_path: str) -> List[dict]:
+        """✅ FONCTION AJOUTÉE : Parse RDF avec fallback BeautifulSoup"""
+        items: List[Dict[str, Any]] = []
 
+        # Essai RDFlib
+        try:
+            from rdflib import Graph, Namespace
+            g = Graph()
+            g.parse(rdf_path)
+            Z = Namespace("http://www.zotero.org/namespaces/export#")
+            DC = Namespace("http://purl.org/dc/elements/1.1/")
+
+            for s in g.subjects():
+                title = None
+                for t in g.objects(s, DC.title):
+                    title = str(t)
+                    break
+
+                attachments = []
+                for att in g.objects(s, Z.attachment):
+                    att_str = str(att)
+                    if att_str.startswith("files/") and att_str.lower().endswith(".pdf"):
+                        attachments.append({"path": att_str})
+
+                if title or attachments:
+                    items.append({
+                        "title": title or "Sans titre",
+                        "attachments": attachments
+                    })
+            return items
+
+        except Exception as e:
+            log("WARNING", f"⚠️ RDFlib échoué: {e}. Fallback BeautifulSoup.")
+
+        # Fallback BeautifulSoup
+        try:
+            from bs4 import BeautifulSoup
+            with open(rdf_path, "r", encoding="utf-8") as f:
+                xml = f.read()
+            soup = BeautifulSoup(xml, "xml")
+
+            results = []
+            for desc in soup.find_all("rdf:Description"):
+                title_tag = desc.find(["dc:title", "dcterms:title"])
+                title = title_tag.get_text(strip=True) if title_tag else "Sans titre"
+
+                attachments = []
+                for za in desc.find_all("z:attachment"):
+                    res = za.get("rdf:resource")
+                    if res and res.startswith("files/") and res.lower().endswith(".pdf"):
+                        attachments.append({"path": res})
+
+                if title or attachments:
+                    results.append({"title": title, "attachments": attachments})
+            return results
+
+        except Exception as e2:
+            log("ERROR", f"❌ Fallback BeautifulSoup échoué: {e2}")
+            return []
+
+    def create_project_glory(self) -> bool:
+        log_section("CRÉATION PROJET GLORY")
         timestamp = self.start_time.strftime("%d/%m/%Y %H:%M")
 
         data = {
@@ -331,7 +299,7 @@ class ATNWorkflowGlory:
 
         log("DEBUG", "🐛 Création projet GLORY...")
         result = api_request_glory("POST", "/api/projects", data)
-        if result is None:  # ✅ CORRECTION: is None
+        if result is None:
             log("ERROR", "❌ Échec création projet")
             return False
 
@@ -345,12 +313,11 @@ class ATNWorkflowGlory:
             return False
 
     def import_articles_glory(self) -> bool:
-        """Import avec chemins export Zotero ATN corrects."""
         log_section("IMPORT ZOTERO RDF - EXPORT ATN AVEC FILES/")
 
-        # ✅ CHEMINS PARFAITS POUR VOTRE STRUCTURE
-        rdf_path = "/app/source/Analylit/Analylit.rdf"    # Correspond à votre export
-        storage_path = "/app/zotero-storage"              # Correspond aux files/
+        # ✅ CORRECTION : Utilise les chemins conteneur unifiés
+        rdf_path = str(ANALYLIT_RDF_PATH)
+        storage_path = ZOTERO_STORAGE_PATH
 
         data = {
             "rdf_file_path": rdf_path,
@@ -359,25 +326,25 @@ class ATNWorkflowGlory:
 
         log("INFO", f"📦 RDF ATN: {rdf_path}")
         log("INFO", f"📁 PDFs: {storage_path}")
-        
+
         result = api_request_glory(
             "POST",
             f"/api/projects/{self.project_id}/import-zotero-rdf",
             data,
-            timeout=300  # ✅ 5 minutes pour 328 articles
+            timeout=300
         )
+        log("DEBUG", f"🐛 Réponse import API: {result}")
 
-        if result and result.get("task_id"):
+        if result and isinstance(result, dict) and result.get("task_id"):
             task_id = result['task_id']
             log("SUCCESS", f"✅ Import ATN lancé! Task: {task_id}")
-            log("GLORY", "👑 328 articles ATN → Workers RTX 2060 SUPER!")
+            log("GLORY", "👑 327+ articles ATN → Workers RTX 2060 SUPER!")
             return True
         else:
             log("ERROR", "❌ Échec import RDF ATN")
             return False
 
     def monitor_extractions_glory(self) -> bool:
-        """Monitor extractions avec patience."""
         log_section("MONITORING EXTRACTIONS GLORY")
 
         start_time = time.time()
@@ -392,7 +359,7 @@ class ATNWorkflowGlory:
                 f"/api/projects/{self.project_id}/extractions"
             )
 
-            if extractions is None:  # ✅ CORRECTION: is None
+            if extractions is None:
                 log("WARNING", "⚠️ Status extractions indisponible")
                 current = 0
             else:
@@ -405,7 +372,6 @@ class ATNWorkflowGlory:
             else:
                 stable_minutes += 1
 
-            # Conditions d'arrêt
             completion_rate = (current / len(self.articles)) * 100 if self.articles else 0
 
             if completion_rate >= 70:
@@ -426,18 +392,16 @@ class ATNWorkflowGlory:
         return False
 
     def generate_glory_report(self):
-        """Génère le rapport final GLORY."""
         log_section("RAPPORT FINAL GLORY")
 
         elapsed = round((datetime.now() - self.start_time).total_seconds() / 60, 1)
 
-        # Récupération données avec correction
         extractions = api_request_glory("GET", f"/api/projects/{self.project_id}/extractions")
-        if extractions is None:  # ✅ CORRECTION: is None
+        if extractions is None:
             extractions = []
 
-        analyses = api_request_glory("GET", f"/api/projects/{self.project_id}/analyses")  
-        if analyses is None:  # ✅ CORRECTION: is None
+        analyses = api_request_glory("GET", f"/api/projects/{self.project_id}/analyses")
+        if analyses is None:
             analyses = []
 
         scores = [e.get("relevance_score", 0) for e in extractions if isinstance(e, dict)]
@@ -451,36 +415,15 @@ class ATNWorkflowGlory:
                 "duration_minutes": elapsed,
                 "project_id": self.project_id,
                 "bug_fixed": "Liste vide [] vs None correctement gérée",
-                "correction_applied": "if projects is None (au lieu de if not projects)",
                 "victory_achieved": True
             },
-
             "results_glory": {
                 "articles_loaded": len(self.articles),
                 "extractions_completed": len(extractions),
                 "analyses_completed": len(analyses),
                 "extraction_rate": round((len(extractions) / len(self.articles)) * 100, 1) if self.articles else 0,
                 "mean_score": round(mean_score, 2),
-                "articles_validated": validated,
-                "validation_rate": round((validated / len(scores)) * 100, 1) if scores else 0
-            },
-
-            "technical_glory": {
-                "api_connection_fixed": True,
-                "bug_identified_and_resolved": "if not [] → True (erreur)",
-                "correction_applied": "if [] is None → False (OK)",
-                "docker_network_operational": True,
-                "workers_active": 22,
-                "gpu_ready": True,
-                "database_functional": True
-            },
-
-            "thesis_validation": {
-                "system_proven_functional": len(extractions) > 0,
-                "scoring_algorithm_working": mean_score > 0,
-                "architecture_validated": True,
-                "glory_status": "VICTORY_TOTAL",
-                "ready_for_massive_processing": True
+                "articles_validated": validated
             }
         }
 
@@ -492,68 +435,29 @@ class ATNWorkflowGlory:
         except Exception as e:
             log("WARNING", f"⚠️ Erreur sauvegarde rapport: {e}")
 
-        # Affichage résultats
         log("DATA", f"⏱️ Durée totale: {elapsed:.1f} minutes")
         log("DATA", f"📊 Extractions: {len(extractions)}")
         log("DATA", f"📈 Score moyen: {mean_score:.2f}")
         log("DATA", f"✅ Validés (≥8): {validated}")
         log("DATA", f"🔗 Projet: {WEB_BASE}/projects/{self.project_id}")
-        log("DATA", f"💾 Rapport: {filename.name}")
 
-        if report["thesis_validation"]["glory_status"] == "VICTORY_TOTAL":
+        if len(extractions) > 0:
             log("FINAL", "👑 ANALYLIT V4.1 - GLOIRE TOTALE!")
             log("FINAL", "🎯 Bug résolu - système opérationnel")
             log("FINAL", "🚀 Prêt pour traitement massif thèse")
-            
-        # ================================================================
-        # === ANALYSE DE PERFORMANCE "GLORY"
-        # ================================================================
-        try:
-            log("INFO", "🔍 Analyse des logs de performance...")
-            import pandas as pd
-            
-            # Trouver le dernier log de performance
-            perf_logs = sorted(list(OUTPUT_DIR.glob("performance_log_*.csv")))
-            if perf_logs:
-                latest_log = perf_logs[-1]
-                df = pd.read_csv(latest_log)
-                
-                # Assurer que les colonnes sont numériques
-                df['gpu_percent'] = pd.to_numeric(df['gpu_percent'], errors='coerce')
-                df['gpu_mem_percent'] = pd.to_numeric(df['gpu_mem_percent'], errors='coerce')
-                
-                gpu_stats = df[df['container_name'] == 'nvidia_gpu'].dropna(subset=['gpu_percent'])
-                
-                if not gpu_stats.empty:
-                    avg_gpu_usage = gpu_stats['gpu_percent'].mean()
-                    max_gpu_usage = gpu_stats['gpu_percent'].max()
-                    avg_vram_usage = gpu_stats['gpu_mem_percent'].mean()
-                    
-                    report["performance_glory"] = {
-                        "log_file": latest_log.name,
-                        "avg_gpu_utilization_percent": round(avg_gpu_usage, 2),
-                        "max_gpu_utilization_percent": round(max_gpu_usage, 2),
-                        "avg_vram_utilization_percent": round(avg_vram_usage, 2),
-                        "recommendation": "GPU sous-utilisé. Augmenter les 'replicas' de worker-extraction/analysis." if avg_gpu_usage < 75 else "GPU bien utilisé. Configuration optimale."
-                    }
-                    log("SUCCESS", f"✅ Analyse de performance incluse. Utilisation GPU moyenne: {avg_gpu_usage:.2f}%")
-        except Exception as perf_e:
-            log("WARNING", f"⚠️ Impossible d'analyser les logs de performance: {perf_e}")
 
         return report
 
 def main():
-    """Fonction principale GLORY."""
     try:
         log_section("🏆 WORKFLOW ATN GLORY - BUG LISTE VIDE RÉSOLU")
-        log("GLORY", "👑 Version finale - correction if [] is None")
+        log("GLORY", "👑 Version finale corrigée - 11 octobre 2025")
 
         workflow = ATNWorkflowGlory()
         success = workflow.run_glory_workflow()
 
         if success:
             log("FINAL", "👑 WORKFLOW GLORY RÉUSSI!")
-            log("FINAL", "🎉 Bug définitivement corrigé")
             log("FINAL", "✅ AnalyLit V4.1 prêt pour thèse")
         else:
             log("WARNING", "⚠️ Résultats partiels - système fonctionnel")

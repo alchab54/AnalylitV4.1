@@ -1,32 +1,72 @@
 # ===================================================================
-# == Dockerfile.base-cpu - Image de base LÉGÈRE ==
+# == ANALYLIT V4.2 - BASE CPU OPTIMISÉE MULTI-COUCHES
 # ===================================================================
-# Cette image contient toutes les dépendances SAUF PyTorch.
-
 FROM python:3.11-slim
 
-# Installer les dépendances système
-RUN apt-get update && \
-    apt-get install -y postgresql-client curl iproute2 && \
-    rm -rf /var/lib/apt/lists/*
+# Arguments de build pour optimisations
+ARG DEBIAN_FRONTEND=noninteractive
+ARG PIP_NO_CACHE_DIR=1
+ARG PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Copier uniquement le fichier de dépendances pour optimiser le cache
-WORKDIR /deps
-COPY requirements.txt .
+# Métadonnées
+LABEL maintainer="AnalyLit Team"
+LABEL version="4.2"
+LABEL description="Base CPU optimisée avec cache multi-couches"
 
-# Installer toutes les dépendances SAUF PyTorch et ses dérivés.
-# On utilise grep pour les exclure. --no-cache-dir réduit la taille de l'image.
-RUN grep -v "torch" requirements.txt > requirements-cpu.txt && \
-    pip install --no-cache-dir -r requirements-cpu.txt
+# Variables d'environnement système
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    DEBIAN_FRONTEND=noninteractive
 
-# ✅ AMÉLIORATION: Créer un utilisateur non-root pour la sécurité.
-# Tous les services qui hériteront de cette image pourront l'utiliser.
-RUN useradd -ms /bin/bash appuser
+# === COUCHE 1: SYSTÈME (change très rarement) ===
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    libpq-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
-# Définir le PATH pour inclure les binaires installés par pip
-ENV PATH="/home/appuser/.local/bin:${PATH}"
-ENV PYTHONPATH="/home/appuser/.local/lib/python3.11/site-packages"
+# === COUCHE 2: PIP UPGRADE (change rarement) ===
+RUN pip install --upgrade pip setuptools wheel
 
-# Changer d'utilisateur
+# === COUCHE 3: DÉPENDANCES LOURDES STABLES (change très rarement) ===
+COPY requirements-base.txt /tmp/
+RUN pip install --no-deps -r /tmp/requirements-base.txt \
+    && rm /tmp/requirements-base.txt
+
+# === COUCHE 4: DÉPENDANCES MOYENNES (change occasionnellement) ===
+COPY requirements-common.txt /tmp/
+RUN pip install -r /tmp/requirements-common.txt \
+    && rm /tmp/requirements-common.txt
+
+# === COUCHE 5: DÉPENDANCES LÉGÈRES (change souvent) ===
+COPY requirements-dev.txt /tmp/
+RUN pip install -r /tmp/requirements-dev.txt \
+    && rm /tmp/requirements-dev.txt
+
+# === COUCHE 6: APPLICATION (change très souvent) ===
+WORKDIR /app
+
+# Copy application code (this layer will be rebuilt most often)
+COPY . /app/
+
+# Permissions et nettoyage final
+RUN groupadd -g 1000 appuser && useradd -r -u 1000 -g appuser appuser \
+    && chown -R appuser:appuser /app \
+    && find /app -type f -name "*.pyc" -delete \
+    && find /app -type d -name "__pycache__" -exec rm -rf {} + || true
+
 USER appuser
-WORKDIR /home/appuser/app
+
+EXPOSE 5000
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:5000/api/health || exit 1
+
+CMD ["python", "-m", "backend.wsgi"]

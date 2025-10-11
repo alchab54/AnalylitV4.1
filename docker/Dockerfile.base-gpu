@@ -1,30 +1,86 @@
 # ===================================================================
-# == Dockerfile.base-gpu - Image de base LOURDE (IA) ==
+# == ANALYLIT V4.2 - BASE GPU OPTIMISÉE MULTI-COUCHES RTX 2060 SUPER
 # ===================================================================
-# Cette image hérite de la base-cpu et ajoute PyTorch.
+FROM nvidia/cuda:12.1-devel-ubuntu22.04
 
-ARG BASE_IMAGE=analylit-base-cpu:latest
-FROM ${BASE_IMAGE}
+# Arguments de build
+ARG DEBIAN_FRONTEND=noninteractive
+ARG PIP_NO_CACHE_DIR=1
+ARG PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Toujours travailler dans un répertoire dédié aux dépendances
-WORKDIR /deps
+# Métadonnées
+LABEL maintainer="AnalyLit Team"
+LABEL version="4.2-gpu"
+LABEL description="Base GPU optimisée RTX 2060 SUPER avec cache multi-couches"
 
-# Basculer vers l'utilisateur root pour avoir les droits d'installation
-USER root
+# Variables d'environnement NVIDIA & Python
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    DEBIAN_FRONTEND=noninteractive \
+    NVIDIA_VISIBLE_DEVICES=all \
+    NVIDIA_DRIVER_CAPABILITIES=compute,utility \
+    CUDA_CACHE_PATH=/tmp/cuda-cache
 
-# Copier le fichier de dépendances depuis le contexte de build
-COPY requirements.txt .
+# === COUCHE 1: SYSTÈME + CUDA (change très rarement) ===
+RUN apt-get update && apt-get install -y \
+    python3.11 \
+    python3.11-dev \
+    python3-pip \
+    build-essential \
+    curl \
+    git \
+    libpq-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    pkg-config \
+    && ln -s /usr/bin/python3.11 /usr/bin/python \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
-# ✅ CORRECTION DÉFINITIVE: L'image de base a déjà toutes les dépendances CPU.
-# On installe UNIQUEMENT les dépendances GPU manquantes.
-RUN grep -i "torch" requirements.txt > requirements-gpu.txt && \
-    pip install --no-cache-dir \
-        --retries 10 \
-        --timeout 120 \
-        -r requirements-gpu.txt
+# === COUCHE 2: PIP UPGRADE (change rarement) ===
+RUN python -m pip install --upgrade pip setuptools wheel
 
-# Revenir à l'utilisateur non-root pour la sécurité
+# === COUCHE 3: CUDA + PyTorch (change très rarement - LA PLUS LOURDE) ===
+RUN pip install torch==2.1.0+cu121 torchvision==0.16.0+cu121 torchaudio==2.1.0+cu121 \
+    --extra-index-url https://download.pytorch.org/whl/cu121 \
+    && python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
+
+# === COUCHE 4: DÉPENDANCES LOURDES STABLES (change très rarement) ===
+COPY requirements-base.txt /tmp/
+RUN pip install --no-deps -r /tmp/requirements-base.txt \
+    && rm /tmp/requirements-base.txt
+
+# === COUCHE 5: DÉPENDANCES MOYENNES (change occasionnellement) ===
+COPY requirements-common.txt /tmp/
+RUN pip install -r /tmp/requirements-common.txt \
+    && rm /tmp/requirements-common.txt
+
+# === COUCHE 6: DÉPENDANCES LÉGÈRES (change souvent) ===
+COPY requirements-dev.txt /tmp/
+RUN pip install -r /tmp/requirements-dev.txt \
+    && rm /tmp/requirements-dev.txt
+
+# === COUCHE 7: APPLICATION (change très souvent) ===
+WORKDIR /app
+
+# Copy application code (this layer will be rebuilt most often)
+COPY . /app/
+
+# Permissions et optimisation GPU
+RUN groupadd -g 1000 appuser && useradd -r -u 1000 -g appuser appuser \
+    && chown -R appuser:appuser /app \
+    && mkdir -p /tmp/cuda-cache \
+    && chown -R appuser:appuser /tmp/cuda-cache \
+    && find /app -type f -name "*.pyc" -delete \
+    && find /app -type d -name "__pycache__" -exec rm -rf {} + || true
+
 USER appuser
 
-# Revenir au répertoire de travail de l'application
-WORKDIR /home/appuser/app
+EXPOSE 5000
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:5000/api/health || exit 1
+
+CMD ["python", "-m", "backend.wsgi"]

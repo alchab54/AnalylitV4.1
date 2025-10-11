@@ -1,0 +1,19 @@
+# ===================================================================
+# == DÉPENDANCES MOYENNES (changent occasionnellement)
+# ===================================================================
+
+# --- Framework Web ---
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+Flask-Migrate>=3.1.0
+Flask-Cors==4.0.0
+Flask-SocketIO==5.3.6
+gunicorn==21.2.0
+
+# --- Utilitaires ---
+redis==5.0.1
+rq==1.16.1
+requests==2.31.0
+beautifulsoup4==4.12.2
+rdflib==7.0.0
+chromadb==0.4.22
