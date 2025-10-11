@@ -1,3 +1,8 @@
+# ===================================================================
+# == ANALYLIT V4.2 GLORY - PRODUCTION RTX 2060 SUPER
+# == Utilise les images pré-construites pour build rapide
+# ===================================================================
+
 services:
   test-db:
     image: postgres:15-alpine
@@ -46,19 +51,17 @@ services:
     restart: unless-stopped
 
   migrate:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.migrate
+    # ✅ UTILISE L'IMAGE PRÉ-CONSTRUITE
+    image: analylit-base-gpu:latest
     container_name: analylit-migrate
     restart: "no"
     working_dir: /app
     volumes:
       # ✅ VOLUMES CORRIGÉS POUR EXPORT ZOTERO ATN
-      - .:/app
+      - .:/app:rw
       - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro
-      - ./output:/app/output                                         # Output avec permissions
-      - ./data:/app/data                                             # Base de données
-      - .:/app:rw                                                    # Code source
+      - ./output:/app/output
+      - ./data:/app/data
     networks: ["analylit-network"]
     environment: &common-env
       DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
@@ -73,20 +76,18 @@ services:
     command: ["alembic", "upgrade", "head"]
 
   web:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.worker
+    # ✅ UTILISE L'IMAGE PRÉ-CONSTRUITE avec live reload
+    image: analylit-base-gpu:latest
     container_name: analylit_web
     restart: unless-stopped
     working_dir: /app
     volumes:
-      # ✅ VOLUMES IDENTIQUES POUR TOUS LES SERVICES
-      - .:/app
-      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro    # PDFs au bon endroit
-      - ./output:/app/output                                         # Output avec permissions
-      - ./data:/app/data                                             # Base de données
-      - .:/app:rw                                                    # Code source
-      - ./templates:/app/templates:ro                                # Templates d'export
+      # ✅ LIVE RELOAD: Code source monté en lecture-écriture
+      - .:/app:rw
+      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro
+      - ./output:/app/output
+      - ./data:/app/data
+      - ./templates:/app/templates:ro
     networks: ["analylit-network"]
     environment: *common-env
     command: >
@@ -96,24 +97,23 @@ services:
            --worker-connections=1000
            --max-requests=1000
            --timeout=30
+           --reload
            "backend.wsgi:app"
     ports: ["8080:5000"]
     depends_on:
       migrate: { condition: service_completed_successfully }
 
   worker-import:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.worker
+    # ✅ UTILISE L'IMAGE PRÉ-CONSTRUITE
+    image: analylit-base-gpu:latest
     restart: unless-stopped
     working_dir: /app
     volumes:
       # ✅ VOLUMES IDENTIQUES - CRUCIAL POUR ACCÈS RDF/PDFs
-      - .:/app                           # Dossier parent export  
-      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro    # PDFs au bon endroit
-      - ./output:/app/output                                         # Output avec permissions
-      - ./data:/app/data                                             # Base de données
-      - .:/app:rw                                                    # Code source
+      - .:/app:rw
+      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro
+      - ./output:/app/output
+      - ./data:/app/data
     networks: ["analylit-network"]
     environment: *common-env
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "import_queue"]
@@ -124,20 +124,21 @@ services:
           memory: 4G
         reservations:
           memory: 2G
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
-  # ✅ TOUS LES AUTRES WORKERS AVEC LES MÊMES VOLUMES
   worker-screening:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.worker
+    # ✅ UTILISE L'IMAGE PRÉ-CONSTRUITE
+    image: analylit-base-gpu:latest
     restart: unless-stopped
     working_dir: /app
     volumes:
-      - .:/app                           
-      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro    
-      - ./output:/app/output                                         
-      - ./data:/app/data                                             
-      - .:/app:rw                                                    
+      - .:/app:rw
+      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro
+      - ./output:/app/output
+      - ./data:/app/data
     networks: ["analylit-network"]
     environment: *common-env
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue", "atn_scoring_queue"]
@@ -152,17 +153,15 @@ services:
               capabilities: [gpu]
 
   worker-extraction:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.worker
+    # ✅ UTILISE L'IMAGE PRÉ-CONSTRUITE
+    image: analylit-base-gpu:latest
     restart: unless-stopped
     working_dir: /app
     volumes:
-      - .:/app                           
-      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro    
-      - ./output:/app/output                                         
-      - ./data:/app/data                                             
-      - .:/app:rw                                                    
+      - .:/app:rw
+      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro
+      - ./output:/app/output
+      - ./data:/app/data
     networks: ["analylit-network"]
     environment: *common-env
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "extraction_queue"]
@@ -177,17 +176,15 @@ services:
               capabilities: [gpu]
 
   worker-analysis:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.worker
+    # ✅ UTILISE L'IMAGE PRÉ-CONSTRUITE
+    image: analylit-base-gpu:latest
     restart: unless-stopped
     working_dir: /app
     volumes:
-      - .:/app                           
-      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro    
-      - ./output:/app/output                                         
-      - ./data:/app/data                                             
-      - .:/app:rw                                                    
+      - .:/app:rw
+      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro
+      - ./output:/app/output
+      - ./data:/app/data
     networks: ["analylit-network"]
     environment: *common-env
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue"]
@@ -202,17 +199,15 @@ services:
               capabilities: [gpu]
 
   worker-synthesis:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.worker
+    # ✅ UTILISE L'IMAGE PRÉ-CONSTRUITE
+    image: analylit-base-gpu:latest
     restart: unless-stopped
     working_dir: /app
     volumes:
-      - .:/app                           
-      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro    
-      - ./output:/app/output                                         
-      - ./data:/app/data                                             
-      - .:/app:rw                                                    
+      - .:/app:rw
+      - C:\Users\alich\Downloads\Analylit\source\Analylit:/app/zotero-storage:ro
+      - ./output:/app/output
+      - ./data:/app/data
     networks: ["analylit-network"]
     environment: *common-env
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "synthesis_queue", "discussion_draft_queue"]
@@ -228,23 +223,29 @@ services:
 
   rq-dashboard:
     image: eoranged/rq-dashboard
+    container_name: analylit_rq_dashboard
     ports: ["9181:9181"]
-    environment: { RQ_DASHBOARD_REDIS_URL: "redis://redis:6379/0" }
+    environment: 
+      RQ_DASHBOARD_REDIS_URL: "redis://redis:6379/0"
     networks: ["analylit-network"]
     depends_on:
       redis: { condition: service_started }
     restart: unless-stopped
 
   resource-monitor:
-    build:
-      context: ./docker
-      dockerfile: Dockerfile.monitor
+    # ✅ UTILISE L'IMAGE PRÉ-CONSTRUITE pour cohérence
+    image: analylit-base-gpu:latest
     container_name: analylit_monitor
     restart: unless-stopped
+    working_dir: /app
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./output:/output
+      - .:/app:rw
     networks: ["analylit-network"]
+    environment: *common-env
+    # Override la commande par défaut pour le monitoring
+    command: ["python", "/app/scripts/resource_monitor.py"]
 
 networks:
   analylit-network:
@@ -252,4 +253,6 @@ networks:
 
 volumes:
   test_postgres_data:
+    driver: local
   ollama_data:
+    driver: local
