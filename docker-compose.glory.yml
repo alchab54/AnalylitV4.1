@@ -50,36 +50,45 @@ services:
       context: .
       dockerfile: docker/Dockerfile.migrate
     container_name: analylit-migrate
-    <<: &common-config
-      restart: unless-stopped
-      working_dir: /app
-      volumes:
-        - .:/app:rw
-        - ./source:/app/source
-        - ./zotero-storage:/app/zotero-storage
-        - ./output:/app/output
-        - ./data:/app/data
-      networks:
-        - analylit-network
-      environment: &common-env
-        DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
-        REDIS_URL: redis://redis:6379/0
-        OLLAMA_BASE_URL: http://ollama:11434
-        SECRET_KEY: "8cfb18e58a85676a34a6658a0263b48b85c7479edb807f38"
-        FLASK_ENV: production  # ✅ AJOUT
-        PYTHONPATH: /app       # ✅ AJOUT pour éviter les erreurs d'import
-        TZ: Europe/Paris
+    restart: "no"
+    working_dir: /app
+    volumes:
+      # ✅ VOLUMES CORRIGÉS POUR EXPORT ZOTERO ATN
+      - ./export_zotero_atn:/app/source:ro                           # Dossier parent export  
+      - ./export_zotero_atn/Analylit/files:/app/zotero-storage:ro    # PDFs au bon endroit
+      - ./output:/app/output                                         # Output avec permissions
+      - ./data:/app/data                                             # Base de données
+      - .:/app:rw                                                    # Code source
+    networks: ["analylit-network"]
+    environment: &common-env
+      DATABASE_URL: postgresql://analylit_user:strong_password@test-db:5432/analylit_test_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      SECRET_KEY: "8cfb18e58a85676a34a6658a0263b48b85c7479edb807f38"
+      FLASK_ENV: production
+      PYTHONPATH: /app
+      TZ: Europe/Paris
     depends_on:
       test-db: { condition: service_healthy }
     command: ["alembic", "upgrade", "head"]
-    restart: "no"
 
   web:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
     container_name: analylit_web
-    <<: *common-config
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      # ✅ VOLUMES IDENTIQUES POUR TOUS LES SERVICES
+      - ./export_zotero_atn:/app/source:ro                           # Dossier parent export  
+      - ./export_zotero_atn/Analylit/files:/app/zotero-storage:ro    # PDFs au bon endroit
+      - ./output:/app/output                                         # Output avec permissions
+      - ./data:/app/data                                             # Base de données
+      - .:/app:rw                                                    # Code source
+      - ./templates:/app/templates:ro                                # Templates d'export
+    networks: ["analylit-network"]
+    environment: *common-env
     command: >
         gunicorn --bind 0.0.0.0:5000
            --workers=10
@@ -89,12 +98,6 @@ services:
            --timeout=30
            "backend.wsgi:app"
     ports: ["8080:5000"]
-    volumes:
-      - ./source:/app/source:ro
-      - ./zotero-storage:/app/zotero-storage:ro
-      - ./output:/app/output
-      - ./data:/app/data
-      - ./templates:/app/templates:ro  # ✅ AJOUT pour templates d'export
     depends_on:
       migrate: { condition: service_completed_successfully }
 
@@ -102,7 +105,17 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-    <<: *common-config
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      # ✅ VOLUMES IDENTIQUES - CRUCIAL POUR ACCÈS RDF/PDFs
+      - ./export_zotero_atn:/app/source:ro                           # Dossier parent export  
+      - ./export_zotero_atn/Analylit/files:/app/zotero-storage:ro    # PDFs au bon endroit
+      - ./output:/app/output                                         # Output avec permissions
+      - ./data:/app/data                                             # Base de données
+      - .:/app:rw                                                    # Code source
+    networks: ["analylit-network"]
+    environment: *common-env
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "import_queue"]
     deploy:
       replicas: 1
@@ -112,11 +125,21 @@ services:
         reservations:
           memory: 2G
 
+  # ✅ TOUS LES AUTRES WORKERS AVEC LES MÊMES VOLUMES
   worker-screening:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-    <<: *common-config
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./export_zotero_atn:/app/source:ro                           
+      - ./export_zotero_atn/Analylit/files:/app/zotero-storage:ro    
+      - ./output:/app/output                                         
+      - ./data:/app/data                                             
+      - .:/app:rw                                                    
+    networks: ["analylit-network"]
+    environment: *common-env
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "screening_queue", "atn_scoring_queue"]
     deploy:
       replicas: 2
@@ -132,7 +155,16 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-    <<: *common-config
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./export_zotero_atn:/app/source:ro                           
+      - ./export_zotero_atn/Analylit/files:/app/zotero-storage:ro    
+      - ./output:/app/output                                         
+      - ./data:/app/data                                             
+      - .:/app:rw                                                    
+    networks: ["analylit-network"]
+    environment: *common-env
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "extraction_queue"]
     deploy:
       replicas: 6
@@ -148,7 +180,16 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-    <<: *common-config
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./export_zotero_atn:/app/source:ro                           
+      - ./export_zotero_atn/Analylit/files:/app/zotero-storage:ro    
+      - ./output:/app/output                                         
+      - ./data:/app/data                                             
+      - .:/app:rw                                                    
+    networks: ["analylit-network"]
+    environment: *common-env
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "analysis_queue"]
     deploy:
       replicas: 6
@@ -164,7 +205,16 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-    <<: *common-config
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./export_zotero_atn:/app/source:ro                           
+      - ./export_zotero_atn/Analylit/files:/app/zotero-storage:ro    
+      - ./output:/app/output                                         
+      - ./data:/app/data                                             
+      - .:/app:rw                                                    
+    networks: ["analylit-network"]
+    environment: *common-env
     command: ["rq", "worker", "--url", "redis://redis:6379/0", "synthesis_queue", "discussion_draft_queue"]
     deploy:
       replicas: 2
@@ -193,7 +243,7 @@ services:
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./output:/output  # ✅ CORRECTION : chemin simplifié
+      - ./output:/output
     networks: ["analylit-network"]
 
 networks:

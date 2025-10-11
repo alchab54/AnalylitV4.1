@@ -70,3 +70,9 @@ __pycache__/
 output/logs/               # Logs de monitoring (persistants via volumes)
 downloads/                 # Téléchargements temporaires
 cache/                     # Cache applicatif
+
+# ===================================================================
+# == SCRIPTS DE TEST ATN (INCLUS DANS L'IMAGE) ==
+# ===================================================================
+!atn_workflow_GLORY.py        # ✅ AJOUT : Script de test
+!atn_*.py          
