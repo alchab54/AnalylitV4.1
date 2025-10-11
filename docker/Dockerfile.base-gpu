@@ -1,14 +1,14 @@
 # ===================================================================
-# == ANALYLIT V4.2 - BASE GPU RTX 2060 SUPER OPTIMISÉE
+# == ANALYLIT V4.2 - BASE GPU RTX 2060 SUPER (requirements.txt)
 # ===================================================================
-FROM nvidia/cuda:12.2-devel-ubuntu22.04
+FROM nvidia/cuda:11.8-devel-ubuntu22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG PIP_NO_CACHE_DIR=1
 
 LABEL maintainer="AnalyLit Team" \
       version="4.2-gpu" \
-      description="Base GPU RTX 2060 SUPER optimisée"
+      description="Base GPU RTX 2060 SUPER avec requirements.txt existant"
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -31,28 +31,22 @@ RUN apt-get update && apt-get install -y \
     libxslt1-dev \
     pkg-config \
     && ln -s /usr/bin/python3 /usr/bin/python \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
 # === COUCHE 2: PIP UPGRADE ===
 RUN python -m pip install --upgrade pip setuptools wheel
 
-# === COUCHE 3: PYTORCH CUDA (LA PLUS LOURDE) ===
+# === COUCHE 3: PYTORCH CUDA (compatible RTX 2060 SUPER) ===
 RUN pip install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 \
-    --index-url https://download.pytorch.org/whl/cu118
+    --index-url https://download.pytorch.org/whl/cu118 \
+    && python -c "import torch; print(f'CUDA disponible: {torch.cuda.is_available()}'); print(f'Version PyTorch: {torch.__version__}')"
 
-# === COUCHE 4: DÉPENDANCES LOURDES STABLES ===
-COPY requirements-base.txt /tmp/
-RUN pip install -r /tmp/requirements-base.txt && rm /tmp/requirements-base.txt
+# === COUCHE 4: REQUIREMENTS EXISTANT ===
+COPY requirements.txt /tmp/
+RUN pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
-# === COUCHE 5: DÉPENDANCES MOYENNES ===
-COPY requirements-common.txt /tmp/
-RUN pip install -r /tmp/requirements-common.txt && rm /tmp/requirements-common.txt
-
-# === COUCHE 6: DÉPENDANCES LÉGÈRES ===
-COPY requirements-dev.txt /tmp/
-RUN pip install -r /tmp/requirements-dev.txt && rm /tmp/requirements-dev.txt
-
-# === COUCHE 7: APPLICATION ===
+# === COUCHE 5: APPLICATION ===
 WORKDIR /app
 COPY . /app/
 
