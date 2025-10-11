@@ -94,11 +94,11 @@ services:
       LOG_LEVEL: WARNING  # ✅ Au lieu de INFO/DEBUG
       FLASK_LOG_LEVEL: ERROR
       GUNICORN_LOG_LEVEL: WARNING
+      SOCKETIO_ASYNC_MODE: threading
     command: >
         gunicorn --bind 0.0.0.0:5000
-           --workers=10
-           --worker-class=gevent
-           --worker-connections=1000
+           --workers=4
+           --worker-class=sync
            --max-requests=1000
            --timeout=30
            --reload
