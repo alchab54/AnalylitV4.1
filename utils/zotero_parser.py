@@ -4,12 +4,27 @@ import logging
 from pathlib import Path
 import hashlib
 from bs4 import BeautifulSoup
-
+import re 
 logger = logging.getLogger(__name__)
 
 def generate_pmid_from_title(title: str) -> str:
     """Génère un ID stable basé sur le titre."""
     return hashlib.md5(str(title).encode('utf-8')).hexdigest()[:15]
+
+def extract_year_robust(date_string):
+    """Parser robuste pour les années problématiques"""
+    if not date_string:
+        return None
+    
+    # Nettoyage du format problématique "2022 Jun-Jul 01"
+    date_clean = re.sub(r'(\d{4})\s+\w+-\w+\s+\d+', r'\1', str(date_string))
+    
+    # Extraction directe de l'année
+    year_match = re.search(r'\b(19|20)\d{2}\b', date_clean)
+    if year_match:
+        return int(year_match.group())
+    
+    return None
 
 def parse_zotero_rdf(rdf_path: str, storage_path: str) -> list:
     """
@@ -62,12 +77,17 @@ def parse_zotero_rdf(rdf_path: str, storage_path: str) -> list:
             # Extraction de l'année
             year = None
             date_tag = item.find('dc:date')
-            if date_tag and date_tag.string and '-' in date_tag.string:
+            if date_tag and date_tag.string:
                 try:
-                    year = int(date_tag.string.split('-')[0])
+                    if '-' in date_tag.string:
+                        year = int(date_tag.string.split('-')[0])
+                    else:
+                        # Utiliser le parser robuste pour les formats complexes
+                        year = extract_year_robust(date_tag.string)
                 except (ValueError, IndexError):
                     logger.warning(f"Impossible de parser l'année depuis: {date_tag.string}")
-
+                    year = extract_year_robust(date_tag.string)  # Fallback
+                    
             # Extraction du journal/publication
             journal_tag = item.find('dcterms:isPartOf')
             journal_title = ""
