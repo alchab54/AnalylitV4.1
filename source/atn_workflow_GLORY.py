@@ -141,7 +141,7 @@ class ATNWorkflowGlory:
             if not self.create_project_glory():
                 return False
 
-            if not self.import_articles_glory():
+            if not self.import_articles_via_rq_glory():
                 log("WARNING", "⚠️ Import partiel")
 
             self.monitor_extractions_glory()
@@ -328,39 +328,60 @@ class ATNWorkflowGlory:
             log("ERROR", "❌ Création projet échouée")
             return False
 
-    def import_articles_glory(self) -> bool:
-        """Import par chunks avec monitoring RTX 2060 SUPER"""
-        log_section(f"IMPORT {len(self.articles)} ARTICLES ATN")
+    def import_articles_via_rq_glory(self) -> bool:
+        """Import via RQ Worker (méthode native AnalyLit)"""
+        log_section(f"IMPORT RQ WORKER - {len(self.articles)} ARTICLES ATN")
         
-        if not self.project_id:
-            log("ERROR", "❌ Pas de projet_id")
+        try:
+            # Import via RQ comme le fait l'interface web
+            from redis import Redis
+            from rq import Queue
+            
+            # Connexion Redis (same config que workers)
+            redis_conn = Redis(host='redis', port=6379, db=0)
+            import_queue = Queue('import_queue', connection=redis_conn)
+            
+            success_count = 0
+            
+            # Import par chunks (comme vos workers le font)
+            chunks = [self.articles[i:i+CONFIG["chunk_size"]] 
+                     for i in range(0, len(self.articles), CONFIG["chunk_size"])]
+            
+            for i, chunk in enumerate(chunks):
+                log("PROGRESS", f"⏳ Enqueue chunk {i+1}/{len(chunks)} ({len(chunk)} articles)")
+                
+                # Job RQ avec vos vrais paramètres
+                job_data = {
+                    "articles": chunk,
+                    "source": "zotero_atn",
+                    "project_id": str(self.project_id),
+                    "analysis_mode": "extraction",
+                    "rdf_path": str(ANALYLIT_RDF_PATH),
+                    "storage_path": ZOTERO_STORAGE_PATH
+                }
+                
+                try:
+                    # Enqueue la tâche (même méthode que l'interface)
+                    job = import_queue.enqueue(
+                        'backend.tasks_v4_complete.process_zotero_import',
+                        job_data,
+                        timeout=3600,
+                        job_id=f"atn_import_{i+1}"
+                    )
+                    
+                    success_count += len(chunk)
+                    log("SUCCESS", f"✅ Chunk {i+1} en queue : Job {job.id}")
+                    time.sleep(1)  # Éviter spam
+                    
+                except Exception as e:
+                    log("WARNING", f"⚠️ Chunk {i+1} échoué : {str(e)[:100]}")
+            
+            log("FINAL", f"🏆 {len(chunks)} jobs RQ créés pour {success_count} articles")
+            return success_count > 0
+            
+        except Exception as e:
+            log("ERROR", f"❌ Import RQ échoué : {e}")
             return False
-        
-        chunks = [self.articles[i:i+CONFIG["chunk_size"]] 
-                 for i in range(0, len(self.articles), CONFIG["chunk_size"])]
-        
-        log("INFO", f"📦 {len(chunks)} chunks de {CONFIG['chunk_size']} articles")
-        
-        success_count = 0
-        for i, chunk in enumerate(chunks):
-            log("PROGRESS", f"⏳ Import chunk {i+1}/{len(chunks)} ({len(chunk)} articles)")
-            
-            import_data = {
-                "articles": chunk,
-                "source": "zotero_atn_glory",
-                "project_id": self.project_id
-            }
-            
-            result = api_request_glory("POST", f"/api/projects/{self.project_id}/import", import_data)
-            if result:
-                success_count += len(chunk)
-                log("SUCCESS", f"✅ Chunk {i+1} importé ({len(chunk)} articles)")
-                time.sleep(2)  # Éviter la surcharge GPU
-            else:
-                log("WARNING", f"⚠️ Chunk {i+1} échoué")
-        
-        log("FINAL", f"🏆 Import terminé : {success_count}/{len(self.articles)} articles")
-        return success_count > 0
 
     def monitor_extractions_glory(self):
         """Monitoring des extractions RTX 2060 SUPER"""
