@@ -1,28 +1,21 @@
 services:
-  # Images de base construites localement (profil build-only pour GPU)
   base-cpu:
     build:
       context: .
       dockerfile: docker/Dockerfile.base-cpu
-    image: analylit-base-cpu:latest
+    image: analylit-base:cpu-v4.2
     pull_policy: never
     profiles: ["build-only"]
-    networks:
-      - analylit-network
 
   base-gpu:
     build:
       context: .
       dockerfile: docker/Dockerfile.base-gpu
-      args:
-        BASE_IMAGE: analylit-base-cpu:latest
-    image: analylit-base-gpu:latest
+    image: analylit-base:gpu-v4.2
     pull_policy: never
     profiles: ["build-only"]
     depends_on:
       - base-cpu
-    networks:
-      - analylit-network
 
   db:
     image: postgres:15-alpine

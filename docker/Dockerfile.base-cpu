@@ -3,22 +3,17 @@
 # ===================================================================
 FROM python:3.11-slim
 
-# Arguments de build pour optimisations
 ARG DEBIAN_FRONTEND=noninteractive
 ARG PIP_NO_CACHE_DIR=1
-ARG PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Métadonnées
-LABEL maintainer="AnalyLit Team"
-LABEL version="4.2"
-LABEL description="Base CPU optimisée avec cache multi-couches"
+LABEL maintainer="AnalyLit Team" \
+      version="4.2" \
+      description="Base CPU optimisée avec cache multi-couches"
 
-# Variables d'environnement système
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONPATH=/app \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
     DEBIAN_FRONTEND=noninteractive
 
 # === COUCHE 1: SYSTÈME (change très rarement) ===
@@ -36,35 +31,26 @@ RUN apt-get update && apt-get install -y \
 # === COUCHE 2: PIP UPGRADE (change rarement) ===
 RUN pip install --upgrade pip setuptools wheel
 
-# === COUCHE 3: DÉPENDANCES LOURDES STABLES (change très rarement) ===
+# === COUCHE 3: DÉPENDANCES LOURDES STABLES ===
 COPY requirements-base.txt /tmp/
-RUN pip install --no-deps -r /tmp/requirements-base.txt \
-    && rm /tmp/requirements-base.txt
+RUN pip install -r /tmp/requirements-base.txt && rm /tmp/requirements-base.txt
 
-# === COUCHE 4: DÉPENDANCES MOYENNES (change occasionnellement) ===
+# === COUCHE 4: DÉPENDANCES MOYENNES ===
 COPY requirements-common.txt /tmp/
-RUN pip install -r /tmp/requirements-common.txt \
-    && rm /tmp/requirements-common.txt
+RUN pip install -r /tmp/requirements-common.txt && rm /tmp/requirements-common.txt
 
-# === COUCHE 5: DÉPENDANCES LÉGÈRES (change souvent) ===
+# === COUCHE 5: DÉPENDANCES LÉGÈRES ===
 COPY requirements-dev.txt /tmp/
-RUN pip install -r /tmp/requirements-dev.txt \
-    && rm /tmp/requirements-dev.txt
+RUN pip install -r /tmp/requirements-dev.txt && rm /tmp/requirements-dev.txt
 
-# === COUCHE 6: APPLICATION (change très souvent) ===
+# === COUCHE 6: APPLICATION ===
 WORKDIR /app
-
-# Copy application code (this layer will be rebuilt most often)
 COPY . /app/
 
-# Permissions et nettoyage final
 RUN groupadd -g 1000 appuser && useradd -r -u 1000 -g appuser appuser \
-    && chown -R appuser:appuser /app \
-    && find /app -type f -name "*.pyc" -delete \
-    && find /app -type d -name "__pycache__" -exec rm -rf {} + || true
+    && chown -R appuser:appuser /app
 
 USER appuser
-
 EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:5000/api/health || exit 1
