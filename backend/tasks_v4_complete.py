@@ -23,6 +23,8 @@ from utils.app_globals import PROJECTS_DIR
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
+# Ajoutez cette ligne aux imports existants
+from sqlalchemy import select, func, text
 
 # --- IMPORTS EXTERNES (3rd PARTY) ---
 from sentence_transformers import SentenceTransformer, util
@@ -846,10 +848,11 @@ def import_from_zotero_rdf_task(project_id, rdf_file_path, zotero_storage_path):
     """
     with db.session.begin():
         logger.info(f"Démarrage de l'import RDF pour le projet {project_id}...")
-        
+
         try:
             # Étape 1: Parser le fichier RDF
             articles = parse_zotero_rdf(rdf_file_path, zotero_storage_path)
+
             if not articles:
                 logger.warning("Aucun article trouvé dans le fichier RDF.")
                 return {"status": "completed", "message": "Aucun article trouvé."}
@@ -857,23 +860,23 @@ def import_from_zotero_rdf_task(project_id, rdf_file_path, zotero_storage_path):
             logger.info(f"{len(articles)} articles parsés depuis le RDF.")
 
             # Étape 2: Ajouter les articles à la base de données
-            # (Cette logique peut être externalisée dans une fonction helper si besoin)
             new_articles_count = 0
             for article_data in articles:
-                # Vérifier si l'article existe déjà pour éviter les doublons
+                # ✅ CORRECTION SQLAlchemy 2.0 - SYNTAXE MODERNE
                 existing_article = db.session.scalar(
-                    select(SearchResult).filter_by(project_id=project_id, pmid=article_data['pmid'])
+                    select(SearchResult).where(
+                        SearchResult.project_id == project_id,
+                        SearchResult.pmid == article_data['pmid']
+                    )
                 )
+
                 if not existing_article:
                     new_article = SearchResult(project_id=project_id, **article_data)
                     db.session.add(new_article)
                     new_articles_count += 1
-            
+
             db.session.commit()
             logger.info(f"{new_articles_count} nouveaux articles ajoutés à la base de données.")
-            
-            # (Optionnel) Lancer automatiquement le screening ou l'extraction après l'import
-            # ...
 
             return {"status": "success", "articles_added": new_articles_count}
 
